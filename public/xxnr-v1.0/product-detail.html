@@ -1,0 +1,147 @@
+<!doctype html>
+<html ng-app="xxnr">
+<head>
+    <meta charset="utf-8">
+    <title>商品详情</title>
+    <link rel='icon' href='images\title_logo.png' type='image/png' />
+    <link type="text/css" rel="stylesheet" href="css/style.css">
+    <script src="js/jquery.min.js"></script>
+    <script src="js/angular.min.js"></script>
+    <script src="js/commonConfig.js"></script>
+    <script src="js/commonService.js"></script>
+    <script src="js/payService.js"></script>
+    <script src="js/remoteApiService.js"></script>
+    <script src="js/login/loginController.js"></script>
+    <script src="js/productDetail/productDetailController.js"></script>
+    <script src="js/shoppingCart/shoppingCartController.js"></script>
+    <script src="js/commonFilter.js"></script>
+    <script>
+        $('.header').ready(function(){
+            $(".header").load("header.html");
+        });
+        $('.footer').ready(function(){
+            $(".footer").load("footer.html");
+        })
+    </script>
+</head>
+<body ng-controller="productDetailController">
+<div class="header"></div>
+<div class="wrap nav">
+    <h1 class="left logo"><a href="index.html">新新农人</a></h1>
+    <ul class="left">
+        <li><a href="index.html">首页</a></li>
+        <li><a href="huafei.html">化肥专场</a></li>
+        <li><a href="car.html">汽车专场</a></li>
+        <li><a href="news.html">新农资讯</a></li>
+        <!-- <li><a href="#">新农论坛</a></li> -->
+        <li><a href="company.html">公司简介</a></li>
+    </ul>
+    <div class="right buy" ng-controller="shoppingCartController">
+        <a href="" ng-click="accessShoppingCart()"><em>&nbsp;</em>购物车（{{shoppingCartCount}}）</a>
+    </div>
+</div>
+
+<div class="clear channel3 detail_news">
+    <p class="guide">
+        <a href="index.html">首页</a> ／ <a href="" id="productType" ng-click="product_category()">{{category}}</a> ／ <a href="#f" id="product_title">{{item.name}}</a>
+    </p>
+    <div class="wrap">
+        <div class="product_detail">
+            <div class="product_img"><img ng-src={{item.imgUrl}} alt=""></div>
+            <div class="product_info">
+                <div class="product_info_part1">
+                    <h4 class="product_name">{{item.name}}</h4>
+                    <!--<p class="sub_tit"></p>-->
+                    <p class="price"><sapn>￥{{item.nowPrice}}</sapn><del style="color:#C0C0C0" ng-hide="{{!item.onSale}}">{{item.oldPrice}}</del></p>
+                </div>
+                <!--<div class="search">-->
+                    <!--<div class="search_category">-->
+                        <!--<span class="left search_key">规&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;格</span>-->
+                        <!--<ul class="left">-->
+                            <!--<li><a href="javascript:;" class="current">40kg</a></li>-->
+                            <!--<li><a href="javascript:;">80kg</a></li>-->
+                            <!--<li><a href="javascript:;">120kg</a></li>-->
+                        <!--</ul>-->
+                    <!--</div>-->
+                <!--</div>-->
+                <div class="buy_box">
+                    <div class="left buy_btn">
+                        <a class="btn-reduce" href="" ng-click="reduce()">-</a>
+                        <a class="btn-add" href="" ng-click="add()">+</a>
+                        <input class="text" id="buy-num" ng-model="buy_count">
+                    </div>
+                    <a href="" ng-click="buy()" class="buy">立即购买</a>
+                    <a href="" ng-click="addToShoppingCart()" class="shopping_car">加入购物车</a>
+                </div>
+                <!--<p><a href="" ng-click="showFreight()">我是运费规则</a></p>-->
+            </div>
+        </div>
+    </div>
+    <div class="wrap wrap_intro">
+        <ul class="details_tab">
+            <li ng-repeat="tab in tabs"><a href="" ng-click="show($index)" ng-class="{true:'current', false:''}[tab.isSelected]">{{tab.name}}</a></li>
+        </ul>
+        <div class="intro_list">
+            <div class="intro_box" ng-show="tabs[0].isSelected">
+                <div class="detail">
+                </div>
+                <ul class="intro">
+                    <li><h4>产品特色</h4></li>
+                    <li ng-bind-html="item.detail | trustHtml"></li>
+                </ul>
+            </div>
+            <div class="intro_box" ng-show="tabs[1].isSelected">
+                <div class="canshu" ng-bind-html="item.canshu | trustHtml"></div>
+            </div>
+            <div class="intro_box" ng-show="tabs[2].isSelected">
+                <div class="star_box">
+                    <div class="left percent">
+                        <p class="num">{{item.rate}}%</p>
+                        <p>好评率</p>
+                    </div>
+                    <div class="left stars">
+                        <span class="left txt">建议星级：</span>
+                        <span ng-class={'left':true,'star':true,'star1':stars[1],'star2':stars[2],'star3':stars[3],'star4':stars[4],'star5':stars[5]}></span>
+                    </div>
+                </div>
+                <ul class="comments_list">
+                </ul>
+            </div>
+            <div class="intro_box" ng-show="tabs[3].isSelected">
+                <!-- <div class="product_support">
+                </div> -->
+                <ul class="intro">
+                    <li><h4>起订吨量</h4></li>
+                    <li class="notice">由于品牌方运力对起订吨量有要求，若不够起订量请与附近经销商凑单订购</li>
+                    <li>尿素：40吨</li>
+                    <li>过磷酸钙：60吨</li>
+                    <li>富过磷酸钙：60吨</li>
+                    <li>重过磷酸钙：60吨</li>
+                    <li>有机肥：40吨</li>
+                    <li>复合肥：40吨</li>
+                    <li>液体肥：1吨</li>
+                </ul>
+                <ul class="intro">
+                    <li><h4>运费规则</h4></li>
+                    <li>原则上建议客户自己找货车发货，这样节省运费。也可以由厂家找车发货。运费客户自行与货车司机结算。</li>
+                </ul>
+                <ul class="intro">
+                    <li><h4>付款方式</h4></li>
+                    <li>1. 在线支付宝、银联支付</li>
+                    <li>2. 汇款至新新农人公司账号</li>
+                </ul>
+                <ul class="intro bdnone">
+                    <li><h4>配送流程</h4></li>
+                    <li>1. 财务收到客户汇款确认书。</li>
+                    <li>2. 商务部开具为厂家打款的汇款指令。</li>
+                    <li>3. 商务部联系厂家发货负责人，联系火车进行发货。</li>
+                    <li>4. 商务部与货车司机和客户联系。</li>
+                    <li>5. 商务部进行客户回访沟通，确认准确到货</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="footer"></div>
+</body>
+</html>

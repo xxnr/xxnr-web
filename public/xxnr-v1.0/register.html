@@ -1,0 +1,61 @@
+<!doctype html>
+<html ng-app="xxnr">
+<head>
+    <meta charset="utf-8">
+    <title>注册</title>
+    <link rel='icon' href='images\title_logo.png' type='image/png' />
+    <link type="text/css" rel="stylesheet" href="css/style.css">
+    <script src="js/jquery.min.js"></script>
+    <script src="js/angular.min.js"></script>
+    <script src="js/commonConfig.js"></script>
+    <script src="js/commonService.js"></script>
+    <script src="js/remoteApiService.js"></script>
+    <script src="js/login/loginController.js"></script>
+</head>
+<body ng-controller="loginController">
+<div class="user_wrap">
+    <div class="logo">
+        <a href="index.html">
+            <img src="images/logo.png" alt="">
+        </a>
+    </div>
+    <div class="lenged">
+        <span>使用手机号注册</span>
+    </div>
+    <ul class="register">
+        <li>
+            <input type="text" id="tel" placeholder="请输入您的手机号" ng-model="phoneNumber">
+        </li>
+        <!-- <li class="error">错误提示</li> -->
+        <li class="reg_code">
+            <div class="left">
+                <input type="text" id="dynamic_code" placeholder="请输入验证码" ng-model="code">
+            </div>
+            <div class="right reg_get_code"><a href="" ng-click="sendRegistCode($event)">{{countDown}}</a></div>
+        </li>
+        <li>
+            <input type="password" id="password" placeholder="请输入您的密码" ng-model="newPassword">
+        </li>
+        <li>
+            <input type="password" id="password_cf" placeholder="请输入您的确认密码" ng-model="confirm_newPassword" ng-keydown="regist_keydown($event)">
+        </li>
+        <li class="reg_btn">
+            <a href="" ng-click="regist()">立即注册</a>
+        </li>
+        <li class="argument">
+            <p>点击“立即注册”，即表示您同意并愿意遵守 <a href="" ng-click="showPolicy()">新新农人网站使用协议</a></p>
+        </li>
+        <div class="pop_mask" ng-show="showPolicyPop"></div>
+        <div class="pop_content_policy" ng-show="showPolicyPop">
+            <div class="pop_head">
+                <span class="left">新新农人网站使用协议</span>
+                <a href="" ng-click="hidePolicy()" class="right close"></a>
+            </div>
+            <div class="pop_content_policy_body">
+                <iframe src="resources/privacyPolicy.html" frameborder="false" scrolling="auto" style="border:none;" width="100%" height="90%" allowtransparency="true"></iframe>
+            </div>
+        </div>
+    </ul>
+</div>
+</body>
+</html>

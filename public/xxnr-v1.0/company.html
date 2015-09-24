@@ -1,0 +1,160 @@
+<!doctype html>
+<html ng-app="xxnr">
+<head>
+    <meta charset="utf-8">
+    <title>公司简介-新新农人</title>
+    <link rel='icon' href='images\title_logo.png' type='image/png' />
+    <link type="text/css" rel="stylesheet" href="css/style.css">
+    <meta name="description" content="新新农人公司简介，展示新新农人的合作伙伴、企业理念、公司风采、联系方式，方便您更好的了解我们！">
+    <meta name="keywords" content="农资电商,农资商城,化肥,汽车,电子商务,农村金融,新新农人">
+    <script src="js/jquery.min.js"></script>
+    <script src="js/angular.min.js"></script>
+    <script src="js/commonConfig.js"></script>
+    <script src="js/commonService.js"></script>
+    <script src="js/remoteApiService.js"></script>
+    <script src="js/payService.js"></script>
+    <script src="js/shoppingCart/shoppingCartController.js"></script>
+    <script src="js/responsiveslides.min.js"></script>
+    <script>
+        $('.header').ready(function(){
+            $(".header").load("header.html");
+        });
+        $('.footer').ready(function(){
+            $(".footer").load("footer.html");
+        })
+    </script>
+</head>
+<body>
+<div class="header"></div>
+<div class="wrap nav">
+    <h1 class="left logo"><a href="index.html">新新农人</a></h1>
+    <ul class="left">
+        <li><a href="index.html">首页</a></li>
+        <li><a href="huafei.html">化肥专场</a></li>
+        <li><a href="car.html">汽车专场</a></li>
+        <li><a href="news.html">新农资讯</a></li>
+        <!-- <li><a href="#">新农论坛</a></li> -->
+        <li><a href="#" class="current">公司简介</a></li>
+    </ul>
+    <div class="right buy" ng-controller="shoppingCartController">
+        <a href="" ng-click="accessShoppingCart()"><em>&nbsp;</em>购物车（{{shoppingCartCount}}）</a>
+    </div>
+</div>
+<div class="company">
+    <div class="wrap">
+        <div class="intro">
+            <h3>公司介绍</h3>
+            <p>北京新新农人网络科技有限公司是一家农业互联网电商服务平台，创立于2015年4月，注册资金500万，并在河南郑州设立分公司。公司致力于中国互联网＋农业行业，以O2O为模式进行农业供应链综合服务和信息交互服务。</p>
+            <p>我们坚持以客户为中心，快速响应客户需求，持续为客户创造长期价值进而成就客户。为客户提供有效服务，是我们工作的方向和价值评价的标尺，成就客户就是成就我们自己。</p>
+        </div>
+        <div class="intro clear">
+            <h3>合作伙伴</h3>
+            <div class="related_product">
+                <div class="page">
+                    <a href="javascript:;" class="prev"></a>
+                    <a href="javascript:;" class="next"></a>
+                </div>
+
+                <div class="related_product_list">
+                    <ul>
+                        <li><a href="#"><img src="images/brand1.png" alt=""></a></li>
+                        <li><a href="#"><img src="images/brand2.png" alt=""></a></li>
+                        <li><a href="#"><img src="images/brand3.png" alt=""></a></li>
+                        <li><a href="#"><img src="images/brand4.png" alt=""></a></li>
+                        <li><a href="#"><img src="images/brand5.png" alt=""></a></li>
+                        <li><a href="#"><img src="images/brand1.png" alt=""></a></li>
+                        <li><a href="#"><img src="images/brand2.png" alt=""></a></li>
+                        <li><a href="#"><img src="images/brand3.png" alt=""></a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="intro">
+            <h3>企业理念</h3>
+            <h4>我们的团队</h4>
+            <p>公司创始人均是国内国际一流人才，既有国内顶级私募基金经理，又有互联网专家、农资农业专家和对农村市场非常熟悉的创业者。</p>
+            <p>公司现有核心员工近100名，是一批互联网农业，具有创新精神的年轻团队。我们诚邀有热爱互联网农业的专业人才加入河南新农人网络科技有限公司，共举农业互联网大旗。</p>
+            <h4 class="tit">我们的业务</h4>
+            <p>公司致力于中国互联网＋农业行业，关注新农人、聚焦新农人、服务新农人，以O2O为模式进行农业供应链综合服务和信息交互服务，上游逐步联合大型化肥企业、农机企业、农药生产企业、种子公司，下游拓展遍布各乡镇的农资配送中心与农资服务点。公司旨在打造三个平台，一是工业品下乡的电子商务平台；二是农产品进城的信息撮合平台；三是农村金融服务平台。</p>
+        </div>
+        <div class="intro">
+            <h3>公司风采</h3>
+            <div class="banner">
+                <ul class="rslides">
+                    <img src="images/company1.png" alt="" />
+                    <img src="images/company2.png" alt="" />
+                    <img src="images/company3.png" alt="" />
+                    <img src="images/company4.png" alt="" />
+                </ul>
+            </div>
+        </div>
+        <div class="intro">
+            <h3>联系我们</h3>
+            <div class="intro_contact">
+                <div class="left qrcode">
+                    <p><img src="images/ewcode.jpg" alt=""></p>
+                    <p>官方微信</p>
+                </div>
+                <div class="left address">
+                    <p>官方微信：北京新新农人</p>
+                    <p>公司地址：河南省郑州市金水东路美盛中心1710室</p>
+                    <p>客服电话：400-056-0371</p>
+                    <p>客服邮件：kefu@xinxinnongren.com</p>
+                    <p>客服QQ：2487401812</p>
+                    <p class="notice">如果在购买产品、售后服务、信息咨询等任何方面的问题，欢迎您联系我们</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="footer"></div>
+
+<script>
+    $(function() {
+        $(".rslides").responsiveSlides({
+            auto: true,
+            pager: true,
+            nav: true,
+            speed: 500,
+            namespace: "slide"
+
+        });
+    });
+    function initSlider(options) {
+        var index = 0, liWidth = $(options.wrapLi).find('li').eq(0).width(), imgTotal = $(options.wrapLi).find('li').length;
+        function move() {
+            if(index > imgTotal - options.num) {
+                index = imgTotal - options.num;
+            } else if(index < 0) {
+                index = 0;
+            } else {
+                $(options.wrapLi).stop().animate({
+                    left : -(liWidth * index) - 25 * index + 'px'
+                }, 300);
+            }
+        };
+
+        $(options.next).click(function() {
+            index++;
+            move();
+            return false;
+        });
+        $(options.prev).click(function() {
+            index--;
+            move();
+            return false;
+        });
+    }
+    $(function(){
+        initSlider({
+            wrapLi : '.related_product_list ul',
+            num : 4,
+            next : '.company .next',
+            prev : '.company .prev'
+        });
+
+    })
+</script>
+</body>
+</html>

@@ -1,0 +1,37 @@
+name                      : E-shop
+version                   : 1.0.2
+author                    : Peter Širka
+
+// A relative URL address into the eshop management
+manager-url               : /$manager
+
+// Hidden super admin in the form username:password
+manager-superadmin        : admin:admin
+
+// Custom SMTP settings
+mail.smtp                 : YOUR.SMTPSERVER.COM
+// mail.smtp.options         : {"user":"","password":"","timeout":2000}
+
+// Gmail SMTP settings
+// mail.smtp                : smtp.gmail.com
+// mail.smtp.options        : {"port":465,"secure":true,"user":"ENTER_YOUR_EMAIL","password":"ENTER_YOUR_PASSWORD","rejectUnauthorized":true}
+
+// Office365 SMTP settings
+// mail.smtp                : smtp.office365.com
+// mail.smtp.options        : {"port":587,"secure":false,"user":"ENTER_YOUR_EMAIL","password":"ENTER_YOUR_PASSWORD","tls":{"ciphers":"SSLv3"}}
+
+// Image convertor for resizing of pictures
+// Default image converter: im = ImageMagick, gm = GraphicsMagick
+default-image-converter		: gm
+
+// session cookie name
+usercookie					: __user
+
+// vcode valid time 10 mins
+vcode_resend_valid			: 600000
+
+// vcode next send time
+vcode_resend_interval		: 60000
+
+// send phone message options
+phone_message_options		: {"userid":"617","account":"xinxinnongren","password":"xxnr201505","url":"/sms.aspx?","http_request_options":{"host":"123.57.51.191","port":8888,"method":"POST"}}

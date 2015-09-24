@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>微信教育页</title>
+	<style>
+	html, body{margin:0;padding:0;font-family:"Microsoft YaHei",sans-serif;background:#fff;color:#333;}
+	.wrap{width:238px;margin-top: -1px;}
+	.header-wrap{padding:12px 13px;height:40px;line-height:38px;font-size:18px;}
+	.header-wrap img {float:left;margin-right:13px;vertical-align: middle;}
+	.container{border-top:1px solid #ddd;}
+	.container-wrap li{padding:0;margin:0;margin-bottom: 8px;list-style:none;line-height:24px;font-size:14px;color:#333;}
+	.container-wrap{margin: 0; padding:8px 10px; margin-bottom: -8px;}
+	</style>
+</head>
+<body>
+	<div class="wrap">
+		<div class="header"><div class="header-wrap"><img src="logo40.png" alt="">"微信聊天" 已启用</div></div>
+		<div class="container">
+			<ul class="container-wrap">
+				<li>快捷输入、实时沟通、随时分享</li>
+				<li><button onclick="javascript:sendPicture()">发送图片</button>
+				<li><button onclick="javascript:sendText()">发送文本</button>
+				<li><button onclick="javascript:closeWindow()">关闭窗口</button>
+			</ul>
+		</div>
+	</div>
+	<script>
+		function sendPicture() {
+			qqbrowser.extension.sendMessage({msg:"sendPicture", url:"http://e.hiphotos.baidu.com/image/w%3D2048/sign=8b2abc1d99504fc2a25fb705d1e5e711/d058ccbf6c81800abddcb91bb33533fa828b47ed.jpg"});
+		}
+		
+		function sendText() {
+			qqbrowser.extension.sendMessage({msg:"sendText", text:"新年好！"});
+		}
+		
+		function closeWindow() {
+			qqbrowser.extension.sendMessage({msg:"closeWindow"});
+		}
+	</script>
+</body>
+</html>

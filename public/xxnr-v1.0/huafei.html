@@ -1,0 +1,52 @@
+<!doctype html>
+<html ng-app="xxnr">
+<head>
+    <meta charset="utf-8">
+    <title>化肥专场-新新农人</title>
+    <link rel='icon' href='images\title_logo.png' type='image/png' />
+    <link type="text/css" rel="stylesheet" href="css/style.css">
+    <meta name="description" content="新新农人化肥专场，提供多种品牌优质化肥商品的最新报价、导购、图片等相关信息，快速了解化肥商品信息，为您提供放心的网购体验！">
+    <meta name="keywords" content="农资电商,农资商城,化肥,电子商务,农村金融,新新农人">
+    <script src="js/jquery.min.js"></script>
+    <script src="js/angular.min.js"></script>
+    <script src="js/commonConfig.js"></script>
+    <script src="js/commonService.js"></script>
+    <script src="js/payService.js"></script>
+    <script src="js/remoteApiService.js"></script>
+    <script src="js/category/huafeiController.js"></script>
+    <script src="js/category/categoryController.js"></script>
+    <script src="js/shoppingCart/shoppingCartController.js"></script>
+    <script src="js/category/categoryDirective.js"></script>
+    <script src="js/login/loginController.js"></script>
+    <script>
+        $('.header').ready(function(){
+            $(".header").load("header.html");
+        })
+        $('.footer').ready(function(){
+            $(".footer").load("footer.html");
+        })
+    </script>
+</head>
+<body ng-controller="huafeiController">
+<div class="header" id="HF"></div>
+<div class="wrap nav">
+    <h1 class="left logo"><a href="index.html">新新农人</a></h1>
+    <ul class="left">
+        <li><a href="index.html">首页</a></li>
+        <li><a href="#" class="current">化肥专场</a></li>
+        <li><a href="car.html">汽车专场</a></li>
+        <li><a href="news.html">新农资讯</a></li>
+        <!-- <li><a href="#">新农论坛</a></li> -->
+        <li><a href="company.html">公司简介</a></li>
+    </ul>
+    <div class="right buy" ng-controller="shoppingCartController">
+        <a href="" ng-click="accessShoppingCart()"><em>&nbsp;</em>购物车（{{shoppingCartCount}}）</a>
+    </div>
+</div>
+
+<div class="clear channel3 fenye" ng-controller="categoryController">
+    <category></category>
+</div>
+<div class="footer"></div>
+</body>
+</html>
