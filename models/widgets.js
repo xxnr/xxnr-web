@@ -1,10 +1,25 @@
 var Widget = NEWSCHEMA('Widget')
+
+/*
 Widget.define('id', String);
 Widget.define('name', String, true);
 Widget.define('body', String);
 Widget.define('icon', 'String(20)');
 Widget.define('istemplate', Boolean);
 Widget.define('datecreated', Date);
+*/
+
+var widgetSchema = {
+    'id': String,
+    'name': {type: String, required: true},
+    'body': String,
+    'icon': String,
+    'istemplate': Boolean,
+    'datecreated': Date,	
+};
+
+Widget.DEFINE(widgetSchema);
+var db = DB('widgets', widgetSchema, DB.BUILT_IN_DB);
 
 // Sets default values
 Widget.setDefault(function(name) {
@@ -21,7 +36,7 @@ Widget.setQuery(function(error, options, callback) {
 		return { id: doc.id, icon: doc.icon, name: doc.name, istemplate: doc.istemplate };
 	};
 
-	DB('widgets').all(filter, function(err, docs, count) {
+	db.all(filter, function(err, docs, count) {
 		callback(docs);
 	});
 });
@@ -45,7 +60,7 @@ Widget.setGet(function(error, model, options, callback) {
 	};
 
 	// Gets a specific document
-	DB('widgets').one(filter, function(err, doc) {
+	db.one(filter, function(err, doc) {
 
 		if (doc)
 			return callback(doc);
@@ -66,7 +81,7 @@ Widget.setRemove(function(error, id, callback) {
 	};
 
 	// Updates database file
-	DB('widgets').update(updater, callback);
+	db.update(updater, callback);
 });
 
 // Saves the widget into the database
@@ -92,11 +107,11 @@ Widget.setSave(function(error, model, options, callback) {
 	};
 
 	// Updates database file
-	DB('widgets').update(updater, function() {
+	db.update(updater, function() {
 
 		// Creates record if not exists
 		if (count === 0)
-			DB('widgets').insert(model);
+			db.insert(model);
 
 		// Returns response
 		callback(SUCCESS(true));
@@ -105,7 +120,7 @@ Widget.setSave(function(error, model, options, callback) {
 
 // Clears widget database
 Widget.addWorkflow('clear', function(error, model, options, callback) {
-	DB('widgets').clear(NOOP);
+	db.clear(NOOP);
 	callback(SUCCESS(true));
 });
 
@@ -123,7 +138,7 @@ Widget.addWorkflow('load', function(error, model, widgets, callback) {
 			output[doc.id] = doc;
 	};
 
-	DB('widgets').all(filter, function() {
+	db.all(filter, function() {
 		callback(output);
 	});
 });

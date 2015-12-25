@@ -1,6 +1,8 @@
 var tools = require('../common/tools');
 
 var VCode = NEWSCHEMA('VCode');
+
+/*
 VCode.define('id', String);					// vcode ID
 VCode.define('code_type', String);			// register, resetpwd..
 VCode.define('code', String);				// random string.
@@ -9,6 +11,21 @@ VCode.define('target_type', String);		// phone, email or session.
 VCode.define('valid_time', Date);			// valid time
 VCode.define('start_time', Date);			// start time
 VCode.define('ttl', Number);				// times to live
+*/
+
+var vcodeSchema = {
+    'id': String,					// vcode ID
+    'code_type': String,			// register, resetpwd..
+    'code': String,				// random string.
+    'target': String,				// phone number or email address or session id.
+    'target_type': String,		// phone, email or session.
+    'valid_time': Date,			// valid time
+    'start_time': Date,			// start time
+    'ttl': Number,				// times to live
+};
+
+VCode.DEFINE(vcodeSchema);
+var db = DB('vcodes', vcodeSchema);
 
 // Sets default values
 VCode.setDefault(function(name) {
@@ -36,7 +53,7 @@ VCode.addWorkflow('create', function(error, model, options, callback) {
     //vcode.start_time = nowtime.getTime();
 
     // Inserts vcode into the database
-	DB('vcodes').insert(vcode, function(err) {
+	db.insert(vcode, function(err) {
 		if (err) {
             return callback(err, null);
         }
@@ -82,7 +99,9 @@ VCode.addWorkflow('verify', function(error, model, options, callback) {
 				return doc;
 			}
 			// Updates vcode into the database
-			DB('vcodes').update(updater, function(err) {
+			var queryoptions = {target:vcode.target, code_type:vcode.code_type};
+			var operatoroptions = {ttl:vcode.ttl};
+			db.update(db.type == DB.MONGO_DB ? {query:queryoptions, operator:{$set:operatoroptions}} : updater, function(err) {
                 if (err) {
                     return callback(err);
                 }
@@ -90,22 +109,26 @@ VCode.addWorkflow('verify', function(error, model, options, callback) {
                 return callback(null, {'type':2,'data':'验证码输入错误'});
             });
         } else {
-			// Filter for removing
-			var updater = function(doc) {
-				if (vcode.target && vcode.code_type && doc.target === vcode.target && doc.code_type === vcode.code_type)
-					return null;
-
-				return doc;
-			};
-
-			// Updates database file
-			DB('vcodes').update(updater,  function(err) {
-				if (err) {
+        	var returncall = function(err) {
+    			if (err) {
                     return callback(err);
                 }
 
                 return callback(null, {'type':1,'data':vcode});
-            });
+        	};
+
+        	if (db.type == DB.MONGO_DB) {
+        		db.remove({query:{target:vcode.target, code_type:vcode.code_type}}, returncall(err));
+        	} else {
+				// Filter for removing
+				var updater = function(doc) {
+					if (vcode.target && vcode.code_type && doc.target === vcode.target && doc.code_type === vcode.code_type)
+						return null;
+
+					return doc;
+				};
+				db.update(updater, returncall(err));
+	        }
         }
     });
 });
@@ -123,7 +146,7 @@ VCode.addWorkflow('update', function(error, model, options, callback) {
 	};
 
 	// Updates database file
-	DB('vcodes').update(updater,  function(err) {
+	db.update(db.type == DB.MONGO_DB ? {query:{id:model.id}, operator:{$set:model}} : updater,  function(err) {
 		if (err) {
             return callback(err);
         }
@@ -161,7 +184,12 @@ function getByIdentity(id, target, code_type, callback) {
 	};
 
 	// Gets a specific document from DB
-	DB('vcodes').one(filter, function(err, doc) {
+	var queryoptions = {};
+	if (id)
+		queryoptions = {id:id};
+	if (target && code_type)
+		queryoptions = {target:target,code_type:code_type};
+	db.one(db.type == DB.MONGO_DB ? {query: queryoptions} : filter, function(err, doc) {
 		if (err) {
 			return callback(err, null);
 		} else {

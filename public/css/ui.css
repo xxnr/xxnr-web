@@ -1,12 +1,13 @@
 input:-ms-input-placeholder, input:-webkit-input-placeholder, input:-moz-input-placeholder { color: silver; }
 input[type="text"]:disabled, input[type="password"]:disabled, select:disabled { background-color: #F0F0F0; cursor: not-allowed; color: silver; }
 button { outline: 0; }
+ul {list-style-type: none;padding:0;margin:0}
 
 .hidden { display: none; }
 
 .ui-grid-page { font-size: 14px; color: silver; margin-bottom: 10px; }
 .ui-grid tbody tr:hover { background-color: #F0F0F0; }
-.ui-grid td, .ui-grid th { text-overflow:ellipsis;white-space:nowrap;overflow:hidden; padding: 0 8px; height: 25px; border-top: 1px solid #E0E0E0; vertical-align: middle; line-height: 16px; }
+.ui-grid td, .ui-grid th { text-overflow:ellipsis;white-space:nowrap;overflow:hidden; padding: 0 8px; height: 25px; border: 1px solid #E0E0E0; vertical-align: middle; line-height: 16px; }
 .ui-grid .checkbox { width: 30px !important; padding-right: 0; }
 .ui-grid .checkbox input { cursor: pointer; float: left; margin-top: -2px; }
 .ui-grid table { table-layout: fixed; font-size: 12px; margin-bottom: 15px; }

@@ -20,6 +20,10 @@ $(document).ready(function() {
 	resizer();
 });
 
+var redirectToHomePage = function(){
+    jRouting.redirect(managerurl + '/' + su.roles[0] + '/');
+};
+
 jRouting.route(managerurl + '/', function() {
 
 	if (can('dashboard')) {
@@ -27,44 +31,82 @@ jRouting.route(managerurl + '/', function() {
 		return;
 	}
 
-	jRouting.redirect(managerurl + '/' + su.roles[0] + '/');
+    redirectToHomePage();
 });
 
-if (can('orders')) {
-	jRouting.route(managerurl + '/orders/', function() {
-		SET('common.page', 'orders');
-	});
-}
+jRouting.route(managerurl + '/orders/', function() {
 
-if (can('products')) {
-	jRouting.route(managerurl + '/products/', function() {
-		SET('common.page', 'products');
-	});
-}
+    if (can('orders')) {
+        SET('common.page', 'orders');
+        return;
+    }
 
-if (can('newsletter')) {
-	jRouting.route(managerurl + '/newsletter/', function() {
-		SET('common.page', 'newsletter');
-	});
-}
+    redirectToHomePage();
+});
 
-if (can('settings')) {
-	jRouting.route(managerurl + '/settings/', function() {
-		SET('common.page', 'settings');
-	});
-}
+jRouting.route(managerurl + '/products/', function() {
 
-if (can('pages')) {
-	jRouting.route(managerurl + '/pages/', function() {
-		SET('common.page', 'pages');
-	});
-}
+    if (can('products')) {
+        SET('common.page', 'products');
+        return;
+    }
 
-if (can('system')) {
-	jRouting.route(managerurl + '/system/', function() {
-		SET('common.page', 'system');
-	});
-}
+    jRouting.redirect(managerurl + '/' + su.roles[0] + '/');
+});
+
+jRouting.route(managerurl + '/users/', function() {
+    if (can('users')) {
+        SET('common.page', 'users');
+        return;
+    }
+
+    redirectToHomePage();
+});
+
+jRouting.route(managerurl + '/news/', function() {
+    if (can('news')) {
+        SET('common.page', 'news');
+        return;
+    }
+
+    redirectToHomePage();
+});
+
+jRouting.route(managerurl + '/newsletter/', function() {
+    if (can('newsletter')) {
+        SET('common.page', 'newsletter');
+        return;
+    }
+
+    redirectToHomePage();
+});
+
+jRouting.route(managerurl + '/settings/', function() {
+    if (can('settings')) {
+        SET('common.page', 'settings');
+        return;
+    }
+
+    redirectToHomePage();
+});
+
+jRouting.route(managerurl + '/pages/', function() {
+    if (can('pages')) {
+        SET('common.page', 'pages');
+        return;
+    }
+
+    redirectToHomePage();
+});
+
+jRouting.route(managerurl + '/system/', function() {
+    if (can('system')) {
+        SET('common.page', 'system');
+        return;
+    }
+
+    redirectToHomePage();
+});
 
 jRouting.on('location', function(url) {
 	var nav = $('nav');
@@ -142,3 +184,18 @@ function getSelectionStartNode(context){
 	var startNode = (node.nodeName == "#text" ? node.parentNode : node);
 	return startNode;
 }
+
+angular.module('xxnr_manager',['ngCookies'])
+    .service('loginService', function($cookieStore) {
+        var tokenKey = "be_token";
+        this.logout = function () {
+            $cookieStore.remove(tokenKey, {path: "/", domain: ".xinxinnongren.com"});
+            $cookieStore.remove(tokenKey, {path: "/"});
+        };
+    })
+    .controller('managerController', function($scope, loginService) {
+        $scope.logout = function(){
+            loginService.logout();
+            window.location.reload();
+        }
+    });

@@ -1,4 +1,6 @@
 var Contact = NEWSCHEMA('Contact');
+
+/*
 Contact.define('id', String);
 Contact.define('firstname', 'String(40)', true);
 Contact.define('lastname', 'String(40)', true);
@@ -7,7 +9,22 @@ Contact.define('message', String, true);
 Contact.define('phone', 'String(20)');
 Contact.define('language', 'String(3)');
 Contact.define('ip', 'String(80)');
-Contact.define('datecreated', Date);
+Contact.define('datecreated', Date);*/
+
+var contactSchema = {
+	'id': String,
+	'firstname': {type: String, required: true},
+	'lastname': {type: String, required: true},
+	'email': {type: String, required: true},
+	'message': {type: String, required: true},
+	'phone': String,
+	'language': String,
+	'ip': String,
+	'datecreated': Date,
+};
+
+Contact.DEFINE(contactSchema);
+var db = DB('contactforms', contactSchema, DB.BUILT_IN_DB);
 
 // Saves the model into the database
 Contact.setSave(function(error, model, options, callback) {
@@ -17,7 +34,7 @@ Contact.setSave(function(error, model, options, callback) {
 	model.datecreated = (new Date()).format();
 
 	// Saves to database
-	DB('contactforms').insert(model);
+	db.insert(model);
 
 	// Returns response
 	callback(SUCCESS(true));

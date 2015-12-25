@@ -7,6 +7,7 @@ SuperUser.define('password', String, true);
 SuperUser.define('roles', '[String]');
 
 var Settings = NEWSCHEMA('Settings');
+
 Settings.define('currency', String, true);
 Settings.define('currency_entity', String);
 Settings.define('emailcontactform', String, true);
@@ -25,6 +26,31 @@ Settings.define('paypaluser', String);
 Settings.define('paypalpassword', String);
 Settings.define('paypalsignature', String);
 Settings.define('paypaldebug', Boolean);
+
+//var settingSchema = {
+//    'currency': {type: String, required: true},
+//    'currency_entity': String,
+//    'emailcontactform': {type: String, required: true},
+//    'emailorderform': {type: String, required: true},
+//    'emailreply': {type: String, required: true},
+//    'emailsender': {type: String, required: true},
+//    'url': {type: String, required: true},
+//    'templates': [String],
+//    'navigations': [String],
+//    'deliverytypes': [String],
+//    'defaultorderstatus': String,
+//	'users': {subschemaName:"SuperUser", type: [{
+//        'login': {type:String, required:true},
+//        'password': {type:String, required:true},
+//        'roles': [String]
+//	}] },
+//	'paypaluser': String,
+//    'paypalpassword': String,
+//    'paypalsignature': String,
+//    'paypaldebug': Boolean,
+//};
+//
+//Settings.DEFINE(settingSchema);
 
 // Saves settings into the file
 Settings.setSave(function(error, model, options, callback) {

@@ -4,19 +4,20 @@ module.exports = {
             var result = {};
 
             product.discount = product.discount || 1.0;
-            product.discountPrice = product.discountPrice || calculatePrice(product);
+            product.discountPrice = product.discountPrice || calculateDiscountPrice(product);
 
             for(var i in product){
                 if(product.hasOwnProperty(i)){
-                    if(i == "body"){
+                    /*if(i == "body"){
                         result["description"] = product.body;
                         continue;
-                    }
+                    }*/
 
                     if(i == "pictures"){
                         var pic = product.pictures[0];
-                        result.imgUrl = "/images/original/" + product.linker_category + '/' + pic + ".jpg?category=" + product.linker_category;
+                        result.imgUrl = "/images/large/" + product.linker_category + '/' + pic + ".jpg?category=" + product.linker_category;
                         result.thumbnail = "/images/thumbnail/" + product.linker_category + '/' + pic + ".jpg?category=" + product.linker_category + '&thumb=true';
+                        result.originalUrl = "/images/original/" + product.linker_category + '/' + pic + ".jpg";
                         continue;
                     }
 
@@ -31,7 +32,7 @@ module.exports = {
             
             // TODO:
             if(typeof result.payWithScoresLimit == 'undefined'){
-                result.payWithScoresLimit = result.price * 0.2;
+                result.payWithScoresLimit = 0;
             }
             
             // TODO: specification, comments, 
@@ -71,19 +72,19 @@ module.exports = {
                 }
             }
 
-            category.url = category.url || (encodeURI(category.name) + '.html');
-            category.imgUrl = category.imgUrl || ("images\\" + encodeURI(category.name) + '.png');
-            category.title = category.title || category.name;
+            result.url = result.url || (encodeURI(result.name) + '.html');
+            result.imgUrl = result.imgUrl || ("images/" + encodeURI(result.id) + '.png');
+            result.title = result.title || result.name;
             
             return result;
         };
         
         this.convertCategories = function(categories, mapCategoriesObjects){
             mapCategoriesObjects = mapCategoriesObjects || {};
-            var result = [];
+            var result = {categories:[]};
 
             for(var i=0; i<categories.length; i++){
-                result.push(this.convertCategory(categories[i], mapCategoriesObjects.hasOwnProperty(categories[i].linker) ? mapCategoriesObjects[categories[i].linker] : null));
+                result.categories.push(this.convertCategory(categories[i], mapCategoriesObjects.hasOwnProperty(categories[i].linker) ? mapCategoriesObjects[categories[i].linker] : null));
             }
 
             return result;
@@ -92,3 +93,13 @@ module.exports = {
 };
 
 var calculatePrice = require('../common/calculator').calculatePrice;
+var calculateDiscountPrice = require('../common/calculator').calculateDiscountPrice;
+
+exports.convertOptions = function(options, mapping){
+    for(var i in mapping){
+        if(mapping.hasOwnProperty(i) && options.hasOwnProperty(i) && i!=mapping[i]){
+            options[mapping[i]] = options[i];
+            delete options[i];
+        }
+    }
+};

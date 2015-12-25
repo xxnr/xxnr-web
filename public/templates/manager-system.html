@@ -48,7 +48,7 @@
 		</tr>
 	</table>
 	<br />
-	<div class="b">@(Clearing)</div>
+	<!-- <div class="b">@(Clearing)</div>
 	<br />
 	<table class="table table-bordered">
 		<tr>
@@ -80,7 +80,7 @@
 			<td class="ui-center bg-smoke" style="width:120px"><a href="javascript:void(0)" data-component="click" data-component-path="system_clear_webcounter">@(Clear now)</a></td>
 		</tr>
 	</table>
-	<br />
+	<br /> -->
 	<br />
 </div>
 
@@ -111,81 +111,81 @@ function system_backup_website() {
 	}, 5000);
 }
 
-function system_clear_products() {
-	if (!confirm('@(Please, confirm clearing of the database.)'))
-		return;
-	loading(true);
-	$.components.GET(managerurl + '/api/products/clear/', null, function() {
-		success();
-		if (window.products_refresh)
-			window.products_refresh(true);
-	});
-}
+// function system_clear_products() {
+// 	if (!confirm('@(Please, confirm clearing of the database.)'))
+// 		return;
+// 	loading(true);
+// 	$.components.GET(managerurl + '/api/products/clear/', null, function() {
+// 		success();
+// 		if (window.products_refresh)
+// 			window.products_refresh(true);
+// 	});
+// }
 
-function system_clear_orders() {
-	if (!confirm('@(Please, confirm clearing of the database.)'))
-		return;
-	loading(true);
-	$.components.GET(managerurl + '/api/orders/clear/', null, function() {
-		success();
-		if (window.orders_refresh)
-			window.orders_refresh(true);
-	});
-}
+// function system_clear_orders() {
+// 	if (!confirm('@(Please, confirm clearing of the database.)'))
+// 		return;
+// 	loading(true);
+// 	$.components.GET(managerurl + '/api/orders/clear/', null, function() {
+// 		success();
+// 		if (window.orders_refresh)
+// 			window.orders_refresh(true);
+// 	});
+// }
 
-function system_clear_pages() {
-	if (!confirm('@(Please, confirm clearing of the database.)'))
-		return;
-	loading(true);
-	$.components.GET(managerurl + '/api/pages/clear/', null, function() {
-		success();
-		if (window.pages_refresh)
-			window.pages_refresh();
-	});
-}
+// function system_clear_pages() {
+// 	if (!confirm('@(Please, confirm clearing of the database.)'))
+// 		return;
+// 	loading(true);
+// 	$.components.GET(managerurl + '/api/pages/clear/', null, function() {
+// 		success();
+// 		if (window.pages_refresh)
+// 			window.pages_refresh();
+// 	});
+// }
 
-function system_clear_widgets() {
-	if (!confirm('@(Please, confirm clearing of the database.)'))
-		return;
-	loading(true);
-	$.components.GET(managerurl + '/api/widgets/clear/', null, function() {
-		success();
-		if (window.widgets_refresh)
-			window.widgets_refresh();
-	});
-}
+// function system_clear_widgets() {
+// 	if (!confirm('@(Please, confirm clearing of the database.)'))
+// 		return;
+// 	loading(true);
+// 	$.components.GET(managerurl + '/api/widgets/clear/', null, function() {
+// 		success();
+// 		if (window.widgets_refresh)
+// 			window.widgets_refresh();
+// 	});
+// }
 
-function system_clear_files() {
-	if (!confirm('@(Please, confirm clearing of the database.)'))
-		return;
-	loading(true);
-	$.components.GET(managerurl + '/api/files/clear/', null, function() {
-		success();
-	});
-}
+// function system_clear_files() {
+// 	if (!confirm('@(Please, confirm clearing of the database.)'))
+// 		return;
+// 	loading(true);
+// 	$.components.GET(managerurl + '/api/files/clear/', null, function() {
+// 		success();
+// 	});
+// }
 
-function system_clear_newsletter() {
-	if (!confirm('@(Please, confirm clearing of the database.)'))
-		return;
-	loading(true);
-	$.components.GET(managerurl + '/api/newsletter/clear/', null, function() {
-		success();
-		if (window.newsletter_refresh)
-			window.newsletter_refresh(true);
-	});
-}
+// function system_clear_newsletter() {
+// 	if (!confirm('@(Please, confirm clearing of the database.)'))
+// 		return;
+// 	loading(true);
+// 	$.components.GET(managerurl + '/api/newsletter/clear/', null, function() {
+// 		success();
+// 		if (window.newsletter_refresh)
+// 			window.newsletter_refresh(true);
+// 	});
+// }
 
-function system_clear_webcounter() {
-	if (!confirm('@(Please, confirm clearing of the database.)'))
-		return;
-	loading(true);
-	$.components.GET(managerurl + '/api/dashboard/clear/', null, function() {
-		success();
-		setTimeout(function() {
-			window.location.reload(true);
-		}, 1500);
-	});
-}
+// function system_clear_webcounter() {
+// 	if (!confirm('@(Please, confirm clearing of the database.)'))
+// 		return;
+// 	loading(true);
+// 	$.components.GET(managerurl + '/api/dashboard/clear/', null, function() {
+// 		success();
+// 		setTimeout(function() {
+// 			window.location.reload(true);
+// 		}, 1500);
+// 	});
+// }
 
 $('#system_restore_backup').on('change', function(e) {
 	e.preventDefault();

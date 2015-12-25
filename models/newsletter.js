@@ -2,9 +2,18 @@ var Fs = require('fs');
 var filename = F.path.databases('newsletter.csv');
 
 var Newsletter = NEWSCHEMA('Newsletter');
+
 Newsletter.define('email', 'String(200)', true);
 Newsletter.define('ip', 'String(80)');
 Newsletter.define('language', 'String(3)');
+
+//var newsletterSchema = {
+//	'email': {type: String, required: true},
+//    'ip': String,
+//    'language': String,
+//};
+//
+//Newsletter.DEFINE(newsletterSchema);
 
 // Saves the model into the database
 Newsletter.setSave(function(error, model, options, callback) {

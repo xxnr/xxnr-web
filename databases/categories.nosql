@@ -1,2 +1,2 @@
-{"id":"531680A5", "parent":null, "productImgSize":{"width":260, "height":400}, "productThumbSize":{"width":220, "height":220}, "name":"化肥", "title":"农肥产品", "url":"huafei.html"}
-{"id":"6C7D8F66", "parent":null, "productImgSize":{"width":260, "height":400}, "productThumbSize":{"width":126, "height":172}, "name":"汽车", "title":"汽车", "url":"car.html"}
+{"id":"531680A5", "parent":null, "productImgSize":{"width":350, "height":350}, "productThumbSize":{"width":190, "height":190}, "name":"化肥", "title":"农肥产品", "url":"huafei_list.html"}
+{"id":"6C7D8F66", "parent":null, "productImgSize":{"width":350, "height":350}, "productThumbSize":{"width":190, "height":190}, "name":"汽车", "title":"汽车", "url":"car_list.html"}

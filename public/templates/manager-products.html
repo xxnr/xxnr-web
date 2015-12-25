@@ -1,19 +1,20 @@
 <div class="filter">
 	<div class="container">
-		<div class="caption"><span class="fa fa-navicon mr5"></span> @(Products)</div>
+		<div class="caption"><span class="fa fa-navicon mr5"></span> @(商品管理)</div>
 		<div class="row">
 			<div class="col-md-3 col-sm-6 m">
-				<div data-component="textbox" data-component-path="products.filter.search" data-placeholder="@(Search products ...)" data-control-icon="fa-search"></div>
+				<div data-component="textbox" data-component-path="products.filter.search" data-placeholder="@(查找商品...)" data-control-icon="fa-search"></div>
 				<div class="help" data-component="template" data-component-path="products.info"><script type="text/html">{{ count | pluralize(@('items','item','items','items')) }} / {{ pages | pluralize(@('pages','page','pages','pages')) }}</script></div>
 			</div>
 			<div class="col-md-3 col-sm-6 m">
-				<div data-component="dropdown" data-component-path="products.filter.category" data-source="products.categories" data-empty="true" data-empty-text="@(All products)" data-source-value="linker"></div>
+				<div data-component="dropdown" data-component-path="products.filter.category" data-source="products.categories" data-empty="true" data-empty-text="@(全部商品)" data-source-value="linker"></div>
 			</div>
 			<div class="col-md-6 m">
 				<div class="row">
-					<div class="col-xs-4"><a href="javascript:void(0)" data-component="click" class="linkbutton" data-component-path="products_new"><span class="fa fa-plus-circle"></span>@(Add product)</a></div>
-					<div class="col-xs-4"><a href="javascript:void(0)" data-component="click" class="linkbutton" data-component-path="products_import"><span class="fa fa-cloud-upload"></span>@(Import CSV)</a></div>
-					<div class="col-xs-4"><a href="javascript:void(0)" data-component="click" class="linkbutton" data-component-path="products_category"><span class="fa fa-folder"></span>@(Replace category)</a></div>
+					<div class="col-xs-3"><a href="javascript:void(0)" data-component="click" class="linkbutton" data-component-path="products_huafei_new"><span class="fa fa-plus-circle"></span>@(新增化肥)</a></div>
+					<div class="col-xs-3"><a href="javascript:void(0)" data-component="click" class="linkbutton" data-component-path="products_qiche_new"><span class="fa fa-plus-circle"></span>@(新增汽车)</a></div>
+					<!-- <div class="col-xs-3"><a href="javascript:void(0)" data-component="click" class="linkbutton" data-component-path="products_import"><span class="fa fa-cloud-upload"></span>@(Import CSV)</a></div> -->
+					<div class="col-xs-3"><a href="javascript:void(0)" data-component="click" class="linkbutton" data-component-path="products_category"><span class="fa fa-folder"></span>@(更新分类)</a></div>
 				</div>
 			</div>
 		</div>
@@ -21,25 +22,32 @@
 </div>
 
 <div class="container">
-	<div data-component="grid" data-component-path="products.grid" data-max="auto" data-options-page="@(Page: #)" data-options-button="@(Show more products)" data-component-id="products.grid">
+	<div data-component="grid" data-component-path="products.grid" data-max="auto" data-options-page="@(Page: #)" data-options-button="@(查看更多商品)" data-component-id="products.grid">
 		<script type="text/html">
 		<tr>
-			<td>{{ if pictures && pictures.length }}<span class="fa fa-photo mr5"></span>{{ fi }} {{ if istop }}<b class="mr5 fs11 red">@(TOP)</b>{{ fi }}{{ name }}</td>
-			<td style="width:200px" class="silver hidden-xs"><span class="fa fa-folder"></span> {{ category }}</td>
-			<td style="width:100px" class="ui-right active">{{ price | price(2) }}</td>
-			<td style="width:80px" class="ui-right">
-				<button name="edit" title="@(Edit)"><span class="fa fa-pencil"></span></button>
-				<button name="remove" title="@(Remove)"><span class="fa fa-times"></span></button>
+			<td style="width:30px" class="silver hidden-xs">$index</td>
+            <td style="width:80px" class="silver hidden-xs" data-title="商品ID">{{ id }}</td>
+            <td style="width:60px" data-title="主图">{{ if pictures && pictures.length }}<img width="100%" src="/images/thumbnail/{{ pictures[0] }}.jpg"></img>{{ fi }}</td>
+			<td style="width:300px" class="hidden-xs" data-title="商品">{{ if istop }}<b class="mr5 fs11 red">@(TOP)</b>{{ fi }}{{ name }}</td>
+            <td style="width:50px" class="silver hidden-xs" data-title="类目"> {{ category }}</td>
+            <td style="width:60px" class="silver hidden-xs" data-title="品牌"> {{ brandName }}</td>
+            <td style="width:60px" class="ui-right active" data-title="平台价">{{ price | price(2) }}</td>
+            <td style="width:60px" class="ui-right active" data-title="定金">{{ deposit | price(2) }}</td>
+            <td style="width:100px" class="ui-right active" data-title="创建时间">{{ datecreated | format('@(yyyy-MM-dd HH:mm:ss)') }}</td>
+            <td style="width:80px" class="ui-right">
+				<button name="edit" title="@(编辑)"><span class="fa fa-pencil"></span></button>
+				<button name="remove" title="@(删除)"><span class="fa fa-times"></span></button>
 			</td>
 		</tr>
 		</script>
 	</div>
 </div>
 
-<div data-component="form" data-title="@(Product evidence)" data-component-path="common.form" data-if="value === 'products'" data-width="900px" data-component-id="products.form">
 
-	<div data-component="visible" data-component-path="products.form.id">
-		<div data-component="template" data-component-path="products.form" class="padding" style="padding-bottom:0">
+<div data-component="form" data-title="@(新增商品-化肥)" data-component-path="common.form" data-if="value === 'products.huafei'" data-width="900px" data-component-id="products.form.huafei">
+
+	<div data-component="visible" data-component-path="products.form.huafei.id">
+		<div data-component="template" data-component-path="products.form.huafei" class="padding" style="padding-bottom:0">
 			<script type="text/html">
 			<table class="table table-bordered" border="0">
 				<tbody>
@@ -59,72 +67,211 @@
 
 	<div class="padding" style="padding-bottom:0">
 		<div class="row">
-			<div class="col-md-12">
-				<div data-component="textbox" data-component-path="products.form.name" data-required="true">@(Name)</div>
-				<div data-component="checkbox" data-component-path="products.form.istop" style="margin-top:10px" class="red">@(Mark as <b>top product</b>)</div>
+			<div class="col-md-2 m">
+				<h3 class="ui-center">@(商品属性)</h3>
+			</div>	
+			<div class="col-md-10">
+				<div class="hidden" data-component="texthidden" data-component-path="products.form.huafei.category" data-readonly="readonly"></div>
+				<div class="col-md-6 m">
+					<div data-component="dropdown" data-component-path="products.form.huafei.brandName" data-source="products.huafei.brands" data-source-value="name">@(存在的品牌)</div>
+				</div>
+				<div class="col-md-6 m">
+					<div data-component="textbox" data-component-path="products.form.huafei.brandName" data-placeholder="@(如果没有找到品牌，请输入品牌名称)" data-required="true">@(商品品牌)</div>
+				</div>
 			</div>
 		</div>
 	</div>
-	<br />
+	<hr>
+	<div class="padding" style="padding-bottom:0">
+		<div class="row">
+			<div class="col-md-2 m">
+				<h3 class="ui-center">@(基本信息)</h3>
+			</div>
+			<div class="col-md-10">
+				<div class="col-md-8">
+					<div class="mb10" data-component="textbox" data-component-path="products.form.huafei.name" data-required="true">@(商品名称)</div>
+					<div class="mb10" data-component="textbox" data-component-path="products.form.huafei.price" data-component-type="currency" data-increment="true" data-icon="fa-jpy" data-required="true" >@(平台价格)</div>
+					<div class="mb10" data-component="textbox" data-component-path="products.form.huafei.deposit" data-component-type="currency" data-increment="true" data-icon="fa-jpy">@(定金)</div>
+					<div class="mb10" data-component="textbox" data-component-path="products.form.huafei.description">@(商品描述)</div>
+					<div class="mb10" data-component="fileupload" data-component-path="products.form.huafei.pictures" data-placeholder="@(添加图片)" data-accept="image/png,image/jpeg" data-multiple="true" data-icon="fa-camera" data-extension="false">@(商品主图)</div>
+					<div class="mb10" data-component="pictures" data-component-path="products.form.huafei.pictures"></div>
+				</div>
+				<div class="col-md-8">
+					<div data-component="checkbox" data-component-path="products.form.huafei.istop" style="margin-top:10px" class="red">@(<b>置顶商品</b>)</div>
+				</div>
+				<div class="col-md-8">
+					<div data-component="checkbox" data-component-path="products.form.huafei.presale" style="margin-top:10px" class="red">@(<b>预售商品</b>)</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<hr>
 	<div class="padding bg-smoke">
 		<div class="row">
-			<div class="col-md-6 m">
-				<div data-component="dropdown" data-component-path="products.form.category" data-source="products.categories" data-empty="true" data-source-value="name">@(Existing category)</div>
+			<div class="col-md-2 m">
+				<h3 class="ui-center">@(商品详情)</h3>
 			</div>
-			<div class="col-md-6 m">
-				<div data-component="textbox" data-component-path="products.form.category" data-required="true">@(Category)</div>
+			<div class="col-md-10">
+				<div class="m" data-component="textarea" data-component-path="products.form.huafei.body" data-height="100px" data-name="huafeibody">@(商品详情)</div>
+				<div class="m" data-component="textarea" data-component-path="products.form.huafei.standard" data-height="100px" data-name="huafeistandard">@(参数规格)</div>
+				<div class="m" data-component="textarea" data-component-path="products.form.huafei.support" data-height="100px" data-name="huafeisupport">@(服务说明)</div>
 			</div>
-		</div>
-		<div class="row">
-			<div class="col-md-12 m">
-				<div data-component="textarea" data-component-path="products.form.body" data-required="true" data-height="100px">@(Description)</div>
+			<div class="col-md-2 m">
+				<h3 class="ui-center">@(APP商品详情)</h3>
 			</div>
-		</div>
-		<div class="row">
-			<div class="col-md-3 col-sm-6 m">
-				<div data-component="textbox" data-component-path="products.form.price" data-required="true" data-align="center" data-component-type="currency" data-increment="true" data-icon="fa-shopping-cart">@(Price)</div>
+			<div class="col-md-10">
+				<div class="m" data-component="textarea" data-component-path="products.form.huafei.app_body" data-height="100px" data-name="huafeiapp_body">@(APP商品详情)</div>
+				<div class="m" data-component="textarea" data-component-path="products.form.huafei.app_standard" data-height="100px" data-name="huafeiapp_standard">@(APP参数规格)</div>
+				<div class="m" data-component="textarea" data-component-path="products.form.huafei.app_support" data-height="100px" data-name="huafeiapp_support">@(APP服务说明)</div>
 			</div>
-			<div class="col-md-3 col-sm-6">
-				<div data-component="textbox" data-component-path="products.form.reference">@(Custom product code)</div>
-			</div>
-		</div>
-	</div>
-	<div class="padding">
-		<div class="row">
-			<div class="col-md-12 m">
-				<div data-component="fileupload" data-component-path="products.form.pictures" data-placeholder="@(Browse device)" data-accept="image/jpeg" data-multiple="true" data-icon="fa-camera" data-extension="false">@(Pictures)</div>
-			</div>
-		</div>
-		<br />
-		<div class="row">
-			<div data-component="pictures" data-component-path="products.form.pictures"></div>
 		</div>
 	</div>
 	<div data-component="error" data-component-path="products.response"></div>
 	<div class="ui-form-buttons">
-		<div data-component="validation" data-component-path="products.form">
-			<button name="submit">@(SUBMIT)</button>
-		</div>
-		<button name="cancel">@(Cancel)</button>
+		<!-- <div data-component="validation" data-component-path="products.form.huafei">
+			<button name="submit">@(确认)</button>
+		</div> -->
+		<button name="submit">@(确认)</button>
+		<button name="cancel">@(取消)</button>
 	</div>
 </div>
 
-<div data-component="form" data-title="@(Category replacer)" data-component-path="common.form" data-if="value === 'products.category'" data-width="450px" data-top="true" data-component-id="products.category">
+<div data-component="form" data-title="@(新增商品-汽车)" data-component-path="common.form" data-if="value === 'products.qiche'" data-width="900px" data-component-id="products.form.qiche">
+
+	<div data-component="visible" data-component-path="products.form.qiche.id">
+		<div data-component="template" data-component-path="products.form.qiche" class="padding" style="padding-bottom:0">
+			<script type="text/html">
+			<table class="table table-bordered" border="0">
+				<tbody>
+					<tr>
+						<td class="col-xs-5 active">@(# id)</td>
+						<td>{{ id }}</td>
+					</tr>
+					<tr>
+						<td class="col-xs-5 active">@(Created)</td>
+						<td>{{ datecreated | format('yyyy-MM-dd') }}</td>
+					</tr>
+				</tbody>
+			</table>
+			</script>
+		</div>
+	</div>
+
+	<div class="padding productinfo" style="padding-bottom:0">
+		<div class="row">
+			<div class="col-md-2 m">
+				<h3 class="ui-center">@(商品属性)</h3>
+			</div>	
+			<div class="col-md-10">
+				<div class="hidden" data-component="texthidden" data-component-path="products.form.qiche.category" data-readonly="readonly"></div>
+				<div class="col-md-6 m">
+					<div data-component="dropdown" data-component-path="products.form.qiche.brandName" data-source="products.qiche.brands" data-source-value="name">@(存在的品牌)</div>
+				</div>
+				<div class="col-md-6 m">
+					<div data-component="textbox" data-component-path="products.form.qiche.brandName" data-placeholder="@(如果没有找到品牌，请输入品牌名称)" data-required="true">@(商品品牌)</div>
+				</div>
+				
+				<div class="col-md-6 m">
+					<div data-component="dropdown" data-component-path="products.form.qiche.model" data-source="products.qiche.models" data-source-value="name">@(汽车车系)</div>
+				</div>
+				<div class="col-md-6 m">
+					<div data-component="textbox" data-component-path="products.form.qiche.model" data-placeholder="@(如果没有找到车系，请输入车系名称)" data-required="true">@(商品车系)</div>
+				</div>
+				<div class="col-md-6 m">
+					<div data-component="dropdown" data-component-path="products.form.qiche.engine" data-source="products.qiche.engines" data-source-value="name">@(排量)</div>
+				</div>
+				<div class="col-md-6 m">
+					<div data-component="textbox" data-component-path="products.form.qiche.engine" data-placeholder="@(如果没有找到排量，请输入排量名称)" data-required="true">@(商品排量)</div>
+				</div>
+				<div class="col-md-6 m">
+					<div data-component="dropdown" data-component-path="products.form.qiche.gearbox" data-source="products.qiche.gearboxes" data-source-value="name">@(变速器)</div>
+				</div>
+				<div class="col-md-6 m">
+					<div data-component="textbox" data-component-path="products.form.qiche.gearbox" data-placeholder="@(如果没有找到变速器，请输入品类变速器)" data-required="true">@(商品变速器)</div>
+				</div>
+				<div class="col-md-6 m">
+					<div data-component="dropdown" data-component-path="products.form.qiche.level" data-source="products.qiche.levels" data-source-value="name">@(车型)</div>
+				</div>
+				<div class="col-md-6 m">
+					<div data-component="textbox" data-component-path="products.form.qiche.level" data-placeholder="@(如果没有找到车型，请输入车型名称)" data-required="true">@(商品车型)</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<hr>
+	<div class="padding" style="padding-bottom:0">
+		<div class="row">
+			<div class="col-md-2 m">
+				<h3 class="ui-center">@(基本信息)</h3>
+			</div>
+			<div class="col-md-10">
+				<div class="col-md-8">
+					<div class="mb10" data-component="textbox" data-component-path="products.form.qiche.name" data-required="true">@(商品名称)</div>
+					<div class="mb10" data-component="textbox" data-component-path="products.form.qiche.price" data-component-type="currency" data-increment="true" data-icon="fa-jpy"  data-required="true">@(平台价格)</div>
+					<div class="mb10" data-component="textbox" data-component-path="products.form.qiche.deposit" data-component-type="currency" data-increment="true" data-icon="fa-jpy">@(定金)</div>
+					<!--<div class="mb10" data-component="textbox" data-component-path="products.form.originprice">@(市场价格)</div>
+					<div class="mb10" data-component="textbox" data-component-path="products.form.stock">@(库存数量)</div>
+					<div class="mb10" data-component="textbox" data-component-path="products.form.reference">@(商品货号)</div>-->
+					<div class="mb10" data-component="textbox" data-component-path="products.form.qiche.description">@(商品描述)</div>
+					<div class="mb10" data-component="fileupload" data-component-path="products.form.qiche.pictures" data-placeholder="@(添加图片)" data-accept="image/png,image/jpeg" data-multiple="true" data-icon="fa-camera" data-extension="false">@(商品主图)</div>
+					<div class="mb10" data-component="pictures" data-component-path="products.form.qiche.pictures"></div>
+				</div>
+				<div class="col-md-8">
+					<div data-component="checkbox" data-component-path="products.form.qiche.istop" style="margin-top:10px" class="red">@(<b>置顶商品</b>)</div>
+				</div>
+				<div class="col-md-8">
+					<div data-component="checkbox" data-component-path="products.form.qiche.presale" style="margin-top:10px" class="red">@(<b>预售商品</b>)</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<hr>
+	<div class="padding bg-smoke">
+		<div class="row">
+			<div class="col-md-2 m">
+				<h3 class="ui-center">@(商品详情)</h3>
+			</div>
+			<div class="col-md-10">
+				<div class="m" data-component="textarea" data-component-path="products.form.qiche.body" data-height="100px" data-name="qichebody">@(商品详情)</div>
+				<div class="m" data-component="textarea" data-component-path="products.form.qiche.standard" data-height="100px" data-name="qichestandard">@(参数规格)</div>
+				<div class="m" data-component="textarea" data-component-path="products.form.qiche.support" data-height="100px" data-name="qichesupport">@(服务说明)</div>
+			</div>
+			<div class="col-md-2 m">
+				<h3 class="ui-center">@(APP商品详情)</h3>
+			</div>
+			<div class="col-md-10">
+				<div class="m" data-component="textarea" data-component-path="products.form.qiche.app_body" data-height="100px" data-name="qicheapp_body">@(APP商品详情)</div>
+				<div class="m" data-component="textarea" data-component-path="products.form.qiche.app_standard" data-height="100px" data-name="qicheapp_standard">@(APP参数规格)</div>
+				<div class="m" data-component="textarea" data-component-path="products.form.qiche.app_support" data-height="100px" data-name="qicheapp_support">@(APP服务说明)</div>
+			</div>
+		</div>
+	</div>
+	<div data-component="error" data-component-path="products.response"></div>
+	<div class="ui-form-buttons">
+		<!-- <div data-component="validation" data-component-path="products.form.qiche">
+			<button name="submit">@(确认)</button>
+		</div> -->
+		<button name="submit">@(确认)</button>
+		<button name="cancel">@(取消)</button>
+	</div>
+</div>
+
+<div data-component="form" data-title="@(更新分类)" data-component-path="common.form" data-if="value === 'products.category'" data-width="450px" data-top="true" data-component-id="products.category">
 	<div class="padding">
 		<div class="row">
 			<div class="col-md-12">
 				<div class="silver">@(Replacement old category with new category name in all products which have old category.)</div>
 				<hr />
-				<div data-component="dropdown" data-component-path="products.category.category_old" data-source="products.categories" data-required="true" data-empty="true" data-source-value="name" class="m">@(Existing category)</div>
-				<div data-component="textbox" data-component-path="products.category.category_new" data-required="true" class="m">@(New name)</div>
+				<div data-component="dropdown" data-component-path="products.category.category_old" data-source="products.categories" data-required="true" data-empty="true" data-source-value="name" class="m">@(已存在的分类)</div>
+				<div data-component="textbox" data-component-path="products.category.category_new" data-required="true" class="m">@(新分类)</div>
 			</div>
 		</div>
 	</div>
 	<div class="ui-form-buttons">
 		<div data-component="validation" data-component-path="products.category">
-			<button name="submit">@(SUBMIT)</button>
+			<button name="submit">@(确认)</button>
 		</div>
-		<button name="cancel">@(Cancel)</button>
+		<button name="cancel">@(取消)</button>
 	</div>
 </div>
 
@@ -132,7 +279,10 @@
 <input type="file" id="products_file_cvs" class="hidden" accept="text/csv" />
 
 <script>
-
+	
+	var productckeditors = {'huafei':['huafeibody', 'huafeistandard', 'huafeisupport', 'huafeiapp_body', 'huafeiapp_standard', 'huafeiapp_support'],'qiche':['qichebody', 'qichestandard', 'qichesupport', 'qicheapp_body', 'qicheapp_standard', 'qicheapp_support']};
+	var productcategories = {'化肥':'huafei', '汽车':'qiche'};
+	var productattributes = [{'key':'huafei','name':'化肥','arr':['brands']}, {'key':'qiche','name':'汽车','arr':['brands', 'models', 'engines', 'gearboxes', 'levels']}];
 	var products = {};
 
 	products.filter = {};
@@ -141,7 +291,10 @@
 	products.grid = [];
 	products.info = {};
 	products.form = {};
+	products.form.huafei = {};
+	products.form.qiche = {};
 	products.categories = [];
+	products_init_allattributes();
 	products.response = null;
 
 	products.category = {};
@@ -151,24 +304,33 @@
 		// Max items per page
 		products.filter.max = component.max;
 		products_refresh_categories();
+		products_refresh_allattributes();
 		products_refresh(true);
 
 		component.click = function(index, row, button) {
 			switch ($(button).attr('name')) {
 				case 'edit':
-					$.components.GET('/api/products/' + row.id, null, function(response, err) {
+					$.components.GET(managerurl + '/api/products/' + row.id, null, function(response, err) {
 
 						// Error prevention
 						if (response instanceof Array)
 							response = {};
 
-						SET('products.form', $.extend({ $index: index }, response), true);
+						if (response && response.category) {
+							if (productcategories[response.category]) {
+								var path_id = 'products.form.' + productcategories[response.category];
+								SET(path_id, $.extend({ $index: index }, response), true);
+								products_init_ckeditors(productcategories[response.category], response);
+								var form_id = 'products.' + productcategories[response.category];
+								SET('common.form', form_id);
+							}
+						}
 						SET('products.response', null);
-						SET('common.form', 'products');
+						
 					});
 					break;
 				case 'remove':
-					if (!confirm('@(Do you want to remove) ' + row.name + '?'))
+					if (!confirm('@(你确认要删除") ' + row.name + '"？【删除后不能恢复】'))
 						return;
 					$.components.DELETE(managerurl + '/api/products', { id: row.id }, function() {
 						products_refresh(true);
@@ -208,9 +370,21 @@
 		products_refresh(path !== 'products.filter.page');
 	});
 
-	ON('#products.form', function(component) {
+	ON('#products.form.huafei', function(component) {
 		component.submit = function(hide) {
-			$.components.POST(managerurl + '/api/products/', products.form, function(response) {
+			var requiredlist = [{'key':'brandName','name':'品牌'},{'key':'name','name':'商品名称'},{'key':'price','name':'价格','re':/^[0-9]*(\.[0-9]{1,2})?$/},{'key':'deposit','name':'定金','re':/^[0-9]*(\.[0-9]{1,2})?$/}];
+			if (!required(requiredlist, products.form.huafei))
+				return;
+
+			var confirm_note = '你确认要新增"' + products.form.huafei.name + '"?';
+			if (products.form.huafei.id)
+				confirm_note = '你确认要提交修改后的"' + products.form.huafei.name + '"?';
+			if (!confirm(confirm_note))
+				return;
+
+			products_get_ckeditors(productcategories[products.form.huafei.category], products.form.huafei);
+
+			$.components.POST(managerurl + '/api/products/', products.form.huafei, function(response) {
 
 				// Error handling
 				SET('products.response', response);
@@ -220,8 +394,66 @@
 				hide();
 
 				// Is a new category?
-				if (products.form.$index === undefined || products.grid[products.form.$index].category !== products.form.category)
+				if (products.form.huafei.$index === undefined || products.grid[products.form.huafei.$index].category !== products.form.huafei.category)
 					setTimeout(products_refresh_categories, 2000);
+
+				// Is a new brand?
+				if (products.form.huafei.$index === undefined || products.grid[products.form.huafei.$index].brandName !== products.form.huafei.brandName)
+					setTimeout(products_refresh_attribute('brands'), 2000);
+
+				products_refresh(true);
+				success();
+			});
+		};
+	});
+
+	ON('#products.form.qiche', function(component) {
+		component.submit = function(hide) {
+			var requiredlist = [{'key':'brandName','name':'品牌'},{'key':'model','name':'车系'},{'key':'engine','name':'排量'},{'key':'gearbox','name':'变速器'},{'key':'level','name':'车型'},{'key':'name','name':'商品名称'},{'key':'price','name':'平台价格','re':/^[0-9]*(\.[0-9]{1,2})?$/},{'key':'deposit','name':'定金','re':/^[0-9]*(\.[0-9]{1,2})?$/}];
+			if (!required(requiredlist, products.form.qiche))
+				return;
+
+			var confirm_note = '你确认要新增"' + products.form.qiche.name + '"?';
+			if (products.form.qiche.id)
+				confirm_note = '你确认要提交修改后的"' + products.form.qiche.name + '"?';
+			if (!confirm(confirm_note))
+				return;
+
+			products_get_ckeditors(productcategories[products.form.qiche.category], products.form.qiche);
+			
+			$.components.POST(managerurl + '/api/products/', products.form.qiche, function(response) {
+
+				// Error handling
+				SET('products.response', response);
+				if (response instanceof Array)
+					return;
+
+				hide();
+
+				// Is a new category?
+				if (products.form.qiche.$index === undefined || products.grid[products.form.qiche.$index].category !== products.form.qiche.category)
+					setTimeout(products_refresh_categories, 2000);
+
+				// Is a new brand?
+				if (products.form.qiche.$index === undefined || products.grid[products.form.qiche.$index].brandName !== products.form.qiche.brandName)
+					setTimeout(products_refresh_attribute('brands'), 2000);
+
+
+				// Is a new model?
+				if (products.form.qiche.$index === undefined || products.grid[products.form.qiche.$index].model !== products.form.qiche.model)
+					setTimeout(products_refresh_attribute('models'), 2000);
+
+				// Is a new engine?
+				if (products.form.qiche.$index === undefined || products.grid[products.form.qiche.$index].engine !== products.form.qiche.engine)
+					setTimeout(products_refresh_attribute('engines'), 2000);
+
+				// Is a new gearbox?
+				if (products.form.qiche.$index === undefined || products.grid[products.form.qiche.$index].gearbox !== products.form.qiche.gearbox)
+					setTimeout(products_refresh_attribute('gearboxes'), 2000);
+
+				// Is a new level?
+				if (products.form.qiche.$index === undefined || products.grid[products.form.qiche.$index].level !== products.form.qiche.level)
+					setTimeout(products_refresh_attribute('levels'), 2000);
 
 				products_refresh(true);
 				success();
@@ -243,10 +475,22 @@
 		};
 	});
 
-	function products_new() {
-		SET('products.form', {}, true);
+	function products_huafei_new() {
+		//SET('products.nowcategory', 'huafei', true);
+		//console.log(products.nowcategory);
+		SET('products.form.huafei', {'category':'化肥'}, true);
 		SET('products.response', null);
-		SET('common.form', 'products');
+		products_init_ckeditors('huafei');
+		SET('common.form', 'products.huafei');
+	}
+
+	function products_qiche_new() {
+		//SET('products.nowcategory', 'qiche', true);
+		//console.log(products.nowcategory);
+		SET('products.form.qiche', {'category':'汽车'}, true);
+		SET('products.response', null);
+		products_init_ckeditors('qiche');
+		SET('common.form', 'products.qiche');
 	}
 
 	function products_category() {
@@ -284,5 +528,94 @@
 
 	function products_import() {
 		$('#products_file_cvs').click();
+	}
+
+	function products_init_ckeditors(key, model) {
+		var ckeditors = productckeditors[key] || [];
+		for (var i = 0, length = ckeditors.length; i < length; i++) {
+			ckeditor_add(key, ckeditors[i], model);
+		}
+	}
+	function ckeditor_add(prev, id, model) {
+		var ckeditor = CKEDITOR.instances[id];
+		if (ckeditor) ckeditor.destroy(true); //销毁编辑器 ,然后新增一个
+		
+		ckeditor = CKEDITOR.replace(id);
+	    var value = id.split(prev)[1];
+	    if (model && model[value]) {
+	    	ckeditor.setData(model[value]);
+	    }
+	}
+
+	function products_get_ckeditors(key, model) {
+		var ckeditors = productckeditors[key] || [];
+		for (var i = 0, length = ckeditors.length; i < length; i++) {
+			ckeditor_getdata(key, ckeditors[i], model);
+		}
+	}
+	function ckeditor_getdata(prev, id, model) {
+		var ckeditor = CKEDITOR.instances[id];
+		var value = id.split(prev)[1];
+		if (ckeditor) {
+			model[value] = ckeditor.getData();
+		}
+	}
+
+	// init all attributes
+	function products_init_allattributes() {
+		for (var i = 0, length = productattributes.length; i < length; i++) {
+			var key = productattributes[i]['key'];
+			var arr = productattributes[i]['arr'];
+			products[key] = {};
+			for (var j = 0; j < arr.length; j++) {
+				var name = arr[j];
+				products[key][name] = [];
+			}
+		}
+	}
+	// Method refreshes all attributes
+	function products_refresh_allattributes() {
+		for (var i = 0, length = productattributes.length; i < length; i++) {
+			var key = productattributes[i]['key'];
+			var value = productattributes[i]['name'];
+			var arr = productattributes[i]['arr'];
+			for (var j = 0; j < arr.length; j++) {
+				var name = arr[j];
+				products_refresh_attribute(name, key, value);
+			}
+		}
+	}
+	// Method refreshes attribute
+	function products_refresh_attribute(name, formid, category) {
+		var url = managerurl + '/api/products/attr/' + name;
+		if (category) {
+			url += '?category=' + category;
+		}
+		$.components.GET(url, null, function(response) {
+			response.sort(function(a, b) {
+				return a.name.localeCompare(b.name);
+			});
+			var key = 'products.' + formid + '.' + name;
+			SET(key, response);
+		});
+	}
+
+
+	// Method required
+	function required(requiredlist, item) {
+		for (var i = 0; i < requiredlist.length; i++) {
+			var key = requiredlist[i]['key'];
+			var name = requiredlist[i]['name'];
+			var re = requiredlist[i]['re'] || null;
+			if (item[key] === undefined || item[key].length == 0) {
+				alert('请填写"' + name + '"后再提交');
+				return false;
+			}
+			if (re && !re.test(item[key])) {
+				alert('请填写正确的"' + name + '"后再提交');
+				return false;
+			}
+		}
+		return true;
 	}
 </script>

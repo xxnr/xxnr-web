@@ -6,11 +6,14 @@
 
 // Supported workflows
 // "create-url"
-var Size = NEWSCHEMA('Size');
+/*var Size = NEWSCHEMA('Size');
 Size.define('width', Number);
 Size.define('height', Number);
+*/
 
 var Category = NEWSCHEMA('Category');
+
+/*
 Category.define('id', String, true);
 Category.define('parent', String);
 Category.define('productImgSize', 'Size');
@@ -19,6 +22,29 @@ Category.define('pictures', '[String]') // URL address to first 5 pictures
 Category.define('name', String);
 Category.define('title', String, true);
 Category.define('datecreated', Date);
+*/
+
+var sizeSchema = {
+	'width': Number,
+	'height': Number
+};
+
+var categorySchema = {
+	'id': {type:String, required:true},
+	'parent': String,
+	'productImgSize': {subschemaName:"Size", type: sizeSchema },
+	'productThumbSize': {subschemaName:"Size", type: sizeSchema },
+	'pictures': [String], // URL address to first 5 pictures
+	'name': String,
+	'url': String,
+	'title': {type:String, required:true},
+	'datecreated': Date,
+};
+
+
+	
+Category.DEFINE(categorySchema);
+var db = DB('categories', categorySchema);
 
 // Sets default values
 Category.setDefault(function(name) {
@@ -31,15 +57,19 @@ Category.setDefault(function(name) {
 // Removes a specific category
 Category.setRemove(function(error, id, callback) {
 
-	// Filters for removing
-	var updater = function(doc) {
-		if (doc.id !== id)
-			return doc;
-		return null;
-	};
+	if (db.type == DB.MONGO_DB) {
+		db.remove({query:{id:id}}, callback);
+	} else {
+		// Filters for removing
+		var updater = function(doc) {
+			if (doc.id !== id)
+				return doc;
+			return null;
+		};
 
-	// Updates database file
-	DB('categories').update(updater, callback);
+		// Updates database file
+		db.update(updater, callback);
+	}
 
 	// Refreshes internal informations e.g. sitemap
 	setTimeout(refresh, 1000);
@@ -59,8 +89,9 @@ Category.setSave(function(error, model, options, callback) {
 	if (!model.id)
 		model.id = U.GUID(10);
 
-	if (model.datecreated)
-		model.datecreated = model.datecreated.format();
+	if (!model.datecreated)
+		model.datecreated = new Date();
+		// model.datecreated = model.datecreated.format();
 
 	// Removes unnecessary properties (e.g. SchemaBuilder internal properties and methods)
 	var clean = model.$clean();
@@ -74,11 +105,15 @@ Category.setSave(function(error, model, options, callback) {
 	};
 
 	// Updates database file
-	DB('categories').update(updater, function() {
+	db.update(db.type == DB.MONGO_DB ? {query:{id:clean.id}, operator:{$set:clean}} : updater, function(err, updatedCount) {
 
 		// Creates record if not exists
+		if(updatedCount && updatedCount>0){
+            // mongodb callback, updated count >0
+            count = updatedCount;
+        }
 		if (count === 0)
-			DB('categories').insert(clean);
+			db.insert(clean);
 
 		// Returns response
 		callback(SUCCESS(true));
@@ -91,7 +126,7 @@ Category.setSave(function(error, model, options, callback) {
 // Clears database
 Category.addWorkflow('clear', function(error, model, options, callback) {
 
-	DB('categories').clear(function() {
+	db.clear(function() {
 		setTimeout(refresh, 1000);
 	});
 
@@ -106,7 +141,13 @@ function refresh() {
 		categories[doc.id] = doc;
 	};
 
-	DB('categories').all(prepare, function() {
+	db.all(db.type == DB.MONGO_DB ? {query:{}} : prepare, function(err, docs, Count) {
+		if (db.type == DB.MONGO_DB) {
+			for (var i = 0; i < docs.length; i++) {
+				var doc = docs[i];
+				categories[doc.id] = doc;
+			}
+		}
 		F.global.mapCategories = categories;
 	});
 }

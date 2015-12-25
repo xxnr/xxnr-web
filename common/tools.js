@@ -5,6 +5,7 @@
 var http = require('http');
 var https = require('https');
 var querystring = require('querystring');
+var JWT = require('jsonwebtoken');
 
 var regexpPhone = new RegExp('^(13[0-9]|15[012356789]|17[678]|18[0-9]|14[57])[0-9]{8}$');
 
@@ -30,7 +31,7 @@ exports.generateAuthCode = function () {
 };
 
 function sendPhoneMessage(phonenumber, content) {
-   
+
     var options = (F.config.phone_message_options).parseJSON();
     var httpOptions = options.http_request_options;
 
@@ -59,16 +60,21 @@ function sendPhoneMessage(phonenumber, content) {
     // req.write(postData); we don't have body.
 
     req.end();
-}
+};
 
-exports.sendPhoneMessage = sendPhoneMessage;
+exports.sendMessage = function(phonenumber, message){
+    var content = '验证码：' + message;
+    console.log(phonenumber + content);
+    sendPhoneMessage(phonenumber, content);
+};
 
 exports.sendActivePhoneMessage = function (phonenumber, code) {
     // If anyone change the content below, please DO phone the 和信通 to add it into whitelist, otherwise, our short message will be blocked.
-    var content = '【新新农人】验证码：' + code + '，确认后请在10分钟内填写，切勿泄露给他人，如非本人操作，建议及时与客服人员联系'
-    console.log(content);
-    //sendPhoneMessage(phonenumber, content);
-}
+    //var content = '【新新农人】验证码：' + code + '，确认后请在10分钟内填写，切勿泄露给他人，如非本人操作，建议及时与客服人员联系'
+    var content = '验证码：' + code + '，确认后请在10分钟内填写，切勿泄露给他人，如非本人操作，建议及时与客服人员联系 - 新新农人';
+    console.log(phonenumber + content);
+    sendPhoneMessage(phonenumber, content);
+};
 
 
 function guessMobileCode(mobile_code, target) {
@@ -106,4 +112,81 @@ exports.guessTarget = function (mobile_code, target) {
     }
 
     return target;
+};
+
+/* moved into total js, so we don't need to require tools
+exports.common_response = function(data){
+    var self = this;
+    var callbackName = self.data['callback'];
+    callbackName ? self.jsonp(callbackName, data) : self.json(data);
+};
+*/
+
+exports.getStringLen = function(val, max) {
+    var len = 0;
+    for (var i = 0; i < val.length; i++) {
+       var length = val.charCodeAt(i);
+       if(length>=0&&length<=128) {
+            len += 1;
+        } else {
+            len += 2;
+        }
+        if (max && len > parseInt(max))
+            return true;
+    }
+    if (max)
+        return false;
+    else
+        return len;
+};
+
+// Json Web Token authentication part.
+
+/**
+ * this function is used to generate the jwt object for a logged in user
+ * should be called after the user login/regist
+ * @param userId: user.id field
+ * @param appLoginId:
+ * @param webLoginId:
+ * @return token: issued token
+ */
+exports.generate_token = function(userId, appLoginId, webLoginId){
+    var token = JWT.sign(
+        {                                               //payload
+            userId:userId,
+            appLoginId:appLoginId,
+            webLoginId:webLoginId
+        },
+        F.global.key.exportKey('pkcs8-private-pem'),    //private key
+        {                                               //options
+            algorithm: F.config.user_token_algorithm,
+            subject:userId,
+            expiresIn: F.config.user_token_expires_in,
+            issuer: F.config.user_token_issuer
+        }
+    );
+    return token;
+};
+
+exports.decrypt_password = function(encryptedPassword){
+    try {
+        return F.global.key.decrypt(encryptedPassword, 'utf8');
+    }catch(e){
+        console.log(e);
+        return null;
+    }
+};
+
+
+exports.verify_token = function(token){
+    var payload = JWT.verify(
+        token,
+        F.global.key.exportKey('pkcs8-public-pem'),
+        {
+            algorithm: F.config.user_token_algorithm,
+            issuer: F.config.user_token_issuer
+        }
+    );
+
+    return payload;
 };

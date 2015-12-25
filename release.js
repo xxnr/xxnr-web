@@ -8,7 +8,7 @@ var fs = require('fs');
 var options = {};
 
 options.ip = '0.0.0.0';
-options.port = 8070;
+options.port = 80;
 
 /*  var args = process.argv.splice(2);  // skip argv[0], argv[1] which is "node" "release.js"
 
@@ -23,5 +23,6 @@ options.port = 8070;
 /**
  * Release notes:
  */
-
-require('total.js').http('release', options);
+var framework = require('total.js');
+framework.setWorkingDirectory(__dirname);
+framework.http('release', options);

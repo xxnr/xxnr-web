@@ -9,6 +9,7 @@ nav { font-size: 20px; position: relative; display: inline-block; font-smoothing
 nav a { color: gray; border-right: 1px solid #D0D0D0; padding: 6px 0 0; position: relative; display: inline-block; min-width: 60px; text-align: center; height: 40px; }
 nav a:first-child { border-left: 1px solid #D0D0D0; }
 nav a:hover { color: #303030; text-decoration: none; }
+
 nav .selected { background-color: white; color: black; }
 nav .highlight { background-color: #D0D0D0; color: gray; }
 
@@ -29,6 +30,8 @@ h2 b { font-weight: 400; }
 .mr5 { margin-right: 5px !important; }
 .mr15 { margin-right: 15px !important; }
 .nmb { margin-bottom: 0 !important; }
+.mb10 { margin-bottom: 10px; }
+.mb50 { margin-bottom: 50px; }
 
 .bg-smoke { background-color: #F8F8F8; }
 .b { font-weight: bold; }
@@ -96,3 +99,15 @@ canvas { display: block; }
 	.table-xs td:before { content: attr(data-label); font-weight: bold; border-right: 1px solid #E0E0E0; width: 100px; float: left; margin-right: 10px; }
 	.table-xs tr { margin-bottom: 20px; display: block; }
 }
+@media (min-width:1400px){.container{width:1350px}}
+.cke_reset_all table td { vertical-align: baseline !important; }
+
+.login {margin-top: 150px;}
+.account {display:inline;float:right;}
+.account a {
+    border: none;
+    margin-left: 15px;
+}
+.table-bordered ul li .product-name {width: 75%; height:20px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; float: left;}
+.table-bordered ul li span{float: right;}
+/*.account a:first-child {border: none;}*/

@@ -1,3 +1,51 @@
+// Utils
+
+var regexpTRIM = /^[\s]+|[\s]+$/g;
+
+if (!String.prototype.trim) {
+    String.prototype.trim = function() {
+        return this.replace(regexpTRIM, '');
+    };
+}
+
+/**
+ * Checks if string starts with the text
+ * @see {@link http://docs.totaljs.com/String.prototype/#String.prototype.startsWith|Documentation}
+ * @param  {String}  text       Text to find.
+ * @param  {Boolean} ignoreCase Ingore case sensitive.
+ * @return {Boolean}
+ */
+String.prototype.startsWith = function(text, ignoreCase) {
+
+    var self = this;
+    var length = text.length;
+    var tmp = self.substring(0, length);
+
+    if (ignoreCase)
+        return tmp.length === length && tmp.toLowerCase() === text.toLowerCase();
+
+    return tmp.length === length && tmp === text;
+};
+
+/**
+ * Checks if string ends with the text
+ * @see {@link http://docs.totaljs.com/String.prototype/#String.prototype.endsWith|Documentation}
+ * @param  {String}  text Text to find.
+ * @param  {Boolean} ignoreCase Ingore case sensitive.
+ * @return {Boolean}
+ */
+String.prototype.endsWith = function(text, ignoreCase) {
+    var self = this;
+    var length = text.length;
+    var tmp = self.substring(self.length - length);
+
+    if (ignoreCase)
+        return tmp.length === length && tmp.toLowerCase() === text.toLowerCase();
+
+    return tmp.length === length && tmp === text;
+
+};
+
 COMPONENT('click', function() {
 	var self = this;
 
@@ -279,8 +327,9 @@ COMPONENT('textarea', function() {
 		var element = self.element;
 		var height = element.attr('data-height');
 		var icon = element.attr('data-icon');
+		var name = element.attr('data-name');
 		var content = element.html();
-		var html = '<textarea data-component-bind=""' + (attrs.length > 0 ? ' ' + attrs.join('') : '') + (height ? ' style="height:' + height + '"' : '') + (element.attr('data-autofocus') === 'true' ? ' autofocus="autofocus"' : '') + '></textarea>';
+		var html = '<textarea data-component-bind=""' + (attrs.length > 0 ? ' ' + attrs.join('') : '') + (height ? ' style="height:' + height + '"' : '') + (element.attr('data-autofocus') === 'true' ? ' autofocus="autofocus"' : '') + (attrs.name > 0 ? ' ' + attrs.join('') : '') + (name ? ' name="' + name + '"' : '') +'></textarea>';
 
 		if (content.length === 0) {
 			element.addClass('ui-textarea');
@@ -434,6 +483,35 @@ COMPONENT('textboxtags', function() {
 	};
 });
 
+COMPONENT('texthidden', function() {
+
+    var self = this;
+
+    self.make = function() {
+
+        var attrs = [];
+
+        function attr(name) {
+            var a = self.element.attr(name);
+            if (!a)
+                return;
+            attrs.push(name.substring(name.indexOf('-') + 1) + '="' + a + '"');
+        }
+
+        attr('data-value');
+        attr('data-readonly');
+
+        var delay = self.attr('data-component-keypress-delay');
+        var keypress = self.attr('data-component-keypress');
+        var html = '<input type="hidden" ' + (attrs.length ? ' ' + attrs.join('') : '') + '/>';
+
+        self.element.empty();
+        self.element.addClass('ui-textbox ui-textbox-container');
+        self.element.append(html);
+    };
+
+});
+
 COMPONENT('page', function() {
 	var self = this;
 	var isProcessed = false;
@@ -473,7 +551,14 @@ COMPONENT('grid', function() {
 	var self = this;
 	var button;
 	var element;
+    self.title = [];
 	var lastpage = -1;
+    var tdStylePattern = /<td[^>]+style="[^"]+"[^>]+>/;
+    var stylePattern = /style="[^"]+"/;
+    var dataTitlePattern = /data-title="[^"]+"/;
+    var tdClassPattern = /<td[^>]+class="[^"]+"[^>]+>/;
+    var classPattern = /class="[^"]+"/;
+    var tdPattern = /<td/;
 
 	self.click = function(index, row, button) {console.log(index, row, button)};
 	self.next = function(page) {};
@@ -483,9 +568,48 @@ COMPONENT('grid', function() {
 	};
 
 	self.make = function(template) {
-
 		element = self.element.find('script');
 		self.template = Tangular.compile(element.html());
+
+        // find all title
+        var currentParsingStatus = 'OK';
+        element.html().split('\n').forEach(function(row){
+            switch(currentParsingStatus){
+                case 'OK':
+                    if(row.trim().startsWith('<!--')){
+                        //comment starts
+                        currentParsingStatus = 'COMMENT';
+                    }else {
+                        var isColumn = tdPattern.test(row);
+                        var data_title = dataTitlePattern.exec(row);
+                        var style = tdStylePattern.exec(row);
+                        var _class = tdClassPattern.exec(row);
+                        if (isColumn) {
+                            var _style = '';
+                            if (style) {
+                                _style = stylePattern.exec(style[0])[0].substr('style="'.length, style[0].length - 'style="'.length - 1);
+                            }
+
+                            var __class = '';
+                            if (_class) {
+                                __class = classPattern.exec(_class[0])[0].substr('class="'.length, _class[0].length - 'class="'.length - 1);
+                            }
+
+                            var _title = '';
+                            if (data_title && data_title.length >= 1) {
+                                _title = data_title[0].substr('data-title="'.length, data_title[0].length - 'data-title="'.length - 1);
+                            }
+                            self.title.push({style: _style, title: _title, _class: __class});
+                        }
+                    }
+                case 'COMMENT':
+                    if(row.trim().endsWith('-->')){
+                        //comment starts
+                        currentParsingStatus = 'OK';
+                    }
+                    break;
+            }
+        });
 
 		self.element.on('click', 'tr', function() {});
 		self.element.addClass('ui-grid');
@@ -527,7 +651,7 @@ COMPONENT('grid', function() {
 	};
 
 	self.prerender = function(index, row) {
-		return self.template(row).replace('<tr', '<tr data-index="' + index + '"');
+		return self.template(row).replace('<tr', '<tr data-index="' + index + '"').replace(/\$index/g, ((index)%self.max+1).toString());
 	};
 
 	self.setter = function(value) {
@@ -540,7 +664,17 @@ COMPONENT('grid', function() {
 		var pages = getPages(value.length, self.max);
 		var output = '';
 
+        var title = '';
+        self.title.forEach(function(col){
+            title += '<td style="'+col.style+'" class="'+col._class+'">'+col.title+'</td>';
+        });
+
 		button.toggleClass('hidden', value.length === 0 || value.length % self.max !== 0);
+
+        var tableWidth = "100%";
+        if(typeof self.attr("data-talble-width") !== 'undefined'){
+            tableWidth=self.attr("data-talble-width");
+        }
 
 		for (var i = 0; i < pages; i++) {
 
@@ -553,7 +687,7 @@ COMPONENT('grid', function() {
 			}
 
 			if (items.length > 0)
-				output += (self.attr('data-options-page') ? '<div class="ui-grid-page">' + self.attr('data-options-page').replace('#', i + 1).replace('$', value.length) + '</div>' : '') + '<table width="100%" cellpadding="0" cellspacing="0" border="0"><tbody>' + items + '</tbody></table>';
+				output += (self.attr('data-options-page') ? '<div class="ui-grid-page">' + self.attr('data-options-page').replace('#', i + 1).replace('$', value.length) + '</div>' : '') + '<table width="' + tableWidth + '" cellpadding="0" cellspacing="0" border="0"><tbody>' + title + items + '</tbody></table>';
 		}
 
 		element.html(output);
@@ -593,11 +727,12 @@ COMPONENT('form', function() {
 		var content = self.element.html();
 		var width = self.attr('data-width') || '800px';
 		var submit = self.attr('data-submit');
+        var data_class = self.attr('data-class') || '';
 
 		self.condition = self.attr('data-if');
 		self.element.empty();
 
-		$(document.body).append('<div id="' + self._id + '" class="hidden ui-form-container"' + (self.attr('data-top') ? ' style="z-index:10"' : '') + '><div class="ui-form-container-padding"><div class="ui-form" style="max-width:' + width + '"><div class="ui-form-title"><span class="fa fa-times ui-form-button-close" data-id="' + self.id + '"></span>' + self.attr('data-title') + '</div>' + content + '</div></div>');
+		$(document.body).append('<div id="' + self._id + '" class="hidden ui-form-container"' + (self.attr('data-top') ? ' style="z-index:10"' : '') + '><div class="ui-form-container-padding ' + data_class + '"><div class="ui-form" style="max-width:' + width + '"><div class="ui-form-title"><span class="fa fa-times ui-form-button-close" data-id="' + self.id + '"></span>' + self.attr('data-title') + '</div>' + content + '</div></div>');
 
 		self.element = $('#' + self._id);
 		self.element.data(COM_ATTR, self);
@@ -1309,3 +1444,74 @@ $.components.$formatter.push(function(path, value, type) {
 
 	return value.format(2);
 });
+
+/*COMPONENT('ckeditor', function() {
+
+	var self = this;
+	var isRequired = self.attr('data-required') === 'true';
+
+    self.validate = function(value) {
+
+        var is = false;
+        var element = self.element;
+		var name = element.attr('data-name');
+		var ckeditor = CKEDITOR.instances[name];
+		var ck_value = ckeditor.getData();
+		console.log(ck_value);
+		is = isRequired ? ck_value.length > 0 : true;
+        return is;
+    };
+
+	this.make = function() {
+
+		var attrs = [];
+
+		function attr(name) {
+			var a = self.attr(name);
+			if (!a)
+				return;
+			attrs.push(name.substring(name.indexOf('-') + 1) + '="' + a + '"');
+		}
+
+		attr('data-placeholder');
+		attr('data-maxlength');
+
+		var element = self.element;
+		var height = element.attr('data-height');
+		var icon = element.attr('data-icon');
+		var name = element.attr('data-name');
+		var pre_name = element.attr('data-pre');
+		var content = element.html();
+		var html = '<textarea data-component-bind=""' + (attrs.length > 0 ? ' ' + attrs.join('') : '') + (height ? ' style="height:' + height + '"' : '') + (element.attr('data-autofocus') === 'true' ? ' autofocus="autofocus"' : '') + (attrs.name > 0 ? ' ' + attrs.join('') : '') + (name ? ' name="' + name + '"' : '') +'></textarea>';
+		html += '<script type="text/javascript">CKEDITOR.replace("' + name + '");</script>';
+
+		if (content.length === 0) {
+			element.addClass('ui-textarea');
+			element.append(html);
+			return;
+		}
+
+		element.empty();
+		element.append('<div class="ui-textarea-label' + (isRequired ? ' ui-textarea-label-required' : '') + '">' + (icon ? '<span class="fa ' + icon + '"></span> ' : '') + content + ':</div>');
+		element.append('<div class="ui-textarea">' + html + '</div>');
+
+	};
+	function ckeditor_add(id, model) {
+		var ckeditor = CKEDITOR.instances[id];
+		if (ckeditor) ckeditor.destroy(true); //销毁编辑器 ,然后新增一个
+
+		ckeditor = CKEDITOR.replace(id);
+	    var value = id.split('products')[1];
+	    if (model && model[value]) {
+	    	ckeditor.setData(model[value]);
+	    }
+	}
+
+	function ckeditor_getdata(id, model) {
+		var ckeditor = CKEDITOR.instances[id];
+		var value = id.split('products')[1];
+		if (ckeditor) {
+			model[value] = ckeditor.getData();
+		}
+	}
+});*/

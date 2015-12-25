@@ -8,6 +8,7 @@
 // "create-url"
 
 var Page = NEWSCHEMA('Page');
+/*
 Page.define('id', String);
 Page.define('parent', String);
 Page.define('template', String, true);
@@ -26,6 +27,30 @@ Page.define('priority', Number);
 Page.define('ispartial', Boolean);
 Page.define('body', String);
 Page.define('datecreated', Date);
+*/
+var pageSchema = {
+    'id': String,
+    'parent': String,
+    'template': {type: String, required: false},
+    'language': String,
+    'url': String,
+    'icon': String,
+    'navigations': [String],
+    'widgets': [String], // Widgets lists, contains Array of ID widget
+    'settings': [String], // Widget settings (according to widgets array index)
+    'tags': [String],
+    'pictures': [String], // URL address to first 5 pictures
+    'name': String,
+    'perex': String,
+    'title': {type: String, required: true},
+    'priority': Number,
+    'ispartial': Boolean,
+    'body': String,
+    'datecreated': Date,
+};
+
+Page.DEFINE(pageSchema);
+var db = DB('pages', pageSchema, DB.BUILT_IN_DB);
 
 // Sets default values
 Page.setDefault(function(name) {
@@ -89,7 +114,7 @@ Page.setQuery(function(error, options, callback) {
 		return 1;
 	};
 
-	DB('pages').sort(filter, sorting, function(err, docs, count) {
+	db.all(filter, sorting, function(err, docs, count) {
 		var data = {};
 
 		data.count = count;
@@ -125,7 +150,7 @@ Page.setGet(function(error, model, options, callback) {
 	};
 
 	// Gets specific document
-	DB('pages').one(filter, function(err, doc) {
+	db.one(filter, function(err, doc) {
 
 		if (doc)
 			return callback(doc);
@@ -146,7 +171,7 @@ Page.setRemove(function(error, id, callback) {
 	};
 
 	// Updates database file
-	DB('pages').update(updater, callback);
+	db.update(updater, callback);
 
 	// Refreshes internal informations e.g. sitemap
 	setTimeout(refresh, 1000);
@@ -191,11 +216,11 @@ Page.setSave(function(error, model, options, callback) {
 	};
 
 	// Updates database file
-	DB('pages').update(updater, function() {
+	db.update(updater, function() {
 
 		// Creates record if not exists
 		if (count === 0)
-			DB('pages').insert(clean);
+			db.insert(clean);
 
 		// Returns response
 		callback(SUCCESS(true));
@@ -394,7 +419,7 @@ Page.addOperation('breadcrumb', function(error, model, url, callback) {
 // Clears database
 Page.addWorkflow('clear', function(error, model, options, callback) {
 
-	DB('pages').clear(function() {
+	db.clear(function() {
 		setTimeout(refresh, 1000);
 	});
 
@@ -431,7 +456,7 @@ function refresh() {
 		}
 	};
 
-	DB('pages').all(prepare, function() {
+	db.all(prepare, function() {
 
 		// Pairs parents by URL
 		Object.keys(sitemap).forEach(function(key) {

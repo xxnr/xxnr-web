@@ -8,3 +8,4 @@ F.merge('/css/manager.css', '/css/bootstrap.min.css', '/css/ui.css', '/css/manag
 // JavaScript
 F.merge('/js/default.js', '/js/jctajr.min.js', '/js/ui.js', '/js/default.js');
 F.merge('/js/manager.js', '/js/jctajr.min.js', '/js/ui.js', '/js/manager.js');
+F.merge('/js/be_common.js',  '/js/jctajr.min.js', '/js/ui.js');
