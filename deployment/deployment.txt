@@ -1,0 +1,25 @@
+https://nodejs.org/dist/v4.1.1/node-v4.1.1-linux-x64.tar.gz
+extract and run "absolutepath/node debug.js" directly 
+
+/root/xxnr/v2.0/node-v4.1.1/node-v4.1.1-linux-x64/bin/npm install ffi
+
+/root/xxnr/v2.0/node-v4.1.1/node-v4.1.1-linux-x64/bin/node debug.js
+nohup /root/xxnr/v2.0/node-v4.1.1/node-v4.1.1-linux-x64/bin/node debug.js > /dev/null &
+
+tr -d '\r' < xxnr.sh > /etc/init.d/xxnr
+chkconfig xxnr on
+reboot
+
+
+enable pm2:
+	npm install pm2 -g
+	在 /etc/profile 加上
+		#set for nodejs
+		export NODE_HOME=~/node-v4.1.1-linux-x64 
+		export PATH=$NODE_HOME/bin:$PATH
+		
+		
+pm2 start debug.js
+
+export NODE_PATH=~/xxnr/v2.0/website/
+pm2 start release.js -i 0

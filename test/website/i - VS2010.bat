@@ -1,0 +1,1 @@
+%~sdp0i.bat "%VS100COMNTOOLS%" test-xxnr.sln

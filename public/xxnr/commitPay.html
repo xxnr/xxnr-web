@@ -1,0 +1,89 @@
+<!doctype html>
+<html ng-app="commit_pay">
+<head>
+<meta charset="utf-8">
+<meta name="renderer" content="webkit">
+<meta name="force-rendering" content="webkit">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+<title>订单结算 - 新新农人</title>
+    <!--[if lte IE 7]><script>alert('为了更好的购物体验，请升级您的浏览器版本');window.location.href='http://cdn.dmeng.net/upgrade-your-browser.html?referrer='+location.href;</script><![endif]-->
+    <link rel='icon' href='images/title_logo.png' type='image/png' />
+    <meta http-equiv="pragma" content="no-cache">
+    <meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
+    <meta http-equiv="expires" content="Wed, 26 Feb 1997 08:21:57 GMT">
+    <!-- build:css -->
+    <link type="text/css" rel="stylesheet" href="css/addAddress.css">
+    <link type="text/css" rel="stylesheet" href="css/sweetalert.css">
+    <link type="text/css" rel="stylesheet" href="css/style.css">
+    <!-- endbuild -->
+    <!-- build:js -->
+    <script src="js/jquery.min.js"></script>
+    <script src="js/angular.min.js"></script>
+    <script src="js/angular-cookies.min.js"></script>
+    <script src="js/common.js"></script>
+    <script src="js/login/loginService.js"></script>
+    <script src="js/remoteApiService.js"></script>
+    <script src="js/payService.js"></script>
+    <script src="js/login/loginController.js"></script>
+    <script src="js/headerFooterDirective.js"></script>
+    <script src="js/headerController.js"></script>
+    <script src="js/shoppingCart/shoppingCartController.js"></script>
+    <script src="js/sweetalert.min.js"></script>
+    <script src="js/commitPay/commitPayController.js"></script>
+    <script src="js/sideService.js"></script>
+    <!-- endbuild -->
+</head>
+<body ng-controller="commitPayController" >
+<header ng-controller="headerController"></header>
+<div class="wrap nav" ng-controller="shoppingCartController">
+    <h1 class="left logo"><a href="/">新新农人</a></h1>
+    <ul class="right shopping_procedure">
+    <li><img src="images/green1.png" alt=""/><p>我的购物车</p></li>
+    <li class="procedure_line"><img src="images/green_line.png" alt=""/></li>
+    <li><img src="images/green2.png" alt=""/><p>填写核对订单信息</p></li>
+    <li class="procedure_line"><img src="images/green_line.png" alt=""/></li>
+    <li><img src="images/green_ok.png" alt=""/><p>成功提交订单</p></li>
+    </ul>
+</div>
+<div class="payBody ng-cloak">
+    <div class="orderInfo ng-cloak">
+        <p class="big ng-cloak">订单提交成功,请您尽快付款! 订单号：<span class="ng-cloak">{{order.id}}</span> <span class="right">应付金额：<span class="price ng-cloak">{{order.deposit}}</span>元</span></p>
+        <p class="ng-cloak">收货地址：<span class="ng-cloak">{{order.address}}，</span><span class="ng-cloak">{{order.receiver}}，</span><span class="ng-cloak">{{order.receiverPhone}}</span></p>
+        <!--<p>商品名称：<span ng-repeat="product in order.products">{{product.goodsName}}<span> -{{product.goodsCount}}件，</span></span></p>-->
+        <p>商品名称：<span class="ng-cloak">{{order.resultStr}}</span></p>
+    </div>
+    <div class="wrap clearfix">
+        <div class="payMethod ng-cloak">
+            <p class="confirm-tit">
+                <span class="left">选择您的付款方式</span>
+            </p>
+            <div class="clear checkout-steps">
+                <p>平台支付</p>
+                <ul class="pay-style clearfix">
+                    <li ng-repeat="payMethod in payMethods" class="ng-cloak"><a href=""  ng-class="{ 'current': $index == selectedPayMethodIndex }" ng-click="itemClicked($index)"><img ng-src="{{payMethod.imgUrl}}" alt=""></a></li>
+                </ul>
+            </div>
+            <a class="xxnr_btn" href="" ng-click="pay()">去支付</a>
+        </div>
+    </div>
+</div>
+</body>
+<div class="pop_pay_mask" ng-show="showPayPop" ng-cloak></div>
+<div class="pop_content" ng-show="showPayPop" ng-cloak>
+    <div class="pop_head">
+        <span class="left">确认付款</span>
+    </div>
+    <div class="pop_pay">
+        <p for="" class="pay_alter_info">请在支付页面中完成支付，付款完成前请不要关闭此窗口</p>
+        <div class="pop_pay_btn">
+            <div class="left">
+                <a href="" class="btn" ng-click="finishPay()">支付完成</a>
+            </div>
+            <div class="right">
+                <a href="" class="btn" ng-click="notFinishPay()">支付遇到问题</a>
+            </div>
+        </div>
+    </div>
+</div>
+<footer></footer>
+</html>

@@ -1,0 +1,12 @@
+[{
+  "name"        : "xxnr",
+  "script"      : "release.js",
+  "cwd"         : "/root/xxnr/v2.0/website", /* 指定该app工作目录，这样pm2会相对这个目录去找脚本之类的。*/
+  "error_file" : "app-err.log",
+  "out_file"   : "app-out.log",
+  "pid_file"   : "app.pid",
+  "one_launch_only"  : "true",
+  "env": {
+      "NODE_ENV": "production"
+  }
+}]

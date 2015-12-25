@@ -1,0 +1,48 @@
+@{layout('')}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>@{model.title} - 新新农人</title>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=10" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=0.5, maximum-scale=2.0, user-scalable=yes" />
+    <meta name="robots" content="all,follow" />
+    @{head}
+    <style>
+        .container{margin: 0 auto;width: 90%;}
+        .container .title h2{text-align: center;}
+        .container .info{display: inline-block;width: 100%;}
+        .container .info div{color: rgb(102, 102, 102);display: inline-block;    margin-right: 10px;}
+        .container #news_body{margin-top: 5px;padding-left: 5px;padding-right: 5px;padding-bottom: 5px;}
+        .container #news_body img{display: block;max-width: 90%;width: 90%;-ms-interpolation-mode: bicubic;height:auto;margin: 0 auto;}
+    </style>
+</head>
+
+<body>
+	<div class="container">
+        <div class="title">
+            <h2>@{model.title}</h2>
+        </div>
+        <div class="info">
+            <div id="createdate"></div>
+            <div id="tags"></div>
+        </div>
+        <div id="news_body"></div>
+    </div>
+            
+    @{json(model, 'news')}
+
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/moment.min.js"></script>
+    <script  type="text/javascript">
+        var data = JSON.parse($('#news').html());
+        var time_s = new Date(data.datecreated);
+        $("#createdate").html(moment(time_s).format('YYYY-MM-DD HH:mm:ss'));
+        $("#tags").html('标签：' + data.category);
+        $("#news_body").html(data.newsbody);
+    </script>
+  
+</body>
+</html>

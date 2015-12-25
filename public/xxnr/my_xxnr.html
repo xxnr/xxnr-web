@@ -1,0 +1,278 @@
+<!doctype html>
+<html ng-app="user_center" ng-controller="needLoginController">
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit">
+    <meta name="force-rendering" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+    <title>我的新农人</title>
+    <!--[if lte IE 7]><script>alert('为了更好的购物体验，请升级您的浏览器版本');window.location.href='http://cdn.dmeng.net/upgrade-your-browser.html?referrer='+location.href;</script><![endif]-->
+    <link rel='icon' href='images/title_logo.png' type='image/png' />
+    <meta http-equiv="pragma" content="no-cache">
+    <meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
+    <meta http-equiv="expires" content="Wed, 26 Feb 1997 08:21:57 GMT">
+    <!-- build:css -->
+    <link rel="stylesheet" type="text/css" href="css/uploadify.css" />
+    <link type="text/css" rel="stylesheet" href="css/style.css">
+    <link type="text/css" rel="stylesheet" href="css/sweetalert.css">
+    <!-- endbuild -->
+    <!-- build:js -->
+    <script src="js/jquery.min.js"></script>
+    <script src="js/angular.min.js"></script>
+    <script src="js/angular-cookies.min.js"></script>
+    <script src="js/common.js"></script>
+    <script src="js/login/loginService.js"></script>
+    <script src="js/remoteApiService.js"></script>
+    <script src="js/payService.js"></script>
+    <script src="js/shoppingCart/shoppingCartController.js"></script>
+    <script src="js/userCenter/userCenterController.js"></script>
+    <script src="js/login/loginController.js"></script>
+    <script src="js/headerFooterDirective.js"></script>
+    <script src="js/headerController.js"></script>
+    <script src="js/jsencrypt.js"></script>
+    <script src="js/sweetalert.min.js"></script>
+    <script src="js/uploadService.js"></script>
+    <script src="js/jquery.uploadify.min.js"></script>
+    <script src="js/sideService.js"></script>
+    <!-- endbuild -->
+</head>
+<body ng-controller="userCenterController" ng-class="{true:'overflow_body', false:'not_overflow_body'}[isOverflow]">
+<header ng-controller="headerController"></header>
+
+
+
+<div class="wrap nav" ng-controller="shoppingCartController">
+    <h1 class="left logo"><a href="/">新新农人</a></h1>
+    <ul class="left">
+        <li><a href="/">首页</a></li>
+        <li><a href="huafei_list.html">化肥专场</a></li>
+        <li><a href="car_list.html">汽车专场</a></li>
+        <li><a href="news_list.html">新农资讯</a></li>
+        <!-- <li><a href="#">新农论坛</a></li> -->
+        <li><a href="about.html">公司介绍</a></li>
+    </ul>
+    <div class="right buy">
+        <a href="" ng-click="accessShoppingCart()">
+            <em>&nbsp;</em>
+            购物车
+        </a>
+    </div>
+    <span class="shopping_cart_badge ng-cloak" ng-bind="shoppingCartCount"></span>
+    <a href="#" id="side_shoping_cart" ng-click="accessShoppingCart()" title="side shopping cart">
+        <img src="images/shopping-right.png" alt=""/>
+        <span class="side_shopping_cart_badge ng-cloak" ng-show="shoppingCartCount>0">{{shoppingCartCount>99?'99+':shoppingCartCount}}</span>
+    </a>
+</div>
+
+<a href="#" id="back-to-top" title="Back to top"><img src="images/backToTop.png" alt=""/></a>
+<div class="clear channel3 cart_box">
+    <p class="guide">
+        <a href="/">首页</a> ／ <a href="my_xxnr.html">我的新农人</a>
+    </p>
+    <div class="wrap jifen_box ng-cloak">
+        <div class="user_img">
+            <a href="" ng-click="showAvatarChange()"><img ng-src={{user.imgUrl}} alt=""></a>
+            <div id="hover-content">
+                点击头像修改
+            </div>
+        </div>
+        <div class="user_info">
+            <p>昵称：</p>
+            <input type="text" ng-class="{true:'editable_input_editing', false:'editable_input_not_editing'}[user.nickname_editing]" ng-model="user.nickname" ng-readonly="!user.nickname_editing" focus-me="{{user.nickname_editing}}">
+            <a href="" ng-class="{true:'editable_button_editing',false:'editable_button_not_editing'}[user.nickname_editing]" ng-click="modifyNickname()" ng-cloak>{{user.nickname_action_name}}</a>
+            <p>手机：<span class="phoneNumber" ng-cloak>{{user.phoneNumber}}</span></p>
+            <p ng-cloak>地址： {{user.address}}</p>
+
+            <!-- -->
+            <!--<div class="user_info" ng-class="{false:'notFilledTop'}[user.isUserInfoFullFilled]">-->
+            <!--<p class="nickname">昵称：</p>-->
+            <!--<input type="text" ng-class="{true:'editable_input_editing', false:'editable_input_not_editing'}[user.nickname_editing]" ng-model="user.nickname" ng-readonly="!user.nickname_editing" focus-me="{{user.nickname_editing}}">-->
+            <!--<a href="" ng-class="{true:'editable_button_editing',false:'editable_button_not_editing'}[user.nickname_editing]" ng-click="modifyNickname()" ng-cloak>{{user.nickname_action_name}}</a>-->
+            <!--<div class="userProfile ng-hide" ng-hide="!user.isUserInfoFullFilled">-->
+                <!--<p class="name">姓名: {{user.name}} <span ng-class="{true:'female',false:'male'}[user.sex]">{{user.sex}}</span></p>-->
+                <!--<p>所在地区：{{user.address}}</p>-->
+                <!--<p class="type">类型：{{user.type}}<img ng-if="user.isVerified" src="images/huiyuan.png" alt=""/><a href="fillProfile.html">修改资料<img src="images/right-button.png" alt=""/></a></p>-->
+            <!--</div>-->
+            <!--<div class="needToFillProfile ng-hide" ng-hide="user.isUserInfoFullFilled">-->
+                <!--还没有完善资料哟，快去填写领积分！<a href="fillProfile.html">去完善资料<img src="images/right-button.png" alt=""/></a>-->
+            <!--</div>-->
+            <p ng-cloak><a href="" ng-click="showModifyPwd()">修改密码</a></p>
+        </div>
+        <div class="jifen">
+            <p class="total">总积分：</p>
+            <p class="num" ng-cloak>{{user.points}}</p>
+            <!--<div class="jifen_input">-->
+                <!--<div class="left input">-->
+                    <!--<input placeholder="输入新农币兑换码" type="text">-->
+                <!--</div>-->
+                <!--<div class="left"><a href="#" class="xxnr_btn">兑换成积分</a></div>-->
+            <!--</div>-->
+
+            <div class="invitation_btn"><a href="invitationCenter.html" class="xxnr_btn">新农代表</a></div>
+        </div>
+    </div>
+    <div class="wrap wrap_user_info">
+        <div class="orders">
+            <div class="orders-main">
+                <ul class="details_tab">
+                    <li ng-repeat="showType in showTypes" ng-class="{true:'current', false:''}[showType.isSelected]"><a href="" ng-click='show(showType.id, $index, 1)' ng-cloak>{{showType.name}}</a></li>
+                </ul>
+                <ul class="order-titles">
+                    <li>商品详情</li>
+                    <li>单价</li>
+                    <li>数量</li>
+                    <li>实付款（元）</li>
+                    <li>状态</li>
+                    <li>操作</li>
+                </ul>
+                <div class="order-list" class="ng-cloak">
+                    <div class="single-order clearfix" ng-repeat="order in orderList | orderBy:'+createTime':true">
+                        <div class="order-info"><span class="order-time" ng-cloak>{{order.createTime_local}}</span><span class="order-number ng-cloak">订单号:{{order.id}}</span></div>
+                        <div class="row clearfix">
+                            <div class="products-section">
+                                <ul>
+                                    <li class="product clearfix" ng-repeat="product in order.products">
+                                        <div class="p-info ng-cloak">
+                                            <div class="p-img">
+                                                <a ng-href="productDetail.html?goodsId={{product.id}}" target="_blank">
+                                                    <img class="ng-cloak" ng-src={{product.thumbnail}}>
+                                                </a>
+                                            </div>
+                                            <div class="p-name">
+                                                <a class="ng-cloak" ng-href="productDetail.html?goodsId={{product.id}}" ng-cloak target="_blank">{{product.name}}</a>
+                                            </div>
+                                            <div class="p-price">
+                                            <p class="now" class="ng-cloak">¥{{product.deposit?product.deposit.toFixed(2):product.price.toFixed(2)}}{{product.deposit?"(订金)":""}}</p>
+                                            <!--<p class="jifen">{{item.point}}积分抵价{{item.point}}元</p>-->
+                                            </div>
+                                            <div class="p-quantity ng-cloak">
+                                                {{product.count}}
+                                            </div>
+                                            <!--<div class="pay-step" ng-show="{{product.deposit>0}}">-->
+                                                <!--<div class="pay-step-1"><span class="text-info">阶段一： 预付款</span><span class="order-price">¥ {{product.deposit}}</span></div>-->
+                                                <!--<div class="pay-step-2"><span class="text-info">阶段二：尾款</span>¥ {{product.price-product.deposit}}</div>-->
+                                            <!--</div>-->
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="pay-section">
+                                <div class="pay-info">
+
+                                    <p class="now" ng-cloak>￥{{order.totalPrice}}</p>
+                                    <p ng-cloak>{{order.payType}}</p>
+                                </div>
+                                <div class="pay-status">
+                                    <p class="order-statusName" ng-cloak>{{order.statusName}}</p>
+                                    <p class="order-detail" ng-cloak><a ng-href="orderDetail.html?id={{order.id}}" target="_blank">订单详情</a></p>
+                                </div>
+                                <div class="pay-action">
+                                    <p ng-show="{{order.showAction}}" ng-cloak><a href='' ng-click='order.action(order)' class="order-actionName">{{order.actionName}}</a></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="pager">
+            <ul>
+                <div id="pageIds">
+                    <li class="pre_btn"><a href="" ng-click="pre_page()"><em class="ban ban_8_0">&nbsp;</em></a></li>
+                    <li ng-repeat="page in pages"><a href="" ng-click="show_page(page.id)" ng-class="{true:'current', false:''}[page.isSelected]">{{page.id}}</a></li>
+                    <li class="next_btn"><a href="" ng-click="next_page()"><em class="ban ban_9_0">&nbsp;</em></a></li>
+                </div>
+            </ul>
+        </div>
+    </div>
+</div>
+<div class="pop_pay_mask" ng-show="showPayPop" ng-cloak></div>
+<div class="pop_content" ng-show="showPayPop" ng-cloak>
+    <div class="pop_head">
+        <span class="left">确认付款</span>
+    </div>
+    <div class="pop_pay">
+        <p for="" class="">请在支付页面中完成支付，付款完成前请不要关闭此窗口</p>
+        <div class="pop_pay_btn">
+            <div class="left">
+                <a href="" class="btn" ng-click="finishPay()">支付完成</a>
+            </div>
+            <div class="right">
+                <a href="" class="btn" ng-click="notFinishPay()">支付遇到问题</a>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="pop_mask" ng-show="showPop" ng-cloak></div>
+<div class="pop_content" ng-show="showPop" ng-cloak>
+    <div class="pop_head">
+        <span class="left">修改密码</span>
+        <a href="" ng-click='closePop()' class="right close"></a>
+    </div>
+    <div class="pop_body">
+        <ul class="pop_login">
+            <li>
+                <label for="" class="left label">旧密码：</label>
+                <div class="left">
+                    <input type="password" id="password" class="input" value="" ng-model="oldPassword">
+                </div>
+            </li>
+            <li>
+                <label for="" class="left label">新密码：</label>
+                <div class="left">
+                    <input type="password" id="password" class="input" value="" ng-model="newPassword">
+                </div>
+            </li>
+            <li>
+                <label for="" class="left label">确认密码：</label>
+                <div class="left">
+                    <input type="password" id="password_cf" class="input" value="" ng-model="confirm_newPassword" ng-keydown="confirm_newPassword_keydown($event)">
+                </div>
+            </li>
+            <li>
+                <label for="" class="left label">&nbsp;</label>
+                <div class="left">
+                    <a href="" class="btn" ng-click="modifyPwd()">确 认</a>
+                </div>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<div class="pop_mask ng-hide" ng-show="showAvatarPop" ng-cloak></div>
+<div class="pop_uploadAvatar ng-hide" ng-show="showAvatarPop">
+    <div class="avatar_container">
+        <div class="avatar_popHead clearfix">
+            <span class="left">上传一张形象照，做个“有头有脸”的人吧！</span>
+            <a href="" ng-click='closeAvatarPop()' class="right close"></a>
+        </div>
+        <div class="avatar_Body">
+            <div class="uploadAvatar">
+                <div class="newAvatarBody">
+                    <img class="original" src="" alt=""/>
+                    <div class="swf_upload_btn">
+                    <input type="file" name="file_upload" id="file_upload" />
+                    </div>
+                </div>
+                <div class="oldAvatarBody">
+                    <div class="oldAvatar">
+                        <img class="oldAvatarImg" ng-src={{user.imgUrl}} alt=""/>
+                        <p>170*170像素</p>
+                        <p>预览更换后的头像</p>
+                    </div>
+                </div>
+            </div>
+            <p>个人头像上传须知</p>
+            <div class="avatarInfo">
+                <p>支持JPG，BMP，GIF，PNG图片格式且头像小于2MB</p>
+                <p>您上传的头像会自动匹配为系统默认的尺寸，请注意查看头像是否清晰</p>
+                <p>请确保您的浏览器支持Flash</p>
+            </div>
+        </div>
+        <a href="" class="xxnr_btn" ng-click="confirmUploadAvatar()">确认并上传个人头像</a>
+    </div>
+</div>
+
+<footer></footer>
+</body>
+</html>

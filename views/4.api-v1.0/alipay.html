@@ -1,0 +1,22 @@
+﻿@{layout('')}
+<form id="alipaysubmit" name="alipaysubmit" action="https://mapi.alipay.com/gateway.do?_input_charset=UTF-8" method="get">
+	<input type="hidden" name="sign" value="@{model.sign}" />
+	<input type="hidden" name="body" value="@{model.body}" />
+	<input type="hidden" name="_input_charset" value="@{model._input_charset}" />
+	<input type="hidden" name="exter_invoke_ip" value="@{model.exter_invoke_ip}" />
+	<input type="hidden" name="total_fee" value="@{model.total_fee}" />
+	<input type="hidden" name="subject" value="@{model.subject}" />
+	<input type="hidden" name="sign_type" value="@{model.sign_type}" />
+	<input type="hidden" name="service" value="@{model.service}" />
+	<input type="hidden" name="notify_url" value="@{model.notify_url}" />
+	<input type="hidden" name="partner" value="@{model.partner}" />
+	<input type="hidden" name="seller_email" value="@{model.seller_email}" />
+	<input type="hidden" name="anti_phishing_key" value="@{model.anti_phishing_key}" />
+	<input type="hidden" name="out_trade_no" value="@{model.out_trade_no}" />
+	<input type="hidden" name="payment_type" value="@{model.payment_type}" />
+	<input type="hidden" name="return_url" value="@{model.return_url}" />
+	<input type="submit" value="чбошод" style="display: none;">
+</form>
+<script>
+	document.forms['alipaysubmit'].submit();
+</script>

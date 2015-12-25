@@ -1,0 +1,128 @@
+<!doctype html>
+<html ng-app="invitation" ng-controller="needLoginController">
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit">
+    <meta name="force-rendering" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+    <title>我的新农人</title>
+    <!--[if lte IE 7]><script>alert('为了更好的购物体验，请升级您的浏览器版本');window.location.href='http://cdn.dmeng.net/upgrade-your-browser.html?referrer='+location.href;</script><![endif]-->
+    <link rel='icon' href='images/title_logo.png' type='image/png' />
+    <meta http-equiv="pragma" content="no-cache">
+    <meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
+    <meta http-equiv="expires" content="Wed, 26 Feb 1997 08:21:57 GMT">
+    <!-- build:css -->
+    <link type="text/css" rel="stylesheet" href="css/style.css">
+    <link type="text/css" rel="stylesheet" href="css/sweetalert.css">
+    <!-- endbuild -->
+    <!-- build:js -->
+    <script src="js/jquery.min.js"></script>
+    <script src="js/angular.min.js"></script>
+    <script src="js/angular-cookies.min.js"></script>
+    <script src="js/common.js"></script>
+    <script src="js/login/loginService.js"></script>
+    <script src="js/remoteApiService.js"></script>
+    <script src="js/payService.js"></script>
+    <script src="js/shoppingCart/shoppingCartController.js"></script>
+    <script src="js/userCenter/userCenterController.js"></script>
+    <script src="js/login/loginController.js"></script>
+    <script src="js/headerFooterDirective.js"></script>
+    <script src="js/headerController.js"></script>
+    <script src="js/jsencrypt.js"></script>
+    <script src="js/sweetalert.min.js"></script>
+    <script src="js/invitation/invitationController.js"></script>
+    <script src="js/sideService.js"></script>
+    <!-- endbuild -->
+</head>
+<body ng-controller="invitationController">
+<header ng-controller="headerController"></header>
+
+<div class="wrap nav" ng-controller="shoppingCartController">
+    <h1 class="left logo"><a href="/">新新农人</a></h1>
+    <ul class="left">
+        <li><a href="/">首页</a></li>
+        <li><a href="huafei_list.html">化肥专场</a></li>
+        <li><a href="car_list.html">汽车专场</a></li>
+        <li><a href="news_list.html">新农资讯</a></li>
+        <!-- <li><a href="#">新农论坛</a></li> -->
+        <li><a href="about.html">公司介绍</a></li>
+    </ul>
+    <div class="right buy">
+        <a href="" ng-click="accessShoppingCart()">
+            <em>&nbsp;</em>
+            购物车
+        </a>
+    </div>
+    <span class="shopping_cart_badge ng-cloak" ng-bind="shoppingCartCount"></span>
+    <a href="#" id="side_shoping_cart" ng-click="accessShoppingCart()" title="side shopping cart">
+        <img src="images/shopping-right.png" alt=""/>
+        <span class="side_shopping_cart_badge ng-cloak" ng-show="shoppingCartCount>0">{{shoppingCartCount>99?'99+':shoppingCartCount}}</span>
+    </a>
+</div>
+
+<a href="#" id="back-to-top" title="Back to top"><img src="images/backToTop.png" alt=""/></a>
+<div class="clear channel3 invitation">
+    <p class="guide">
+        <a href="/">首页</a> ／ <a href="my_xxnr.html">我的新农人</a> ／ <a href="invitationCenter.html">新农代表</a>
+    </p>
+    <div class="invitation_section">
+        <div class="wrap">
+            <ul class="invitation_tabs row" ng-init="tab = this.tabNum">
+                <li><a class="xxnr_btn" ng-class="{current:tab===1}" href="#" ng-click="tab = 1" >我的客户</a>
+                <li><a class="xxnr_btn" ng-class="{current:tab===2}" href="#" ng-click="tab = 2" >我的新农代表</a>
+            </ul>
+            <div class="myClients_forms">
+                <div ng-cloak ng-show="tab===1" class="clients_section ng-cloak" ng-cloak>
+                    <div ng-show="invitees.length==0" class="noClient-info">
+                        <p>您还没有邀请用户,若您是新新农人的代理商，快去邀请客户吧~</p>
+                    </div>
+                    <div class="clients_info" ng-show="invitees.length!==0">
+                        <p class="clients_count">我已邀请<span>{{invitees.length}}</span>位客户</p>
+                        <ul class="clients_form">
+                            <li class="form_title">
+                                <ul class="row">
+                                    <li>序号</li>
+                                    <li>客户昵称</li>
+                                    <li>客户手机号</li>
+                                    <li>邀请时间</li>
+                                </ul>
+                            </li>
+                            <li class="client_row" ng-repeat="invitee in invitees">
+                                <ul class="row">
+                                    <li>{{$index+1}}</li>
+                                    <li>{{invitee.nickname?invitee.nickname:"该用户未设置昵称"}}</li>
+                                    <li>{{invitee.account}}</li>
+                                    <li>{{invitee.dateinvited | convertDateToLocal }}</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div ng-show="tab===2" class="inviter_section" ng-cloak>
+                    <div ng-show="!inviter" class="noInviter_info" ng-cloak>
+                        <p>您还没有设置新农代表，可通过输入对方手机号添加，设置后，新农代表将专人跟进您的订单和配送问题~</p>
+                        <div class="add_inviter">
+                            <input type="text" ng-model="inviterNum" /><a href="" class="xxnr_btn" ng-click="bindInviter()" ng-cloak>添加代表人</a>
+                        </div>
+                    </div>
+                    <div class="inviter_wrap" ng-cloak>
+                        <div ng-show="inviter" class="inviter_info" ng-show="">
+                            <p class="info_title">我的代表</p>
+                            <div class="inviter_img left">
+                                <img ng-src={{imgUrl}} alt="">
+                            </div>
+                            <div class="inviter_info left">
+                                <p>昵称：<span class="nickname" ng-cloak>{{inviterNickname?inviterNickname:"该用户未设置昵称"}}</p>
+                                <p>手机：<span class="phoneNumber" ng-cloak>{{ inviter }}</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<footer></footer>
+</body>
+</html>

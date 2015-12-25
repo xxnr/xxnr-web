@@ -1,0 +1,190 @@
+<!doctype html>
+<html ng-app="shop_cart" ng-controller="needLoginController">
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit">
+    <meta name="force-rendering" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+    <title>购物车 - 新新农人</title>
+    <!--[if lte IE 7]><script>alert('为了更好的购物体验，请升级您的浏览器版本');window.location.href='http://cdn.dmeng.net/upgrade-your-browser.html?referrer='+location.href;</script><![endif]-->
+    <link rel='icon' href='images/title_logo.png' type='image/png' />
+    <meta http-equiv="pragma" content="no-cache">
+    <meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
+    <meta http-equiv="expires" content="Wed, 26 Feb 1997 08:21:57 GMT">
+    <!-- build:css -->
+    <link type="text/css" rel="stylesheet" href="css/style.css">
+    <link type="text/css" rel="stylesheet" href="css/sweetalert.css">
+    <!-- endbuild -->
+    <!-- build:js -->
+    <script src="js/jquery.min.js"></script>
+    <script src="js/angular.min.js"></script>
+    <script src="js/angular-cookies.min.js"></script>
+    <script src="js/common.js"></script>
+    <script src="js/login/loginService.js"></script>
+    <script src="js/remoteApiService.js"></script>
+    <script src="js/payService.js"></script>
+    <script src="js/shoppingCart/shoppingCartController.js"></script>
+    <script src="js/login/loginController.js"></script>
+    <script src="js/headerFooterDirective.js"></script>
+    <script src="js/headerController.js"></script>
+    <script src="js/sweetalert.min.js"></script>
+    <script src="js/angular-ui-router.min.js"></script>
+    <script src="js/adaptiveOptBoxDirective.js"></script>
+    <script src="js/sideService.js"></script>
+    <!-- endbuild -->
+</head>
+<body ng-controller="shoppingCartController">
+<header ng-controller="headerController"></header>
+<div class="wrap nav" ng-controller="shoppingCartController">
+    <h1 class="left logo"><a href="/">新新农人</a></h1>
+    <div class="ng-hide ng-cloak" ng-show="shoppingCartCount===0">
+        <ul class="left">
+            <li><a href="/">首页</a></li>
+            <li><a href="huafei_list.html">化肥专场</a></li>
+            <li><a href="car_list.html">汽车专场</a></li>
+            <li><a href="news_list.html">新农资讯</a></li>
+            <!-- <li><a href="#">新农论坛</a></li> -->
+            <li><a href="about.html">公司介绍</a></li>
+        </ul>
+        <div class="right buy">
+            <a href="" ng-click="accessShoppingCart()">
+                <em>&nbsp;</em>
+                购物车
+            </a>
+        </div>
+        <span class="shopping_cart_badge ng-cloak" ng-bind="shoppingCartCount"></span>
+    </div>
+    <div class="ng-hide" ng-show="shoppingCartCount>0">
+        <ul class="right shopping_procedure">
+            <li><img src="images/green1.png" alt=""/><p>我的购物车</p></li>
+            <li class="procedure_line"><img src="images/gray_line.png" alt=""/></li>
+            <li><img src="images/gray2.png" alt=""/><p>填写核对订单信息</p></li>
+            <li class="procedure_line"><img src="images/gray_line.png" alt=""/></li>
+            <li><img src="images/gray0k.png" alt=""/><p>成功提交订单</p></li>
+        </ul>
+    </div>
+
+</div>
+<div class="clear channel3 cart_box">
+    <div class="wrap">
+    <div class="buy" ng-show="shoppingCartCount>0">
+        <a class="ng-cloak" href="" ng-click="accessShoppingCart()"><em>&nbsp;</em>购物车（{{shoppingCartCount}}）</a>
+    </div>
+    </div>
+    <div class="wrap">
+
+        <div class="cart ng-cloak">
+            <div class="cart-main" ng-show="shoppingCartCount>0">
+                <div class="cart-thead">
+                    <div class="column t-checkbox">
+                        <div class="cart-checkbox">
+                            <input type="checkbox" checked="checked" class="checkbox" ng-change="selectAll()" ng-model="allSelected">
+                        </div>
+                        全选
+                    </div>
+                    <div class="column t-goods">商品信息</div>
+                    <div class="column t-price">单价(元)</div>
+                    <div class="column t-quantity">数量</div>
+                    <div class="column t-sum">合计(元)</div>
+                    <div class="column t-action">操作</div>
+                </div>
+                <div class="cart-list">
+                    <div class="cart-item-list">
+                        <div class="cart-tbody" ng-repeat="shop in shops">
+                            <div class="shop">
+                                <div class="cart-checkbox">
+                                    <input type="checkbox" checked="checked" class="checkbox"ng-change="selectShop($index)" ng-model="shop.allSelected" >
+                                </div>
+                                <span class="shop-txt">
+                                        <a class="shop-name ng-cloak" href="#" target="_blank">{{shop.name}}</a>
+                                </span>
+                            </div>
+                            <div class="item-list">
+                                <div class="item-item" ng-repeat="item in shop.items">
+                                    <div class="item-form">
+
+                                        <div class="cell p-goods">
+                                            <div class="cell p-checkbox">
+                                                <input type="checkbox" class="checkbox" ng-change="selectItem($parent.$index, $index)" ng-model="item.selected">
+                                            </div>
+                                            <div class="goods-item">
+                                                <div class="p-img">
+                                                    <a class="ng-cloak" ng-href={{item.detailPageUrl}}>
+                                                        <img ng-src={{item.thumbnailUrl}}>
+                                                    </a>
+                                                </div>
+                                                <div class="item-msg">
+                                                    <div class="p-name">
+                                                        <a class="ng-cloak" ng-href={{item.detailPageUrl}}>{{item.name}}</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="cell p-props-price">
+                                            <p class="old">
+                                            <div class="ng-cloak" ng-show="{{item.onSale}}" class="old" ng-cloak>{{item.oldPrice}}元</div>
+                                            </p>
+                                            <p class="now ng-cloak">¥ {{item.nowPrice}}</p>
+                                            <!--<p class="jifen">{{item.point}}积分抵价{{item.point}}元</p>-->
+                                        </div>
+                                        <div class="cell p-props-quantity">
+                                            <div class="buy_box">
+                                                <div class="left buy_btn">
+                                                    <a class="btn-reduce" href="" ng-click="reduce($parent.$index, $index)">-</a>
+                                                    <a class="btn-add" href="" ng-click="add($parent.$index, $index)">+</a>
+                                                    <input maxLength=4 class="text" id="buy-num" ng-change="buyCountChange($parent.$index, $index, item.buyCount, item.oldBuyCount)" ng-Blur="submitChange(item.goodsId, item.buyCount)" ng-model="item.buyCount">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="cell p-sum">
+                                            <!--<div ng-cloak>{{item.totalDeposit}}<span ng-show="{{item.deposit}}">（订金）</span></div>-->
+                                            <div class="ng-cloak">¥ {{item.totalPrice}}</div>
+
+                                        </div>
+
+                                        <div class="cell p-ops"><a class="cart-remove" href="" ng-click="deleteItem($parent.$index, $index)">删除</a></div>
+
+                                    </div>
+                                    <div class="pay-step" ng-show="{{item.hasDeposit}}">
+                                        <div class="ng-cloak pay-step-1"><span class="text-info">阶段一： 预付款</span><span class="order-price ng-cloak">¥ {{item.totalDeposit}}</span></div>
+                                        <div class="ng-cloak pay-step-2"><span class="text-info">阶段二：尾款</span>¥{{(item.totalPrice-item.totalDeposit).toFixed(2)}}</div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <ng-view>
+    <div class="wrap options-box ng-hide" ng-show="shoppingCartCount>0">
+        <div class="submit-btn right"><a href="" ng-click="checkout('confirmOrder.html')">去结算</a></div>
+        <div class="price-total right">
+            <p><label>已选择商品<span class="ng-cloak">{{totalCount}}</span>件</label></p>
+            <p><label>总价（不计运费）：</label><span class="total ng-cloak">¥{{totalPrice}}</span></p>
+            <!--<p><label>已节省：</label><span ng-cloak>{{totalSaving}}元</span></p>-->
+        </div>
+
+    </div>
+    </ng-view>
+    <div class="wrap emptyCart ng-hide" ng-show="shoppingCartCount===0">
+        <div class="emptyCartContent">
+            <div class="cartImage left">
+                <img src="images/gouwuche.png" alt=""/>
+            </div>
+            <div class="emptyCartBody right">
+                <p>购物车空空的哦，赶快去挑心仪的产品吧~</p>
+                <a href="huafei_list.html" class="xxnr_btn">去买化肥</a>
+                <a href="car_list.html" class="xxnr_btn">去买汽车</a>
+            </div>
+
+        </div>
+    </div>
+<!-- <custom-alert ng-hide="hiddenAlert"></custom-alert> -->
+</div>
+<footer></footer>
+</script>
+</body>
+</html>

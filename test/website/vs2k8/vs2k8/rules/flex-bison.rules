@@ -1,0 +1,46 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<VisualStudioToolFile
+	Name="Flex&amp;Bison File"
+	Version="8.00"
+	>
+	<Rules>
+		<CustomBuildRule
+			Name="Bison"
+			DisplayName="Bison"
+			CommandLine="win_bison [AllOptions] [AdditionalOptions]  [Inputs]"
+			Outputs="[$(BisonOutput)]"
+			FileExtensions="*.y"
+			>
+			<Properties>
+				<BooleanProperty
+					Name="Defines"
+					DisplayName="Defines"
+					Switch="--defines"
+					DefaultValue="true"
+				/>
+				<StringProperty
+					Name="BisonOutput"
+					DisplayName="BisonOutput"
+					Switch="--output=&quot;[value]&quot;"
+					DefaultValue="$(InputName).tab.cpp"
+				/>
+			</Properties>
+		</CustomBuildRule>
+		<CustomBuildRule
+			Name="Flex"
+			DisplayName="Flex"
+			CommandLine="win_flex [AllOptions] [AdditionalOptions]  [Inputs]"
+			Outputs="[$(FlexOutput)]"
+			FileExtensions="*.l"
+			>
+			<Properties>
+				<StringProperty
+					Name="FlexOutput"
+					DisplayName="FlexOutput"
+					Switch="--outfile=&quot;[value]&quot;"
+					DefaultValue="$(InputName).flex.cpp"
+				/>
+			</Properties>
+		</CustomBuildRule>
+	</Rules>
+</VisualStudioToolFile>

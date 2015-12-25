@@ -1,0 +1,1 @@
+%~sdp0i.bat "%VS90COMNTOOLS%" test-xxnr-VS2K8.sln

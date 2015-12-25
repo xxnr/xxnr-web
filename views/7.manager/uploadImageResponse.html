@@ -1,0 +1,8 @@
+@{layout('')}
+<script type="text/javascript">
+	@{if model.imageurl && model.imageurl !== ''}
+		window.parent.CKEDITOR.tools.callFunction(@{model.callback},'@{model.imageurl}');
+	@{else}
+		window.parent.CKEDITOR.tools.callFunction(@{model.callback},'','@{model.message}');
+	@{fi}
+</script>

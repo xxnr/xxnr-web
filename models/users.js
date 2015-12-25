@@ -8,7 +8,7 @@ var UserSchema = new mongoose.Schema({
     'datecreated': {type: Date, default: Date.now},		// 注册时间
     'nickname': String,		                                // 用户昵称
     'name': String,			                                // 用户名称
-    'type': {type: String, default: false},		                            // 用户类型 1：其他 2：种植大户 3：村级经销商 4：乡镇经销商 5：县级经销商 it's configured in config file right now
+    'type': {type: String, default:"1"},    		        // 用户类型 1：其他 2：种植大户 3：村级经销商 4：乡镇经销商 5：县级经销商 it's configured in config file right now
     'typeVerified': {type: String},                         // 认证类型
     'sex': {type: Boolean, default:false},			    // 性别 0：男 1：女
     'photo': String,			                            // 用户头像
@@ -20,7 +20,7 @@ var UserSchema = new mongoose.Schema({
     'webLoginId' : String,                                  // web login id
     'appLoginId' : String,                                  // app login id
     'registerAgent': String,					            // 注册时的设备
-    isUserInfoFullFilled:{type: Boolean, default: false},   // 是否完善用户信息并获取积分
+    isUserInfoFullFilled:{type: Boolean, default: false}, // 是否完善用户信息并获取积分
 	address:{                                               // 用户所在地
         province:{type:mongoose.Schema.ObjectId, ref:'province'},
         city:{type:mongoose.Schema.ObjectId, ref:'city'},

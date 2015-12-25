@@ -1,6 +1,5 @@
-databases/*
-databases-online/*
-.idea/*
-tmp/
-*
+databases
+databases-online
+.idea
+tmp
 *.pid
