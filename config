@@ -29,7 +29,8 @@ default-image-converter		: gm
 backendtokencookie          :be_token
 tokencookie                 :token
 usercookie					: __user
-domain                      :.xinxinnongren.com
+//domain                      :.xinxinnongren.com
+domain                      :101.200.194.203
 usercookie_expires_in       :30 days
 
 // user sign
