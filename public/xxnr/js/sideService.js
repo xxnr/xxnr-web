@@ -62,6 +62,7 @@ app.service('sideService',function () {
                 $('#back-to-top').css('right', '22px');
                 $('#side_shoping_cart').css('right', '22px');
             }
+
         });
 
         $('#back-to-top').on('click', function (e) {

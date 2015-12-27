@@ -123,7 +123,7 @@ function json_town_query() {
 	AreaService.queryTown(options, function(err, data){
 		if(!data || err) {
 			if (err)
-				console.log('area json_county_query err:' + err);
+				console.log('area json_town_query err:' + err);
 			self.respond({'code':'1001','message':'没有查询到乡镇'});
 			return;
 		} else {

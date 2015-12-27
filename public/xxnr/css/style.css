@@ -99,7 +99,7 @@ body{font-family:"Microsoft YaHei","Lucida Sans Unicode","Myriad Pro","Hiragino 
 .product_not_allowed_btn{cursor:not-allowed;float:left;margin-left:80px;width:150px;height:46px;background:#9A9691;border:1px solid #9A9691;color:#FFFFFF;text-align:center;line-height:46px;}
 .cursor_not_allowed{cursor:not-allowed;}
 /*header*/
-.header{width:100%;height:40px;font-size:12px;color:#d2d2d2;background:#333;}
+.header{width:100%;height:40px;font-size:12px;color:#d2d2d2;background:#333;position: relative;}
 .header .telephone{line-height: 40px;position: relative;}
 .header .telephone img{padding-top: 10px;padding-right: 5px;}
 .header .header_weChat{padding: 10px;display: inline-block;}
@@ -117,7 +117,7 @@ body{font-family:"Microsoft YaHei","Lucida Sans Unicode","Myriad Pro","Hiragino 
 .header .header_slide{position:relative;display:inline-block;*display:inline;zoom:1;margin-right: 10px;height: 40px;line-height: 40px;}
 .header .header_slide .mobile{width:78px;height:40px;line-height:40px;text-align:center;cursor:pointer;}
 .header .header_slide .mobile.current{z-index:2;position:relative;}
-.header .header_slide .header_pop{display:none;position:absolute;right:-60px;top:40px;width:184px;height:210px;background:#fff;border:1px solid #e0e0e0;z-index: 100;}
+.header .header_slide .header_pop{display:none;position:absolute;left:-50px;top:40px;width:184px;height:210px;background:#fff;border:1px solid #e0e0e0;z-index: 100;}
 .header .header_slide .header_pop a{display:block;width:142px;height:34px;margin:10px auto;line-height:34px;text-align:center;border:1px solid #eee;color:#616161;}
 .header .header_slide .header_pop .qrcode{padding:0 20px;color: #000000;}
 .header .header_slide .header_pop .qrcode p{line-height:24px;text-align: center;}
@@ -125,6 +125,9 @@ body{font-family:"Microsoft YaHei","Lucida Sans Unicode","Myriad Pro","Hiragino 
 .header .header_slide .header_pop .qrcode a{border: 0;}
 .header .header_slide .header_pop .qrcode img{width:100px;height:100px;padding-left: 25px;}
 .header .header_slide .header_pop .qrcode .ios-qrcode{padding-top: 10px;}
+.header #help{margin-left: 30px;display: inline-block;width: 50px;}
+.header #help img{margin-top: 0px;position: absolute;margin-left: -25px;}
+.header #help a{margin-right: -10px;}
 .nav{height:110px;position: relative;}
 .nav h1 a{display:block;height:70px;width:190px;text-indent:-9999px;background:url(../images/new_logo.png) 0 -2px;margin-top: 20px;}
 .nav ul{padding-left:190px;margin-top: 20px;}
@@ -396,6 +399,8 @@ transition-delay: initial;
 .news_section .news_list .single-news .gongsidongtai{background: url(../images/news_tag02.png);}
 .news_section .news_list .single-news .hangqingfenxi{background: url(../images/news_tag03.png);}
 .news_section .news_list .single-news .zhihuinongye{background: url(../images/news_tag04.png);}
+.news_section .news_list .single-news .zhihuinongye{background: url(../images/news_tag05.png);}
+.news_section .news_list .single-news .zhihuinongye{background: url(../images/news_tag06.png);}
 .news_section .news_list .news_list_pager{display: block;margin:0px auto;text-align:center; }
 .news_section .news_list .news_list_pager #page_buttons{display: block;margin: 50px auto;}
 .news_section .news_list .news_list_pager #page_buttons ul li a{background: #FFFFFF;height: 26px;width: 26px;border-radius: 50%;border: 1px solid #c7c7c7;line-height: 26px;margin-left: 12px;display: inline-block;}
@@ -941,7 +946,7 @@ transition-delay: initial;
 .bigdata_section .bigdata_body1{height: 380px;background:#fcfeff; }
 .bigdata_section .bigdata_body1 .description{margin-left: 60px;margin-top: 130px;}
 .bigdata_section .bigdata_body1 img{margin-left: 52px;margin-top: 46px;}
-.bigdata_section .bigdata_body2{height: 380px;background:#f3fbff;}
+.bigdata_section .bigdata_body2{height: 380px;background:#F5FEF6;}
 .bigdata_section .bigdata_body2 .description{margin-left: 120px;margin-top: 96px;}
 .bigdata_section .bigdata_body2 img{margin-left: 206px;margin-top: 46px;}
 .bigdata_section .bigdata_body3{height: 380px;background:#fff;}
@@ -976,10 +981,30 @@ transition-delay: initial;
 
 .help_section{background: #F5F5F5;position: relative;}
 .help_section .side_tab{display: inline-block;width: 200px;position: absolute;margin-top: 24px;background: #FFFFFF;}
-.help_section .side_tab ul li{height: 56px;background: #FFFFFF;font-size: 18px;color: #323232;line-height: 56px;border-bottom: 1px solid #c7c7c7;text-align: center;box-sizing: border-box;}
+.help_section .side_tab ul li{border-left: 4px solid #FFFFFF;;cursor: pointer;height: 56px;background: #FFFFFF;font-size: 18px;color: #323232;line-height: 56px;border-bottom: 1px solid #c7c7c7;text-align: center;box-sizing: border-box;position: relative;}
 .help_section .side_tab ul li:first-child{background: #008a2f;color: #eafdf1;height: 60px;;line-height: 60px;border: 0;}
-.help_section .side_tab ul li.current{background:#f2f2f2;border-left: 4px solid #008a2f;}
-.help_section .side_tab ul li .image{position: absolute;width: 30px;height: 30px;display: inline-block;margin-top: 15px;margin-left: -40px;}
+.help_section .side_tab ul li.current{background:#f8f8f8;border-left: 4px solid #008a2f;}
+.help_section .side_tab ul li:hover{background:#f8f8f8;border-left: 4px solid #008a2f;}
+.help_section .side_tab ul li:first-child:hover{background:#008a2f;border-left: 0;}
+.help_section .side_tab ul li .image{position: relative;display: inline-block;margin-top: 15px;margin-left: -110px;height: 29px;}
+.help_section .side_tab ul li span{margin-top: 0px;position: absolute;margin-left: 15px;}
 .help_section .side_tab ul li .third{margin-top: 17px;}
 .help_section .help_body{display: inline-block;position: relative;margin-left: 225px;margin-top: 24px;}
-.help_section .help_body .buy_guide,.pay_method,.ship_method,.Q_And_A{background: #FFFFFF;padding: 40px 32px;width: 912px;}
+.help_section .help_body .buy_guide,.pay_method,.ship_method,.Q_And_A{min-height: 800px;background: #FFFFFF;padding: 40px 32px;width: 912px;margin-bottom: 30px;}
+.help_section .help_body h2{color: #008a2f;font-size: 24px;font-weight: bold;padding-bottom: 12px;border-bottom: 2px dotted #e2e2e2;}
+.help_section .help_body h3{color: #008a2f;font-size: 18px;padding:16px 0;font-weight: bold;}
+.help_section .help_body h4{color: #323232;font-weight: bold;padding: 12px 0;}
+.help_section .help_body p{color: #323232;padding: 5px 0;}
+.help_section .help_body img{margin: 10px 0;border: 2px solid #e2e2e2;border-radius: 2px;}
+.help_section .help_body .buy_guide img{padding: 4px;}
+.help_section .help_body .pay_method {height: 800px;}
+.help_section .help_body .pay_method img{margin-left: 40px;border: 0;}
+.help_section .help_body .pay_method h3{color: #323232;font-weight: bold;}
+.help_section .help_body .pay_method span{font-weight: normal;margin-left: 24px;}
+.help_section .help_body .pay_method h4 img{margin: 0px;margin-right: 20px;margin-top: 2px;}
+.help_section .help_body .Q_And_A{position: relative;}
+.help_section .help_body .Q_And_A img{border: 0;}
+.help_section .help_body .Q_And_A span{border: 0;font-weight: bold;font-size: 16px;}
+.help_section .help_body .Q_And_A p{padding: 3px 0;}
+.help_section .help_body .Q_And_A .huafei_requirement{position: relative;margin-top: -25px;margin-left: 50px;}
+.help_section .help_body .Q_And_A .huafei_requirement .title{margin-left: -20px;}
