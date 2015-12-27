@@ -10,6 +10,7 @@ var UserService = services.user;
 var UseraddressService = services.useraddress;
 var AreaService = services.area;
 var CartService = services.cart;
+var OrderService = services.order;
 var REG_MOBILE = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|Tablet|IOS/i;
 
 exports.install = function() {
@@ -29,6 +30,7 @@ exports.install = function() {
     F.route('/api/v2.0/user/findAccount/',              json_user_findaccount, ['get', 'post']);
     F.route('/api/v2.0/user/bindInviter',               process_bind_inviter, ['get','post'], ['isLoggedIn']);
     F.route('/api/v2.0/user/getInvitee',                json_get_invitee, ['get', 'post'], ['isLoggedIn']);
+    F.route('/api/v2.0/user/getInviteeOrders',          json_get_invitee_orders, ['get', 'post'], ['isLoggedIn']);
 	F.route('/api/v2.0/usertypes',                      json_usertypes_get, ['get']);
 
 	// User Address
@@ -132,7 +134,7 @@ function process_login() {
     UserService.login(options, function (err, data) {
         // Error
         if (err) {
-            console.error('user process_login fail', err);
+            console.error('user process_login fail:', err);
             self.respond({code:1001, message:err});
             return;
         }
@@ -180,7 +182,7 @@ var setCookieAndResponse = function(user, keepLogin){
     var token = tools.generate_token(user.userid, options.appLoginId, options.webLoginId);
     UserService.update(options, function(err){
         if(err){
-            console.log('setCookieAndResponse err: ' + err);
+            console.error('setCookieAndResponse err:', err);
             self.respond({code:1001, message:'登录失败'});
             return;
         }
@@ -381,6 +383,7 @@ function json_user_get() {
             user.inviter = data.inviter.account;
             user.inviterPhoto = data.inviter.photo;
             user.inviterNickname = data.inviter.nickname;
+            user.inviterName = data.inviter.name;
         }
 
         var flags = self.data['flags'];
@@ -590,7 +593,7 @@ function json_user_modify() {
             options.address = {};
             AreaService.getProvince({id: address.provinceId}, function (err, province) {
                 if (err) {
-                    console.log('get province err', err);
+                    console.error('get province err:', err);
                     self.respond({code: 1001, message: err});
                     return;
                 }
@@ -598,7 +601,7 @@ function json_user_modify() {
                 options.address.province = province;
                 AreaService.getCity({id: address.cityId}, function (err, city) {
                     if (err) {
-                        console.log('get city err', err);
+                        console.error('get city err:', err);
                         self.respond({code: 1001, message: err});
                         return;
                     }
@@ -607,7 +610,7 @@ function json_user_modify() {
                     if (self.data.address.countyId) {
                         AreaService.getCounty({id: address.countyId}, function (err, county) {
                             if (err) {
-                                console.log('get county err', err);
+                                console.error('get county err:', err);
                                 self.respond({code: 1001, message: err});
                                 return;
                             }
@@ -616,7 +619,7 @@ function json_user_modify() {
                             if (address.townId) {
                                 AreaService.getTown({id: address.townId}, function (err, town) {
                                     if (err) {
-                                        console.log('get town err', err);
+                                        console.error('get town err:', err);
                                         self.respond({code: 1001, message: err});
                                         return;
                                     }
@@ -631,7 +634,7 @@ function json_user_modify() {
                     } else if (address.townId) {
                         AreaService.getTown({id: address.townId}, function (err, town) {
                             if (err) {
-                                console.log('get town err', err);
+                                console.error('get town err:', err);
                                 self.respond({code: 1001, message: err});
                                 return;
                             }
@@ -690,7 +693,7 @@ function json_useraddresslist_query(callback) {
     UseraddressService.query(options, function (err, data) {
         // Error
         if (err) {
-            console.log('user json_useraddresslist_query UseraddressService query err:' + err);
+            console.error('user json_useraddresslist_query UseraddressService query err:', err);
             if (data) {
                 self.respond(data);
                 return;
@@ -743,7 +746,7 @@ function json_useraddressslist_query_lagency(){
     UseraddressService.query(options, function (err, data) {
         // Error
         if (err) {
-            console.log('user json_useraddressslist_query_lagency UseraddressService query err:' + err);
+            console.error('user json_useraddressslist_query_lagency UseraddressService query err:', err);
             if (data) {
                 self.respond(data);
                 return;
@@ -840,7 +843,7 @@ function json_useraddress_create() {
     UseraddressService.create(options, function (err, data) {
         // Error
         if (err) {
-            console.log('user json_useraddress_create UseraddressService create err:' + err);
+            console.error('user json_useraddress_create UseraddressService create err:', err);
             if (data) {
                 self.respond(data);
                 return;
@@ -857,7 +860,7 @@ function json_useraddress_create() {
 
                UseraddressService.query(Qoptions, function (err, data) {
                     if (err) {
-                        console.log('user json_useraddress_create UseraddressService query err:' + err);
+                        console.error('user json_useraddress_create UseraddressService query err:', err);
                         self.respond({'code': '1001', 'message': '保存收货地址失败'});
                         return;
                     }
@@ -872,7 +875,7 @@ function json_useraddress_create() {
                             UseraddressService.update(data.items[i], function (err, data) {
                                 if (err) {
                                     var printerror = ['重置用户', item.userid.toString(), '默认收货地址出错'];
-                                    console.log(printerror.join(''));
+                                    console.error(printerror.join(''));
                                 }
                             }, true);
                         }
@@ -957,7 +960,7 @@ function json_useraddress_update() {
                             UseraddressService.update(data.items[i], function (err, data) {
                                 if (err) {
                                     var printerror = ['重置用户', item.userid.toString(), '默认收货地址出错'];
-                                    console.log(printerror.join(''));
+                                    console.error(printerror.join(''));
                                 }
                             }, true);
                         }
@@ -1055,7 +1058,7 @@ function process_user_sign(){
                     self.respond({code: '1010', message: '您今日已签到成功，明天再来呦！'});
                 }else{
                     // other errors, don't know how to handle it, log to console.
-                    console.error(err);
+                    console.error('user process_user_sign UserSignService insert err:', err);
                     self.respond({code: '1001', message: '签到失败啦，再试一试吧'});
                 }
             } else {
@@ -1066,11 +1069,11 @@ function process_user_sign(){
                         // there are 2 cases of error: one is db operation error,
                         // we should rollback User_Sign document insert command
                         // another one is user's not exist, and there will be no harm if we rollback the change.
-                        console.log('user sign fail: fail to update User table. Start to rollback, error: ' + err);
+                        console.error('user sign fail: fail to update User table. Start to rollback, error: ', err);
                         UserSignService.delete({id_date:id_date}, function(error){
                             if(error){
                                 // rollback fail, don't know how to handle it, log to console
-                                console.error('user_sign document rollback fail, error: '+ error);
+                                console.error('user_sign document rollback fail, error:', error);
                             }else{
                                 self.respond({code: '1001', message: '签到失败，大侠请重新来过'});
                             }
@@ -1122,7 +1125,7 @@ function uploadPhoto(){
     self.files.wait(function(file, next) {
         file.read(function(err, photo) {
             if(err){
-                console.log('uploadPhoto fail: ' + err);
+                console.error('uploadPhoto fail:', err);
                 self.respond({code:1001,message:'上传失败'});
                 return;
             }
@@ -1155,7 +1158,7 @@ function uploadPhoto(){
                 // start to update user info
                 UserService.update({userid:userId, photo:imageurl}, function(err){
                     if(err){
-                        console.log('User uploadPhoto fail: '+ err);
+                        console.error('User uploadPhoto fail:', err);
                         self.respond({code:1001, message:'上传失败'});
                         return;
                     }
@@ -1166,7 +1169,7 @@ function uploadPhoto(){
                     if(oldPhotoId) {
                         files.remove(oldPhotoId, function(err, data){
                             if(err){
-                                console.log('User uploadPhoto fail: '+ err);
+                                console.error('User uploadPhoto fail:', err);
                             }
                         });
                     }
@@ -1191,7 +1194,7 @@ function userUpload() {
     self.files.wait(function(file, next) {
         file.read(function(err, photo) {
             if (err) {
-                console.log('userUpload fail: ' + err);
+                console.error('userUpload fail:', err);
                 self.respond({code:1001,message:'上传失败'});
                 return;
             }
@@ -1258,7 +1261,7 @@ function confirmUpload() {
         // Reads specific file by ID
         files.read(fileId, function(err, stream, header) {
             if (err || !stream) {
-                console.log('User confirmUpload fail: '+ err);
+                console.error('User confirmUpload fail:', err);
                 self.respond({code:1001, message:'确认失败'});
                 return;
             }
@@ -1267,7 +1270,7 @@ function confirmUpload() {
             // start to update user info
             UserService.update({userid:userId, photo:imageurl}, function(err, data) {
                 if (err) {
-                    console.log('User confirmUpload fail: '+ err);
+                    console.error('User confirmUpload fail:', err);
                     self.respond({code:1001, message:'确认失败'});
                     return;
                 }
@@ -1277,7 +1280,7 @@ function confirmUpload() {
                 if (oldPhotoId) {
                     files.remove(oldPhotoId, function(err, data) {
                         if (err) {
-                            console.log('User confirmUpload fail: '+ err);
+                            console.error('User confirmUpload fail:', err);
                         }
                     });
                 }
@@ -1328,7 +1331,7 @@ function process_bind_inviter(){
             // update user to add inviter to user
             UserService.update({userid:self.data.userId, inviter:data._id, dateinvited:new Date()}, function(err){
                 if(err){
-                    console.log('User bind inviter fail:' + err);
+                    console.error('User bind inviter fail:', err);
                     self.respond({code:1001, message:'添加邀请人失败'});
                     return;
                 }
@@ -1339,36 +1342,149 @@ function process_bind_inviter(){
     });
 }
 
-function json_get_invitee(){
+function json_get_invitee() {
     var self = this;
-    if(!self.data.userId){
-        self.respond({code:1001, message:'请填写用户ID'});
-        return;
-    }
-    UserService.getInvitee({_id:self.user._id}, function(err, data){
-        if(err){
-            console.log(err);
+    UserService.getInvitee({_id:self.user._id}, function(err, data) {
+        if (err) {
+            console.error('user json_get_invitee err:', err);
             self.respond({code:1001, message:'无法获取被邀请人列表'});
             return;
         }
 
         var invitees = [];
-        for(var i=0; i<data.length; i++){
-            var user = data[i];
-            var invitee = {};
-            invitee.account = user.account;
-            invitee.nickname = user.nickname;
-            invitee.name = user.name;
-            invitee.dateinvited = user.dateinvited;
-            invitee.photo = user.photo;
-            invitees.push(invitee);
-        }
+        if (data && data.length > 0) {
+            var inviteeIds = [];
+            for (var i=0; i<data.length; i++) {
+                var user = data[i];
+                var invitee = {};
+                invitee.userId = user.id;
+                invitee.account = user.account;
+                invitee.nickname = user.nickname;
+                invitee.name = user.name;
+                invitee.dateinvited = user.dateinvited;
+                invitee.photo = user.photo;
+                invitee.newOrdersNumber = 0;
+                invitees.push(invitee);
+                inviteeIds.push(user.id);
+            }
 
-        self.respond({code:1000, message:'success', invitee:invitees});
-    }, true);
+            // get invitee new orders number
+            if (inviteeIds && inviteeIds.length > 0) {
+                UserService.getInviteeOrderNumber(inviteeIds, function (err, inviteeOrderData) {
+                    if (err) {
+                        console.error('user json_get_invitee getInviteeOrderNumber err:', err);
+                        self.respond({code:1001, message:'获取被邀请人列表错误'});
+                        return;
+                    }
+
+                    if (inviteeOrderData) {
+                        var inviteeOrders = {};
+                        for (var i=0; i<inviteeOrderData.length; i++) {
+                            var inviteeOrder = inviteeOrderData[i];
+                            inviteeOrders[inviteeOrder.userId] = inviteeOrder;  
+                        }
+                        for (var i=0; i<invitees.length; i++) {
+                            var userId = invitees[i].userId;
+                            if (inviteeOrders && inviteeOrders[userId]) {
+                                invitees[i].newOrdersNumber = inviteeOrders[userId].numberForInviter;
+                            }
+                        }
+                    }
+                    self.respond({code:1000, message:'success', invitee:invitees});
+                });
+            }
+        } else {
+            self.respond({code:1000, message:'success', invitee:invitees});
+        }
+    });
 }
 
-function isAlive(){
+// get the invitee's orders by one inviter
+function json_get_invitee_orders() {
+    var self = this;
+    if(!self.data.inviteeId) {
+        self.respond({code:1001, message:'请填写客户ID'});
+        return;
+    }
+    UserService.getOneInvitee({_id:self.user._id, inviteeId:self.data.inviteeId}, function(err, user) {
+        if (err) {
+            console.error('user json_get_invitee err:', err);
+            self.respond({code:1001, message:'获取客户信息失败'});
+            return;
+        }
+
+        if (!user) {
+            self.respond({code:1001, message:'只能获取自己客户的订单'});
+            return;
+        }
+
+        var options = {};
+        options.buyer = user.id;
+        options.type = -1;
+        if (self.data['page']) {
+            options.page =  self.data['page'];
+        }
+        if (self.data['max']) {
+             options.max = self.data['max'];
+        }
+
+        OrderService.query(options, function(err, data) {
+            if (err) {
+                console.error('User json_get_invitee_orders err:', err);
+                self.respond({code:1001, message:'获取客户订单失败'});
+                return;
+            }
+
+            var result = {};
+            if (data) {
+                var items = data.items;
+                var length = items.length;
+                var arr = new Array(length);
+                for (var i = 0; i < length; i++) {
+                    var item = items[i];
+                    var typeValue = OrderService.orderType(item);
+                    arr[i] = {
+                        'typeValue':typeValue,
+                        'orderId':item.id,
+                        'totalPrice':item.price.toFixed(2),
+                        'goodsCount': item.products ? item.products.length: 0,
+                        'address':item.consigneeAddress,
+                        'recipientName':item.consigneeName,
+                        'recipientPhone':item.consigneePhone,
+                        'deposit':item.deposit.toFixed(2),
+                        'dateCreated': data.dateCreated,
+                        'products': item.products || []
+                    };
+                }
+                result = {'code':'1000','message':'success',
+                            'datas':{
+                                "account":user.account,
+                                "nickname":user.nickname,
+                                "name":user.name,
+                                "total":data.count,
+                                "rows":arr,
+                                "page":data.page,
+                                "pages":data.pages
+                            }
+                        };
+            } else {
+                result = {'code':'1000','message':'success',
+                            'datas':{
+                                "account":user.account,
+                                "nickname":user.nickname,
+                                "name":user.name,
+                                "total":0,"rows":[],"page":0,"pages":0
+                            }
+                        };
+            }
+            self.respond(result);
+            UserService.emptyInviteeOrderNumber({inviteeId:user.id});
+        }); 
+        
+    });
+}
+
+function isAlive() {
     var self = this;
     self.respond({code:1000, message:'isAlive'});
 }

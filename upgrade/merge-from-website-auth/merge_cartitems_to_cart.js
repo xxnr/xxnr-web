@@ -33,7 +33,10 @@ CartModel.find({}, function(err, carts){
                                 return;
                             }
 
-                            items.push({product:product._id, count:item.count});
+                            if(product) {
+                                items.push({product: product._id, count: item.count});
+                            }
+                            
                             resolve();
                         })
                     })

@@ -364,6 +364,91 @@ gulp.task('user_center_js_minify', function() {
         .pipe(gulp.dest('./rev/user_center_js'));
 });
 
+gulp.task('fill_profile_js_minify', function() {
+    var revAll = new RevAll();
+    gulp.src([
+        './js/login/loginService.js',
+        './js/payService.js',
+        './js/shoppingCart/shoppingCartController.js',
+        './js/userCenter/userCenterController.js',
+        './js/login/loginController.js',
+        './js/headerFooterDirective.js',
+        './js/headerController.js',
+        './js/jsencrypt.js',
+        './js/sweetalert.min.js',
+        './js/myPlaceholderDirective.js',
+        './js/fillProfile/fillProfileController.js'])
+        .pipe(concat('fillProfile_js.js'))
+        .pipe(ngmin())
+        .pipe(uglify({mangle: false}))
+        .pipe(gulp.dest('./dev/js'))
+        .pipe(revAll.revision())
+        .pipe(gulp.dest('./production_js'))
+        .pipe(revAll.manifestFile())
+        .pipe(gulp.dest('./rev/fill_profile_js'));
+});
+
+gulp.task('xxnr_bigdata_js_minify', function() {
+    var revAll = new RevAll();
+    gulp.src([
+        './js/login/loginService.js',
+        './js/payService.js',
+        './js/shoppingCart/shoppingCartController.js',
+        './js/login/loginController.js',
+        './js/headerFooterDirective.js',
+        './js/headerController.js',
+        './js/sweetalert.min.js'])
+        .pipe(concat('xxnr_bigdata_js.js'))
+        .pipe(ngmin())
+        .pipe(uglify({mangle: false}))
+        .pipe(gulp.dest('./dev/js'))
+        .pipe(revAll.revision())
+        .pipe(gulp.dest('./production_js'))
+        .pipe(revAll.manifestFile())
+        .pipe(gulp.dest('./rev/xxnr_bigdata_js'));
+});
+
+gulp.task('xxnr_finance_js_minify', function() {
+    var revAll = new RevAll();
+    gulp.src([
+        './js/login/loginService.js',
+        './js/payService.js',
+        './js/shoppingCart/shoppingCartController.js',
+        './js/login/loginController.js',
+        './js/headerFooterDirective.js',
+        './js/headerController.js',
+        './js/sweetalert.min.js'])
+        .pipe(concat('xxnr_finance_js.js'))
+        .pipe(ngmin())
+        .pipe(uglify({mangle: false}))
+        .pipe(gulp.dest('./dev/js'))
+        .pipe(revAll.revision())
+        .pipe(gulp.dest('./production_js'))
+        .pipe(revAll.manifestFile())
+        .pipe(gulp.dest('./rev/xxnr_finance_js'));
+});
+
+gulp.task('xxnr_institute_js_minify', function() {
+    var revAll = new RevAll();
+    gulp.src([
+        './js/login/loginService.js',
+        './js/payService.js',
+        './js/shoppingCart/shoppingCartController.js',
+        './js/login/loginController.js',
+        './js/headerFooterDirective.js',
+        './js/headerController.js',
+        './js/sweetalert.min.js'])
+        .pipe(concat('xxnr_institute_js.js'))
+        .pipe(ngmin())
+        .pipe(uglify({mangle: false}))
+        .pipe(gulp.dest('./dev/js'))
+        .pipe(revAll.revision())
+        .pipe(gulp.dest('./production_js'))
+        .pipe(revAll.manifestFile())
+        .pipe(gulp.dest('./rev/xxnr_institute_js'));
+});
+
+
 
 
 gulp.task('rev', function() {
@@ -384,7 +469,11 @@ gulp.task('rev', function() {
         'my_xxnr.html',
         'list_template.html',
         'footer.html',
-        'header.html'])
+        'header.html',
+        'fillProfile.html',
+        'xxnr_bigdata.html',
+        'xxnr_finance.html',
+        'xxnr_institute.html'])
        //- 读取 rev-manifest.json 文件以及需要进行css名替换的文件
         .pipe(htmlreplace({
             css: 'production_css/styleAllInOne.css',
@@ -401,20 +490,26 @@ gulp.task('rev', function() {
 });
 
 gulp.task('js_minify_all',
-    ['index_js_minify',
-    'car_js_minify',
-    'huafei_js_minify',
-    'company_js_minify',
-    'commit_pay_js_minify',
-    'invitation_js_minify',
-    'jiesuan_js_minify',
-    'logon_js_minify',
-    'news_js_minify',
-    'news_detail_js_minify',
-    'order_detail_js_minify',
-    'product_detail_js_minify',
-    'shopping_cart_js_minify',
-    'user_center_js_minify']);
+    [
+        'index_js_minify',
+        'car_js_minify',
+        'huafei_js_minify',
+        'company_js_minify',
+        'commit_pay_js_minify',
+        'invitation_js_minify',
+        'jiesuan_js_minify',
+        'logon_js_minify',
+        'news_js_minify',
+        'news_detail_js_minify',
+        'order_detail_js_minify',
+        'product_detail_js_minify',
+        'shopping_cart_js_minify',
+        'user_center_js_minify',
+        'fill_profile_js_minify',
+        'xxnr_institute_js_minify',
+        'xxnr_finance_js_minify',
+        'xxnr_bigdata_js_minify'
+    ]);
 
 
 gulp.task('minify', ['css_minify','framework_js_minify','js_minify_all']);

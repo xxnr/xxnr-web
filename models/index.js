@@ -37,6 +37,8 @@ exports.news = mongoose.model('news');
 exports.newsCategory = mongoose.model('newscategory');
 // cart
 exports.cart = mongoose.model('cart');
+// user new orders number
+exports.userordersnumber = mongoose.model('userordersnumber');
 
 exports.getModel = function (name, options) {
     options = options || {};

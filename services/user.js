@@ -5,6 +5,7 @@ var bcrypt = require('bcrypt-nodejs');
 var crypto = require('crypto');
 var UserModel = require('../models').user;
 var UserLogModel = require('../models').userLog;
+var UseOrdersNumberModel = require('../models').userordersnumber;
 
 // Service
 UserService = function(){};
@@ -75,13 +76,13 @@ UserService.prototype.update = function(options, callback) {
 
     UserModel.update(query, {$set: setValue}, {new: true, multi: false}, function (err, numAffected) {
         if (err) {
-            console.log('User Service update err:' + err);
+            console.error('User Service update err:', err);
             callback('用户更新失败');
             return;
         }
 
         if (numAffected.n == 0) {
-            console.log('User Service update err: user not exists');
+            console.error('User Service update err: user not exists');
             callback('用户不存在');
             return;
         }
@@ -105,7 +106,7 @@ UserService.prototype.login = function(options, callback) {
         .populate({path:'address.town', select:'-_id -__v'})
         .exec(function(err, user){
         if(err){
-            console.log('user login fail: ' + err);
+            console.error('user login fail:', err);
             callback('登录失败');
             return;
         }
@@ -167,10 +168,10 @@ UserService.prototype.get = function(options, callback) {
         .populate({path: 'address.city', select: ' -__v'})
         .populate({path: 'address.county', select: ' -__v'})
         .populate({path: 'address.town', select: ' -__v'})
-        .populate({path: 'inviter', select: 'id account photo nickname'})
+        .populate({path: 'inviter', select: 'id account photo nickname name'})
         .exec(function (err, user) {
             if (err) {
-                console.log('get user error: ' + err);
+                console.error('get user error:', err);
                 callback('获取用户信息失败');
                 return;
             }
@@ -203,7 +204,7 @@ UserService.prototype.increaseScore = function(options, callback){
 
     UserModel.update({id:options.userid}, {$inc:{score: parseInt(options.score)}}, function(err, numAffected){
         if(err){
-            console.log('increaseScore err: ' + err);
+            console.error('increaseScore err:', err);
             callback('增加积分失败');
             return;
         }
@@ -223,13 +224,79 @@ UserService.prototype.getInvitee = function(options, callback) {
         return;
     }
 
-    UserModel.find({$query:{inviter: options._id}, $orderby:{dateinvited: -1}}, function (err, docs) {
+    // UserModel.find({$query:{inviter: options._id}, $orderby:{dateinvited: -1}}, function (err, docs) {
+    UserModel.find({inviter: options._id})
+        .sort({dateinvited:-1})
+        .lean()
+        .exec(function(err, docs) {
+            if (err) {
+                console.error('User workflow getInvitee error:', err);
+                callback('获取新农客户失败');
+            }
+
+            callback(null, docs);
+        });
+};
+
+UserService.prototype.getOneInvitee = function(options, callback) {
+    if (!options._id || !options.inviteeId) {
+        callback('_id or inviteeId required');
+        return;
+    }
+
+    UserModel.findOne({inviter: options._id, id:options.inviteeId}, function(err, doc) {
         if (err) {
-            console.log('User workflow getInvitee error: ' + err);
+            console.error('User workflow getOneInvitee error:', err);
             callback('获取新农客户失败');
         }
 
+        callback(null, doc);
+    });
+};
+
+// get invitees order number
+UserService.prototype.getInviteeOrderNumber = function(invitees, callback) {
+
+    if (!invitees || invitees.length === 0) {
+        callback(null, []);
+        return;
+    }
+
+    UseOrdersNumberModel.find({userId:{$in:invitees}}).sort({dateUpdated:-1}).lean().exec(function (err, docs) {
+        if (err) {
+            console.error('User emptyInviteeOrderNumber findOne err:', err);
+            callback(null, []);
+            return;
+        }
         callback(null, docs);
+    });
+};
+
+// empty the invitee order number by inviter
+UserService.prototype.emptyInviteeOrderNumber = function(options, callback) {
+
+    if (!options.inviteeId) {
+        console.error('User emptyInviteeOrderNumber err: no inviteeId');
+        return;
+    }
+
+    UseOrdersNumberModel.findOne({userId:options.inviteeId}, function (err, doc) {
+        if (err) {
+            console.error('User emptyInviteeOrderNumber findOne err:', err);
+            return;
+        }
+        if (doc) {
+            UseOrdersNumberModel.update({userId:doc.userId}, {$set:{numberForInviter:0, dateUpdated: new Date()}}, function(err, count) {
+                // Record not exists
+                if (err) {
+                    console.error('User emptyInviteeOrderNumber update err:', err);
+                    return;
+                }
+                if (count.n === 0) {
+                    console.error('User emptyInviteeOrderNumber update not find doc');
+                }
+            });
+        }
     });
 };
 
