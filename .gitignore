@@ -3,3 +3,5 @@ databases-online
 .idea
 tmp
 *.pid
+
+debug.js
