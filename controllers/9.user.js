@@ -1452,7 +1452,7 @@ function json_get_invitee_orders() {
                         'recipientName':item.consigneeName,
                         'recipientPhone':item.consigneePhone,
                         'deposit':item.deposit.toFixed(2),
-                        'dateCreated': data.dateCreated,
+                        'dateCreated': item.dateCreated,
                         'products': item.products || []
                     };
                 }
