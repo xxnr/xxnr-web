@@ -254,7 +254,7 @@ UseraddressService.prototype.update = function(options, callback) {
 				            callback(err, {'code':'1001','message':'收货地址更新失败'});
 				            return;
 				        }
-						if (updatedCount === 0) {
+						if (updatedCount.n === 0) {
 							callback('not get data', {'code':'1001','message':'数据没有查到，未查询到要更新的收货地址'});
 							return;
 						} else {
