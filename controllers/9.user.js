@@ -1344,7 +1344,15 @@ function process_bind_inviter(){
 
 function json_get_invitee() {
     var self = this;
-    UserService.getInvitee({_id:self.user._id}, function(err, data) {
+    var options = {};
+    if (self.data['page']) {
+        options.page =  self.data['page'];
+    }
+    if (self.data['max']) {
+        options.max = self.data['max'];
+    }
+    options._id = self.user._id;
+    UserService.getInvitee(options, function(err, result) {
         if (err) {
             console.error('user json_get_invitee err:', err);
             self.respond({code:1001, message:'无法获取被邀请人列表'});
@@ -1352,6 +1360,7 @@ function json_get_invitee() {
         }
 
         var invitees = [];
+        var data = result.items;
         if (data && data.length > 0) {
             var inviteeIds = [];
             for (var i=0; i<data.length; i++) {
@@ -1390,11 +1399,11 @@ function json_get_invitee() {
                             }
                         }
                     }
-                    self.respond({code:1000, message:'success', invitee:invitees});
+                    self.respond({code:1000, message:'success', invitee:invitees, total:result.count, page:result.page, pages:result.pages});
                 });
             }
         } else {
-            self.respond({code:1000, message:'success', invitee:invitees});
+            self.respond({code:1000, message:'success', invitee:invitees, total:0, page:0, pages:0});
         }
     });
 }
@@ -1452,7 +1461,7 @@ function json_get_invitee_orders() {
                         'recipientName':item.consigneeName,
                         'recipientPhone':item.consigneePhone,
                         'deposit':item.deposit.toFixed(2),
-                        'dateCreated': data.dateCreated,
+                        'dateCreated': item.dateCreated,
                         'products': item.products || []
                     };
                 }
