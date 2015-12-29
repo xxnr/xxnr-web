@@ -629,34 +629,34 @@ transition-delay: initial;
 .pay-style li a{display:block;width:188px;height:58px;border:1px solid #e0e0e0;}
 .pay-style li a.current{border:1px solid #00913a;}
 
-/*.jifen_box{margin-bottom:30px;padding:30px 50px;width:1100px;overflow:hidden;background: #fff;height: 190px;}*/
-/*.jifen_box .user_img{float:left;width:170px;padding-right:30px;position: relative;}*/
-/*.jifen_box .user_img img{width:170px;height:170px;border-radius:100px;}*/
-/*.jifen_box .user_img #hover-content {display:none;position: absolute;left: 45px;}*/
-/*.jifen_box .user_img:hover #hover-content {display:block;margin-top: 5px;}*/
-/*.jifen_box .user_img:hover {opacity:.7}*/
-/*.jifen_box .user_info{float:left;width:400px;color:#616161;border-right: 1px solid #f2f2f2;height: 180px;}*/
-/*.jifen_box .notFilledTop{padding-top: 20px;}*/
-/*.jifen_box .user_info p{padding-bottom:25px;}*/
-/*.jifen_box .user_info p:first-child{display: inline-block;}*/
-/*.jifen_box .user_info a{display: inline-block;text-align: center;background: #008a2f;color: #fff;border-radius: 3px;padding: 0 5px;height: 26px;line-height: 26px;}*/
-/*.jifen_box .user_info .userProfile p{padding-bottom: 18px;}*/
-/*.jifen_box .user_info .userProfile span{display: inline-block;text-indent: 9999px;margin-left: 20px;height: 24px;width: 24px;margin-top: -4px;}*/
-/*.jifen_box .user_info .userProfile span.male{background: url(../images/boy-img.png) no-repeat;}*/
-/*.jifen_box .user_info .userProfile span.female{background: url(../images/girl-img.png) no-repeat;}*/
-/*.jifen_box .user_info .userProfile .type img{margin-left: 6px;margin-top: 7px;}*/
-/*.jifen_box .user_info .userProfile a{background: none;color: #008a2f;margin-left: 60px;}*/
-/*.jifen_box .user_info .userProfile .sex{display: inline-block;}*/
-/*.jifen_box .user_info .userProfile .name{height: 24px;line-height: 24px;}*/
-/*.jifen_box .user_info .needToFillProfile{margin-bottom: 30px;}*/
-/*.jifen_box .user_info .needToFillProfile a{background: none;color: #008a2f;}*/
-/*.jifen_box .user_info .needToFillProfile a img{margin-top: 7px;margin-left: 6px;}*/
-/*.jifen_box .user_info .nickname{font-size:18px;color:#333;font-family: "Microsoft YaHei"}*/
-/*.jifen_box .user_info .nickname input{width: 120px;}*/
-/*.jifen_box .user_info .name a{font-size:14px;}*/
-/*.jifen_box .jifen {padding-top: 30px;padding-left: 700px;}*/
+.jifen_box{margin-bottom:30px;padding:30px 50px;width:1100px;overflow:hidden;background: #fff;height: 190px;}
+.jifen_box .user_img{float:left;width:170px;padding-right:30px;position: relative;}
+.jifen_box .user_img img{width:170px;height:170px;border-radius:100px;}
+.jifen_box .user_img #hover-content {display:none;position: absolute;left: 45px;}
+.jifen_box .user_img:hover #hover-content {display:block;margin-top: 5px;}
+.jifen_box .user_img:hover {opacity:.7}
+.jifen_box .user_info{float:left;width:400px;color:#616161;border-right: 1px solid #f2f2f2;height: 180px;}
+.jifen_box .notFilledTop{padding-top: 20px;}
+.jifen_box .user_info p{padding-bottom:25px;}
+.jifen_box .user_info p:first-child{display: inline-block;}
+.jifen_box .user_info a{display: inline-block;text-align: center;background: #008a2f;color: #fff;border-radius: 3px;padding: 0 5px;height: 26px;line-height: 26px;}
+.jifen_box .user_info .userProfile p{padding-bottom: 18px;}
+.jifen_box .user_info .userProfile span{display: inline-block;text-indent: 9999px;margin-left: 20px;height: 24px;width: 24px;margin-top: -4px;}
+.jifen_box .user_info .userProfile span.male{background: url(../images/boy-img.png) no-repeat;}
+.jifen_box .user_info .userProfile span.female{background: url(../images/girl-img.png) no-repeat;}
+.jifen_box .user_info .userProfile .type img{margin-left: 6px;margin-top: 7px;}
+.jifen_box .user_info .userProfile a{background: none;color: #008a2f;margin-left: 60px;}
+.jifen_box .user_info .userProfile .sex{display: inline-block;}
+.jifen_box .user_info .userProfile .name{height: 24px;line-height: 24px;}
+.jifen_box .user_info .needToFillProfile{margin-bottom: 30px;}
+.jifen_box .user_info .needToFillProfile a{background: none;color: #008a2f;}
+.jifen_box .user_info .needToFillProfile a img{margin-top: 7px;margin-left: 6px;}
+.jifen_box .user_info .nickname{font-size:18px;color:#333;font-family: "Microsoft YaHei"}
+.jifen_box .user_info .nickname input{width: 120px;}
+.jifen_box .user_info .name a{font-size:14px;}
+.jifen_box .jifen {padding-top: 30px;padding-left: 700px;}
 
-.jifen_box{margin-bottom:30px;padding:30px 50px;width:1100px;overflow:hidden;background: #fff;}
+/*.jifen_box{margin-bottom:30px;padding:30px 50px;width:1100px;overflow:hidden;background: #fff;}
 .jifen_box .user_img{float:left;width:170px;padding-right:30px;position: relative;}
 .jifen_box .user_img img{width:170px;height:170px;border-radius:100px;}
 .jifen_box .user_img #hover-content {display:none;position: absolute;left: 45px;}
@@ -667,7 +667,7 @@ transition-delay: initial;
 .jifen_box .user_info p:first-child{display: inline-block;}
 .jifen_box .user_info a{display: inline-block;text-align: center;background: #008a2f;color: #fff;border-radius: 3px;padding: 0 5px;}
 .jifen_box .user_info .nickname{font-size:18px;color:#333;padding-left: 5px;width: 120px;font-family: "Microsoft YaHei"}
-.jifen_box .user_info .name a{font-size:14px;}
+.jifen_box .user_info .name a{font-size:14px;}*/
 /*.jifen_box .jifen {padding-top: 30px;}*/
 
 .jifen_box .jifen .total{font-size:16px;padding-bottom:42px;display: inline-block;}
