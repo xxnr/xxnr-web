@@ -224,18 +224,47 @@ UserService.prototype.getInvitee = function(options, callback) {
         return;
     }
 
-    // UserModel.find({$query:{inviter: options._id}, $orderby:{dateinvited: -1}}, function (err, docs) {
-    UserModel.find({inviter: options._id})
-        .sort({dateinvited:-1})
-        .lean()
-        .exec(function(err, docs) {
-            if (err) {
-                console.error('User workflow getInvitee error:', err);
-                callback('获取新农客户失败');
-            }
+    // page max num
+    var pagemax = 20;
+    var max = U.parseInt(options.max, 20);
+    options.page = U.parseInt(options.page) - 1;
+    options.max = max > pagemax ? pagemax : max;
 
-            callback(null, docs);
-        });
+    if (options.page < 0)
+        options.page = 0;
+
+    var take = U.parseInt(options.max);
+    var skip = U.parseInt(options.page * options.max);
+    // UserModel.find({$query:{inviter: options._id}, $orderby:{dateinvited: -1}}, function (err, docs) {
+    UserModel.count({inviter: options._id}, function(err, count) {
+        if(err){
+            console.error('User workflow getInvitee error:', err);
+            callback(err);
+            return;
+        }
+        UserModel.find({inviter: options._id})
+            .sort({dateinvited:-1})
+            .skip(skip)
+            .limit(take)
+            .lean()
+            .exec(function(err, docs) {
+                if (err) {
+                    console.error('User workflow getInvitee error:', err);
+                    callback('获取新农客户失败');
+                }
+
+                var data = {};
+                data.count = count;
+                data.items = docs;
+                data.pages = Math.floor(count / options.max) + (count % options.max ? 1 : 0);
+
+                if (data.pages === 0)
+                    data.pages = 1;
+
+                data.page = options.page + 1;
+                callback(null, data);
+            });
+    });
 };
 
 UserService.prototype.getOneInvitee = function(options, callback) {
