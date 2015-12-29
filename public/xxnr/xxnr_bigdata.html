@@ -1,0 +1,96 @@
+<!doctype html>
+<html ng-app="shop_cart">
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit">
+    <meta name="force-rendering" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+    <title>新农大数据农技服务</title>
+    <!--[if lte IE 7]><script>alert('为了更好的购物体验，请升级您的浏览器版本');window.location.href='http://cdn.dmeng.net/upgrade-your-browser.html?referrer='+location.href;</script><![endif]-->
+    <link rel='icon' href='images/title_logo.png' type='image/png' />
+    <meta name="description" content="新新农人公司简介，展示新新农人的合作伙伴、企业理念、公司风采、联系方式，方便您更好的了解我们！">
+    <meta name="keywords" content="农资电商,农资商城,化肥,汽车,电子商务,农村金融,新新农人">
+    <meta http-equiv="pragma" content="no-cache">
+    <meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
+    <meta http-equiv="expires" content="Wed, 26 Feb 1997 08:21:57 GMT">
+    <!-- build:css -->
+    <link type="text/css" rel="stylesheet" href="css/style.css">
+    <link type="text/css" rel="stylesheet" href="css/sweetalert.css">
+    <!-- endbuild -->
+    <!-- build:js -->
+    <script src="js/jquery.min.js"></script>
+    <script src="js/angular.min.js"></script>
+    <script src="js/angular-cookies.min.js"></script>
+    <script src="js/common.js"></script>
+    <script src="js/login/loginService.js"></script>
+    <script src="js/remoteApiService.js"></script>
+    <script src="js/payService.js"></script>
+    <script src="js/shoppingCart/shoppingCartController.js"></script>
+    <script src="js/headerFooterDirective.js"></script>
+    <script src="js/headerController.js"></script>
+    <script src="js/sweetalert.min.js"></script>
+    <script src="js/sideService.js"></script>
+    <script src="js/jquery.SuperSlide.2.1.1.js"></script>
+    <!-- endbuild -->
+</head>
+<body>
+<header ng-controller="headerController"></header>
+<div class="wrap nav" ng-controller="shoppingCartController">
+    <h1 class="left logo"><a href="/">新新农人</a></h1>
+    <ul class="left">
+        <li><a href="/">首页</a></li>
+        <li><a href="huafei_list.html">化肥专场</a></li>
+        <li><a href="car_list.html">汽车专场</a></li>
+        <li><a href="news_list.html">新农资讯</a></li>
+        <!-- <li><a href="#">新农论坛</a></li> -->
+        <li><a href="about.html">公司介绍</a></li>
+    </ul>
+    <div class="right buy">
+        <a href="" ng-click="accessShoppingCart()">
+            <em>&nbsp;</em>
+            购物车
+        </a>
+    </div>
+    <span class="shopping_cart_badge ng-cloak" ng-bind="shoppingCartCount"></span>
+    <a href="#" id="side_shoping_cart" ng-click="accessShoppingCart()" title="side shopping cart">
+        <img src="images/shopping-right.png" alt=""/>
+        <span class="side_shopping_cart_badge ng-cloak" ng-show="shoppingCartCount>0">{{shoppingCartCount>99?'99+':shoppingCartCount}}</span>
+    </a>
+</div>
+
+<a href="#" id="back-to-top" title="Back to top"><img src="images/backToTop.png" alt=""/></a>
+<div class="bigdata_section">
+    <div class="wrap">
+        <div class="bigdata_head"></div>
+        <div class="bigdata_body1">
+            <img src="images/increase-icon.png" alt=""/>
+            <div class="description">
+
+                <h3>增产增收种植技术指导</h3>
+                <p>聚焦业内专家，连接业内解答不同季节、作物、土壤的种植问题和增产技术，帮助</p>
+                <p>新农人更好的实现科学种植</p>
+            </div>
+        </div>
+        <div class="bigdata_body2">
+            <div class="description">
+                <h3>智慧农业信息分享</h3>
+                <p>分享国内外先进的农业科学技术、农场管理、农产品品牌</p>
+                <p>推广等经验，实现智慧化、系统化农业管理</p>
+                <a href="news_list.html?tab=4">了解更多<img src="images/more1.png" alt=""/></a>
+            </div>
+            <img src="images/argicicon-.png" alt=""/>
+        </div>
+        <div class="bigdata_body3">
+            <img src="images/big-tdata.png" alt=""/>
+            <div class="description">
+                <h3>大数据支撑的农业分析</h3>
+                <p>通过线上（交易、点评、推荐）、线下（调研、服务反馈）的配合，建立农资交易、</p>
+                <p>科学种植等属性维度数据模型，提供具体可靠的数据分析服务</p>
+            </div>
+        </div>
+    </div>
+</div>
+<footer></footer>
+
+</body>
+</html>

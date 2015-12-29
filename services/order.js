@@ -5,10 +5,27 @@ var PAYMENTSTATUS = require('../common/defs').PAYMENTSTATUS;
 var DELIVERSTATUS = require('../common/defs').DELIVERSTATUS;
 var PAYTYPE = require('../common/defs').PAYTYPE;
 var OrderModel = require('../models').order;
+var UseOrdersNumberModel = require('../models').userordersnumber;
 var moment = require('moment-timezone');
 
 // Service
 OrderService = function(){};
+
+// Method
+// order type
+OrderService.prototype.orderType = function (order) {
+    if (order.payStatus == PAYMENTSTATUS.UNPAID && !order.isClosed) {
+        return 1;
+    } else if (order.payStatus == PAYMENTSTATUS.PAID && order.deliverStatus == DELIVERSTATUS.UNDELIVERED) {
+        return 2;
+    } else if (order.payStatus == PAYMENTSTATUS.PAID && order.deliverStatus == DELIVERSTATUS.DELIVERED && !order.confirmed) {
+        return 3;
+    } else if (order.confirmed) {
+        return 4;
+    } else {
+        return 0;
+    }
+}
 
 // Method
 // Gets listing
@@ -31,11 +48,16 @@ OrderService.prototype.query = function(options, callback) {
 	var type = U.parseInt(options.type);
 
 	var mongoOptions = {};
-		
+	
+	// not Closed
+	if (type === -1) {
+        mongoOptions["$or"] = [{isClosed: { $ne: true }}, {payStatus: { $ne: PAYMENTSTATUS.UNPAID }}];
+    }
+
 	// unpaid
 	if (type === 1) {
+		mongoOptions["isClosed"] = { $ne: true };
         mongoOptions["payStatus"] = { $ne: PAYMENTSTATUS.PAID };
-        mongoOptions["isClosed"] = { $ne: true };
     }
 
 	// paid and not delivered
@@ -89,7 +111,7 @@ OrderService.prototype.query = function(options, callback) {
 
 // Creates order (Old codes, maybe not use)
 OrderService.prototype.create = function(options, callback) {
-
+	var self = this;
 	var price = 0;
 	var count = 0;
     var deposit = 0;
@@ -116,12 +138,17 @@ OrderService.prototype.create = function(options, callback) {
 		// Returns response with order id
 		callback(null, options.id);
 
+		// add user order number
+		self.addUserOrderNumber({userId:order.buyerId});
+
 		// Writes stats
 		MODULE('webcounter').increment('orders');
 	});
 };
 
 OrderService.prototype.add = function(options, callback) {
+	var self = this;
+
 	options.id = options.id || U.GUID(8);
 	options.paymentId = options.paymentId || U.GUID(10);
 	// Inserts order into the database
@@ -133,6 +160,9 @@ OrderService.prototype.add = function(options, callback) {
 		}
 		// Returns response with order id
 		callback(null, options);
+
+		// add user order number
+		self.addUserOrderNumber({userId:order.buyerId});
 
 		// Writes stats
 		MODULE('webcounter').increment('orders');
@@ -182,7 +212,7 @@ OrderService.prototype.save = function(options, callback) {
             return;
         }
 
-        if (count == 0) {
+        if (count.n == 0) {
             callback('订单未找到');
             return;
         }
@@ -308,7 +338,7 @@ OrderService.prototype.paid = function(id, callback) {
             return;
         }
 
-        if (count == 0) {
+        if (count.n == 0) {
             callback('订单不存在');
             return;
         }
@@ -329,7 +359,7 @@ OrderService.prototype.confirm = function(id, callback) {
             return;
         }
 
-        if (count == 0) {
+        if (count.n == 0) {
             callback('订单不存在');
             return;
         }
@@ -354,7 +384,7 @@ OrderService.prototype.updatepayType = function(options, callback) {
             callback(err);
             return;
         }
-		if (count === 0) {
+		if (count.n === 0) {
 			callback('订单不存在', {'code':'1001','message':'订单不存在'});
 			return;
 		}
@@ -444,6 +474,41 @@ OrderService.prototype.closeOrders = function(callback) {
                 callback(err)
             })
     })
+};
+
+// add user order number
+OrderService.prototype.addUserOrderNumber = function(options, callback) {
+
+	if (!options.userId) {
+		console.error('Order addUserOrderNumber err: no userId');
+		return;
+	}
+
+	UseOrdersNumberModel.findOne({userId:options.userId}, function (err, doc) {
+		if (err) {
+			console.error('Order addUserOrderNumber findOne err:', err);
+			return;
+		}
+		if (doc) {
+			UseOrdersNumberModel.update({userId:doc.userId}, {$inc:{numberForInviter: 1}, $set:{dateUpdated: new Date()}}, function(err, count) {
+				// Record not exists
+				if (err) {
+		            console.error('Order addUserOrderNumber update err:', err);
+		            return;
+		        }
+				if (count.n === 0) {
+					console.error('Order addUserOrderNumber update not find doc');
+				}
+			});
+		} else {
+			var ordernumber = new UseOrdersNumberModel({userId:options.userId});
+			ordernumber.save(function(err) {
+				if (err) {
+					console.error('Order addUserOrderNumber save err:', err);
+				}
+			});
+		}
+	});
 };
 
 module.exports = new OrderService();
