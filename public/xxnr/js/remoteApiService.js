@@ -256,13 +256,13 @@ app.service('remoteApiService', function(commonService){
         };
         return commonService.ajax(params);
     };
-	
+
 	this.getCategories = function(){
         var params={
             methodname:'/api/v2.0/products/categories/'
         };
-		
-        return commonService.ajax(params);	    
+
+        return commonService.ajax(params);
 	};
     this.login = function(userName, password, keepLogin){
         var params={
@@ -343,7 +343,7 @@ app.service('remoteApiService', function(commonService){
         };
         return commonService.ajax(params);
     };
-    
+
     this.addToShoppingCart = function(id, count, update_by_add){
         if(!user || !user.userid){
             window.location.href="logon.html";
@@ -422,4 +422,12 @@ app.service('remoteApiService', function(commonService){
         };
         return commonService.ajax(params);
     };
+
+    this.userTypeList = function(){
+        var params = {
+            methodname:'api/v2.0/usertypes'
+        };
+        return commonService.ajax(params);
+    };
+
 });

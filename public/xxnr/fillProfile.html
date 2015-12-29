@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html ng-app="fillProfile">
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="renderer" content="webkit">
+    <meta name="force-rendering" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+    <title>完善个人资料</title>
+    <!--[if lte IE 7]><script>alert('为了更好的购物体验，请升级您的浏览器版本');window.location.href='http://cdn.dmeng.net/upgrade-your-browser.html?referrer='+location.href;</script><![endif]-->
+    <link rel='icon' href='images/title_logo.png' type='image/png' />
+    <meta http-equiv="pragma" content="no-cache">
+    <meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
+    <meta http-equiv="expires" content="Wed, 26 Feb 1997 08:21:57 GMT">
+    <!-- build:css -->
+    <link type="text/css" rel="stylesheet" href="css/style.css">
+    <link type="text/css" rel="stylesheet" href="css/sweetalert.css">
+    <!-- endbuild -->
+    <!-- build:js -->
+    <script src="js/jquery.min.js"></script>
+    <script src="js/angular.min.js"></script>
+    <script src="js/angular-cookies.min.js"></script>
+    <script src="js/common.js"></script>
+    <script src="js/login/loginService.js"></script>
+    <script src="js/remoteApiService.js"></script>
+    <script src="js/login/loginController.js"></script>
+    <script src="js/jsencrypt.js"></script>
+    <script src="js/headerFooterDirective.js"></script>
+    <script src="js/headerController.js"></script>
+    <script src="js/sweetalert.min.js"></script>
+    <script src="js/myPlaceholderDirective.js"></script>
+    <script src="js/fillProfile/fillProfileController.js"></script>
+    <script src="js/sideService.js"></script>
+    <script src="js/shoppingCart/shoppingCartController.js"></script>
+    <!-- endbuild -->
+</head>
+<body>
+<header ng-controller="headerController"></header>
+<div class="wrap nav" ng-controller="shoppingCartController">
+    <h1 class="left logo"><a href="/">新新农人</a></h1>
+    <div class="ng-cloak">
+        <ul class="left">
+            <li><a href="/">首页</a></li>
+            <li><a href="huafei_list.html">化肥专场</a></li>
+            <li><a href="car_list.html">汽车专场</a></li>
+            <li><a href="news_list.html">新农资讯</a></li>
+            <!-- <li><a href="#">新农论坛</a></li> -->
+            <li><a href="about.html">公司介绍</a></li>
+        </ul>
+        <div class="right buy">
+            <a href="" ng-click="accessShoppingCart()">
+                <em>&nbsp;</em>
+                购物车
+            </a>
+        </div>
+    </div>
+</div>
+<div ng-controller="fillProfileController" class="fillProfile">
+    <div class="clearfix wrap">
+        <div class="container">
+            <div class="profile_box">
+                <ul class="clearfix">
+                    <li class="name clearfix">
+                        <label class="label clearfix">姓名</label>
+                            <input class="profileInput" id="name" type="text" value="" ng-model="userName" placeholder="请输入您的真实姓名" my-placeholder="请输入您的真实姓名">
+                    </li>
+                    <li class="sex">
+                        <label class="label">性别 </label>
+                        <form class="sex_form">
+                            <input type="radio" checked="checked" name="Sex" value="male" ng-model="sex" />
+                            <img src="images/boy-img.png" alt=""/>
+                            男
+
+                            <input class="female" type="radio" name="Sex" value="female" ng-model="sex" />
+                            <img src="images/girl-img.png" alt=""/>
+                            女
+                        </form>
+                    </li>
+                    <li class="address">
+                        <div>
+                            <select class="profileInput" ng-class="{'changed':profileProvince.id!=0}" name="" id="provin" ng-model="profileProvince" ng-options="province as province.name for province in provinces" ng-change="getCityList()">
+                            </select>
+                            <select class="profileInput" ng-class="{'changed':profileCity.id!=0}" name="" id="city" ng-model="profileCity" ng-options="city as city.name for city in cities" ng-change="getCountyList()">
+                            </select>
+                            <select class="profileInput" ng-class="{'changed':profileCounty.id!=0}" name="" ng-model="profileCounty" ng-show="profileCounty" id="county" ng-options="county as county.name for county in counties" ng-change="getTownList()">
+                            </select>
+                            <select class="profileInput" ng-class="{'changed':profileTown.id!=0}" name="" id="town" ng-model="profileTown" ng-options="town as town.name for town in towns" >
+                            </select>
+                        </div>
+                    </li>
+                    <li class="identity">
+                        <label class="label">给自己个身份吧~</label>
+                        <select class="profileInput" ng-class="{'changed':selectedIdentity.id!=1}" ng-model="selectedIdentity" ng-options="identity as identity.name for identity in identities">
+                        </select>
+                    </li>
+                    <li class="buttons">
+                        <a href="" class="xxnr_btn cancel" ng-click="skip()">跳 过</a>
+                        <a href="" class="xxnr_btn save" ng-click="modifyProfile()">保&nbsp;&nbsp;&nbsp;&nbsp;存</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<footer></footer>
+</body>
+</html>

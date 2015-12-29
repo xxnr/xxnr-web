@@ -3,17 +3,6 @@
  */
 var app = angular.module('login', ['xxnr_common']);
 app.controller('loginController', function($scope, $timeout, remoteApiService, commonService){
-    //Custom alert   by CUIDI 2015.10.14 //
-    // $scope.hiddenAlert = true;
-    // $scope.alertMessage = "";
-    // $scope.showAlert = function(str){
-    //     $scope.hiddenAlert = false;
-    //     $scope.alertMessage = str;
-    // };
-    // $scope.hideAlert = function(str){
-    //     $scope.hiddenAlert = true;
-    // };
-    ////////////////////////////////////////
 
     var sweetalert = commonService.sweetalert;
     $scope.tabNum = 1;
@@ -34,16 +23,28 @@ app.controller('loginController', function($scope, $timeout, remoteApiService, c
                 var encrypted = encrypt.encrypt($scope.password);
                 remoteApiService.login($scope.phoneNumber, encodeURI(encrypted), ($scope.keepLoginChecked ? true : false))
                     .then(function (data) {
+                        //console.log(data.datas.isUserInfoFullFilled);
                         if (data.code == 1000) {
-                            sessionStorage.setItem('user', JSON.stringify(data.datas));
-                            window.location.href = '/';
+                            if(data.datas.isUserInfoFullFilled){
+                                sessionStorage.setItem('user', JSON.stringify(data.datas));
+                                window.location.href = '/';
+                            }else{
+                                sessionStorage.setItem('user', JSON.stringify(data.datas));
+                                window.location.href = '/fillProfile.html';
+                            }
+
                         } else if (data.code == 1001 && data.userVersion == 'v1.0') {
                             //re-request with md5
                             remoteApiService.login($scope.phoneNumber, hex_md5($scope.password))
                                 .then(function (data) {
                                     if (data.code == 1000) {
-                                        sessionStorage.setItem('user', JSON.stringify(data.datas));
-                                        window.location.href = '/';
+                                        if(data.datas.isUserInfoFullFilled){
+                                            sessionStorage.setItem('user', JSON.stringify(data.datas));
+                                            window.location.href = '/';
+                                        }else{
+                                            sessionStorage.setItem('user', JSON.stringify(data.datas));
+                                            window.location.href = '/fillProfile.html';
+                                        }
                                     } else {
                                         sweetalert(data.message);
                                     }
@@ -112,7 +113,7 @@ app.controller('loginController', function($scope, $timeout, remoteApiService, c
                         resetSetTimeOut(60);
                     }else{
                         sweetalert(data.message);
-                    }   
+                    }
                 })
         }
     };
@@ -253,7 +254,7 @@ app.controller('loginController', function($scope, $timeout, remoteApiService, c
                         .then(function (data) {
                             if (data.code == 1000) {
                                 sessionStorage.setItem('user', JSON.stringify(data.datas));
-                                window.location.href = '/';
+                                window.location.href = '/fillProfile.html';
                             } else {
                                 sweetalert(data.message);
                             }
