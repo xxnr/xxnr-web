@@ -783,6 +783,7 @@ OrderService.prototype.checkPayStatus = function(orderId, callback) {
 			var setValues = {};							// order need set values
 			var pushValues = {};						// order need push values
 			var orderPayStatus = PAYMENTSTATUS.UNPAID;	// default order paystatus
+			var paidCount = 0;							// suborder paid count
 			var subOrdersPayments = {};					// suborder all payments
 			var Payments = {};							// order payments
 			var orderClosed = false;					// default order closed status is false
@@ -810,6 +811,7 @@ OrderService.prototype.checkPayStatus = function(orderId, callback) {
 				if (order && order.subOrders) {
 					for (var i=0; i < order.subOrders.length; i++) {
 						var subOrder = order.subOrders[i];
+						var subOrderPayStatus = subOrder.payStatus;
 						var payments = subOrdersPayments[subOrder.id] || [];
 						var paidPrice = 0;
 						var paidTimes = 0;
@@ -842,16 +844,19 @@ OrderService.prototype.checkPayStatus = function(orderId, callback) {
 							else
 								orderPayStatus = PAYMENTSTATUS.UNPAID;
 						} else {
-							if (orderPayStatus === PAYMENTSTATUS.UNPAID || orderPayStatus === PAYMENTSTATUS.PARTPAID)
-								orderPayStatus = PAYMENTSTATUS.PARTPAID;
-							else
-								orderPayStatus = PAYMENTSTATUS.PAID;
+							orderPayStatus = PAYMENTSTATUS.PARTPAID;
+							paidCount += 1;
 						}
 
 						Payments[subOrder.type] = {'payment':orderPayment,'suborder':subOrder,'payprice':(subOrder.price-paidPrice),'paidtimes':paidTimes};
-						// set suborder paystatus
-						var key = 'subOrders.' + i + '.payStatus';
-						setValues[key] = subOrder.payStatus;
+						if (subOrder.payStatus !== subOrderPayStatus) {
+							// set suborder paystatus
+							var key = 'subOrders.' + i + '.payStatus';
+							setValues[key] = subOrder.payStatus;
+						}
+					}
+					if (order.subOrders.length > 0 && paidCount === order.subOrders.length) {
+						orderPayStatus = PAYMENTSTATUS.PAID;
 					}
 				}
 
