@@ -598,7 +598,7 @@ OrderService.prototype.addUserOrderNumber = function(options, callback) {
 // get payment info when payorder
 OrderService.prototype.getPayOrderPaymentInfo = function(order, payment, payPrice, callback) {
 	// user input price is null, not price Regexp, <= 0, > surplus price. use surplus price
-    if (!payPrice || !tools.isPrice(payPrice.toString()) || !parseFloat(payPrice) || parseFloat(payPrice) <= 0 || parseFloat(payPrice) > payment.price) {
+    if (!payPrice || !tools.isPrice(payPrice.toString()) || !parseFloat(payPrice) || parseFloat(payPrice) < 0.01 || parseFloat(payPrice) > payment.price) {
         payPrice = payment.price;
         callback(null, payment, payPrice);
         return;
