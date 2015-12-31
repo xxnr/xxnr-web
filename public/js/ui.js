@@ -730,6 +730,7 @@ COMPONENT('form', function() {
 		var submit = self.attr('data-submit');
         var data_class = self.attr('data-class') || '';
 
+        self.submitbutton = self.attr('data-submitbutton') || null;
 		self.condition = self.attr('data-if');
 		self.element.empty();
 
@@ -768,7 +769,9 @@ COMPONENT('form', function() {
 
 			self.element.animate({ scrollTop: 0 }, 0);
 		}
-		self.disable_submit_button();
+		if (self.submitbutton && self.submitbutton == 'true') {
+			self.disable_submit_button();
+		}
 	};
 
 	self.disable_submit_button = function () {

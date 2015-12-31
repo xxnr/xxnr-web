@@ -98,7 +98,7 @@
 	</div>
 </div>
 
-<div data-component="form" data-title="@(订单详情)" data-component-path="common.form" data-if="value === 'orders'" data-width="900px" data-component-id="orders.form">
+<div data-component="form" data-title="@(订单详情)" data-component-path="common.form" data-if="value === 'orders'" data-width="900px" data-component-id="orders.form" data-submitbutton="true">
 	<br />
 	<div data-component="template" data-component-path="orders.form" class="padding">
 		<script type="text/html">
@@ -537,7 +537,6 @@
 		// Max items per page
 		orders.filter.max = component.max;
 		orders_refresh(true);
-		console.log('grid');
 
 		component.click = function(index, row, button) {
 			switch ($(button).attr('name')) {
@@ -564,7 +563,6 @@
 	});
 
 	ON('#orders.form', function(component) {
-		
 		// Submits order form
 		// component.submit = function(hide) {
 		// 	var price = 0;
@@ -729,7 +727,6 @@
 	// Method refreshes grid
 	function orders_refresh(reset) {
 
-		console.log('refresh');
 		if (reset) {
 			orders.filter.page = 1;
 			orders.grid = [];
@@ -739,7 +736,6 @@
 		}
 
 		$.components.GET(managerurl + '/api/orders/', orders.filter, function(response) {
-			console.log('orders');
 			SET((reset ? '' : '+') + 'orders.grid', response.items);
 			if (!reset)
 				return;
