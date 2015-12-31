@@ -868,7 +868,7 @@ OrderService.prototype.checkPayStatus = function(orderId, callback) {
 						if (subOrder['payStatus'] !== PAYMENTSTATUS.PAID) {
 							// create new payment
 							if (!payment) {
-								payment = createPayment({'paymentId':U.GUID(10),'slice':(Payments[key].paidTimes+1),'price':Payments[key].payprice,'suborderId':subOrder.id});
+								payment = createPayment({'paymentId':U.GUID(10),'slice':(Payments[key].paidtimes+1),'price':Payments[key].payprice,'suborderId':subOrder.id});
 								pushValues = {'payments':payment};
 							}
 							if (!orderPayment) {
