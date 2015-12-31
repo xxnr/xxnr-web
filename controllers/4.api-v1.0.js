@@ -5,6 +5,7 @@ console.log('processing api-v1.0.js');
 
 const XXNR_DIR = "xxnr";
 
+var tools = require('../common/tools');
 var services = require('../services');
 var UserService = services.user;
 var OrderService = services.order;
@@ -531,6 +532,7 @@ function payOrder(payExecutor){
     var self = this;
     var callbackName = this.query['callback'];
     var orderId = this.data['orderId'];
+    var payPrice = this.data['price'];
 
     if(!orderId){
         var response = ( {code:1001, message:'param orderId required'});
@@ -541,9 +543,10 @@ function payOrder(payExecutor){
     //aliPay request creation
     var options = {};
     options.id = orderId;
-    OrderService.get(options, function(err, order){
+    OrderService.get(options, function(err, order, payment) {
         if(err) {
-            console.log('api-v1.0 payOrder OrderService get err:' + err);
+            console.error('api-v1.0 payOrder OrderService get err:', err);
+            self.respond({code:1001, message:'支付出错'});
             return;
         }
 
@@ -552,16 +555,58 @@ function payOrder(payExecutor){
             return;
         }
 
-        var options = {"ids":[]};
-        var paymentId = order.paymentId;
-        payExecutor(paymentId, order.deposit, self.ip, orderId);
+        if (!payment || typeof(payment.id) === 'undefined' || typeof(payment.price) === 'undefined') {
+            self.respond({code:1001, message:'未找到支付信息'});
+            return;
+        }
+
+        OrderService.getPayOrderPaymentInfo(order, payment, payPrice, function (err, resultPayment, resultPayPrice) {
+            if (err) {
+                console.error('api-v1.0 payOrder OrderService getPayOrderPaymentInfo err:', err);
+                self.respond({code:1001, message:'获取支付信息出错'});
+                return;
+            }
+            payExecutor(resultPayment.id, resultPayPrice, self.ip, order.id);
+            return;
+        });
+
+        // // user input price is null, not price Regexp, <= 0, > surplus price. use surplus price
+        // if (!payPrice || !tools.isPrice(payPrice.toString()) || !parseFloat(payPrice) || parseFloat(payPrice) <= 0 || parseFloat(payPrice) > payment.price) {
+        //     payPrice = payment.price;
+        //     payExecutor(payment.id, payPrice, self.ip, order.id);
+        //     return;
+        // } else {
+        //     // the price of user input, and equal last time inputted value.
+        //     if (payment.payPrice && parseFloat(payment.payPrice) === parseFloat(payPrice)) {
+        //         payExecutor(payment.id, payPrice, self.ip, order.id);
+        //         return; 
+        //     } else {
+        //         // the price of user input is a new one, not in the payment and not equal last time inputted value. need push one new payment
+        //         var query = {'id':order.id, 'payments.id':payment.id};
+        //         var values = {};
+        //         var newPayment = payment;
+        //         newPayment.id = U.GUID(10);
+        //         newPayment.payPrice = parseFloat(payPrice).toFixed(2);
+        //         values['$push'] = {'payments':newPayment};
+        //         values['$set'] = {'payments.$.isClosed':true};
+        //         OrderService.updateAndPushPayment(query, values, function (err) {
+        //             if (err) {
+        //                 console.error('api-v1.0 payOrder OrderService update and add new payment err:', err);
+        //                 self.respond({code:1001, message:'生成支付信息出错'});
+        //                 return;
+        //             }
+        //             payExecutor(newPayment.id, newPayment.payPrice, self.ip, order.id);
+        //             return;
+        //         });   
+        //     }
+        // }
     });
 }
 
 function alipayOrder(){
     var self = this;
-    payOrder.call(this, function(paymentId, totalPrice, ip){
-        alipay.alipaySubmitService.query_timestamp(function(encrypt_key){
+    payOrder.call(this, function(paymentId, totalPrice, ip) {
+        alipay.alipaySubmitService.query_timestamp(function(encrypt_key) {
                 var param = {};
                 param.out_trade_no = paymentId;
                 param.subject = '新新农人';
@@ -581,20 +626,21 @@ function aliPaySuccess(){
     this.view('alipaySuccess', null);
 }
 
-function payNotify(paymentId, orderId){
+function payNotify(paymentId, options){
 
-    OrderService.get({"paymentId": paymentId}, function(err, order){
+    OrderService.get({"paymentId": paymentId}, function(err, order) {
         // TODO: log err
-        if(err) {
-            console.log('api-v1.0 payNotify OrderService get err:' + err);
+        if (err) {
+            console.error('api-v1.0 payNotify OrderService get err:', err);
+            dri.sendDRI('[DRI] Fail to get order in order payNotify: ', 'paymentId:'+paymentId, err);
         }
-        if(order){
-            if((order.payStatus||PAYMENTSTATUS.UNPAID) == PAYMENTSTATUS.UNPAID){
-                OrderService.paid(order.id, function(err){
+        if (order) {
+            if ((order.payStatus||PAYMENTSTATUS.UNPAID) == PAYMENTSTATUS.UNPAID || order.payStatus == PAYMENTSTATUS.PARTPAID) {
+                OrderService.paid(order.id, paymentId, options, function(err) {
                     if(err){
                         // if err happen
                         // send sms to dri
-                        dri.sendDRI('[DRI] Fail to update order: ', order.orderId, err);
+                        dri.sendDRI('[DRI] Fail to update order in order payNotify: ', 'orderId:'+order.id, err);
                     }
                 }); // SchemaBuilderEntity.prototype.save = function(model, helper, callback, skip)
             }
@@ -606,16 +652,21 @@ function alipayNotify(){
     var self = this;
     var qs = require('querystring');
     var body = qs.parse(self.body);
-    var paymentId = body.out_trade_no;
-    var status = body.trade_status;
-
+    
     AlipayNotify.verifyNotify(body, function(isValid){
         if(!isValid){
             return;
         }
 
+        var paymentId = body.out_trade_no;
+        var status = body.trade_status;
+        var price = body.total_fee || null;
         if(status == 'TRADE_SUCCESS'){
-            payNotify.call(self, paymentId);
+            var options = {};
+            if (price) {
+                options.price = price;
+            }
+            payNotify.call(self, paymentId, options);
         }
 
         self.content('success');
@@ -626,7 +677,7 @@ function unionpayNotify(){
     var self = this;
 
     if(!self.body){
-        console.log('cannot get unionpay notification body');
+        console.error('unionpayNotify cannot get unionpay notification body');
     }
 
     var qs = require('querystring');
@@ -643,7 +694,7 @@ function unionpayNotify(){
 
     new php_processor(commandLine).execute(function(output, error){
         if(error){
-            console.error('verification failure:' + error);
+            console.error('unionpayNotify verification failure:', error);
             self.content('verification failure:' + error);
             return;
         }
@@ -661,16 +712,17 @@ function unionpayNotify(){
             if(body['respCode'] === 00 || body['respCode'] === '00'){
                 var paymentInfo = JSON.parse(new Buffer(body.reqReserved, 'base64').toString());
                 var paymentId = paymentInfo.paymentId;
-                payNotify.call(self, paymentId);
+                var options = {price:paymentInfo.txnAmt, orderId:paymentInfo.orderId};
+                payNotify.call(self, paymentId, options);
                 self.content('success');
             }
             else{
-                console.error('error : respCode is ' + body['respCode']);
+                console.error('unionpayNotify error : respCode is ', body['respCode'], 'body:', body);
                 self.content('success'); // tell the notifier we successfully handled the notification
             }
         }
         else{
-            console.error('verification failure:' + result);
+            console.error('unionpayNotify verification failure:', result);
             self.content('verification failure:' + result);
         }
     });
