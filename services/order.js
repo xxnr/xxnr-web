@@ -611,21 +611,46 @@ OrderService.prototype.getPayOrderPaymentInfo = function(order, payment, payPric
             // the price of user input is a new one, not in the payment and not equal last time inputted value. need push one new payment
             var query = {'id':order.id, 'payments.id':payment.id};
             var values = {};
-            var newPayment = payment;
-            newPayment.id = U.GUID(10);
-            newPayment.payPrice = parseFloat(payPrice).toFixed(2);
-            values['$push'] = {'payments':newPayment};
             values['$set'] = {'payments.$.isClosed':true};
+            // var newPayment = payment;
+            // newPayment.id = U.GUID(10);
+            // newPayment.payPrice = parseFloat(payPrice).toFixed(2);
+            // values['$push'] = {'payments':newPayment};
+            // values['$set'] = {'payments.$.isClosed':true};
             
-            OrderModel.findOneAndUpdate(query, values, {new: true}, function(err, order) {
-				if (err) {
-		            console.error('Order getPayOrderPaymentInfo findOneAndUpdate err:', err);
+            // OrderModel.findOneAndUpdate(query, values, {new: true}, function(err, order) {
+            OrderModel.update(query, values, function(err, count) {
+            	if (err) {
+		            console.error('Order getPayOrderPaymentInfo update closed payment err:', err);
 		            callback(err);
 		            return;
 		        }
+		        if (count.n == 0) {
+		        	console.error('Order getPayOrderPaymentInfo update closed payment not find the doc.');
+		            callback('not find the doc');
+		            return;
+		        }
 
-		        callback(null, newPayment, newPayment.payPrice);
-		        return;
+		        var pushValues = {};
+		        var newPayment = payment;
+	            newPayment.id = U.GUID(10);
+	            newPayment.payPrice = parseFloat(payPrice).toFixed(2);
+		        pushValues['$push'] = {'payments':newPayment};
+            	OrderModel.update(query, pushValues, function(err, count) {
+					if (err) {
+			            console.error('Order getPayOrderPaymentInfo update push payment err:', err);
+			            callback(err);
+			            return;
+			        }
+			        if (count.n == 0) {
+			        	console.error('Order getPayOrderPaymentInfo update push payment not find the doc.');
+			            callback('not find the doc');
+			            return;
+			        }
+
+			        callback(null, newPayment, newPayment.payPrice);
+			        return;
+			    });
 			});
         }
     }
