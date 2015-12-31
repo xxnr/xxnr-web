@@ -34,7 +34,7 @@ app.controller('newsController', function($scope,remoteApiService,sideService){
         }else if($scope.pages.length>7 && $scope.current_page<5){                              // e.g.: 1 2 3 4 5 ... 20
             $scope.pages = $scope.pages.slice(0,6).concat($scope.pages[$scope.pages.length-1]);
             $scope.pages[5].id = '...';
-        }else if($scope.pages.length>7 && $scope.current_page <= tempPageNum && $scope.current_page> tempPageNum - 4 ) {    // e.g.: 1 ... 16 17 18 19 20
+        }else if($scope.pages.length>7 && $scope.current_page <= $scope.pages_count && $scope.current_page> $scope.pages_count - 4 ) {    // e.g.: 1 ... 16 17 18 19 20
             $scope.pages = $scope.pages.slice(0,1).concat($scope.pages.slice($scope.pages.length-6,$scope.pages.length));
             $scope.pages[1].id = '...';
         }else{                                                                          // e.g.: 1 .. 8 9 10 ... 20
@@ -204,28 +204,5 @@ app.controller('newsController', function($scope,remoteApiService,sideService){
             $scope.show_page($scope.current_page);
         }
     };
-
-    Date.fromISO= function(s){
-        var day, tz,
-            rx=/^(\d{4}\-\d\d\-\d\d([tT ][\d:\.]*)?)([zZ]|([+\-])(\d\d):(\d\d))?$/,
-            p= rx.exec(s) || [];
-        if(p[1]){
-            day= p[1].split(/\D/);
-            for(var i= 0, L= day.length; i<L; i++){
-                day[i]= parseInt(day[i], 10) || 0;
-            };
-            day[1]-= 1;
-            day= new Date(Date.UTC.apply(Date, day));
-            if(!day.getDate()) return NaN;
-            if(p[5]){
-                tz= (parseInt(p[5], 10)*60);
-                if(p[6]) tz+= parseInt(p[6], 10);
-                if(p[4]== '+') tz*= -1;
-                if(tz) day.setUTCMinutes(day.getUTCMinutes()+ tz);
-            }
-            return day;
-        }
-        return NaN;
-    }
 
 });
