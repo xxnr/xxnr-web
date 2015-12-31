@@ -566,7 +566,7 @@ function payOrder(payExecutor){
                 self.respond({code:1001, message:'获取支付信息出错'});
                 return;
             }
-            payExecutor(resultPayment.id, resultPayPrice, self.ip, order.id);
+            payExecutor(resultPayment.id, parseFloat(resultPayPrice).toFixed(2), self.ip, order.id);
             return;
         });
 
@@ -610,7 +610,7 @@ function alipayOrder(){
                 var param = {};
                 param.out_trade_no = paymentId;
                 param.subject = '新新农人';
-                param.total_fee = totalPrice;
+                param.total_fee = parseFloat(totalPrice).toFixed(2);
                 param.body = '新新农人服务';
                 param.anti_phishing_key = encrypt_key;
                 param.exter_invoke_ip = ip;
