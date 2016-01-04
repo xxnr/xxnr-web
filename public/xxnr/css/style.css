@@ -267,7 +267,7 @@ body{font-family:"Microsoft YaHei","Lucida Sans Unicode","Myriad Pro","Hiragino 
 .channel3_body ul .index_product_item:hover{box-shadow: 0 5px 15px rgba(0,0,0,0.2);z-index: 2;}
 
 .footer{width:100%;background:#333;color:#d2d2d2;padding-top: 40px;}
-.footer .foot_copyright{font-size:14px;text-align:center;line-height:20px;height: 40px;border-top:1px solid #000;padding-bottom: 20px;padding-top: 20px;}
+.footer .foot_copyright{font-size:14px;text-align:center;line-height:20px;height: 40px;border-top:1px solid #000;padding-bottom: 20px;padding-top: 20px;box-shadow: 0px 2px #3f3f3f inset;}
 .foot {padding-left: 50px;}
 .foot a{color: #d2d2d2;}
 .foot .help_center,.about_us{width: 180px}

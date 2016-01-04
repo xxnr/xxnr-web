@@ -133,7 +133,7 @@ app.controller('invitationController', function($scope, remoteApiService, common
     remoteApiService.getBasicUserInfo()
         .then(function (data) {
             $scope.inviter = data.datas.inviter;
-            $scope.inviterNickname = data.datas.inviterNickname;
+            $scope.inviterName = data.datas.inviterName;
             $scope.imgUrl = data.datas.inviterPhoto;
             if(!$scope.imgUrl){
                 $scope.imgUrl = "images/default_avatar.png"
