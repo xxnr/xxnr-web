@@ -158,7 +158,7 @@ app.controller('invitationController', function($scope, remoteApiService, common
                     // var d = new Date(commonService.parseDate($scope.orderList[order].dateCreated));
                     // $scope.orderList[order].createTime_local = d.toLocaleString();
                     var d = Date.fromISO($scope.orderList[order].dateCreated);
-                    $scope.orderList[order].createTime_local = d.getFullYear().toString()+'-'+ (d.getMonth()+1).toString() +'-'+d.getDate().toString()+' '+d.getHours().toString()+':'+d.getMinutes().toString()+':'+d.getSeconds().toString();
+                    $scope.orderList[order].createTime_local = d.getFullYear().toString()+'-'+ (d.getMonth()+1).toString() +'-'+d.getDate().toString()+' '+d.getHours().toString()+':'+timeStringExpendZero(d.getMinutes().toString())+':'+ timeStringExpendZero(d.getSeconds().toString());
                 }
             });
     };
@@ -210,7 +210,15 @@ app.controller('invitationController', function($scope, remoteApiService, common
                 return '已关闭';
         }
     };
+    var timeStringExtendZero = function(timeString){
+        if(timeString.length < 2){
+            return '0'+timeString;
+        }else{
+            return timeString;
+        }
+    };
 });
+
 
 app.filter('convertDateToLocal', function (commonService) {
     return function (date) {
