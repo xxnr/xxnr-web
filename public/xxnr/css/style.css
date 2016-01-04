@@ -869,17 +869,17 @@ transition-delay: initial;
 .myClients_forms .client_order .orders_list .orders .orders-main .row{position: relative;border: 1px solid #e0e0e0;}
 .myClients_forms .client_order .orders_list .orders .orders-main .products-section {background: #fff;width: 789px;box-sizing: border-box;display: inline-block;float: left;border-right: 1px solid #e0e0e0;}
 .myClients_forms .client_order .orders_list .orders .orders-main .pay-section {box-sizing: border-box;width: 330px;display: inline-block;float: left;background: #fff;height: 100%;position: absolute;}
-.myClients_forms .client_order .orders_list .orders .orders-main .product {border-top: 1px solid #e0e0e0;box-sizing: border-box;display: table;}
+.myClients_forms .client_order .orders_list .orders .orders-main .product {border-top: 1px solid #e0e0e0;box-sizing: border-box;}
 .myClients_forms .client_order .orders_list .orders .orders-main .products-section li:first-child{border-top: 0;}
 .myClients_forms .client_order .orders_list .orders .orders-main .products-section li{}
 .myClients_forms .client_order .orders_list .orders .orders-main .product div{float: left;display: inline-block;}
 .myClients_forms .client_order .orders_list .orders .orders-main .product .p-img {width: 160px;overflow: hidden;}
 .myClients_forms .client_order .orders_list .orders .orders-main .product .p-img img{width:100px;height:100px;margin-left: 30px;margin-top: 20px;}
-.myClients_forms .client_order .orders_list .orders .orders-main .product .p-name {min-height: 60px;display: table-cell;vertical-align: middle;padding: 18px;box-sizing: border-box;font-size:16px;line-height:30px;width: 640px;padding-right: 48px;border-right: 1px solid #e0e0e0;}
+.myClients_forms .client_order .orders_list .orders .orders-main .product .p-name {padding: 18px;box-sizing: border-box;font-size:16px;line-height:30px;width: 640px;padding-right: 48px;border-right: 1px solid #e0e0e0;}
 .myClients_forms .client_order .orders_list .orders .orders-main .product .p-name a{width: 360px;overflow: hidden;}
 .myClients_forms .client_order .orders_list .orders .orders-main .product .p-price {width: 160px;height: 110px;padding-top: 30px;}
-.myClients_forms .client_order .orders_list .orders .orders-main .product .p-quantity {min-height: 66px;display:table;box-sizing: border-box;text-align: center;width: 148px;position:relative;overflow:hidden;height: 100%;}
-.myClients_forms .client_order .orders_list .orders .orders-main .product .p-quantity p{display: table-cell;vertical-align: middle;}
+.myClients_forms .client_order .orders_list .orders .orders-main .product .p-quantity {min-height: 66px;box-sizing: border-box;text-align: center;width: 148px;position:relative;overflow:hidden;height: 100%;}
+.myClients_forms .client_order .orders_list .orders .orders-main .product .p-quantity p{position: absolute;top: 50%;left: 50%;margin-top: -10px;}
 .myClients_forms .client_order .orders_list .orders .orders-main .product .pay-step{height: 120px;display: block;}
 .myClients_forms .client_order .orders_list .orders .orders-main .product .pay-step-1{border-top: 1px solid #e0e0e0;display:block;width:730px;line-height:60px;height: 60px;font-size: 16px;color:#323232;padding-left: 30px;}
 .myClients_forms .client_order .orders_list .orders .orders-main .product .pay-step-2{border-top: 1px solid #e0e0e0;display:block;width:730px;line-height:60px;height: 60px;font-size: 16px;color:#323232;padding-left: 30px;}
