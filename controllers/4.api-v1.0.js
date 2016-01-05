@@ -560,15 +560,21 @@ function payOrder(payExecutor){
             return;
         }
 
-        OrderService.getPayOrderPaymentInfo(order, payment, payPrice, function (err, resultPayment, resultPayPrice) {
-            if (err) {
-                console.error('api-v1.0 payOrder OrderService getPayOrderPaymentInfo err:', err);
-                self.respond({code:1001, message:'获取支付信息出错'});
+        try {
+            OrderService.getPayOrderPaymentInfo(order, payment, payPrice, function (err, resultPayment, resultPayPrice) {
+                if (err) {
+                    console.error('api-v1.0 payOrder OrderService getPayOrderPaymentInfo err:', err);
+                    self.respond({code:1001, message:'获取支付信息出错'});
+                    return;
+                }
+                payExecutor(resultPayment.id, parseFloat(resultPayPrice).toFixed(2), self.ip, order.id);
                 return;
-            }
-            payExecutor(resultPayment.id, parseFloat(resultPayPrice).toFixed(2), self.ip, order.id);
+            });
+        } catch (e) {
+            console.error('api-v1.0 payOrder OrderService getPayOrderPaymentInfo err:', e);
+            self.respond({"code":1001, "mesage":"获取支付信息出错"});
             return;
-        });
+        }
 
         // // user input price is null, not price Regexp, <= 0, > surplus price. use surplus price
         // if (!payPrice || !tools.isPrice(payPrice.toString()) || !parseFloat(payPrice) || parseFloat(payPrice) <= 0 || parseFloat(payPrice) > payment.price) {
@@ -605,20 +611,30 @@ function payOrder(payExecutor){
 
 function alipayOrder(){
     var self = this;
+    var consumer = self.data['consumer']||'website';
     payOrder.call(this, function(paymentId, totalPrice, ip) {
-        alipay.alipaySubmitService.query_timestamp(function(encrypt_key) {
-                var param = {};
-                param.out_trade_no = paymentId;
-                param.subject = '新新农人';
-                param.total_fee = parseFloat(totalPrice).toFixed(2);
-                param.body = '新新农人服务';
-                param.anti_phishing_key = encrypt_key;
-                param.exter_invoke_ip = ip;
-                // notify_url CANNOT be 127.0.0.1 because ailiy cannot send notification to 127.0.0.1
-                param.notify_url = ((alipay.alipay_config.notify_host || 'http://' + require("node-ip/lib/ip").address('public')) + ":" + alipay.alipay_config.notify_host_port + '/' + alipay.alipay_config.create_direct_pay_by_user_notify_url);
-                param.return_url = ((alipay.alipay_config.return_host || 'http://' + require("node-ip/lib/ip").address('public')) + ":" + alipay.alipay_config.return_host_port + '/' + alipay.alipay_config.create_direct_pay_by_user_return_url);
-                self.view('alipay', alipay.build_direct_pay_by_user_param(param));
-            });
+        switch(consumer) {
+            case 'app':
+                var response = {"code":1000, "paymentId":paymentId, 'price':totalPrice};
+                self.respond(response);
+                break;
+            case 'website':
+                alipay.alipaySubmitService.query_timestamp(function(encrypt_key) {
+                    var param = {};
+                    param.out_trade_no = paymentId;
+                    param.subject = '新新农人';
+                    param.total_fee = parseFloat(totalPrice).toFixed(2);
+                    param.body = '新新农人服务';
+                    param.anti_phishing_key = encrypt_key;
+                    param.exter_invoke_ip = ip;
+                    // notify_url CANNOT be 127.0.0.1 because ailiy cannot send notification to 127.0.0.1
+                    param.notify_url = ((alipay.alipay_config.notify_host || 'http://' + require("node-ip/lib/ip").address('public')) + ":" + alipay.alipay_config.notify_host_port + '/' + alipay.alipay_config.create_direct_pay_by_user_notify_url);
+                    param.return_url = ((alipay.alipay_config.return_host || 'http://' + require("node-ip/lib/ip").address('public')) + ":" + alipay.alipay_config.return_host_port + '/' + alipay.alipay_config.create_direct_pay_by_user_return_url);
+                    self.view('alipay', alipay.build_direct_pay_by_user_param(param));
+                });
+                break;
+            default:
+        }
     });
 }
 

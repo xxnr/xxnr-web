@@ -157,6 +157,7 @@ OrderService.prototype.create = function(options, callback) {
 	});
 };
 
+// New order
 OrderService.prototype.add = function(options, callback) {
 	var self = this;
 	options.id = options.id || U.GUID(8);
@@ -612,13 +613,7 @@ OrderService.prototype.getPayOrderPaymentInfo = function(order, payment, payPric
             var query = {'id':order.id, 'payments.id':payment.id};
             var values = {};
             values['$set'] = {'payments.$.isClosed':true};
-            // var newPayment = payment;
-            // newPayment.id = U.GUID(10);
-            // newPayment.payPrice = parseFloat(payPrice).toFixed(2);
-            // values['$push'] = {'payments':newPayment};
-            // values['$set'] = {'payments.$.isClosed':true};
             
-            // OrderModel.findOneAndUpdate(query, values, {new: true}, function(err, order) {
             OrderModel.update(query, values, function(err, count) {
             	if (err) {
 		            console.error('Order getPayOrderPaymentInfo update closed payment err:', err);
@@ -654,6 +649,31 @@ OrderService.prototype.getPayOrderPaymentInfo = function(order, payment, payPric
 			});
         }
     }
+};
+
+// remove order(use for error handle)
+OrderService.prototype.remove = function(options, callback) {
+	var self = this;
+	var orderId = null;
+	if (options && options.id) {
+		orderId = options.id;
+	}
+	
+	if (!orderId) {
+		callback('need order id');
+		return;
+	}
+	var query = {};
+	query.id = orderId;
+	OrderModel.remove(query, function(err) {
+		if (err) {
+			callback(err);
+			return;
+		}
+
+		callback(null);
+	});
+
 };
 
 

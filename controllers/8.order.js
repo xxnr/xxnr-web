@@ -101,7 +101,8 @@ function api10_getOders() {
                     'typeLable':'',
                     'deposit':item.deposit.toFixed(2),
                     'payType':item.payType,
-                    'products': item.products || []
+                    'products': item.products || [],
+                    'subOrders': item.subOrders || []
                 };
             }
             result = {'code':'1000','message':'success','datas':{"total":data.count,"rows":arr,"page":data.page,"pages":data.pages}};
@@ -121,7 +122,6 @@ function addOrder(){
     var addressId = data['addressId'];
     var products = data['products'] || [];
     var payType = data['payType'] || PAYTYPE.ZHIFUBAO;
-    var paymentId = U.GUID(10);
 
     if(products.length>0){
         products = JSON.parse(products);
@@ -160,46 +160,174 @@ function addOrder(){
                     return;
                 }
 
-                var price = 0;
-                var deposit = 0;
+                // 拆单 定金的商品和全款的商品拆分支付
+                var orders = {};
                 var orderProducts = [];
                 for(var i=0; i<cart.items.length; i++){
                     var product = api10.convertProduct(cart.items[i].product);
                     product.count = cart.items[i].count;
-                    price += product.count * product.discountPrice;
-                    deposit += product.count * (product.deposit?product.deposit:product.discountPrice);
+                    if (product.deposit) {
+                        if (!orders['deposit']) {
+                            orders['deposit'] = {
+                                "buyerName":user.name,
+                                "buyerPhone":user.account,
+                                "buyerId":user.id,
+                                "consigneeName":address.receiptpeople,
+                                "consigneePhone":address.receiptphone,
+                                "consigneeAddress":address.provincename + address.cityname + (address.countyname || '') + (address.townname || '') + address.address,
+                                "price":0,
+                                "deposit":0,
+                                "products":[],
+                                "payType":payType,
+                                "payStatus":PAYMENTSTATUS.UNPAID,
+                                "deliverStatus":DELIVERSTATUS.UNDELIVERED
+                            };
+                            orders['deposit'].id = U.GUID(10);
+                            orders['deposit'].paymentId = U.GUID(10);
+                        }
+                        orders['deposit'].price +=  product.count * product.discountPrice;
+                        orders['deposit'].deposit += product.count * product.deposit;
+                        orders['deposit'].products.push(product);
+                    } else {
+                        if (!orders['full']) {
+                            orders['full'] = {
+                                "buyerName":user.name,
+                                "buyerPhone":user.account,
+                                "buyerId":user.id,
+                                "consigneeName":address.receiptpeople,
+                                "consigneePhone":address.receiptphone,
+                                "consigneeAddress":address.provincename + address.cityname + (address.countyname || '') + (address.townname || '') + address.address,
+                                "price":0,
+                                "deposit":0,
+                                "products":[],
+                                "payType":payType,
+                                "payStatus":PAYMENTSTATUS.UNPAID,
+                                "deliverStatus":DELIVERSTATUS.UNDELIVERED
+                            };
+                            orders['full'].id = U.GUID(10);
+                            orders['full'].paymentId = U.GUID(10);
+                        }
+                        orders['full'].price +=  product.count * product.discountPrice;
+                        orders['full'].products.push(product);
+                    }
                     orderProducts.push(product);
                 }
 
-                var order = {"id": U.GUID(10),
-                    "buyerName":user.name,
-                    "buyerPhone":user.account,
-                    "buyerId":user.id,
-                    "paymentId":paymentId,
-                    "consigneeName":address.receiptpeople,
-                    "consigneePhone":address.receiptphone,
-                    "consigneeAddress":address.provincename + address.cityname + (address.countyname || '') + (address.townname || '') + address.address,
-                    "price":price,
-                    "deposit":deposit,
-                    "products":orderProducts,
-                    "payType":payType,
-                    "payStatus":PAYMENTSTATUS.UNPAID,
-                    "deliverStatus":DELIVERSTATUS.UNDELIVERED};
+                var keys = Object.keys(orders);
+                if (orders && keys.length > 0) {
+                    var order1, order2;
+                    if (orders['deposit']) {
+                        order1 = orders['deposit'];
+                        if (orders['full']) {
+                            order2 = orders['full'];
+                        } 
+                    } else if (orders['full']) {
+                        order1 = orders['full'];
+                    }
+                    if (order1) {
+                        try {
+                            OrderService.add(order1, function(err, data, payment) {
+                                if (err || !data) {
+                                    if (err) console.error('Order addOrder order1 err:', err);
+                                    var response = {"code":1001, "mesage":"保存订单出错"};
+                                    self.respond(response);
+                                    return;
+                                }
+                                var resultOrders = [];
+                                var result = {'id': data.id, 'price':data.price, 'deposit': data.deposit};
+                                if (payment) {
+                                    result.payment = {'paymentId':payment.id, 'price':payment.price};
+                                }
+                                resultOrders.push(result);
 
-                OrderService.add(order, function(err, data, payment) {
-                    if(err) {
-                        console.log('Order addOrder err:' + err);
-                        // Error TODO*
-                        var response = {"code":1001, "mesage":"保存订单出错"};
-                        self.respond(response);
+                                var orderId = data.id;
+                                var paymentId = payment && payment.id ? payment.id : data.paymentId;
+                                var price = data.price;
+                                var payPrice = payment && typeof(payment.price) != 'undefined' ? payment.price : data.deposit && data.deposit > 0 ? data.deposit : data.price;
+                                var response = {'code':1000, 'id': data.id, 'paymentId':paymentId, 'price':data.price, 'deposit':payPrice.toFixed(2)};
+                                if (order2) {
+                                    OrderService.add(order2, function(err, data, payment) {
+                                        if (err || !data) {
+                                            if (err) console.error('Order addOrder order2 err:', err);
+                                            self.respond({"code":1001, "mesage":"保存订单出错"});
+                                            OrderService.remove({id:orderId}, function(err) {
+                                                if (err) {
+                                                    console.error('Order addOrder remove order1 err:', err);
+                                                }
+                                            });
+                                            return;
+                                        }
+                                        result = {'id': data.id, 'price':data.price, 'deposit': data.deposit};
+                                        if (payment) {
+                                            result.payment = {'paymentId':payment.id, 'price':payment.price};
+                                        }
+                                        resultOrders.push(result);
+                                        response['orders'] = resultOrders;
+                                        self.respond(response);
+                                        CartService.removeItems(shopCartId, orderProducts, function(){});
+                                    });
+                                } else {
+                                    response['orders'] = resultOrders;
+                                    self.respond(response);
+                                    CartService.removeItems(shopCartId, orderProducts, function(){});
+                                }
+                            });
+                        } catch (e) {
+                            console.error('Order addOrder orders err:', e);
+                            self.respond({"code":1001, "mesage":"保存订单出错"});
+                            return;
+                        }
+                    } else {
+                        console.error('Order addOrder err: not get the order..');
+                        self.respond({"code":1001, "mesage":"没有要保存的订单"});
                         return;
                     }
-                    var paymentId = payment && payment.id ? payment.id : data.paymentId;
-                    var payPrice = payment && typeof(payment.price) != 'undefined' ? payment.price : data.deposit;
-                    var response = {'code':1000, 'id': data.id, 'paymentId':paymentId, 'price':data.price, 'deposit':payPrice.toFixed(2), 'payment':payment};
-                    self.respond(response);
-                    CartService.removeItems(shopCartId, orderProducts, function(){});
-                });
+                } else {
+                    console.error('Order addOrder err: no orders info..');
+                    self.respond({"code":1001, "mesage":"获取订单信息出错"});
+                    return;
+                }
+                // var paymentId = U.GUID(10);
+                // var price = 0;
+                // var deposit = 0;
+                // var orderProducts = [];
+                // for(var i=0; i<cart.items.length; i++){
+                //     var product = api10.convertProduct(cart.items[i].product);
+                //     product.count = cart.items[i].count;
+                //     price += product.count * product.discountPrice;
+                //     deposit += product.count * (product.deposit?product.deposit:product.discountPrice);
+                //     orderProducts.push(product);
+                // }
+
+                // var order = {"id": U.GUID(10),
+                //     "buyerName":user.name,
+                //     "buyerPhone":user.account,
+                //     "buyerId":user.id,
+                //     "paymentId":paymentId,
+                //     "consigneeName":address.receiptpeople,
+                //     "consigneePhone":address.receiptphone,
+                //     "consigneeAddress":address.provincename + address.cityname + (address.countyname || '') + (address.townname || '') + address.address,
+                //     "price":price,
+                //     "deposit":deposit,
+                //     "products":orderProducts,
+                //     "payType":payType,
+                //     "payStatus":PAYMENTSTATUS.UNPAID,
+                //     "deliverStatus":DELIVERSTATUS.UNDELIVERED};
+                
+                // OrderService.add(order, function(err, data, payment) {
+                //     if(err) {
+                //         console.log('Order addOrder err:' + err);
+                //         // Error TODO*
+                //         var response = {"code":1001, "mesage":"保存订单出错"};
+                //         self.respond(response);
+                //         return;
+                //     }
+                //     var paymentId = payment && payment.id ? payment.id : data.paymentId;
+                //     var payPrice = payment && typeof(payment.price) != 'undefined' ? payment.price : data.deposit;
+                //     var response = {'code':1000, 'id': data.id, 'paymentId':paymentId, 'price':data.price, 'deposit':payPrice.toFixed(2), 'payment':payment};
+                //     self.respond(response);
+                //     CartService.removeItems(shopCartId, orderProducts, function(){});
+                // });
 			});
 		});
 	});
@@ -322,8 +450,12 @@ function api10_getOrderDetails() {
             order.payType           = data.payType;
             order.confirmed         = data.confirmed;
             order.isClosed          = data.isClosed;
-            order.payment           = payment;
-            order.order             = {'totalPrice':data.price.toFixed(2),'deposit':data.deposit.toFixed(2)};
+            order.order             = {'totalPrice':data.price.toFixed(2),'deposit':data.deposit.toFixed(2),'dateCreated':data.dateCreated};
+            order.subOrders         = data.subOrders;
+            if (payment) {
+                order.payment       = {'paymentId':payment.id, 'price':payment.price};
+            }
+
             for (var i=0; i < productslength; i++) {
                 var product = data.products[i];
                 arr[i] = {

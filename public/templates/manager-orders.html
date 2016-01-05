@@ -240,8 +240,8 @@
 					<script type="text/html">
 						{{ if subOrders && subOrders.length > 0 }}
 							<tr>
-								<td class="ui-center col-xs-1 active">@(序号)</td>
-								<td class="ui-center col-xs-1 active">@(支付内容)</td>
+								<td class="ui-center active">@(序号)</td>
+								<td class="ui-center col-xs-2 active">@(支付内容)</td>
 								<td class="ui-center col-xs-1 active">@(支付状态)</td>
 		                        <td class="ui-center col-xs-1 active">@(应支付金额)</td>
 		                        <td class="ui-center col-xs-1 active">@(已支付金额)</td>
@@ -249,17 +249,17 @@
 								<td class="ui-center col-xs-1 active">@(已支付次数)</td>
 								<td class="ui-center col-xs-1 active">@(总支付次数)</td>
 								<td class="ui-center col-xs-1 active">@(关闭支付次数)</td>
-								<td class="ui-center col-xs-1 active">@(最后一次支付时间)</td>
+								<td class="ui-center col-xs-2 active">@(最后一次支付时间)</td>
 							</tr>
 							{{ foreach s in subOrders }}
 							<tr>
-								<td class="ui-center col-xs-1">{{ $index+1 }}</td>
-								<td class="ui-center col-xs-1">
+								<td class="ui-center">{{ $index+1 }}</td>
+								<td class="ui-center col-xs-2">
 									{{ if s.type == 'deposit' }}
-										定金
+										阶段一：定金
 									{{ else }}
 										{{ if s.type == 'balance' }}
-											尾款
+											阶段二：尾款
 										{{ else }}
 											{{ if s.type == 'full' }}
 												全款
@@ -290,7 +290,7 @@
 								<td class="ui-center col-xs-1">{{ s.paidTimes }}</td>
 								<td class="ui-center col-xs-1">{{ s.payments.length }}</td>
 								<td class="ui-center col-xs-1">{{ s.closedTimes }}</td>
-								<td class="ui-center col-xs-1">
+								<td class="ui-center col-xs-2">
 									{{ if s.datePaid }}
 										{{ s.datePaid | format('@(yyyy-MM-dd HH:mm:ss)') }}
 									{{ else }}
@@ -384,10 +384,10 @@
 									<tr>
 										<td class="ui-center">
 										{{ if s.type == 'deposit' }}
-											定金
+											阶段一：定金
 										{{ else }}
 											{{ if s.type == 'balance' }}
-												尾款
+												阶段二：尾款
 											{{ else }}
 												{{ if s.type == 'full' }}
 													全款
