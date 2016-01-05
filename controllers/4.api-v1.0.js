@@ -615,7 +615,7 @@ function alipayOrder(){
     payOrder.call(this, function(paymentId, totalPrice, ip) {
         switch(consumer) {
             case 'app':
-                var response = {"code":1000, "paymentId":paymentId, 'price':totalPrice};
+                var response = {"code":1000, "paymentId":paymentId, "price":totalPrice};
                 self.respond(response);
                 break;
             case 'website':
@@ -728,7 +728,7 @@ function unionpayNotify(){
             if(body['respCode'] === 00 || body['respCode'] === '00'){
                 var paymentInfo = JSON.parse(new Buffer(body.reqReserved, 'base64').toString());
                 var paymentId = paymentInfo.paymentId;
-                var options = {price:paymentInfo.txnAmt, orderId:paymentInfo.orderId};
+                var options = {price: (parseFloat(paymentInfo.txnAmt)/100).toFixed(2), orderId:paymentInfo.orderId};
                 payNotify.call(self, paymentId, options);
                 self.content('success');
             }
