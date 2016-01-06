@@ -430,4 +430,15 @@ app.service('remoteApiService', function(commonService){
         return commonService.ajax(params);
     };
 
+    this.getInviteeOrders = function(inviteeId,page,max){
+        var params = {
+            methodname:'api/v2.0/user/getInviteeOrders',
+            'inviteeId':inviteeId,
+            'page':page,
+            'max':max
+        };
+        return commonService.ajax(params);
+
+    }
+
 });

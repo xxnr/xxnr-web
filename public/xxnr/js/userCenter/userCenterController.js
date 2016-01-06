@@ -318,7 +318,7 @@ app.controller('userCenterController', function($scope, $rootScope, remoteApiSer
                     order.createTime_local = d.toLocaleString();
                     if (orders[i].payStatus == 1 && !orders[i].isClosed) {
                         order.statusName = '待付款';
-                        order.actionName = '立即付款';
+                        order.actionName = '去付款';
                         order.showAction = true;
                         order.action = function(order) {
                             window.location.href = "commitPay.html?id=" + order.id;
@@ -340,13 +340,20 @@ app.controller('userCenterController', function($scope, $rootScope, remoteApiSer
                                 //    })
                             }
                         }
-                    } else if (orders[i].isClosed) {
+                    } else if(orders[i].payStatus == 3){
+                        order.statusName = '部分付款';
+                        order.actionName = '去付款';
+                        order.showAction = true;
+                        order.action = function(order){
+                            window.location.href = "commitPay.html?id=" + order.id;
+                        }
+                    } else if (orders[i].confirmed) {
                         order.showAction = false;
-                        order.statusName = '已关闭';
+                        order.statusName = '已完成';
                         order.actionName = '联系客服';
                     } else {
                         order.showAction = false;
-                        order.statusName = '已完成';
+                        order.statusName = '已关闭';
                         order.actionName = '联系客服';
                     }
 
