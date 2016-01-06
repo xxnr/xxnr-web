@@ -2,7 +2,7 @@
  * Created by pepelu on 2015/9/9.
  */
 
- 
+
 /*************************************************************************************************
 **                                    common configuration                                      **
 *************************************************************************************************/
@@ -34,7 +34,7 @@ app.service('commonService',function($q,$http,BaseUrl,loginService){
             if(data.code == 1401){
                 // Unauthorized
                 loginService.logout();
-                sweetalert('你已被登出，请重新登录', window.location.href);
+                sweetalert('你已被登出，请重新登录', "logon.html");
             }
             deferred.resolve(data);
         }).error(function(data, error){
@@ -153,6 +153,28 @@ if (!window.console || !console.firebug){
     for (var i = 0; i < names.length; ++i)
         window.console[names[i]] = function() {}
 }
+Date.fromISO= function(s){
+    var day, tz,
+        rx=/^(\d{4}\-\d\d\-\d\d([tT ][\d:\.]*)?)([zZ]|([+\-])(\d\d):(\d\d))?$/,
+        p= rx.exec(s) || [];
+    if(p[1]){
+        day= p[1].split(/\D/);
+        for(var i= 0, L= day.length; i<L; i++){
+            day[i]= parseInt(day[i], 10) || 0;
+        };
+        day[1]-= 1;
+        day= new Date(Date.UTC.apply(Date, day));
+        if(!day.getDate()) return NaN;
+        if(p[5]){
+            tz= (parseInt(p[5], 10)*60);
+            if(p[6]) tz+= parseInt(p[6], 10);
+            if(p[4]== '+') tz*= -1;
+            if(tz) day.setUTCMinutes(day.getUTCMinutes()+ tz);
+        }
+        return day;
+    }
+    return NaN;
+};
 
 
 /*************************************************************************************************
