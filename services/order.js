@@ -17,16 +17,21 @@ OrderService = function(){};
 // Method
 // order type
 OrderService.prototype.orderType = function (order) {
-    if (order.payStatus == PAYMENTSTATUS.UNPAID && !order.isClosed) {
-        return 1;
-    } else if (order.payStatus == PAYMENTSTATUS.PAID && order.deliverStatus == DELIVERSTATUS.UNDELIVERED) {
+    if (order.payStatus == PAYMENTSTATUS.PAID) {
+        if (order.deliverStatus == DELIVERSTATUS.DELIVERED) {
+            if (order.confirmed) {
+                return 4;
+            }
+            return 3;
+        }
         return 2;
-    } else if (order.payStatus == PAYMENTSTATUS.PAID && order.deliverStatus == DELIVERSTATUS.DELIVERED && !order.confirmed) {
-        return 3;
-    } else if (order.confirmed) {
-        return 4;
+    } else if (order.payStatus == PAYMENTSTATUS.PARTPAID) {
+        return 1;
     } else {
-        return 0;
+        if (order.isClosed) {
+            return 0;
+        }
+        return 1;
     }
 }
 
@@ -62,8 +67,8 @@ OrderService.prototype.query = function(options, callback) {
 
 	// closed
 	if (type === 0) {
+		mongoOptions["isClosed"] = { $eq: true };
 		mongoOptions["payStatus"] = { $eq: PAYMENTSTATUS.UNPAID };
-        mongoOptions["isClosed"] = { $eq: true };
     }
 	// unpaid
 	if (type === 1) {
@@ -73,12 +78,14 @@ OrderService.prototype.query = function(options, callback) {
 	// paid and not delivered
 	if (type === 2) {
 		// mongoOptions["payStatus"] = { $ne:  PAYMENTSTATUS.UNPAID };
-		mongoOptions["payStatus"] = { $nin: [PAYMENTSTATUS.UNPAID, PAYMENTSTATUS.PARTPAID] };
-		mongoOptions["deliverStatus"] = { $nin: [DELIVERSTATUS.DELIVERED, DELIVERSTATUS.PARTDELIVERED] };
+		// mongoOptions["payStatus"] = { $nin: [PAYMENTSTATUS.UNPAID, PAYMENTSTATUS.PARTPAID] };
+		// mongoOptions["deliverStatus"] = { $nin: [DELIVERSTATUS.DELIVERED, DELIVERSTATUS.PARTDELIVERED] };
+		mongoOptions["payStatus"] = { $eq: PAYMENTSTATUS.PAID };
+		mongoOptions["deliverStatus"] = { $eq: DELIVERSTATUS.UNDELIVERED };
 	}
 	// paid and delivered(including: part delivered)
 	if (type === 3) {
-		mongoOptions["deliverStatus"] = { $ne:  DELIVERSTATUS.UNDELIVERED };
+		mongoOptions["deliverStatus"] = { $ne: DELIVERSTATUS.UNDELIVERED };
 		mongoOptions["confirmed"] = { $ne:  true};
 	} 
 	// Completed
@@ -598,8 +605,16 @@ OrderService.prototype.addUserOrderNumber = function(options, callback) {
 
 // get payment info when payorder
 OrderService.prototype.getPayOrderPaymentInfo = function(order, payment, payPrice, callback) {
+	// var minPayPrice = 3000;
+	// // one time pay price must more than minPayPrice
+	// if (minPayPrice > payment.price) {
+	// 	payPrice = payment.price;
+	// }
+	// if (payPrice && tools.isPrice(payPrice.toString()) && parseFloat(payPrice) && minPayPrice > parseFloat(payPrice)) {
+	// 	payPrice = minPayPrice;
+	// }
 	// user input price is null, not price Regexp, <= 0, > surplus price. use surplus price
-    if (!payPrice || !tools.isPrice(payPrice.toString()) || !parseFloat(payPrice) || parseFloat(payPrice) < 0.01 || parseFloat(payPrice) > payment.price) {
+    if (!payPrice || !tools.isPrice(payPrice.toString()) || !parseFloat(payPrice) || parseFloat(payPrice) < 0.01 || parseFloat(payPrice) >= payment.price) {
         payPrice = payment.price;
         callback(null, payment, payPrice);
         return;
