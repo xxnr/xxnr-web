@@ -185,7 +185,7 @@ function getSelectionStartNode(context){
 	return startNode;
 }
 
-angular.module('xxnr_manager',['ngCookies'])
+var app = angular.module('xxnr.manager',['ngCookies'])
     .service('loginService', function($cookieStore) {
         var tokenKey = "be_token";
         this.logout = function () {
@@ -193,9 +193,12 @@ angular.module('xxnr_manager',['ngCookies'])
             $cookieStore.remove(tokenKey, {path: "/"});
         };
     })
-    .controller('managerController', function($scope, loginService) {
+    .controller('ManagerController', function($scope, loginService) {
         $scope.logout = function(){
             loginService.logout();
             window.location.reload();
         }
     });
+app.controller('ProductController', function($scope){
+		$scope.show_product_edit = false;
+	});

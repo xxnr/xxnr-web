@@ -1,7 +1,9 @@
 /**
  * Created by pepelu on 2015/12/16.
  */
+var mongoose = require('mongoose');
 var ProductModel = require('../models').product;
+var ProductAttributeModel = require('../models').productAttribute;
 var sortOptions = {"price-desc":{price:-1},"price-asc":{price:1}};
 
 // Service
@@ -45,8 +47,10 @@ ProductService.prototype.query = function(options, callback) {
         nor.push({presale: {$eq: true}});
     }
 
-    if (options.modelName)
-        nor.push({model: {$nin: options.modelName}});
+    if(options.attributes){
+        // attributes will be like [{name:'车型级别', value:'轿车'},{name:'汽车车系', value:'瑞风M3'},...]
+        nor.push({attributes:{$nin: options.attributes}});
+    }
 
     if (options.id) {
         nor.push({id: {$ne: options.id}});
@@ -60,6 +64,12 @@ ProductService.prototype.query = function(options, callback) {
         nor.push({id: options.skip});
     }
 
+    if(typeof options.online !== 'undefined'){
+        nor.push({online: {$ne:options.online}});
+    } else{
+        //nor.push({online:{$ne:true}});
+    }
+
     var mongoOptions = nor.length ? {$nor: nor} : {};
 
     var orderbyOptions = {};
@@ -68,6 +78,7 @@ ProductService.prototype.query = function(options, callback) {
             for (var key in sortOptions[options.sort])
                 orderbyOptions[key] = sortOptions[options.sort][key];
     orderbyOptions.istop = -1;
+    orderbyOptions.online = -1;
     orderbyOptions.datecreated = -1;
 
     if(options.search){
@@ -84,6 +95,7 @@ ProductService.prototype.query = function(options, callback) {
             .sort(orderbyOptions)
             .skip(skip)
             .limit(take)
+            .populate('brand')
             .lean()
             .exec(function (err, docs) {
                 if(err){
@@ -108,7 +120,7 @@ ProductService.prototype.query = function(options, callback) {
 
 // Saves the product into the database
 ProductService.prototype.save = function(model, callback) {
-
+console.log(model);
     if (!model.id)
         model.id = U.GUID(10);
 
@@ -135,12 +147,21 @@ ProductService.prototype.save = function(model, callback) {
                     return;
                 }
 
-                callback(null);
-                setTimeout(refresh, 1000);
+                newProduct.populate('brand', function(err, doc){
+                    if(err){
+                        console.error('product populate err', err, 'model', model);
+                        callback(err);
+                        return;
+                    }
+
+                    callback(null, doc);
+                    //TODO:call add attributes before new product with new attribute
+                    //setTimeout(refresh, 1000);
+                })
             });
         } else {
             callback(null);
-            setTimeout(refresh, 1000);
+            //setTimeout(refresh, 1000);
         }
     })
 };
@@ -165,6 +186,7 @@ ProductService.prototype.get = function(options, callback) {
 
     // Gets a specific document from DB
     ProductModel.findOne(mongoOptions)
+        .populate('brand')
         .lean()
         .exec(function (err, doc) {
             if (err) {
@@ -311,6 +333,111 @@ ProductService.prototype.idJoinWithCount = function(options, callback){
     };
 
     joinProduct(0);
+};
+
+ProductService.prototype.saveAttribute = function(category, brand, name, value, callback){
+    if(!category){
+        callback('category _id required');
+        return;
+    }
+
+    if(!name){
+        callback('name required');
+        return;
+    }
+
+    if(!value){
+        callback('value required');
+        return;
+    }
+
+    var productAttribute = new ProductAttributeModel({category:category, brand:brand, name:name, value:value});
+    productAttribute.save(function(err){
+        if(err){
+            if(11000 == err.code){
+                // already exist, update value
+                ProductAttributeModel.update({category:category, brand:brand, name:name}, {$set:{value:value}}, function(err, numAffected){
+                    if(err){
+                        console.error(err);
+                        callback(err);
+                        return;
+                    }
+
+                    if(numAffected.n==0){
+                        var err = 'saveAttribute: attribute not exist: ' + {category:category, brand:brand, name:name};
+                        console.error(err);
+                        callback(err);
+                        return;
+                    }
+
+                    callback(null, productAttribute);
+                    return;
+                })
+            }else {
+                console.error(err);
+                callback(err);
+                return;
+            }
+        }
+
+        callback(null, productAttribute);
+    })
+};
+
+ProductService.prototype.getAttributes = function(category, brand, name, callback, newSchema){
+    var matchOptions = {};
+    if(category)
+        matchOptions.category = category;
+    if(brand){
+        if(brand == 'null'){
+            matchOptions.brand = null;
+        } else{
+            matchOptions.brand = mongoose.Types.ObjectId(brand);
+        }
+    }
+    if(name)
+        matchOptions.name = name;
+
+    var schemaToAdd = {name:'$value'};
+    if(newSchema){
+        schemaToAdd = {value:'$value',ref:'$_id'};
+    }
+
+    ProductAttributeModel.aggregate({$match:matchOptions},
+        {$group:{
+            _id:{brand:'$brand', name:'$name'},
+            values:{$addToSet:schemaToAdd}
+        }})
+        .exec(function(err, attributes){
+            if(err){
+                console.error(err);
+                callback(err);
+                return;
+            }
+
+            callback(null, attributes || []);
+        })
+};
+
+ProductService.prototype.updateStatus = function(_id, online, callback){
+    if(!_id){
+        callback('_id required');
+        return;
+    }
+
+    if(typeof online === 'undefined'){
+        online = false;
+    }
+
+    ProductModel.update({_id:_id}, {$set:{online:online}}, function(err, numAffected){
+        if(err){
+            console.error(err);
+            callback(err);
+            return;
+        }
+
+        callback();
+    })
 };
 
 // Refreshes internal information (categories)
@@ -474,5 +601,5 @@ function refresh() {
     } );
 }
 
-setTimeout(refresh, 1000);
+//setTimeout(refresh, 1000);
 module.exports = new ProductService();

@@ -12,6 +12,10 @@ require('./orders');
 require('./products');
 require('./news');
 require('./carts');
+require('./SKU');
+require('./brands');
+require('./Supplier');
+require('./categories');
 
 //user
 exports.user = mongoose.model('user');
@@ -32,13 +36,22 @@ exports.useraddress = mongoose.model('useraddress');
 exports.order = mongoose.model('order');
 // product
 exports.product = mongoose.model('product');
+exports.productAttribute = mongoose.model('productAttribute');
 // news
 exports.news = mongoose.model('news');
 exports.newsCategory = mongoose.model('newscategory');
 // cart
 exports.cart = mongoose.model('cart');
-// user new orders number
-exports.userordersnumber = mongoose.model('userordersnumber');
+// SKU
+exports.SKU = mongoose.model('SKU');
+exports.SKUAttributes = mongoose.model('SKUAttribute');
+exports.SKUAddition = mongoose.model('SKUAddition');
+// brand
+exports.brand = mongoose.model('brand');
+// supplier
+exports.supplier = mongoose.model('supplier');
+// category
+exports.category = mongoose.model('category');
 
 exports.getModel = function (name, options) {
     options = options || {};

@@ -17,7 +17,7 @@ var schema = new mongoose.Schema({
 	'dateDelivered': Date,
 	'price': Number,
 	'deposit': Number,
-	'products': {subschemaName:"OrderItem", type:
+	'products': {subschemaName:"OrderItem", type:								// keep this to support old apis.
 		[{
 			'id': {type:String, required: true, index: true},
 			'price': {type:Number, required: true},
@@ -29,6 +29,22 @@ var schema = new mongoose.Schema({
             'dateDelivered': Date,
             'deliverStatus': {type:Number, required:true, default: DELIVERSTATUS.UNDELIVERED}
 		}], required: true},
+	SKUs:[{
+		ref:{type:mongoose.Schema.ObjectId, ref:'sku', required:true},
+		price:{type:Number, required: true},
+		deposit:{type:Number, required:true},
+		name:{type:String, required:true},
+		thumbnail:String,
+		count:{type:Number, required:true},
+		category:{type:String, required:false},
+		dateDelivered:Date,
+		deliverStatus:{type:Number, required:true, default:DELIVERSTATUS.UNDELIVERED},
+		additions:[{							// the additions added to order
+			ref:{type:mongoose.Schema.ObjectId, ref:'SKUAddition', required:true},
+			name:{type:String, required:true},
+			price:{type:Number, required:true}
+		}]
+	}],
 	'payStatus': {type:Number, required:true},
 	'payType': {type:Number, required:true},
 	'deliverStatus': {type:Number, required:true}, // 主订单发货状态，从商品发货状态统计得来 分为无发货、部分发货、已发货三种

@@ -173,3 +173,6 @@ label span { vertical-align: middle; }
 .ui-cookie { font-size: 11px; padding: 3px 20px 5px; border-bottom: 1px solid #F0F0F0; text-align: center; }
 .ui-cookie button { position: relative; display: inline-block; padding: 1px 5px; border-radius: 4px; font-size: 10px; background-color: black; color: white; border: 0; margin-left: 5px; cursor: pointer; outline: 0; }
 .ui-cookie button:hover { background-color: #303030; }
+
+.ui-textbox-with-button { border: 1px solid #E0E0E0; padding: 5px 2px 5px 5px; border-radius: 2px; width: 100%; position: relative; background-color: white; display: table; }
+.ui-textbox-with-button input { display: table-cell; border: 0; outline: 0; font: normal 14px Arial; color: black; background-color: white; padding: 0; }

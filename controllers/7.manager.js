@@ -8,6 +8,9 @@ var AuthService = services.auth;
 var OrderService = services.order;
 var ProductService = services.product;
 var NewsService = services.news;
+var SKUService = services.SKU;
+var BrandService = services.brand;
+var CategoryService = services.category;
 
 exports.install = function() {
 	// Auto-localize static HTML templates
@@ -46,16 +49,22 @@ exports.install = function() {
 	// F.route(CONFIG('manager-url') + '/api/users/',              			json_users_remove, ['delete']);
 	// F.route(CONFIG('manager-url') + '/api/users/clear/',        			json_users_clear);
 
+	// BRANDS
+	F.route(CONFIG('manager-url') + '/api/brands/',							json_brands,	['get'],['backend_auth']);
+
 	// PRODUCTS
 	F.route(CONFIG('manager-url') + '/api/products/',            			json_products_query, ['get'], ['backend_auth']);
 	F.route(CONFIG('manager-url') + '/api/products/',            			json_products_save, ['post'], ['backend_auth']);
+	F.route(CONFIG('manager-url') + '/api/products/updateStatus',			process_products_updateStatus, ['post'], ['backend_auth']);
 	F.route(CONFIG('manager-url') + '/api/products/{id}/',       			json_products_read, ['get'], ['backend_auth']);
 	F.route(CONFIG('manager-url') + '/api/products/',            			json_products_remove, ['delete'], ['backend_auth']);
 	// F.route(CONFIG('manager-url') + '/api/products/clear/',      			json_products_clear);
 	F.route(CONFIG('manager-url') + '/api/products/import/',     			json_products_import, ['upload'], 1024, ['backend_auth']);
 	F.route(CONFIG('manager-url') + '/api/products/categories/', 			json_products_categories, ['get'], ['backend_auth']);
 	F.route(CONFIG('manager-url') + '/api/products/category/',   			json_products_category_replace, ['post'] ,['backend_auth']);
-	F.route(CONFIG('manager-url') + '/api/products/attr/{attributeName}/',	json_products_attributes, ['get'], ['backend_auth']);
+	F.route(CONFIG('manager-url') + '/api/products/attr/{attributeName}/',	json_products_attribute, ['get'], ['backend_auth']);
+	F.route(CONFIG('manager-url') + '/api/products/attribute/add',			process_product_attributes_add,	['post'], ['backend_auth']);
+	F.route(CONFIG('manager-url') + '/api/products/attributes/',			json_products_attributes, ['get'], ['backend_auth']);
 
 	// NEWS
 	F.route(CONFIG('manager-url') + '/api/news/',            				json_news_query, ['get'], ['backend_auth']);
@@ -112,6 +121,14 @@ exports.install = function() {
 
     // business
     F.route(CONFIG('manager-url') + '/api/businesses/',                     json_businesses,['get'], ['backend_auth']);
+
+	// SKU
+	F.route(CONFIG('manager-url') + '/api/v2.1/SKU/add/',               process_SKU_add,                ['post'], ['backend_auth']);
+	F.route(CONFIG('manager-url') + '/api/v2.1/SKU/update/{id}',               process_SKU_update,             ['post'], ['backend_auth']);
+	F.route(CONFIG('manager-url') + '/api/v2.1/SKU/attribute/add/',     process_SKU_Attribute_add,      ['post'], ['backend_auth']);
+	F.route(CONFIG('manager-url') + '/api/v2.1/SKU/attributes',         json_SKU_Attributes_get,        ['get'], ['backend_auth']);
+	F.route(CONFIG('manager-url') + '/api/v2.1/SKU/query',				json_SKU_get,					['get'], ['backend_auth']);
+	F.route(CONFIG('manager-url') + '/api/v2.1/SKU/remove/{id}',			process_SKU_remove,				['get'], ['backend_auth']);
 };
 
 var files = DB('files', null, require('total.js/database/database').BUILT_IN_DB).binary;
@@ -321,6 +338,7 @@ function json_dashboard_clear() {
 // Gets all products
 function json_products_query() {
 	var self = this;
+
 	ProductService.query(self.query, self.callback());
 }
 
@@ -328,12 +346,24 @@ function json_products_query() {
 function json_products_save() {
 	var self = this;
 
-    ProductService.save(self.body, self.callback());
+    ProductService.save(self.body, function(err, product){
+		if(err){
+			self.respond({code:1001, message:err});
+			return;
+		}
+
+		self.respond({code:1000, product:product});
+	});
 
 	// Clears view cache
 	setTimeout(function() {
 		F.cache.removeAll('cache.');
 	}, 2000);
+}
+
+function process_products_updateStatus(){
+	var self = this;
+	ProductService.updateStatus(self.body._id, self.body.online, self.callback())
 }
 
 // Removes specific product
@@ -359,10 +389,14 @@ function json_products_import() {
 function json_products_categories() {
 	var self = this;
 
-	if (!F.global.categories)
-		F.global.categories = [];
+	CategoryService.all(function(err, categories){
+		if(err){
+			self.respond({code:1001, message:'fail to query category'});
+			return;
+		}
 
-	self.json(F.global.categories);
+		self.respond(categories);
+	})
 }
 
 // Replaces old category with new
@@ -372,30 +406,46 @@ function json_products_category_replace() {
 }
 
 // Reads all product attributes (brands models engines gearboxes levels etc.)
-function json_products_attributes(attributeName) {
+function json_products_attribute(attributeName) {
 	var self = this;
-	var category = self.query['category'];
+	var category = self.data.category;
+	var brand = self.data.brand;
+	ProductService.getAttributes(category, brand, attributeName, function (err, attributes) {
+		if (err) {
+			console.error('query attributes error', err);
+			self.respond({code: 1001, message: '获取商品属性列表失败', error: err});
+			return;
+		}
 
-	if (!F.global.attributes)
-        F.global.attributes = {};
+		self.respond(attributes.length > 0 ? attributes[0].values || [] : []);
+	})
+}
 
-	if (!F.global.attributes[attributeName]) {
-		self.json([]);
-		return;
-	}
-    
-    var arr = F.global.attributes[attributeName];
-    var result = [];
-    for (var i = 0; i < arr.length; i++) {
-        var item = arr[i];
-        if (category) {
-            if ((item['category'] && item['category'] == category) || (item['categoryid'] && item['categoryid'] == category))
-                result.push(item);
-        } else {
-            result.push(item);
-        }
-    }
-    self.json(result);
+function json_brands(){
+	var self = this;
+	var category = self.data.category;
+	BrandService.query(category, function(err, brands){
+		if(err){
+			console.error('query brands error', err);
+			self.respond({code:1001, message:'获取品牌列表失败', error:err});
+			return;
+		}
+
+		self.respond({code:1000, brands:brands});
+	})
+}
+
+function json_products_attributes(){
+	var self = this;
+	ProductService.getAttributes(self.data.category, self.data.brand, self.data.name, function(err, attributes){
+		if (err) {
+			console.error('query attributes error', err);
+			self.respond({code: 1001, message: '获取商品属性列表失败', error: err});
+			return;
+		}
+
+		self.respond({code:1000, message:'success', attributes:attributes});
+	}, true)
 }
 
 // Reads a specific product by ID
@@ -1022,4 +1072,134 @@ function json_be_users_update(){
 function json_businesses(){
     var self= this;
     BackEndUserService.getBusinessList(self.callback());
+}
+
+function process_SKU_add() {
+	var self = this;
+	if (!self.data.name) {
+		self.respond({code: 1001, message: '请输入SKU名称'});
+		return;
+	}
+
+	if (!self.data.product) {
+		self.respond({code: 1001, message: '请选择商品'});
+		return;
+	}
+
+	if (!self.data.price || !self.data.price.platform_price) {
+		self.respond({code: 1001, message: '请输入平台价'});
+		return;
+	}
+
+	SKUService.addSKU(self.data.name, self.data.product, self.data.attributes, self.data.additions, self.data.price, function (err, SKU) {
+		if (err) {
+			console.error('process_SKU_add error', err);
+			self.respond({code: 1001, message: '添加失败'});
+			return;
+		}
+
+		self.respond({code: 1000, message: 'success', SKU: SKU});
+	})
+}
+
+function process_SKU_update(id){
+	var self = this;
+	if(!self.data.price || !self.data.price.platform_price){
+		self.respond({code:1001, message:'请输入平台价'});
+		return;
+	}
+
+	SKUService.updateSKU(id, self.data.price, self.data.attributes, self.data.additions, self.data.name, function(err){
+		if(err){
+			console.error('updateSKU error', err);
+			self.respond({code:1001, message:'更新SKU失败'});
+			return;
+		}
+
+		self.respond({code:1000, message:'success'});
+	})
+}
+
+function process_SKU_Attribute_add(){
+	var self = this;
+	if(!self.data.category){
+		self.respond({code:1001, message:'请填写category'});
+		return;
+	}
+
+	if(!self.data.brand){
+		self.respond({code:1001, message:'请填写brand'});
+		return;
+	}
+
+	if(!self.data.name){
+		self.respond({code:1001, message:'请填写name'});
+		return;
+	}
+
+	if(!self.data.value){
+		self.respond({code:1001, message:'请填写value'});
+		return;
+	}
+
+	SKUService.addSKUAttribute(self.data.category, self.data.brand, self.data.name, self.data.value, function(err, attribute){
+		if(err){
+			console.error('process_SKU_Attribute_add error', err);
+			self.respond({code:1001, message:'添加SKU属性失败'});
+			return;
+		}
+
+		self.respond({code:1000, message:'success', attribute:attribute});
+	})
+}
+
+function json_SKU_Attributes_get(){
+	var self = this;
+	SKUService.querySKUAttributes(self.data.category, self.data.brand, function(err, attributes){
+		if(err){
+			console.error('json_SKU_Attributes_get error', err);
+			self.respond({code:1001, message:'获取SKU属性失败'});
+			return;
+		}
+
+		self.respond({code:1000, message:'success', attributes:attributes});
+	})
+}
+
+function process_product_attributes_add(){
+	var self = this;
+	ProductService.saveAttribute(self.data.category, self.data.brand, self.data.name, self.data.value, function(err, new_attribute){
+		if(err){
+			self.respond({code:1001, message:'保存商品属性失败'});
+			return;
+		}
+
+		self.respond({code:1000, message:'succcess', attribute:new_attribute});
+	})
+}
+
+function json_SKU_get(){
+	var self = this;
+	SKUService.querySKUByProductId(self.data.product, function(err, SKUs){
+		if(err){
+			console.log(err);
+			self.respond({code:1001, message:'查询SKU失败'});
+			return;
+		}
+
+		self.respond({code:1000, message:'success', SKUs:SKUs});
+	})
+}
+
+function process_SKU_remove(id){
+	var self = this;
+	SKUService.removeSKU(id, function(err){
+		if(err){
+			console.log(err);
+			self.respond({code:1001, message:'删除SKU失败'});
+			return;
+		}
+
+		self.respond({code:1000, message:'success'});
+	})
 }

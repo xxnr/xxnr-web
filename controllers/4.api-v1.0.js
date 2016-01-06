@@ -10,6 +10,7 @@ var UserService = services.user;
 var OrderService = services.order;
 var ProductService = services.product;
 var CartService = services.cart;
+var BrandService = services.brand;
 
 exports.install = function() {
 	//fix api// F.route('/api/v2.0/getProductDetails/', getProductDetails, ['post', 'get']);
@@ -107,7 +108,7 @@ function getGoodsListPage(transformer) {
     var modelName = self.data["modelName"];
     var sort = self.data["sort"];
 
-    var options = {};
+    var options = {online:true};
 
 	if (category)
 		options.category = category;
@@ -124,8 +125,14 @@ function getGoodsListPage(transformer) {
     if (reservePrice)
         options.reservePrice = decodeURI(reservePrice).split(',');
 
-    if (modelName)
-        options.modelName = decodeURI(modelName).split(',');
+    if (modelName) {
+        // support old api
+        var modelNames = decodeURI(modelName).split(',');
+        options.attributes = [];
+        modelNames.forEach(function(name){
+            options.attributes.push({name:'车系',value:name});
+        })
+    }
 
     if (sort)
         options.sort = decodeURI(sort);
@@ -139,9 +146,6 @@ function getGoodsListPage(transformer) {
                 return;
 			}
 
-			var mapCategories = F.global.mapCategories || {};
-			var categories = {};
-//			var products = api10.convertProducts(data.items);
             var products = [];
             var count = data.count;
             var pages = data.pages;
@@ -149,7 +153,6 @@ function getGoodsListPage(transformer) {
 
             for(var i = 0; i < data.items.length; i++) {
                 var product = api10.convertProduct(data.items[i]);
-//                var categoryId = product.categoryId;
                 var good = {"goodsId":product.id, "awardPoint":"","unitPrice": (product.discountPrice),
                             "goodsGreatCount":(product.positiveRating || 1.0) * 100, "brandId": product.brandId,
                             "brandName": product.brandName, "imgUrl": product.imgUrl,
@@ -161,78 +164,15 @@ function getGoodsListPage(transformer) {
                             "presale": product.presale ? product.presale : false
                         };
 
-
-
                 products.push(good);
-//                if(!categories.hasOwnProperty(categoryId)) {
-//                    categories[product.categoryId] = [];
-//                    categories[product.categoryId].push(good);
-//                } else {
-//                    categories[product.categoryId].push(good);
-//                }
             }
-//            var goodsListPage = {"code":"1000","message":"success","datas":{"total":Object.keys(categories).length,"locationUserId":userId,"rows":[],"pages":pages,"page":page}};
+
             var goodsListPage = {"code":"1000","message":"success","datas":{total:count, "rows":products,"pages":pages,"page":page}};
-
-//            for(var i in categories){
-//                var goods = {"total":categories[i].length,"typeName": mapCategories[i].name, /*"typeSort":5,*/
-//                                    "typeId": i,"rows":categories[i]};
-//                if (Object.keys(categories).length === 1) {
-//                    goods.pages = pages;
-//                    goods.page = page;
-//                }
-//                goodsListPage.datas.push(goods);
-//            }
-
-			// for(var i = 0; i<products.length; i++){
-			// 	product = products[i];
-			// 	categoryId = product.categoryId;
-
-			// 	if(!categories.hasOwnProperty(categoryId)){
-			// 		category = categories[product.categoryId] = {};
-			// 		category.products = [];
-			// 		category.category = mapCategories.hasOwnProperty(categoryId) ? mapCategories[categoryId] : {};
-			// 	}
-			// 	else{
-			// 		category = categories[product.categoryId];
-			// 	}
-
-			// 	category.products.push(product);
-			// }
-
-			// var goodsListPage =
-			// {"code":"1000","message":"success",
-			// "datas":{"total":Object.keys(categories).length,"locationUserId":userId
-			// ,"rows":[]}};
-
-			// for(var i in categories){
-			// 	category = categories[i];
-			// 	var goods = {"total":category.products.length,"typeName": mapCategories[i].name, /*"typeSort":5,*/
-			// 	"typeId": i,
-			// 	"rows":[]};
-
-			// 	for(var j =0; j<category.products.length; j++){
-			// 		var product = category.products[j];
-			// 		var good =
-			// 		{"goodsId":product.id, "awardPoint":"","unitPrice": (product.discountPrice),
-			// 		"goodsGreatCount":(product.positiveRating || 1.0) * 100, "brandId": product.brandId,
-			// 		"brandName": product.brandName, "imgUrl": product.imgUrl,
-			// 		"allowScore": product.payWithScoresLimit,
-			// 		"thumbnail": product.thumbnail,
-			// 		"stock":"100" /*TODO*/,"originalPrice": product.price, "goodsSellCount": 2/*TODO*/,
-			// 		/*"goodsSort":3,*/ "goodsName": product.name};
-
-			// 		goods.rows.push(good);
-			// 	}
-
-			// 	goodsListPage.datas.rows.push(goods);
-			// }
 
             if(transformer) transformer(goodsListPage);
 
             self.respond(goodsListPage);
 		});
-	//});
 }
 
 function api10_getProducts(){
@@ -331,7 +271,11 @@ function getGoodsDetails(transformer){
             "productDesc": product.body,
             "standard": product.standard || null,
             "support": product.support || null,
-            "goodsAbstract": product.abstract || ""
+            "goodsAbstract": product.abstract || "",
+            "attributes":product.attributes,
+            "SKUAttributes":product.SKUAttributes,
+            "SKUAdditions":product.SKUAdditions,
+            "SKUPrice":product.SKUPrice
             };
 
         delete product.body;
@@ -896,26 +840,33 @@ function convertToShoppingCartFormatV_1_0(productDetails, cartId, userId){
 // Get Brands Models Engines etc. attributes
 function getAttributes(attributeName) {
     var self = this;
-    var category = self.query['category'];
+    var category = self.data.category;
+    var brand = self.data.brand;
+    if(attributeName == 'brands'){
+        // brands is treated as an attribute before
+        // we need to check here
+        BrandService.query(category, function(err, brands){
+            if(err){
+                console.error('query brands error', err);
+                self.respond({code:1001, message:'获取品牌列表失败', error:err});
+                return;
+            }
 
-    if (!F.global.attributes)
-        F.global.attributes = {};
+            self.respond({'code': '1000', 'message': 'success', 'datas': brands});
+        })
+    } else {
+        if(attributeName == 'models') attributeName = '车系';
+        if(attributeName == 'engines') attributeName = '排量';
+        if(attributeName == 'gearboxes') attributeName = '变速箱';
+        if(attributeName == 'levels') attributeName = '车型';
+        ProductService.getAttributes(category, brand, attributeName, function (err, attributes) {
+            if (err) {
+                console.error('query attributes error', err);
+                self.respond({code: 1001, message: '获取商品属性列表失败', error: err});
+                return;
+            }
 
-    if (!F.global.attributes[attributeName]) {
-        self.respond({'code': '1000', 'message': 'success', 'datas': []});
-        return;
+            self.respond({'code': '1000', 'message': 'success', 'datas': attributes.length > 0 ? attributes[0].values || [] : []});
+        })
     }
-
-    var arr = F.global.attributes[attributeName];
-    var result = [];
-    for (var i = 0; i < arr.length; i++) {
-        var item = arr[i];
-        if (category) {
-            if ((item['category'] && item['category'] == category) || (item['categoryid'] && item['categoryid'] == category))
-                result.push({name: item['name']});
-        } else {
-            result.push({name: item['name']});
-        }
-    }
-    self.respond({'code': '1000', 'message': 'success', 'datas': result});
 }

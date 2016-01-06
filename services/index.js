@@ -22,3 +22,12 @@ exports.news = require('./news');
 
 // cart
 exports.cart = require('./cart');
+
+// sku
+exports.SKU = require('./sku');
+
+// brand
+exports.brand = require('./brand');
+
+// category
+exports.category = require('./category');
