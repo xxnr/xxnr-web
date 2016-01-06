@@ -158,7 +158,7 @@ app.controller('invitationController', function($scope, remoteApiService, common
                     // var d = new Date(commonService.parseDate($scope.orderList[order].dateCreated));
                     // $scope.orderList[order].createTime_local = d.toLocaleString();
                     var d = Date.fromISO($scope.orderList[order].dateCreated);
-                    $scope.orderList[order].createTime_local = d.getFullYear().toString()+'-'+ (d.getMonth()+1).toString() +'-'+d.getDate().toString()+' '+d.getHours().toString()+':'+timeStringExpendZero(d.getMinutes().toString())+':'+ timeStringExpendZero(d.getSeconds().toString());
+                    $scope.orderList[order].createTime_local = d.getFullYear().toString()+'-'+ (d.getMonth()+1).toString() +'-'+d.getDate().toString()+' '+d.getHours().toString()+':'+timeStringExtendZero(d.getMinutes().toString())+':'+ timeStringExtendZero(d.getSeconds().toString());
                 }
             });
     };
