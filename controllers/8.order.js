@@ -87,7 +87,7 @@ function api10_getOders() {
                 var item = items[i];
                 var typeValue = type;
                 if (!typeValue) {
-                    typeValue = orderType(item);
+                    typeValue = OrderService.orderType(item);
                 }
                 arr[i] = {
                     'typeValue':typeValue,
@@ -301,7 +301,7 @@ function api10_getOrderDetails() {
             order.address           = data.consigneeAddress;
             order.remarks           = '';
             order.deliveryTime      = '';
-            order.orderType         = orderType(data);
+            order.orderType         = OrderService.orderType(data);
             order.deposit           = data.deposit.toFixed(2);
             order.payStatus           = data.payStatus;
             order.deliverStatus       = data.deliverStatus;
@@ -332,18 +332,18 @@ function api10_getOrderDetails() {
     });
 }
 
-function orderType(order) {
-    if (order.payStatus == PAYMENTSTATUS.UNPAID && !order.isClosed) {
-        return 1;
-    } else if (order.payStatus == PAYMENTSTATUS.PAID && order.deliverStatus == DELIVERSTATUS.UNDELIVERED) {
-        return 2;
-    } else if (order.payStatus == PAYMENTSTATUS.PAID && order.deliverStatus == DELIVERSTATUS.DELIVERED && !order.confirmed) {
-        return 3;
-    } else if (order.confirmed) {
-        return 4;
-    } else {
-        return 0;
-    }
-}
+//function orderType(order) {
+//    if (order.payStatus == PAYMENTSTATUS.UNPAID && !order.isClosed) {
+//        return 1;
+//    } else if (order.payStatus == PAYMENTSTATUS.PAID && order.deliverStatus == DELIVERSTATUS.UNDELIVERED) {
+//        return 2;
+//    } else if (order.payStatus == PAYMENTSTATUS.PAID && order.deliverStatus == DELIVERSTATUS.DELIVERED && !order.confirmed) {
+//        return 3;
+//    } else if (order.confirmed) {
+//        return 4;
+//    } else {
+//        return 0;
+//    }
+//}
 
 exports.getOders = getOdersList;

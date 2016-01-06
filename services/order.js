@@ -14,17 +14,22 @@ OrderService = function(){};
 // Method
 // order type
 OrderService.prototype.orderType = function (order) {
-    if (order.payStatus == PAYMENTSTATUS.UNPAID && !order.isClosed) {
-        return 1;
-    } else if (order.payStatus == PAYMENTSTATUS.PAID && order.deliverStatus == DELIVERSTATUS.UNDELIVERED) {
-        return 2;
-    } else if (order.payStatus == PAYMENTSTATUS.PAID && order.deliverStatus == DELIVERSTATUS.DELIVERED && !order.confirmed) {
-        return 3;
-    } else if (order.confirmed) {
-        return 4;
-    } else {
-        return 0;
-    }
+	if (order.payStatus == PAYMENTSTATUS.PAID) {
+		if (order.deliverStatus == DELIVERSTATUS.DELIVERED) {
+			if (order.confirmed) {
+				return 4;
+			}
+			return 3;
+		}
+		return 2;
+	} else if (order.payStatus == PAYMENTSTATUS.PARTPAID) {
+		return 1;
+	} else {
+		if (order.isClosed) {
+			return 0;
+		}
+		return 1;
+	}
 }
 
 // Method
