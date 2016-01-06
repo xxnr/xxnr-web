@@ -61,6 +61,10 @@ var schema = new mongoose.Schema({
 });
 
 schema.index({dateCreated: -1});
+schema.index({buyerId: 1, dateCreated: -1});
+schema.index({isClosed: 1, payStatus: 1, buyerId: 1, dateCreated: -1});
+schema.index({payStatus: 1, deliverStatus: 1, buyerId: 1, dateCreated: -1});
+schema.index({confirmed: -1, deliverStatus: 1, buyerId: 1, dateCreated: -1});
 schema.index({id:"text", buyerId:"text", buyerName:"text", buyerPhone:"text", consigneeName:"text", consigneePhone:"text", paymentId:"text"});
 
 // Model
@@ -76,7 +80,7 @@ mongoose.model('order', schema);
 //    }else{
 //        console.info()
 //    }
-// })
+// });
 
 // var Order = NEWSCHEMA('Order');
 // // var OrderItem = NEWSCHEMA('OrderItem');

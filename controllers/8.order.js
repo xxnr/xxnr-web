@@ -87,7 +87,7 @@ function api10_getOders() {
                 var item = items[i];
                 var typeValue = type;
                 if (!typeValue) {
-                    typeValue = orderType(item);
+                    typeValue = OrderService.orderType(item);
                 }
                 arr[i] = {
                     'typeValue':typeValue,
@@ -443,7 +443,7 @@ function api10_getOrderDetails() {
             order.address           = data.consigneeAddress;
             order.remarks           = '';
             order.deliveryTime      = '';
-            order.orderType         = orderType(data);
+            order.orderType         = OrderService.orderType(data);
             order.deposit           = payPrice.toFixed(2);
             order.payStatus         = data.payStatus;
             order.deliverStatus     = data.deliverStatus;
@@ -480,35 +480,35 @@ function api10_getOrderDetails() {
     });
 }
 
-function orderType(order) {
-    // if ((order.payStatus == PAYMENTSTATUS.UNPAID && !order.isClosed) || order.payStatus == PAYMENTSTATUS.PARTPAID) {
-    //     return 1;
-    // } else if (order.payStatus == PAYMENTSTATUS.PAID && (order.deliverStatus == DELIVERSTATUS.UNDELIVERED || order.deliverStatus == DELIVERSTATUS.PARTDELIVERED)) {
-    //     return 2;
-    // } else if (order.payStatus == PAYMENTSTATUS.PAID && order.deliverStatus == DELIVERSTATUS.DELIVERED && !order.confirmed) {
-    //     return 3;
-    // } else if (order.confirmed) {
-    //     return 4;
-    // } else {
-    //     return 0;
-    // }
+// function orderType(order) {
+//     // if ((order.payStatus == PAYMENTSTATUS.UNPAID && !order.isClosed) || order.payStatus == PAYMENTSTATUS.PARTPAID) {
+//     //     return 1;
+//     // } else if (order.payStatus == PAYMENTSTATUS.PAID && (order.deliverStatus == DELIVERSTATUS.UNDELIVERED || order.deliverStatus == DELIVERSTATUS.PARTDELIVERED)) {
+//     //     return 2;
+//     // } else if (order.payStatus == PAYMENTSTATUS.PAID && order.deliverStatus == DELIVERSTATUS.DELIVERED && !order.confirmed) {
+//     //     return 3;
+//     // } else if (order.confirmed) {
+//     //     return 4;
+//     // } else {
+//     //     return 0;
+//     // }
 
-    if (order.payStatus == PAYMENTSTATUS.PAID) {
-        if (order.deliverStatus == DELIVERSTATUS.DELIVERED) {
-            if (order.confirmed) {
-                return 4;
-            }
-            return 3;
-        }
-        return 2;
-    } else if (order.payStatus == PAYMENTSTATUS.PARTPAID) {
-        return 1;
-    } else {
-        if (order.isClosed) {
-            return 0;
-        }
-        return 1;
-    }
-}
+//     if (order.payStatus == PAYMENTSTATUS.PAID) {
+//         if (order.deliverStatus == DELIVERSTATUS.DELIVERED) {
+//             if (order.confirmed) {
+//                 return 4;
+//             }
+//             return 3;
+//         }
+//         return 2;
+//     } else if (order.payStatus == PAYMENTSTATUS.PARTPAID) {
+//         return 1;
+//     } else {
+//         if (order.isClosed) {
+//             return 0;
+//         }
+//         return 1;
+//     }
+// }
 
 exports.getOders = getOdersList;
