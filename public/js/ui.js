@@ -708,6 +708,7 @@ function getPages(length, max) {
 COMPONENT('form', function() {
 
 	var self = this;
+	var button;
 
 	if (!$cmanager.$$form) {
 		$cmanager.$$form = true;
@@ -722,7 +723,7 @@ COMPONENT('form', function() {
 
 	self.noValid();
 	self.noDirty();
-	self.submit = function(hide) { self.hide(); };
+	self.submit = function(hide, button) { self.hide(); };
 	self.cancel = function(hide) { self.hide(); };
 
 	self.make = function() {
@@ -731,6 +732,7 @@ COMPONENT('form', function() {
 		var submit = self.attr('data-submit');
         var data_class = self.attr('data-class') || '';
 
+        self.submitbutton = self.attr('data-submitbutton') || null;
 		self.condition = self.attr('data-if');
 		self.element.empty();
 
@@ -742,7 +744,7 @@ COMPONENT('form', function() {
 		self.element.find('button').on('click', function(e) {
 			switch (this.name) {
 				case 'submit':
-					self.submit(hide);
+					self.submit(hide, this);
 					break;
 				case 'cancel':
 					if (!this.disabled)
@@ -769,6 +771,20 @@ COMPONENT('form', function() {
 
 			self.element.animate({ scrollTop: 0 }, 0);
 		}
+		if (self.submitbutton && self.submitbutton == 'true') {
+			self.disable_submit_button();
+		}
+	};
+
+	self.disable_submit_button = function () {
+		self.element.find('button').each(function() {
+			switch (this.name) {
+				case 'submit':
+					var el = $(this);
+					el.prop({ disabled: true });
+					break;
+			}
+		});
 	};
 });
 
@@ -1446,74 +1462,3 @@ $.components.$formatter.push(function(path, value, type) {
 
 	return value.format(2);
 });
-
-/*COMPONENT('ckeditor', function() {
-
-	var self = this;
-	var isRequired = self.attr('data-required') === 'true';
-
-    self.validate = function(value) {
-
-        var is = false;
-        var element = self.element;
-		var name = element.attr('data-name');
-		var ckeditor = CKEDITOR.instances[name];
-		var ck_value = ckeditor.getData();
-		console.log(ck_value);
-		is = isRequired ? ck_value.length > 0 : true;
-        return is;
-    };
-
-	this.make = function() {
-
-		var attrs = [];
-
-		function attr(name) {
-			var a = self.attr(name);
-			if (!a)
-				return;
-			attrs.push(name.substring(name.indexOf('-') + 1) + '="' + a + '"');
-		}
-
-		attr('data-placeholder');
-		attr('data-maxlength');
-
-		var element = self.element;
-		var height = element.attr('data-height');
-		var icon = element.attr('data-icon');
-		var name = element.attr('data-name');
-		var pre_name = element.attr('data-pre');
-		var content = element.html();
-		var html = '<textarea data-component-bind=""' + (attrs.length > 0 ? ' ' + attrs.join('') : '') + (height ? ' style="height:' + height + '"' : '') + (element.attr('data-autofocus') === 'true' ? ' autofocus="autofocus"' : '') + (attrs.name > 0 ? ' ' + attrs.join('') : '') + (name ? ' name="' + name + '"' : '') +'></textarea>';
-		html += '<script type="text/javascript">CKEDITOR.replace("' + name + '");</script>';
-
-		if (content.length === 0) {
-			element.addClass('ui-textarea');
-			element.append(html);
-			return;
-		}
-
-		element.empty();
-		element.append('<div class="ui-textarea-label' + (isRequired ? ' ui-textarea-label-required' : '') + '">' + (icon ? '<span class="fa ' + icon + '"></span> ' : '') + content + ':</div>');
-		element.append('<div class="ui-textarea">' + html + '</div>');
-
-	};
-	function ckeditor_add(id, model) {
-		var ckeditor = CKEDITOR.instances[id];
-		if (ckeditor) ckeditor.destroy(true); //销毁编辑器 ,然后新增一个
-
-		ckeditor = CKEDITOR.replace(id);
-	    var value = id.split('products')[1];
-	    if (model && model[value]) {
-	    	ckeditor.setData(model[value]);
-	    }
-	}
-
-	function ckeditor_getdata(id, model) {
-		var ckeditor = CKEDITOR.instances[id];
-		var value = id.split('products')[1];
-		if (ckeditor) {
-			model[value] = ckeditor.getData();
-		}
-	}
-});*/

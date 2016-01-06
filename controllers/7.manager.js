@@ -11,6 +11,7 @@ var NewsService = services.news;
 var SKUService = services.SKU;
 var BrandService = services.brand;
 var CategoryService = services.category;
+var PAYMENTSTATUS = require('../common/defs').PAYMENTSTATUS;
 
 exports.install = function() {
 	// Auto-localize static HTML templates
@@ -38,7 +39,10 @@ exports.install = function() {
 	// ORDERS
 	F.route(CONFIG('manager-url') + '/api/orders/',              			json_orders_query, ['get'], ['backend_auth']);
 	F.route(CONFIG('manager-url') + '/api/orders/{id}/',         			json_orders_read, ['get'], ['backend_auth']);
-	F.route(CONFIG('manager-url') + '/api/orders/',              			json_orders_save, ['put'], ['backend_auth']);
+	// F.route(CONFIG('manager-url') + '/api/orders/payments/',              	json_orders_payments_update, ['put'], ['backend_auth']);
+	F.route(CONFIG('manager-url') + '/api/orders/products/',              	json_orders_products_update, ['put'], ['backend_auth']);
+	F.route(CONFIG('manager-url') + '/api/orders/subOrders/',              	json_subOrders_products_update, ['put'], ['backend_auth']);
+	// F.route(CONFIG('manager-url') + '/api/orders/',              			json_orders_save, ['put'], ['backend_auth']);
 	// F.route(CONFIG('manager-url') + '/api/orders/',              			json_orders_remove, ['delete']);
 	// F.route(CONFIG('manager-url') + '/api/orders/clear/',        			json_orders_clear);
 
@@ -464,33 +468,102 @@ function json_products_read(id) {
 function json_orders_query() {
     var self = this;
     OrderService.query(self.query, function (err, orders) {
-        // for(var i=0; i<orders.items.length; i++) {
-        //     var order = orders.items[i];
-        //     order.sortId = i+1;
-        //     convertOrderToShow(order);
-        // }
-        if (err) {
-			console.log('manager json_orders_query err' + err);
+    	if (err) {
+			console.log('manager json_orders_query err: ' + err);
 			self.json(err);
 			return;
 		}
+        // for(var i=0; i<orders.items.length; i++) {
+        //      var order = orders.items[i];
+        //      // convertOrderToShow(order);
+        // }
         self.json(orders);
     });
 }
 
-// Saves specific order (order must exist)
-function json_orders_save() {
+// Updates specific order products
+function json_orders_products_update() {
 	var self = this;
-	OrderService.save(self.body, function(err) {
+	var orderid = self.body && self.body.id ? self.body.id: null;
+	var products = self.body && self.body.products ? self.body.products: null;
+	if (!orderid) {
+		self.json([{'error':'更新失败，缺少订单ID'}]);
+		return;
+	}
+	if (!products) {
+		self.json([{'error':'更新失败，缺少商品列表'}]);
+		return;
+	}
+	var updateproducts = {};
+	if (products && products.length > 0) {
+       	for (var i = 0; i < products.length; i++) {
+	    	var product = products[i];
+
+	    	if (!updateproducts.hasOwnProperty(product.id)) {
+	    		updateproducts[product.id] = product;
+	    	}
+       	}
+    }
+    OrderService.updateProducts({'id':orderid,'products':updateproducts}, function(err) {
 		if (err) {
-			console.log('manager json_orders_save err' + err);
-			self.json([err]);
+			console.log('manager json_orders_products_update err: ' + err);
+			self.json([{'error':'更新失败'}]);
 			return;
 		}
 		self.json(SUCCESS(true));
 	});
-
 }
+
+// Updates specific order sub order payments
+function json_subOrders_products_update() {
+	var self = this;
+	var orderid = self.body && self.body.id ? self.body.id: null;
+	var subOrders = self.body && self.body.subOrders ? self.body.subOrders: null;
+	if (!orderid) {
+		self.json([{'error':'更新失败，缺少订单ID'}]);
+		return;
+	}
+	if (!subOrders) {
+		self.json([{'error':'更新失败，缺少子订单列表'}]);
+		return;
+	}
+	var updatepayments = {};
+	if (subOrders && subOrders.length > 0) {
+       	for (var i = 0; i < subOrders.length; i++) {
+	    	var suborder = subOrders[i];
+	    	if (suborder.payments) {
+		    	for (var j = 0; j < suborder.payments.length; j++) {
+		    		var payment = suborder.payments[j];
+			    	if (!updatepayments.hasOwnProperty(payment.id)) {
+			    		updatepayments[payment.id] = payment;
+			    	}
+			    }
+			}
+       	}
+    }
+    OrderService.updatePayments({'id':orderid,'payments':updatepayments}, function(err) {
+		if (err) {
+			console.log('manager json_subOrders_products_update err: ' + err);
+			self.json([{'error':'更新失败'}]);
+			return;
+		}
+		self.json(SUCCESS(true));
+	});
+}
+
+// Saves specific order (order must exist)
+// function json_orders_save() {
+// 	var self = this;
+// 	OrderService.save(self.body, function(err) {
+// 		if (err) {
+// 			console.log('manager json_orders_save err' + err);
+// 			self.json([err]);
+// 			return;
+// 		}
+// 		self.json(SUCCESS(true));
+// 	});
+
+// }
 
 // // Removes specific order
 // function json_orders_remove() {
@@ -509,17 +582,62 @@ function json_orders_read(id) {
 	var self = this;
 	var options = {};
 	options.id = id;
+	
 	OrderService.get(options, function(err, order){
         self.json(convertOrderToShow(order));
     });
 }
 
 var convertOrderToShow = function(order){
-    var products = order.products;
-    if(products[0]) {
-        order.productInfo = products[0].name;
+    var subOrdersPayments = {};					// suborder all payments
+
+	if (order && order.payments) {
+       	for (var i = 0; i < order.payments.length; i++) {
+	    	var payment = order.payments[i];
+
+	    	if (!subOrdersPayments.hasOwnProperty(payment.suborderId)) {
+	    		subOrdersPayments[payment.suborderId] = [];
+	    	}
+	    	subOrdersPayments[payment.suborderId].push(payment);
+       	}
     }
-//    order.dateCreated = moment(order.dateCreated).format('YYYY-MM-DD hh:mm:ss');
+
+	if (order && order.subOrders) {
+		var subOrders = [];
+		for (var i=0; i < order.subOrders.length; i++) {
+			var subOrder = order.subOrders[i];
+			var payments = subOrdersPayments[subOrder.id] || [];
+			var paidPrice = 0;
+			var paidTimes = 0;
+			var closedTimes = 0;
+			var datePaid = null;
+			for (var j = 0; j < payments.length; j++) {
+				var payment = payments[j];
+
+				if (parseInt(payment.payStatus) === PAYMENTSTATUS.PAID) {
+					paidPrice += payment.price;
+					paidTimes += 1;
+					if (payment.datePaid) {
+						if ((datePaid && datePaid < payment.datePaid) || !datePaid)
+							datePaid = payment.datePaid;
+					}
+				}
+
+				if (typeof(payment.isClosed) != 'undefined' && payment.isClosed === true && parseInt(payment.payStatus) === PAYMENTSTATUS.UNPAID) {
+					closedTimes += 1;
+				}
+			}
+			subOrder.paidPrice = paidPrice;
+			subOrder.paidTimes = paidTimes;
+			subOrder.closedTimes = closedTimes;
+			subOrder.payments = payments;
+			subOrder.datePaid = datePaid;
+			subOrders.push(subOrder);
+		}
+		order.subOrders = subOrders;
+	}
+	delete order.payments;
+
     return order;
 };
 
@@ -892,7 +1010,7 @@ function process_login(){
     BackEndUserService.login(options, function(err, user){
         if(err){
             // login fail
-            console.log(err);
+            console.log('backend user process_login err: ' + err);
             self.respond({code:1001, message:'用户名密码错误'});
             return
         }
