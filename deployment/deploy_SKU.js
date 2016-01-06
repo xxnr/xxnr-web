@@ -11,7 +11,8 @@ mongoose.connect(config.db[config.environment]);
 async.series({
         one: SKU.deploy_suppliers,
         two: SKU.deploy_brands,
-        three: SKU.deploy_product_attributes
+        three: SKU.deploy_product_attributes,
+        four: SKU.deploy_SKU_attributes
     },
     function() {
         console.log('done');

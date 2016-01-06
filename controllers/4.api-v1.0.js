@@ -159,7 +159,7 @@ function getGoodsListPage(transformer) {
                             "brandName": product.brandName, "imgUrl": product.imgUrl,
                             "allowScore": product.payWithScoresLimit,
                             "thumbnail": product.thumbnail,
-                            "stock":"100" /*TODO*/,"originalPrice": product.price, "goodsSellCount": 2/*TODO*/,
+                            "stock":"100" /*TODO*/,"originalPrice": product.SKUPrice.min, "goodsSellCount": 2/*TODO*/,
                             /*"goodsSort":3,*/ "goodsName": product.name,
                             "model": product.model,
                             "presale": product.presale ? product.presale : false
@@ -263,7 +263,7 @@ function getGoodsDetails(transformer){
     		"imgUrl":product.imgUrl,
             "originalUrl":product.originalUrl,
     		"allowScore": product.payWithScoresLimit,
-    		"originalPrice": product.price,
+    		"originalPrice": product.price || product.SKUPrice.min,
     		"goodsSellCount": 4/*TODO:*/,
     		"comment": null/*TODO:*/,
     		"goodsName": product.name,
@@ -291,7 +291,7 @@ function getGoodsDetails(transformer){
         var response = goodDetail;
 
         if(transformer) transformer(response);
-
+console.log(response);
 		callbackName ? self.jsonp(callbackName, response) : self.json(response);
 	});
 }

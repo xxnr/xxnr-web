@@ -42,6 +42,8 @@ exports.news = mongoose.model('news');
 exports.newsCategory = mongoose.model('newscategory');
 // cart
 exports.cart = mongoose.model('cart');
+// user new orders number
+exports.userordersnumber = mongoose.model('userordersnumber');
 // SKU
 exports.SKU = mongoose.model('SKU');
 exports.SKUAttributes = mongoose.model('SKUAttribute');

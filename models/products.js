@@ -14,6 +14,7 @@ var productSchema = new mongoose.Schema({
 	discount: Number,
 	stars: Number,
 	brandName: String,
+	price:Number,
 	deposit: Number,
 	description: String,
 	body: String,
@@ -34,8 +35,9 @@ var productSchema = new mongoose.Schema({
 		values: [{type: String, required: true}]
 	}],
 	SKUAdditions: [{								// list all additions of this products, it's aggregated when add/update/delete sku of this product
-		name: {type: String, required: true},
-		price: {type: Number, required: true}
+		ref: {type: mongoose.Schema.ObjectId, ref:'SKUAddition'},
+		name:{type:String, required: true},
+		price:{type:Number, required: true}
 	}],
 	SKUPrice: {									// min and max price of this product, it's aggregated when add/update/delete sku of this product
 		min: {type: Number},

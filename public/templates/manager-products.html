@@ -100,7 +100,7 @@
 						</div>
 						<div class="col-md-3 m">
 							<div class="ui-textbox-label">添加{{attribute.name}}:</div>
-							<div class="ui-textbox-with-button ui-textbox-invalid new_attribute">
+							<div class="ui-textbox-with-button new_attribute">
 								<input class="col-md-10" type="text"/>
 								<a class="col-md-2 account" href="javascript:void(0)" onclick="new_attribute('{{attribute.name}}', {{$index}})">
 									<span class="fa fa-plus-circle"></span>
@@ -123,21 +123,22 @@
 			<script type="text/html">
 			<table class="table table-bordered" border="0">
 				<tr>
-					<td class="col-xs-3 hidden-xs ui-right">@(SKU名称)</td>
+					<td class="col-xs-1 hidden-xs ui-right nopadding">@(SKU名称)</td>
 					{{ foreach SKUAttribute in SKUAttributes}}
-						<td class="col-xs-1 hidden-xs ui-right">{{SKUAttribute.name}}</td>
+						<td class="col-xs-1 hidden-xs ui-right nopadding">{{SKUAttribute.name}}</td>
 					{{ end }}
-					<td class="col-xs-1 hidden-xs ui-right">@(市场价)</td>
-					<td class="col-xs-1 hidden-xs ui-right">@(平台价)</td>
-					<td class="col-xs-2 hidden-xs ui-right">@(操作)</td>
+					<td class="col-xs-3 hidden-xs ui-right">@(附加项目)</td>
+					<td class="col-xs-1 hidden-xs ui-right nopadding">@(市场价)</td>
+					<td class="col-xs-1 hidden-xs ui-right nopadding">@(平台价)</td>
+					<td class="col-xs-2 hidden-xs ui-right nopadding">@(操作)</td>
 				</tr>
 				{{ foreach SKU in SKUs }}
 					<tr class="SKU">
-						<td class="col-xs-3 hidden-xs ui-right">
-							<input size="30" data_SKU_id="{{SKU._id}}" name="name" value="{{SKU.name}}"/>
+						<td class="col-xs-1 hidden-xs ui-right nopadding">
+							<input size="20" data_SKU_id="{{SKU._id}}" name="name" value="{{SKU.name}}"/>
 						</td>
 						{{ foreach attribute in SKUAttributes}}
-							<td class="col-xs-1 hidden-xs ui-right">
+							<td class="col-xs-1 hidden-xs ui-right nopadding">
 								<select data-index="{{$index}}" data_SKU_id="{{SKU._id}}">
 									<option selected disabled hidden value=''></option>
 									{{ foreach value in SKUQueryAttributes[attribute.name] }}
@@ -146,13 +147,31 @@
 								</select>
 							</td>
 						{{ end }}
-						<td class="col-xs-1 hidden-xs ui-right">
+						<td class="col-xs-3 hidden-xs ui-right SKUAdditions">
+							<div class="multiselect">
+								<div class="selectBox" onclick="showCheckboxes({{$index}})">
+									<select>
+										<option>@(请选择附加选项)</option>
+									</select>
+									<div class="overSelect"></div>
+								</div>
+								<div id="checkboxes">
+									{{ foreach addition in SKUAdditions}}
+									<label for="{{addition.ref}}" class="ui-left">
+										<input size="30" name="addition" data_SKU_id="{{SKU._id}}" data-ref="{{ addition._id }}" data-name="{{ addition.name }}" data-price="{{ addition.price }}" type="checkbox" {{ if SKUExistAdditions && SKUExistAdditions[SKU._id] && SKUExistAdditions[SKU._id][addition.name] }} checked="checked"  {{fi}}/>
+										{{addition.name}} 加价（元）：{{addition.price}}
+									</label>
+									{{ end }}
+								</div>
+							</div>
+						</td>
+						<td class="col-xs-1 hidden-xs ui-right nopadding">
 							<input size="10" data_SKU_id="{{SKU._id}}" name="market_price" value="{{SKU.price.market_price}}"/>
 						</td>
-						<td class="col-xs-1 hidden-xs ui-right">
+						<td class="col-xs-1 hidden-xs ui-right nopadding">
 							<input size="10" data_SKU_id="{{SKU._id}}" name="platform_price" value="{{SKU.price.platform_price}}"/>
 						</td>
-						<td class="col-xs-2 hidden-xs ui-right">
+						<td class="col-xs-2 hidden-xs ui-right nopadding">
 							{{ if SKU._id }}
 							<button name="ensure" onclick="update_SKU({{$index}})">@(提交修改)</button>
 							<button name="delete" onclick="remove_SKU({{$index}})">@(删除)</button>
@@ -164,19 +183,27 @@
 					</tr>
 				{{ end }}
 				<tr class="new_SKU">
-					<td class="col-xs-1 hidden-xs ui-center">
+					<td class="col-xs-2 hidden-xs ui-center">
 						<a href="javascript:void(0)" onclick="new_SKU_in_page()">
 							<span class="fa fa-plus-circle">@(添加SKU)</span>
 						</a>
 					</td>
 					{{ foreach attribute in SKUAttributes}}
 						<td class="col-xs-1 hidden-xs ui-center new_SKU_attribute">
-							<input class="col-md-9" type="text"/>
-							<a class="col-md-2 account" href="javascript:void(0)" onclick="new_sku_attribute('{{attribute.name}}', {{$index}})">
+							<input class="col-md-9 nopadding" type="text"/>
+							<a class="col-md-2 account nopadding" href="javascript:void(0)" onclick="new_sku_attribute('{{attribute.name}}', {{$index}})">
 								<span class="fa fa-plus-circle"></span>
 							</a>
 						</td>
 					{{ end }}
+					<td class="col-xs-3 hidden-xs ui-center new_SKU_addition">
+						<input class="col-md-3 nopadding" type="text"/>
+						<div class="col-md-5 nopadding">@(加价（元）：)</div>
+						<input class="col-md-3 nopadding" type="text"/>
+						<a class="col-md-1 account nopadding" href="javascript:void(0)" onclick="new_SKU_addition()">
+							<span class="fa fa-plus-circle"></span>
+						</a>
+					</td>
 				</tr>
 			</table>
 			</script>
@@ -279,16 +306,21 @@
 	products.categories = [];
 	products_init_allattributes();
 	products.response = null;
+	var SKU_attributes_all = [];
 
 	products.category = {};
 
 	function clear_SKU_attributes(){
 		if(products) {
 			SET('products.SKUAttributes', null);
+			SET('products.SKUAdditions', null);
 			products.SKUQueryAttributes=null;
 			products.SKUExistAttributes=null;
+			products.SKUExistAdditions=null;
 			SET('products.SKUs', null);
 		}
+
+		expanded = [];
 	}
 
 	ON('#products.grid', function(component) {
@@ -331,36 +363,23 @@
 										products_init_ckeditors(response);
 										SET('common.form', 'products');
 										request_SKU_attribute(response.linker_category, response.brand._id, function(SKU_attributes){
-											var SKU_attributes_all = [];
 											SKU_attributes_all = SKU_attributes_all.concat(SKU_attributes);
-											$.components.GET(managerurl + '/api/v2.1/SKU/query?product=' + response._id, null, function (response) {
-												if (response.code == 1000) {
-													products.SKUExistAttributes=[];
-													response.SKUs.forEach(function (SKU) {
-														SKU.attributes.forEach(function (attribute) {
-															for (var i = 0; i < SKU_attributes_all.length; i++) {
-																if (attribute.name === SKU_attributes_all[i].name) {
-																	SKU_attributes_all.splice(i, 1);
-																	return;
-																}
-															}
+											request_SKU_Addition(response.linker_category, response.brand._id, function(){
+												$.components.GET(managerurl + '/api/v2.1/SKU/query?product=' + response._id, null, function (response) {
+													if (response.code == 1000) {
+														products.SKUExistAttributes=[];
+														products.SKUExistAdditions=[];
+														response.SKUs.forEach(function (SKU) {
+															SKU_refreshed(SKU);
 														});
 
-														SKU.attributes = SKU.attributes.concat(SKU_attributes_all);
-														products.SKUExistAttributes[SKU._id]=[];
-														SKU.attributes.sort(function (a, b) {
-															return a.name.localeCompare(b.name);
-														});
-														SKU.attributes.forEach(function(attribute){
-															products.SKUExistAttributes[SKU._id][attribute.name] = {ref:attribute.ref, value:attribute.value};
-														})
-													});
-
-													SET('products.SKUExistAttributes', products.SKUExistAttributes);
-													SET('products.SKUs', response.SKUs);
-													products_onchange();
-												}
-											});
+														SET('products.SKUExistAttributes', products.SKUExistAttributes);
+														SET('products.SKUExistAdditions', products.SKUExistAdditions);
+														SET('products.SKUs', response.SKUs);
+														products_onchange();
+													}
+												});
+											})
 										});
 									});
 								});
@@ -541,7 +560,9 @@
 					request_product_attribute(category_id, brand_id, function(product_attributes){
 						SET('+products.form.attributes', product_attributes);
 						request_SKU_attribute(category_id, brand_id, function(){
-							products_onchange();
+							request_SKU_Addition(category_id, brand_id, function() {
+								products_onchange();
+							});
 						});
 					});
 				});
@@ -568,6 +589,15 @@
 				callback(SKUAttributesResponse.attributes);
 			}
 		});
+	}
+
+	function request_SKU_Addition(category_id, brand_id, callback){
+		$.components.GET(managerurl + '/api/v2.1/SKU/additions?category=' + category_id + '&brand=' + brand_id, null, function(SKUAdditionResponse){
+			if(SKUAdditionResponse.code == 1000){
+				SET('products.SKUAdditions', SKUAdditionResponse.additions);
+				callback(SKUAdditionResponse);
+			}
+		})
 	}
 
 	function request_product_attribute(category_id, brand_id, callback){
@@ -734,6 +764,8 @@
 		var _id = products.SKUs[index]._id;
 		$.components.POST(managerurl+'/api/v2.1/SKU/update/' + _id, SKU, function(response){
 			if(response.code==1000) {
+				expanded[index]=true;
+				showCheckboxes(index);
 				success();
 			}
 		})
@@ -790,6 +822,7 @@
 			$.components.POST(managerurl + '/api/v2.1/SKU/add/', SKU, function (response) {
 				if (response.code == 1000) {
 					products.SKUs[index] = response.SKU;
+					SKU_refreshed(response.SKU);
 					SET('products.SKUs', products.SKUs);
 					products_onchange();
 				}
@@ -857,6 +890,25 @@
 		});
 	}
 
+	function new_SKU_addition(){
+		var el=$('.new_SKU_addition input');
+		var category = products.form.linker_category;
+		var brand = products.form.brand._id;
+		var name = el[0].value;
+		var price = el[1].value;
+		$.components.POST(managerurl+'/api/v2.1/SKU/addition/add/', {category:category, brand:brand, name:name, price:price}, function(response){
+			if(response.code==1000){
+				var new_addition = response.addition;
+				products.SKUAdditions.push(new_addition);
+				SET('products.SKUAdditions', products.SKUAdditions);
+				el[0].value = "";
+				el[1].value = "";
+				products_onchange();
+				success();
+			}
+		});
+	}
+
 	function products_onchange(){
 		product_onchange();
 		SKU_onchange();
@@ -913,9 +965,67 @@
 						}
 					});
 					break;
+				case 'addition':
+					var additions = [];
+					el.attr('checked', true);
+					$('.SKUAdditions input').each(function(index){
+						var id = $(this).attr('data_SKU_id');
+						if(SKU_id == id && $(this).attr('checked')) {
+							var ref = $(this).attr('data-ref');
+							var name = $(this).attr('data-name');
+							var price = $(this).attr('data-price');
+							additions.push({ref: ref, name: name, price: price});
+						}
+					});
+					products.SKUs.forEach(function(SKU){
+						if(SKU._id == SKU_id || (typeof SKU._id == 'undefined' && SKU_id=="")){
+							SKU.additions = additions;
+						}
+					});
+					break;
 				default:
 					break;
 			}
 		})
+	}
+
+	function SKU_refreshed(SKU){
+		// initial attributes
+		SKU.attributes.forEach(function (attribute) {
+			for (var i = 0; i < SKU_attributes_all.length; i++) {
+				if (attribute.name === SKU_attributes_all[i].name) {
+					SKU_attributes_all.splice(i, 1);
+					return;
+				}
+			}
+		});
+
+		SKU.attributes = SKU.attributes.concat(SKU_attributes_all);
+		products.SKUExistAttributes[SKU._id]=[];
+		SKU.attributes.sort(function (a, b) {
+			return a.name.localeCompare(b.name);
+		});
+		SKU.attributes.forEach(function(attribute){
+			products.SKUExistAttributes[SKU._id][attribute.name] = {ref:attribute.ref, value:attribute.value};
+		});
+
+		// initial additions
+		products.SKUExistAdditions[SKU._id]=[];
+		SKU.additions.forEach(function(addition){
+			products.SKUExistAdditions[SKU._id][addition.name] = {ref:addition.ref, price:addition.price};
+		})
+	}
+
+	var expanded = [];
+	function showCheckboxes(index) {
+		var checkboxes = $('.multiselect #checkboxes')[index];
+//		var checkboxes = document.getElementById("checkboxes");
+		if (!expanded[index]) {
+			checkboxes.style.display = "block";
+			expanded[index] = true;
+		} else {
+			checkboxes.style.display = "none";
+			expanded[index] = false;
+		}
 	}
 </script>

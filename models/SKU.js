@@ -31,7 +31,7 @@ var SKUAttributesSchema = new mongoose.Schema({
 var SKUAdditionsSchema = new mongoose.Schema({              // sku additions, list all additions for one category/brand, will be like {name:全景天窗,price:2000}...
     name:{type:String, required:true},
     price:{type:Number, required:true},
-    category:{type:mongoose.Schema.ObjectId, ref: 'category', required: true},
+    category:{type: String, required: true},
     brand: {type: mongoose.Schema.ObjectId, ref: 'brand', required: true}
 });
 

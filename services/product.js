@@ -5,6 +5,7 @@ var mongoose = require('mongoose');
 var ProductModel = require('../models').product;
 var ProductAttributeModel = require('../models').productAttribute;
 var sortOptions = {"price-desc":{price:-1},"price-asc":{price:1}};
+var BrandModel = require('../models').brand;
 
 // Service
 ProductService = function(){};
@@ -28,43 +29,65 @@ ProductService.prototype.query = function(options, callback) {
     var take = U.parseInt(options.max);
     var skip = U.parseInt(options.page * options.max);
 
+    var queryOptions = {};
     var nor = [];
 
     if (options.category) {
+        queryOptions.linker_category = options.category;
         nor.push({linker_category: {$ne: options.category}});
     }
 
     if (options.brandName) {
+        queryOptions.brandName = {$in:options.brandName};
         nor.push({brandName: {$nin: options.brandName}});
     }
 
-    if (options.reservePrice && options.reservePrice.length === 2) {
-        if (options.reservePrice[0] !== '')
-            nor.push({price: {$lt: parseInt(options.reservePrice[0])}});
+    if (options.brand){
+        queryOptions.brand = {$in:options.brand};
+    }
 
-        if (options.reservePrice[1] !== '')
-            nor.push({price: {$gt: parseInt(options.reservePrice[1])}});
+    if (options.reservePrice && options.reservePrice.length === 2) {
+        if (options.reservePrice[0] !== ''){
+            queryOptions['SKUPrice.min'] = {$gte:parseInt(options.reservePrice[0])};
+            nor.push({'SKUPrice.min': {$lt: parseInt(options.reservePrice[0])}});
+        }
+
+        if (options.reservePrice[1] !== '') {
+            queryOptions['SKUPrice.max'] = {$lte:parseInt(options.reservePrice[1])};
+            nor.push({'SKUPrice.min': {$gt: parseInt(options.reservePrice[1])}});
+        }
+
+        queryOptions.presale = {$ne: true};
         nor.push({presale: {$eq: true}});
     }
 
     if(options.attributes){
+        queryOptions.attributes = {$all:[]};
         // attributes will be like [{name:'车型级别', value:'轿车'},{name:'汽车车系', value:'瑞风M3'},...]
+        options.attributes.forEach(function(attribute){
+            queryOptions.attributes.$all.push({$elemMatch:attribute});
+        });
+
         nor.push({attributes:{$nin: options.attributes}});
     }
 
     if (options.id) {
+        queryOptions.id = options.id;
         nor.push({id: {$ne: options.id}});
     }
 
     if (options.ids) {
+        queryOptions.id = {$in:options.ids};
         nor.push({id: {$nin: options.ids}});
     }
 
     if (options.skip) {
+        queryOptions.id = {$nin:options.skip};
         nor.push({id: options.skip});
     }
 
     if(typeof options.online !== 'undefined'){
+        queryOptions.online = options.online;
         nor.push({online: {$ne:options.online}});
     } else{
         //nor.push({online:{$ne:true}});
@@ -85,13 +108,13 @@ ProductService.prototype.query = function(options, callback) {
         mongoOptions.name = {$regex:new RegExp(options.search)};
     }
 
-    ProductModel.count(mongoOptions, function (err, count) {
+    ProductModel.count(queryOptions, function (err, count) {
         if (err) {
             callback(err);
             return;
         }
 
-        ProductModel.find(mongoOptions)
+        ProductModel.find(queryOptions)
             .sort(orderbyOptions)
             .skip(skip)
             .limit(take)
@@ -120,7 +143,6 @@ ProductService.prototype.query = function(options, callback) {
 
 // Saves the product into the database
 ProductService.prototype.save = function(model, callback) {
-console.log(model);
     if (!model.id)
         model.id = U.GUID(10);
 
@@ -154,9 +176,18 @@ console.log(model);
                         return;
                     }
 
-                    callback(null, doc);
-                    //TODO:call add attributes before new product with new attribute
-                    //setTimeout(refresh, 1000);
+                    newProduct.brandName = newProduct.brand.name;
+                    newProduct.save(function(err){
+                        if (err) {
+                            console.error('product save err', err, 'model', model);
+                            callback(err);
+                            return;
+                        }
+
+                        callback(null, doc);
+                        //TODO:call add attributes before new product with new attribute
+                        //setTimeout(refresh, 1000);
+                    });
                 })
             });
         } else {
@@ -384,7 +415,7 @@ ProductService.prototype.saveAttribute = function(category, brand, name, value, 
     })
 };
 
-ProductService.prototype.getAttributes = function(category, brand, name, callback, newSchema){
+ProductService.prototype.getAttributes = function(category, brand, name, callback, schema){
     var matchOptions = {};
     if(category)
         matchOptions.category = category;
@@ -399,8 +430,18 @@ ProductService.prototype.getAttributes = function(category, brand, name, callbac
         matchOptions.name = name;
 
     var schemaToAdd = {name:'$value'};
-    if(newSchema){
-        schemaToAdd = {value:'$value',ref:'$_id'};
+    switch(schema){
+        case 1:
+            // backend schema
+            schemaToAdd = {value:'$value',ref:'$_id'};
+            break;
+        case 2:
+            // fromend schema
+            schemaToAdd = '$value';
+            break;
+        default:
+            // old schema
+            break;
     }
 
     ProductAttributeModel.aggregate({$match:matchOptions},

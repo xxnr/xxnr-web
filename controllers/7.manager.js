@@ -133,6 +133,8 @@ exports.install = function() {
 	F.route(CONFIG('manager-url') + '/api/v2.1/SKU/attributes',         json_SKU_Attributes_get,        ['get'], ['backend_auth']);
 	F.route(CONFIG('manager-url') + '/api/v2.1/SKU/query',				json_SKU_get,					['get'], ['backend_auth']);
 	F.route(CONFIG('manager-url') + '/api/v2.1/SKU/remove/{id}',			process_SKU_remove,				['get'], ['backend_auth']);
+	F.route(CONFIG('manager-url') + '/api/v2.1/SKU/additions',				json_SKU_Additions_get,		['get'],['backend_auth']);
+	F.route(CONFIG('manager-url') + '/api/v2.1/SKU/addition/add',			process_SKU_Addition_add,	['post'],['backend_auth']);
 };
 
 var files = DB('files', null, require('total.js/database/database').BUILT_IN_DB).binary;
@@ -449,7 +451,7 @@ function json_products_attributes(){
 		}
 
 		self.respond({code:1000, message:'success', attributes:attributes});
-	}, true)
+	}, 1)
 }
 
 // Reads a specific product by ID
@@ -1319,5 +1321,31 @@ function process_SKU_remove(id){
 		}
 
 		self.respond({code:1000, message:'success'});
+	})
+}
+
+function json_SKU_Additions_get(){
+	var self = this;
+	SKUService.querySKUAdditions(self.data.category, self.data.brand, function(err, additions){
+		if(err){
+			console.error('json_SKU_Attributes_get error', err);
+			self.respond({code:1001, message:'获取SKU属性失败'});
+			return;
+		}
+
+		self.respond({code:1000, message:'success', additions:additions});
+	})
+}
+
+function process_SKU_Addition_add(){
+	var self = this;
+	SKUService.addSKUAddition(self.data.category, self.data.brand, self.data.name, self.data.price, function(err, addition){
+		if(err){
+			console.error('process_SKU_Addition_add error', err);
+			self.respond({code:1001, message:'添加SKU附加属性失败'});
+			return;
+		}
+
+		self.respond({code:1000, message:'success', addition:addition});
 	})
 }

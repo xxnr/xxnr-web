@@ -51,21 +51,42 @@ queryAttributesAndPrice = function(product, attributes, callback) {
                 return;
             }
 
-            var returns = [];
-            var minPrice = 0, maxPrice = 0;
-            docs.forEach(function (doc) {
-                if (names.indexOf(doc.name) != -1) {
-                    return;
-                }
+            SKUModel.aggregate({$match: matchOptions}
+                , {$unwind: '$additions'}
+                , {
+                    $group: {
+                        _id: '$product',
+                        additions: {$addToSet: {ref:'$additions.ref', name:'$additions.name', price:'$additions.price'}}
+                    }
+                })
+                .exec(function (err, additionsResult) {
+                    if (err) {
+                        console.error(err);
+                        callback(err);
+                        return;
+                    }
 
-                minPrice = doc.pricemin;
-                maxPrice = doc.pricemax;
-                delete doc.pricemin;
-                delete doc.pricemax;
-                returns.push(doc);
-            });
+                    var returns = [];
+                    var minPrice = 0, maxPrice = 0;
+                    docs.forEach(function (doc) {
+                        if (names.indexOf(doc.name) != -1) {
+                            return;
+                        }
 
-            callback(null, {price: {min: minPrice, max: maxPrice}, attributes: returns});
+                        minPrice = doc.pricemin;
+                        maxPrice = doc.pricemax;
+                        delete doc.pricemin;
+                        delete doc.pricemax;
+                        returns.push(doc);
+                    });
+
+                    var additions = [];
+                    if(additionsResult && additionsResult.length>0){
+                        additions = additionsResult[0].additions;
+                    }
+
+                    callback(null, {price: {min: minPrice, max: maxPrice}, attributes: returns, additions:additions});
+                });
         });
 };
 
@@ -267,6 +288,57 @@ SKUService.prototype.getSKU = function(id, callback){
     //TODO: get an SKU by _id
 };
 
+SKUService.prototype.querySKUAdditions = function(category, brand, callback){
+    var queryOptions = {};
+    if (category)
+        queryOptions.category = category;
+    if (brand)
+        queryOptions.brand = mongoose.Types.ObjectId(brand);
+
+    SKUAdditionModel.find(queryOptions, function(err, additions){
+        if(err){
+            console.error(err);
+            callback(err);
+            return;
+        }
+
+        callback(null, additions || []);
+    })
+};
+
+SKUService.prototype.addSKUAddition = function(category, brand, name, price, callback){
+    if(!category){
+        callback('category required');
+        return;
+    }
+
+    if(!brand){
+        callback('brand required');
+        return;
+    }
+
+    if(!name){
+        callback('name required');
+        return;
+    }
+
+    if(!price){
+        callback('price required');
+        return;
+    }
+
+    var newSKUAddition = new SKUAdditionModel({category:category, brand:brand, name:name, price:price});
+    newSKUAddition.save(function(err){
+        if(err){
+            console.error(err);
+            callback(err);
+            return;
+        }
+
+        callback(null, newSKUAddition);
+    })
+};
+
 var refresh_product_SKUAttributes = function(product, callback){
     queryAttributesAndPrice(product, null, function(err, data){
         if(err){
@@ -274,7 +346,7 @@ var refresh_product_SKUAttributes = function(product, callback){
             return;
         }
 
-        ProductModel.update({_id:product}, {$set:{SKUPrice:data.price, SKUAttributes:data.attributes}}, function(err, numAffected){
+        ProductModel.update({_id:product}, {$set:{SKUPrice:data.price, SKUAttributes:data.attributes, SKUAdditions:data.additions, price:data.price.min}}, function(err, numAffected){
             if(err){
                 console.error(err);
                 callback(err);
