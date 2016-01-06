@@ -507,7 +507,7 @@ transition-delay: initial;
 .user_wrap .login_form .remenberHint img{vertical-align: middle;}
 .user_wrap .login_form .remenberHint span{padding-left: 30px;}
 .user_wrap .login_form .get_pass{margin-top: 12px;}
-.user_wrap .login_form .reg_btn a{margin-top:16px;border-radius:5px;display:block;width:360px;height:44px;line-height:44px;text-align:center;color:#fff;background:#00913a;font-size:14px;}
+.user_wrap .login_form .login_btn a{margin-top:16px;border-radius:5px;display:block;width:360px;height:44px;line-height:44px;text-align:center;color:#fff;background:#00913a;font-size:14px;}
 .user_wrap .login_form .register_message{margin-top: 20px;}
 .user_wrap .login_form .register_message a{color: #008a2f;}
 
