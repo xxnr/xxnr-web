@@ -260,7 +260,7 @@ SKUService.prototype.querySKUAttributes = function(category, brand, callback) {
             $group: {
                 _id: '$name',
                 values: {$addToSet: {value:'$value',ref:'$_id'}},
-                order:{$avg:'$order'}
+                order:{$max:'$order'}
             }
         },
         {$project: {_id: 0, name: '$_id',values: 1, order:1}},
@@ -270,7 +270,7 @@ SKUService.prototype.querySKUAttributes = function(category, brand, callback) {
                 callback(err);
                 return;
             }
-console.log(attributes);
+
             callback(null, attributes || []);
         })
 };
