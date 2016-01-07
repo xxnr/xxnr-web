@@ -605,14 +605,6 @@ OrderService.prototype.addUserOrderNumber = function(options, callback) {
 
 // get payment info when payorder
 OrderService.prototype.getPayOrderPaymentInfo = function(order, payment, payPrice, callback) {
-	// var minPayPrice = 3000;
-	// // one time pay price must more than minPayPrice
-	// if (minPayPrice > payment.price) {
-	// 	payPrice = payment.price;
-	// }
-	// if (payPrice && tools.isPrice(payPrice.toString()) && parseFloat(payPrice) && minPayPrice > parseFloat(payPrice)) {
-	// 	payPrice = minPayPrice;
-	// }
 	// user input price is null, not price Regexp, <= 0, > surplus price. use surplus price
     if (!payPrice || !tools.isPrice(payPrice.toString()) || !parseFloat(payPrice) || parseFloat(payPrice) < 0.01 || parseFloat(payPrice) >= payment.price) {
         payPrice = payment.price;

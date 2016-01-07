@@ -56,3 +56,6 @@ dri_config                  : {"dri_list":["18612649699", "15110102070"]}
 
 // user types
 user_types                  : {"1":"其他", "2":"种植大户", "3":"村级经销商", "4":"乡镇经销商", "5":"县级经销商"}
+
+// user min pay price
+minPayPrice					: 3000

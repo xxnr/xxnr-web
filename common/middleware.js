@@ -148,3 +148,32 @@ exports.backend_auth = function(req, res, next, options, controller){
         controller.view('login');
     }
 };
+
+exports.isInWhiteList_middleware = function(req, res, next, options, controller){
+    var user = controller.user;
+    try {
+        if (user) {
+            // check user in white list
+            UserService.inWhiteList({userid:user.id}, function(err, data) {
+                if (err) {
+                    // perhaps no user find
+                    console.log('isInWhiteList_middleware user not found: ' + err);
+                    next();
+                    return;
+                }
+
+                if (data) {
+                    user.inWhiteList = true;
+                    controller.user = user;
+                }
+                next();
+            });
+        } else {
+            next();
+        }
+    }catch(e){
+        // white list check fail
+        console.log('White list check fail:' + e);
+        next();
+    }
+};
