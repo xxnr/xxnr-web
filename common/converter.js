@@ -2,7 +2,9 @@ module.exports = {
     api10 : new function(){
         this.convertProduct = function(product){
             var result = {};
-
+            if(product.SKUPrice){
+                product.price = product.SKUPrice.min;
+            }
             product.discount = product.discount || 1.0;
             product.discountPrice = product.discountPrice || calculateDiscountPrice(product);
 

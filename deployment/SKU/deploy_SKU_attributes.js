@@ -50,6 +50,11 @@ module.exports = function(callback) {
                         return new Promise(function (resolve, reject) {
                             SKUService.addSKUAttribute(category, brand, name, value, function (err) {
                                 if (err) {
+                                    if(11000 == err.code){
+                                        resolve();
+                                        return;
+                                    }
+
                                     console.log(err);
                                     reject(err);
                                     return;

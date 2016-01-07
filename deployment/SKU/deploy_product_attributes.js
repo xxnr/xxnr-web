@@ -54,6 +54,11 @@ module.exports = function(callback) {
                         return new Promise(function (resolve, reject) {
                             ProductService.saveAttribute(category, skipBrand ? null : brand._id, name, value, function (err) {
                                 if (err) {
+                                    if(11000 == err.code){
+                                        resolve();
+                                        return;
+                                    }
+
                                     console.log(err);
                                     reject(err);
                                     return;
