@@ -31,7 +31,7 @@
 			<td style="width:300px" class="hidden-xs" data-title="商品">{{ if online }}<b class="mr5 fs11 green">@(Online)</b>{{ fi}}{{ if istop }}<b class="mr5 fs11 red">@(TOP)</b>{{ fi }}{{ name }}</td>
             <td style="width:50px" class="silver hidden-xs" data-title="类目"> {{ category }}</td>
             <td style="width:60px" class="silver hidden-xs" data-title="品牌"> {{ if brand }} {{brand.name }} {{ fi }}</td>
-            <td style="width:60px" class="ui-right active" data-title="平台价">{{ price | price(2) }}</td>
+            <td style="width:60px" class="ui-right active" data-title="平台价">{{ if SKUPrice}} {{ SKUPrice.min | price(2) }} {{ fi }}</td>
             <td style="width:60px" class="ui-right active" data-title="定金">{{ deposit | price(2) }}</td>
             <td style="width:100px" class="ui-right active" data-title="创建时间">{{ datecreated | format('@(yyyy-MM-dd HH:mm:ss)') }}</td>
             <td style="width:80px" class="ui-right">

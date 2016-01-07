@@ -143,6 +143,10 @@ ProductService.prototype.query = function(options, callback) {
 
 // Saves the product into the database
 ProductService.prototype.save = function(model, callback) {
+    delete model.SKUPrice;
+    delete model.SKUAttributes;
+    delete model.SKUAdditions;
+
     if (!model.id)
         model.id = U.GUID(10);
 

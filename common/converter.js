@@ -20,6 +20,7 @@ module.exports = {
                         result.imgUrl = "/images/large/" + product.linker_category + '/' + pic + ".jpg?category=" + product.linker_category;
                         result.thumbnail = "/images/thumbnail/" + product.linker_category + '/' + pic + ".jpg?category=" + product.linker_category + '&thumb=true';
                         result.originalUrl = "/images/original/" + product.linker_category + '/' + pic + ".jpg";
+                        result.pictures = product.pictures;
                         continue;
                     }
 

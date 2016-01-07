@@ -12,6 +12,7 @@ var OrderService = services.order;
 var ProductService = services.product;
 var CartService = services.cart;
 var BrandService = services.brand;
+var CategoryService = services.category;
 
 exports.install = function() {
 	//fix api// F.route('/api/v2.0/getProductDetails/', getProductDetails, ['post', 'get']);
@@ -72,6 +73,8 @@ function getProducts() {
 	var category = this.query['category'];
 	var userId = this.query.userId;
 	var max = this.query['max'];
+
+    var options = {online:true};
 
 	if (category)
 		options.category = category;
@@ -162,7 +165,8 @@ function getGoodsListPage(transformer) {
                             "stock":"100" /*TODO*/,"originalPrice": product.price, "goodsSellCount": 2/*TODO*/,
                             /*"goodsSort":3,*/ "goodsName": product.name,
                             "model": product.model,
-                            "presale": product.presale ? product.presale : false
+                            "presale": product.presale ? product.presale : false,
+                            pictures:product.pictures
                         };
 
                 products.push(good);
@@ -276,7 +280,8 @@ function getGoodsDetails(transformer){
             "attributes":product.attributes,
             "SKUAttributes":product.SKUAttributes,
             "SKUAdditions":product.SKUAdditions,
-            "SKUPrice":product.SKUPrice
+            "SKUPrice":product.SKUPrice,
+            pictures:product.pictures
             };
 
         delete product.body;
@@ -371,11 +376,20 @@ function getCategories(){
 	var self = this;
 	var callbackName = this.query['callback'];
 
-	if (!F.global.categories)
-		F.global.categories = [];
+    CategoryService.all(function(err, categories){
+        if(err){
+            self.respond({code:1001, message:'fail to query category'});
+            return;
+        }
 
-    var response = api10.convertCategories(F.global.categories, F.global.mapCategories);
-	callbackName ? self.jsonp(callbackName, response) : self.json(response);
+        self.respond({code:1000, message:'success', categories:categories});
+    });
+    //
+	//if (!F.global.categories)
+	//	F.global.categories = [];
+    //
+    //var response = api10.convertCategories(F.global.categories, F.global.mapCategories);
+	//callbackName ? self.jsonp(callbackName, response) : self.json(response);
 }
 
 function getShoppingCart(){
