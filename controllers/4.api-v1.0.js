@@ -30,9 +30,9 @@ exports.install = function() {
     // get product detail for web
     F.route('/api/v2.0/product/getProductDetails', getGoodsDetails, ['post', 'get']);
     F.route('/api/v2.0/getShoppingCartOffline', getShoppingCartOffline, ['get', 'post']);
-    F.route('/alipay', alipayOrder, ['post', 'get']);
+    F.route('/alipay', alipayOrder, ['post', 'get'], ['isLoggedIn', 'isInWhiteList']);
     F.route('/dynamic/alipay/nofity.asp', alipayNotify, ['post','raw']);
-    F.route('/unionpay', unionPayOrder, ['post', 'get']);
+    F.route('/unionpay', unionPayOrder, ['post', 'get'], ['isLoggedIn', 'isInWhiteList']);
     F.route('/unionpay/nofity', unionpayNotify, ['post','raw']);
     F.route('/alipay/success', aliPaySuccess);
     // F.route('/notify_alipay.asp', alipayNotify);
@@ -498,7 +498,7 @@ function payOrder(payExecutor){
         return;
     }
 
-    //aliPay request creation
+    // aliPay request creation
     var options = {};
     options.id = orderId;
     OrderService.get(options, function(err, order, payment) {
@@ -519,6 +519,17 @@ function payOrder(payExecutor){
         }
 
         try {
+            // if user not in white list, the price of one time must more than config minPayPrice
+            if ((self.user && !self.user.inWhiteList) || !self.user) {
+                var minPayPrice = F.config.minPayPrice;
+                // one time pay price must more than minPayPrice
+                if (minPayPrice > payment.price) {
+                    payPrice = payment.price;
+                }
+                if (payPrice && tools.isPrice(payPrice.toString()) && parseFloat(payPrice) && minPayPrice > parseFloat(payPrice)) {
+                    payPrice = minPayPrice;
+                }
+            }
             OrderService.getPayOrderPaymentInfo(order, payment, payPrice, function (err, resultPayment, resultPayPrice) {
                 if (err) {
                     console.error('api-v1.0 payOrder OrderService getPayOrderPaymentInfo err:', err);
