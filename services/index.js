@@ -24,7 +24,7 @@ exports.news = require('./news');
 exports.cart = require('./cart');
 
 // sku
-exports.SKU = require('./sku');
+exports.SKU = require('./SKU');
 
 // brand
 exports.brand = require('./brand');

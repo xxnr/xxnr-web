@@ -155,7 +155,7 @@
 									</select>
 									<div class="overSelect"></div>
 								</div>
-								<div id="checkboxes">
+								<div id="checkboxes" {{ if expanded[$index] }} style="display:block;" {{ else }} style="display:none" {{ fi }}>
 									{{ foreach addition in SKUAdditions}}
 									<label for="{{addition.ref}}" class="ui-left">
 										<input size="30" name="addition" data_SKU_id="{{SKU._id}}" data-ref="{{ addition._id }}" data-name="{{ addition.name }}" data-price="{{ addition.price }}" type="checkbox" {{ if SKUExistAdditions && SKUExistAdditions[SKU._id] && SKUExistAdditions[SKU._id][addition.name] }} checked="checked"  {{fi}}/>
@@ -306,6 +306,9 @@
 	products.categories = [];
 	products_init_allattributes();
 	products.response = null;
+	products.SKUQueryAttributes=[];
+	products.SKUExistAttributes=[];
+	products.SKUExistAdditions=[];
 	var SKU_attributes_all = [];
 
 	products.category = {};
@@ -314,13 +317,13 @@
 		if(products) {
 			SET('products.SKUAttributes', null);
 			SET('products.SKUAdditions', null);
-			products.SKUQueryAttributes=null;
-			products.SKUExistAttributes=null;
-			products.SKUExistAdditions=null;
+			products.SKUQueryAttributes=[];
+			products.SKUExistAttributes=[];
+			products.SKUExistAdditions=[];
 			SET('products.SKUs', null);
 		}
 
-		expanded = [];
+		SET('products.expanded', []);
 	}
 
 	ON('#products.grid', function(component) {
@@ -516,7 +519,7 @@
 		request_brands(category, function() {
 			SET('products.form', {'category': '化肥', linker_category: category}, true);
 			SET('products.response', null);
-			products_init_ckeditors('huafei');
+			products_init_ckeditors();
 			SET('common.form', 'products');
 			initial_product_new_page(category, function () {
 			})
@@ -532,7 +535,6 @@
 			SET('products.form', {'category':'汽车', linker_category:category}, true);
 			SET('products.response', null);
 			SET('products.SKUs', null);
-
 			products_init_ckeditors();
 			SET('common.form', 'products');
 			initial_product_new_page(category, function(){
@@ -541,35 +543,23 @@
 	}
 
 	function initial_product_new_page(category_id, callback){
-		var url = managerurl + '/api/products/attributes?category='+category_id+'&brand=null';
-		$.components.GET(url, null, function(attributesResponse){
-			if(attributesResponse.code==1000) {
-				var attributes = [];
-				var product_attributes = [];
-				for (var i = 0; i < attributesResponse.attributes.length; i++) {
-					var attribute = attributesResponse.attributes[i];
-					attributes[attribute._id.name] = {values:attribute.values, brand:attribute._id.brand};
-					product_attributes.push({name:attribute._id.name});
-				}
-
-				SET('products.attributes', attributes);
-				SET('products.form.attributes', product_attributes);
-				$('.productinfo .brand select').off('change').on('change', function(){
-					var el = $(this);
-					var brand_id = el.find('option:selected').val();
-					request_product_attribute(category_id, brand_id, function(product_attributes){
-						SET('+products.form.attributes', product_attributes);
-						request_SKU_attribute(category_id, brand_id, function(){
-							request_SKU_Addition(category_id, brand_id, function() {
-								products_onchange();
-							});
+		request_product_attribute(category_id, null, function(product_attributes){
+			SET('products.form.attributes', product_attributes);
+			$('.productinfo .brand select').off('change').on('change', function(){
+				var el = $(this);
+				var brand_id = el.find('option:selected').val();
+				request_product_attribute(category_id, brand_id, function(product_attributes){
+					SET('+products.form.attributes', product_attributes);
+					request_SKU_attribute(category_id, brand_id, function(){
+						request_SKU_Addition(category_id, brand_id, function() {
+							products_onchange();
 						});
 					});
 				});
+			});
 
-				products_onchange();
-				callback();
-			}
+			products_onchange();
+			callback();
 		});
 	}
 
@@ -764,7 +754,7 @@
 		var _id = products.SKUs[index]._id;
 		$.components.POST(managerurl+'/api/v2.1/SKU/update/' + _id, SKU, function(response){
 			if(response.code==1000) {
-				expanded[index]=true;
+				products.expanded[index]=true;
 				showCheckboxes(index);
 				success();
 			}
@@ -824,7 +814,10 @@
 					products.SKUs[index] = response.SKU;
 					SKU_refreshed(response.SKU);
 					SET('products.SKUs', products.SKUs);
+					products.expanded[index]=true;
+					showCheckboxes(index);
 					products_onchange();
+					success();
 				}
 			})
 		};
@@ -836,8 +829,7 @@
 
 			// add product
 			add_product(function(product){
-				success();
-				SET('products.form',product);
+				products.form = product;
 				SKU.product = product._id;
 				add_SKU_processer();
 			});
@@ -855,9 +847,12 @@
 			if(response.code==1000){
 				var new_attribute = response.attribute;
 				products.attributes[name].values.push({ref:new_attribute._id, value:new_attribute.value});
+				console.log(products.attributes[name], 'start to SET');
 				SET('products.attributes', products.attributes);
+				console.log(GET('products.attributes'));
 				el.value = "";
 				products_onchange();
+				console.log('finish SET');
 				success();
 			}
 		});
@@ -936,6 +931,11 @@
 			products.SKUs.forEach(function(SKU){
 				if(SKU._id == SKU_id || (typeof SKU._id == 'undefined' && SKU_id=="")){
 					SKU.attributes[attributeIndex] = {ref:ref, name:name, value:value};
+					if(!products.SKUExistAttributes[SKU._id]){
+						products.SKUExistAttributes[SKU._id]=[];
+					}
+
+					products.SKUExistAttributes[SKU._id][name] = {ref:ref, value:value};
 				}
 			});
 		});
@@ -960,6 +960,7 @@
 					break;
 				case 'name':
 					products.SKUs.forEach(function(SKU){
+						console.log(SKU._id, SKU_id, el.val());
 						if(SKU._id == SKU_id || (typeof SKU._id == 'undefined' && SKU_id=="")){
 							SKU.name = el.val();
 						}
@@ -968,6 +969,7 @@
 				case 'addition':
 					var additions = [];
 					el.attr('checked', true);
+					var existAdditions = [];
 					$('.SKUAdditions input').each(function(index){
 						var id = $(this).attr('data_SKU_id');
 						if(SKU_id == id && $(this).attr('checked')) {
@@ -975,10 +977,16 @@
 							var name = $(this).attr('data-name');
 							var price = $(this).attr('data-price');
 							additions.push({ref: ref, name: name, price: price});
+							existAdditions[name]={ref:ref, price:price};
 						}
 					});
 					products.SKUs.forEach(function(SKU){
 						if(SKU._id == SKU_id || (typeof SKU._id == 'undefined' && SKU_id=="")){
+							if(!products.SKUExistAdditions[SKU._id]){
+								products.SKUExistAdditions[SKU._id] = [];
+							}
+
+							products.SKUExistAdditions[SKU._id] = existAdditions;
 							SKU.additions = additions;
 						}
 					});
@@ -1016,16 +1024,18 @@
 		})
 	}
 
-	var expanded = [];
 	function showCheckboxes(index) {
 		var checkboxes = $('.multiselect #checkboxes')[index];
 //		var checkboxes = document.getElementById("checkboxes");
-		if (!expanded[index]) {
-			checkboxes.style.display = "block";
-			expanded[index] = true;
+		if (!products.expanded[index]) {
+//			checkboxes.style.display = "block";
+			products.expanded[index] = true;
 		} else {
-			checkboxes.style.display = "none";
-			expanded[index] = false;
+//			checkboxes.style.display = "none";
+			products.expanded[index] = false;
 		}
+
+		SET('products.expanded', products.expanded);
+		products_onchange();
 	}
 </script>
