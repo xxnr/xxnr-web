@@ -19,17 +19,18 @@ module.exports = function(callback) {
                 }
 
                 var fields = line.split(',');
-                if (fields.length < 4) {
+                if (fields.length < 5) {
                     resolve();
                     return;
                 }
 
-                var category = fields[0].trim();
-                var brand = fields[1].trim();
-                var name = fields[2].trim();
+                var order = parseInt(fields[0].trim());
+                var category = fields[1].trim();
+                var brand = fields[2].trim();
+                var name = fields[3].trim();
 
                 var values = [];
-                for (var i = 3; i < fields.length; i++) {
+                for (var i = 4; i < fields.length; i++) {
                     values.push(fields[i].trim());
                 }
 
@@ -48,10 +49,18 @@ module.exports = function(callback) {
 
                     var valuePromises = values.map(function (value) {
                         return new Promise(function (resolve, reject) {
-                            SKUService.addSKUAttribute(category, brand, name, value, function (err) {
+                            SKUService.addSKUAttribute(category, brand, name, value, order, function (err) {
                                 if (err) {
                                     if(11000 == err.code){
-                                        resolve();
+                                        SKUService.updateSKUAttributeSort(category, brand, name, value, order, function(err){
+                                            if(err){
+                                                reject(err);
+                                                return;
+                                            }
+
+                                            resolve();
+                                        });
+
                                         return;
                                     }
 

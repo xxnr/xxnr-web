@@ -153,7 +153,7 @@
 			<script type="text/html">
 				<table class="table table-bordered" border="0">
 					<tr>
-						<td class="col-xs-1 hidden-xs ui-center nopadding">@(SKU名称)</td>
+						<td class="col-xs-1 hidden-xs ui-center nopadding">@(序号)</td>
 						{{ foreach SKUAttribute in SKUAttributes}}
 						<td class="col-xs-1 hidden-xs ui-center nopadding">{{SKUAttribute.name}}</td>
 						{{ end }}
@@ -165,7 +165,7 @@
 					{{ foreach SKU in SKUs }}
 					<tr class="SKU">
 						<td class="col-xs-1 hidden-xs ui-center nopadding">
-							<input size="20" data_SKU_id="{{SKU._id}}" name="name" value="{{SKU.name}}"/>
+							<h6 class="nopadding">{{$index+1}}</h6>
 						</td>
 						{{ foreach attribute in SKUAttributes}}
 						<td class="col-xs-1 hidden-xs ui-center nopadding">
@@ -581,7 +581,7 @@
 		$.components.GET(managerurl + '/api/v2.1/SKU/attributes?category=' + category_id + '&brand=' + brand_id, null, function (SKUAttributesResponse) {
 			if (SKUAttributesResponse.code == 1000) {
 				SKUAttributesResponse.attributes.sort(function (a, b) {
-					return a.name.localeCompare(b.name);
+					return a.order > b.order;
 				});
 
 				var SKUQueryAttributes = [];
@@ -808,6 +808,10 @@
 
 	function add_SKU(index){
 		var SKU = products.SKUs[index];
+		SKU.name=products.form.name;
+		SKU.attributes.forEach(function(attribute){
+			SKU.name += ' - ' + attribute.value;
+		});
 		if(!SKU.name){
 			alert('@(请填写SKU名称)');
 			return;
@@ -972,14 +976,14 @@
 						}
 					});
 					break;
-				case 'name':
-					products.SKUs.forEach(function(SKU){
-						console.log(SKU._id, SKU_id, el.val());
-						if(SKU._id == SKU_id || (typeof SKU._id == 'undefined' && SKU_id=="")){
-							SKU.name = el.val();
-						}
-					});
-					break;
+//				case 'name':
+//					products.SKUs.forEach(function(SKU){
+//						console.log(SKU._id, SKU_id, el.val());
+//						if(SKU._id == SKU_id || (typeof SKU._id == 'undefined' && SKU_id=="")){
+//							SKU.name = el.val();
+//						}
+//					});
+//					break;
 				case 'addition':
 					var additions = [];
 					el.attr('checked', true);
@@ -1012,21 +1016,19 @@
 	}
 
 	function SKU_refreshed(SKU){
+//		console.log(SKU_attributes_all);
 		// initial attributes
-		SKU.attributes.forEach(function (attribute) {
-			for (var i = 0; i < SKU_attributes_all.length; i++) {
-				if (attribute.name === SKU_attributes_all[i].name) {
-					SKU_attributes_all.splice(i, 1);
-					return;
-				}
-			}
-		});
-
-		SKU.attributes = SKU.attributes.concat(SKU_attributes_all);
+//		SKU.attributes.forEach(function (attribute) {
+//			for (var i = 0; i < SKU_attributes_all.length; i++) {
+//				if (attribute.name === SKU_attributes_all[i].name) {
+//					SKU_attributes_all.splice(i, 1);
+//					return;
+//				}
+//			}
+//		});
+//
+//		SKU.attributes = SKU.attributes.concat(SKU_attributes_all);
 		products.SKUExistAttributes[SKU._id]=[];
-		SKU.attributes.sort(function (a, b) {
-			return a.name.localeCompare(b.name);
-		});
 		SKU.attributes.forEach(function(attribute){
 			products.SKUExistAttributes[SKU._id][attribute.name] = {ref:attribute.ref, value:attribute.value};
 		});

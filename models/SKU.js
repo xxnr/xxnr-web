@@ -25,7 +25,8 @@ var SKUAttributesSchema = new mongoose.Schema({
     name: {type: String, required: true},                                          // name of attribute, will be like 车型
     value:{type:String, required: true},                                           // all values of this attribute, will be like 舒适性,豪华型
     category: {type: String, required: true},   // category
-    brand: {type: mongoose.Schema.ObjectId, ref: 'brand', required: true}          // brand
+    brand: {type: mongoose.Schema.ObjectId, ref: 'brand', required: true},         // brand
+    order:{type: Number}
 });
 
 var SKUAdditionsSchema = new mongoose.Schema({              // sku additions, list all additions for one category/brand, will be like {name:全景天窗,price:2000}...

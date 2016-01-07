@@ -122,6 +122,38 @@ SKUService.prototype.updateSKU = function(id, price, attributes, additions, name
     })
 };
 
+SKUService.prototype.updateSKUAttributeSort = function(category, brand, name, value, order, callback){
+    if(!category){
+        callback('category required');
+        return;
+    }
+
+    if(!brand){
+        callback('brand required');
+        return;
+    }
+
+    if(!name){
+        callback('name required');
+        return;
+    }
+
+    if(!value){
+        callback('value required');
+        return;
+    }
+
+    SKUAttributeModel.update({category:category, brand:brand._id, name:name, value:value}, {$set:{order:order}}, function(err){
+        if(err){
+            console.error(err);
+            callback(err);
+            return;
+        }
+
+        callback();
+    })
+};
+
 SKUService.prototype.addSKU = function(name, product, attributes, additions, price, callback){
     if(!name){
         callback('name required');
@@ -183,7 +215,7 @@ SKUService.prototype.removeSKU = function(id, callback){
     })
 };
 
-SKUService.prototype.addSKUAttribute = function(category, brand, name, value, callback){
+SKUService.prototype.addSKUAttribute = function(category, brand, name, value, order, callback){
     if(!category){
         callback('category required');
         return;
@@ -204,7 +236,7 @@ SKUService.prototype.addSKUAttribute = function(category, brand, name, value, ca
         return;
     }
 
-    var newSKUAttribute = new SKUAttributeModel({category:category, brand:brand, name:name, value:value});
+    var newSKUAttribute = new SKUAttributeModel({category:category, brand:brand, name:name, value:value, order:order});
     newSKUAttribute.save(function(err){
         if(err){
             console.error(err);
@@ -227,17 +259,18 @@ SKUService.prototype.querySKUAttributes = function(category, brand, callback) {
         {
             $group: {
                 _id: '$name',
-                values: {$addToSet: {value:'$value',ref:'$_id'}}
+                values: {$addToSet: {value:'$value',ref:'$_id'}},
+                order:{$avg:'$order'}
             }
         },
-        {$project: {_id: 0, name: '$_id',values: 1}},
+        {$project: {_id: 0, name: '$_id',values: 1, order:1}},
         function (err, attributes) {
             if (err) {
                 console.error(err);
                 callback(err);
                 return;
             }
-
+console.log(attributes);
             callback(null, attributes || []);
         })
 };
