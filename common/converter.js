@@ -16,11 +16,19 @@ module.exports = {
                     }*/
 
                     if(i == "pictures"){
-                        var pic = product.pictures[0];
-                        result.imgUrl = "/images/large/" + product.linker_category + '/' + pic + ".jpg?category=" + product.linker_category;
-                        result.thumbnail = "/images/thumbnail/" + product.linker_category + '/' + pic + ".jpg?category=" + product.linker_category + '&thumb=true';
-                        result.originalUrl = "/images/original/" + product.linker_category + '/' + pic + ".jpg";
-                        result.pictures = product.pictures;
+                        var pictures = [];
+                        product.pictures.forEach(function(pic){
+                            var picture = {};
+                            picture.imgUrl = "/images/large/" + product.linker_category + '/' + pic + ".jpg?category=" + product.linker_category;
+                            picture.thumbnail = "/images/thumbnail/" + product.linker_category + '/' + pic + ".jpg?category=" + product.linker_category + '&thumb=true';
+                            picture.originalUrl = "/images/original/" + product.linker_category + '/' + pic + ".jpg";
+                            pictures.push(picture);
+                        });
+
+                        result.imgUrl = pictures[0] ? pictures[0].imgUrl : '';
+                        result.thumbnail = pictures[0] ? pictures[0].thumbnail : '';
+                        result.originalUrl = pictures[0] ? pictures[0].originalUrl : '';
+                        result.pictures = pictures;
                         continue;
                     }
 
