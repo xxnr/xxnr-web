@@ -16,6 +16,7 @@ require('./SKU');
 require('./brands');
 require('./Supplier');
 require('./categories');
+require('./whitelist');
 
 //user
 exports.user = mongoose.model('user');
@@ -54,6 +55,8 @@ exports.brand = mongoose.model('brand');
 exports.supplier = mongoose.model('supplier');
 // category
 exports.category = mongoose.model('category');
+// user white list
+exports.userwhitelist = mongoose.model('userwhitelist');
 
 exports.getModel = function (name, options) {
     options = options || {};

@@ -54,6 +54,9 @@ exports.install = function() {
 
     F.route('/api/v2.0/user/isAlive',                   isAlive, ['get'], ['isLoggedIn']);
 
+    // check user in white list
+    F.route('/api/v2.0/user/isInWhiteList',             isInWhiteList, ['get', 'post'], ['isLoggedIn', 'isInWhiteList']);
+
 	// v1.0
 	// LOGIN
 	//fix api// F.route('/app/user/login/', 				        process_login, ['get', 'post']);
@@ -1092,53 +1095,34 @@ function process_user_sign(){
 // ==========================================================================
 
 // upload photo for app
-function uploadPhoto(){
+function uploadPhoto() {
     var self = this;
-//    var uploadRoute = F.findRoute('/files/upload');
-//
-//    if(!uploadRoute){
-//        var err = 'cannot find upload route which is expected to be registered previously';
-//        console.error(err);
-//        self.throw500(err);
-//    }
-//
-//    var upload = uploadRoute.execute();
-//
-//    upload.call(this, function(ids){
-//        if((!ids) || ids.length >1){
-//            self.throw500('returned image id is invalid!');
-//        }
-//
-//        var imgId = ids[0];
-//        self.respond({code: '1000', message: 'success', datas: getUrl(imgId)});
-//    });
-
     var id = '';
     var userId = self.query['userId'];
     var default_extension = '.jpg';
     var type_avail = ['png', 'jpg', "jpeg"];
-    if(!userId){
+    if (!userId) {
         self.respond({code:1001, message:'请填写用户ID'});
         return;
     }
 
     self.files.wait(function(file, next) {
         file.read(function(err, photo) {
-            if(err){
+            if (err) {
                 console.error('uploadPhoto fail:', err);
                 self.respond({code:1001,message:'上传失败'});
                 return;
             }
 
-            UserService.get({userid:userId}, function(err, data){
-                if(err){
+            UserService.get({userid:userId}, function(err, data) {
+                if (err) {
                     self.respond({code:1001, message:err});
                     return;
                 }
 
                 var index = file.filename.lastIndexOf('.');
                 file.extension = file.filename.substring(index + 1);
-                if(!type_avail.find(file.extension.toLowerCase())){
+                if (!type_avail.find(file.extension.toLowerCase())) {
                     self.respond({'code': 1001, 'message': '文件格式不正确（必须为.jpg/.png文件）'});
                     return;
                 }
@@ -1152,12 +1136,12 @@ function uploadPhoto(){
                 id = files.insert(file.filename, file.type, photo) + default_extension;
                 var imageurl = "/images/original/" + id;
                 var oldPhotoId = null;
-                if(data.photo) {
+                if (data.photo) {
                     oldPhotoId = data.photo.substring(data.photo.lastIndexOf('/')+1, data.photo.lastIndexOf('.'));
                 }
                 // start to update user info
-                UserService.update({userid:userId, photo:imageurl}, function(err){
-                    if(err){
+                UserService.update({userid:userId, photo:imageurl}, function(err) {
+                    if (err) {
                         console.error('User uploadPhoto fail:', err);
                         self.respond({code:1001, message:'上传失败'});
                         return;
@@ -1166,9 +1150,9 @@ function uploadPhoto(){
                     self.respond({code:1000, message:'上传成功', imageUrl:imageurl});
 
                     // success, delete old photo
-                    if(oldPhotoId) {
-                        files.remove(oldPhotoId, function(err, data){
-                            if(err){
+                    if (oldPhotoId) {
+                        files.remove(oldPhotoId, function(err, data) {
+                            if (err) {
                                 console.error('User uploadPhoto fail:', err);
                             }
                         });
@@ -1496,6 +1480,15 @@ function json_get_invitee_orders() {
 function isAlive() {
     var self = this;
     self.respond({code:1000, message:'isAlive'});
+}
+
+function isInWhiteList() {
+    var self = this;
+    if (self.user && self.user.inWhiteList) {
+        self.respond({code:1000, message:'true'});
+        return;
+    }
+    self.respond({code:1001, message:'false'});
 }
 
 function json_usertypes_get() {
