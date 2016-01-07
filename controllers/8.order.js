@@ -409,12 +409,67 @@ function getOrder(callback) {
         return;
     }
 
-    OrderService.get({'buyer':buyer,'id':orderid}, function(err, data, payment) {
+    OrderService.get({'buyer':buyer,'id':orderid}, function(err, data, returnPayment) {
         if (err) {
             console.log('Order getOrder err:' + err);
             callback(err);
         } else {
-            callback(null, data, payment);
+            if (data) {
+                if (data.subOrders) {
+                    var subOrdersPayments = {}; // suborder all payments
+                    if (data && data.payments && data.payments.length > 0) {
+                        for (var i = 0; i < data.payments.length; i++) {
+                            var payment = data.payments[i];
+                            if (!subOrdersPayments.hasOwnProperty(payment.suborderId)) {
+                                subOrdersPayments[payment.suborderId] = [];
+                            }
+                            subOrdersPayments[payment.suborderId].push(payment);
+                        }
+                    }
+                    if (data && data.subOrders && data.subOrders.length > 0) {
+                        var subOrders = [];
+                        for (var i=0; i < data.subOrders.length; i++) {
+                            var subOrder = data.subOrders[i];
+                            var payments = subOrdersPayments[subOrder.id] || [];
+                            var paidPrice = 0;
+                            var resultPayments = [];
+                            for (var j = 0; j < payments.length; j++) {
+                                var payment = payments[j];
+                                if (parseInt(payment.payStatus) == PAYMENTSTATUS.PAID) {
+                                    var resultPayment = {dateCreated: payment.dateCreated,
+                                                        id: payment.id,
+                                                        payStatus: payment.payStatus,
+                                                        payType: payment.payType,
+                                                        price: payment.price.toFixed(2),
+                                                        slice: payment.slice,
+                                                        suborderId: payment.suborderId
+                                                    };
+                                    if (payment.datePaid) {
+                                        resultPayment.datePaid = payment.datePaid;
+                                    }
+                                    resultPayments.push(resultPayment);
+                                    paidPrice += payment.price;
+                                }
+                            }
+                            subOrder.paidCount = resultPayments.length;
+                            subOrder.paidPrice = paidPrice.toFixed(2);
+                            subOrder.price = subOrder.price.toFixed(2);
+                            if (paidPrice == subOrder.price && resultPayments.length == 1) {
+                                subOrder.payType = resultPayments[0].payType;
+                            } else {
+                                if (resultPayments.length > 0) {
+                                    subOrder.payments = resultPayments;
+                                }
+                            }
+                            subOrders.push(subOrder);
+                        }
+                        data.subOrders = subOrders;
+                    }
+                }
+                callback(null, data, returnPayment);
+            } else {
+                callback(null, data, returnPayment);
+            }
         }
     });
 }
@@ -430,7 +485,7 @@ function api10_getOrderDetails() {
         }
         if (data) {
             var paymentId           = payment && payment.id ? payment.id : data.paymentId;
-            var payPrice            = payment && typeof(payment.price) != 'undefined' ? payment.price : data.deposit;
+            var payPrice            = payment && typeof(payment.price) != 'undefined' ? payment.price : 0;
             var order               = {};
             var productslength      = data.products? data.products.length: 0;
             var arr                 = new Array(productslength);
@@ -452,8 +507,14 @@ function api10_getOrderDetails() {
             order.isClosed          = data.isClosed;
             order.order             = {'totalPrice':data.price.toFixed(2),'deposit':data.deposit.toFixed(2),'dateCreated':data.dateCreated};
             order.subOrders         = data.subOrders;
+            if (data.dateDelivered) {
+                order.dateDelivered = data.dateDelivered;
+            }
+            if (data.dateCompleted) {
+                order.dateCompleted = data.dateCompleted;
+            }
             if (payment) {
-                order.payment       = {'paymentId':payment.id, 'price':payment.price};
+                order.payment       = {'paymentId':payment.id, 'price':payment.price};;
             }
 
             for (var i=0; i < productslength; i++) {
