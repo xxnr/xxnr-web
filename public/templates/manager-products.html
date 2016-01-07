@@ -113,102 +113,6 @@
 			</div>
 		</div>
 	</div>
-	<div>
-		<div class="row">
-			<div class="col-md-2 m">
-				<h3 class="ui-center">@(SKU)</h3>
-			</div>
-		</div>
-		<div data-component="template" class="padding" data-component-path="products">
-			<script type="text/html">
-			<table class="table table-bordered" border="0">
-				<tr>
-					<td class="col-xs-1 hidden-xs ui-right nopadding">@(SKU名称)</td>
-					{{ foreach SKUAttribute in SKUAttributes}}
-						<td class="col-xs-1 hidden-xs ui-right nopadding">{{SKUAttribute.name}}</td>
-					{{ end }}
-					<td class="col-xs-3 hidden-xs ui-right">@(附加项目)</td>
-					<td class="col-xs-1 hidden-xs ui-right nopadding">@(市场价)</td>
-					<td class="col-xs-1 hidden-xs ui-right nopadding">@(平台价)</td>
-					<td class="col-xs-2 hidden-xs ui-right nopadding">@(操作)</td>
-				</tr>
-				{{ foreach SKU in SKUs }}
-					<tr class="SKU">
-						<td class="col-xs-1 hidden-xs ui-right nopadding">
-							<input size="20" data_SKU_id="{{SKU._id}}" name="name" value="{{SKU.name}}"/>
-						</td>
-						{{ foreach attribute in SKUAttributes}}
-							<td class="col-xs-1 hidden-xs ui-right nopadding">
-								<select data-index="{{$index}}" data_SKU_id="{{SKU._id}}">
-									<option selected disabled hidden value=''></option>
-									{{ foreach value in SKUQueryAttributes[attribute.name] }}
-									<option value="{{value.value}}"  ref="{{value.ref}}"  name="{{attribute.name}}" {{ if SKUExistAttributes && SKUExistAttributes[SKU._id] && SKUExistAttributes[SKU._id][attribute.name] && value.ref == SKUExistAttributes[SKU._id][attribute.name].ref }} selected {{ fi }}>{{value.value}}</option>
-									{{ end }}
-								</select>
-							</td>
-						{{ end }}
-						<td class="col-xs-3 hidden-xs ui-right SKUAdditions">
-							<div class="multiselect">
-								<div class="selectBox" onclick="showCheckboxes({{$index}})">
-									<select>
-										<option>@(请选择附加选项)</option>
-									</select>
-									<div class="overSelect"></div>
-								</div>
-								<div id="checkboxes" {{ if expanded[$index] }} style="display:block;" {{ else }} style="display:none" {{ fi }}>
-									{{ foreach addition in SKUAdditions}}
-									<label for="{{addition.ref}}" class="ui-left">
-										<input size="30" name="addition" data_SKU_id="{{SKU._id}}" data-ref="{{ addition._id }}" data-name="{{ addition.name }}" data-price="{{ addition.price }}" type="checkbox" {{ if SKUExistAdditions && SKUExistAdditions[SKU._id] && SKUExistAdditions[SKU._id][addition.name] }} checked="checked"  {{fi}}/>
-										{{addition.name}} 加价（元）：{{addition.price}}
-									</label>
-									{{ end }}
-								</div>
-							</div>
-						</td>
-						<td class="col-xs-1 hidden-xs ui-right nopadding">
-							<input size="10" data_SKU_id="{{SKU._id}}" name="market_price" value="{{SKU.price.market_price}}"/>
-						</td>
-						<td class="col-xs-1 hidden-xs ui-right nopadding">
-							<input size="10" data_SKU_id="{{SKU._id}}" name="platform_price" value="{{SKU.price.platform_price}}"/>
-						</td>
-						<td class="col-xs-2 hidden-xs ui-right nopadding">
-							{{ if SKU._id }}
-							<button name="ensure" onclick="update_SKU({{$index}})">@(提交修改)</button>
-							<button name="delete" onclick="remove_SKU({{$index}})">@(删除)</button>
-							{{ else }}
-							<button name="new_SKU" onclick="add_SKU({{$index}})">@(确认添加)</button>
-							<button name="cancel_new_SKU" onclick="cancel_new_SKU({{$index}})">@(取消)</button>
-							{{ fi }}
-						</td>
-					</tr>
-				{{ end }}
-				<tr class="new_SKU">
-					<td class="col-xs-2 hidden-xs ui-center">
-						<a href="javascript:void(0)" onclick="new_SKU_in_page()">
-							<span class="fa fa-plus-circle">@(添加SKU)</span>
-						</a>
-					</td>
-					{{ foreach attribute in SKUAttributes}}
-						<td class="col-xs-1 hidden-xs ui-center new_SKU_attribute">
-							<input class="col-md-9 nopadding" type="text"/>
-							<a class="col-md-2 account nopadding" href="javascript:void(0)" onclick="new_sku_attribute('{{attribute.name}}', {{$index}})">
-								<span class="fa fa-plus-circle"></span>
-							</a>
-						</td>
-					{{ end }}
-					<td class="col-xs-3 hidden-xs ui-center new_SKU_addition">
-						<input class="col-md-3 nopadding" type="text"/>
-						<div class="col-md-5 nopadding">@(加价（元）：)</div>
-						<input class="col-md-3 nopadding" type="text"/>
-						<a class="col-md-1 account nopadding" href="javascript:void(0)" onclick="new_SKU_addition()">
-							<span class="fa fa-plus-circle"></span>
-						</a>
-					</td>
-				</tr>
-			</table>
-			</script>
-		</div>
-	</div>
 	<hr>
 	<div class="padding" style="padding-bottom:0">
 		<div class="row">
@@ -236,6 +140,116 @@
 					<div data-component="checkbox" data-component-path="products.form.presale" style="margin-top:10px" class="red">@(<b>预售商品</b>)</div>
 				</div>
 			</div>
+		</div>
+	</div>
+	<hr>
+	<div>
+		<div class="row">
+			<div class="col-md-2 m">
+				<h3 class="ui-center">@(SKU)</h3>
+			</div>
+		</div>
+		<div data-component="template" class="padding" data-component-path="products">
+			<script type="text/html">
+				<table class="table table-bordered" border="0">
+					<tr>
+						<td class="col-xs-1 hidden-xs ui-center nopadding">@(SKU名称)</td>
+						{{ foreach SKUAttribute in SKUAttributes}}
+						<td class="col-xs-1 hidden-xs ui-center nopadding">{{SKUAttribute.name}}</td>
+						{{ end }}
+						<td class="col-xs-2 hidden-xs ui-center">@(附加项目)</td>
+						<td class="col-xs-1 hidden-xs ui-center nopadding">@(市场价)</td>
+						<td class="col-xs-1 hidden-xs ui-center nopadding">@(平台价)</td>
+						<td class="col-xs-2 hidden-xs ui-center nopadding">@(操作)</td>
+					</tr>
+					{{ foreach SKU in SKUs }}
+					<tr class="SKU">
+						<td class="col-xs-1 hidden-xs ui-center nopadding">
+							<input size="20" data_SKU_id="{{SKU._id}}" name="name" value="{{SKU.name}}"/>
+						</td>
+						{{ foreach attribute in SKUAttributes}}
+						<td class="col-xs-1 hidden-xs ui-center nopadding">
+							<select data-index="{{$index}}" data_SKU_id="{{SKU._id}}">
+								<option selected disabled hidden value=''></option>
+								{{ foreach value in SKUQueryAttributes[attribute.name] }}
+								<option value="{{value.value}}"  ref="{{value.ref}}"  name="{{attribute.name}}" {{ if SKUExistAttributes && SKUExistAttributes[SKU._id] && SKUExistAttributes[SKU._id][attribute.name] && value.ref == SKUExistAttributes[SKU._id][attribute.name].ref }} selected {{ fi }}>{{value.value}}</option>
+								{{ end }}
+							</select>
+						</td>
+						{{ end }}
+						<td class="col-xs-2 hidden-xs ui-center SKUAdditions">
+							<div class="multiselect">
+								<div class="selectBox" onclick="showCheckboxes({{$index}})">
+									<select>
+										<option>@(请选择附加选项)</option>
+									</select>
+									<div class="overSelect"></div>
+								</div>
+								<div id="checkboxes" {{ if expanded[$index] }} style="display:block;" {{ else }} style="display:none" {{ fi }}>
+									<table width="100%">
+									{{ foreach addition in SKUAdditions}}
+									<label for="{{addition.ref}}" class="ui-left">
+										<tr>
+											<td class="col-xs-1 nopadding"><input size="30" name="addition" data_SKU_id="{{SKU._id}}" data-ref="{{ addition._id }}" data-name="{{ addition.name }}" data-price="{{ addition.price }}" type="checkbox" {{ if SKUExistAdditions && SKUExistAdditions[SKU._id] && SKUExistAdditions[SKU._id][addition.name] }} checked="checked"  {{fi}}/></td>
+											<td class="col-xs-4 ui-left nopadding"><h6 class="nopadding">{{addition.name}}</h6></td>
+											<td class="col-xs-5 nopadding"><h6 class="nopadding">加价（元）：</h6></td>
+											<td class="col-xs-2 ui-right nopadding"><h6 class="nopadding">{{addition.price}}</h6></td>
+										</tr>
+									</label>
+									{{ end }}
+									</table>
+								</div>
+							</div>
+						</td>
+						<td class="col-xs-1 hidden-xs ui-center nopadding">
+							<input size="10" data_SKU_id="{{SKU._id}}" name="market_price" value="{{SKU.price.market_price}}"/>
+						</td>
+						<td class="col-xs-1 hidden-xs ui-center nopadding">
+							<input size="10" data_SKU_id="{{SKU._id}}" name="platform_price" value="{{SKU.price.platform_price}}"/>
+						</td>
+						<td class="col-xs-2 hidden-xs ui-center nopadding">
+							{{ if SKU._id }}
+							<button name="ensure" onclick="update_SKU({{$index}})">@(提交修改)</button>
+							<button name="delete" onclick="remove_SKU({{$index}})">@(删除)</button>
+							{{ else }}
+							<button name="new_SKU" onclick="add_SKU({{$index}})">@(确认添加)</button>
+							<button name="cancel_new_SKU" onclick="cancel_new_SKU({{$index}})">@(取消)</button>
+							{{ fi }}
+						</td>
+					</tr>
+					{{ end }}
+					<tr class="new_SKU">
+						<td class="col-xs-1 hidden-xs ui-center">
+							<a href="javascript:void(0)" onclick="new_SKU_in_page()">
+								<span class="fa fa-plus-circle">@(添加SKU)</span>
+							</a>
+						</td>
+						{{ foreach attribute in SKUAttributes}}
+						<td class="col-xs-1 hidden-xs ui-center new_SKU_attribute">
+							<div class="ui-textbox-with-button new_attribute">
+								<input class="col-md-9 nopadding" type="text"/>
+								<a class="col-md-2 account nopadding" href="javascript:void(0)" onclick="new_sku_attribute('{{attribute.name}}', {{$index}})">
+									<span class="fa fa-plus-circle"></span>
+								</a>
+							</div>
+						</td>
+						{{ end }}
+						<td class="col-xs-2 hidden-xs ui-center new_SKU_addition">
+							<div class="ui-textbox-with-button new_attribute">
+								<input class="col-md-4 nopadding h6" type="text"/>
+								<div class="col-md-3 nopadding"><h6 class="nopadding">@(加价(元):)</h6></div>
+								<input class="col-md-4 nopadding h6" type="text"/>
+								<a class="col-md-1 account nopadding" href="javascript:void(0)" onclick="new_SKU_addition()">
+									<span class="fa fa-plus-circle"></span>
+								</a>
+							</div>
+						</td>
+						<td class="col-xs-1 hidden-xs ui-center new_SKU_attribute"></td>
+						<td class="col-xs-1 hidden-xs ui-center new_SKU_attribute"></td>
+						<td class="col-xs-2 hidden-xs ui-center new_SKU_attribute"></td>
+					</tr>
+				</table>
+			</script>
 		</div>
 	</div>
 	<hr>
