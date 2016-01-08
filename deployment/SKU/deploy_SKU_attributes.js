@@ -52,7 +52,7 @@ module.exports = function(callback) {
                             SKUService.addSKUAttribute(category, brand, name, value, order, function (err) {
                                 if (err) {
                                     if(11000 == err.code){
-                                        SKUService.updateSKUAttributeSort(category, brand, name, value, order, function(err){
+                                        SKUService.updateSKUAttributeOrder(category, brand, name, value, order, function(err){
                                             if(err){
                                                 reject(err);
                                                 return;

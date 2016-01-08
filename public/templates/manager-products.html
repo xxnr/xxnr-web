@@ -580,9 +580,9 @@
 	function request_SKU_attribute(category_id, brand_id, callback) {
 		$.components.GET(managerurl + '/api/v2.1/SKU/attributes?category=' + category_id + '&brand=' + brand_id, null, function (SKUAttributesResponse) {
 			if (SKUAttributesResponse.code == 1000) {
-				SKUAttributesResponse.attributes.sort(function (a, b) {
-					return a.order > b.order;
-				});
+//				SKUAttributesResponse.attributes.sort(function (a, b) {
+//					return a.order > b.order;
+//				});
 
 				var SKUQueryAttributes = [];
 				SKUAttributesResponse.attributes.forEach(function (attribute) {
@@ -751,10 +751,10 @@
 
 	function update_SKU(index){
 		var SKU = products.SKUs[index];
-		if(!SKU.name){
-			alert('@(请填写SKU名称)');
-			return;
-		}
+		SKU.name=products.form.name;
+		SKU.attributes.forEach(function(attribute){
+			SKU.name += ' - ' + attribute.value;
+		});
 		if(!PRICE_REGEX.test(SKU.price.market_price)){
 			alert('@(请填写正确的市场价)');
 			return;
@@ -812,10 +812,6 @@
 		SKU.attributes.forEach(function(attribute){
 			SKU.name += ' - ' + attribute.value;
 		});
-		if(!SKU.name){
-			alert('@(请填写SKU名称)');
-			return;
-		}
 		if(!PRICE_REGEX.test(SKU.price.market_price)){
 			alert('@(请填写正确的市场价)');
 			return;

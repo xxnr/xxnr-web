@@ -1262,7 +1262,7 @@ function process_SKU_Attribute_add(){
 		return;
 	}
 
-	SKUService.addSKUAttribute(self.data.category, self.data.brand, self.data.name, self.data.value, function(err, attribute){
+	SKUService.addSKUAttribute(self.data.category, self.data.brand, self.data.name, self.data.value, null, function(err, attribute){
 		if(err){
 			console.error('process_SKU_Attribute_add error', err);
 			self.respond({code:1001, message:'添加SKU属性失败'});
@@ -1288,7 +1288,7 @@ function json_SKU_Attributes_get(){
 
 function process_product_attributes_add(){
 	var self = this;
-	ProductService.saveAttribute(self.data.category, self.data.brand, self.data.name, self.data.value, function(err, new_attribute){
+	ProductService.addAttribute(self.data.category, self.data.brand, self.data.name, self.data.value, null, function(err, new_attribute){
 		if(err){
 			self.respond({code:1001, message:'保存商品属性失败'});
 			return;

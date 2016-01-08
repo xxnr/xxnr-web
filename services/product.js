@@ -370,7 +370,39 @@ ProductService.prototype.idJoinWithCount = function(options, callback){
     joinProduct(0);
 };
 
-ProductService.prototype.saveAttribute = function(category, brand, name, value, callback){
+ProductService.prototype.updateAttributeOrder = function(category, brand, name, value, order, callback){
+    if(!category){
+        callback('category required');
+        return;
+    }
+
+    if(!name){
+        callback('name required');
+        return;
+    }
+
+    if(!value){
+        callback('value required');
+        return;
+    }
+
+    if(!order){
+        callback('order required');
+        return;
+    }
+
+    ProductAttributeModel.update({category:category, brand:brand, name:name, value:value}, {$set:{order:order}}, function(err){
+        if(err){
+            console.error(err);
+            callback(err);
+            return;
+        }
+
+        callback();
+    })
+};
+
+ProductService.prototype.addAttribute = function(category, brand, name, value, order, callback){
     if(!category){
         callback('category _id required');
         return;
@@ -386,33 +418,17 @@ ProductService.prototype.saveAttribute = function(category, brand, name, value, 
         return;
     }
 
-    var productAttribute = new ProductAttributeModel({category:category, brand:brand, name:name, value:value});
+    var model = {category:category, brand:brand, name:name, value:value};
+    if(order){
+        model.order = order;
+    }
+
+    var productAttribute = new ProductAttributeModel(model);
     productAttribute.save(function(err){
         if(err){
-            if(11000 == err.code){
-                // already exist, update value
-                ProductAttributeModel.update({category:category, brand:brand, name:name}, {$set:{value:value}}, function(err, numAffected){
-                    if(err){
-                        console.error(err);
-                        callback(err);
-                        return;
-                    }
-
-                    if(numAffected.n==0){
-                        var err = 'saveAttribute: attribute not exist: ' + {category:category, brand:brand, name:name};
-                        console.error(err);
-                        callback(err);
-                        return;
-                    }
-
-                    callback(null, productAttribute);
-                    return;
-                })
-            }else {
-                console.error(err);
-                callback(err);
-                return;
-            }
+            console.error(err);
+            callback(err);
+            return;
         }
 
         callback(null, productAttribute);
@@ -451,8 +467,10 @@ ProductService.prototype.getAttributes = function(category, brand, name, callbac
     ProductAttributeModel.aggregate({$match:matchOptions},
         {$group:{
             _id:{brand:'$brand', name:'$name'},
-            values:{$addToSet:schemaToAdd}
-        }})
+            values:{$addToSet:schemaToAdd},
+            order:{$max:'$order'}
+        }},
+        {$sort:{order:1}})
         .exec(function(err, attributes){
             if(err){
                 console.error(err);

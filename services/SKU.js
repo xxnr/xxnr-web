@@ -39,10 +39,12 @@ queryAttributesAndPrice = function(product, attributes, callback) {
                 _id: '$attributes.name',
                 values: {$addToSet: '$attributes.value'},
                 pricemin: {$min: '$price.platform_price'},
-                pricemax: {$max: '$price.platform_price'}
+                pricemax: {$max: '$price.platform_price'},
+                order: {$max:'$order'}
             }
         }
         , {$project: {_id: 0, name: '$_id', values: 1, pricemin: 1, pricemax: 1}}
+        , {$sort: {order:1}}
         )
         .exec(function (err, docs) {
             if (err) {
@@ -122,7 +124,7 @@ SKUService.prototype.updateSKU = function(id, price, attributes, additions, name
     })
 };
 
-SKUService.prototype.updateSKUAttributeSort = function(category, brand, name, value, order, callback){
+SKUService.prototype.updateSKUAttributeOrder = function(category, brand, name, value, order, callback){
     if(!category){
         callback('category required');
         return;
@@ -140,6 +142,11 @@ SKUService.prototype.updateSKUAttributeSort = function(category, brand, name, va
 
     if(!value){
         callback('value required');
+        return;
+    }
+
+    if(!order){
+        callback('order required');
         return;
     }
 
@@ -236,7 +243,12 @@ SKUService.prototype.addSKUAttribute = function(category, brand, name, value, or
         return;
     }
 
-    var newSKUAttribute = new SKUAttributeModel({category:category, brand:brand, name:name, value:value, order:order});
+    var model = {category:category, brand:brand, name:name, value:value};
+    if(order){
+        model.order = order;
+    }
+
+    var newSKUAttribute = new SKUAttributeModel(model);
     newSKUAttribute.save(function(err){
         if(err){
             console.error(err);
@@ -264,6 +276,7 @@ SKUService.prototype.querySKUAttributes = function(category, brand, callback) {
             }
         },
         {$project: {_id: 0, name: '$_id',values: 1, order:1}},
+        {$sort:{order:1}},
         function (err, attributes) {
             if (err) {
                 console.error(err);
