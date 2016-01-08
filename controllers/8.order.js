@@ -94,15 +94,16 @@ function api10_getOders() {
                     'orderId':item.id,
                     'orderNo':item.paymentId,
                     'totalPrice':item.price.toFixed(2),
-                    'goodsCount': item.products ? item.products.length: 0,
+                    'goodsCount':item.products ? item.products.length: 0,
                     'address':item.consigneeAddress,
                     'recipientName':item.consigneeName,
                     'recipientPhone':item.consigneePhone,
                     'typeLable':'',
-                    'deposit':item.deposit.toFixed(2),
+                    'deposit': item.duePrice ? item.duePrice.toFixed(2) : item.deposit.toFixed(2),
                     'payType':item.payType,
-                    'products': item.products || [],
-                    'subOrders': item.subOrders || []
+                    'order': {'totalPrice':item.price.toFixed(2), 'deposit':item.deposit.toFixed(2), 'dateCreated':item.dateCreated},
+                    'products':item.products || [],
+                    'subOrders':item.subOrders || []
                 };
             }
             result = {'code':'1000','message':'success','datas':{"total":data.count,"rows":arr,"page":data.page,"pages":data.pages}};
@@ -217,11 +218,14 @@ function addOrder(){
                 if (orders && keys.length > 0) {
                     var order1, order2;
                     if (orders['deposit']) {
+                        orders['deposit'].duePrice = orders['deposit'].deposit;
                         order1 = orders['deposit'];
                         if (orders['full']) {
+                            orders['full'].duePrice = orders['full'].price;
                             order2 = orders['full'];
                         } 
                     } else if (orders['full']) {
+                        orders['full'].duePrice = orders['full'].price;
                         order1 = orders['full'];
                     }
                     if (order1) {
@@ -287,47 +291,6 @@ function addOrder(){
                     self.respond({"code":1001, "mesage":"获取订单信息出错"});
                     return;
                 }
-                // var paymentId = U.GUID(10);
-                // var price = 0;
-                // var deposit = 0;
-                // var orderProducts = [];
-                // for(var i=0; i<cart.items.length; i++){
-                //     var product = api10.convertProduct(cart.items[i].product);
-                //     product.count = cart.items[i].count;
-                //     price += product.count * product.discountPrice;
-                //     deposit += product.count * (product.deposit?product.deposit:product.discountPrice);
-                //     orderProducts.push(product);
-                // }
-
-                // var order = {"id": U.GUID(10),
-                //     "buyerName":user.name,
-                //     "buyerPhone":user.account,
-                //     "buyerId":user.id,
-                //     "paymentId":paymentId,
-                //     "consigneeName":address.receiptpeople,
-                //     "consigneePhone":address.receiptphone,
-                //     "consigneeAddress":address.provincename + address.cityname + (address.countyname || '') + (address.townname || '') + address.address,
-                //     "price":price,
-                //     "deposit":deposit,
-                //     "products":orderProducts,
-                //     "payType":payType,
-                //     "payStatus":PAYMENTSTATUS.UNPAID,
-                //     "deliverStatus":DELIVERSTATUS.UNDELIVERED};
-                
-                // OrderService.add(order, function(err, data, payment) {
-                //     if(err) {
-                //         console.log('Order addOrder err:' + err);
-                //         // Error TODO*
-                //         var response = {"code":1001, "mesage":"保存订单出错"};
-                //         self.respond(response);
-                //         return;
-                //     }
-                //     var paymentId = payment && payment.id ? payment.id : data.paymentId;
-                //     var payPrice = payment && typeof(payment.price) != 'undefined' ? payment.price : data.deposit;
-                //     var response = {'code':1000, 'id': data.id, 'paymentId':paymentId, 'price':data.price, 'deposit':payPrice.toFixed(2), 'payment':payment};
-                //     self.respond(response);
-                //     CartService.removeItems(shopCartId, orderProducts, function(){});
-                // });
 			});
 		});
 	});
@@ -485,7 +448,7 @@ function api10_getOrderDetails() {
         }
         if (data) {
             var paymentId           = payment && payment.id ? payment.id : data.paymentId;
-            var payPrice            = payment && typeof(payment.price) != 'undefined' ? payment.price : 0;
+            var payPrice            = payment && typeof(payment.price) != 'undefined' ? payment.price : data.duePrice ? data.duePrice : 0;
             var order               = {};
             var productslength      = data.products? data.products.length: 0;
             var arr                 = new Array(productslength);
@@ -540,36 +503,5 @@ function api10_getOrderDetails() {
         self.respond(result);
     });
 }
-
-// function orderType(order) {
-//     // if ((order.payStatus == PAYMENTSTATUS.UNPAID && !order.isClosed) || order.payStatus == PAYMENTSTATUS.PARTPAID) {
-//     //     return 1;
-//     // } else if (order.payStatus == PAYMENTSTATUS.PAID && (order.deliverStatus == DELIVERSTATUS.UNDELIVERED || order.deliverStatus == DELIVERSTATUS.PARTDELIVERED)) {
-//     //     return 2;
-//     // } else if (order.payStatus == PAYMENTSTATUS.PAID && order.deliverStatus == DELIVERSTATUS.DELIVERED && !order.confirmed) {
-//     //     return 3;
-//     // } else if (order.confirmed) {
-//     //     return 4;
-//     // } else {
-//     //     return 0;
-//     // }
-
-//     if (order.payStatus == PAYMENTSTATUS.PAID) {
-//         if (order.deliverStatus == DELIVERSTATUS.DELIVERED) {
-//             if (order.confirmed) {
-//                 return 4;
-//             }
-//             return 3;
-//         }
-//         return 2;
-//     } else if (order.payStatus == PAYMENTSTATUS.PARTPAID) {
-//         return 1;
-//     } else {
-//         if (order.isClosed) {
-//             return 0;
-//         }
-//         return 1;
-//     }
-// }
 
 exports.getOders = getOdersList;
