@@ -298,6 +298,7 @@ app.controller('userCenterController', function($scope, $rootScope, remoteApiSer
                     order.id = orders[i].id;
                     order.orderNo = orders[i].paymentId;
                     order.totalPrice = orders[i].deposit.toFixed(2) || -1;
+                    // order.totalPrice = orders[i].deposit?orders[i].deposit.toFixed(2):orders[i].price;
                     switch (parseInt(orders[i].payType)) {
                         case 1:
                             order.payType = '支付宝支付';
