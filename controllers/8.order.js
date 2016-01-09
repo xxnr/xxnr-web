@@ -576,17 +576,17 @@ function addOrderBySKU(){
                 for(var i=0; i<cart.SKU_items.length; i++){
                     var SKU = cart.SKU_items[i].SKU;
                     var additions = cart.SKU_items[i].additions;
+                    var additionPrice = 0;
+                    additions.forEach(function(addition){
+                        additionPrice += addition.price;
+                        addition.ref = addition._id;
+                        delete addition._id;
+                    });
                     var SKU_to_add = {};
                     var product = api10.convertProduct(SKU.product);
                     SKU_to_add.ref = SKU._id;
                     SKU_to_add.productId = product.id;
                     SKU_to_add.price = SKU.price.platform_price;
-                    additions.forEach(function(addition){
-                        SKU_to_add.price += addition.price;
-                        addition.ref = addition._id;
-                        delete addition._id;
-                    });
-
                     SKU_to_add.deposit = product.deposit;
                     SKU_to_add.name = SKU.name;
                     SKU_to_add.thumbnail = product.thumbnail;
@@ -612,7 +612,7 @@ function addOrderBySKU(){
                             orders['deposit'].id = U.GUID(10);
                             orders['deposit'].paymentId = U.GUID(10);
                         }
-                        orders['deposit'].price +=  SKU_to_add.count * SKU_to_add.price;
+                        orders['deposit'].price +=  SKU_to_add.count * (SKU_to_add.price+additionPrice);
                         orders['deposit'].deposit += SKU_to_add.count * SKU_to_add.deposit;
                         orders['deposit'].SKUs.push(SKU_to_add);
                     } else {
@@ -634,7 +634,7 @@ function addOrderBySKU(){
                             orders['full'].id = U.GUID(10);
                             orders['full'].paymentId = U.GUID(10);
                         }
-                        orders['full'].price +=  SKU_to_add.count * SKU_to_add.price.platform_price;
+                        orders['full'].price +=  SKU_to_add.count * (SKU_to_add.price+additionPrice);
                         orders['full'].SKUs.push(SKU_to_add);
                     }
                     orderSKUs.push(SKU_to_add);

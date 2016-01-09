@@ -4,8 +4,11 @@
 var services = require('../services');
 var CartService = services.cart;
 var SKUService = services.SKU;
+var converter = require('../common/converter');
+var api10 = converter.api10;
 
 exports.install = function() {
+    F.route('/api/v2.1/cart/getShoppingCart', getShoppingCart, ['get'], ['isLoggedIn']);
     F.route('/api/v2.1/cart/addToCart', updateShoppingCart, ['post'], ['isLoggedIn']);
     F.route('/api/v2.1/cart/changeNum', updateShoppingCart, ['post'], ['isLoggedIn']);
     F.route('/api/v2.1/cart/getShoppingCartOffline', getShoppingCartOffline, ['post'], ['isLoggedIn']);
@@ -83,19 +86,88 @@ function updateShoppingCart() {
     });
 }
 
+function getShoppingCart(){
+    var self = this;
+    var userId = self.data.userId;
+    if(!userId){
+        self.respond({code:1001, message:'param userId required'});
+        return;
+    }
+
+    CartService.getOrAdd(userId, function(err, cart){
+        if(err){
+            self.respond({code:1001, message:'查询购物车失败'});
+            return;
+        }
+
+        var SKUs = [];
+        if(cart.SKU_items && cart.SKU_items.length>0) {
+            cart.SKU_items.forEach(function (item) {
+                if(item.SKU) {
+                    var SKU = item.SKU;
+                    SKU.count = item.count;
+                    SKU.additions = item.additions;
+                    SKUs.push(SKU);
+                }
+            });
+        }
+
+        self.respond(convertToShoppingCartFormatV_1_0(SKUs, cart.cartId, cart.userId));
+    })
+}
+
 function getShoppingCartOffline(){
     var self = this;
-    var products = JSON.parse(decodeURI(self.data.products));
-    if(!products || !Array.isArray(products) || !(products.length > 0)){
+    var SKUs = self.data.SKUs;
+    if(!SKUs || !Array.isArray(SKUs) || !(SKUs.length > 0)){
         self.respond({code:1001,message:'请提供正确的参数'});
         return;
     }
 
-    ProductService.idJoinWithCount({products: products}, function(err, products){
+    SKUService.idJoinWithCount({SKUs: SKUs}, function(err, SKUs){
         if(err){
             self.respond({code:1001,message:err});
         }else {
-            self.respond(convertToShoppingCartFormatV_1_0(products, null, null));
+            self.respond(convertToShoppingCartFormatV_1_0(SKUs, null, null));
         }
     });
+}
+
+function convertToShoppingCartFormatV_1_0(SKUs, cartId, userId){
+    var goodDetails = {"code":"1000","message":"success",
+        "datas":{"total":0, "shopCartId":cartId, "DiscountPrice":0, "locationUserId":userId, "totalPrice":0, "rows":[
+        ]}};
+    var brands = [];
+    var brandNames = [];
+    var totalCount = 0;
+
+    for(var i=0; i<SKUs.length; i++) {
+        var SKU = SKUs[i];
+        var product = api10.convertProduct(SKUs[i].product);
+        var SKUDetail = {"goodsId": product.id,
+            "unitPrice": SKU.price.platform_price,
+            "imgUrl": product.thumbnail,
+            "productDesc": product.description,
+            "point": product.payWithScoresLimit,
+            "originalPrice": SKU.price.platform_price,
+            "name": SKU.name,
+            "deposit": product.deposit,
+            "count":SKU.count,
+            additions:SKU.additions};
+        var brandName = product.brandName;
+        if(!brands[brandName]){
+            brands[brandName] = [];
+            brandNames.push(brandName);
+        }
+        totalCount += parseInt(SKUDetail.count);
+        brands[brandName].push(SKUDetail);
+    }
+    goodDetails.datas.total = SKUs.length;
+    goodDetails.datas.totalCount = totalCount;
+    for(var brandNameIndex=0; brandNameIndex<brandNames.length; brandNameIndex++) {
+        var brand = {"brandName":brandNames[brandNameIndex], "SKUList":brands[brandNames[brandNameIndex]]};
+        goodDetails.datas.rows.push(brand);
+    }
+
+    return goodDetails;
 }
