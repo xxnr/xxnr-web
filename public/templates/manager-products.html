@@ -172,7 +172,20 @@
 							<select data-index="{{$index}}" data_SKU_id="{{SKU._id}}">
 								<option selected disabled hidden value=''></option>
 								{{ foreach value in SKUQueryAttributes[attribute.name] }}
-								<option value="{{value.value}}"  ref="{{value.ref}}"  name="{{attribute.name}}" {{ if SKUExistAttributes && SKUExistAttributes[SKU._id] && SKUExistAttributes[SKU._id][attribute.name] && value.ref == SKUExistAttributes[SKU._id][attribute.name].ref }} selected {{ fi }}>{{value.value}}</option>
+								<option value="{{value.value}}"  ref="{{value.ref}}"  name="{{attribute.name}}"
+									{{ if SKU._id }}
+										{{ if SKUExistAttributes && SKUExistAttributes[SKU._id] && SKUExistAttributes[SKU._id][attribute.name] && value.ref == SKUExistAttributes[SKU._id][attribute.name].ref }} 
+											selected
+										{{ fi }}
+									{{ else }}
+										{{ foreach SKUAttribute in SKU.attributes }}
+											{{ if SKUAttribute.ref && value.ref == SKUAttribute.ref }} 
+												selected
+												{{ break }}
+											{{ fi }}
+										{{ end }}
+									{{ fi }}
+									>{{value.value}}</option>
 								{{ end }}
 							</select>
 						</td>
@@ -190,7 +203,18 @@
 									{{ foreach addition in SKUAdditions}}
 									<label for="{{addition.ref}}" class="ui-left">
 										<tr>
-											<td class="col-xs-1 nopadding"><input size="30" name="addition" data_SKU_id="{{SKU._id}}" data-ref="{{ addition._id }}" data-name="{{ addition.name }}" data-price="{{ addition.price }}" type="checkbox" {{ if SKUExistAdditions && SKUExistAdditions[SKU._id] && SKUExistAdditions[SKU._id][addition.name] }} checked="checked"  {{fi}}/></td>
+											<td class="col-xs-1 nopadding"><input size="30" name="addition" data_SKU_id="{{SKU._id}}" data-ref="{{ addition._id }}" data-name="{{ addition.name }}" data-price="{{ addition.price }}" type="checkbox" 
+												{{ if SKU._id }}
+													{{ if SKUExistAdditions && SKUExistAdditions[SKU._id] && SKUExistAdditions[SKU._id][addition.name] }} checked="checked"  {{ fi }}
+												{{ else }}
+													{{ foreach SKUAddition in SKU.additions }}
+														{{ if SKUAddition.ref && addition._id == SKUAddition.ref }} 
+															checked="checked"
+															{{ break }}
+														{{ fi }}
+													{{ end }}
+												{{ fi }}
+												/></td>
 											<td class="col-xs-4 ui-left nopadding"><h6 class="nopadding">{{addition.name}}</h6></td>
 											<td class="col-xs-5 nopadding"><h6 class="nopadding">加价（元）：</h6></td>
 											<td class="col-xs-2 ui-right nopadding"><h6 class="nopadding">{{addition.price}}</h6></td>
@@ -211,6 +235,7 @@
 							{{ if SKU._id }}
 							<button name="ensure" onclick="update_SKU({{$index}})">@(提交修改)</button>
 							<button name="delete" onclick="remove_SKU({{$index}})">@(删除)</button>
+							<button name="copy" onclick="copy_SKU({{$index}})">@(复制)</button>
 							{{ else }}
 							<button name="new_SKU" onclick="add_SKU({{$index}})">@(确认添加)</button>
 							<button name="cancel_new_SKU" onclick="cancel_new_SKU({{$index}})">@(取消)</button>
@@ -789,11 +814,26 @@
 		})
 	}
 
-	function new_SKU_in_page(){
-		var newSKU = {attributes:[], price:{market_price:0, platform_price:0}, additions:[], product:products.form._id};
-		products.SKUAttributes.forEach(function(attribute){
-			newSKU.attributes.push({name:attribute.name, value:attribute.values[0].value, ref:attribute.values[0].ref});
+	function copy_SKU(index) {
+		var SKU = products.SKUs[index];
+		var CSKU = {attributes:[], price:{}, additions:[], product:products.form._id};
+		SKU.attributes.forEach(function(attribute) {
+			CSKU.attributes.push({name:attribute.name, value:attribute.value, ref:attribute.ref});
 		});
+		SKU.additions.forEach(function(addition) {
+			CSKU.additions.push({name:addition.name, ref:addition.ref, price: addition.price});
+		});
+		CSKU.price = {market_price:typeof(SKU.price.market_price) !== 'undefined' ? SKU.price.market_price : 0,
+					platform_price:typeof(SKU.price.platform_price) !== 'undefined' ? SKU.price.platform_price : 0
+		};
+		new_SKU_in_page(CSKU);
+	}
+
+	function new_SKU_in_page(CSKU){
+		var newSKU = {attributes:[], price:{market_price:0, platform_price:0}, additions:[], product:products.form._id};
+		if (CSKU) {
+			newSKU = CSKU;
+		}
 
 		products.SKUs.push(newSKU);
 		SET('products.SKUs', products.SKUs);
@@ -861,12 +901,9 @@
 			if(response.code==1000){
 				var new_attribute = response.attribute;
 				products.attributes[name].values.push({ref:new_attribute._id, value:new_attribute.value});
-				console.log(products.attributes[name], 'start to SET');
 				SET('products.attributes', products.attributes);
-				console.log(GET('products.attributes'));
 				el.value = "";
 				products_onchange();
-				console.log('finish SET');
 				success();
 			}
 		});

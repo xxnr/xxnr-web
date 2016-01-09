@@ -889,7 +889,7 @@ OrderService.prototype.checkPayStatus = function(orderId, callback) {
 
 				// get order payment by suborder types
 				// var typekeys = ['deposit','balance','full'];
-				var typekeysSort  = SUBORDERTYPEKEYS;
+				var typekeysSort = SUBORDERTYPEKEYS;
 				var orderPayment = null;
 				// for (var i=0; i < typekeys.length; i++) {
 				for (var i=0; i < typekeysSort.length; i++) {
@@ -904,8 +904,15 @@ OrderService.prototype.checkPayStatus = function(orderId, callback) {
 								pushValues = {'payments':payment};
 							}
 							if (!orderPayment) {
-								setValues['paymentId'] = payment.id;
-								setValues['payType'] = payment.payType || PAYTYPE.ZHIFUBAO;
+								if (order.paymentId !== payment.id) {
+									setValues['paymentId'] = payment.id;
+								}
+								if (!payment.payType || order.payType !== payment.payType) {
+									setValues['payType'] = payment.payType || PAYTYPE.ZHIFUBAO;
+								}
+								if (order.duePrice !== payment.price) {
+									setValues['duePrice'] = payment.price;
+								}
 								orderPayment = payment;
 								break
 							}
