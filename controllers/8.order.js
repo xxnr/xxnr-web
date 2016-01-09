@@ -20,6 +20,10 @@ exports.install = function() {
 	F.route('/app/order/getOderList',              api10_getOders, ['post', 'get'], ['isLoggedIn']);
 	//fix api// F.route('/app/order/addOrder',                 addOrder, ['post', 'get'], ['isLoggedIn']);
     //fix api// F.route('/app/order/confirmReceipt',           confirmOrder, ['post', 'get'], ['isLoggedIn']);
+
+    // v2.1
+    F.route('/api/v2.1/order/addOrder',            addOrderBySKU, ['post'], ['isLoggedIn']);
+
 };
 
 var converter = require('../common/converter');
@@ -102,6 +106,7 @@ function api10_getOders() {
                     'deposit':item.deposit.toFixed(2),
                     'payType':item.payType,
                     'products': item.products || [],
+                    'SKUs':item.SKUs || [],
                     'subOrders': item.subOrders || []
                 };
             }
@@ -488,7 +493,9 @@ function api10_getOrderDetails() {
             var payPrice            = payment && typeof(payment.price) != 'undefined' ? payment.price : 0;
             var order               = {};
             var productslength      = data.products? data.products.length: 0;
-            var arr                 = new Array(productslength);
+            var SKUsLength          = data.SKUs? data.SKUs.length: 0;
+            var productArr          = new Array(productslength);
+            var SKUArr              = new Array(productslength);
             order.id                = data.id;
             order.orderNo           = paymentId;
             order.totalPrice        = data.price.toFixed(2);
@@ -514,12 +521,12 @@ function api10_getOrderDetails() {
                 order.dateCompleted = data.dateCompleted;
             }
             if (payment) {
-                order.payment       = {'paymentId':payment.id, 'price':payment.price};;
+                order.payment       = {'paymentId':payment.id, 'price':payment.price};
             }
 
             for (var i=0; i < productslength; i++) {
                 var product = data.products[i];
-                arr[i] = {
+                productArr[i] = {
                     'goodsName': product.name,
                     'goodsCount': product.count,
                     'unitPrice': product.price.toFixed(2),
@@ -532,7 +539,23 @@ function api10_getOrderDetails() {
                     'category': product.category
                 }
             }
-            order.orderGoodsList    = arr;
+            for (var i=0; i < SKUsLength; i++) {
+                var SKU = data.SKUs[i];
+                SKUArr[i] = {
+                    'name': SKU.name,
+                    'count': SKU.count,
+                    'unitPrice': SKU.price.toFixed(2),
+                    'orderSubType': '',
+                    'orderSubNo': '',
+                    'originalPrice': SKU.price.toFixed(2),
+                    'goodsId': SKU.productId,
+                    'imgs': SKU.thumbnail,
+                    'deposit': SKU.deposit.toFixed(2),
+                    'category': SKU.category
+                }
+            }
+            order.orderGoodsList  = productArr;
+            order.SKUList = SKUArr;
             result = {'code':'1000','message':'success','datas':{'total':1,'rows':order,'locationUserId':locationUserId}};
         } else {
             result = {'code':'1001','message':'未查询到订单'};
@@ -571,5 +594,195 @@ function api10_getOrderDetails() {
 //         return 1;
 //     }
 // }
+function addOrderBySKU(){
+    var self = this;
 
+    var data = self.data;
+    var userId = data['userId'];
+    var shopCartId = data.shopCartId;
+    var addressId = data['addressId'];
+    var SKUs = data['SKUs'] || [];
+    var payType = data['payType'] || PAYTYPE.ZHIFUBAO;
+
+    if (!shopCartId) {
+        self.respond({"code":1001, "mesage":"请选择购物车"});
+        return;
+    }
+
+    if (!addressId) {
+        self.respond({"code":1001, "mesage":"请先填写收货地址"});
+        return;
+    }
+
+    UserService.get({"userid":userId}, function(err, user) {
+        if(err || !user){
+            self.respond({code:1001, message:'用户不存在'});
+            return;
+        }
+
+        UseraddressService.get({"id": addressId}, function(err, address) {
+            if(err || !address){
+                self.respond({code:1001, message:'收货地址不存在'});
+                return;
+            }
+
+            CartService.checkoutSKU(shopCartId, SKUs, function(err, cart) {
+                if(err || !cart){
+                    self.respond({code:1001, message:'购物车不存在'});
+                    return;
+                }
+
+                if(cart.SKU_items.length==0){
+                    self.respond({code:1001, message:'购物车为空'});
+                    return;
+                }
+
+                // 拆单 定金的商品和全款的商品拆分支付
+                var orders = {};
+                var orderSKUs = [];
+                for(var i=0; i<cart.SKU_items.length; i++){
+                    var SKU = cart.SKU_items[i].SKU;
+                    var additions = cart.SKU_items[i].additions;
+                    var SKU_to_add = {};
+                    var product = api10.convertProduct(SKU.product);
+                    SKU_to_add.ref = SKU._id;
+                    SKU_to_add.productId = product.id;
+                    SKU_to_add.price = SKU.price.platform_price;
+                    additions.forEach(function(addition){
+                        SKU_to_add.price += addition.price;
+                        addition.ref = addition._id;
+                        delete addition._id;
+                    });
+
+                    SKU_to_add.deposit = product.deposit;
+                    SKU_to_add.name = SKU.name;
+                    SKU_to_add.thumbnail = product.thumbnail;
+                    SKU_to_add.count = cart.SKU_items[i].count;
+                    SKU_to_add.category = product.category;
+                    SKU_to_add.additions = additions;
+                    if (SKU_to_add.deposit) {
+                        if (!orders['deposit']) {
+                            orders['deposit'] = {
+                                "buyerName":user.name,
+                                "buyerPhone":user.account,
+                                "buyerId":user.id,
+                                "consigneeName":address.receiptpeople,
+                                "consigneePhone":address.receiptphone,
+                                "consigneeAddress":address.provincename + address.cityname + (address.countyname || '') + (address.townname || '') + address.address,
+                                "price":0,
+                                "deposit":0,
+                                "SKUs":[],
+                                "payType":payType,
+                                "payStatus":PAYMENTSTATUS.UNPAID,
+                                "deliverStatus":DELIVERSTATUS.UNDELIVERED
+                            };
+                            orders['deposit'].id = U.GUID(10);
+                            orders['deposit'].paymentId = U.GUID(10);
+                        }
+                        orders['deposit'].price +=  SKU_to_add.count * SKU_to_add.price;
+                        orders['deposit'].deposit += SKU_to_add.count * SKU_to_add.deposit;
+                        orders['deposit'].SKUs.push(SKU_to_add);
+                    } else {
+                        if (!orders['full']) {
+                            orders['full'] = {
+                                "buyerName":user.name,
+                                "buyerPhone":user.account,
+                                "buyerId":user.id,
+                                "consigneeName":address.receiptpeople,
+                                "consigneePhone":address.receiptphone,
+                                "consigneeAddress":address.provincename + address.cityname + (address.countyname || '') + (address.townname || '') + address.address,
+                                "price":0,
+                                "deposit":0,
+                                "SKUs":[],
+                                "payType":payType,
+                                "payStatus":PAYMENTSTATUS.UNPAID,
+                                "deliverStatus":DELIVERSTATUS.UNDELIVERED
+                            };
+                            orders['full'].id = U.GUID(10);
+                            orders['full'].paymentId = U.GUID(10);
+                        }
+                        orders['full'].price +=  SKU_to_add.count * SKU_to_add.price.platform_price;
+                        orders['full'].SKUs.push(SKU_to_add);
+                    }
+                    orderSKUs.push(SKU_to_add);
+                }
+
+                var keys = Object.keys(orders);
+                if (orders && keys.length > 0) {
+                    var order1, order2;
+                    if (orders['deposit']) {
+                        order1 = orders['deposit'];
+                        if (orders['full']) {
+                            order2 = orders['full'];
+                        }
+                    } else if (orders['full']) {
+                        order1 = orders['full'];
+                    }
+                    if (order1) {
+                        try {
+                            OrderService.add(order1, function(err, data, payment) {
+                                if (err || !data) {
+                                    if (err) console.error('Order addOrder order1 err:', err);
+                                    var response = {"code":1001, "mesage":"保存订单出错"};
+                                    self.respond(response);
+                                    return;
+                                }
+                                var resultOrders = [];
+                                var result = {'id': data.id, 'price':data.price, 'deposit': data.deposit};
+                                if (payment) {
+                                    result.payment = {'paymentId':payment.id, 'price':payment.price};
+                                }
+                                resultOrders.push(result);
+
+                                var orderId = data.id;
+                                var paymentId = payment && payment.id ? payment.id : data.paymentId;
+                                var price = data.price;
+                                var payPrice = payment && typeof(payment.price) != 'undefined' ? payment.price : data.deposit && data.deposit > 0 ? data.deposit : data.price;
+                                var response = {'code':1000, 'id': data.id, 'paymentId':paymentId, 'price':data.price, 'deposit':payPrice.toFixed(2)};
+                                if (order2) {
+                                    OrderService.add(order2, function(err, data, payment) {
+                                        if (err || !data) {
+                                            if (err) console.error('Order addOrder order2 err:', err);
+                                            self.respond({"code":1001, "mesage":"保存订单出错"});
+                                            OrderService.remove({id:orderId}, function(err) {
+                                                if (err) {
+                                                    console.error('Order addOrder remove order1 err:', err);
+                                                }
+                                            });
+                                            return;
+                                        }
+                                        result = {'id': data.id, 'price':data.price, 'deposit': data.deposit};
+                                        if (payment) {
+                                            result.payment = {'paymentId':payment.id, 'price':payment.price};
+                                        }
+                                        resultOrders.push(result);
+                                        response['orders'] = resultOrders;
+                                        self.respond(response);
+                                        CartService.removeSKUItems(shopCartId, orderSKUs, function(){});
+                                    });
+                                } else {
+                                    response['orders'] = resultOrders;
+                                    self.respond(response);
+                                    CartService.removeSKUItems(shopCartId, orderSKUs, function(){});
+                                }
+                            });
+                        } catch (e) {
+                            console.error('Order addOrder orders err:', e);
+                            self.respond({"code":1001, "mesage":"保存订单出错"});
+                            return;
+                        }
+                    } else {
+                        console.error('Order addOrder err: not get the order..');
+                        self.respond({"code":1001, "mesage":"没有要保存的订单"});
+                        return;
+                    }
+                } else {
+                    console.error('Order addOrder err: no orders info..');
+                    self.respond({"code":1001, "mesage":"获取订单信息出错"});
+                    return;
+                }
+            });
+        });
+    });
+}
 exports.getOders = getOdersList;

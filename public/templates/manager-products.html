@@ -755,11 +755,11 @@
 		SKU.attributes.forEach(function(attribute){
 			SKU.name += ' - ' + attribute.value;
 		});
-		if(!PRICE_REGEX.test(SKU.price.market_price)){
+		if(!PRICE_REGEX.test(SKU.price.market_price) || parseFloat(SKU.price.market_price) > 0){
 			alert('@(请填写正确的市场价)');
 			return;
 		}
-		if(!PRICE_REGEX.test(SKU.price.platform_price)){
+		if(!PRICE_REGEX.test(SKU.price.platform_price) || parseFloat(SKU.price.platform_price) > 0){
 			alert('@(请填写正确的平台价)');
 			return;
 		}
@@ -812,11 +812,11 @@
 		SKU.attributes.forEach(function(attribute){
 			SKU.name += ' - ' + attribute.value;
 		});
-		if(!PRICE_REGEX.test(SKU.price.market_price)){
+		if(!PRICE_REGEX.test(SKU.price.market_price) || parseFloat(SKU.price.market_price) > 0){
 			alert('@(请填写正确的市场价)');
 			return;
 		}
-		if(!PRICE_REGEX.test(SKU.price.platform_price)){
+		if(!PRICE_REGEX.test(SKU.price.platform_price) || parseFloat(SKU.price.platform_price) > 0){
 			alert('@(请填写正确的平台价)');
 			return;
 		}

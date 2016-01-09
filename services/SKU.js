@@ -331,7 +331,22 @@ SKUService.prototype.querySKUByProductId = function(product, callback){
 };
 
 SKUService.prototype.getSKU = function(id, callback){
-    //TODO: get an SKU by _id
+    if(!id){
+        callback('id required');
+        return;
+    }
+
+    SKUModel.findOne({_id:id})
+        .populate('product')
+        .exec(function(err, SKU){
+        if(err){
+            console.error(err);
+            callback(err);
+            return;
+        }
+
+        callback(null, SKU);
+    })
 };
 
 SKUService.prototype.querySKUAdditions = function(category, brand, callback){

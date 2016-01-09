@@ -7,7 +7,7 @@ var schema = new mongoose.Schema({
         count:Number
     }],
     SKU_items:[{
-        SKU:{type:mongoose.Schema.ObjectId, ref:'sku', required:true},
+        SKU:{type:mongoose.Schema.ObjectId, ref:'SKU', required:true},
         additions:[{type:mongoose.Schema.ObjectId, ref:'SKUAddition', required:true}],  // the additions added to cart
         count:Number
     }]

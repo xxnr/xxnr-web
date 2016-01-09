@@ -2,7 +2,7 @@ var mongoose = require('mongoose');
 
 var productSchema = new mongoose.Schema({
 	id: {type: String, required: true, unique: true},
-	pictures: [String],
+	pictures: [String],																// 主图
 	reference: String,
 	category: {type: String, required: true},
 	name: {type: String, required: true},

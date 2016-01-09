@@ -26,9 +26,10 @@ var schema = new mongoose.Schema({
             'dateDelivered': Date,
             'dateSet': Date,														// 人为设置的日期
             'deliverStatus': {type:Number, required:true, default: DELIVERSTATUS.UNDELIVERED}
-		}], required: true},
+		}]},
 	SKUs:[{
-		ref:{type:mongoose.Schema.ObjectId, ref:'sku', required:true},
+		ref:{type:mongoose.Schema.ObjectId, ref:'SKU', required:true},
+		productId:{type:String, required:true},
 		price:{type:Number, required: true},
 		deposit:{type:Number, required:true},
 		name:{type:String, required:true},

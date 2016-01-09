@@ -12,6 +12,7 @@ CartService.prototype.getOrAdd = function(userId, callback, populate){
     if(!(populate === false)){
         query = query.populate('items.product', '-_id id price linker_category pictures description discount name deposit brandName');
         query = query.populate('SKU_Items.SKU');
+        query = query.populate('SKU_Items.additions');
     }
 
     query.lean()
@@ -430,7 +431,7 @@ CartService.prototype.checkoutSKU = function(cartId, items, callback) {
     }
     CartModel.findOne({cartId: cartId})
         .populate('SKU_items.SKU')
-        .lean()
+        .populate('SKU_items.additions')
         .exec(function (err, cart) {
             if (err) {
                 console.error(err);
@@ -442,16 +443,34 @@ CartService.prototype.checkoutSKU = function(cartId, items, callback) {
                 callback(null, cart);
                 return;
             }
-            var checkoutItems = [];
-            for (var j = 0; j < cart.SKU_items.length; j++) {
-                cart.SKU_items[j].count = SKUBuyCount[cart.SKU_items[j].SKU.id];
-                if (cart.SKU_items[j].count) {
-                    checkoutItems.push(cart.SKU_items[j]);
-                }
-            }
 
-            cart.SKU_items = checkoutItems;
-            callback(null, cart);
+            var checkoutItems = [];
+            var promises = cart.SKU_items.map(function(item){
+                return new Promise(function(resolve ,reject){
+                    item.SKU.populate('product', function(err, SKU){
+                        if(err){
+                            reject(err);
+                        }
+
+                        item.SKU = SKU;
+                        item.count = SKUBuyCount[SKU._id];
+                        if(item.count) {
+                            checkoutItems.push(item);
+                        }
+
+                        resolve()
+                    })
+                })
+            });
+
+            Promise.all(promises)
+                .then(function(){
+                    cart.SKU_items = checkoutItems;
+                    callback(null, cart.toObject());
+                })
+                .catch(function(err){
+                    callback(err);
+                });
         })
 };
 
