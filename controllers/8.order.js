@@ -108,7 +108,8 @@ function api10_getOders() {
                     'order': {'totalPrice':item.price.toFixed(2), 'deposit':item.deposit.toFixed(2), 'dateCreated':item.dateCreated},
                     'products': item.products || [],
                     'SKUs':item.SKUs || [],
-                    'subOrders': item.subOrders || []
+                    'subOrders': item.subOrders || [],
+                    'duePrice': item.duePrice ? item.duePrice.toFixed(2) : null,
                 };
             }
             result = {'code':'1000','message':'success','datas':{"total":data.count,"rows":arr,"page":data.page,"pages":data.pages}};
