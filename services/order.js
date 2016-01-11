@@ -236,12 +236,12 @@ OrderService.prototype.get = function(options, callback) {
 					callback(null, doc, null);
 					return;
 				} else {
-					callback(null, order ? order : doc, payment ? payment : null);
+					callback(null, order ? order : doc.toObject(), payment ? payment : null);
 					return;
-				}		
+				}
 			});
 		} else {
-			callback(null, doc.toObject(), null);
+			callback(null, null, null);
 		}
 	});
 };
