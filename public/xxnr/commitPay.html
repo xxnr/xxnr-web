@@ -33,7 +33,7 @@
     <script src="js/sideService.js"></script>
     <!-- endbuild -->
 </head>
-<body ng-controller="commitPayController" >
+<body ng-controller="commitPayController" ng-class="{true:'overflow_body', false:'not_overflow_body'}[isOverflow]">
 <header ng-controller="headerController"></header>
 <div class="wrap nav" ng-controller="shoppingCartController">
     <h1 class="left logo"><a href="/">新新农人</a></h1>
@@ -46,35 +46,71 @@
     </ul>
 </div>
 <div class="payBody ng-cloak">
-    <div class="orderInfo ng-cloak">
-        <p class="big ng-cloak">订单提交成功,请您尽快付款! 订单号：<span class="ng-cloak">{{order.id}}</span> <span class="right">应付金额：<span class="price ng-cloak">{{order.deposit}}</span>元</span></p>
-        <p class="ng-cloak">收货地址：<span class="ng-cloak">{{order.address}}，</span><span class="ng-cloak">{{order.receiver}}，</span><span class="ng-cloak">{{order.receiverPhone}}</span></p>
-        <!--<p>商品名称：<span ng-repeat="product in order.products">{{product.goodsName}}<span> -{{product.goodsCount}}件，</span></span></p>-->
-        <p>商品名称：<span class="ng-cloak">{{order.resultStr}}</span></p>
+    <div class="orderInfo ng-cloak" ng-repeat='order in orders' ng-click='orderClicked($index)' ng-class="{true:'selected',false:'unselected'}[$index == orderSelectedNum]">
+        <div class="big ng-cloak">订单号：
+            <span class="ng-cloak">{{order.id}}</span>
+            <span class="orderType">{{order.orderType}}</span>
+            <p class="right needToPay" >待付金额：
+                <span class="price ng-cloak">{{order.deposit}}</span>元
+            </p>
+        </div>
+        <div class="clearfix totalPrice" ng-show='$index==orderSelectedNum'>
+            <p class="right">订单总额：{{order.totalPrice}}元</p>
+        </div>
+        <div ng-show='$index==orderSelectedNum'>
+            <p class="ng-cloak">收货地址：<span class="ng-cloak">{{order.address}}，</span><span class="ng-cloak">{{order.receiver}}，</span><span class="ng-cloak">{{order.receiverPhone}}</span></p>
+            <!--<p>商品名称：<span ng-repeat="product in order.products">{{product.goodsName}}<span> -{{product.goodsCount}}件，</span></span></p>-->
+            <p>商品名称：<span class="ng-cloak">{{order.resultStr}}</span></p>
+        </div>
     </div>
     <div class="wrap clearfix">
-        <div class="payMethod ng-cloak">
-            <p class="confirm-tit">
-                <span class="left">选择您的付款方式</span>
-            </p>
-            <div class="clear checkout-steps">
-                <p>平台支付</p>
-                <ul class="pay-style clearfix">
-                    <li ng-repeat="payMethod in payMethods" class="ng-cloak"><a href=""  ng-class="{ 'current': $index == selectedPayMethodIndex }" ng-click="itemClicked($index)"><img ng-src="{{payMethod.imgUrl}}" alt=""></a></li>
-                </ul>
+        <div class="pay_box">
+            <div class="pay_box_title">支付方式</div>
+            <div class="pay_times">
+                <div class="full_Pay" ng-click="changePayTimes(0)">
+                    <img src="images/full_Pay.png" alt="" />
+                    <img class="selected" src="images/righticon.png" alt="" ng-show="payTimes == 0" />
+                </div>
+                <div class="multi_pay" ng-click="changePayTimes(1)" ng-show="more_toggle">
+                    <img src="images/multi_pay.png" alt="" />
+                    <img class="selected" src="images/righticon.png" alt="" ng-show="payTimes == 1" />
+                    <span class="intro">选择本次支付金额</span>
+                    <div class="buy_btn">
+                        <a class="btn-reduce" href="" ng-click="multi_pay_amount_reduce()" ng-class="{true:'editable'}[amount_reduce_editable]">-</a>
+                        <a class="btn-add" href="" ng-click="multi_pay_amount_add()" ng-class="{true:'editable'}[amount_add_editable]">+</a>
+                        <input maxlength="4" class="text" id="buy-num" ng-model="multi_pay_amount" ng-change="buyCountChange(buy_count)" disabled="disabled">
+                    </div>
+                    <!-- <a class="xxnr_btn" href="" ng-click="edit_multi_pay_num()">{{multi_pay_edit_bth}}</a> -->
+                    <p>点击<span>+ -</span>调节金额，每次幅度<span>500</span>元，最低调至<span>3000</span>元，不足则按实际付款金额</p>
+                </div>
+                <div class="more_pay" ng-click="pay_times_toggle()">
+                    <span>{{more_text}}</span><img ng-src="images/{{more_imgUrl}}" alt="">
+                </div>
             </div>
-            <a class="xxnr_btn" href="" ng-click="pay()">去支付</a>
+            <div class="payMethod ng-cloak">
+                <p class="confirm-tit">
+                    <span class="left">选择您的付款方式</span>
+                </p>
+                <div class="clear checkout-steps">
+                    <p>平台支付</p>
+                    <ul class="pay-style clearfix">
+                        <li ng-repeat="payMethod in payMethods" class="ng-cloak"><a href=""  ng-class="{ 'current': $index == selectedPayMethodIndex }" ng-click="itemClicked($index)"><img ng-src="{{payMethod.imgUrl}}" alt=""></a></li>
+                    </ul>
+                </div>
+                <a class="xxnr_btn" href="" ng-click="pay()">立即支付</a>
+                <p class="pay_price">支付金额：<span>￥{{pay_price}}</span></p>
+            </div>
         </div>
     </div>
 </div>
 </body>
 <div class="pop_pay_mask" ng-show="showPayPop" ng-cloak></div>
-<div class="pop_content" ng-show="showPayPop" ng-cloak>
-    <div class="pop_head">
+<div class="pop_content commitPay_pop_content" ng-show="showPayPop" ng-cloak>
+    <!-- <div class="pop_head">
         <span class="left">确认付款</span>
-    </div>
+    </div> -->
     <div class="pop_pay">
-        <p for="" class="pay_alter_info">请在支付页面中完成支付，付款完成前请不要关闭此窗口</p>
+        <p for="" class="pay_alter_info">请在新打开的页面上完成支付；支付完成前请不要关闭此窗口</p>
         <div class="pop_pay_btn">
             <div class="left">
                 <a href="" class="btn" ng-click="finishPay()">支付完成</a>

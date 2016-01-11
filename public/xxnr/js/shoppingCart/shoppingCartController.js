@@ -114,7 +114,7 @@ app.controller('shoppingCartController', function($scope, remoteApiService, comm
             $scope.shops[index].items[itemIndex].selected = isAllSelected;
             $scope.selectItem(index, itemIndex);
         }
-        
+
         var shouldModifyAll = true;
         for (var i in $scope.shops) {
             if ($scope.shops[i].allSelected != $scope.shops[index].allSelected) {
@@ -226,7 +226,7 @@ app.controller('shoppingCartController', function($scope, remoteApiService, comm
     $scope.buy = function(){
 
         var products = [];
-        
+
         for(var shopIndex = 0; shopIndex<$scope.shops.length; shopIndex++){
             for(var itemIndex = 0; itemIndex < $scope.shops[shopIndex].items.length; itemIndex++){
                 if($scope.shops[shopIndex].items[itemIndex].selected){
@@ -242,9 +242,15 @@ app.controller('shoppingCartController', function($scope, remoteApiService, comm
             return;
         }
         remoteApiService.addOrder($scope.shoppingCartId, $scope.$parent.selectedAddressId, products, 1)
-            .then(function(data){
-                if(data.code == 1000) {
-                    window.location.href = "commitPay.html?id=" + data.id;
+            .then(function(datas){
+                $scope.data = datas;
+                if(datas.code == 1000) {
+                    var commitUrl = "commitPay.html?";
+                    for(var orderIndex in datas.orders){
+                        commitUrl + = "id" + '=' + datas.orders[orderIndex].id + '&';
+                    };
+                    // console.log(commitUrl);
+                    window.location.href = commitUrl;
                 }
             });
     };

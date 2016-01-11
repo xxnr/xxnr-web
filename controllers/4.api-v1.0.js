@@ -474,6 +474,11 @@ function updateShoppingCart() {
                 return;
             }
 
+            if (data && !data.online){
+                self.respond({code:1001, message:"无法添加下线商品"});
+                return
+            }
+
             CartService.updateItems(cart.cartId, data._id, count, update_by_add, function (err) {
                 if (err) {
                     self.respond({code: 1001, message: '更新购物车失败'});

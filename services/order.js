@@ -33,7 +33,7 @@ OrderService.prototype.orderType = function (order) {
         }
         return 1;
     }
-}
+};
 
 // Method
 // Gets listing

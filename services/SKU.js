@@ -331,7 +331,22 @@ SKUService.prototype.querySKUByProductId = function(product, callback){
 };
 
 SKUService.prototype.getSKU = function(id, callback){
-    //TODO: get an SKU by _id
+    if(!id){
+        callback('id required');
+        return;
+    }
+
+    SKUModel.findOne({_id:id})
+        .populate('product')
+        .exec(function(err, SKU){
+        if(err){
+            console.error(err);
+            callback(err);
+            return;
+        }
+
+        callback(null, SKU);
+    })
 };
 
 SKUService.prototype.querySKUAdditions = function(category, brand, callback){
@@ -383,6 +398,49 @@ SKUService.prototype.addSKUAddition = function(category, brand, name, price, cal
 
         callback(null, newSKUAddition);
     })
+};
+
+SKUService.prototype.idJoinWithCount = function(options, callback){
+    var joinedSKUs = [];
+    var SKUs = options.SKUs;
+
+    var joinSKU = function(index){
+        if(index >= SKUs.length){
+            callback(null, joinedSKUs);
+        }
+        else {
+            var SKU = SKUs[index];
+            SKUModel.findOne({_id: SKU._id})
+                .populate('product')
+                .exec(function (err, doc) {
+                    if (err) {
+                        callback(err);
+                        return;
+                    }
+
+                    if (doc) {
+                        doc.product.populate('brand', function(err, product){
+                            if(err){
+                                console.error(err);
+                                callback(err);
+                                return;
+                            }
+
+                            doc.product = product.toObject();
+                            doc = doc.toObject();
+                            doc.count = SKU.count;
+                            doc.additions = SKU.additions;
+                            joinedSKUs.push(doc);
+                            joinSKU(index + 1);
+                        })
+                    }else {
+                        joinSKU(index + 1);
+                    }
+                });
+        }
+    };
+
+    joinSKU(0);
 };
 
 var refresh_product_SKUAttributes = function(product, callback){
