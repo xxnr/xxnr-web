@@ -2,6 +2,11 @@
  * Created by pepelu on 2015/9/8.
  */
 var app = angular.module('user_center', ['xxnr_common', 'shop_cart']);
+app.filter('fixedTwo', function () {
+    return function(input) {
+      return input = input.toFixed(2);
+    };
+});
 app.controller('userCenterController', function($scope, $rootScope, remoteApiService, payService, loginService, commonService, fileUpload, sideService) {
     var user = commonService.user;
 
@@ -204,7 +209,7 @@ app.controller('userCenterController', function($scope, $rootScope, remoteApiSer
         }
     };
 
-    var current_page = 1;
+    $scope.current_page = 1;
     $scope.pages_count = 0;
 
     var generate_page = function() {
@@ -219,7 +224,7 @@ app.controller('userCenterController', function($scope, $rootScope, remoteApiSer
             $scope.pages[0].isSelected = true;
         }
         for (var pageIndex in $scope.pages) {
-            if ($scope.pages[pageIndex].id == current_page) {
+            if ($scope.pages[pageIndex].id == $scope.current_page) {
                 $scope.pages[pageIndex].isSelected = true;
             } else {
                 $scope.pages[pageIndex].isSelected = false;
@@ -227,7 +232,7 @@ app.controller('userCenterController', function($scope, $rootScope, remoteApiSer
         }
     };
     $scope.show_page = function(pageId) {
-        current_page = pageId;
+        $scope.current_page = pageId;
         for (var pageIndex in $scope.pages) {
             if ($scope.pages[pageIndex].id == pageId) {
                 $scope.pages[pageIndex].isSelected = true;
@@ -245,24 +250,24 @@ app.controller('userCenterController', function($scope, $rootScope, remoteApiSer
     };
 
     $scope.pre_page = function() {
-        if (current_page > 1) {
-            current_page--;
-            $scope.show_page(current_page);
+        if ($scope.current_page > 1) {
+            $scope.current_page--;
+            $scope.show_page($scope.current_page);
         }
     };
     $scope.next_page = function() {
-        if (current_page < $scope.pages_count) {
-            current_page++;
-            $scope.show_page(current_page);
+        if ($scope.current_page < $scope.pages_count) {
+            $scope.current_page++;
+            $scope.show_page($scope.current_page);
         }
     };
 
 
     $scope.show = function(showTypeId, index, reset) {
         if (reset > 0) {
-            current_page = 1;
+            $scope.current_page = 1;
         };
-        remoteApiService.getOrderList(current_page, showTypeId)
+        remoteApiService.getOrderList($scope.current_page, showTypeId)
             .then(function(data) {
                 $scope.orderList = [];
                 $scope.pages_count = data.pages;
@@ -297,7 +302,7 @@ app.controller('userCenterController', function($scope, $rootScope, remoteApiSer
 
                     order.id = orders[i].id;
                     order.orderNo = orders[i].paymentId;
-                    order.totalPrice = orders[i].deposit.toFixed(2) || -1;
+                    order.totalPrice = orders[i].price.toFixed(2);
                     // order.totalPrice = orders[i].deposit?orders[i].deposit.toFixed(2):orders[i].price;
                     switch (parseInt(orders[i].payType)) {
                         case 1:
