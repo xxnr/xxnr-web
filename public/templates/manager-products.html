@@ -172,7 +172,7 @@
 							<select data-index="{{$index}}" data_SKU_id="{{SKU._id}}">
 								<option selected disabled hidden value=''></option>
 								{{ foreach value in SKUQueryAttributes[attribute.name] }}
-								<option value="{{value.value}}"  ref="{{value.ref}}"  name="{{attribute.name}}"
+								<option value="{{value.value}}"  ref="{{value.ref}}"  name="{{attribute.name}}" order="{{value.order}}"
 									{{ if SKU._id }}
 										{{ if SKUExistAttributes && SKUExistAttributes[SKU._id] && SKUExistAttributes[SKU._id][attribute.name] && value.ref == SKUExistAttributes[SKU._id][attribute.name].ref }} 
 											selected
@@ -780,11 +780,11 @@
 		SKU.attributes.forEach(function(attribute){
 			SKU.name += ' - ' + attribute.value;
 		});
-		if(!PRICE_REGEX.test(SKU.price.market_price) || parseFloat(SKU.price.market_price) > 0){
+		if(!PRICE_REGEX.test(SKU.price.market_price) || parseFloat(SKU.price.market_price) < 0){
 			alert('@(请填写正确的市场价)');
 			return;
 		}
-		if(!PRICE_REGEX.test(SKU.price.platform_price) || parseFloat(SKU.price.platform_price) > 0){
+		if(!PRICE_REGEX.test(SKU.price.platform_price) || parseFloat(SKU.price.platform_price) <= 0){
 			alert('@(请填写正确的平台价)');
 			return;
 		}
@@ -852,11 +852,11 @@
 		SKU.attributes.forEach(function(attribute){
 			SKU.name += ' - ' + attribute.value;
 		});
-		if(!PRICE_REGEX.test(SKU.price.market_price) || parseFloat(SKU.price.market_price) > 0){
+		if(!PRICE_REGEX.test(SKU.price.market_price) || parseFloat(SKU.price.market_price) < 0){
 			alert('@(请填写正确的市场价)');
 			return;
 		}
-		if(!PRICE_REGEX.test(SKU.price.platform_price) || parseFloat(SKU.price.platform_price) > 0){
+		if(!PRICE_REGEX.test(SKU.price.platform_price) || parseFloat(SKU.price.platform_price) <= 0){
 			alert('@(请填写正确的平台价)');
 			return;
 		}
@@ -927,7 +927,7 @@
 		$.components.POST(managerurl+'/api/v2.1/SKU/attribute/add/', {category:category, brand:brand, name:name, value:value}, function(response){
 			if(response.code==1000){
 				var new_attribute = response.attribute;
-				products.SKUQueryAttributes[name].push({ref:new_attribute._id, value:new_attribute.value});
+				products.SKUQueryAttributes[name].push({ref:new_attribute._id, value:new_attribute.value, order:new_attribute.order});
 				SET('products.SKUQueryAttributes', products.SKUQueryAttributes);
 				el.value = "";
 				products_onchange();
@@ -978,10 +978,11 @@
 			var SKU_id = el.attr('data_SKU_id');
 			var ref = el.find('option:selected').attr('ref');
 			var name = el.find('option:selected').attr('name');
+			var order = el.find('option:selected').attr('order');
 			var value = el.val();
 			products.SKUs.forEach(function(SKU){
 				if(SKU._id == SKU_id || (typeof SKU._id == 'undefined' && SKU_id=="")){
-					SKU.attributes[attributeIndex] = {ref:ref, name:name, value:value};
+					SKU.attributes[attributeIndex] = {ref:ref, name:name, value:value, order:order};
 					if(!products.SKUExistAttributes[SKU._id]){
 						products.SKUExistAttributes[SKU._id]=[];
 					}

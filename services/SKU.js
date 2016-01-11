@@ -40,11 +40,11 @@ queryAttributesAndPrice = function(product, attributes, callback) {
                 values: {$addToSet: '$attributes.value'},
                 pricemin: {$min: '$price.platform_price'},
                 pricemax: {$max: '$price.platform_price'},
-                order: {$max:'$order'}
+                order: {$max:'$attributes.order'}
             }
         }
-        , {$project: {_id: 0, name: '$_id', values: 1, pricemin: 1, pricemax: 1}}
         , {$sort: {order:1}}
+        , {$project: {_id: 0, name: '$_id', values: 1, pricemin: 1, pricemax: 1}}
         )
         .exec(function (err, docs) {
             if (err) {
@@ -124,7 +124,7 @@ SKUService.prototype.updateSKU = function(id, price, attributes, additions, name
     })
 };
 
-SKUService.prototype.updateSKUAttributeOrder = function(category, brand, name, value, order, callback){
+SKUService.prototype.updateSKUAttribute = function(category, brand, name, order, callback){
     if(!category){
         callback('category required');
         return;
@@ -140,24 +140,47 @@ SKUService.prototype.updateSKUAttributeOrder = function(category, brand, name, v
         return;
     }
 
-    if(!value){
-        callback('value required');
-        return;
-    }
-
     if(!order){
         callback('order required');
         return;
     }
 
-    SKUAttributeModel.update({category:category, brand:brand._id, name:name, value:value}, {$set:{order:order}}, function(err){
+    SKUAttributeModel.update({category:category, brand:brand._id, name:name}, {$set:{order:order}}, function(err){
         if(err){
             console.error(err);
             callback(err);
             return;
         }
 
-        callback();
+        SKUAttributeModel.find({category:category, brand:brand._id, name:name}, function(err, docs){
+            if(err){
+                console.error(err);
+                callback(err);
+                return;
+            }
+
+            var promises = docs.map(function(SKUAttribute){
+                return new Promise(function(resolve, reject){
+                    SKUAttribute.ref = SKUAttribute._id;
+                    SKUModel.update({'attributes.ref': SKUAttribute._id}, {$set: {'attributes.$':SKUAttribute}}, function(err){
+                        if(err){
+                            reject(err);
+                            return;
+                        }
+
+                        resolve();
+                    });
+                })
+            });
+
+            Promise.all(promises)
+                .then(function(){
+                    callback();
+                })
+                .catch(function(err){
+                    callback(err);
+                });
+        })
     })
 };
 
@@ -222,42 +245,64 @@ SKUService.prototype.removeSKU = function(id, callback){
     })
 };
 
-SKUService.prototype.addSKUAttribute = function(category, brand, name, value, order, callback){
-    if(!category){
+SKUService.prototype.addSKUAttribute = function(category, brand, name, value, order, callback) {
+    if (!category) {
         callback('category required');
         return;
     }
 
-    if(!brand){
+    if (!brand) {
         callback('brand required');
         return;
     }
 
-    if(!name){
+    if (!name) {
         callback('name required');
         return;
     }
 
-    if(!value){
+    if (!value) {
         callback('value required');
         return;
     }
 
-    var model = {category:category, brand:brand, name:name, value:value};
-    if(order){
+    var model = {category: category, brand: brand, name: name, value: value};
+    var newSKUAttributeProcessor = function () {
+        var newSKUAttribute = new SKUAttributeModel(model);
+        newSKUAttribute.save(function (err) {
+            if (err) {
+                console.error(err);
+                callback(err);
+                return;
+            }
+
+            callback(null, newSKUAttribute);
+        })
+    };
+
+    if (order) {
         model.order = order;
+        newSKUAttributeProcessor();
+    } else {
+        SKUAttributeModel.aggregate({
+            $match: {
+                category: category,
+                brand: mongoose.Types.ObjectId(brand),
+                name: name
+            }
+        }, {
+            $group: {
+                _id: {category:'$category', brand:'$brand', name:'$name'},
+                order: {$max: '$order'}
+            }
+        }).exec(function (err, results) {
+            console.log(results);
+            if (results && results.length > 0) {
+                model.order = results[0].order;
+                newSKUAttributeProcessor();
+            }
+        });
     }
-
-    var newSKUAttribute = new SKUAttributeModel(model);
-    newSKUAttribute.save(function(err){
-        if(err){
-            console.error(err);
-            callback(err);
-            return;
-        }
-
-        callback(null, newSKUAttribute);
-    })
 };
 
 SKUService.prototype.querySKUAttributes = function(category, brand, callback) {
@@ -271,7 +316,7 @@ SKUService.prototype.querySKUAttributes = function(category, brand, callback) {
         {
             $group: {
                 _id: '$name',
-                values: {$addToSet: {value:'$value',ref:'$_id'}},
+                values: {$addToSet: {value:'$value',ref:'$_id', order:'$order'}},
                 order:{$max:'$order'}
             }
         },

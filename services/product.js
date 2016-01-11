@@ -456,7 +456,7 @@ ProductService.prototype.getAttributes = function(category, brand, name, callbac
             schemaToAdd = {value:'$value',ref:'$_id'};
             break;
         case 2:
-            // fromend schema
+            // frontend schema
             schemaToAdd = '$value';
             break;
         default:
@@ -465,12 +465,19 @@ ProductService.prototype.getAttributes = function(category, brand, name, callbac
     }
 
     ProductAttributeModel.aggregate({$match:matchOptions},
-        {$group:{
-            _id:{brand:'$brand', name:'$name'},
-            values:{$addToSet:schemaToAdd},
-            order:{$max:'$order'}
-        }},
-        {$sort:{order:1}})
+        {
+            $group:
+            {
+                _id: {brand: '$brand', name: '$name'},
+                values: {$addToSet: schemaToAdd},
+                order: {$max: '$order'}
+            }
+        },
+        {
+            $sort:{order:1}
+        }
+        , {$project: {_id:1, values: 1}}
+    )
         .exec(function(err, attributes){
             if(err){
                 console.error(err);
