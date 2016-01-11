@@ -972,8 +972,8 @@ OrderService.prototype.checkPayStatus = function(orderId, callback) {
 			        return;
 				});
 			} else {
-				if (result && result.order) {
-					callback(null, result.order.toObject(), orderPayment);
+				if (result && result['order']) {
+					callback(null, result['order'], orderPayment);
 			        return;
 				} else {
 					callback(null, null, orderPayment);
