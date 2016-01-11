@@ -73,6 +73,11 @@ function updateShoppingCart() {
                 return
             }
 
+            if(!SKU.online){
+                self.respond({code:1001, message:"无法添加下线SKU"});
+                return
+            }
+
             CartService.updateSKUItems(cart.cartId, SKU._id, count, update_by_add, additions || [], function (err) {
                 if (err) {
                     console.log(err);

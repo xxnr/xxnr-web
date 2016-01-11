@@ -382,7 +382,7 @@ CartService.prototype.removeSKUItems = function(cartId, items, callback) {
         var updator = function (index) {
             if (index < items.length) {
                 var count = items[index].count;
-                CartModel.update({cartId: cartId, SKU_items:{$elemMatch:{SKU: items[index]._id, count: {$gt: count}}}}, {$inc: {'SKU_items.$.count': -count}}, function (err, numAffected) {
+                CartModel.update({cartId: cartId, SKU_items:{$elemMatch:{SKU: items[index].ref, count: {$gt: count}}}}, {$inc: {'SKU_items.$.count': -count}}, function (err, numAffected) {
                     if (err) {
                         console.error(err);
                         callback(err);
@@ -394,7 +394,7 @@ CartService.prototype.removeSKUItems = function(cartId, items, callback) {
                         return;
                     }
 
-                    CartModel.update({cartId: cartId}, {$pull: {SKU_items: {count: count, SKU: items[index]._id}}}, function (err, numAffected) {
+                    CartModel.update({cartId: cartId}, {$pull: {SKU_items: {count: count, SKU: items[index].ref}}}, function (err, numAffected) {
                         if (err) {
                             console.error(err);
                             callback(err);
@@ -463,37 +463,55 @@ CartService.prototype.checkoutSKU = function(cartId, items, callback) {
             }
 
             if (checkoutAll) {
-                callback(null, cart);
-                return;
-            }
+                var promises = cart.SKU_items.map(function (item) {
+                    return new Promise(function (resolve, reject) {
+                        item.SKU.populate('product', function (err, SKU) {
+                            if (err) {
+                                reject(err);
+                            }
 
-            var checkoutItems = [];
-            var promises = cart.SKU_items.map(function(item){
-                return new Promise(function(resolve ,reject){
-                    item.SKU.populate('product', function(err, SKU){
-                        if(err){
-                            reject(err);
-                        }
-
-                        item.SKU = SKU;
-                        item.count = SKUBuyCount[SKU._id];
-                        if(item.count) {
-                            checkoutItems.push(item);
-                        }
-
-                        resolve()
+                            item.SKU = SKU;
+                            resolve()
+                        })
                     })
-                })
-            });
-
-            Promise.all(promises)
-                .then(function(){
-                    cart.SKU_items = checkoutItems;
-                    callback(null, cart.toObject());
-                })
-                .catch(function(err){
-                    callback(err);
                 });
+
+                Promise.all(promises)
+                    .then(function () {
+                        callback(null, cart.toObject());
+                    })
+                    .catch(function (err) {
+                        callback(err);
+                    });
+            } else {
+                var checkoutItems = [];
+                var promises = cart.SKU_items.map(function (item) {
+                    return new Promise(function (resolve, reject) {
+                        item.SKU.populate('product', function (err, SKU) {
+                            if (err) {
+                                reject(err);
+                            }
+
+                            item.SKU = SKU;
+                            item.count = SKUBuyCount[SKU._id];
+                            if (item.count) {
+                                checkoutItems.push(item);
+                            }
+
+                            resolve()
+                        })
+                    })
+                });
+
+                Promise.all(promises)
+                    .then(function () {
+                        cart.SKU_items = checkoutItems;
+                        callback(null, cart.toObject());
+                    })
+                    .catch(function (err) {
+                        callback(err);
+                    });
+            }
         })
 };
 

@@ -585,6 +585,16 @@ function addOrderBySKU(){
                 var orderSKUs = [];
                 for(var i=0; i<cart.SKU_items.length; i++){
                     var SKU = cart.SKU_items[i].SKU;
+                    if(!SKU.product.online){
+                        self.respond({code:1001, message:"无法添加下线商品"});
+                        return;
+                    }
+
+                    if(!SKU.online){
+                        self.respond({code:1001, message:"无法添加下线SKU"});
+                        return;
+                    }
+
                     var additions = cart.SKU_items[i].additions;
                     var additionPrice = 0;
                     additions.forEach(function(addition){
