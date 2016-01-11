@@ -247,7 +247,7 @@ app.controller('shoppingCartController', function($scope, remoteApiService, comm
                 if(datas.code == 1000) {
                     var commitUrl = "commitPay.html?";
                     for(var orderIndex in datas.orders){
-                        commitUrl + = "id" + '=' + datas.orders[orderIndex].id + '&';
+                        commitUrl = commitUrl + "id" + '=' + datas.orders[orderIndex].id + '&';
                     };
                     // console.log(commitUrl);
                     window.location.href = commitUrl;
