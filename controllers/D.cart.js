@@ -113,7 +113,7 @@ function getShoppingCart(){
         }
 
         self.respond(convertToShoppingCartFormatV_1_0(SKUs, cart.cartId, cart.userId));
-    })
+    }, true)
 }
 
 function getShoppingCartOffline(){
