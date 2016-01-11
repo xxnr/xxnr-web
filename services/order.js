@@ -234,6 +234,7 @@ OrderService.prototype.get = function(options, callback) {
 			self.checkPayStatus(doc.id, function(err, order, payment) {
 				if (err) {
 					callback(null, doc, null);
+					return;
 				} else {
 					callback(null, order ? order : doc, payment ? payment : null);
 					return;
@@ -926,13 +927,13 @@ OrderService.prototype.checkPayStatus = function(orderId, callback) {
 					}
 				}
 			}
-			emit(order.id, {'id':order.id, 'setValues':setValues, 'pushValues':pushValues, 'orderPayment':orderPayment});
+			emit(order.id, {'id':order.id, 'setValues':setValues, 'pushValues':pushValues, 'orderPayment':orderPayment, 'order':order});
 		},
 		reduce: function (key, values) {
 			var result = {};
 			for (var idx = 0; idx < values.length; idx++) {
 				var value = values[idx];
-				result[value.id] = {'setValues':value.setValues, 'pushValues':value.pushValues, 'orderPayment':value.orderPayment};
+				result[value.id] = {'setValues':value.setValues, 'pushValues':value.pushValues, 'orderPayment':value.orderPayment, 'order':value.order};
 			}
 			return result;
 		},
@@ -971,26 +972,17 @@ OrderService.prototype.checkPayStatus = function(orderId, callback) {
 			        return;
 				});
 			} else {
-				OrderModel.findOne({id:orderId}, function(err, order) {
-					if (err) {
-			            console.error('Order checkPayStatus findOne err:', err);
-			            callback(err);
-			            return;
-			        }
-
-			        callback(null, order.toObject(), orderPayment);
-				});
+				if (result && result.order) {
+					callback(null, result.order.toObject(), orderPayment);
+			        return;
+				} else {
+					callback(null, null, orderPayment);
+			        return;
+				}
 			}
 		} else {
-			OrderModel.findOne({id:orderId}, function(err, order) {
-				if (err) {
-		            console.error('Order checkPayStatus findOne err:', err);
-		            callback(err);
-		            return;
-		        }
-
-		        callback(null, order.toObject(), orderPayment);
-			});
+			callback(null, null, orderPayment);
+			return;
 		}
 	});
 };

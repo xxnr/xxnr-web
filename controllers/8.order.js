@@ -340,8 +340,8 @@ function confirmOrder() {
     var orderid = self.data.orderId || null;
 
     OrderService.get({'buyer':buyer,'id':orderid}, function(err, data) {
-        if (err) {
-            console.log('Order confirmOrder err:' + err);
+        if (err || !data) {
+            if (err) console.log('Order confirmOrder err:' + err);
             self.respond({'code':'1001','message':'未查询到订单'});
             return;
         }
