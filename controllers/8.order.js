@@ -402,6 +402,9 @@ function getOrder(callback) {
                             var payments = subOrdersPayments[subOrder.id] || [];
                             var paidPrice = 0;
                             var resultPayments = [];
+                            if (returnPayment && returnPayment.suborderId && returnPayment.suborderId == subOrder.id) {
+                                data.paySubOrderType = subOrder.type;
+                            }
                             for (var j = 0; j < payments.length; j++) {
                                 var payment = payments[j];
                                 if (parseInt(payment.payStatus) == PAYMENTSTATUS.PAID) {
@@ -454,7 +457,7 @@ function api10_getOrderDetails() {
         }
         if (data) {
             var paymentId           = payment && payment.id ? payment.id : data.paymentId;
-            var payPrice            = payment && typeof(payment.price) != 'undefined' ? payment.price : data.duePrice ? data.duePrice : 0;
+            var payPrice            = payment && typeof(payment.price) != 'undefined' ? payment.price : typeof(data.duePrice) != 'undefined' ? data.duePrice : 0;
             var order               = {};
             var productslength      = data.products? data.products.length: 0;
             var SKUsLength          = data.SKUs? data.SKUs.length: 0;
@@ -478,6 +481,12 @@ function api10_getOrderDetails() {
             order.isClosed          = data.isClosed;
             order.order             = {'totalPrice':data.price.toFixed(2),'deposit':data.deposit.toFixed(2),'dateCreated':data.dateCreated};
             order.subOrders         = data.subOrders;
+            if (payPrice && payPrice > 0) {
+                order.duePrice      = payPrice.toFixed(2);
+            }
+            if (data.paySubOrderType) {
+                order.paySubOrderType = data.paySubOrderType;
+            }
             if (data.dateDelivered) {
                 order.dateDelivered = data.dateDelivered;
             }
@@ -485,7 +494,7 @@ function api10_getOrderDetails() {
                 order.dateCompleted = data.dateCompleted;
             }
             if (payment) {
-                order.payment       = {'paymentId':payment.id, 'price':payment.price};
+                order.payment       = {'paymentId':payment.id, 'price':payment.price, 'suborderId':payment.suborderId};
             }
 
             for (var i=0; i < productslength; i++) {
