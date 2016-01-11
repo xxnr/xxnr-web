@@ -2,7 +2,7 @@
  * Created by cuidi on 15/11/16.
  */
 var app = angular.module('commit_pay', ['xxnr_common', 'shop_cart']);
-app.controller('commitPayController', function($scope, remoteApiService, payService, commonService, loginService, $location){
+app.controller('commitPayController', function($scope, remoteApiService, payService, commonService, loginService){
     // if not login
     if(!loginService.isLogin) {
         window.location.href = "logon.html";
@@ -20,7 +20,8 @@ app.controller('commitPayController', function($scope, remoteApiService, payServ
     $scope.more_imgUrl = "pay_times_more_down.png";
     // $scope.id = commonService.getParam('id');
     $scope.ids = [];
-    $scope.ids = $scope.ids.concat($location.search()['id']);
+    // $scope.ids = $scope.ids.concat($location.search()['id']);
+    $scope.ids = getQueryParams('id');
 
     $scope.itemClicked = function ($index) {
         $scope.selectedPayMethodIndex = $index;
@@ -162,27 +163,35 @@ app.controller('commitPayController', function($scope, remoteApiService, payServ
     }
 
 
-    $scope.$watch('selectedPayMethodIndex',function(){
-        if($scope.selectedPayMethodIndex==0){
-            $scope.payType = '支付宝支付';
-            if($scope.payTimes==0){
-                $scope.payUrl = payService.aliPayUrl($scope.orders[$scope.orderSelectedNum].id);
-            }else if($scope.payTimes==1){
-                $scope.payUrl = payService.aliPayUrl($scope.orders[$scope.orderSelectedNum].id,$scope.pay_price);
-            }
+    $scope.$watch('selectedPayMethodIndex',function(newValue, oldValue){
+        if ( newValue !== oldValue ) {
+            if($scope.selectedPayMethodIndex==0){
+                $scope.payType = '支付宝支付';
+                if($scope.orders[$scope.orderSelectedNum]){
+                    if($scope.payTimes==0){
+                        $scope.payUrl = payService.aliPayUrl($scope.orders[$scope.orderSelectedNum].id);
+                    }else if($scope.payTimes==1){
+                        $scope.payUrl = payService.aliPayUrl($scope.orders[$scope.orderSelectedNum].id,$scope.pay_price);
+                    }
+                }
 
-        }else if($scope.selectedPayMethodIndex==1){
-            $scope.payType = '银联支付';
-            if($scope.payTimes==0){
-                $scope.payUrl = payService.unionPayUrl($scope.orders[$scope.orderSelectedNum].id);
-            }else if($scope.payTimes==1){
-                $scope.payUrl = payService.unionPayUrl($scope.orders[$scope.orderSelectedNum].id,$scope.pay_price);
+            }else if($scope.selectedPayMethodIndex==1){
+                $scope.payType = '银联支付';
+                if($scope.orders[$scope.orderSelectedNum]){
+                    if($scope.payTimes==0){
+                        $scope.payUrl = payService.unionPayUrl($scope.orders[$scope.orderSelectedNum].id);
+                    }else if($scope.payTimes==1){
+                        $scope.payUrl = payService.unionPayUrl($scope.orders[$scope.orderSelectedNum].id,$scope.pay_price);
+                    }
+                }
             }
-        }
-        if($scope.selectedPayMethodIndex!==null){
-            remoteApiService.updateOrderPaytype($scope.orders[$scope.orderSelectedNum].id,$scope.selectedPayMethodIndex+1)
-                .then(function(data) {
-                });
+            if($scope.selectedPayMethodIndex!==null){
+                if($scope.orders[$scope.orderSelectedNum]){
+                    remoteApiService.updateOrderPaytype($scope.orders[$scope.orderSelectedNum].id,$scope.selectedPayMethodIndex+1)
+                        .then(function(data) {
+                        });
+                }
+            }
         }
 
     });
@@ -204,5 +213,17 @@ app.controller('commitPayController', function($scope, remoteApiService, payServ
         window.location.href='my_xxnr.html';
     };
 
+    function getQueryParams(name) {
+        qs = location.search;
+        var params = [];
+        var tokens;
+        var re = /[?&]?([^=]+)=([^&]*)/g;
 
+        while (tokens = re.exec(qs))
+        {
+            if (decodeURIComponent(tokens[1]) == name)
+            params.push(decodeURIComponent(tokens[2]));
+        }
+        return params;
+    };
 });
