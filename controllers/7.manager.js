@@ -132,7 +132,7 @@ exports.install = function() {
 	F.route(CONFIG('manager-url') + '/api/v2.1/SKU/attribute/add/',     process_SKU_Attribute_add,      ['post'], ['backend_auth']);
 	F.route(CONFIG('manager-url') + '/api/v2.1/SKU/attributes',         json_SKU_Attributes_get,        ['get'], ['backend_auth']);
 	F.route(CONFIG('manager-url') + '/api/v2.1/SKU/query',				json_SKU_get,					['get'], ['backend_auth']);
-	F.route(CONFIG('manager-url') + '/api/v2.1/SKU/remove/{id}',			process_SKU_remove,				['get'], ['backend_auth']);
+	F.route(CONFIG('manager-url') + '/api/v2.1/SKU/online/{id}',			process_SKU_online,				['get'], ['backend_auth']);
 	F.route(CONFIG('manager-url') + '/api/v2.1/SKU/additions',				json_SKU_Additions_get,		['get'],['backend_auth']);
 	F.route(CONFIG('manager-url') + '/api/v2.1/SKU/addition/add',			process_SKU_Addition_add,	['post'],['backend_auth']);
 };
@@ -1328,16 +1328,21 @@ function json_SKU_get(){
 	})
 }
 
-function process_SKU_remove(id){
+function process_SKU_online(id){
 	var self = this;
-	SKUService.removeSKU(id, function(err){
+	if(typeof self.data.online == 'undefiled'){
+		self.respond({code:1001, message:"请填写上线与否"});
+		return;
+	}
+
+	SKUService.online(id, self.data.online, function(err, doc){
 		if(err){
 			console.log(err);
-			self.respond({code:1001, message:'删除SKU失败'});
+			self.respond({code:1001, message:'更新SKU失败'});
 			return;
 		}
 
-		self.respond({code:1000, message:'success'});
+		self.respond({code:1000, message:'success', SKU:doc});
 	})
 }
 

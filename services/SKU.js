@@ -17,9 +17,15 @@ SKUService = function(){};
  * @param attributes : array of key value pairs, [{name:'', value:''}, ...]
  * @param callback
  */
-queryAttributesAndPrice = function(product, attributes, callback) {
+queryAttributesAndPrice = function(product, attributes, callback, online) {
     var names = [];
     var matchOptions = {};
+    if (product)
+        matchOptions.product = mongoose.Types.ObjectId(product);
+
+    if(typeof online !== 'undefined'){
+        matchOptions.online = online;
+    }
 
     if (attributes && attributes.length > 0) {
         matchOptions.attributes = {$all:[]};
@@ -28,9 +34,6 @@ queryAttributesAndPrice = function(product, attributes, callback) {
             matchOptions.attributes.$all.push({$elemMatch:attribute});
         });
     }
-
-    if (product)
-        matchOptions.product = mongoose.Types.ObjectId(product);
 
     SKUModel.aggregate({$match: matchOptions}
         , {$unwind: '$attributes'}
@@ -220,13 +223,18 @@ SKUService.prototype.addSKU = function(name, product, attributes, additions, pri
     })
 };
 
-SKUService.prototype.removeSKU = function(id, callback){
+SKUService.prototype.online = function(id, online, callback){
     if(!id){
         callback('id required');
         return;
     }
 
-    SKUModel.findOneAndRemove({_id:id}, function(err, doc){
+    if(typeof online == 'undefined'){
+        callback('online required');
+        return;
+    }
+
+    SKUModel.findOneAndUpdate({_id:id}, {$set:{online:online}}, {new:true}, function(err, doc){
         if(err){
             console.error(err);
             callback(err);
@@ -240,7 +248,7 @@ SKUService.prototype.removeSKU = function(id, callback){
                 return;
             }
 
-            callback();
+            callback(null, doc);
         });
     })
 };
@@ -503,13 +511,13 @@ var refresh_product_SKUAttributes = function(product, callback){
             }
 
             if(numAffected.n==0){
-                callback('product', product, 'not exist');
+                callback('product '+product+' not exist');
                 return;
             }
 
             callback();
         })
-    })
+    }, true)
 };
 
 module.exports = new SKUService();

@@ -234,7 +234,11 @@
 						<td class="col-xs-2 hidden-xs ui-center nopadding">
 							{{ if SKU._id }}
 							<button name="ensure" onclick="update_SKU({{$index}})">@(提交修改)</button>
-							<button name="delete" onclick="remove_SKU({{$index}})">@(删除)</button>
+							{{ if SKU.online }}
+							<button name="offline" title="@(下线)" onclick="online_SKU('{{$index}}', false)"><span class="fa fa-stop"></span></button>
+							{{ else }}
+							<button name="online" title="@(上线)" onclick="online_SKU('{{$index}}', true)"><span class="fa fa-play"></span></button>
+							{{ fi }}
 							<button name="copy" onclick="copy_SKU({{$index}})">@(复制)</button>
 							{{ else }}
 							<button name="new_SKU" onclick="add_SKU({{$index}})">@(确认添加)</button>
@@ -802,16 +806,16 @@
 		})
 	}
 
-	function remove_SKU(index){
-		if (!confirm('@(你确认要删除SKU？【删除后不能恢复】)'))
-			return;
+	function online_SKU(index, online){
 		var _id = products.SKUs[index]._id;
-		$.components.GET(managerurl+'/api/v2.1/SKU/remove/' + _id, null, function(response){
+		$.components.GET(managerurl+'/api/v2.1/SKU/online/' + _id, {online:online}, function(response){
 			if(response.code==1000) {
-				products.SKUs.splice(index, 1);
+				products.SKUs[index] = response.SKU;
 				SET('products.SKUs', products.SKUs);
 				products_onchange();
 				success();
+			} else{
+				alert(response.message);
 			}
 		})
 	}

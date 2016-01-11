@@ -20,7 +20,8 @@ var SKUSchema = new mongoose.Schema({
     price: {                                                                   // price of sku
         market_price: {type: Number},                  // market price
         platform_price: {type: Number, required: true} // platform price
-    }
+    },
+    online:{type:Boolean, default:false}
 });
 
 var SKUAttributesSchema = new mongoose.Schema({

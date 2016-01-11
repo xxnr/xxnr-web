@@ -165,7 +165,7 @@ function json_SKU_Attributes_query(){
         }
 
         self.respond({code:1000, message:'success', data:data});
-    })
+    }, true)
 }
 
 function json_SKU_get(){
