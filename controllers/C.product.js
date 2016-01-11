@@ -5,7 +5,8 @@ var services = require('../services');
 var ProductService = services.product;
 var SKUService = services.SKU;
 var BrandService = services.brand;
-
+var converter = require('../common/converter');
+var api10 = converter.api10;
 exports.install = function(){
     F.route('/api/v2.1/brands/',                getBrands,                      ['get']);
     F.route('/api/v2.1/products/',              json_products_get,              ['get']);
