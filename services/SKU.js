@@ -124,7 +124,7 @@ SKUService.prototype.updateSKU = function(id, price, attributes, additions, name
     })
 };
 
-SKUService.prototype.updateSKUAttribute = function(category, brand, name, order, callback){
+SKUService.prototype.updateSKUAttributeOrder = function(category, brand, name, order, callback){
     if(!category){
         callback('category required');
         return;
