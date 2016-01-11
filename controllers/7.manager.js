@@ -1214,7 +1214,12 @@ function process_SKU_add() {
 	SKUService.addSKU(self.data.name, self.data.product, self.data.attributes, self.data.additions, self.data.price, function (err, SKU) {
 		if (err) {
 			console.error('process_SKU_add error', err);
-			self.respond({code: 1001, message: '添加失败'});
+			if(11000 == err.code){
+				self.respond({code:1001, message:'相同属性的SKU已经添加过了'});
+			} else {
+				self.respond({code: 1001, message: '添加失败'});
+			}
+
 			return;
 		}
 
@@ -1232,7 +1237,11 @@ function process_SKU_update(id){
 	SKUService.updateSKU(id, self.data.price, self.data.attributes, self.data.additions, self.data.name, function(err){
 		if(err){
 			console.error('updateSKU error', err);
-			self.respond({code:1001, message:'更新SKU失败'});
+			if(11000 == err.code){
+				self.respond({code:1001, message:'相同属性的SKU已经添加过了'});
+			} else {
+				self.respond({code: 1001, message: '更新SKU失败'});
+			}
 			return;
 		}
 
@@ -1265,7 +1274,11 @@ function process_SKU_Attribute_add(){
 	SKUService.addSKUAttribute(self.data.category, self.data.brand, self.data.name, self.data.value, null, function(err, attribute){
 		if(err){
 			console.error('process_SKU_Attribute_add error', err);
-			self.respond({code:1001, message:'添加SKU属性失败'});
+			if(11000 == err.code){
+				self.respond({code:1001, message:'相同的SKU属性已经添加过了'});
+			} else {
+				self.respond({code: 1001, message: '添加SKU属性失败'});
+			}
 			return;
 		}
 
@@ -1290,7 +1303,11 @@ function process_product_attributes_add(){
 	var self = this;
 	ProductService.addAttribute(self.data.category, self.data.brand, self.data.name, self.data.value, null, function(err, new_attribute){
 		if(err){
-			self.respond({code:1001, message:'保存商品属性失败'});
+			if(11000 == err.code){
+				self.respond({code:1001, message:'相同的商品属性已经添加过了'});
+			} else {
+				self.respond({code: 1001, message: '保存商品属性失败'});
+			}
 			return;
 		}
 
