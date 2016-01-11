@@ -714,11 +714,11 @@ transition-delay: initial;
 .wrap_user_info .orders .orders-main .product .p-info {width: 760px;}
 .wrap_user_info .orders .orders-main .product .p-info div{float: left;display: inline-block;}
 .wrap_user_info .orders .orders-main .product .p-info .p-img {width: 160px;overflow: hidden;}
-.wrap_user_info .orders .orders-main .product .p-info .p-img img{width:100px;height:100px;margin-left: 30px;margin-top: 20px;}
-.wrap_user_info .orders .orders-main .product .p-info .p-name {font-size:16px;height:60px;line-height:30px;padding-top: 14px;width: 350px;padding-right: 10px;}
+.wrap_user_info .orders .orders-main .product .p-info .p-img img{width:100px;height:100px;margin-left: 30px;margin-top: 20px;border: 1px solid #e0e0e0;}
+.wrap_user_info .orders .orders-main .product .p-info .p-name {font-size:16px;height:60px;line-height:30px;padding-top: 15px;width: 350px;padding-right: 10px;}
 .wrap_user_info .orders .orders-main .product .p-info .p-name a{width: 360px;overflow: hidden;}
-.wrap_user_info .orders .orders-main .product .p-info .p-price {width: 160px;height: 110px;padding-top: 14px;}
-.wrap_user_info .orders .orders-main .product .p-info .p-quantity {height: 110px;padding-top: 14px;width: 40px;text-align: center;}
+.wrap_user_info .orders .orders-main .product .p-info .p-price {width: 160px;height: 110px;padding-top: 20px;}
+.wrap_user_info .orders .orders-main .product .p-info .p-quantity {height: 110px;padding-top: 20px;width: 40px;text-align: center;}
 .wrap_user_info .orders .orders-main .product .p-info .pay-step{height: 120px;display: block;}
 .wrap_user_info .orders .orders-main .product .p-info .pay-step-1{border-top: 1px solid #e0e0e0;display:block;width:730px;line-height:60px;height: 60px;color:#323232;padding-left: 30px;}
 .wrap_user_info .orders .orders-main .product .p-info .pay-step-2{border-top: 1px solid #e0e0e0;display:block;width:730px;line-height:60px;height: 60px;color:#323232;padding-left: 30px;}
@@ -737,10 +737,10 @@ transition-delay: initial;
 
 
 .wrap_user_info .orders .orders-main .single-order .pay-section div{float: left;}
-.wrap_user_info .orders .orders-main .single-order .pay-section .pay-info{margin-left:10px;width: 140px;height: 100%;border-right: 1px solid #e0e0e0;text-align: center;padding-top: 14px;}
-.wrap_user_info .orders .orders-main .single-order .pay-section .pay-status{width: 140px;height: 100%;border-right: 1px solid #e0e0e0;padding-top: 14px;text-align: center;}
+.wrap_user_info .orders .orders-main .single-order .pay-section .pay-info{margin-left:10px;width: 140px;height: 100%;border-right: 1px solid #e0e0e0;text-align: center;padding-top: 20px;}
+.wrap_user_info .orders .orders-main .single-order .pay-section .pay-status{width: 140px;height: 100%;border-right: 1px solid #e0e0e0;padding-top: 20px;text-align: center;}
 .wrap_user_info .orders .orders-main .single-order .pay-section .pay-status .order-detail a:hover{color:#00a838;}
-.wrap_user_info .orders .orders-main .single-order .pay-section .pay-action{width: 140px;height: 100%;text-align: center;padding-top: 14px;}
+.wrap_user_info .orders .orders-main .single-order .pay-section .pay-action{width: 140px;height: 100%;text-align: center;padding-top: 20px;}
 .wrap_user_info .orders .orders-main .single-order .pay-section .pay-action a{width: 80px;height: 30px;border: 1px solid #008a2f;background: #e0e0e0;color: #008a2f;display: block;line-height: 30px;margin: 0 auto;border-radius: 3px;}
 .wrap_user_info .orders .orders-main .single-order .row{overflow: hidden}
 
