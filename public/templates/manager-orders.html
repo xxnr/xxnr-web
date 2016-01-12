@@ -98,7 +98,7 @@
 	</div>
 </div>
 
-<div data-component="form" data-title="@(订单详情)" data-component-path="common.form" data-if="value === 'orders'" data-width="900px" data-component-id="orders.form" data-submitbutton="true">
+<div data-component="form" data-title="@(订单详情)" data-component-path="common.form" data-if="value === 'orders'" data-width="1000px" data-component-id="orders.form" data-submitbutton="true">
 	<br />
 	<div data-component="template" data-component-path="orders.form" class="padding">
 		<script type="text/html">
@@ -467,47 +467,115 @@
 			<div data-component="error" data-component-path="orders.form.subOrders.response"></div>
 		</div>
 		<hr />
-		
-		<div class="padding" style="padding-top: 0px;">
-			<div class="silver"><strong>@(订单商品)</strong></div>
-			<br />
-			<table class="table table-bordered checkoutlist" border="0">
-				<tbody data-component="template" data-component-path="orders">
-					<script type="text/html">
-						<tr>
-							<td class="ui-center col-xs-2 hidden-xs active">@(商品ID)</td>
-							<td class="ui-center col-xs-3 hidden-xs active">@(商品名称)</td>
-	                        <td class="ui-center col-xs-2 active">@(单价)</td>
-	                        <td class="ui-center col-xs-2 active">@(订金)</td>
-							<td class="ui-center col-xs-2 col-sm-1 active">@(数量)</td>
-							<td class="ui-center col-xs-2 active">@(发货状态)</td>
-						</tr>
-						{{ foreach p in form.products }}
-						<tr>
-							<td class="ui-center col-xs-2 hidden-xs">{{ p.id }}</td>
-							<td class="ui-center col-xs-3 hidden-xs" title="{{ p.name }}">{{ p.name }}</td>
-	                        <td class="ui-center col-xs-2">{{ p.price | price(2) }}</td>
-	                        <td class="ui-center col-xs-2">{{ p.deposit | price(2) }}</td>
-							<td class="ui-center col-xs-2 col-sm-1 active">{{ p.count }}x</td>
-							<td class="ui-center col-xs-2">
-								<select data-name="deliverStatus" data-id="{{ p.id }}">
-								{{ foreach d in deliverStatuses }}
-									<option value="{{ d.value }}" {{ if p.deliverStatus == d.value }}selected{{ fi }}>{{ d.name }}
-									</option>
-								{{ end }}
-								</select>
-							</td>
-						</tr>
-						{{ end }}
-					</script>
-				</tbody>
-			</table>
 
-			<div class="ui-buttons">
+		<div class="padding" style="padding-top: 0px;">
+			<div data-component="template" data-component-path="orders" class="productslist">
+			<script type="text/html">
+			<!-- <div class="padding" style="padding-top: 0px;"> -->
+				{{ if form.products && form.products.length > 0 }}
+					<div class="silver"><strong>@(订单商品)</strong></div>
+					<br />
+					<table class="table table-bordered" border="0">
+					<!-- <table class="table table-bordered checkoutlist" border="0">
+						<tbody data-component="template" data-component-path="orders">
+							<script type="text/html"> -->
+						<tbody>
+							<tr>
+								<td class="ui-center col-xs-2 hidden-xs active">@(商品ID)</td>
+								<td class="ui-center col-xs-3 hidden-xs active">@(商品名称)</td>
+		                        <td class="ui-center col-xs-2 active">@(单价)</td>
+		                        <td class="ui-center col-xs-2 active">@(订金)</td>
+								<td class="ui-center col-xs-2 active">@(数量)</td>
+								<td class="ui-center col-xs-2 active">@(发货状态)</td>
+							</tr>
+							{{ foreach p in form.products }}
+							<tr>
+								<td class="ui-center col-xs-2 hidden-xs">{{ p.id }}</td>
+								<td class="ui-center col-xs-3 hidden-xs" title="{{ p.name }}">{{ p.name }}</td>
+		                        <td class="ui-center col-xs-2">{{ p.price | price(2) }}</td>
+		                        <td class="ui-center col-xs-2">{{ p.deposit | price(2) }}</td>
+								<td class="ui-center col-xs-2 active">{{ p.count }}x</td>
+								<td class="ui-center col-xs-2">
+									<select data-name="deliverStatus" data-id="{{ p.id }}">
+									{{ foreach d in deliverStatuses }}
+										<option value="{{ d.value }}" {{ if p.deliverStatus == d.value }}selected{{ fi }}>{{ d.name }}
+										</option>
+									{{ end }}
+									</select>
+								</td>
+							</tr>
+							{{ end }}
+						</tbody>
+					</table>
+				{{ fi }}
+			</script>
+			</div>
+
+			<!-- <div class="ui-buttons">
+				<button name="submit" data-name="products">@(提交修改)</button>
+			</div>
+			<div data-component="error" data-component-path="orders.form.products.response"></div> -->
+			<div data-component="visible" class="ui-buttons" data-component-path="orders.form.products" data-if="orders.form.products && orders.form.products.length > 0">
 				<button name="submit" data-name="products">@(提交修改)</button>
 			</div>
 			<div data-component="error" data-component-path="orders.form.products.response"></div>
-			
+		</div>
+
+		<div class="padding" style="padding-top: 0px;">
+			<div data-component="template" data-component-path="orders" class="SKUslist">
+			<script type="text/html">
+				{{ if form.SKUs && form.SKUs.length > 0 }}
+					<div class="silver"><strong>@(订单商品SKU)</strong></div>
+					<br />
+					<table class="table table-bordered" border="0">
+						<tbody>
+							<tr>
+								<td class="ui-center hidden-xs active">@(商品ID)</td>
+								<td class="ui-center hidden-xs active">@(商品SKU ID)</td>
+								<td class="ui-center col-xs-4 hidden-xs active">@(商品名称)</td>
+		                        <td class="ui-center col-xs-2 active">@(单价)</td>
+		                        <td class="ui-center col-xs-2 active">@(订金)</td>
+								<td class="ui-center col-xs-1 active">@(数量)</td>
+								<td class="ui-center col-xs-4 active">@(附加项)</td>
+								<td class="ui-center col-xs-2 active">@(发货状态)</td>
+							</tr>
+							{{ foreach s in form.SKUs }}
+							<tr>
+								<td class="ui-center hidden-xs">{{ s.productId }}</td>
+								<td class="ui-center hidden-xs">{{ s.ref }}</td>
+								<td class="ui-center col-xs-4 hidden-xs" title="{{ s.name }}">{{ s.name }}</td>
+		                        <td class="ui-center col-xs-2">{{ s.price | price(2) }}</td>
+		                        <td class="ui-center col-xs-2">{{ s.deposit | price(2) }}</td>
+								<td class="ui-center col-xs-1">{{ s.count }}x</td>
+								<td class="ui-center col-xs-4">
+									{{ if s.additions && s.additions.length > 0 }}
+										{{ foreach addition in s.additions }}
+											{{ addition.name }} - {{ addition.price | price(2) }}
+										{{ end }}
+									{{ else }}
+										-
+									{{ fi }}
+								</td>
+								<td class="ui-center col-xs-2">
+									<select data-name="deliverStatus" data-id="{{ s.ref }}">
+									{{ foreach d in deliverStatuses }}
+										<option value="{{ d.value }}" {{ if s.deliverStatus == d.value }}selected{{ fi }}>{{ d.name }}
+										</option>
+									{{ end }}
+									</select>
+								</td>
+							</tr>
+							{{ end }}
+						</tbody>
+					</table>
+				{{ fi }}
+			</script>
+			</div>
+
+			<div data-component="visible" class="ui-buttons" data-component-path="orders.form.SKUs" data-if="orders.form.SKUs && orders.form.SKUs.length > 0">
+				<button name="submit" data-name="SKUs">@(提交修改)</button>
+			</div>
+			<div data-component="error" data-component-path="orders.form.SKUs.response"></div>
 		</div>
 	</div>
 	<!-- <div data-component="error" data-component-path="orders.response"></div> -->
@@ -563,59 +631,8 @@
 	});
 
 	ON('#orders.form', function(component) {
-		// Submits order form
-		// component.submit = function(hide) {
-		// 	var price = 0;
-		// 	var count = 0;
-  //           var deposit = 0;
-		// 	for (var i = 0, length = orders.form.products.length; i < length; i++) {
-		// 		var product = orders.form.products[i];
-		// 		if (product.count > 0) {
-  //                   price += (product.price * product.count);
-  //                   deposit += (product.deposit ? product.deposit : product.price) * product.count;
-  //               }
-		// 		count += product.count;
-		// 	}
-
-  //           orders.form.count = count;
-  //           orders.form.price = price;
-  //           orders.form.deposit = deposit;
-
-		// 	$.components.PUT(managerurl + '/api/orders/', orders.form, function(response) {
-
-		// 		// Error handling
-		// 		SET('orders.response', response);
-		// 		if (response instanceof Array)
-		// 			return;
-
-		// 		hide();
-		// 		orders_refresh(true);
-		// 		success();
-
-		// 		// Refreshes dashboard informations
-		// 		if (window.dashboard_refresh)
-		// 			window.dashboard_refresh();
-		// 	});
-		// };
 
 		component.submit = function(hide, button) {
-			// switch ($(button).attr('data-name')) {
-			// 	case 'products':
-			// 		if (!confirm('你确认要提交修改后的订单商品？'))
-			// 			return;
-			// 		var postdata = {'id':orders.form.id,'products':orders.form.products};
-			// 		$.components.PUT(managerurl + '/api/orders/products', postdata, function(response) {
-
-			// 			// Error handling
-			// 			SET('orders.form.products.response', response);
-			// 			if (response instanceof Array)
-			// 				return;
-			// 			hide();
-			// 			orders_refresh(true);
-			// 			success();
-			// 		});
-			// 		break;
-			// }
 			var dataname = $(button).attr('data-name');
 			if (dataname) {
 				if (orders.form[dataname]) {
@@ -647,37 +664,52 @@
 			switch (name) {
 				case 'payStatus':
 					var value = el.val();
-					orders_form_update(subOrderid, function(item) {
-						item[name] = parseInt(value);
-					},{'name':'subOrders','paymentid':paymentid});
-					component.changedisabled_botton('subOrders');
-					orders_form_refresh();
+					orders_form_update(subOrderid, {'name':'subOrders','paymentid':paymentid}, function(item) {
+						if (item) {
+							item[name] = parseInt(value);
+							component.changedisabled_botton('subOrders');
+							orders_form_refresh();
+						}
+					});
+					
 					break;
 			}
 		});
 
-		$('.checkoutlist').on('change', 'select', function() {
+		$('.productslist').on('change', 'select', function() {
 			var el = $(this);
 			var id = el.attr('data-id');
 			var name = el.attr('data-name');
 			switch (name) {
 				case 'deliverStatus':
 					var value = el.val();
-					orders_form_update(id, function(item) {
-						item[name] = parseInt(value);
+					orders_form_update(id, {'name':'products'}, function(item) {
+						if (item) {
+							item[name] = parseInt(value);
+							component.changedisabled_botton('products');
+							orders_form_refresh();
+						}
 					});
-					component.changedisabled_botton('products');
-					orders_form_refresh();
 					break;
 			}
 		});
 
-		// Removes selected oredered item
-		$('.checkoutlist').on('click', '.fa-times-circle', function(e) {
-			orders_form_update($(this).attr('data-id'), function(item, index) {
-				orders.form.products.splice(index, 1);
-				orders_form_refresh();
-			});
+		$('.SKUslist').on('change', 'select', function() {
+			var el = $(this);
+			var id = el.attr('data-id');
+			var name = el.attr('data-name');
+			switch (name) {
+				case 'deliverStatus':
+					var value = el.val();
+					orders_form_update(id, {'name':'SKUs'}, function(item) {
+						if (item) {
+							item[name] = parseInt(value);
+							component.changedisabled_botton('SKUs');
+							orders_form_refresh();
+						}
+					});
+					break;
+			}
 		});
 
 		component.changedisabled_botton = function (name) {
@@ -692,6 +724,14 @@
 				}
 			});
 		}
+
+		// Removes selected oredered item
+		// $('.checkoutlist').on('click', '.fa-times-circle', function(e) {
+		// 	orders_form_update($(this).attr('data-id'), function(item, index) {
+		// 		orders.form.products.splice(index, 1);
+		// 		orders_form_refresh();
+		// 	});
+		// });
 
 		// Handles all inputs in ordered items
 		// $('.checkoutlist').on('change', 'input', function() {
@@ -758,12 +798,15 @@
 	});
 
 	// Method finds ordered item by its id
-	function orders_form_update(id, callback, options) {
+	function orders_form_update(id, options, callback) {
 		var name = options && options['name'] ? options['name']: '';
 		switch (name) {
 			case 'subOrders':
 				var paymentid = options && options['paymentid'] ? options['paymentid']: null;
-				if (!paymentid) break;
+				if (!paymentid) {
+					callback(null);
+					break;
+				}
 				for (var i = 0, length = orders.form.subOrders.length; i < length; i++) {
 					var subOrder = orders.form.subOrders[i];
 					if (subOrder.id === id && subOrder.payments) {
@@ -774,11 +817,13 @@
 								break;
 							}
 						}
+						callback(null);
 						break;
 					}
 				}
+				callback(null);
 				break;
-			default:
+			case 'products':
 				for (var i = 0, length = orders.form.products.length; i < length; i++) {
 					var p = orders.form.products[i];
 					if (p.id === id) {
@@ -786,6 +831,17 @@
 						break;
 					}
 				}
+				callback(null);
+				break;
+			case 'SKUs':
+				for (var i = 0, length = orders.form.SKUs.length; i < length; i++) {
+					var s = orders.form.SKUs[i];
+					if (s.ref === id) {
+						callback(s, i);
+						break;
+					}
+				}
+				callback(null);
 				break;
 		}
 	}

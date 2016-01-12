@@ -40,8 +40,9 @@ exports.install = function() {
 	F.route(CONFIG('manager-url') + '/api/orders/',              			json_orders_query, ['get'], ['backend_auth']);
 	F.route(CONFIG('manager-url') + '/api/orders/{id}/',         			json_orders_read, ['get'], ['backend_auth']);
 	// F.route(CONFIG('manager-url') + '/api/orders/payments/',              	json_orders_payments_update, ['put'], ['backend_auth']);
+	F.route(CONFIG('manager-url') + '/api/orders/subOrders/',              	json_subOrders_payments_update, ['put'], ['backend_auth']);
 	F.route(CONFIG('manager-url') + '/api/orders/products/',              	json_orders_products_update, ['put'], ['backend_auth']);
-	F.route(CONFIG('manager-url') + '/api/orders/subOrders/',              	json_subOrders_products_update, ['put'], ['backend_auth']);
+	F.route(CONFIG('manager-url') + '/api/orders/SKUs/',              		json_orders_SKUs_update, ['put'], ['backend_auth']);
 	// F.route(CONFIG('manager-url') + '/api/orders/',              			json_orders_save, ['put'], ['backend_auth']);
 	// F.route(CONFIG('manager-url') + '/api/orders/',              			json_orders_remove, ['delete']);
 	// F.route(CONFIG('manager-url') + '/api/orders/clear/',        			json_orders_clear);
@@ -483,6 +484,43 @@ function json_orders_query() {
     });
 }
 
+// Updates specific order sub order payments
+function json_subOrders_payments_update() {
+	var self = this;
+	var orderid = self.body && self.body.id ? self.body.id: null;
+	var subOrders = self.body && self.body.subOrders ? self.body.subOrders: null;
+	if (!orderid) {
+		self.json([{'error':'更新失败，缺少订单ID'}]);
+		return;
+	}
+	if (!subOrders) {
+		self.json([{'error':'更新失败，缺少子订单列表'}]);
+		return;
+	}
+	var updatepayments = {};
+	if (subOrders && subOrders.length > 0) {
+       	for (var i = 0; i < subOrders.length; i++) {
+	    	var suborder = subOrders[i];
+	    	if (suborder.payments) {
+		    	for (var j = 0; j < suborder.payments.length; j++) {
+		    		var payment = suborder.payments[j];
+			    	if (!updatepayments.hasOwnProperty(payment.id)) {
+			    		updatepayments[payment.id] = payment;
+			    	}
+			    }
+			}
+       	}
+    }
+    OrderService.updatePayments({'id':orderid,'payments':updatepayments}, function(err) {
+		if (err) {
+			console.log('manager json_subOrders_payments_update err: ' + err);
+			self.json([{'error':'更新失败'}]);
+			return;
+		}
+		self.json(SUCCESS(true));
+	});
+}
+
 // Updates specific order products
 function json_orders_products_update() {
 	var self = this;
@@ -516,36 +554,32 @@ function json_orders_products_update() {
 	});
 }
 
-// Updates specific order sub order payments
-function json_subOrders_products_update() {
+// Updates specific order SKUs
+function json_orders_SKUs_update() {
 	var self = this;
 	var orderid = self.body && self.body.id ? self.body.id: null;
-	var subOrders = self.body && self.body.subOrders ? self.body.subOrders: null;
+	var SKUs = self.body && self.body.SKUs ? self.body.SKUs: null;
 	if (!orderid) {
 		self.json([{'error':'更新失败，缺少订单ID'}]);
 		return;
 	}
-	if (!subOrders) {
-		self.json([{'error':'更新失败，缺少子订单列表'}]);
+	if (!SKUs) {
+		self.json([{'error':'更新失败，缺少商品列表'}]);
 		return;
 	}
-	var updatepayments = {};
-	if (subOrders && subOrders.length > 0) {
-       	for (var i = 0; i < subOrders.length; i++) {
-	    	var suborder = subOrders[i];
-	    	if (suborder.payments) {
-		    	for (var j = 0; j < suborder.payments.length; j++) {
-		    		var payment = suborder.payments[j];
-			    	if (!updatepayments.hasOwnProperty(payment.id)) {
-			    		updatepayments[payment.id] = payment;
-			    	}
-			    }
-			}
+	var updateSKUs = {};
+	if (SKUs && SKUs.length > 0) {
+       	for (var i = 0; i < SKUs.length; i++) {
+	    	var sku = SKUs[i];
+
+	    	if (!updateSKUs.hasOwnProperty(sku.ref)) {
+	    		updateSKUs[sku.ref] = sku;
+	    	}
        	}
     }
-    OrderService.updatePayments({'id':orderid,'payments':updatepayments}, function(err) {
+    OrderService.updateSKUs({'id':orderid,'SKUs':updateSKUs}, function(err) {
 		if (err) {
-			console.log('manager json_subOrders_products_update err: ' + err);
+			console.log('manager json_orders_SKUs_update err: ' + err);
 			self.json([{'error':'更新失败'}]);
 			return;
 		}
