@@ -331,7 +331,6 @@ SKUService.prototype.addSKUAttribute = function(category, brand, name, value, or
                 order: {$max: '$order'}
             }
         }).exec(function (err, results) {
-            console.log(results);
             if (results && results.length > 0) {
                 model.order = results[0].order;
                 newSKUAttributeProcessor();

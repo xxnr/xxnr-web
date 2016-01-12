@@ -928,7 +928,7 @@ function convertToShoppingCartFormatV_1_0(productDetails, cartId, userId){
 function getAttributes(attributeName) {
     var self = this;
     var category = self.data.category;
-    
+
     // support old app
     if(category == '化肥'){
         category = '531680A5';

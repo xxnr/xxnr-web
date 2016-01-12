@@ -431,20 +431,46 @@ ProductService.prototype.addAttribute = function(category, brand, name, value, o
     }
 
     var model = {category:category, brand:brand, name:name, value:value};
-    if(order){
-        model.order = order;
+    var newAttributeProcessor = function () {
+        var productAttribute = new ProductAttributeModel(model);
+        productAttribute.save(function(err){
+            if(err){
+                console.error(err);
+                callback(err);
+                return;
+            }
+
+            callback(null, productAttribute);
+        })
+    };
+
+    var matchOptions = {
+        category: category,
+        name: name
+    };
+
+    if(brand){
+        matchOptions.brand = mongoose.Types.ObjectId(brand);
     }
 
-    var productAttribute = new ProductAttributeModel(model);
-    productAttribute.save(function(err){
-        if(err){
-            console.error(err);
-            callback(err);
-            return;
-        }
-
-        callback(null, productAttribute);
-    })
+    if (order) {
+        model.order = order;
+        newAttributeProcessor();
+    } else {
+        ProductAttributeModel.aggregate({
+            $match: matchOptions
+        }, {
+            $group: {
+                _id: {category:'$category', brand:'$brand', name:'$name'},
+                order: {$max: '$order'}
+            }
+        }).exec(function (err, results) {
+            if (results && results.length > 0) {
+                model.order = results[0].order;
+                newAttributeProcessor();
+            }
+        });
+    }
 };
 
 ProductService.prototype.getAttributes = function(category, brand, name, callback, schema){
