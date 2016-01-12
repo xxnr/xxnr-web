@@ -603,7 +603,8 @@ transition-delay: initial;
 .cart-tbody .item-item .p-ops {width:70px;padding-top:24px;}
 .cart-tbody .item-item .p-ops .cart-remove{display:block;font-size: 16px;color: #909090;}
 .cart-tbody .item-item .pay-step{margin-left: -30px;height: 120px;}
-.cart-tbody .item-item .pay-step-1,.pay-step-2 {line-height:60px;height: 60px;font-size: 16px;color:#323232;border-top: 1px solid #e0e0e0;padding-left: 910px;}
+.cart-tbody .item-item .pay-step-1{line-height:60px;height: 60px;font-size: 16px;color:#323232;border-top: 1px solid #e0e0e0;padding-left: 910px;}
+.cart-tbody .item-item .pay-step-2{line-height:60px;height: 60px;font-size: 16px;color:#323232;border-top: 1px solid #e0e0e0;padding-left: 910px;}
 .cart-tbody .item-item .pay-step-1 span.text-info{width: 140px;display: inline-block;}
 .cart-tbody .item-item .pay-step-2 span.text-info{width: 140px;display: inline-block;}
 .cart-tbody .item-item .pay-step-1 .order-price{color: #ff6700;}
@@ -708,27 +709,38 @@ transition-delay: initial;
 .wrap_user_info .orders .orders-main .products-section {background: #fff;width: 760px;box-sizing: border-box;display: inline-block;float: left;border-right: 1px solid #e0e0e0;}
 .wrap_user_info .orders .orders-main .pay-section {box-sizing: border-box;width: 440px;display: inline-block;float: left;background: #fff;height: 100%;position: absolute;}
 .wrap_user_info .orders .orders-main .product {border-top: 1px solid #e0e0e0;}
+.wrap_user_info .orders .orders-main .product .product-row{padding-bottom: 20px;}
 .wrap_user_info .orders .orders-main .products-section li:first-child{border-top: 0;}
 .wrap_user_info .orders .orders-main .product .p-info {width: 760px;}
 .wrap_user_info .orders .orders-main .product .p-info div{float: left;display: inline-block;}
 .wrap_user_info .orders .orders-main .product .p-info .p-img {width: 160px;overflow: hidden;}
-.wrap_user_info .orders .orders-main .product .p-info .p-img img{width:100px;height:100px;margin-left: 30px;margin-top: 20px;}
-.wrap_user_info .orders .orders-main .product .p-info .p-name {font-size:16px;height:60px;line-height:30px;padding-top: 24px;width: 350px;padding-right: 10px;}
+.wrap_user_info .orders .orders-main .product .p-info .p-img img{width:100px;height:100px;margin-left: 30px;margin-top: 20px;border: 1px solid #e0e0e0;}
+.wrap_user_info .orders .orders-main .product .p-info .p-name {font-size:16px;height:60px;line-height:30px;padding-top: 15px;width: 350px;padding-right: 10px;}
 .wrap_user_info .orders .orders-main .product .p-info .p-name a{width: 360px;overflow: hidden;}
-.wrap_user_info .orders .orders-main .product .p-info .p-price {width: 160px;height: 110px;padding-top: 30px;}
-.wrap_user_info .orders .orders-main .product .p-info .p-quantity {height: 110px;padding-top: 30px;width: 40px;text-align: center;}
+.wrap_user_info .orders .orders-main .product .p-info .p-price {width: 160px;height: 110px;padding-top: 20px;}
+.wrap_user_info .orders .orders-main .product .p-info .p-quantity {height: 110px;padding-top: 20px;width: 40px;text-align: center;}
 .wrap_user_info .orders .orders-main .product .p-info .pay-step{height: 120px;display: block;}
-.wrap_user_info .orders .orders-main .product .p-info .pay-step-1{border-top: 1px solid #e0e0e0;display:block;width:730px;line-height:60px;height: 60px;font-size: 16px;color:#323232;padding-left: 30px;}
-.wrap_user_info .orders .orders-main .product .p-info .pay-step-2{border-top: 1px solid #e0e0e0;display:block;width:730px;line-height:60px;height: 60px;font-size: 16px;color:#323232;padding-left: 30px;}
+.wrap_user_info .orders .orders-main .product .p-info .pay-step-1{border-top: 1px solid #e0e0e0;display:block;width:730px;line-height:60px;height: 60px;color:#323232;padding-left: 30px;}
+.wrap_user_info .orders .orders-main .product .p-info .pay-step-2{border-top: 1px solid #e0e0e0;display:block;width:730px;line-height:60px;height: 60px;color:#323232;padding-left: 30px;}
 .wrap_user_info .orders .orders-main .product .p-info .pay-step-1 span.text-info{width: 140px;display: inline-block;}
 .wrap_user_info .orders .orders-main .product .p-info .pay-step-2 span.text-info{width: 140px;display: inline-block;}
-.wrap_user_info .orders .orders-main .product .p-info .pay-step-1 .order-price{color: #ff6700;}
+.wrap_user_info .orders .orders-main .product .p-info .pay-step-1 .pay-step-1-price{margin-left: 350px;}
+.wrap_user_info .orders .orders-main .product .p-info .pay-step-2 .pay-step-2-price{margin-left: 350px;}
+.wrap_user_info .orders .orders-main .product .p-info .pay-step-1 .right{margin-right: 55px;}
+.wrap_user_info .orders .orders-main .product .p-info .pay-step-2 .right{margin-right: 55px;}
+.wrap_user_info .xxnr_pager{display: block;margin:0px auto;text-align:center; }
+.wrap_user_info .xxnr_pager #page_buttons{display: block;margin: 50px auto;}
+.wrap_user_info .xxnr_pager #page_buttons ul li a{background: #FFFFFF;height: 26px;width: 26px;border-radius: 50%;border: 1px solid #c7c7c7;line-height: 26px;margin-left: 12px;display: inline-block;}
+.wrap_user_info .xxnr_pager #page_buttons ul li a.current{background: #ff6600;color: #FFFFFF;border: 0;}
+.wrap_user_info .xxnr_pager #page_buttons .pre_btn a{border: 0;background: url(../images/lefticon02.png) no-repeat 7px;width: 26px;height: 26px;display: inline-block;}
+.wrap_user_info .xxnr_pager #page_buttons .next_btn a{border: 0;background: url(../images/righticon01.png) no-repeat 7px;width: 26px;height: 26px;display: inline-block;}
+
 
 .wrap_user_info .orders .orders-main .single-order .pay-section div{float: left;}
-.wrap_user_info .orders .orders-main .single-order .pay-section .pay-info{margin-left:10px;width: 140px;height: 100%;border-right: 1px solid #e0e0e0;text-align: center;padding-top: 24px;}
-.wrap_user_info .orders .orders-main .single-order .pay-section .pay-status{width: 140px;height: 100%;border-right: 1px solid #e0e0e0;padding-top: 24px;text-align: center;}
+.wrap_user_info .orders .orders-main .single-order .pay-section .pay-info{margin-left:10px;width: 140px;height: 100%;border-right: 1px solid #e0e0e0;text-align: center;padding-top: 20px;}
+.wrap_user_info .orders .orders-main .single-order .pay-section .pay-status{width: 140px;height: 100%;border-right: 1px solid #e0e0e0;padding-top: 20px;text-align: center;}
 .wrap_user_info .orders .orders-main .single-order .pay-section .pay-status .order-detail a:hover{color:#00a838;}
-.wrap_user_info .orders .orders-main .single-order .pay-section .pay-action{width: 140px;height: 100%;text-align: center;padding-top: 24px;}
+.wrap_user_info .orders .orders-main .single-order .pay-section .pay-action{width: 140px;height: 100%;text-align: center;padding-top: 20px;}
 .wrap_user_info .orders .orders-main .single-order .pay-section .pay-action a{width: 80px;height: 30px;border: 1px solid #008a2f;background: #e0e0e0;color: #008a2f;display: block;line-height: 30px;margin: 0 auto;border-radius: 3px;}
 .wrap_user_info .orders .orders-main .single-order .row{overflow: hidden}
 

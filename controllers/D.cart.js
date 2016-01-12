@@ -73,6 +73,11 @@ function updateShoppingCart() {
                 return
             }
 
+            if(!SKU.online){
+                self.respond({code:1001, message:"无法添加下线SKU"});
+                return
+            }
+
             CartService.updateSKUItems(cart.cartId, SKU._id, count, update_by_add, additions || [], function (err) {
                 if (err) {
                     console.log(err);
@@ -105,6 +110,7 @@ function getShoppingCart(){
             cart.SKU_items.forEach(function (item) {
                 if(item.SKU) {
                     var SKU = item.SKU;
+                    SKU.product = item.product;
                     SKU.count = item.count;
                     SKU.additions = item.additions;
                     SKUs.push(SKU);
@@ -113,7 +119,7 @@ function getShoppingCart(){
         }
 
         self.respond(convertToShoppingCartFormatV_1_0(SKUs, cart.cartId, cart.userId));
-    })
+    }, true)
 }
 
 function getShoppingCartOffline(){

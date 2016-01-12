@@ -2,6 +2,7 @@
  * Created by pepelu on 2015/12/17.
  */
 var CartModel = require('../models').cart;
+var SKUModel = require('../models').SKU;
 
 // Service
 var CartService = function(){};
@@ -12,9 +13,11 @@ CartService.prototype.getOrAdd = function(userId, callback, populate){
     if(!(populate === false)){
         query = query.populate('items.product', '-_id id price linker_category pictures description discount name deposit brandName');
         query = query.populate('SKU_items.SKU');
+        query = query.populate('SKU_items.product');
         query = query.populate('SKU_items.additions');
     }
 
+    query = query.lean();
     query.exec(function(err, cart){
         if(err){
             console.error(err);
@@ -23,32 +26,7 @@ CartService.prototype.getOrAdd = function(userId, callback, populate){
         }
 
         if(cart){
-            if(populate) {
-                var promises = cart.SKU_items.map(function (item) {
-                    return new Promise(function (resolve, reject) {
-                        item.SKU.populate('product', function (err, SKU) {
-                            if (err) {
-                                reject(err);
-                                return;
-                            }
-
-                            item.SKU = SKU;
-                            resolve();
-                        });
-                    });
-                });
-
-                Promise.all(promises)
-                    .then(function () {
-                        callback(null, cart.toObject());
-                    })
-                    .catch(function (err) {
-                        console.error(err);
-                        callback(err);
-                    })
-            } else{
-                callback(null, cart.toObject());
-            }
+            callback(null, cart);
         }else {
             var newCart = new CartModel({userId: userId, cartId: U.GUID(10), items: [], SKU_items: []});
             newCart.save(function (err) {
@@ -231,81 +209,102 @@ CartService.prototype.updateSKUItems = function(cartId, SKU_id, count, update_by
         })
     } else {
         // update by add
-        var newSKUItem = {SKU:SKU_id, count:count};
-        if(additions && additions.length > 0){
-            newSKUItem.additions = additions;
-        }
-        CartModel.update({cartId:cartId, 'SKU_items.SKU':{$ne:SKU_id}}, {$push:{SKU_items:newSKUItem}}, function(err, numAffected){
-            if(err){
+        SKUModel.find({_id: SKU_id}, function (err, SKU) {
+            if (err) {
                 console.error(err);
                 callback(err);
                 return;
             }
 
-            if(numAffected.n > 0){
-                // successfully add one item to array
-                // which indicates there is no such SKU_id
-                callback();
-                return;
+            var newSKUItem = {SKU: SKU_id, count: count, product: SKU.product};
+            if (additions && additions.length > 0) {
+                newSKUItem.additions = additions;
             }
 
-            if(count < 0){
-                // if count<0, it means we are removing items
-                // we first update those who's count is greater than -count, using $inc
-                var options = {$inc:{'SKU_items.$.count':count}};
-                if(additions && additions.length > 0){
-                    options.$set = {'SKU_items.$.additions':additions};
+            CartModel.update({
+                cartId: cartId,
+                'SKU_items.SKU': {$ne: SKU_id}
+            }, {$push: {SKU_items: newSKUItem}}, function (err, numAffected) {
+                if (err) {
+                    console.error(err);
+                    callback(err);
+                    return;
                 }
-                CartModel.update({cartId:cartId, 'SKU_items.SKU':SKU_id, 'items.count':{$gt:-count}}, options, function(err, numAffected){
-                    if(err){
-                        console.error(err);
-                        callback(err);
-                        return;
-                    }
 
-                    var greaterCount = numAffected.n;
-                    if(greaterCount>0){
-                        callback();
-                        return;
-                    }
+                if (numAffected.n > 0) {
+                    // successfully add one item to array
+                    // which indicates there is no such SKU_id
+                    callback();
+                    return;
+                }
 
-                    // then we update those who's count is equal to -count, using pull
-                    CartModel.update({cartId:cartId}, {$pull:{'items.count':-count, 'SKU_items.product':SKU_id}}, function(err, numAffected){
-                        if(err){
+                if (count < 0) {
+                    // if count<0, it means we are removing items
+                    // we first update those who's count is greater than -count, using $inc
+                    var options = {$inc: {'SKU_items.$.count': count}};
+                    if (additions && additions.length > 0) {
+                        options.$set = {'SKU_items.$.additions': additions};
+                    }
+                    CartModel.update({
+                        cartId: cartId,
+                        'SKU_items.SKU': SKU_id,
+                        'items.count': {$gt: -count}
+                    }, options, function (err, numAffected) {
+                        if (err) {
                             console.error(err);
                             callback(err);
                             return;
                         }
 
-                        if(numAffected.n + greaterCount == 0){
+                        var greaterCount = numAffected.n;
+                        if (greaterCount > 0) {
+                            callback();
+                            return;
+                        }
+
+                        // then we update those who's count is equal to -count, using pull
+                        CartModel.update({cartId: cartId}, {
+                            $pull: {
+                                'items.count': -count,
+                                'SKU_items.product': SKU_id
+                            }
+                        }, function (err, numAffected) {
+                            if (err) {
+                                console.error(err);
+                                callback(err);
+                                return;
+                            }
+
+                            if (numAffected.n + greaterCount == 0) {
+                                callback('not found');
+                                return;
+                            }
+
+                            callback();
+                        })
+                    })
+                } else {
+                    options = {$inc: {'SKU_items.$.count': count}};
+                    if (additions && additions.length > 0) {
+                        options.$set = {'SKU_items.$.additions': additions};
+                    }
+                    CartModel.update({cartId: cartId, 'SKU_items.SKU': SKU_id}, options, function (err, numAffected) {
+                        if (err) {
+                            console.error(err);
+                            callback(err);
+                            return;
+                        }
+
+                        if (numAffected.n == 0) {
                             callback('not found');
                             return;
                         }
 
                         callback();
                     })
-                })
-            } else{
-                options = {$inc:{'SKU_items.$.count':count}};
-                if(additions && additions.length > 0){
-                    options.$set = {'SKU_items.$.additions':additions};
                 }
-                CartModel.update({cartId:cartId, 'SKU_items.SKU':SKU_id}, options, function(err, numAffected){
-                    if(err){
-                        console.error(err);
-                        callback(err);
-                        return;
-                    }
-
-                    if(numAffected.n == 0){
-                        callback('not found');
-                        return;
-                    }
-
-                    callback();
-                })
-            }
-        })
+            })
+        });
     }
 };
 
@@ -382,7 +381,7 @@ CartService.prototype.removeSKUItems = function(cartId, items, callback) {
         var updator = function (index) {
             if (index < items.length) {
                 var count = items[index].count;
-                CartModel.update({cartId: cartId, SKU_items:{$elemMatch:{SKU: items[index]._id, count: {$gt: count}}}}, {$inc: {'SKU_items.$.count': -count}}, function (err, numAffected) {
+                CartModel.update({cartId: cartId, SKU_items:{$elemMatch:{SKU: items[index].ref, count: {$gt: count}}}}, {$inc: {'SKU_items.$.count': -count}}, function (err, numAffected) {
                     if (err) {
                         console.error(err);
                         callback(err);
@@ -394,7 +393,7 @@ CartService.prototype.removeSKUItems = function(cartId, items, callback) {
                         return;
                     }
 
-                    CartModel.update({cartId: cartId}, {$pull: {SKU_items: {count: count, SKU: items[index]._id}}}, function (err, numAffected) {
+                    CartModel.update({cartId: cartId}, {$pull: {SKU_items: {count: count, SKU: items[index].ref}}}, function (err, numAffected) {
                         if (err) {
                             console.error(err);
                             callback(err);
@@ -454,7 +453,9 @@ CartService.prototype.checkoutSKU = function(cartId, items, callback) {
     }
     CartModel.findOne({cartId: cartId})
         .populate('SKU_items.SKU')
+        .populate('SKU_items.product')
         .populate('SKU_items.additions')
+        .lean()
         .exec(function (err, cart) {
             if (err) {
                 console.error(err);
@@ -464,36 +465,18 @@ CartService.prototype.checkoutSKU = function(cartId, items, callback) {
 
             if (checkoutAll) {
                 callback(null, cart);
-                return;
+            } else {
+                var checkoutItems = [];
+                for (var j = 0; j < cart.SKU_items.length; j++) {
+                    cart.SKU_items[j].count = SKUBuyCount[cart.SKU_items[j]._id];
+                    if (cart.SKU_items[j].count) {
+                        checkoutItems.push(cart.SKU_items[j]);
+                    }
+                }
+
+                cart.SKU_items = checkoutItems;
+                callback(null, cart);
             }
-
-            var checkoutItems = [];
-            var promises = cart.SKU_items.map(function(item){
-                return new Promise(function(resolve ,reject){
-                    item.SKU.populate('product', function(err, SKU){
-                        if(err){
-                            reject(err);
-                        }
-
-                        item.SKU = SKU;
-                        item.count = SKUBuyCount[SKU._id];
-                        if(item.count) {
-                            checkoutItems.push(item);
-                        }
-
-                        resolve()
-                    })
-                })
-            });
-
-            Promise.all(promises)
-                .then(function(){
-                    cart.SKU_items = checkoutItems;
-                    callback(null, cart.toObject());
-                })
-                .catch(function(err){
-                    callback(err);
-                });
         })
 };
 

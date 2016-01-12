@@ -587,6 +587,16 @@ function addOrderBySKU(){
                 var orderSKUs = [];
                 for(var i=0; i<cart.SKU_items.length; i++){
                     var SKU = cart.SKU_items[i].SKU;
+                    if(!SKU.product.online){
+                        self.respond({code:1001, message:"无法添加下线商品"});
+                        return;
+                    }
+
+                    if(!SKU.online){
+                        self.respond({code:1001, message:"无法添加下线SKU"});
+                        return;
+                    }
+
                     var additions = cart.SKU_items[i].additions;
                     var additionPrice = 0;
                     additions.forEach(function(addition){
@@ -595,7 +605,7 @@ function addOrderBySKU(){
                         delete addition._id;
                     });
                     var SKU_to_add = {};
-                    var product = api10.convertProduct(SKU.product);
+                    var product = api10.convertProduct(cart.SKU_items[i].product);
                     SKU_to_add.ref = SKU._id;
                     SKU_to_add.productId = product.id;
                     SKU_to_add.price = SKU.price.platform_price;

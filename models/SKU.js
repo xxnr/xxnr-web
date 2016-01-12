@@ -8,7 +8,9 @@ var SKUSchema = new mongoose.Schema({
     attributes: [{                                                             // sku attributes, list all attributes this sku has, will be like [{name:车型,value:舒适性}, {name:排量,value:1.5L}]
         ref: {type: mongoose.Schema.ObjectId, ref:'SKUAttribute'},
         name: {type: String, required: true},         // attribute name
-        value: {type: String, required: true}          // attribute value
+        value: {type: String, required: true},          // attribute value
+        order:{type: Number},
+        merge_label:{type:String}
     }],
     additions: [{                                                               // sku additions, list all additions of this sku, will be like [{name:全景天窗,price:2000}, {name:大灯, price:1000}]
         ref: {type: mongoose.Schema.ObjectId, ref:'SKUAddition'},
@@ -18,7 +20,9 @@ var SKUSchema = new mongoose.Schema({
     price: {                                                                   // price of sku
         market_price: {type: Number},                  // market price
         platform_price: {type: Number, required: true} // platform price
-    }
+    },
+    online:{type:Boolean, default:false},
+    dateCreated:{type:Date, default: Date.now}
 });
 
 var SKUAttributesSchema = new mongoose.Schema({
@@ -26,7 +30,8 @@ var SKUAttributesSchema = new mongoose.Schema({
     value:{type:String, required: true},                                           // all values of this attribute, will be like 舒适性,豪华型
     category: {type: String, required: true},   // category
     brand: {type: mongoose.Schema.ObjectId, ref: 'brand', required: true},         // brand
-    order:{type: Number}
+    order:{type: Number},
+    merge_label:{type:String}
 });
 
 var SKUAdditionsSchema = new mongoose.Schema({              // sku additions, list all additions for one category/brand, will be like {name:全景天窗,price:2000}...
@@ -37,7 +42,7 @@ var SKUAdditionsSchema = new mongoose.Schema({              // sku additions, li
 });
 
 // indexes
-SKUSchema.index({product:1});
+SKUSchema.index({product:1, dateCreated:1});
 SKUSchema.index({name:1, product:1}, {unique:true});
 SKUAttributesSchema.index({category:1, brand:1, name:1, value:1}, {unique:true});
 SKUAttributesSchema.index({category:1, brand:1, name:1});

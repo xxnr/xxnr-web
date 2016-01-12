@@ -28,7 +28,8 @@ var productSchema = new mongoose.Schema({
 	attributes: [{								// all attributes of this product, used for product query
 		ref: {type:mongoose.Schema.ObjectId, ref:'productAttribute', required:true},
 		name: {type: String, required: true},
-		value: {type: String, required: true}
+		value: {type: String, required: true},
+		order:{type:Number}
 	}],
 	SKUAttributes: [{						// list all SKU attributes of this products, it's aggregated when add/update/delete sku of this product
 		name: String,

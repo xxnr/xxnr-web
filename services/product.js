@@ -12,7 +12,7 @@ ProductService = function(){};
 
 // Methods
 // Gets listing
-ProductService.prototype.query = function(options, callback) {
+ProductService.prototype.query = function(options, callback, oldSchema) {
 
     // page max num
     var pagemax = 50;
@@ -48,18 +48,30 @@ ProductService.prototype.query = function(options, callback) {
 
     if (options.reservePrice && options.reservePrice.length === 2) {
         if (options.reservePrice[0] !== ''){
-            queryOptions['SKUPrice.min'] = {$gte:parseInt(options.reservePrice[0])};
-            nor.push({'SKUPrice.min': {$lt: parseInt(options.reservePrice[0])}});
+            if(oldSchema) {
+                queryOptions['SKUPrice.min'] = {$gte: parseInt(options.reservePrice[0])};
+                nor.push({'SKUPrice.min': {$lt: parseInt(options.reservePrice[0])}});
+            } else{
+                queryOptions.price = {$gte: parseInt(options.reservePrice[0])};
+            }
         }
 
         if (options.reservePrice[1] !== '') {
-            queryOptions['SKUPrice.max'] = {$lte:parseInt(options.reservePrice[1])};
-            nor.push({'SKUPrice.min': {$gt: parseInt(options.reservePrice[1])}});
+            if(oldSchema) {
+                queryOptions['SKUPrice.max'] = {$lte: parseInt(options.reservePrice[1])};
+                nor.push({'SKUPrice.min': {$gt: parseInt(options.reservePrice[1])}});
+            } else{
+                queryOptions.price.$lte = parseInt(options.reservePrice[1]);
+            }
         }
 
         queryOptions.presale = {$ne: true};
         nor.push({presale: {$eq: true}});
     }
+
+    // support old app
+    if (options.modelName)
+        queryOptions.model = {$in:options.modelName};
 
     if(options.attributes){
         queryOptions.attributes = {$all:[]};
@@ -456,7 +468,7 @@ ProductService.prototype.getAttributes = function(category, brand, name, callbac
             schemaToAdd = {value:'$value',ref:'$_id'};
             break;
         case 2:
-            // fromend schema
+            // frontend schema
             schemaToAdd = '$value';
             break;
         default:
@@ -465,12 +477,19 @@ ProductService.prototype.getAttributes = function(category, brand, name, callbac
     }
 
     ProductAttributeModel.aggregate({$match:matchOptions},
-        {$group:{
-            _id:{brand:'$brand', name:'$name'},
-            values:{$addToSet:schemaToAdd},
-            order:{$max:'$order'}
-        }},
-        {$sort:{order:1}})
+        {
+            $group:
+            {
+                _id: {brand: '$brand', name: '$name'},
+                values: {$addToSet: schemaToAdd},
+                order: {$max: '$order'}
+            }
+        },
+        {
+            $sort:{order:1}
+        }
+        , {$project: {_id:1, values: 1}}
+    )
         .exec(function(err, attributes){
             if(err){
                 console.error(err);

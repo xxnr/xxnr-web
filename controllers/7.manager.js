@@ -133,7 +133,7 @@ exports.install = function() {
 	F.route(CONFIG('manager-url') + '/api/v2.1/SKU/attribute/add/',     process_SKU_Attribute_add,      ['post'], ['backend_auth']);
 	F.route(CONFIG('manager-url') + '/api/v2.1/SKU/attributes',         json_SKU_Attributes_get,        ['get'], ['backend_auth']);
 	F.route(CONFIG('manager-url') + '/api/v2.1/SKU/query',				json_SKU_get,					['get'], ['backend_auth']);
-	F.route(CONFIG('manager-url') + '/api/v2.1/SKU/remove/{id}',			process_SKU_remove,				['get'], ['backend_auth']);
+	F.route(CONFIG('manager-url') + '/api/v2.1/SKU/online/{id}',			process_SKU_online,				['get'], ['backend_auth']);
 	F.route(CONFIG('manager-url') + '/api/v2.1/SKU/additions',				json_SKU_Additions_get,		['get'],['backend_auth']);
 	F.route(CONFIG('manager-url') + '/api/v2.1/SKU/addition/add',			process_SKU_Addition_add,	['post'],['backend_auth']);
 };
@@ -1248,7 +1248,12 @@ function process_SKU_add() {
 	SKUService.addSKU(self.data.name, self.data.product, self.data.attributes, self.data.additions, self.data.price, function (err, SKU) {
 		if (err) {
 			console.error('process_SKU_add error', err);
-			self.respond({code: 1001, message: '添加失败'});
+			if(11000 == err.code){
+				self.respond({code:1001, message:'相同属性的SKU已经添加过了'});
+			} else {
+				self.respond({code: 1001, message: '添加失败'});
+			}
+
 			return;
 		}
 
@@ -1266,7 +1271,11 @@ function process_SKU_update(id){
 	SKUService.updateSKU(id, self.data.price, self.data.attributes, self.data.additions, self.data.name, function(err){
 		if(err){
 			console.error('updateSKU error', err);
-			self.respond({code:1001, message:'更新SKU失败'});
+			if(11000 == err.code){
+				self.respond({code:1001, message:'相同属性的SKU已经添加过了'});
+			} else {
+				self.respond({code: 1001, message: '更新SKU失败'});
+			}
 			return;
 		}
 
@@ -1299,7 +1308,11 @@ function process_SKU_Attribute_add(){
 	SKUService.addSKUAttribute(self.data.category, self.data.brand, self.data.name, self.data.value, null, function(err, attribute){
 		if(err){
 			console.error('process_SKU_Attribute_add error', err);
-			self.respond({code:1001, message:'添加SKU属性失败'});
+			if(11000 == err.code){
+				self.respond({code:1001, message:'相同的SKU属性已经添加过了'});
+			} else {
+				self.respond({code: 1001, message: '添加SKU属性失败'});
+			}
 			return;
 		}
 
@@ -1324,7 +1337,11 @@ function process_product_attributes_add(){
 	var self = this;
 	ProductService.addAttribute(self.data.category, self.data.brand, self.data.name, self.data.value, null, function(err, new_attribute){
 		if(err){
-			self.respond({code:1001, message:'保存商品属性失败'});
+			if(11000 == err.code){
+				self.respond({code:1001, message:'相同的商品属性已经添加过了'});
+			} else {
+				self.respond({code: 1001, message: '保存商品属性失败'});
+			}
 			return;
 		}
 
@@ -1345,16 +1362,21 @@ function json_SKU_get(){
 	})
 }
 
-function process_SKU_remove(id){
+function process_SKU_online(id){
 	var self = this;
-	SKUService.removeSKU(id, function(err){
+	if(typeof self.data.online == 'undefiled'){
+		self.respond({code:1001, message:"请填写上线与否"});
+		return;
+	}
+
+	SKUService.online(id, self.data.online, function(err, doc){
 		if(err){
 			console.log(err);
-			self.respond({code:1001, message:'删除SKU失败'});
+			self.respond({code:1001, message:'更新SKU失败'});
 			return;
 		}
 
-		self.respond({code:1000, message:'success'});
+		self.respond({code:1000, message:'success', SKU:doc});
 	})
 }
 

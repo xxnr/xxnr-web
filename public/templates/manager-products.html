@@ -172,7 +172,7 @@
 							<select data-index="{{$index}}" data_SKU_id="{{SKU._id}}">
 								<option selected disabled hidden value=''></option>
 								{{ foreach value in SKUQueryAttributes[attribute.name] }}
-								<option value="{{value.value}}"  ref="{{value.ref}}"  name="{{attribute.name}}"
+								<option value="{{value.value}}"  ref="{{value.ref}}"  name="{{attribute.name}}" order="{{value.order}}"
 									{{ if SKU._id }}
 										{{ if SKUExistAttributes && SKUExistAttributes[SKU._id] && SKUExistAttributes[SKU._id][attribute.name] && value.ref == SKUExistAttributes[SKU._id][attribute.name].ref }} 
 											selected
@@ -234,7 +234,11 @@
 						<td class="col-xs-2 hidden-xs ui-center nopadding">
 							{{ if SKU._id }}
 							<button name="ensure" onclick="update_SKU({{$index}})">@(提交修改)</button>
-							<button name="delete" onclick="remove_SKU({{$index}})">@(删除)</button>
+							{{ if SKU.online }}
+							<button name="offline" title="@(下线)" onclick="online_SKU('{{$index}}', false)"><span class="fa fa-stop"></span></button>
+							{{ else }}
+							<button name="online" title="@(上线)" onclick="online_SKU('{{$index}}', true)"><span class="fa fa-play"></span></button>
+							{{ fi }}
 							<button name="copy" onclick="copy_SKU({{$index}})">@(复制)</button>
 							{{ else }}
 							<button name="new_SKU" onclick="add_SKU({{$index}})">@(确认添加)</button>
@@ -780,11 +784,11 @@
 		SKU.attributes.forEach(function(attribute){
 			SKU.name += ' - ' + attribute.value;
 		});
-		if(!PRICE_REGEX.test(SKU.price.market_price) || parseFloat(SKU.price.market_price) > 0){
+		if(!PRICE_REGEX.test(SKU.price.market_price) || parseFloat(SKU.price.market_price) < 0){
 			alert('@(请填写正确的市场价)');
 			return;
 		}
-		if(!PRICE_REGEX.test(SKU.price.platform_price) || parseFloat(SKU.price.platform_price) > 0){
+		if(!PRICE_REGEX.test(SKU.price.platform_price) || parseFloat(SKU.price.platform_price) <= 0){
 			alert('@(请填写正确的平台价)');
 			return;
 		}
@@ -796,20 +800,22 @@
 				products.expanded[index]=true;
 				showCheckboxes(index);
 				success();
+			} else{
+				alert(response.message);
 			}
 		})
 	}
 
-	function remove_SKU(index){
-		if (!confirm('@(你确认要删除SKU？【删除后不能恢复】)'))
-			return;
+	function online_SKU(index, online){
 		var _id = products.SKUs[index]._id;
-		$.components.GET(managerurl+'/api/v2.1/SKU/remove/' + _id, null, function(response){
+		$.components.GET(managerurl+'/api/v2.1/SKU/online/' + _id, {online:online}, function(response){
 			if(response.code==1000) {
-				products.SKUs.splice(index, 1);
+				products.SKUs[index] = response.SKU;
 				SET('products.SKUs', products.SKUs);
 				products_onchange();
 				success();
+			} else{
+				alert(response.message);
 			}
 		})
 	}
@@ -852,11 +858,11 @@
 		SKU.attributes.forEach(function(attribute){
 			SKU.name += ' - ' + attribute.value;
 		});
-		if(!PRICE_REGEX.test(SKU.price.market_price) || parseFloat(SKU.price.market_price) > 0){
+		if(!PRICE_REGEX.test(SKU.price.market_price) || parseFloat(SKU.price.market_price) < 0){
 			alert('@(请填写正确的市场价)');
 			return;
 		}
-		if(!PRICE_REGEX.test(SKU.price.platform_price) || parseFloat(SKU.price.platform_price) > 0){
+		if(!PRICE_REGEX.test(SKU.price.platform_price) || parseFloat(SKU.price.platform_price) <= 0){
 			alert('@(请填写正确的平台价)');
 			return;
 		}
@@ -872,6 +878,8 @@
 					showCheckboxes(index);
 					products_onchange();
 					success();
+				} else{
+					alert(response.message);
 				}
 			})
 		};
@@ -905,6 +913,8 @@
 				el.value = "";
 				products_onchange();
 				success();
+			} else{
+				alert(response.message);
 			}
 		});
 	}
@@ -927,11 +937,13 @@
 		$.components.POST(managerurl+'/api/v2.1/SKU/attribute/add/', {category:category, brand:brand, name:name, value:value}, function(response){
 			if(response.code==1000){
 				var new_attribute = response.attribute;
-				products.SKUQueryAttributes[name].push({ref:new_attribute._id, value:new_attribute.value});
+				products.SKUQueryAttributes[name].push({ref:new_attribute._id, value:new_attribute.value, order:new_attribute.order});
 				SET('products.SKUQueryAttributes', products.SKUQueryAttributes);
 				el.value = "";
 				products_onchange();
 				success();
+			} else{
+				alert(response.message);
 			}
 		});
 	}
@@ -978,10 +990,11 @@
 			var SKU_id = el.attr('data_SKU_id');
 			var ref = el.find('option:selected').attr('ref');
 			var name = el.find('option:selected').attr('name');
+			var order = el.find('option:selected').attr('order');
 			var value = el.val();
 			products.SKUs.forEach(function(SKU){
 				if(SKU._id == SKU_id || (typeof SKU._id == 'undefined' && SKU_id=="")){
-					SKU.attributes[attributeIndex] = {ref:ref, name:name, value:value};
+					SKU.attributes[attributeIndex] = {ref:ref, name:name, value:value, order:order};
 					if(!products.SKUExistAttributes[SKU._id]){
 						products.SKUExistAttributes[SKU._id]=[];
 					}

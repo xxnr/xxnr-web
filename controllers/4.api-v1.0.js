@@ -74,7 +74,7 @@ function getProducts() {
 	var userId = this.query.userId;
 	var max = this.query['max'];
 
-    var options = {online:true};
+    var options = {online:{$exists:false}};
 
 	if (category)
 		options.category = category;
@@ -112,7 +112,7 @@ function getGoodsListPage(transformer) {
     var modelName = self.data["modelName"];
     var sort = self.data["sort"];
 
-    var options = {online:true};
+    var options = {online:{$exists:false}};
 
 	if (category)
 		options.category = category;
@@ -129,14 +129,8 @@ function getGoodsListPage(transformer) {
     if (reservePrice)
         options.reservePrice = decodeURI(reservePrice).split(',');
 
-    if (modelName) {
-        // support old api
-        var modelNames = decodeURI(modelName).split(',');
-        options.attributes = [];
-        modelNames.forEach(function(name){
-            options.attributes.push({name:'车系',value:name});
-        })
-    }
+    if (modelName)
+        options.modelName = decodeURI(modelName).split(',');
 
     if (sort)
         options.sort = decodeURI(sort);
@@ -472,11 +466,6 @@ function updateShoppingCart() {
             if (data && data.presale) {
                 self.respond({"code": "1001", "message": "无法添加预售商品"});
                 return;
-            }
-
-            if (data && !data.online){
-                self.respond({code:1001, message:"无法添加下线商品"});
-                return
             }
 
             CartService.updateItems(cart.cartId, data._id, count, update_by_add, function (err) {
