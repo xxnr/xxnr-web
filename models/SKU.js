@@ -21,7 +21,8 @@ var SKUSchema = new mongoose.Schema({
         market_price: {type: Number},                  // market price
         platform_price: {type: Number, required: true} // platform price
     },
-    online:{type:Boolean, default:false}
+    online:{type:Boolean, default:false},
+    dateCreated:{type:Date, default: Date.now}
 });
 
 var SKUAttributesSchema = new mongoose.Schema({
@@ -41,7 +42,7 @@ var SKUAdditionsSchema = new mongoose.Schema({              // sku additions, li
 });
 
 // indexes
-SKUSchema.index({product:1});
+SKUSchema.index({product:1, dateCreated:1});
 SKUSchema.index({name:1, product:1}, {unique:true});
 SKUAttributesSchema.index({category:1, brand:1, name:1, value:1}, {unique:true});
 SKUAttributesSchema.index({category:1, brand:1, name:1});

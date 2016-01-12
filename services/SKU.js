@@ -372,7 +372,9 @@ SKUService.prototype.querySKUByProductId = function(product, callback){
         return;
     }
 
-    SKUModel.find({product:product}, function(err, SKUs){
+    SKUModel.find({product:product})
+        .sort({dateCreated:1})
+        .exec(function(err, SKUs){
         if(err){
             console.error(err);
             callback(err);
