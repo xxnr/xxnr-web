@@ -117,7 +117,7 @@ ProductService.prototype.query = function(options, callback, oldSchema) {
     orderbyOptions.datecreated = -1;
 
     if(options.search){
-        mongoOptions.name = {$regex:new RegExp(options.search)};
+        queryOptions.name = {$regex:new RegExp(options.search)};
     }
 
     ProductModel.count(queryOptions, function (err, count) {

@@ -155,7 +155,7 @@
 		<button name="cancel">@(取消)</button>
 	</div>
 </div>
-<div data-component="form" data-title="@(订单信息)" data-component-path="common.form" data-if="value==='users_orders'" data-width="900px" data-component-id="users.orders.form">
+<div data-component="form" data-title="@(订单信息)" data-component-path="common.form" data-if="value==='users_orders'" data-width="1000px" data-component-id="users.orders.form">
     <div data-component="template" class="padding" data-component-path="users.orders.form">
         <script type="text/html">
             <table class="table table-bordered" border="0">
@@ -347,7 +347,7 @@
 	}
 
 	// Watchs changes in user filter
-	WATCH('users.filter.*', function(path, value) {
+	Delay_Search_WATCH('users.filter.*', function(path, value) {
 		if (NOTMODIFIED('users.filter', users.filter))
 			return;
 		users_refresh(path !== 'users.filter.page');

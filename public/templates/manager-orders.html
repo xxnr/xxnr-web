@@ -25,7 +25,7 @@
 	        	<!--{{ fi }}-->
 	        <!--</td>-->
             <td style="width:80px" class="silver hidden-xs ui-center" data-title="收货人">{{ consigneeName }}</br>{{ consigneePhone }}</td>
-	        <td style="width:110px" class="silver hidden-xs" data-title="下单时间" title="{{ dateCreated | format('@(yyyy-MM-dd HH:mm:ss)') }}">{{ dateCreated | format('@(yyyy-MM-dd HH:mm:ss)') }}</td>
+	        <td style="width:110px" class="silver hidden-xs ui-right" data-title="下单时间" title="{{ dateCreated | format('@(yyyy-MM-dd HH:mm:ss)') }}">{{ dateCreated | format('@(yyyy-MM-dd HH:mm:ss)') }}</td>
 			<td style="width:80px" class="silver hidden-xs ui-center" data-title="下单用户">{{ buyerName }}</br>{{ buyerPhone }}</td>
 	        <td style="width:80px" class="ui-right active" data-title="总金额" title="{{price | price(2)}}">{{ price | price(2) }} </td>
 	        <td style="width:80px" class="ui-right active" data-title="定金" title="{{deposit | price(2)}}">{{ deposit | price(2) }} </td>
@@ -791,7 +791,7 @@
 	}
 
 	// Watchs changes in order filter
-	WATCH('orders.filter.*', function(path, value) {
+	Delay_Search_WATCH('orders.filter.*', function(path, value) {
 		if (NOTMODIFIED('orders.filter', orders.filter))
 			return;
 		orders_refresh(path !== 'orders.filter.page');

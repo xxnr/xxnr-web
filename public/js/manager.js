@@ -185,6 +185,26 @@ function getSelectionStartNode(context){
 	return startNode;
 }
 
+Delay_Search_WATCH = function(field, callback, latency_in_millisecond){
+	if(typeof latency_in_millisecond == 'undefined'){
+		latency_in_millisecond = 1000;
+	}
+	var timer;
+	WATCH(field, function(path, value){
+		if(/.*filter\.search/.test(path)) {
+			if (timer) {
+				clearTimeout(timer);
+			}
+
+			timer = setTimeout(function (path, value) {
+				callback(path, value);
+			}, latency_in_millisecond);
+		} else{
+			callback(path, value);
+		}
+	})
+};
+
 var app = angular.module('xxnr.manager',['ngCookies'])
     .service('loginService', function($cookieStore) {
         var tokenKey = "be_token";

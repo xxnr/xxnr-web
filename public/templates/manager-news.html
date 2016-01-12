@@ -297,7 +297,7 @@
 	}
 
 	// Watchs changes in user filter
-	WATCH('news.filter.*', function(path, value) {
+	Delay_Search_WATCH('news.filter.*', function(path, value) {
 		if (NOTMODIFIED('news.filter', news.filter))
 			return;
 		news_refresh(path !== 'news.filter.page');

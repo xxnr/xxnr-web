@@ -23,15 +23,15 @@ queryAttributesAndPrice = function(product, attributes, callback, online) {
     if (product)
         matchOptions.product = mongoose.Types.ObjectId(product);
 
-    if(typeof online !== 'undefined'){
+    if (typeof online !== 'undefined') {
         matchOptions.online = online;
     }
 
     if (attributes && attributes.length > 0) {
-        matchOptions.attributes = {$all:[]};
+        matchOptions.attributes = {$all: []};
         attributes.forEach(function (attribute) {
             names.push(attribute.name);
-            matchOptions.attributes.$all.push({$elemMatch:attribute});
+            matchOptions.attributes.$all.push({$elemMatch: attribute});
         });
     }
 
@@ -43,10 +43,10 @@ queryAttributesAndPrice = function(product, attributes, callback, online) {
                 values: {$addToSet: '$attributes.value'},
                 pricemin: {$min: '$price.platform_price'},
                 pricemax: {$max: '$price.platform_price'},
-                order: {$max:'$attributes.order'}
+                order: {$max: '$attributes.order'}
             }
         }
-        , {$sort: {order:1}}
+        , {$sort: {order: 1}}
         , {$project: {_id: 0, name: '$_id', values: 1, pricemin: 1, pricemax: 1}}
         )
         .exec(function (err, docs) {
@@ -61,7 +61,13 @@ queryAttributesAndPrice = function(product, attributes, callback, online) {
                 , {
                     $group: {
                         _id: '$product',
-                        additions: {$addToSet: {ref:'$additions.ref', name:'$additions.name', price:'$additions.price'}}
+                        additions: {
+                            $addToSet: {
+                                ref: '$additions.ref',
+                                name: '$additions.name',
+                                price: '$additions.price'
+                            }
+                        }
                     }
                 })
                 .exec(function (err, additionsResult) {
@@ -86,11 +92,32 @@ queryAttributesAndPrice = function(product, attributes, callback, online) {
                     });
 
                     var additions = [];
-                    if(additionsResult && additionsResult.length>0){
+                    if (additionsResult && additionsResult.length > 0) {
                         additions = additionsResult[0].additions;
                     }
+                    var callbackValue = {
+                        price: {min: minPrice, max: maxPrice},
+                        attributes: returns,
+                            additions: additions
+                    };
+                    if (returns.length == 0) {
+                        // all attributes selected, should return selected SKU
+                        SKUModel.findOne(matchOptions, function (err, SKU) {
+                            if (err) {
+                                console.error(err);
+                                callback(err);
+                                return;
+                            }
 
-                    callback(null, {price: {min: minPrice, max: maxPrice}, attributes: returns, additions:additions});
+                            callbackValue.SKU = SKU.toObject();
+                            callbackValue.price.min = SKU.price.platform_price;
+                            callbackValue.price.max = SKU.price.platform_price;
+                            callback(null, callbackValue);
+                        });
+                    } else {
+
+                        callback(null, callbackValue);
+                    }
                 });
         });
 };

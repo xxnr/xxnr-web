@@ -484,7 +484,7 @@
 	});
 
 	// Watch for changes in order filter
-	WATCH('products.filter.*', function(path, value) {
+	Delay_Search_WATCH('products.filter.*', function(path, value) {
 		if (NOTMODIFIED('products.filter', products.filter))
 			return;
 		products_refresh(path !== 'products.filter.page');
