@@ -110,6 +110,7 @@ function getShoppingCart(){
             cart.SKU_items.forEach(function (item) {
                 if(item.SKU) {
                     var SKU = item.SKU;
+                    SKU.product = item.product;
                     SKU.count = item.count;
                     SKU.additions = item.additions;
                     SKUs.push(SKU);

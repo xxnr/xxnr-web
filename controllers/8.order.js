@@ -603,7 +603,7 @@ function addOrderBySKU(){
                         delete addition._id;
                     });
                     var SKU_to_add = {};
-                    var product = api10.convertProduct(SKU.product);
+                    var product = api10.convertProduct(cart.SKU_items[i].product);
                     SKU_to_add.ref = SKU._id;
                     SKU_to_add.productId = product.id;
                     SKU_to_add.price = SKU.price.platform_price;
