@@ -282,6 +282,42 @@ OrderService.prototype.updateProducts = function(options, callback) {
 	});
 };
 
+// Updates specific order SKUs
+OrderService.prototype.updateSKUs = function(options, callback) {
+
+	// check order deliverStatus by all SKUs
+	var self = this;
+	OrderModel.findOne({ id: options.id }, function (err, doc) {
+		if (err) {
+			callback(err);
+			return;
+		}
+		if (doc) {
+			doc.SKUs.forEach(function (sku) {
+				if (options.SKUs[sku.ref] && sku.deliverStatus !== options.SKUs[sku.ref].deliverStatus) {
+					sku.deliverStatus = options.SKUs[sku.ref].deliverStatus;
+					sku.dateSet = new Date();
+					if (sku.deliverStatus === DELIVERSTATUS.DELIVERED) {
+						sku.dateDelivered = new Date();
+					}
+				}
+			});
+			// check order deliver status
+			var order = self.checkDeliverStatus(doc);
+			order.save(function(err) {
+				if (err) {
+					callback(err);
+					return;
+				}
+
+				callback(null);
+			});
+		} else {
+			callback('未查找到订单');
+		}
+	});
+};
+
 // Updates specific order payments
 OrderService.prototype.updatePayments = function(options, callback) {
 
@@ -767,19 +803,19 @@ OrderService.prototype.createPayment = function(suborderPayment) {
 	return payment;
 };
 
-// Check order deliver status by all products' deliver status
+// Check order deliver status by all products or SKUs deliver status
 OrderService.prototype.checkDeliverStatus = function(order) {
-	if (order && order.products) {
-		for (var i=0; i < order.products.length; i++) {
-			var product = order.products[i];
-			if (!product.deliverStatus) continue;
+	if (order && order.SKUs && order.SKUs.length > 0) {
+		for (var i=0; i < order.SKUs.length; i++) {
+			var sku = order.SKUs[i];
+			if (!sku.deliverStatus) continue;
 
 			if (i == 0) {
-				order.deliverStatus = product.deliverStatus;
+				order.deliverStatus = sku.deliverStatus;
 				continue
 			}
 
-			if (parseInt(product.deliverStatus) === DELIVERSTATUS.UNDELIVERED) {
+			if (parseInt(sku.deliverStatus) === DELIVERSTATUS.UNDELIVERED) {
 				if (order.deliverStatus && (parseInt(order.deliverStatus) === DELIVERSTATUS.DELIVERED || parseInt(order.deliverStatus) === DELIVERSTATUS.PARTDELIVERED))
 					order.deliverStatus = DELIVERSTATUS.PARTDELIVERED;
 				else
@@ -796,6 +832,36 @@ OrderService.prototype.checkDeliverStatus = function(order) {
 		}
 		if (parseInt(order.deliverStatus) === DELIVERSTATUS.DELIVERED) {
 			order.dateDelivered = new Date();
+		}
+	} else {
+		if (order && order.products) {
+			for (var i=0; i < order.products.length; i++) {
+				var product = order.products[i];
+				if (!product.deliverStatus) continue;
+
+				if (i == 0) {
+					order.deliverStatus = product.deliverStatus;
+					continue
+				}
+
+				if (parseInt(product.deliverStatus) === DELIVERSTATUS.UNDELIVERED) {
+					if (order.deliverStatus && (parseInt(order.deliverStatus) === DELIVERSTATUS.DELIVERED || parseInt(order.deliverStatus) === DELIVERSTATUS.PARTDELIVERED))
+						order.deliverStatus = DELIVERSTATUS.PARTDELIVERED;
+					else
+						order.deliverStatus = DELIVERSTATUS.UNDELIVERED;
+				} else {
+					if (order.deliverStatus && (parseInt(order.deliverStatus) === DELIVERSTATUS.UNDELIVERED || parseInt(order.deliverStatus) === DELIVERSTATUS.PARTDELIVERED))
+						order.deliverStatus = DELIVERSTATUS.PARTDELIVERED;
+					else
+						order.deliverStatus = DELIVERSTATUS.DELIVERED;
+				}
+			}
+			if (!order.deliverStatus) {
+				order.deliverStatus = DELIVERSTATUS.UNDELIVERED;
+			}
+			if (parseInt(order.deliverStatus) === DELIVERSTATUS.DELIVERED) {
+				order.dateDelivered = new Date();
+			}
 		}
 	}
 	return order;

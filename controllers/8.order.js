@@ -509,7 +509,8 @@ function api10_getOrderDetails() {
                     'goodsId': product.id,
                     'imgs': product.thumbnail,
                     'deposit': product.deposit.toFixed(2),
-                    'category': product.category
+                    'category': product.category,
+                    'deliverStatus': product.deliverStatus
                 }
             }
             for (var i=0; i < SKUsLength; i++) {
@@ -524,7 +525,8 @@ function api10_getOrderDetails() {
                     'goodsId': SKU.productId,
                     'imgs': SKU.thumbnail,
                     'deposit': SKU.deposit.toFixed(2),
-                    'category': SKU.category
+                    'category': SKU.category,
+                    'deliverStatus': SKU.deliverStatus
                 }
             }
             order.orderGoodsList  = productArr;

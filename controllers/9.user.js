@@ -1449,7 +1449,7 @@ function json_get_invitee_orders() {
                         'products': item.products || []
                     };
                 }
-                result = {'code':'1000','message':'success',
+                result = {'code':1000,'message':'success',
                             'datas':{
                                 "account":user.account,
                                 "nickname":user.nickname,
@@ -1461,7 +1461,7 @@ function json_get_invitee_orders() {
                             }
                         };
             } else {
-                result = {'code':'1000','message':'success',
+                result = {'code':1000,'message':'success',
                             'datas':{
                                 "account":user.account,
                                 "nickname":user.nickname,

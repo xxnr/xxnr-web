@@ -27,21 +27,22 @@ var schema = new mongoose.Schema({
             'dateSet': Date,														// 人为设置的日期
             'deliverStatus': {type:Number, required:true, default: DELIVERSTATUS.UNDELIVERED}
 		}]},
-	SKUs:[{
-		ref:{type:mongoose.Schema.ObjectId, ref:'SKU', required:true},
-		productId:{type:String, required:true},
-		price:{type:Number, required: true},
-		deposit:{type:Number, required:true},
-		name:{type:String, required:true},
-		thumbnail:String,
-		count:{type:Number, required:true},
-		category:{type:String, required:false},
-		dateDelivered:Date,
-		deliverStatus:{type:Number, required:true, default:DELIVERSTATUS.UNDELIVERED},
-		additions:[{							// the additions added to order
-			ref:{type:mongoose.Schema.ObjectId, ref:'SKUAddition', required:true},
-			name:{type:String, required:true},
-			price:{type:Number, required:true}
+	'SKUs':[{
+		'ref':{type:mongoose.Schema.ObjectId, ref:'SKU', required:true},
+		'productId':{type:String, required:true},
+		'price':{type:Number, required: true},
+		'deposit':{type:Number, required:true},
+		'name':{type:String, required:true},
+		'thumbnail':String,
+		'count':{type:Number, required:true},
+		'category':{type:String, required:false},
+		'dateDelivered':Date,
+		'dateSet': Date,
+		'deliverStatus':{type:Number, required:true, default:DELIVERSTATUS.UNDELIVERED},
+		'additions':[{							// the additions added to order
+			'ref':{type:mongoose.Schema.ObjectId, ref:'SKUAddition', required:true},
+			'name':{type:String, required:true},
+			'price':{type:Number, required:true}
 		}]
 	}],
 	'payStatus': {type:Number, required:true, default: PAYMENTSTATUS.UNPAID},		// 主订单付款状态，从子订单付款状态统计得来 分为未付款、部分付款、已付款三种，只用来做查询
