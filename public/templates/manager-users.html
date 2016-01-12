@@ -185,9 +185,12 @@
                             <td class="col-xs-2 hidden-xs ui-right">{{ order.id }}</td>
                             <td class="ui-right col-xs-4 hidden-xs">
                                 <ul>
-                            {{ foreach product in order.products }}
-                                    <li><div class="product-name" title="{{product.name}}">{{ product.name }}</div><sapn>({{ product.count }}x)</sapn></li>
-                            {{ end }}
+									{{ foreach product in order.products }}
+										<li><div class="product-name" title="{{product.name}}">{{ product.name }}</div><sapn>({{ product.count }}x)</sapn></li>
+									{{ end }}
+									{{ foreach SKU in order.SKUs }}
+										<li><div class="product-name" title="{{SKU.name}}">{{SKU.name}}</div><span>({{SKU.count}}x)</span></li>
+									{{ end }}
                                 </ul>
                             </td>
                             <td class="ui-right col-xs-3 hidden-xs">{{ order.dateCreated | format('yyyy-MM-dd hh:mm:ss') }}</td>
@@ -272,7 +275,6 @@
 				// 	break;
                 case 'order':
                     $.components.GET(managerurl + '/api/orders/?buyer=' + row.id, null, function(response) {
-                        console.log(response);
                         SET('users.orders.form', response);
                         SET('common.form','users_orders');
                     });
