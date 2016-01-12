@@ -1331,7 +1331,7 @@ function json_SKU_get(){
 function process_SKU_online(id){
 	var self = this;
 	if(typeof self.data.online == 'undefiled'){
-		self.respond({code:1001, message:"请填写上线与否"});
+		self.respond({code:1001, message:"请填写上架与否"});
 		return;
 	}
 

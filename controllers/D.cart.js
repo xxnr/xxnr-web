@@ -69,12 +69,12 @@ function updateShoppingCart() {
             }
 
             if (SKU && !SKU.product.online){
-                self.respond({code:1001, message:"无法添加下线商品"});
+                self.respond({code:1001, message:"无法添加下架商品"});
                 return
             }
 
             if(!SKU.online){
-                self.respond({code:1001, message:"无法添加下线SKU"});
+                self.respond({code:1001, message:"无法添加下架SKU"});
                 return
             }
 

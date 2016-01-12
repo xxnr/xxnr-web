@@ -37,9 +37,9 @@
             <td style="width:80px" class="ui-right">
 				<button name="edit" title="@(编辑)"><span class="fa fa-pencil"></span></button>
 				{{ if online }}
-				<button name="offline" title="@(下线)"><span class="fa fa-stop"></span></button>
+				<button name="offline" title="@(下架)"><span class="fa fa-stop"></span></button>
 				{{ else }}
-				<button name="online" title="@(上线)"><span class="fa fa-play"></span></button>
+				<button name="online" title="@(上架)"><span class="fa fa-play"></span></button>
 				{{ fi }}
 				<button name="remove" title="@(删除)"><span class="fa fa-times"></span></button>
 			</td>
@@ -235,9 +235,9 @@
 							{{ if SKU._id }}
 							<button name="ensure" onclick="update_SKU({{$index}})">@(提交修改)</button>
 							{{ if SKU.online }}
-							<button name="offline" title="@(下线)" onclick="online_SKU('{{$index}}', false)"><span class="fa fa-stop"></span></button>
+							<button name="offline" title="@(下架)" onclick="online_SKU('{{$index}}', false)"><span class="fa fa-stop"></span></button>
 							{{ else }}
-							<button name="online" title="@(上线)" onclick="online_SKU('{{$index}}', true)"><span class="fa fa-play"></span></button>
+							<button name="online" title="@(上架)" onclick="online_SKU('{{$index}}', true)"><span class="fa fa-play"></span></button>
 							{{ fi }}
 							<button name="copy" onclick="copy_SKU({{$index}})">@(复制)</button>
 							{{ else }}
@@ -443,14 +443,14 @@
 					});
 					break;
 				case 'online':
-					if (!confirm('@(你确定要上线你选择的商品吗?)'))
+					if (!confirm('@(你确定要上架你选择的商品吗?)'))
 						return;
 					$.components.POST(managerurl + '/api/products/updateStatus', { _id: row._id, online:true }, function() {
 						products_refresh(true);
 					});
 					break;
 				case 'offline':
-					if (!confirm('@(你确定要下线你选择的商品吗?)'))
+					if (!confirm('@(你确定要下架你选择的商品吗?)'))
 						return;
 					$.components.POST(managerurl + '/api/products/updateStatus', { _id:row._id, online:false }, function() {
 						products_refresh(true);
