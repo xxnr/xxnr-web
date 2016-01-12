@@ -928,12 +928,13 @@ function convertToShoppingCartFormatV_1_0(productDetails, cartId, userId){
 function getAttributes(attributeName) {
     var self = this;
     var category = self.data.category;
+    
     // support old app
     if(category == '化肥'){
         category = '531680A5';
     }
     if(category == '汽车'){
-        category = '531680A5';
+        category = '6C7D8F66';
     }
 
     var brand = self.data.brand;
