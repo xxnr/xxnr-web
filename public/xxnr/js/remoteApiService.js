@@ -439,6 +439,12 @@ app.service('remoteApiService', function(commonService){
         };
         return commonService.ajax(params);
 
-    }
+    };
+    this.isInWhiteList = function(){
+        var params = {
+            methodname:'api/v2.0/user/isInWhiteList'
+        };
+        return commonService.ajax(params);
+    };
 
 });
