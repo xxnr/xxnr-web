@@ -8,6 +8,7 @@ app.controller('commitPayController', function($scope, remoteApiService, payServ
         window.location.href = "logon.html";
     }
     var sweetalert = commonService.sweetalert;
+    var isInWhiteList = false;
     $scope.orderSelectedNum = 0;
     $scope.payMethods = [{imgUrl:'images/alipay.png',payUrl:payService.aliPayUrl,payType:1},
         {imgUrl:'images/unionpay.png',payUrl:payService.unionPayUrl, payType:2}]; //image file name array
@@ -66,6 +67,9 @@ app.controller('commitPayController', function($scope, remoteApiService, payServ
         if($scope.orders[$scope.orderSelectedNum].deposit > $scope.multi_pay_amount ){
             $scope.amount_add_editable = true;
         };
+        if(isInWhiteList){
+            $scope.amount_reduce_editable = true;
+        }
     };
 
     // $scope.edit_multi_pay_num = function () {
@@ -84,7 +88,11 @@ app.controller('commitPayController', function($scope, remoteApiService, payServ
         if((Number($scope.multi_pay_amount) - 500) >= 3000){
             $scope.multi_pay_amount = (Number($scope.multi_pay_amount) - 500);
             if($scope.multi_pay_amount == 3000){
-                $scope.amount_reduce_editable = false;
+                if(isInWhiteList){
+                    $scope.amount_reduce_editable = true;
+                }else{
+                    $scope.amount_reduce_editable = false;
+                }
             }
             if($scope.multi_pay_amount > 3000){
                 $scope.amount_reduce_editable = true;
@@ -93,8 +101,13 @@ app.controller('commitPayController', function($scope, remoteApiService, payServ
                 $scope.amount_add_editable = true;
             }
         }else if (Number($scope.multi_pay_amount) - 500 < 3000 && $scope.multi_pay_amount != $scope.orders[$scope.orderSelectedNum].deposit) {
-            $scope.amount_reduce_editable = false;
-            $scope.multi_pay_amount = 3000;
+            if(isInWhiteList){
+                $scope.amount_reduce_editable = false;
+                $scope.multi_pay_amount = 0.01;
+            }else{
+                $scope.amount_reduce_editable = false;
+                $scope.multi_pay_amount = 3000;
+            }
         }
     };
     $scope.multi_pay_amount_add = function(){
@@ -116,6 +129,13 @@ app.controller('commitPayController', function($scope, remoteApiService, payServ
         }
     };
 
+    remoteApiService.isInWhiteList()
+        .then(function(data) {
+            if(data.message=='true'){
+                isInWhiteList = true;
+                console.log(isInWhiteList);
+            }
+        });
     for(var index in $scope.ids){
         (function(index){
             remoteApiService.getOrderDetail($scope.ids[index])
@@ -154,6 +174,7 @@ app.controller('commitPayController', function($scope, remoteApiService, payServ
                         $scope.orders[index].resultStr = $scope.orders[index].resultStr.substr(0,$scope.orders[index].resultStr.length-1);
                         $scope.orders[index].resultStr = $scope.orders[index].resultStr.length > 100 ? ($scope.orders[index].resultStr.substr(0, 100) + '...') : $scope.orders[index].resultStr;
                         $scope.orders[index].payUrl = payService.aliPayUrl($scope.orders[index].id);
+
                         $scope.multi_pay_amount = $scope.orders[$scope.orderSelectedNum].deposit>3000?3000:$scope.orders[$scope.orderSelectedNum].deposit;
                         $scope.pay_price = $scope.orders[$scope.orderSelectedNum].deposit;
                         $scope.payUrl = payService.aliPayUrl($scope.orders[$scope.orderSelectedNum].id);
