@@ -444,7 +444,7 @@ OrderService.prototype.updatePayments = function(options, callback) {
 
 // Sets the payment status to paid
 OrderService.prototype.paid = function(id, paymentId, options, callback) {
-
+	var self = this;
 	// Updates database file
 	// OrderModel.update({id:id}, {$set:{payStatus:PAYMENTSTATUS.PAID, datepaid:new Date()}}, function(err, count) {
 	var values = {'payments.$.payStatus':PAYMENTSTATUS.PAID, 'payments.$.datePaid':new Date()};
