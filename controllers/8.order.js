@@ -93,6 +93,16 @@ function api10_getOders() {
                 if (!typeValue) {
                     typeValue = OrderService.orderType(item);
                 }
+                var orderInfo = {'totalPrice':item.price.toFixed(2), 'deposit':item.deposit.toFixed(2), 'dateCreated':item.dateCreated};
+                if (item.payStatus == PAYMENTSTATUS.PAID && item.datePaid) {
+                    orderInfo.datePaid = item.datePaid;
+                }
+                if (item.payStatus == DELIVERSTATUS.DELIVERED && item.dateDelivered) {
+                    orderInfo.dateDelivered = item.dateDelivered;
+                }
+                if (item.confirmed && item.dateCompleted) {
+                    orderInfo.dateCompleted = item.dateCompleted;
+                }
                 arr[i] = {
                     'typeValue':typeValue,
                     'orderId':item.id,
@@ -105,12 +115,13 @@ function api10_getOders() {
                     'typeLable':'',
                     'deposit': item.duePrice ? item.duePrice.toFixed(2) : item.deposit.toFixed(2),
                     'payType':item.payType,
-                    'order': {'totalPrice':item.price.toFixed(2), 'deposit':item.deposit.toFixed(2), 'dateCreated':item.dateCreated},
+                    'order': orderInfo,
                     'products': item.products || [],
                     'SKUs':item.SKUs || [],
                     'subOrders': item.subOrders || [],
                     'duePrice': item.duePrice ? item.duePrice.toFixed(2) : null,
                 };
+                
             }
             result = {'code':'1000','message':'success','datas':{"total":data.count,"rows":arr,"page":data.page,"pages":data.pages}};
         } else {
@@ -463,6 +474,16 @@ function api10_getOrderDetails() {
             var SKUsLength          = data.SKUs? data.SKUs.length: 0;
             var productArr          = new Array(productslength);
             var SKUArr              = new Array(productslength);
+            var orderInfo = {'totalPrice':data.price.toFixed(2),'deposit':data.deposit.toFixed(2),'dateCreated':data.dateCreated};
+            if (data.payStatus == PAYMENTSTATUS.PAID && data.datePaid) {
+                orderInfo.datePaid = data.datePaid;
+            }
+            if (data.payStatus == DELIVERSTATUS.DELIVERED && data.dateDelivered) {
+                orderInfo.dateDelivered = data.dateDelivered;
+            }
+            if (data.confirmed && data.dateCompleted) {
+                orderInfo.dateCompleted = data.dateCompleted;
+            }
             order.id                = data.id;
             order.orderNo           = paymentId;
             order.totalPrice        = data.price.toFixed(2);
@@ -479,19 +500,13 @@ function api10_getOrderDetails() {
             order.payType           = data.payType;
             order.confirmed         = data.confirmed;
             order.isClosed          = data.isClosed;
-            order.order             = {'totalPrice':data.price.toFixed(2),'deposit':data.deposit.toFixed(2),'dateCreated':data.dateCreated};
+            order.order             = orderInfo;
             order.subOrders         = data.subOrders;
             if (payPrice && payPrice > 0) {
                 order.duePrice      = payPrice.toFixed(2);
             }
             if (data.paySubOrderType) {
                 order.paySubOrderType = data.paySubOrderType;
-            }
-            if (data.dateDelivered) {
-                order.dateDelivered = data.dateDelivered;
-            }
-            if (data.dateCompleted) {
-                order.dateCompleted = data.dateCompleted;
             }
             if (payment) {
                 order.payment       = {'paymentId':payment.id, 'price':payment.price, 'suborderId':payment.suborderId};
