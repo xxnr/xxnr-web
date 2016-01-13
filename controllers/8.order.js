@@ -533,10 +533,9 @@ function api10_getOrderDetails() {
                 SKUArr[i] = {
                     'name': SKU.name,
                     'count': SKU.count,
-                    'unitPrice': SKU.price.toFixed(2),
+                    'price': SKU.price.toFixed(2),
                     'orderSubType': '',
                     'orderSubNo': '',
-                    'originalPrice': SKU.price.toFixed(2),
                     'goodsId': SKU.productId,
                     'imgs': SKU.thumbnail,
                     'deposit': SKU.deposit.toFixed(2),
