@@ -151,11 +151,10 @@ function convertToShoppingCartFormatV_1_0(SKUs, cartId, userId){
         var SKU = SKUs[i];
         var product = api10.convertProduct(SKUs[i].product);
         var SKUDetail = {"goodsId": product.id,
-            "unitPrice": SKU.price.platform_price,
+            "price": SKU.price.platform_price,
             "imgUrl": product.thumbnail,
             "productDesc": product.description,
             "point": product.payWithScoresLimit,
-            "originalPrice": SKU.price.platform_price,
             "name": SKU.name,
             "deposit": product.deposit,
             "count":SKU.count,

@@ -473,7 +473,7 @@ function api10_getOrderDetails() {
             var productslength      = data.products? data.products.length: 0;
             var SKUsLength          = data.SKUs? data.SKUs.length: 0;
             var productArr          = new Array(productslength);
-            var SKUArr              = new Array(productslength);
+            var SKUArr              = new Array(SKUsLength);
             var orderInfo = {'totalPrice':data.price.toFixed(2),'deposit':data.deposit.toFixed(2),'dateCreated':data.dateCreated};
             if (data.payStatus == PAYMENTSTATUS.PAID && data.datePaid) {
                 orderInfo.datePaid = data.datePaid;
@@ -526,23 +526,22 @@ function api10_getOrderDetails() {
                     'deposit': product.deposit.toFixed(2),
                     'category': product.category,
                     'deliverStatus': product.deliverStatus
-                }
+                };
             }
             for (var i=0; i < SKUsLength; i++) {
                 var SKU = data.SKUs[i];
                 SKUArr[i] = {
                     'name': SKU.name,
                     'count': SKU.count,
-                    'unitPrice': SKU.price.toFixed(2),
+                    'price': SKU.price.toFixed(2),
                     'orderSubType': '',
                     'orderSubNo': '',
-                    'originalPrice': SKU.price.toFixed(2),
                     'goodsId': SKU.productId,
                     'imgs': SKU.thumbnail,
                     'deposit': SKU.deposit.toFixed(2),
                     'category': SKU.category,
                     'deliverStatus': SKU.deliverStatus
-                }
+                };
             }
             order.orderGoodsList  = productArr;
             order.SKUList = SKUArr;
