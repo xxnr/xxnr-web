@@ -66,9 +66,32 @@ function getOdersList(callback) {
 
 function getOders() {
     var self = this;
+    var type = self.data['type'] || self.data['typeValue'] || null;
 
     getOdersList.call(this, function(data, error) {
         if (data) {
+            var items = data.items;
+            var length = items.length;
+            var arr = new Array(length);
+            for (var i = 0; i < length; i++) {
+                var item = items[i];
+                var typeValue = type;
+                // 订单合成状态
+                if (!typeValue) {
+                    item.typeValue = OrderService.orderType(item);
+                }
+                var orderInfo = {'totalPrice':item.price.toFixed(2), 'deposit':item.deposit.toFixed(2), 'dateCreated':item.dateCreated, 'orderStatus': OrderService.orderStatus(item)};
+                if (item.payStatus == PAYMENTSTATUS.PAID && item.datePaid) {
+                    orderInfo.datePaid = item.datePaid;
+                }
+                if (item.payStatus == DELIVERSTATUS.DELIVERED && item.dateDelivered) {
+                    orderInfo.dateDelivered = item.dateDelivered;
+                }
+                if (item.confirmed && item.dateCompleted) {
+                    orderInfo.dateCompleted = item.dateCompleted;
+                }
+                item.order = orderInfo;
+            }
             self.respond(data);
         } else {
             self.respond({'code':'1001','message':'没有找到订单'});
@@ -90,10 +113,11 @@ function api10_getOders() {
             for (var i = 0; i < length; i++) {
                 var item = items[i];
                 var typeValue = type;
+                // 订单合成状态
                 if (!typeValue) {
                     typeValue = OrderService.orderType(item);
                 }
-                var orderInfo = {'totalPrice':item.price.toFixed(2), 'deposit':item.deposit.toFixed(2), 'dateCreated':item.dateCreated};
+                var orderInfo = {'totalPrice':item.price.toFixed(2), 'deposit':item.deposit.toFixed(2), 'dateCreated':item.dateCreated, 'orderStatus': OrderService.orderStatus(item)};
                 if (item.payStatus == PAYMENTSTATUS.PAID && item.datePaid) {
                     orderInfo.datePaid = item.datePaid;
                 }
@@ -474,7 +498,7 @@ function api10_getOrderDetails() {
             var SKUsLength          = data.SKUs? data.SKUs.length: 0;
             var productArr          = new Array(productslength);
             var SKUArr              = new Array(SKUsLength);
-            var orderInfo = {'totalPrice':data.price.toFixed(2),'deposit':data.deposit.toFixed(2),'dateCreated':data.dateCreated};
+            var orderInfo = {'totalPrice':data.price.toFixed(2),'deposit':data.deposit.toFixed(2),'dateCreated':data.dateCreated, 'orderStatus': OrderService.orderStatus(data)};
             if (data.payStatus == PAYMENTSTATUS.PAID && data.datePaid) {
                 orderInfo.datePaid = data.datePaid;
             }
@@ -493,6 +517,7 @@ function api10_getOrderDetails() {
             order.address           = data.consigneeAddress;
             order.remarks           = '';
             order.deliveryTime      = '';
+            // 订单合成状态
             order.orderType         = OrderService.orderType(data);
             order.deposit           = payPrice.toFixed(2);
             order.payStatus         = data.payStatus;
