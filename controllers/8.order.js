@@ -604,7 +604,6 @@ function addOrderBySKU(){
                 for(var i=0; i<cart.SKU_items.length; i++){
                     var SKU = cart.SKU_items[i].SKU;
                     var product = cart.SKU_items[i].product;
-                    console.log(product);
                     if(!product.online){
                         self.respond({code:1001, message:"无法添加下架商品"});
                         return;

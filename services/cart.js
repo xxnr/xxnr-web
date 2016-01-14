@@ -458,7 +458,7 @@ CartService.prototype.checkoutSKU = function(cartId, items, callback) {
     var checkoutAll = items.length == 0;
     var SKUBuyCount = [];
     for (var i = 0; i < items.length; i++) {
-        SKUBuyCount[items[i].id] = items[i].count;
+        SKUBuyCount[items[i]._id] = items[i].count;
     }
     CartModel.findOne({cartId: cartId})
         .populate('SKU_items.SKU')
