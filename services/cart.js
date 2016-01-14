@@ -209,10 +209,16 @@ CartService.prototype.updateSKUItems = function(cartId, SKU_id, count, update_by
         })
     } else {
         // update by add
-        SKUModel.find({_id: SKU_id}, function (err, SKU) {
+        SKUModel.findOne({_id: SKU_id}, function (err, SKU) {
             if (err) {
                 console.error(err);
                 callback(err);
+                return;
+            }
+            if(!SKU){
+                var error = 'update shopping cart error: no such SKU found: ' + SKU_id;
+                console.error(error);
+                callback(error);
                 return;
             }
 
@@ -242,8 +248,9 @@ CartService.prototype.updateSKUItems = function(cartId, SKU_id, count, update_by
                     // if count<0, it means we are removing items
                     // we first update those who's count is greater than -count, using $inc
                     var options = {$inc: {'SKU_items.$.count': count}};
+                    options.$set = {'SKU_items.$.product':SKU.product};
                     if (additions && additions.length > 0) {
-                        options.$set = {'SKU_items.$.additions': additions};
+                        options.$set['SKU_items.$.additions'] = additions;
                     }
                     CartModel.update({
                         cartId: cartId,
@@ -266,7 +273,7 @@ CartService.prototype.updateSKUItems = function(cartId, SKU_id, count, update_by
                         CartModel.update({cartId: cartId}, {
                             $pull: {
                                 'items.count': -count,
-                                'SKU_items.product': SKU_id
+                                'SKU_items.SKU': SKU_id
                             }
                         }, function (err, numAffected) {
                             if (err) {
@@ -285,9 +292,11 @@ CartService.prototype.updateSKUItems = function(cartId, SKU_id, count, update_by
                     })
                 } else {
                     options = {$inc: {'SKU_items.$.count': count}};
+                    options.$set = {'SKU_items.$.product':SKU.product};
                     if (additions && additions.length > 0) {
-                        options.$set = {'SKU_items.$.additions': additions};
+                        options.$set['SKU_items.$.additions'] = additions;
                     }
+
                     CartModel.update({cartId: cartId, 'SKU_items.SKU': SKU_id}, options, function (err, numAffected) {
                         if (err) {
                             console.error(err);
@@ -468,7 +477,7 @@ CartService.prototype.checkoutSKU = function(cartId, items, callback) {
             } else {
                 var checkoutItems = [];
                 for (var j = 0; j < cart.SKU_items.length; j++) {
-                    cart.SKU_items[j].count = SKUBuyCount[cart.SKU_items[j]._id];
+                    cart.SKU_items[j].count = SKUBuyCount[cart.SKU_items[j].SKU._id];
                     if (cart.SKU_items[j].count) {
                         checkoutItems.push(cart.SKU_items[j]);
                     }

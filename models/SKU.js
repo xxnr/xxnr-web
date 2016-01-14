@@ -9,8 +9,7 @@ var SKUSchema = new mongoose.Schema({
         ref: {type: mongoose.Schema.ObjectId, ref:'SKUAttribute'},
         name: {type: String, required: true},         // attribute name
         value: {type: String, required: true},          // attribute value
-        order:{type: Number},
-        merge_label:{type:String}
+        order:{type: Number}
     }],
     additions: [{                                                               // sku additions, list all additions of this sku, will be like [{name:全景天窗,price:2000}, {name:大灯, price:1000}]
         ref: {type: mongoose.Schema.ObjectId, ref:'SKUAddition'},

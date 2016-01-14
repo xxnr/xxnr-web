@@ -33,12 +33,18 @@ var schema = new mongoose.Schema({
 		'price':{type:Number, required: true},
 		'deposit':{type:Number, required:true},
 		'name':{type:String, required:true},
+		'productName':{type:String, required:true},
 		'thumbnail':String,
 		'count':{type:Number, required:true},
 		'category':{type:String, required:false},
 		'dateDelivered':Date,
 		'dateSet': Date,
 		'deliverStatus':{type:Number, required:true, default:DELIVERSTATUS.UNDELIVERED},
+		'attributes':[{
+			'ref':{type:mongoose.Schema.ObjectId, ref:'SKUAttributes', required:true},
+			'name':{type:String, required:true},
+			'value':{type:String, required:true}
+		}],
 		'additions':[{							// the additions added to order
 			'ref':{type:mongoose.Schema.ObjectId, ref:'SKUAddition', required:true},
 			'name':{type:String, required:true},

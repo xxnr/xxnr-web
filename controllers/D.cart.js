@@ -11,7 +11,7 @@ exports.install = function() {
     F.route('/api/v2.1/cart/getShoppingCart', getShoppingCart, ['get'], ['isLoggedIn']);
     F.route('/api/v2.1/cart/addToCart', updateShoppingCart, ['post'], ['isLoggedIn']);
     F.route('/api/v2.1/cart/changeNum', updateShoppingCart, ['post'], ['isLoggedIn']);
-    F.route('/api/v2.1/cart/getShoppingCartOffline', getShoppingCartOffline, ['post'], ['isLoggedIn']);
+    F.route('/api/v2.1/cart/getShoppingCartOffline', getShoppingCartOffline, ['post']);
 };
 
 function updateShoppingCart() {
@@ -151,11 +151,14 @@ function convertToShoppingCartFormatV_1_0(SKUs, cartId, userId){
         var SKU = SKUs[i];
         var product = api10.convertProduct(SKUs[i].product);
         var SKUDetail = {"goodsId": product.id,
+            "_id": SKU._id,
             "price": SKU.price.platform_price,
             "imgUrl": product.thumbnail,
             "productDesc": product.description,
             "point": product.payWithScoresLimit,
-            "name": SKU.name,
+            "name:": SKU.name,
+            "productName": product.name,
+            "attributes" : SKU.attributes,
             "deposit": product.deposit,
             "count":SKU.count,
             additions:SKU.additions};
