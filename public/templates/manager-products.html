@@ -810,7 +810,7 @@
 		var _id = products.SKUs[index]._id;
 		$.components.GET(managerurl+'/api/v2.1/SKU/online/' + _id, {online:online}, function(response){
 			if(response.code==1000) {
-				products.SKUs[index] = response.SKU;
+				products.SKUs[index].online = response.SKU.online;
 				SET('products.SKUs', products.SKUs);
 				products_onchange();
 				success();

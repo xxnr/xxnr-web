@@ -115,7 +115,6 @@ queryAttributesAndPrice = function(product, attributes, callback, online) {
                             callback(null, callbackValue);
                         });
                     } else {
-
                         callback(null, callbackValue);
                     }
                 });
@@ -546,6 +545,163 @@ var refresh_product_SKUAttributes = function(product, callback){
             callback();
         })
     }, true)
+};
+
+SKUService.prototype.querySKUAttributesAndPrice = function(productId, attributes, callback, online) {
+    if(!productId){
+        // if we don't specify productId, the query will be slow, so we force people to specify productId here
+        callback('productId needed');
+        return;
+    }
+
+    var matchOptions = {product:mongoose.Types.ObjectId(productId)};
+    if (typeof online !== 'undefined') {
+        matchOptions.online = online;
+    }
+
+    var queryAttributes = {};
+    if (attributes && attributes.length > 0) {
+        matchOptions.attributes = {$all: []};
+        attributes.forEach(function (attribute) {
+            queryAttributes[attribute.name] = attribute.value;
+            matchOptions.attributes.$all.push({$elemMatch: attribute});
+        });
+    }
+
+    // Get all attributes this product has
+    ProductModel.findOne({_id: productId}, function (err, product) {
+        var allSKUAttributes = product.SKUAttributes;
+        var queryOptions = {};
+        var allAttributesSelected = true;
+        allSKUAttributes.forEach(function (SKUAttributes) {
+            var attributeSelected = false;
+            queryOptions[SKUAttributes.name] = {online: true, product: mongoose.Types.ObjectId(productId)};
+            for (var i = 0; i < attributes.length; i++) {
+                if (attributes[i].name != SKUAttributes.name) {
+                    if (!queryOptions[SKUAttributes.name].attributes) {
+                        queryOptions[SKUAttributes.name].attributes = {$all: [{$elemMatch: attributes[i]}]};
+                    } else {
+                        queryOptions[SKUAttributes.name].attributes.$all.push({$elemMatch: attributes[i]});
+                    }
+                } else{
+                    attributeSelected = true;
+                }
+            }
+
+            if(!attributeSelected){
+                allAttributesSelected = false;
+            }
+        });
+
+        var promises = [];
+        var results = [];
+        for (var j in queryOptions) {
+            if (queryOptions.hasOwnProperty(j)) {
+                var promise = new Promise(function (resolve, reject) {
+                    SKUModel.aggregate({$match: queryOptions[j]}
+                        , {$unwind: '$attributes'}
+                        , {
+                            $group: {
+                                _id: '$attributes.name',
+                                values: {$addToSet: '$attributes.value'},
+                                pricemin: {$min: '$price.platform_price'},
+                                pricemax: {$max: '$price.platform_price'},
+                                queryKey: {$max: j}
+                            }
+                        }
+                        , {$project: {_id: 0, name: '$_id', values: 1, pricemin: 1, pricemax: 1, queryKey: 1}}
+                        )
+                        .exec(function (err, docs) {
+                            if (err) {
+                                reject(err);
+                                return;
+                            }
+
+                            docs.forEach(function (doc) {
+                                if (doc.queryKey === doc.name) {
+                                    results.push(doc);
+                                }
+                            });
+
+                            resolve();
+                        });
+                });
+
+                promises.push(promise);
+            }
+        }
+
+        Promise.all(promises)
+            .then(function () {
+                var minPrice = Number.MIN_VALUE;
+                var maxPrice = Number.MAX_VALUE;
+                var remainAttributes = [];
+                results.forEach(function (result) {
+                    if (result.pricemin > minPrice) {
+                        minPrice = result.pricemin;
+                    }
+
+                    if (result.pricemax < maxPrice) {
+                        maxPrice = result.pricemax;
+                    }
+
+                    delete result.queryKey;
+                    delete result.pricemin;
+                    delete result.pricemax;
+                    remainAttributes.push(result);
+                });
+
+                SKUModel.aggregate({$match: matchOptions}
+                    , {$unwind: '$additions'}
+                    , {
+                        $group: {
+                            _id: '$product',
+                            additions: {
+                                $addToSet: {
+                                    ref: '$additions.ref',
+                                    name: '$additions.name',
+                                    price: '$additions.price'
+                                }
+                            }
+                        }
+                    })
+                    .exec(function (err, additionsResult) {
+                        if (err) {
+                            console.error(err);
+                            callback(err);
+                            return;
+                        }
+
+                        var additions = [];
+                        if (additionsResult && additionsResult.length > 0) {
+                            additions = additionsResult[0].additions;
+                        }
+
+                        var callbackValue = {attributes: remainAttributes, price: {min: minPrice, max: maxPrice}, additions:additions};
+                        if(allAttributesSelected) {
+                            // should query one SKU here
+                            SKUModel.findOne(matchOptions)
+                                .lean()
+                                .exec(function (err, SKU) {
+                                if (err) {
+                                    console.error(err);
+                                    callback(err);
+                                    return;
+                                }
+
+                                callbackValue.SKU = SKU;
+                                callback(null, callbackValue);
+                            });
+                        } else {
+                            callback(null, callbackValue);
+                        }
+                    })
+            })
+            .catch(function (err) {
+                console.error(err);
+                callback(err);
+            })
+    });
 };
 
 module.exports = new SKUService();

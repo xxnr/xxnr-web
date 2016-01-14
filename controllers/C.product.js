@@ -157,7 +157,7 @@ function getBrands(){
 
 function json_SKU_Attributes_query(){
     var self = this;
-    SKUService.queryAttributesAndPrice(self.data.product, self.data.attributes, function(err, data){
+    SKUService.querySKUAttributesAndPrice(self.data.product, self.data.attributes, function(err, data){
         if(err){
             console.error('json_SKU_Attributes_query error', err);
             self.respond({code:1001, message:'查询SKU属性价格区间失败'});
