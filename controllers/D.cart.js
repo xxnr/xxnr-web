@@ -151,6 +151,7 @@ function convertToShoppingCartFormatV_1_0(SKUs, cartId, userId){
         var SKU = SKUs[i];
         var product = api10.convertProduct(SKUs[i].product);
         var SKUDetail = {"goodsId": product.id,
+            "_id": SKU._id,
             "price": SKU.price.platform_price,
             "imgUrl": product.thumbnail,
             "productDesc": product.description,
