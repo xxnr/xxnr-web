@@ -11,7 +11,7 @@ exports.install = function() {
     F.route('/api/v2.1/cart/getShoppingCart', getShoppingCart, ['get'], ['isLoggedIn']);
     F.route('/api/v2.1/cart/addToCart', updateShoppingCart, ['post'], ['isLoggedIn']);
     F.route('/api/v2.1/cart/changeNum', updateShoppingCart, ['post'], ['isLoggedIn']);
-    F.route('/api/v2.1/cart/getShoppingCartOffline', getShoppingCartOffline, ['post'], ['isLoggedIn']);
+    F.route('/api/v2.1/cart/getShoppingCartOffline', getShoppingCartOffline, ['post']);
 };
 
 function updateShoppingCart() {
