@@ -35,6 +35,30 @@ OrderService.prototype.orderType = function (order) {
     }
 };
 
+// order status
+OrderService.prototype.orderStatus = function (order) {
+    if (order.payStatus == PAYMENTSTATUS.PAID) {
+        if (order.deliverStatus == DELIVERSTATUS.DELIVERED) {
+            if (order.confirmed) {
+                return {type:6, value:"已完成"};
+            }
+            return {type:5, value:"已发货"};
+        } else {
+        	if (order.deliverStatus == DELIVERSTATUS.PARTDELIVERED) {
+        		return {type:4, value:"部分发货"};
+        	}
+        	return {type:3, value:"待发货"};
+        }
+    } else if (order.payStatus == PAYMENTSTATUS.PARTPAID) {
+        return {type:2, value:"部分付款"};
+    } else {
+        if (order.isClosed) {
+            return {type:0, value:"交易关闭"};
+        }
+        return {type:1, value:"待付款"};
+    }
+};
+
 // Method
 // Gets listing
 OrderService.prototype.query = function(options, callback) {
