@@ -43,6 +43,7 @@ app.controller('orderDetailController',function($scope, remoteApiService, common
                     $scope.subOrdersPaymentshow.push(false);
                     $scope.subOrdersPaymentshowText.push('查看详情');
                     $scope.subOrdersPayments_detail_imgUrl.push("icon-down.png");
+                    $scope.subOrders[i].paidPrice = $scope.subOrders[i].paidPrice?$scope.subOrders[i].paidPrice:0;
                     for(var j in $scope.subOrders[i].payments){
                         var d = Date.fromISO($scope.subOrders[i].payments[j].datePaid);
                         $scope.subOrders[i].payments[j].FormattedDatePaid = d.getFullYear().toString()+'-'+ (d.getMonth()+1).toString() +'-'+d.getDate().toString();
