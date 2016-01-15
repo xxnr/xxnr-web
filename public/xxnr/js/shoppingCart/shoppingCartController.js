@@ -262,9 +262,9 @@ app.controller('shoppingCartController', function($scope, remoteApiService, comm
             sweetalert("请至少选中一件商品进行结算");
         }
         else{
-            console.log( $scope.shoppingCartCount);
+            // console.log( $scope.shoppingCartCount);
             var products = [];
-            console.log($scope.shoppingCartCount);
+            // console.log($scope.shoppingCartCount);
             for(var shopIndex = 0; shopIndex<$scope.shops.length; shopIndex++){
                 for(var itemIndex = 0; itemIndex < $scope.shops[shopIndex].items.length; itemIndex++){
                     if($scope.shops[shopIndex].items[itemIndex].selected){

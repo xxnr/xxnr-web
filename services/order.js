@@ -916,8 +916,8 @@ OrderService.prototype.checkPayStatus = function(options, callback) {
 					callback(err, null, null);
 					return;
 				}
-				if (order) {
-					self.checkPayStatusDetail(order, function(err, order, payment) {
+				if (doc) {
+					self.checkPayStatusDetail(doc, function(err, order, payment) {
 						if (err) {
 							callback(err, null, null);
 							return;
@@ -1079,7 +1079,7 @@ OrderService.prototype.checkPayStatusDetail = function(order, callback) {
 		        return;
 			});
 		} else {
-			callback(null, order, orderPayment);
+			callback(null, order.toObject(), orderPayment);
 	        return;
 		}
 	} else {

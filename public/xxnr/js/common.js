@@ -141,6 +141,142 @@ app.filter('trustHtml', function ($sce) {
         return $sce.trustAsHtml(input);
     }
 });
+app.filter('subOrderTypeToChineseWording', function () {
+    return function(input) {
+        var output = "";
+        switch (input) {
+            case "deposit":
+                output = "订金";
+                break;
+            case "balance":
+                output = "尾款";
+                break;
+            case "full":
+                output = "订单总额";
+                break;
+            default:
+                output = "";
+        }
+        return input = output;
+    };
+});
+app.filter('payStatusToChineseWording', function () {
+    return function(input) {
+        var output = "";
+        switch (input) {
+            case 1:
+                output = "待付款";
+                break;
+            case 2:
+                output = "已付款";
+                break;
+            case 3:
+                output = "部分付款";
+                break;
+            default:
+                output = "已关闭";
+        }
+        return input = output;
+    };
+});
+app.filter('orderTypeToChineseWording', function () {
+    return function(input) {
+        var output = "";
+        switch (input) {
+            case 1:
+                output = "待付款";
+                break;
+            case 2:
+                output = "已付款";
+                break;
+            case 3:
+                output = "待发货";
+                break;
+            case 4:
+                output = "已发货";
+                break;
+            case 0:
+                output = "已关闭";
+                break;
+            default:
+                output = "";
+        }
+        return input = output;
+    };
+});
+
+app.filter('deliverStatusToChineseWording', function () {
+    return function(input) {
+        var output = "";
+        switch (input) {
+            case 1:
+                output = "待发货";
+                break;
+            case 2:
+                output = "已发货";
+                break;
+            default:
+                output = "其他";
+        }
+        return input = output;
+    };
+});
+
+app.filter('payTypeToChineseWording', function () {
+    return function(input) {
+        var output = "";
+        switch (input) {
+            case 1:
+                output = "支付宝支付";
+                break;
+            case 2:
+                output = "银联支付";
+                break;
+            default:
+                output = "";
+        }
+        return input = output;
+    };
+});
+
+app.filter('payStatusToChineseText', function () {
+    return function(input) {
+        var output = "";
+        switch (input) {
+            case 1:
+                output = "尊敬的客户，我们还未收到该订单的款项，请您尽快完成付款。";
+                break;
+            case 2:
+                output = "尊敬的客户，您的订单还未支付完成，请您尽快完成剩余款项。";
+                break;
+            case 3:
+                output = "尊敬的客户，您的订单已支付完成，请耐心等待卖家发货，如有问题可拨打客服电话联系我们。";
+                break;
+            case 4:
+                output = "尊敬的客户，您的订单商品已部分发货，请您做好收货准备，其他商品请耐心等待发货。";
+                break;
+            case 5:
+                output = "尊敬的客户，您的订单商品已发货，请您做好收货准备。";
+                break;
+            case 6:
+                output = "尊敬的客户，您的订单商品已完成收货，如有问题可拨打客服电话联系我们。";
+                break;
+            case 7:
+                output = "尊敬的客户，您的订单商品已关闭，如有问题可拨打客服电话联系我们。";
+                break;
+            default:
+                output = "";
+        }
+        return input = output;
+    };
+});
+app.filter('toNumberFixedTwo', function() {
+    return function(input) {
+        var output = Number(input).toFixed(2);
+      return output;
+    };
+});
+
 
 
 /*************************************************************************************************
