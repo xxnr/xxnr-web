@@ -1068,7 +1068,7 @@ OrderService.prototype.checkPayStatusDetail = function(order, callback) {
 			values['$push'] = pushValues;
 		}
 		if (!U.isEmpty(values)) {
-			OrderModel.findOneAndUpdate({id:orderId}, values, {new: true}, function(err, order) {
+			OrderModel.findOneAndUpdate({id:order.id}, values, {new: true}, function(err, order) {
 				if (err) {
 		            console.error('OrderService checkPayStatus findOneAndUpdate err:', err);
 		            callback(err);
