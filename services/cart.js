@@ -156,51 +156,57 @@ CartService.prototype.updateItems = function(cartId, product_id, count, update_b
 };
 
 CartService.prototype.updateSKUItems = function(cartId, SKU_id, count, update_by_add, additions, callback) {
-    if(!cartId){
+    if (!cartId) {
         callback('need cartId');
         return;
     }
 
-    if(!SKU_id){
+    if (!SKU_id) {
         callback('need SKU_id');
         return;
     }
 
-    if(typeof count == 'undefined'){
+    if (typeof count == 'undefined') {
         callback('need count');
         return;
     }
 
-    if(!update_by_add && count==0) {
+    if (!update_by_add && count == 0) {
+        console.log('delete', SKU_id);
         // delete
-        CartModel.update({cartId:cartId}, {$pull:{items:{SKU:SKU_id}}}, {multi:true}, function(err, numAffected){
-            if(err){
+        CartModel.update({cartId: cartId}, {$pull: {SKU_items: {SKU: SKU_id}}}, {multi: true}, function (err, numAffected) {
+            if (err) {
                 console.error(err);
                 callback(err);
                 return;
             }
 
-            if(numAffected.n == 0){
+            if (numAffected.n == 0) {
                 callback('not found');
                 return;
             }
 
             callback();
         })
-    } else if(!update_by_add) {
-        // update by replace
-        var setOptions = {$set:{'SKU_items.$.count':count}};
-        if(additions && additions.length > 0){
-            setOptions = {$set:{'SKU_items.$.count':count, 'SKU_items.$.additions':additions}};
+    } else if (!update_by_add) {
+        if(count<0){
+            callback('cannot set count to negative');
+            return;
         }
-        CartModel.update({cartId:cartId, 'SKU_items.SKU':SKU_id}, setOptions, function(err, numAffected){
-            if(err){
+
+        // update by replace
+        var setOptions = {$set: {'SKU_items.$.count': count}};
+        if (additions && additions.length > 0) {
+            setOptions = {$set: {'SKU_items.$.count': count, 'SKU_items.$.additions': additions}};
+        }
+        CartModel.update({cartId: cartId, 'SKU_items.SKU': SKU_id}, setOptions, function (err, numAffected) {
+            if (err) {
                 console.error(err);
                 callback(err);
                 return;
             }
 
-            if(numAffected.n==0){
+            if (numAffected.n == 0) {
                 callback('not found');
                 return;
             }
@@ -215,7 +221,7 @@ CartService.prototype.updateSKUItems = function(cartId, SKU_id, count, update_by
                 callback(err);
                 return;
             }
-            if(!SKU){
+            if (!SKU) {
                 var error = 'update shopping cart error: no such SKU found: ' + SKU_id;
                 console.error(error);
                 callback(error);
@@ -227,72 +233,69 @@ CartService.prototype.updateSKUItems = function(cartId, SKU_id, count, update_by
                 newSKUItem.additions = additions;
             }
 
-            CartModel.update({
-                cartId: cartId,
-                'SKU_items.SKU': {$ne: SKU_id}
-            }, {$push: {SKU_items: newSKUItem}}, function (err, numAffected) {
-                if (err) {
-                    console.error(err);
-                    callback(err);
-                    return;
+            if (count < 0) {
+                // if count<0, it means we are removing items
+                // we first update those who's count is greater than -count, using $inc
+                var options = {$inc: {'SKU_items.$.count': count}};
+                options.$set = {'SKU_items.$.product': SKU.product};
+                if (additions && additions.length > 0) {
+                    options.$set['SKU_items.$.additions'] = additions;
                 }
-
-                if (numAffected.n > 0) {
-                    // successfully add one item to array
-                    // which indicates there is no such SKU_id
-                    callback();
-                    return;
-                }
-
-                if (count < 0) {
-                    // if count<0, it means we are removing items
-                    // we first update those who's count is greater than -count, using $inc
-                    var options = {$inc: {'SKU_items.$.count': count}};
-                    options.$set = {'SKU_items.$.product':SKU.product};
-                    if (additions && additions.length > 0) {
-                        options.$set['SKU_items.$.additions'] = additions;
+                CartModel.update({
+                    cartId: cartId,
+                    'SKU_items.SKU': SKU_id,
+                    'SKU_items.count': {$gt: -count}
+                }, options, function (err, numAffected) {
+                    if (err) {
+                        console.error(err);
+                        callback(err);
+                        return;
                     }
-                    CartModel.update({
-                        cartId: cartId,
-                        'SKU_items.SKU': SKU_id,
-                        'items.count': {$gt: -count}
-                    }, options, function (err, numAffected) {
+
+                    var greaterCount = numAffected.n;
+                    if (greaterCount > 0) {
+                        callback();
+                        return;
+                    }
+
+                    // then we update those who's count is equal to -count, using pull
+                    CartModel.update({cartId: cartId}, {
+                        $pull: {SKU_items: {SKU: SKU_id, count: -count}}
+                    }, function (err, numAffected) {
                         if (err) {
                             console.error(err);
                             callback(err);
                             return;
                         }
 
-                        var greaterCount = numAffected.n;
-                        if (greaterCount > 0) {
-                            callback();
+                        if (numAffected.nModified + greaterCount == 0) {
+                            callback('not found');
                             return;
                         }
 
-                        // then we update those who's count is equal to -count, using pull
-                        CartModel.update({cartId: cartId}, {
-                            $pull: {
-                                'items.count': -count,
-                                'SKU_items.SKU': SKU_id
-                            }
-                        }, function (err, numAffected) {
-                            if (err) {
-                                console.error(err);
-                                callback(err);
-                                return;
-                            }
-
-                            if (numAffected.n + greaterCount == 0) {
-                                callback('not found');
-                                return;
-                            }
-
-                            callback();
-                        })
+                        callback();
                     })
-                } else {
+                })
+            } else {
+                CartModel.update({
+                    cartId: cartId,
+                    'SKU_items.SKU': {$ne: SKU_id}
+                }, {$push: {SKU_items: newSKUItem}}, function (err, numAffected) {
+                    if (err) {
+                        console.error(err);
+                        callback(err);
+                        return;
+                    }
+
+                    if (numAffected.n > 0) {
+                        // successfully add one item to array
+                        // which indicates there is no such SKU_id
+                        callback();
+                        return;
+                    }
+
                     options = {$inc: {'SKU_items.$.count': count}};
-                    options.$set = {'SKU_items.$.product':SKU.product};
+                    options.$set = {'SKU_items.$.product': SKU.product};
                     if (additions && additions.length > 0) {
                         options.$set['SKU_items.$.additions'] = additions;
                     }
@@ -311,8 +314,8 @@ CartService.prototype.updateSKUItems = function(cartId, SKU_id, count, update_by
 
                         callback();
                     })
-                }
-            })
+                })
+            }
         });
     }
 };

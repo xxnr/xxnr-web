@@ -33,9 +33,9 @@ function updateShoppingCart() {
         return;
     }
 
-    if (!count) {
+    if (typeof count == 'undefined') {
         count = self.data['count'];//This is to support addToCart api
-        if (!count) {
+        if (typeof count == 'undefined') {
             var response = {code: 1001, message: 'param quantity/count required'};
             self.respond(response);
             return;
