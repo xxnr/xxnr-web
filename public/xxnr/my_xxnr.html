@@ -177,7 +177,7 @@
                                         <!-- <p ng-cloak>{{order.payType}}</p> -->
                                     </div>
                                     <div class="pay-status">
-                                        <p class="order-statusName" ng-cloak>{{order.statusName}}</p>
+                                        <p class="order-statusName" ng-cloak>{{order.order.orderStatus.value}}</p>
                                         <p class="order-detail" ng-cloak><a ng-href="orderDetail.html?id={{order.id}}" target="_blank">订单详情</a></p>
                                     </div>
                                     <div class="pay-action">

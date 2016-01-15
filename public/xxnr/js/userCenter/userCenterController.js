@@ -320,21 +320,29 @@ app.controller('userCenterController', function($scope, $rootScope, remoteApiSer
                     order.phone = orders[i].consigneePhone;
                     order.deliveryTime = orders[i].dateDelivered;
                     order.createTime = orders[i].dateCreated;
+                    order.order = orders[i].order;
                     var d = new Date(commonService.parseDate(orders[i].dateCreated));
                     order.createTime_local = d.toLocaleString();
-                    if (orders[i].payStatus == 1 && !orders[i].isClosed) {
-                        order.statusName = '待付款';
+
+                    if(order.order.orderStatus.type == 1){
                         order.actionName = '去付款';
                         order.showAction = true;
                         order.action = function(order) {
                             window.location.href = "commitPay.html?id=" + order.id;
                         }
-                    } else if (orders[i].payStatus == 2 && orders[i].deliverStatus == 1) {
-                        order.statusName = '待发货';
+                    }else if(order.order.orderStatus.type == 2){
+                        order.actionName = '去付款';
+                        order.showAction = true;
+                        order.action = function(order) {
+                            window.location.href = "commitPay.html?id=" + order.id;
+                        }
+                    }else if(order.order.orderStatus.type == 3){
                         order.actionName = '联系客服';
                         order.showAction = false;
-                    } else if (orders[i].payStatus == 2 && orders[i].deliverStatus == 2 && !orders[i].confirmed) {
-                        order.statusName = '已发货';
+                    }else if(order.order.orderStatus.type == 4){
+                        order.actionName = '联系客服';
+                        order.showAction = false;
+                    }else if(order.order.orderStatus.type == 5){
                         order.actionName = '确认收货';
                         order.showAction = false;
                         order.action = function(order) {
@@ -346,22 +354,54 @@ app.controller('userCenterController', function($scope, $rootScope, remoteApiSer
                                 //    })
                             }
                         }
-                    } else if(orders[i].payStatus == 3){
-                        order.statusName = '部分付款';
-                        order.actionName = '去付款';
-                        order.showAction = true;
-                        order.action = function(order){
-                            window.location.href = "commitPay.html?id=" + order.id;
-                        }
-                    } else if (orders[i].confirmed) {
+                    }else if(order.order.orderStatus.type == 6){
                         order.showAction = false;
-                        order.statusName = '已完成';
                         order.actionName = '联系客服';
-                    } else {
+                    } else if(order.order.orderStatus.type == 7){
                         order.showAction = false;
-                        order.statusName = '已关闭';
                         order.actionName = '联系客服';
                     }
+
+                    // if (orders[i].payStatus == 1 && !orders[i].isClosed) {
+                    //     order.statusName = '待付款';
+                    //     order.actionName = '去付款';
+                    //     order.showAction = true;
+                    //     order.action = function(order) {
+                    //         window.location.href = "commitPay.html?id=" + order.id;
+                    //     }
+                    // } else if (orders[i].payStatus == 2 && orders[i].deliverStatus == 1) {
+                    //     order.statusName = '待发货';
+                    //     order.actionName = '联系客服';
+                    //     order.showAction = false;
+                    // } else if (orders[i].payStatus == 2 && orders[i].deliverStatus == 2 && !orders[i].confirmed) {
+                    //     order.statusName = '已发货';
+                    //     order.actionName = '确认收货';
+                    //     order.showAction = false;
+                    //     order.action = function(order) {
+                    //         if (confirm('确认收货')) {
+                    //             //remoteApiService.confirmReceipt(order.id)
+                    //             //    .then(function (data) {
+                    //             //        alert("确认订单成功");
+                    //             //        window.location.reload();
+                    //             //    })
+                    //         }
+                    //     }
+                    // } else if(orders[i].payStatus == 3){
+                    //     order.statusName = '部分付款';
+                    //     order.actionName = '去付款';
+                    //     order.showAction = true;
+                    //     order.action = function(order){
+                    //         window.location.href = "commitPay.html?id=" + order.id;
+                    //     }
+                    // } else if (orders[i].confirmed) {
+                    //     order.showAction = false;
+                    //     order.statusName = '已完成';
+                    //     order.actionName = '联系客服';
+                    // } else {
+                    //     order.showAction = false;
+                    //     order.statusName = '已关闭';
+                    //     order.actionName = '联系客服';
+                    // }
 
                     $scope.searchIndex[order.id] = $scope.orderList.push(order) - 1;
                 }

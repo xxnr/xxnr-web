@@ -45,13 +45,13 @@
     <li><img src="images/green_ok.png" alt=""/><p>成功提交订单</p></li>
     </ul>
 </div>
-<div class="payBody ng-cloak">
+<div class="payBody ng-cloak ng-hide" ng-show="wholePageShow">
     <div class="orderInfo ng-cloak" ng-repeat='order in orders' ng-click='orderClicked($index)' ng-class="{true:'selected',false:'unselected'}[$index == orderSelectedNum]">
         <div class="big ng-cloak">订单号：
             <span class="ng-cloak">{{order.id}}</span>
             <span class="orderType">{{order.orderType}}</span>
             <p class="right needToPay" >待付金额：
-                <span class="price ng-cloak">{{order.deposit}}</span>元
+                <span class="price ng-cloak">{{order.duePrice}}</span>元
             </p>
         </div>
         <div class="clearfix totalPrice" ng-show='$index==orderSelectedNum'>
@@ -78,9 +78,9 @@
                     <div class="buy_btn">
                         <a class="btn-reduce" href="" ng-click="multi_pay_amount_reduce()" ng-class="{true:'editable'}[amount_reduce_editable]">-</a>
                         <a class="btn-add" href="" ng-click="multi_pay_amount_add()" ng-class="{true:'editable'}[amount_add_editable]">+</a>
-                        <input maxlength="4" class="text" id="buy-num" ng-model="multi_pay_amount" ng-change="buyCountChange(buy_count)" disabled="disabled">
+                        <input maxlength="4" class="text" id="buy-num" ng-model="multi_pay_amount" ng-change="buyCountChange(buy_count)" ng-readonly="!isInWhiteList">
                     </div>
-                    <!-- <a class="xxnr_btn" href="" ng-click="edit_multi_pay_num()">{{multi_pay_edit_bth}}</a> -->
+                    <a class="xxnr_btn" href="" ng-click="edit_multi_pay_num()" ng-show="isInWhiteList">{{multi_pay_edit_bth}}</a>
                     <p>点击<span>+ -</span>调节金额，每次幅度<span>500</span>元，最低调至<span>3000</span>元，不足则按实际付款金额</p>
                 </div>
                 <div class="more_pay" ng-click="pay_times_toggle()">
