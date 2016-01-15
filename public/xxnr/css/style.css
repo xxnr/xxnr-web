@@ -949,7 +949,7 @@ transition-delay: initial;
 .order-detail-section .order .order-body .pay_table_title li:nth-child(5){width: 150px;}
 .order-detail-section .order .order-body .pay_table_title li:nth-child(6){width: 190px;}
 .order-detail-section .order .order-body .pay_table_content{line-height: 66px;text-align: center;border-top: 1px solid #c7c7c7;}
-.order-detail-section .order .order-body .pay_table_content .xxnr_btn{width: 100px;height: 40px;border-radius: 7px;background: #fea121;}
+.order-detail-section .order .order-body .pay_table_content .xxnr_btn{width: 100px;height: 40px;border-radius: 7px;background: #fea121;line-height: 40px;margin-top: 13px;}
 .order-detail-section .order .order-body .pay_table_content .payments_detail{height: 22px;line-height: 22px;}
 .order-detail-section .order .order-body .pay_table_content .payments_detail a:hover{color:#fea121;}
 .order-detail-section .order .order-body .pay_table_content .payments_detail img{padding-top: 6px;padding-left: 10px;}

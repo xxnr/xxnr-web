@@ -261,7 +261,7 @@ app.filter('payStatusToChineseText', function () {
             case 6:
                 output = "尊敬的客户，您的订单商品已完成收货，如有问题可拨打客服电话联系我们。";
                 break;
-            case 7:
+            case 0:
                 output = "尊敬的客户，您的订单商品已关闭，如有问题可拨打客服电话联系我们。";
                 break;
             default:
