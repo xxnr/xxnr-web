@@ -370,7 +370,14 @@ function json_products_save() {
 
 function process_products_updateStatus(){
 	var self = this;
-	ProductService.updateStatus(self.body._id, self.body.online, self.callback())
+	ProductService.updateStatus(self.body._id, self.body.online, function(err){
+		if(err){
+			self.respond({code:1001, message:err});
+			return;
+		}
+
+		self.respond({code:1000});
+	})
 }
 
 // Removes specific product
