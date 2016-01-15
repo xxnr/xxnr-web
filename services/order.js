@@ -917,7 +917,7 @@ OrderService.prototype.checkPayStatus = function(options, callback) {
 					return;
 				}
 				if (doc) {
-					self.checkPayStatusDetail(order, function(err, order, payment) {
+					self.checkPayStatusDetail(doc, function(err, order, payment) {
 						if (err) {
 							callback(err, null, null);
 							return;
