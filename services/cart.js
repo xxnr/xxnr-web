@@ -172,7 +172,6 @@ CartService.prototype.updateSKUItems = function(cartId, SKU_id, count, update_by
     }
 
     if (!update_by_add && count == 0) {
-        console.log('delete', SKU_id);
         // delete
         CartModel.update({cartId: cartId}, {$pull: {SKU_items: {SKU: SKU_id}}}, {multi: true}, function (err, numAffected) {
             if (err) {
