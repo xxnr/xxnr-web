@@ -530,20 +530,41 @@ var refresh_product_SKUAttributes = function(product, callback){
             return;
         }
 
-        ProductModel.update({_id:product}, {$set:{SKUPrice:data.price, SKUAttributes:data.attributes, SKUAdditions:data.additions, price:data.price.min}}, function(err, numAffected){
-            if(err){
-                console.error(err);
-                callback(err);
-                return;
-            }
+        SKUModel.find({product:product})
+            .sort({dateCreated:-1})
+            .limit(1)
+            .lean()
+            .exec(function(err, docs){
+                if(err){
+                    console.error(err);
+                    callback(err);
+                    return;
+                }
 
-            if(numAffected.n==0){
-                callback('product '+product+' not exist');
-                return;
-            }
+                if(!docs || docs.length < 1){
+                    console.error('SKU not found');
+                    callback('SKU not found');
+                    return;
+                }
 
-            callback();
-        })
+                var defaultSKU = docs[0];
+                defaultSKU.ref = defaultSKU._id;
+                delete defaultSKU._id;
+                ProductModel.update({_id:product}, {$set:{SKUPrice:data.price, SKUAttributes:data.attributes, SKUAdditions:data.additions, price:data.price.min, defaultSKU:defaultSKU}}, function(err, numAffected){
+                    if(err){
+                        console.error(err);
+                        callback(err);
+                        return;
+                    }
+
+                    if(numAffected.n==0){
+                        callback('product '+product+' not exist');
+                        return;
+                    }
+
+                    callback();
+                })
+            });
     }, true)
 };
 
