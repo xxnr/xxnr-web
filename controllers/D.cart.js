@@ -47,6 +47,10 @@ function updateShoppingCart() {
         return;
     }
 
+    if(typeof update_by_add == 'string'){
+        update_by_add = (update_by_add === 'true');
+    }
+
     var options = {};
     options.userId = userId;
     options.SKUId = SKUId;
