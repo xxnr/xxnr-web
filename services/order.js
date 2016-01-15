@@ -1079,7 +1079,7 @@ OrderService.prototype.checkPayStatusDetail = function(order, callback) {
 		        return;
 			});
 		} else {
-			callback(null, order, orderPayment);
+			callback(null, order.toObject(), orderPayment);
 	        return;
 		}
 	} else {
