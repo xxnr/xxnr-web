@@ -158,6 +158,8 @@ ProductService.prototype.save = function(model, callback) {
     delete model.SKUPrice;
     delete model.SKUAttributes;
     delete model.SKUAdditions;
+    delete model.defaultSKU;
+    delete model.price;
 
     if (!model.id)
         model.id = U.GUID(10);
@@ -168,49 +170,74 @@ ProductService.prototype.save = function(model, callback) {
     if (model.datecreated)
         model.datecreated = model.datecreated.format();
 
-    // Updates database file
-    ProductModel.update({id: model.id}, {$set: model}, function (err, numAffected) {
-        if (err) {
-            console.error('product save err', err, 'model', model);
-            callback(err);
-            return;
-        }
+    var updator = function() {
+        // Updates database file
+        ProductModel.update({id: model.id}, {$set: model}, function (err, numAffected) {
+            if (err) {
+                console.error('product save err', err, 'model', model);
+                callback(err);
+                return;
+            }
 
-        if (numAffected.n == 0) {
-            var newProduct = new ProductModel(model);
-            newProduct.save(function (err) {
-                if (err) {
-                    console.error('product save err', err, 'model', model);
-                    callback(err);
-                    return;
-                }
-
-                newProduct.populate('brand', function(err, doc){
-                    if(err){
-                        console.error('product populate err', err, 'model', model);
+            if (numAffected.n == 0) {
+                var newProduct = new ProductModel(model);
+                newProduct.save(function (err) {
+                    if (err) {
+                        console.error('product save err', err, 'model', model);
                         callback(err);
                         return;
                     }
 
-                    newProduct.brandName = newProduct.brand.name;
-                    newProduct.save(function(err){
+                    newProduct.populate('brand', function (err, doc) {
                         if (err) {
-                            console.error('product save err', err, 'model', model);
+                            console.error('product populate err', err, 'model', model);
                             callback(err);
                             return;
                         }
 
-                        callback(null, doc);
-                        //TODO:call add attributes before new product with new attribute
-                        //setTimeout(refresh, 1000);
-                    });
-                })
-            });
-        } else {
-            callback(null);
-            //setTimeout(refresh, 1000);
-        }
-    })
+                        newProduct.brandName = newProduct.brand.name;
+                        newProduct.save(function (err) {
+                            if (err) {
+                                console.error('product save err', err, 'model', model);
+                                callback(err);
+                                return;
+                            }
+
+                            callback(null, doc);
+                            //TODO:call add attributes before new product with new attribute
+                            //setTimeout(refresh, 1000);
+                        });
+                    })
+                });
+            } else {
+                callback(null);
+                //setTimeout(refresh, 1000);
+            }
+        })
+    };
+    if(model.online) {
+        ProductModel.findOne({_id: model._id}, function (err, product) {
+            if (err) {
+                console.error(err);
+                callback(err);
+                return;
+            }
+
+            if (!product) {
+                callback('商品不存在');
+                return;
+            }
+
+            if (product.SKUAttributes && product.SKUAttributes.length > 0) {
+                updator()
+            } else {
+                callback('该商品没有上线的SKU，无法上线');
+                return;
+            }
+        })
+    } else{
+        updator();
+    }
 };
 
 // Gets a specific product
@@ -537,15 +564,41 @@ ProductService.prototype.updateStatus = function(_id, online, callback){
         online = false;
     }
 
-    ProductModel.update({_id:_id}, {$set:{online:online}}, function(err, numAffected){
-        if(err){
-            console.error(err);
-            callback(err);
-            return;
-        }
+    var updator = function(){
+        ProductModel.update({_id:_id}, {$set:{online:online}}, function(err, numAffected){
+            if(err){
+                console.error(err);
+                callback(err);
+                return;
+            }
 
-        callback();
-    })
+            callback();
+        })
+    };
+
+    if(online){
+        ProductModel.findOne({_id:_id}, function(err, product){
+            if(err){
+                console.error(err);
+                callback(err);
+                return;
+            }
+
+            if(!product){
+                callback('商品不存在');
+                return;
+            }
+
+            if (product.SKUAttributes && product.SKUAttributes.length > 0){
+                updator()
+            } else{
+                callback('请先添加并上线SKU');
+                return;
+            }
+        })
+    } else {
+        updator()
+    }
 };
 
 // Refreshes internal information (categories)

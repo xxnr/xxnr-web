@@ -445,8 +445,12 @@
 				case 'online':
 					if (!confirm('@(你确定要上架你选择的商品吗?)'))
 						return;
-					$.components.POST(managerurl + '/api/products/updateStatus', { _id: row._id, online:true }, function() {
-						products_refresh(true);
+					$.components.POST(managerurl + '/api/products/updateStatus', { _id: row._id, online:true }, function(response) {
+						if(response.code == 1000) {
+							products_refresh(true);
+						} else{
+							alert(response.message);
+						}
 					});
 					break;
 				case 'offline':
@@ -526,6 +530,8 @@
 
 			if(response.code==1000) {
 				callback(response.product);
+			} else{
+				alert(response.message);
 			}
 		})
 	}

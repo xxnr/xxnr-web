@@ -109,10 +109,14 @@ queryAttributesAndPrice = function(product, attributes, callback, online) {
                                 return;
                             }
 
-                            callbackValue.SKU = SKU.toObject();
-                            callbackValue.price.min = SKU.price.platform_price;
-                            callbackValue.price.max = SKU.price.platform_price;
-                            callback(null, callbackValue);
+                            if(SKU) {
+                                callbackValue.SKU = SKU.toObject();
+                                callbackValue.price.min = SKU.price.platform_price;
+                                callbackValue.price.max = SKU.price.platform_price;
+                                callback(null, callbackValue);
+                            } else {
+                                callback(null, callbackValue);
+                            }
                         });
                     } else {
                         callback(null, callbackValue);
@@ -530,20 +534,43 @@ var refresh_product_SKUAttributes = function(product, callback){
             return;
         }
 
-        ProductModel.update({_id:product}, {$set:{SKUPrice:data.price, SKUAttributes:data.attributes, SKUAdditions:data.additions, price:data.price.min}}, function(err, numAffected){
-            if(err){
-                console.error(err);
-                callback(err);
-                return;
-            }
+        SKUModel.find({product:product, online:true})
+            .sort({dateCreated:-1})
+            .limit(1)
+            .lean()
+            .exec(function(err, docs){
+                if(err){
+                    console.error(err);
+                    callback(err);
+                    return;
+                }
 
-            if(numAffected.n==0){
-                callback('product '+product+' not exist');
-                return;
-            }
+                var setOption = {SKUPrice:data.price, SKUAttributes:data.attributes, SKUAdditions:data.additions, price:data.price.min};
+                if(docs && docs.length == 1){
+                    var defaultSKU = docs[0];
+                    defaultSKU.ref = defaultSKU._id;
+                    delete defaultSKU._id;
+                    setOption.defaultSKU = defaultSKU;
+                } else{
+                    setOption.defaultSKU = null;
+                    setOption.online = false;
+                }
 
-            callback();
-        })
+                ProductModel.update({_id:product}, {$set:setOption}, function(err, numAffected){
+                    if(err){
+                        console.error(err);
+                        callback(err);
+                        return;
+                    }
+
+                    if(numAffected.n==0){
+                        callback('product '+product+' not exist');
+                        return;
+                    }
+
+                    callback();
+                })
+            });
     }, true)
 };
 

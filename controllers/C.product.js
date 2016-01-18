@@ -89,6 +89,10 @@ function getProductsListPage() {
     if (sort)
         options.sort = decodeURI(sort);
 
+    if (self.data.attributes){
+        options.attributes = self.data.attributes;
+    }
+
     // memorize is designed to work with view rather than api
     // Increases the performance (1 minute cache)
     //self.memorize('cache.' + category + '.' + options.page, '1 minute', DEBUG, function() {
