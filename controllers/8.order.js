@@ -727,7 +727,7 @@ function addOrderBySKU(){
                                     return;
                                 }
                                 var resultOrders = [];
-                                var result = {'id': data.id, 'price':data.price, 'deposit': data.deposit};
+                                var result = {'id': data.id, 'price':data.price, 'deposit': data.deposit, 'SKUs':data.SKUs || []};
                                 if (payment) {
                                     result.payment = {'paymentId':payment.id, 'price':payment.price};
                                 }
@@ -750,7 +750,7 @@ function addOrderBySKU(){
                                             });
                                             return;
                                         }
-                                        result = {'id': data.id, 'price':data.price, 'deposit': data.deposit};
+                                        result = {'id': data.id, 'price':data.price, 'deposit': data.deposit, 'SKUs':data.SKUs || []};
                                         if (payment) {
                                             result.payment = {'paymentId':payment.id, 'price':payment.price};
                                         }
