@@ -190,20 +190,24 @@ var setCookieAndResponse = function(user, keepLogin){
             return;
         }
 
+        var cookieUserInfo = {userid: user.userid, loginName: user.loginName};
+        if (user && user.nickname && user.nickname.length > 0) {
+            cookieUserInfo.nickName = encodeURIComponent(user.nickname);
+        }
         if(keepLogin){
-            if(F.isDebug){
-                self.res.cookie(F.config.usercookie, JSON.stringify({ userid: user.userid, loginName: user.loginName}), new Date().add(F.config.usercookie_expires_in));
+            if(F.isDebug){ 
+                self.res.cookie(F.config.usercookie, JSON.stringify(cookieUserInfo), new Date().add(F.config.usercookie_expires_in));
                 self.res.cookie(F.config.tokencookie, token, new Date().add(F.config.token_cookie_expires_in));
             }else {
-                self.res.cookie(F.config.usercookie, JSON.stringify({ userid: user.userid, loginName: user.loginName}), new Date().add(F.config.usercookie_expires_in), {domain: F.config.domain});
+                self.res.cookie(F.config.usercookie, JSON.stringify(cookieUserInfo), new Date().add(F.config.usercookie_expires_in), {domain: F.config.domain});
                 self.res.cookie(F.config.tokencookie, token, new Date().add(F.config.token_cookie_expires_in), {domain: F.config.domain});
             }
         }else{
             if(F.isDebug){
-                self.res.cookie(F.config.usercookie, JSON.stringify({ userid: user.userid, loginName: user.loginName}));
+                self.res.cookie(F.config.usercookie, JSON.stringify(cookieUserInfo));
                 self.res.cookie(F.config.tokencookie, token);
             }else {
-                self.res.cookie(F.config.usercookie, JSON.stringify({ userid: user.userid, loginName: user.loginName}), null, {domain: F.config.domain});
+                self.res.cookie(F.config.usercookie, JSON.stringify(cookieUserInfo), null, {domain: F.config.domain});
                 self.res.cookie(F.config.tokencookie, token, null, {domain: F.config.domain});
             }
         }
@@ -376,7 +380,7 @@ function json_user_get() {
         user.sex = data.sex;
         user.photo = data.photo;
         user.userType = data.type;
-        user.pointLaterTrade = data.score;
+        user.pointLaterTrade = data.score || 0;
         user.dateinvited = data.dateinvited;
         user.address = data.address;
         user.isVerified = data.isVerified;

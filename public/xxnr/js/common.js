@@ -10,6 +10,9 @@ var app = angular.module('xxnr_common',['ngCookies']);
 app.config(['$locationProvider', function($locationProvider) {
     $locationProvider.html5Mode(true);
 }]);
+// base domain regx
+app.constant('BaseDomainREG', /.*\.xinxinnongren\.com.*/);
+
 //app.constant('BaseUrl', 'http://101.200.181.247/');
 app.constant('BaseUrl', 'http://www.xinxinnongren.com/'); // app.constant('BaseUrl', 'http://123.57.251.173:8070/');
 

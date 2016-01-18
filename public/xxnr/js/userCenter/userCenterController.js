@@ -105,10 +105,10 @@ app.controller('userCenterController', function($scope, $rootScope, remoteApiSer
         isSelected: false
     }];
 
-    remoteApiService.getPointList(1, 10)
-        .then(function(data) {
-            $scope.user.points = data.datas.pointLaterTrade;
-        });
+    // remoteApiService.getPointList(1, 10)
+    //     .then(function(data) {
+    //         $scope.user.points = data.datas.pointLaterTrade;
+    //     });
 
     remoteApiService.getBasicUserInfo()
         .then(function(data) {
@@ -124,6 +124,7 @@ app.controller('userCenterController', function($scope, $rootScope, remoteApiSer
             $scope.user.sex = data.datas.sex;
             $scope.user.typeNum = data.datas.userType;
             $scope.user.isVerified = data.datas.isVerified;
+            $scope.user.points = data.datas.pointLaterTrade;
             switch (data.datas.userType) {
                 case '2':
                     $scope.user.type = "种植大户";
@@ -139,6 +140,14 @@ app.controller('userCenterController', function($scope, $rootScope, remoteApiSer
                     break;
                 default:
                     $scope.user.type = "其他";
+            }
+            // set user nickname to cookie
+            if (data && data.datas && data.datas.nickname) {
+                var cookieUser = loginService.getUser();
+                if (cookieUser) {
+                    cookieUser['nickName'] = encodeURIComponent(data.datas.nickname);
+                    loginService.setUser(cookieUser);
+                }
             }
         });
 
@@ -196,6 +205,14 @@ app.controller('userCenterController', function($scope, $rootScope, remoteApiSer
                                 $scope.user.nickname_editing = false;
                                 $scope.user.nickname_action_name = '修改';
                                 sweetalert('修改昵称成功', 'my_xxnr.html');
+                                // set user nickname to cookie
+                                if ($scope.user.nickname) {
+                                    var cookieUser = loginService.getUser();
+                                    if (cookieUser) {
+                                        cookieUser['nickName'] = encodeURIComponent($scope.user.nickname);
+                                        loginService.setUser(cookieUser);
+                                    }
+                                }
                             } else {
                                 //submit fail
                                 sweetalert(data.message);
