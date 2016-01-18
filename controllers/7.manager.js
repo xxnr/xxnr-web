@@ -691,42 +691,6 @@ var convertOrderToShow = function(order){
 // Reads all users
 function json_users_query() {
 	var self = this;
-    if(self.query.query){
-        switch(U.parseInt(self.query.query)){
-            case 1:
-                // 未认证
-                self.query.query = '!this.typeVerified || this.type !== this.typeVerified';
-                break;
-//            case 2:
-//                // 已认证
-//                self.query.query = "this.typeVerified && this.type === this.typeVerified && this.type !== '1'";
-//                break;
-            case 3:
-                // 申请认证
-                self.query.query = "this.type !== '1' && this.type !== this.typeVerified";
-                break;
-            case 4:
-                // 种植大户
-                self.query.query = "this.typeVerified && this.type === this.typeVerified && this.type === '2'";
-                break;
-            case 5:
-                // 村级经销商
-                self.query.query = "this.typeVerified && this.type === this.typeVerified && this.type === '3'";
-                break;
-            case 6:
-                // 乡镇经销商
-                self.query.query = "this.typeVerified && this.type === this.typeVerified && this.type === '4'";
-                break;
-            case 7:
-                // 县级经销商
-                self.query.query = "this.typeVerified && this.type === this.typeVerified && this.type === '5'";
-                break;
-            default:
-                // 全部
-                self.query.query = '';
-                break;
-        }
-    }
 
 	UserService.query(self.query, self.callback());
 }
@@ -744,8 +708,8 @@ function json_users_save() {
         options.id = self.data.id;
     if(self.data.type)
         options.type = self.data.type;
-    if(typeof self.data.isVerified != 'undefined')
-        options.isVerified = self.data.isVerified;
+	if(self.data.typeVerified)
+		options.typeVerified = self.data.typeVerified;
 
 	// self.body.$save(self.callback());
 	UserService.update(options, function(err){

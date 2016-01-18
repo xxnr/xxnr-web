@@ -140,3 +140,22 @@ canvas { display: block; }
 	padding: 0 !important;
 	margin: 0 !important;
 }
+
+#drop_in div{float:left;
+	margin-right:10px;
+	border-radius: 25px;
+	text-align: center;
+	padding-left:3px;
+	padding-right:3px;
+	-moz-box-shadow:-5px -5px 5px #999 inset;
+	-webkit-box-shadow:-5px -5px 5px #999 inset;
+	box-shadow:-5px -5px 5px #999 inset; }
+#drop_out div{float:left;
+	margin-right:10px;
+	border-radius: 25px;
+	text-align: center;
+	padding-left:3px;
+	padding-right:3px;
+	-moz-box-shadow:-5px -5px 5px #999 inset;
+	-webkit-box-shadow:-5px -5px 5px #999 inset;
+	box-shadow:-5px -5px 5px #999 inset; }

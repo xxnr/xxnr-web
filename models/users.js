@@ -9,7 +9,7 @@ var UserSchema = new mongoose.Schema({
     'nickname': String,                                                     // 用户昵称
     'name': String,                                                         // 用户名称
     'type': {type: String, default:"1"},                                    // 用户类型 1：其他 2：种植大户 3：村级经销商 4：乡镇经销商 5：县级经销商 it's configured in config file right now
-    'typeVerified': {type: String},                                         // 认证类型
+    'typeVerified': [{type: String}],                                         // 认证类型
     'sex': {type: Boolean, default:false},                                  // 性别 0：男 1：女
     'photo': String,                                                        // 用户头像
     'regmethod': Boolean,                                                   // 注册方式 0：手机 1：web
@@ -44,6 +44,7 @@ var UserSchema = new mongoose.Schema({
 
 // Indexes
 UserSchema.index({account:"text", nickname:"text", name:"text"});
+UserSchema.index({type:1});
 
 var UserLogSchema = new mongoose.Schema({id: String, account: String, ip: String, date: String, loginAgent: String});
 
