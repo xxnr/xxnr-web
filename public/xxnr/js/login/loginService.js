@@ -2,7 +2,7 @@
  * Created by pepelu on 2015/10/8.
  */
 var app = angular.module('xxnr_common');
-app.service('loginService', function($cookieStore, $timeout){
+app.service('loginService', function($cookieStore, $timeout, BaseUrl, BaseDomainREG){
 	var userKey = "__user";
     var tokenKey = "token";
 	var _user = $cookieStore.get(userKey);
@@ -20,6 +20,18 @@ app.service('loginService', function($cookieStore, $timeout){
 //        $cookies.put(userKey, $cookies.get(userKey), {expires: expires.toUTCString(), path:"/"});
 //        return _user;
 //    };
+
+    this.getUser = function() {
+        return $cookieStore.get(userKey);
+    };
+
+    this.setUser = function(value) {
+        if (BaseDomainREG.test(BaseUrl)) {
+            $cookieStore.put(userKey, value, {path:"/", domain:".xinxinnongren.com"});
+        } else {
+            $cookieStore.put(userKey, value, {path:"/"});
+        }
+    };
 
     this.logout = function(){
 //        $cookies.remove(userKey, {path:"/"});
