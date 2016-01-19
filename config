@@ -31,6 +31,7 @@ tokencookie                 :token
 usercookie					: __user
 domain                      :.xinxinnongren.com
 usercookie_expires_in       :30 days
+shopingCartcookie			: __scart
 
 // user sign
 user_sign_point_add         :2

@@ -2,7 +2,7 @@
  * Created by pepelu on 9/14/2015.
  */
 var app = angular.module('shop_cart', ['xxnr_common']);
-app.controller('shoppingCartController', function($scope, remoteApiService, commonService, loginService, sideService){
+app.controller('shoppingCartController', function($scope, remoteApiService, commonService, loginService, sideService, shoppingCartService){
 
     var sweetalert = commonService.sweetalert;
 
@@ -18,78 +18,93 @@ app.controller('shoppingCartController', function($scope, remoteApiService, comm
     $scope.$on('shoppingCartController', function(e,d) {
         //console.log(data);         //子级能得到值
         $scope.shoppingCartCount += d;
+        shoppingCartService.setSCart($scope.shoppingCartCount);
         //console.log(d);
     });
 
     if(loginService.isLogin) {
-        remoteApiService.getShoppingCart()
-            .then(function (data) {
-                $scope.shoppingCartCount = 0;
-                if (!data || !data.datas) { // not logged on?
-                    if (!data) data = {};
-                    if (!data.datas) data.datas = {"rows": []};
-                }
-                $scope.shoppingCartId = data.datas.shopCartId || data.datas.cartId;
-                for (var shopIndex in data.datas.rows) {
-                    var shopData = data.datas.rows[shopIndex];
-                    var shop = {};
-                    shop.name = shopData.brandName;
-                    shop.allSelected = true;
-                    shop.items = [];
-                    var shopCount = 0;
-                    var shopTotalPrice = 0;
-                    var shopTotalDeposit = 0;
-                    var shopSaving = 0;
-                    for (var itemIndex in shopData.goodsList) {
-                        var itemData = shopData.goodsList[itemIndex];
-                        $scope.shoppingCartCount += itemData.goodsCount;
+        // only cart page get shoppingCart api
+        if (window.location.pathname.indexOf('cart.html') != -1) {
+            remoteApiService.getShoppingCart()
+                .then(function (data) {
+                    $scope.shoppingCartCount = 0;
+                    if (!data || !data.datas) { // not logged on?
+                        if (!data) data = {};
+                        if (!data.datas) data.datas = {"rows": []};
+                    }
+                    $scope.shoppingCartId = data.datas.shopCartId || data.datas.cartId;
+                    for (var shopIndex in data.datas.rows) {
+                        var shopData = data.datas.rows[shopIndex];
+                        var shop = {};
+                        shop.name = shopData.brandName;
+                        shop.allSelected = true;
+                        shop.items = [];
+                        var shopCount = 0;
+                        var shopTotalPrice = 0;
+                        var shopTotalDeposit = 0;
+                        var shopSaving = 0;
+                        for (var itemIndex in shopData.goodsList) {
+                            var itemData = shopData.goodsList[itemIndex];
+                            $scope.shoppingCartCount += itemData.goodsCount;
 
-                        if (typeof productFilter === 'function') {
-                            var result = productFilter(itemData);
-                            if (result[0]) {
-                                itemData = result[1];
-                            } else {
-                                continue;
+                            if (typeof productFilter === 'function') {
+                                var result = productFilter(itemData);
+                                if (result[0]) {
+                                    itemData = result[1];
+                                } else {
+                                    continue;
+                                }
                             }
+
+                            var item = {};
+                            item.selected = true;
+                            item.goodsId = itemData.goodsId;
+                            item.detailPageUrl = "productDetail.html?goodsId=" + itemData.goodsId + '&type=' + shop.name;
+                            item.thumbnailUrl = commonService.baseUrl + itemData.imgUrl;
+                            item.onSale = (itemData.unitPrice == null || itemData.unitPrice == '') ? false : itemData.unitPrice != itemData.originalPrice;
+                            item.name = itemData.goodsName;
+                            item.oldPrice = parseFloat(itemData.originalPrice).toFixed(2);
+                            item.nowPrice = item.onSale ? parseFloat(itemData.unitPrice).toFixed(2) : item.oldPrice;
+                            item.point = itemData.point;
+                            item.buyCount = parseInt(itemData.buyCount ? itemData.buyCount : itemData.goodsCount);
+                            item.oldBuyCount = item.buyCount;
+                            item.count = parseInt(itemData.goodsCount);
+                            item.deposit = itemData.deposit;
+                            item.totalPrice = (item.buyCount * (item.nowPrice)).toFixed(2);
+                            item.totalDeposit = (item.buyCount * (item.deposit ? item.deposit : item.nowPrice)).toFixed(2);
+                            item.saving = item.buyCount * (item.oldPrice - item.nowPrice);
+                            item.hasDeposit = (item.deposit ? true : false);
+                            shopCount += item.buyCount;
+                            shopTotalPrice += item.totalPrice;
+                            shopTotalDeposit += item.totalDeposit;
+                            shopSaving += item.saving;
+                            shop.items.push(item);
+                        }
+                        // set shoppingCartCount
+                        shoppingCartService.setSCart($scope.shoppingCartCount);
+
+                        $scope.$broadcast('dataloaded');
+
+                        shop.buyCount = shopCount;
+                        shop.totalPrice = shopTotalPrice;
+                        shop.totalDeposit = shopTotalDeposit;
+                        shop.Saving = shopSaving;
+                        if (shop.buyCount > 0) {
+                            $scope.shops.push(shop);
+                            calculateTotal();
                         }
 
-                        var item = {};
-                        item.selected = true;
-                        item.goodsId = itemData.goodsId;
-                        item.detailPageUrl = "productDetail.html?goodsId=" + itemData.goodsId + '&type=' + shop.name;
-                        item.thumbnailUrl = commonService.baseUrl + itemData.imgUrl;
-                        item.onSale = (itemData.unitPrice == null || itemData.unitPrice == '') ? false : itemData.unitPrice != itemData.originalPrice;
-                        item.name = itemData.goodsName;
-                        item.oldPrice = parseFloat(itemData.originalPrice).toFixed(2);
-                        item.nowPrice = item.onSale ? parseFloat(itemData.unitPrice).toFixed(2) : item.oldPrice;
-                        item.point = itemData.point;
-                        item.buyCount = parseInt(itemData.buyCount ? itemData.buyCount : itemData.goodsCount);
-                        item.oldBuyCount = item.buyCount;
-                        item.count = parseInt(itemData.goodsCount);
-                        item.deposit = itemData.deposit;
-                        item.totalPrice = (item.buyCount * (item.nowPrice)).toFixed(2);
-                        item.totalDeposit = (item.buyCount * (item.deposit ? item.deposit : item.nowPrice)).toFixed(2);
-                        item.saving = item.buyCount * (item.oldPrice - item.nowPrice);
-                        item.hasDeposit = (item.deposit ? true : false);
-                        shopCount += item.buyCount;
-                        shopTotalPrice += item.totalPrice;
-                        shopTotalDeposit += item.totalDeposit;
-                        shopSaving += item.saving;
-                        shop.items.push(item);
                     }
-                    $scope.$broadcast('dataloaded');
-
-                    shop.buyCount = shopCount;
-                    shop.totalPrice = shopTotalPrice;
-                    shop.totalDeposit = shopTotalDeposit;
-                    shop.Saving = shopSaving;
-                    if (shop.buyCount > 0) {
-                        $scope.shops.push(shop);
-                        calculateTotal();
-                    }
-
-                }
-            });
+                });
+        } else {
+            var count = shoppingCartService.getSCart();
+            console.log(count);
+            if (count) {
+                $scope.shoppingCartCount = parseInt(count);
+            } else {
+                $scope.shoppingCartCount = 0;
+            }  
+        }
     }else{
         $scope.shoppingCartCount = 0;
     }
@@ -208,7 +223,14 @@ app.controller('shoppingCartController', function($scope, remoteApiService, comm
     };
 
     var submitChange = function(goodId, newCount){
-        remoteApiService.changeCartNum(goodId, newCount);
+        // remoteApiService.changeCartNum(goodId, newCount);
+        remoteApiService.changeCartNum(goodId, newCount)
+            .then(function (data) {
+                if (data && data.code == 1000) {
+                    // set shoppingCartCount
+                    shoppingCartService.setSCart($scope.shoppingCartCount);
+                }
+            }); 
     };
     $scope.submitChange = submitChange;
     $scope.deleteItem = function(shopIndex, itemIndex){
@@ -248,6 +270,14 @@ app.controller('shoppingCartController', function($scope, remoteApiService, comm
                     var commitUrl = "commitPay.html?";
                     for(var orderIndex in datas.orders){
                         commitUrl = commitUrl + "id" + '=' + datas.orders[orderIndex].id + '&';
+                        // set shoppingCartCount
+                        if (datas.orders[orderIndex] && datas.orders[orderIndex].SKUs) {
+                            for (var SKUIndex in datas.orders[orderIndex].SKUs) {
+                                var sku = datas.orders[orderIndex].SKUs[SKUIndex];
+                                $scope.shoppingCartCount -= sku.count;
+                            }
+                        }
+                        shoppingCartService.setSCart($scope.shoppingCartCount);
                     };
                     // console.log(commitUrl);
                     window.location.href = commitUrl;

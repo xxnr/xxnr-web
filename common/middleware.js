@@ -150,28 +150,55 @@ exports.backend_auth = function(req, res, next, options, controller){
 };
 
 exports.isInWhiteList_middleware = function(req, res, next, options, controller){
-    var user = controller.user;
-    try {
-        if (user) {
-            // check user in white list
-            UserService.inWhiteList({userid:user.id}, function(err, data) {
-                if (err) {
-                    // perhaps no user find
-                    console.log('isInWhiteList_middleware user not found: ' + err);
-                    next();
-                    return;
-                }
+    var token = null;
+    // check if token is valid
+    var data = req.method === 'GET' ? controller.query : controller.body;
+    if(data.token){
+        // if data contains token
+        // it means the request is from app
+        token = data.token;
+    }else if (controller.req.cookie(F.config.tokencookie)){
+        token = controller.req.cookie(F.config.tokencookie);
+    }
 
-                if (data) {
-                    user.inWhiteList = true;
-                    controller.user = user;
-                }
+    try {
+        var payload = tools.verify_token(token);
+        // token verify success, still need to check if the login id matches the current one in db
+        UserService.get({userid:payload.userId}, function(err, user) {
+            if (err) {
+                // perhaps no user find
+                console.error('isInWhiteList_middleware isLogin_middleware user not found:', err);
                 next();
-            });
-        } else {
-            next();
-        }
-    }catch(e){
+                return;
+            }
+
+            try {
+                if (user) {
+                    // check user in white list
+                    UserService.inWhiteList({userid:user.id}, function(err, data) {
+                        if (err) {
+                            // perhaps no user find
+                            console.error('isInWhiteList_middleware user not found:', err);
+                            next();
+                            return;
+                        }
+
+                        if (data) {
+                            user.inWhiteList = true;
+                            controller.user = user;
+                        }
+                        next();
+                    });
+                } else {
+                    next();
+                }
+            } catch(e) {
+                // white list check fail
+                console.log('White list check fail:' + e);
+                next();
+            }
+        });
+    } catch(e){
         // white list check fail
         console.log('White list check fail:' + e);
         next();

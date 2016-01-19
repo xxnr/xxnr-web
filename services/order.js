@@ -94,39 +94,40 @@ OrderService.prototype.query = function(options, callback) {
 		mongoOptions["isClosed"] = { $eq: true };
 		mongoOptions["payStatus"] = { $eq: PAYMENTSTATUS.UNPAID };
     }
-	// unpaid
+	// unpaid(including: part paid)
 	if (type === 1) {
 		mongoOptions["isClosed"] = { $ne: true };
         mongoOptions["payStatus"] = { $ne: PAYMENTSTATUS.PAID };
     }
 	// paid and not delivered
 	if (type === 2) {
-		// mongoOptions["payStatus"] = { $ne:  PAYMENTSTATUS.UNPAID };
-		// mongoOptions["payStatus"] = { $nin: [PAYMENTSTATUS.UNPAID, PAYMENTSTATUS.PARTPAID] };
-		// mongoOptions["deliverStatus"] = { $nin: [DELIVERSTATUS.DELIVERED, DELIVERSTATUS.PARTDELIVERED] };
 		mongoOptions["payStatus"] = { $eq: PAYMENTSTATUS.PAID };
 		mongoOptions["deliverStatus"] = { $eq: DELIVERSTATUS.UNDELIVERED };
 	}
 	// paid and delivered(including: part delivered)
 	if (type === 3) {
+		mongoOptions["confirmed"] = { $ne: true };
+		mongoOptions["payStatus"] = { $eq: PAYMENTSTATUS.PAID };
 		mongoOptions["deliverStatus"] = { $ne: DELIVERSTATUS.UNDELIVERED };
-		mongoOptions["confirmed"] = { $ne:  true};
 	} 
 	// Completed
-	if (type === 4 )
-		mongoOptions["confirmed"] = true;
+	if (type === 4) {
+		mongoOptions["confirmed"] = { $eq: true };
+		mongoOptions["payStatus"] = { $eq: PAYMENTSTATUS.PAID };
+		mongoOptions["deliverStatus"] = { $eq: DELIVERSTATUS.DELIVERED };
+	}
 
 	if (options.buyer) {
 		mongoOptions["buyerId"] = options.buyer;
 	}
 
     // Prepares searching
-    if (options.search){
+    if (options.search) {
         mongoOptions.$text = {$search:options.search};
     }
 
 	OrderModel.count(mongoOptions, function (err, count) {
-        if(err) {
+        if (err) {
             callback(err);
             return;
         }
@@ -1054,9 +1055,14 @@ OrderService.prototype.checkPayStatusDetail = function(order, callback) {
 			if (orderPayStatus !== order.payStatus) {
 				setValues['payStatus'] = orderPayStatus;
 				if (orderPayStatus === PAYMENTSTATUS.PAID) {
-					orderPayment = null;
 					setValues['datePaid'] = new Date();
 				}
+			}
+			if (orderPayStatus === PAYMENTSTATUS.PAID) {
+				if (order.duePrice !== 0) {
+					setValues['duePrice'] = 0;
+				}
+				orderPayment = null;
 			}
 		}
 		// update and return order info

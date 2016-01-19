@@ -8,7 +8,7 @@
 			</div>
 			<div class="col-md-3 col-sm-6 m">
 				<!--<div data-component="dropdown" data-component-path="orders.filter.type" data-options="@(全部订单)|0;@(Uncompleted)|1;@(Uncompleted and not paid)|2;@(Uncompleted and paid)|3;@(Completed)|4" data-component-type="number"></div>-->
-				<div data-component="dropdown" data-component-path="orders.filter.type" data-options="@(全部订单)|;@(未付款)|1;@(已付款未发货)|2;@(已发货)|3;@(完成)|4;@(已关闭)|0" data-empty="true" data-empty-text="@(全部订单)">@(订单状态)</div>
+				<div data-component="dropdown" data-component-path="orders.filter.type" data-options="@(全部订单)|;@(待付款)|1;@(待发货)|2;@(已发货)|3;@(完成)|4;@(已关闭)|0" data-empty="true" data-empty-text="@(全部订单)">@(状态筛选)</div>
 			</div>
 		</div>
 	</div>
@@ -57,35 +57,47 @@
 	        		{{ fi }}
 	        	{{ fi }}
 	        </td>
-	        <td style="width:90px" data-title="是否关闭">
+	        <td style="width:50px" data-title="是否关闭">
 	        	{{ if isClosed && payStatus == 1 }}
 	        		<span class="mr5 red">已关闭</span>
 	        	{{ else }}
 	        		<span class="mr5 green">未关闭</span>
 	        	{{ fi }}
 	        </td>
-	        <td style="width:90px" data-title="展示的状态类型">
-	        	{{ if isClosed && payStatus == 1 }}
-	        		<span class="mr5 red">已关闭</span>
-	        	{{ else }}
-	        		{{ if payStatus==1 || payStatus==3 }}
-		        		<span class="mr5 red">待付款</span>
-		        	{{ else }}
-			        	{{ if (deliverStatus==1 || deliverStatus==3) && payStatus==2 }}
-			        		<span class="red">待发货</span>
-			        	{{ else }}
-			        		{{ if deliverStatus==2 && !confirmed }}
-			        			<span class="green">已发货</span>
-			        		{{ else }}
-			        			{{ if confirmed }}
-			        				<span class="green">已完成</span>
-			        			{{ else }}
-			        				<span class="red">其他</span>
-			        			{{ fi }}
-			        		{{ fi }}
-			        	{{ fi }}
-			        {{ fi }}
+	        <td style="width:60px" data-title="订单状态类型">
+	        	{{ if order && order.orderStatus && order.orderStatus.value }}
+	        		{{ if order.orderStatus.type === 0 }}
+						<span class="red">
+					{{ else }}
+						<span class="green">
+					{{ fi }}
+					{{order.orderStatus.value}}</span>
+				{{ else }}
+					-		
 	        	{{ fi }}
+	        </td>
+	        <td style="width:60px" data-title="列表状态类型">
+        		{{ if typeValue === 0 }}
+	        		<span class="red">已关闭</span>
+	        	{{ else }}
+		        	{{ if typeValue === 1 }}
+	        			<span class="green">待付款</span>
+		        	{{ else }}
+		        		{{ if typeValue === 2 }}
+	        				<span class="green">待发货</span>
+		        		{{ else }}
+		        			{{ if typeValue === 3 }}
+	        					<span class="green">已发货</span>
+		        			{{ else }}
+		        				{{ if typeValue === 4 }}
+	        						<span class="green">已完成</span>
+	        					{{ else }}
+			        				-
+			        			{{ fi }}
+		        			{{ fi }}
+		        		{{ fi }}
+		        	{{ fi }}
+		        {{ fi }}
 	        </td>
 	        <!-- <td style="width:20px" class="ui-right">
 				<button name="edit" title="@(修改状态)"><span class="fa fa-pencil"></span></button>
@@ -166,31 +178,56 @@
 			        </td>
 			    </tr>
 		        <tr>
-		        	<td class="col-xs-5 active">@(展示的状态类型)</td>
-			        <td>
-			        	{{ if isClosed && payStatus == 1 }}
-			        		<span class="mr5 red">已关闭</span>
+		        	<td class="col-xs-5 active">@(订单状态类型)</td>
+				    <td>
+		        	{{ if order && order.orderStatus && order.orderStatus.value }}
+		        		{{ if order.orderStatus.type === 0 }}
+							<span class="red">
+						{{ else }}
+							<span class="green">
+						{{ fi }}
+						{{order.orderStatus.value}}</span>
+					{{ else }}
+						-		
+		        	{{ fi }}
+		        	</td>
+		        </tr>
+		        <tr>
+		        	<td class="col-xs-5 active">@(列表状态类型)</td>
+		        	<td>
+	        		{{ if orderType === 0 }}
+		        		<span class="red">已关闭</span>
+		        	{{ else }}
+			        	{{ if orderType === 1 }}
+		        			<span class="green">待付款</span>
 			        	{{ else }}
-			        		{{ if payStatus==1 || payStatus==3 }}
-				        		<span class="mr5 red">待付款</span>
-				        	{{ else }}
-					        	{{ if (deliverStatus==1 || deliverStatus==3) && payStatus==2 }}
-					        		<span class="red">待发货</span>
-					        	{{ else }}
-					        		{{ if deliverStatus==2 && !confirmed }}
-					        			<span class="green">已发货</span>
-					        		{{ else }}
-					        			{{ if confirmed }}
-					        				<span class="green">已完成</span>
-					        			{{ else }}
-					        				<span class="red">其他</span>
-					        			{{ fi }}
-					        		{{ fi }}
-					        	{{ fi }}
-					        {{ fi }}
+			        		{{ if orderType === 2 }}
+		        				<span class="green">待发货</span>
+			        		{{ else }}
+			        			{{ if orderType === 3 }}
+		        					<span class="green">已发货</span>
+			        			{{ else }}
+			        				{{ if orderType === 4 }}
+		        						<span class="green">已完成</span>
+		        					{{ else }}
+				        				-
+				        			{{ fi }}
+			        			{{ fi }}
+			        		{{ fi }}
 			        	{{ fi }}
-			        </td>
-			    </tr>
+			        {{ fi }}
+		        	</td>
+		        </tr>
+		        <tr>
+		        	<td class="col-xs-5 active">@(待付金额)</td>
+		        	<td>
+		        		{{ if duePrice }}
+		        			<span class="green">{{ duePrice | price(2) }}</span>
+		        		{{ else }}
+	        				-
+	        			{{ fi }}
+		        	</td>
+		        </tr>
 			</tbody>
 		</table>
 		</script>
