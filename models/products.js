@@ -45,25 +45,28 @@ var productSchema = new mongoose.Schema({
 		max: {type: Number}
 	},
 	online:{type:Boolean, default:false},
-	defaultSKU:{
-		ref:{type:mongoose.Schema.ObjectId, ref:'SKU', required:true},
-		name:{type:String},
-		attributes: [{                                                             // sku attributes, list all attributes this sku has, will be like [{name:车型,value:舒适性}, {name:排量,value:1.5L}]
-			ref: {type: mongoose.Schema.ObjectId, ref:'SKUAttribute'},
-			name: {type: String, required: true},         // attribute name
-			value: {type: String, required: true},          // attribute value
-			order:{type: Number}
-		}],
-		additions: [{                                                               // sku additions, list all additions of this sku, will be like [{name:全景天窗,price:2000}, {name:大灯, price:1000}]
-			ref: {type: mongoose.Schema.ObjectId, ref:'SKUAddition'},
-			name:{type:String, required: true},
-			price:{type:Number, required: true}
-		}],
-		price: {                                                                   // price of sku
-			market_price: {type: Number},                  // market price
-			platform_price: {type: Number, required: true} // platform price
+	defaultSKU: {
+		type: {
+			ref: {type: mongoose.Schema.ObjectId, ref: 'SKU', required: true},
+			name: {type: String},
+			attributes: [{                                                             // sku attributes, list all attributes this sku has, will be like [{name:车型,value:舒适性}, {name:排量,value:1.5L}]
+				ref: {type: mongoose.Schema.ObjectId, ref: 'SKUAttribute'},
+				name: {type: String, required: true},         // attribute name
+				value: {type: String, required: true},          // attribute value
+				order: {type: Number}
+			}],
+			additions: [{                                                               // sku additions, list all additions of this sku, will be like [{name:全景天窗,price:2000}, {name:大灯, price:1000}]
+				ref: {type: mongoose.Schema.ObjectId, ref: 'SKUAddition'},
+				name: {type: String, required: true},
+				price: {type: Number, required: true}
+			}],
+			price: {                                                                   // price of sku
+				market_price: {type: Number},                  // market price
+				platform_price: {type: Number, required: true} // platform price
+			},
+			online: {type: Boolean, default: false}
 		},
-		online:{type:Boolean, default:false}
+		required:false
 	}
 });
 
@@ -72,7 +75,8 @@ var productAttributeSchema = new mongoose.Schema({
 	brand: {type: mongoose.Schema.ObjectId, ref: 'brand'},
 	name: {type:String, required:true},
 	value:{type:String, required:true},
-	order:{type:Number}
+	order:{type:Number},
+	display:{type:Boolean}
 });
 
 // indexes

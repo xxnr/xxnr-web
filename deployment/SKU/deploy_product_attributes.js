@@ -19,18 +19,19 @@ module.exports = function(callback) {
                 }
 
                 var fields = line.split(',');
-                if (fields.length < 5) {
+                if (fields.length < 6) {
                     resolve();
                     return;
                 }
 
                 var order = parseInt(fields[0].trim());
-                var category = fields[1].trim();
-                var brand = fields[2].trim();
-                var name = fields[3].trim();
+                var display = (fields[1].trim() === 'true');
+                var category = fields[2].trim();
+                var brand = fields[3].trim();
+                var name = fields[4].trim();
 
                 var values = [];
-                for (var i = 4; i < fields.length; i++) {
+                for (var i = 5; i < fields.length; i++) {
                     values.push(fields[i].trim());
                 }
 
@@ -38,6 +39,7 @@ module.exports = function(callback) {
                 if(!brand){
                     skipBrand = true;
                 }
+
                 BrandModel.findOne({name:brand}, function(err, brand){
                     if(err){
                         console.log(err);
@@ -56,14 +58,14 @@ module.exports = function(callback) {
                             ProductService.addAttribute(category, skipBrand ? null : brand._id, name, value, order, function (err) {
                                 if (err) {
                                     if(11000 == err.code){
-                                        ProductService.updateAttributeOrder(category, skipBrand? null:brand._id, name, value, order, function(err){
+                                        ProductService.updateAttributeOrderAndDisplay(category, skipBrand? null:brand._id, name, order, function(err){
                                             if(err){
                                                 reject(err);
                                                 return;
                                             }
 
                                             resolve();
-                                        });
+                                        }, display);
 
                                         return;
                                     }
@@ -80,7 +82,7 @@ module.exports = function(callback) {
                                     value: value
                                 }, 'saved');
                                 resolve();
-                            })
+                            }, display)
                         })
                     });
 

@@ -178,14 +178,16 @@ SKUService.prototype.updateSKUAttributeOrder = function(category, brand, name, o
         return;
     }
 
-    SKUAttributeModel.update({category:category, brand:brand._id, name:name}, {$set:{order:order}}, function(err){
+    SKUAttributeModel.update({category:category, brand:brand._id, name:name}, {$set:{order:order}}, {multi:true}, function(err){
         if(err){
             console.error(err);
             callback(err);
             return;
         }
 
-        SKUAttributeModel.find({category:category, brand:brand._id, name:name}, function(err, docs){
+        SKUAttributeModel.find({category:category, brand:brand._id, name:name})
+            .lean()
+            .exec(function(err, docs){
             if(err){
                 console.error(err);
                 callback(err);
@@ -195,7 +197,8 @@ SKUService.prototype.updateSKUAttributeOrder = function(category, brand, name, o
             var promises = docs.map(function(SKUAttribute){
                 return new Promise(function(resolve, reject){
                     SKUAttribute.ref = SKUAttribute._id;
-                    SKUModel.update({'attributes.ref': SKUAttribute._id}, {$set: {'attributes.$':SKUAttribute}}, function(err){
+                    delete SKUAttribute._id;
+                    SKUModel.update({'attributes.ref': SKUAttribute.ref}, {$set: {'attributes.$':SKUAttribute}}, function(err){
                         if(err){
                             reject(err);
                             return;

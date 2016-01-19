@@ -409,7 +409,7 @@ ProductService.prototype.idJoinWithCount = function(options, callback){
     joinProduct(0);
 };
 
-ProductService.prototype.updateAttributeOrder = function(category, brand, name, value, order, callback){
+ProductService.prototype.updateAttributeOrderAndDisplay = function(category, brand, name, order, callback, display){
     if(!category){
         callback('category required');
         return;
@@ -420,17 +420,17 @@ ProductService.prototype.updateAttributeOrder = function(category, brand, name, 
         return;
     }
 
-    if(!value){
-        callback('value required');
-        return;
-    }
-
     if(!order){
         callback('order required');
         return;
     }
 
-    ProductAttributeModel.update({category:category, brand:brand, name:name, value:value}, {$set:{order:order}}, function(err){
+    var setOption = {$set:{order:order}};
+    if(typeof display != 'undefined'){
+        setOption = {$set:{order:order, display:display}}
+    }
+
+    ProductAttributeModel.update({category:category, brand:brand, name:name}, setOption, {multi:true}, function(err){
         if(err){
             console.error(err);
             callback(err);
@@ -441,7 +441,7 @@ ProductService.prototype.updateAttributeOrder = function(category, brand, name, 
     })
 };
 
-ProductService.prototype.addAttribute = function(category, brand, name, value, order, callback){
+ProductService.prototype.addAttribute = function(category, brand, name, value, order, callback, display){
     if(!category){
         callback('category _id required');
         return;
@@ -480,8 +480,15 @@ ProductService.prototype.addAttribute = function(category, brand, name, value, o
         matchOptions.brand = mongoose.Types.ObjectId(brand);
     }
 
-    if (order) {
-        model.order = order;
+    if (order || display) {
+        if(order) {
+            model.order = order;
+        }
+
+        if(display){
+            model.display = display;
+        }
+
         newAttributeProcessor();
     } else {
         ProductAttributeModel.aggregate({
@@ -489,11 +496,13 @@ ProductService.prototype.addAttribute = function(category, brand, name, value, o
         }, {
             $group: {
                 _id: {category:'$category', brand:'$brand', name:'$name'},
-                order: {$max: '$order'}
+                order: {$max: '$order'},
+                display: {$max: '$display'}
             }
         }).exec(function (err, results) {
             if (results && results.length > 0) {
                 model.order = results[0].order;
+                model.display = results[0].display;
                 newAttributeProcessor();
             }
         });
@@ -505,7 +514,7 @@ ProductService.prototype.getAttributes = function(category, brand, name, callbac
     if(category)
         matchOptions.category = category;
     if(brand){
-        if(brand == 'null'){
+        if(brand == 0){
             matchOptions.brand = null;
         } else{
             matchOptions.brand = mongoose.Types.ObjectId(brand);
@@ -523,9 +532,11 @@ ProductService.prototype.getAttributes = function(category, brand, name, callbac
         case 2:
             // frontend schema
             schemaToAdd = '$value';
+            matchOptions.display = true;
             break;
         default:
             // old schema
+            matchOptions.display = true;
             break;
     }
 

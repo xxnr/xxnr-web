@@ -56,7 +56,7 @@ phone_message_options		: {"userid":"617","account":"xinxinnongren","password":"x
 dri_config                  : {"dri_list":["18612649699", "15110102070"]}
 
 // user types
-user_types                  : {"1":"其他", "2":"种植大户", "3":"村级经销商", "4":"乡镇经销商", "5":"县级经销商"}
+user_types                  : {"1":"其他", "2":"种植大户", "3":"村级经销商", "4":"乡镇经销商", "5":"县级经销商", "6":"新农经纪人"}
 
 // user min pay price
 minPayPrice					: 3000

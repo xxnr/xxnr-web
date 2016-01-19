@@ -154,6 +154,7 @@ function process_login() {
 		user.userAddress = data.address;
         user.isVerified = data.isVerified;
         user.isUserInfoFullFilled = data.isUserInfoFullFilled;
+        user.verifiedTypes = data.typeVerified;
 
         CartService.getOrAdd(user.userid, function(err, cart){
             if(err){
@@ -413,6 +414,7 @@ function json_user_get() {
         user.address = data.address;
         user.isVerified = data.isVerified;
         user.isUserInfoFullFilled = data.isUserInfoFullFilled;
+        user.verifiedTypes = data.typeVerified;
         if (data.inviter) {
             user.inviterId = data.inviter.id;
             user.inviter = data.inviter.account;
