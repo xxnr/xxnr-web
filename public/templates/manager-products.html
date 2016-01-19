@@ -387,7 +387,7 @@
 
 						if (response && response.category) {
 							request_brands(response.linker_category, function() {
-								request_product_attribute(response.linker_category, null, function (product_attributes_without_brand) {
+								request_product_attribute(response.linker_category, 0, function (product_attributes_without_brand) {
 									request_product_attribute(response.linker_category, response.brand._id, function (product_attributes_with_brand) {
 										// product_attributes is queried from product attributes
 										// and should be merged with current product attributes from product form
@@ -592,7 +592,7 @@
 	}
 
 	function initial_product_new_page(category_id, callback){
-		request_product_attribute(category_id, null, function(product_attributes){
+		request_product_attribute(category_id, 0, function(product_attributes){
 			SET('products.form.attributes', product_attributes);
 			$('.productinfo .brand select').off('change').on('change', function(){
 				var el = $(this);
@@ -640,6 +640,7 @@
 	}
 
 	function request_product_attribute(category_id, brand_id, callback){
+		console.log(brand_id);
 		$.components.GET(managerurl + '/api/products/attributes?category=' + category_id+"&brand="+brand_id, null, function(response) {
 			if (response.code == 1000) {
 				var attributes = [];

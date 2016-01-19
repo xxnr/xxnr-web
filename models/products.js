@@ -75,7 +75,8 @@ var productAttributeSchema = new mongoose.Schema({
 	brand: {type: mongoose.Schema.ObjectId, ref: 'brand'},
 	name: {type:String, required:true},
 	value:{type:String, required:true},
-	order:{type:Number}
+	order:{type:Number},
+	display:{type:Boolean}
 });
 
 // indexes
