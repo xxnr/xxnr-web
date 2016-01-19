@@ -129,7 +129,7 @@
                     <td class="col-xs-4 active">@(已认证类型)</td>
                     <td id="drop_in" ondrop="dropin(event)" ondragover="allowDrop(event)" >
 						{{ foreach verifiedType in form.verifiedTypes}}
-							<div id="{{verifiedType.value}}" text="{{ verifiedType.text }}" draggable="true" ondragstart="drag(event)" >{{ verifiedType.text }}</div>
+							<div id="{{verifiedType.value}}" class="drag" text="{{ verifiedType.text }}" draggable="true" ondragstart="drag(event)" >{{ verifiedType.text }}</div>
 						{{ end }}
 					</td>
                 </tr>
@@ -137,7 +137,7 @@
 					<td class="col-xs-4 active">@(未认证类型)</td>
 					<td id="drop_out" ondrop="dropout(event)" ondragover="allowDrop(event)" >
 						{{ foreach notVerifiedType in form.notVerifiedTypes}}
-							<div id="{{notVerifiedType.value}}" text="{{ notVerifiedType.text }}" draggable="true" ondragstart="drag(event)">{{ notVerifiedType.text }}</div>
+							<div id="{{notVerifiedType.value}}" class="drag" text="{{ notVerifiedType.text }}" draggable="true" ondragstart="drag(event)">{{ notVerifiedType.text }}</div>
 						{{ end }}
 					</td>
 				</tr>
