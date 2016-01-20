@@ -213,9 +213,37 @@ var setCookieAndResponse = function(user, keepLogin){
             }
         }
 
-        // Return results
-        var result = {'code': '1000', 'message': 'success', 'datas': user, token:token};
-        self.respond(result);
+        
+        // user shopping carts
+        CartService.getOrAdd(user.userid, function(err, cart) {
+            var shoppingCart_count = 0;
+            if (err) {
+                console.error('setCookieAndResponse CartService set shopoingcart err:', err);
+            } else {
+                if (cart && cart.SKU_items && cart.SKU_items.length>0) {
+                    cart.SKU_items.forEach(function (item) {
+                        if(item && item.count) {
+                            shoppingCart_count += item.count;
+                        }
+                    });
+                }
+            }
+
+            if (F.isDebug) {
+                self.res.cookie(F.config.shopingCartcookie, shoppingCart_count);
+            } else {
+                self.res.cookie(F.config.shopingCartcookie, shoppingCart_count, null, {domain: F.config.domain});
+            }
+
+            // Return results
+            var result = {'code': '1000', 'message': 'success', 'datas': user, token:token};
+            self.respond(result);
+            return;
+        }, true);
+
+        // // Return results
+        // var result = {'code': '1000', 'message': 'success', 'datas': user, token:token};
+        // self.respond(result);
     });
 };
 

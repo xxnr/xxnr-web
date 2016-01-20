@@ -30,9 +30,9 @@ exports.install = function() {
     // get product detail for web
     F.route('/api/v2.0/product/getProductDetails', getGoodsDetails, ['post', 'get']);
     F.route('/api/v2.0/getShoppingCartOffline', getShoppingCartOffline, ['get', 'post']);
-    F.route('/alipay', alipayOrder, ['post', 'get'], ['isLoggedIn', 'isInWhiteList']);
+    F.route('/alipay', alipayOrder, ['post', 'get'], ['isInWhiteList']);
     F.route('/dynamic/alipay/nofity.asp', alipayNotify, ['post','raw']);
-    F.route('/unionpay', unionPayOrder, ['post', 'get'], ['isLoggedIn', 'isInWhiteList']);
+    F.route('/unionpay', unionPayOrder, ['post', 'get'], ['isInWhiteList']);
     F.route('/unionpay/nofity', unionpayNotify, ['post','raw']);
     F.route('/alipay/success', aliPaySuccess);
     // F.route('/notify_alipay.asp', alipayNotify);

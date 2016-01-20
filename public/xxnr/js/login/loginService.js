@@ -5,6 +5,7 @@ var app = angular.module('xxnr_common');
 app.service('loginService', function($cookieStore, $timeout, BaseUrl, BaseDomainREG){
 	var userKey = "__user";
     var tokenKey = "token";
+    var scartKey = "__scart";
 	var _user = $cookieStore.get(userKey);
     if(!_user){
 	    _user={
@@ -39,6 +40,9 @@ app.service('loginService', function($cookieStore, $timeout, BaseUrl, BaseDomain
         $cookieStore.remove(tokenKey, {path:"/", domain:".xinxinnongren.com"});
         $cookieStore.remove(userKey, {path:"/"});
         $cookieStore.remove(tokenKey, {path:"/"});
+        // remove shopping cart
+        $cookieStore.remove(scartKey, {path:"/", domain:".xinxinnongren.com"});
+        $cookieStore.remove(scartKey, {path:"/"});
     };
 
     this.isLogin = (function(){

@@ -12,6 +12,7 @@ var SKUService = services.SKU;
 var BrandService = services.brand;
 var CategoryService = services.category;
 var PAYMENTSTATUS = require('../common/defs').PAYMENTSTATUS;
+var DELIVERSTATUS = require('../common/defs').DELIVERSTATUS;
 
 exports.install = function() {
 	// Auto-localize static HTML templates
@@ -483,10 +484,26 @@ function json_orders_query() {
 			self.json(err);
 			return;
 		}
-        // for(var i=0; i<orders.items.length; i++) {
-        //      var order = orders.items[i];
-        //      // convertOrderToShow(order);
-        // }
+        if (orders) {
+	        var items = orders.items;
+	        var length = items.length;
+	        for (var i = 0; i < length; i++) {
+                var item = items[i];
+                // 订单合成状态
+                item.typeValue = OrderService.orderType(item);
+                var orderInfo = {'totalPrice':item.price.toFixed(2), 'deposit':item.deposit.toFixed(2), 'dateCreated':item.dateCreated, 'orderStatus': OrderService.orderStatus(item)};
+                if (item.payStatus == PAYMENTSTATUS.PAID && item.datePaid) {
+                    orderInfo.datePaid = item.datePaid;
+                }
+                if (item.payStatus == DELIVERSTATUS.DELIVERED && item.dateDelivered) {
+                    orderInfo.dateDelivered = item.dateDelivered;
+                }
+                if (item.confirmed && item.dateCompleted) {
+                    orderInfo.dateCompleted = item.dateCompleted;
+                }
+                item.order = orderInfo;
+            }
+        }
         self.json(orders);
     });
 }
@@ -680,6 +697,23 @@ var convertOrderToShow = function(order){
 		order.subOrders = subOrders;
 	}
 	delete order.payments;
+
+	// order status and type
+	if (order) {
+		// 订单合成状态
+        order.orderType = OrderService.orderType(order);
+		var orderInfo = {'totalPrice':order.price.toFixed(2),'deposit':order.deposit.toFixed(2),'dateCreated':order.dateCreated, 'orderStatus': OrderService.orderStatus(order)};
+        if (order.payStatus == PAYMENTSTATUS.PAID && order.datePaid) {
+            orderInfo.datePaid = order.datePaid;
+        }
+        if (order.payStatus == DELIVERSTATUS.DELIVERED && order.dateDelivered) {
+            orderInfo.dateDelivered = order.dateDelivered;
+        }
+        if (order.confirmed && order.dateCompleted) {
+            orderInfo.dateCompleted = order.dateCompleted;
+        }
+        order.order = orderInfo;
+	}
 
     return order;
 };

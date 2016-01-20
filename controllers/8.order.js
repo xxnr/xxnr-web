@@ -387,7 +387,7 @@ function confirmOrder() {
             return;
         }
         if (data && data.deliverStatus === DELIVERSTATUS.DELIVERED && data.payStatus === PAYMENTSTATUS.PAID && !data.confirmed) {
-            OrderService.confirm(orderid, function(err){
+            OrderService.confirm(orderid, function(err) {
                 if(err) {
                     console.log('Order confirmOrder err:' + err);
                     self.respond({'code':'1001','message':'确认订单出错'});
