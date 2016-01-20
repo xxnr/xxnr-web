@@ -567,7 +567,8 @@ function api10_getOrderDetails() {
                     'category': SKU.category,
                     'deliverStatus': SKU.deliverStatus,
                     'additions':SKU.additions,
-                    'attributes':SKU.attributes
+                    'attributes':SKU.attributes,
+                    'productName':SKU.productName
                 };
             }
             order.orderGoodsList  = productArr;
