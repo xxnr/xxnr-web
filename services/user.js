@@ -9,7 +9,7 @@ var UseOrdersNumberModel = require('../models').userordersnumber;
 var UserWhiteListModel = require('../models').userwhitelist;
 
 // Service
-UserService = function(){};
+var UserService = function(){};
 
 // Method
 // Creates user
