@@ -1480,9 +1480,19 @@ function json_get_invitee_orders() {
                         'recipientPhone':item.consigneePhone,
                         'deposit':item.deposit.toFixed(2),
                         'dateCreated': item.dateCreated,
-                        'products': item.products || []
+                        'products': item.products || [],
+                        'SKUs': item.SKUs || []
                     };
+
+                    if(arr[i].SKUs && arr[i].SKUs.length > 0){
+                        // contains SKUs, need to convert into products to support old app
+                        arr[i].SKUs.forEach(function(SKU){
+                            var product = {id:SKU.productId, price:SKU.price, deposit:SKU.deposit, name:SKU.productName, thumbnail:SKU.thumbnail, count:SKU.count, category:SKU.category, dateDelivered:SKU.dateDelivered, dateSet:SKU.dateSet, deliverStatus:SKU.deliverStatus};
+                            arr[i].products.push(product);
+                        })
+                    }
                 }
+
                 result = {'code':1000,'message':'success',
                             'datas':{
                                 "account":user.account,
