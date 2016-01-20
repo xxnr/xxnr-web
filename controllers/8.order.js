@@ -145,6 +145,14 @@ function api10_getOders() {
                     'subOrders': item.subOrders || [],
                     'duePrice': item.duePrice ? item.duePrice.toFixed(2) : null,
                 };
+
+                if(arr[i].SKUs && arr[i].SKUs.length > 0){
+                    // contains SKUs, need to convert into products to support old app
+                    arr[i].SKUs.forEach(function(SKU){
+                        var product = {id:SKU.productId, price:SKU.price, deposit:SKU.deposit, name:SKU.productName, thumbnail:SKU.thumbnail, count:SKU.count, category:SKU.category, dateDelivered:SKU.dateDelivered, dateSet:SKU.dateSet, deliverStatus:SKU.deliverStatus};
+                        arr[i].products.push(product);
+                    })
+                }
                 
             }
             result = {'code':'1000','message':'success','datas':{"total":data.count,"rows":arr,"page":data.page,"pages":data.pages}};
@@ -553,6 +561,7 @@ function api10_getOrderDetails() {
                     'deliverStatus': product.deliverStatus
                 };
             }
+
             for (var i=0; i < SKUsLength; i++) {
                 var SKU = data.SKUs[i];
                 SKUArr[i] = {
@@ -571,6 +580,29 @@ function api10_getOrderDetails() {
                     'productName':SKU.productName
                 };
             }
+
+            if( SKUsLength > 0 ) {
+                productArr = [];
+                // contains SKUs, need to convert into products to support old app
+                data.SKUs.forEach(function (SKU) {
+                    var product = {
+                        'goodsName': SKU.productName,
+                        'goodsCount': SKU.count,
+                        'unitPrice': SKU.price.toFixed(2),
+                        'orderSubType': '',
+                        'orderSubNo': '',
+                        'originalPrice': SKU.price.toFixed(2),
+                        'goodsId': SKU.productId,
+                        'imgs': SKU.thumbnail,
+                        'deposit': SKU.deposit.toFixed(2),
+                        'category': SKU.category,
+                        'deliverStatus': SKU.deliverStatus
+                    };
+
+                    productArr.push(product);
+                })
+            }
+
             order.orderGoodsList  = productArr;
             order.SKUList = SKUArr;
             result = {'code':'1000','message':'success','datas':{'total':1,'rows':order,'locationUserId':locationUserId}};
