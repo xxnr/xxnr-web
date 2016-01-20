@@ -161,6 +161,11 @@ exports.isInWhiteList_middleware = function(req, res, next, options, controller)
         token = controller.req.cookie(F.config.tokencookie);
     }
 
+    if (!token) {
+        next();
+        return;
+    }
+
     try {
         var payload = tools.verify_token(token);
         // token verify success, still need to check if the login id matches the current one in db
