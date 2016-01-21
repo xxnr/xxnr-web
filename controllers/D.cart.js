@@ -22,13 +22,13 @@ function updateShoppingCart() {
     var update_by_add = self.data['update_by_add'];
     var additions = self.data.additions;
     if (!userId) {
-        var response = {code: 1001, message: 'param userId required'};
+        var response = {code: 1001, message: "param userId required"};
         self.respond(response);
         return;
     }
 
     if (!SKUId) {
-        var response = ( {code: 1001, message: 'param goodsId required'});
+        var response = ( {code: 1001, message: "param goodsId required"});
         self.respond(response);
         return;
     }
@@ -36,14 +36,14 @@ function updateShoppingCart() {
     if (typeof count == 'undefined') {
         count = self.data['count'];//This is to support addToCart api
         if (typeof count == 'undefined') {
-            var response = {code: 1001, message: 'param quantity/count required'};
+            var response = {code: 1001, message: "param quantity/count required"};
             self.respond(response);
             return;
         }
     }
 
     if (parseInt(count) > 9999) {
-        self.respond({code: 1001, message: '商品个数不能大于9999'});
+        self.respond({code: 1001, message: "商品个数不能大于9999"});
         return;
     }
 
@@ -57,39 +57,39 @@ function updateShoppingCart() {
 
     CartService.getOrAdd(userId, function (err, cart) {
         if (err) {
-            self.respond({code: 1001, message: '获取购物车失败'});
+            self.respond({code: 1001, message: "获取购物车失败"});
             return;
         }
 
         SKUService.getSKU({_id: SKUId}, function (err, SKU) {
             if (err || !SKU) {
-                self.respond({"code": "1001", "message": "无法查找到商品"});
+                self.respond({code: 1001, message: "无法查找到商品"});
                 return;
             }
 
             if (SKU && SKU.product.presale) {
-                self.respond({"code": "1001", "message": "无法添加预售商品"});
+                self.respond({code: 1001, message: "无法添加预售商品"});
                 return;
             }
 
             if (SKU && !SKU.product.online){
-                self.respond({code:1001, message:"无法添加下架商品"});
+                self.respond({code: 1001, message: "无法添加下架商品"});
                 return
             }
 
             if(!SKU.online){
-                self.respond({code:1001, message:"无法添加下架SKU"});
+                self.respond({code: 1001, message: "无法添加下架SKU"});
                 return
             }
 
             CartService.updateSKUItems(cart.cartId, SKU._id, count, update_by_add, additions || [], function (err) {
                 if (err) {
                     console.log(err);
-                    self.respond({code: 1001, message: '更新购物车失败'});
+                    self.respond({code: 1001, message: "更新购物车失败"});
                     return;
                 }
 
-                self.respond({code: 1000, message: 'success'});
+                self.respond({code: 1000, message: "success"});
             })
         }, false);
     });
@@ -130,7 +130,7 @@ function getShoppingCartOffline(){
     var self = this;
     var SKUs = self.data.SKUs;
     if(!SKUs || !Array.isArray(SKUs) || !(SKUs.length > 0)){
-        self.respond({code:1001,message:'请提供正确的参数'});
+        self.respond({code:1001, message:'请提供正确的参数'});
         return;
     }
 
@@ -144,7 +144,7 @@ function getShoppingCartOffline(){
 }
 
 function convertToShoppingCartFormatV_1_0(SKUs, cartId, userId){
-    var goodDetails = {"code":"1000","message":"success",
+    var goodDetails = {"code":1000,"message":"success",
         "datas":{"total":0, "shopCartId":cartId, "DiscountPrice":0, "locationUserId":userId, "totalPrice":0, "rows":[
         ]}};
     var brands = [];
@@ -165,7 +165,9 @@ function convertToShoppingCartFormatV_1_0(SKUs, cartId, userId){
             "attributes" : SKU.attributes,
             "deposit": product.deposit,
             "count":SKU.count,
-            additions:SKU.additions};
+            "additions":SKU.additions,
+            "online":SKU.online
+        };
         var brandName = product.brandName;
         if(!brands[brandName]){
             brands[brandName] = [];
