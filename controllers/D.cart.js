@@ -160,13 +160,13 @@ function convertToShoppingCartFormatV_1_0(SKUs, cartId, userId){
             "imgUrl": product.thumbnail,
             "productDesc": product.description,
             "point": product.payWithScoresLimit,
-            "name:": SKU.name,
+            "name": SKU.name,
             "productName": product.name,
-            "attributes" : SKU.attributes,
+            "attributes": SKU.attributes,
             "deposit": product.deposit,
-            "count":SKU.count,
-            "additions":SKU.additions,
-            "online":SKU.online
+            "count": SKU.count,
+            "additions": SKU.additions,
+            "online": SKU.online
         };
         var brandName = product.brandName;
         if(!brands[brandName]){
