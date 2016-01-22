@@ -28,7 +28,13 @@ app.controller('categoryController', function($scope, remoteApiService, commonSe
         }
 
         if($scope.$parent.search_categories['model'] && $scope.$parent.search_categories['model'].current_query != '' && $scope.$parent.search_categories['model'].current_query != '全部'){
-            model = $scope.$parent.search_categories['model'].current_query;
+            model = [];
+            var _model = {};
+            _model.name = "车系";
+            _model.value = $scope.$parent.search_categories['model'].current_query;
+            model.push(_model);
+            console.log(typeof model);
+            // [{"name":"车系","value":"和悦A30"},...]
         }else{
             model= "";
         }

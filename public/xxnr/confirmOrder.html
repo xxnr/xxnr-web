@@ -58,8 +58,9 @@
             return null;
         }
     }();
+    // console.log(products);
     var productFilter = products ? function(product){
-        var productId = product.id || product.goodsId;
+        var productId = product._id;
         if(products[productId] != undefined){
             product.goodsCount = products[productId];
             return [true,product];
@@ -138,7 +139,7 @@
                         <div class="column t-goods t-goods2">商品信息</div>
                         <div class="column t-price">单价(元)</div>
                         <div class="column t-quantity">数量</div>
-                        <div class="column t-sum">小计(元)</div>
+                        <div class="column t-sum">合计(元)</div>
                     </div>
                     <div class="cart-list">
                         <div class="cart-item-list">
@@ -162,13 +163,37 @@
                                                         <div class="p-name">
                                                             <a ng-href={{item.detailPageUrl}} ng-cloak>{{item.name}}</a>
                                                         </div>
+                                                        <div class="p-skus">
+                                                            <ul>
+                                                                <li ng-repeat="attribute in item.attributes">
+                                                                    {{attribute.name}}:{{attribute.value}}
+                                                                </li>
+                                                                <li>
+                                                                    <ul class="row">
+                                                                    附加项目:
+                                                                        <li ng-repeat="addition in item.additions">
+                                                                            {{addition.name}}&nbsp;
+                                                                        </li>
+                                                                    </ul>
+                                                                </li>
+
+                                                            </ul>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
                                             <div class="cell p-props-price" ng-cloak>￥{{item.nowPrice}}
                                             </div>
                                             <div class="cell p-buy-count" ng-cloak>{{item.buyCount}}</div>
-                                            <div class="cell p-sum" ng-cloak>￥{{item.totalDeposit}}<span ng-show="{{item.deposit}}">（订金）</span></div>
+                                            <div class="cell p-sum">
+                                                <!--<div ng-cloak>{{item.totalDeposit}}<span ng-show="{{item.deposit}}">（订金）</span></div>-->
+                                                <div class="ng-cloak">¥ {{item.totalPrice}}</div>
+
+                                            </div>
+                                        </div>
+                                        <div class="pay-step" ng-show="{{item.hasDeposit}}">
+                                            <div class="ng-cloak pay-step-1"><span class="text-info">阶段一： 预付款</span><span class="order-price ng-cloak">¥ {{item.totalDeposit}}</span></div>
+                                            <div class="ng-cloak pay-step-2"><span class="text-info">阶段二：尾款</span>¥{{(item.totalPrice-item.totalDeposit).toFixed(2)}}</div>
                                         </div>
                                     </div>
                                 </div>

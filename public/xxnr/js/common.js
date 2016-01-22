@@ -46,6 +46,23 @@ app.service('commonService',function($q,$http,BaseUrl,loginService){
         return deferred.promise;
     };
 
+    this.sendPost = function(data){
+        var deferred = $q.defer();
+        $http({
+            method: 'POST',
+            url:BaseUrl+data.methodname,
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: data
+        }).success(function(data){
+            deferred.resolve(data);
+        }).error(function(data, error){
+            console.error('error = ' + error + ', and data = ' + data + ', and methodname = ' + data.methodname + ', and BaseUrl = ' + BaseUrl);
+        });
+        return deferred.promise;
+    };
+
     var _user = loginService.user;
     this.user = _user;
     this.accessShoppingCart = function(){
