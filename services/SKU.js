@@ -373,6 +373,35 @@ SKUService.prototype.querySKUAttributes = function(category, brand, callback) {
         })
 };
 
+SKUService.prototype.removeSKUAttributesByName = function(name, callback){
+    if(!name){
+        callback('name required');
+        return;
+    }
+
+    // update SKU first
+    SKUModel.update({"attributes.name":name}, {$pull:{attributes:{name:name}}}, {multi:true}, function(err, numAffected){
+        if(err){
+            console.error(err);
+            callback(err);
+        }
+        console.log(numAffected);
+
+        // delete from SKU attributes
+        SKUAttributeModel.find({name:name}).remove(function(err){
+            if(err){
+                console.error(err);
+                callback(err);
+            }
+
+            callback();
+        });
+
+        // refresh product
+        refresh_product_SKUAttributes(null, function(){});
+    })
+};
+
 SKUService.prototype.getSKUByProductAndAttributes = function(product, attributes, callback){
     if(!product){
         callback('product _id required');
