@@ -493,10 +493,22 @@ ProductService.prototype.getAttributes = function(category, brand, name, callbac
     var matchOptions = {};
     if(category)
         matchOptions.category = category;
-    if(brand){
-        if(brand == 0){
+
+    if(brand) {
+        if (brand == 0) {
             matchOptions.brand = null;
-        } else{
+        } else if (brand.contains(',')) {
+            var brands = [];
+            brand.split(',').forEach(function(one){
+                if(one == 0){
+                    brands.push(null);
+                } else {
+                    brands.push(mongoose.Types.ObjectId(one));
+                }
+            });
+
+            matchOptions.brand = {$in:brands};
+        } else {
             matchOptions.brand = mongoose.Types.ObjectId(brand);
         }
     }
@@ -504,10 +516,12 @@ ProductService.prototype.getAttributes = function(category, brand, name, callbac
         matchOptions.name = name;
 
     var schemaToAdd = {name:'$value'};
+    var groupBy = {name:'$name'};
     switch(schema){
         case 1:
             // backend schema
             schemaToAdd = {value:'$value',ref:'$_id'};
+            groupBy.brand = '$brand';
             break;
         case 2:
             // frontend schema
@@ -524,7 +538,7 @@ ProductService.prototype.getAttributes = function(category, brand, name, callbac
         {
             $group:
             {
-                _id: {brand: '$brand', name: '$name'},
+                _id: groupBy,
                 values: {$addToSet: schemaToAdd},
                 order: {$max: '$order'}
             }
