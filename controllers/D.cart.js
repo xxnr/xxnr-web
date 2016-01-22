@@ -109,20 +109,7 @@ function getShoppingCart(){
             return;
         }
 
-        var SKUs = [];
-        if(cart.SKU_items && cart.SKU_items.length>0) {
-            cart.SKU_items.forEach(function (item) {
-                if(item.SKU) {
-                    var SKU = item.SKU;
-                    SKU.product = item.product;
-                    SKU.count = item.count;
-                    SKU.additions = item.additions;
-                    SKUs.push(SKU);
-                }
-            });
-        }
-
-        self.respond(convertToShoppingCartFormatV_1_0(SKUs, cart.cartId, cart.userId));
+        self.respond(convertToShoppingCartFormatV_1_0(cart.SKU_items || [], cart.cartId, cart.userId));
     }, true)
 }
 
@@ -138,7 +125,7 @@ function getShoppingCartOffline(){
         if(err){
             self.respond({code:1001,message:err});
         }else {
-            self.respond(convertToShoppingCartFormatV_1_0(SKUs, null, null));
+            self.respond(convertToShoppingCartFormatV_1_0(SKUs || [], null, null));
         }
     });
 }
@@ -152,8 +139,10 @@ function convertToShoppingCartFormatV_1_0(SKUs, cartId, userId){
     var totalCount = 0;
 
     for(var i=0; i<SKUs.length; i++) {
-        var SKU = SKUs[i];
+        var SKU = SKUs[i].SKU;
+        var count = SKUs[i].count;
         var product = api10.convertProduct(SKUs[i].product);
+        var additions = SKUs[i].additions;
         var SKUDetail = {"goodsId": product.id,
             "_id": SKU._id,
             "price": SKU.price.platform_price,
@@ -164,8 +153,9 @@ function convertToShoppingCartFormatV_1_0(SKUs, cartId, userId){
             "productName": product.name,
             "attributes" : SKU.attributes,
             "deposit": product.deposit,
-            "count":SKU.count,
-            additions:SKU.additions};
+            "count":count,
+            additions:additions,
+            "online":SKU.online && product.online};
         var brandName = product.brandName;
         if(!brands[brandName]){
             brands[brandName] = [];

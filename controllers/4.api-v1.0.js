@@ -275,7 +275,8 @@ function getGoodsDetails(transformer){
             "SKUAttributes":product.SKUAttributes,
             "SKUAdditions":product.SKUAdditions,
             "SKUPrice":product.SKUPrice,
-            pictures:product.pictures
+            "pictures":product.pictures,
+            "referencePrice":product.referencePrice
             };
 
         delete product.body;
