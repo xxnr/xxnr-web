@@ -4,7 +4,7 @@
 var BrandModel = require('../models').brand;
 
 // Service
-BrandService = function(){};
+var BrandService = function(){};
 
 // Method
 BrandService.prototype.query = function(category, callback){

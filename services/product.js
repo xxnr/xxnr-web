@@ -9,7 +9,7 @@ var sortOptions = {"price-desc":{price:-1},"price-asc":{price:1}};
 var BrandModel = require('../models').brand;
 
 // Service
-ProductService = function(){};
+var ProductService = function(){};
 
 // Methods
 // Gets listing

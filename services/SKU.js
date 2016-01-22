@@ -8,7 +8,7 @@ var SKUAdditionModel = require('../models').SKUAddition;
 var ProductModel = require('../models').product;
 
 // Service
-SKUService = function(){};
+var SKUService = function(){};
 
 // Method
 /**

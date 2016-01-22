@@ -285,13 +285,13 @@ app.filter('toNumberFixedTwo', function() {
 /*************************************************************************************************
 **                                    common fix for IE8                                        **
 *************************************************************************************************/
-// if (!window.console || !console.firebug){
-//     var names = ["log", "debug", "info", "warn", "error", "assert", "dir", "dirxml", "group", "groupEnd", "time", "timeEnd", "count", "trace", "profile", "profileEnd"];
+if (!window.console || !console.firebug){
+    var names = ["log", "debug", "info", "warn", "error", "assert", "dir", "dirxml", "group", "groupEnd", "time", "timeEnd", "count", "trace", "profile", "profileEnd"];
 
-//     window.console = {};
-//     for (var i = 0; i < names.length; ++i)
-//         window.console[names[i]] = function() {}
-// }
+    window.console = {};
+    for (var i = 0; i < names.length; ++i)
+        window.console[names[i]] = function() {}
+}
 Date.fromISO= function(s){
     var day, tz,
         rx=/^(\d{4}\-\d\d\-\d\d([tT ][\d:\.]*)?)([zZ]|([+\-])(\d\d):(\d\d))?$/,

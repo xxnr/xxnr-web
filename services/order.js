@@ -12,7 +12,7 @@ var UseOrdersNumberModel = require('../models').userordersnumber;
 var moment = require('moment-timezone');
 
 // Service
-OrderService = function(){};
+var OrderService = function(){};
 
 // Method
 // order type

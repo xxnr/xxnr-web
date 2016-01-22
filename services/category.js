@@ -4,7 +4,7 @@
 var CategoryModel = require('../models').category;
 
 // Service
-CategoryService = function(){};
+var CategoryService = function(){};
 
 // Method
 CategoryService.prototype.all = function(callback){
