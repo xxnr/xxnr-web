@@ -11,6 +11,8 @@ var UseraddressService = services.useraddress;
 var AreaService = services.area;
 var CartService = services.cart;
 var OrderService = services.order;
+var IntentionProductService = services.intention_product;
+var PotentialCustomerService = services.potential_customer;
 var REG_MOBILE = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|Tablet|IOS/i;
 
 exports.install = function() {
@@ -56,6 +58,13 @@ exports.install = function() {
 
     // check user in white list
     F.route('/api/v2.0/user/isInWhiteList',             isInWhiteList, ['get', 'post'], ['isLoggedIn', 'isInWhiteList']);
+
+    // potential customer/intention products related APIs
+    F.route('/api/v2.1/intentionProducts',              json_intention_products, ['get'], ['isLoggedIn']);
+    F.route('/api/v2.1/potentialCustomer/isAvailable',  json_potential_customer_available, ['get'], ['isLoggedIn']);
+    F.route('/api/v2.1/potentialCustomer/add',          process_add_potential_customer, ['post'], ['isLoggedIn']);
+    F.route('/api/v2.1/potentialCustomer/query',        json_potential_customer, ['get'], ['isLoggedIn']);
+    F.route('/api/v2.1/potentialCustomer/get',          json_potential_customer_get, ['get'], ['isLoggedIn']);
 
 	// v1.0
 	// LOGIN
@@ -1538,4 +1547,103 @@ function isInWhiteList() {
 function json_usertypes_get() {
     var self = this;
     self.respond({code: 1000, data: F.global.usertypes});
+}
+
+function process_add_potential_customer(){
+    var self = this;
+    if(!self.data.name){
+        self.respond({code:1001, message:'请输入姓名'});
+        return;
+    }
+
+    if(!self.data.phone || !tools.isPhone(self.data.phone.toString())){
+        self.respond({code:1001, message:'请输入正确的手机号'});
+        return;
+    }
+
+    if(typeof self.data.sex == 'undefined'){
+        self.respond({code:1001, message:'请输入性别'});
+        return;
+    }
+
+    if(typeof self.data.sex == 'string'){
+        self.data.sex = (self.data.sex === 'true');
+    }
+
+    if(!self.data.address || !self.data.address.province || !self.data.address.city){
+        self.respond({code:1001, message:'请选择省市'});
+        return;
+    }
+
+    if(!self.data.buyIntentions || !self.data.buyIntentions.length < 0){
+        self.respond({code:1001, message:'请选择意向商品'});
+        return;
+    }
+
+    PotentialCustomerService.add(self.user, self.data.name, self.data.phone, self.data.sex, self.data.address, self.data.buyIntentions, self.data.remarks, function(err){
+        if(err){
+            self.respond({code:1001, message:err});
+            return;
+        }
+
+        self.respond({code:1000, message:'success'});
+    })
+}
+
+function json_potential_customer(){
+    var self = this;
+    PotentialCustomerService.query(self.user, function(err, potentialCustomers){
+        if(err){
+            self.respond({code:1001, message:'获取潜在客户列表失败'});
+            return;
+        }
+
+        self.respond({code:1000, message:'success', potentialCustomers:potentialCustomers});
+    })
+}
+
+function json_intention_products(){
+    var self = this;
+    IntentionProductService.query(function(err, products){
+        if(err){
+            self.respond({code:1001, message:'获取意向商品列表失败'});
+            return;
+        }
+
+        self.respond({code:1000, message:'success', intentionProducts:products});
+    })
+}
+
+function json_potential_customer_available(){
+    var self = this;
+    if(!self.data.phone || !tools.isPhone(self.data.phone.toString())){
+        self.respond({code:1001, message:'请填写正确的手机号'});
+        return;
+    }
+
+    PotentialCustomerService.isAvailable(self.data.phone, function(err, available, message){
+        if(err){
+            self.respond({code:1001, message:'获取失败'});
+            return;
+        }
+
+        self.respond({code:1000, available:available, message:message});
+    })
+}
+
+function json_potential_customer_get(){
+    var self = this;
+    if(!self.data._id){
+        self.respond({code:1001, message:'请填写_id'});
+        return;
+    }
+
+    PotentialCustomerService.getById(self.data._id, function(err, doc){
+        if(err){
+            self.respond({code:1001, message:'获取客户信息失败'});
+            return;
+        }
+
+        self.respond({code:1000, message:'success', potentialCustomer:doc});
+    })
 }
