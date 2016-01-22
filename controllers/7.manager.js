@@ -686,8 +686,10 @@ var convertOrderToShow = function(order){
 				if (typeof(payment.isClosed) != 'undefined' && payment.isClosed === true && parseInt(payment.payStatus) === PAYMENTSTATUS.UNPAID) {
 					closedTimes += 1;
 				}
+				payment.price = parseFloat(payment.price.toFixed(2));
 			}
-			subOrder.paidPrice = paidPrice;
+			subOrder.price = parseFloat(subOrder.price.toFixed(2));
+			subOrder.paidPrice = parseFloat(paidPrice.toFixed(2));
 			subOrder.paidTimes = paidTimes;
 			subOrder.closedTimes = closedTimes;
 			subOrder.payments = payments;
@@ -700,9 +702,12 @@ var convertOrderToShow = function(order){
 
 	// order status and type
 	if (order) {
+		order.price = parseFloat(order.price.toFixed(2));
+		order.deposit = parseFloat(order.deposit.toFixed(2));
+		order.duePrice = parseFloat(order.duePrice.toFixed(2));
 		// 订单合成状态
         order.orderType = OrderService.orderType(order);
-		var orderInfo = {'totalPrice':order.price.toFixed(2),'deposit':order.deposit.toFixed(2),'dateCreated':order.dateCreated, 'orderStatus': OrderService.orderStatus(order)};
+		var orderInfo = {'totalPrice':parseFloat(order.price.toFixed(2)),'deposit':parseFloat(order.deposit.toFixed(2)),'dateCreated':order.dateCreated, 'orderStatus': OrderService.orderStatus(order)};
         if (order.payStatus == PAYMENTSTATUS.PAID && order.datePaid) {
             orderInfo.datePaid = order.datePaid;
         }

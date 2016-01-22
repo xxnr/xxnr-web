@@ -149,6 +149,14 @@ Tangular.register('price', function(value, format) {
 	return value.format(format) + ' ' + currency;
 });
 
+Tangular.register('toFixed', function(value, format) {
+	if (value === undefined)
+		value = 0;
+	if (format === undefined)
+		format = (value.toString()).length();
+	return value.toFixed(format) + ' ' + currency;
+});
+
 Tangular.register('join', function(value) {
 	if (value instanceof Array)
 		return value.join(', ');

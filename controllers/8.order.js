@@ -149,7 +149,7 @@ function api10_getOders() {
                 if(arr[i].SKUs && arr[i].SKUs.length > 0){
                     // contains SKUs, need to convert into products to support old app
                     arr[i].SKUs.forEach(function(SKU){
-                        var product = {id:SKU.productId, price:SKU.price, deposit:SKU.deposit, name:SKU.productName, thumbnail:SKU.thumbnail, count:SKU.count, category:SKU.category, dateDelivered:SKU.dateDelivered, dateSet:SKU.dateSet, deliverStatus:SKU.deliverStatus};
+                        var product = {id:SKU.productId, price:SKU.price.toFixed(2), deposit:SKU.deposit.toFixed(2), name:SKU.productName, thumbnail:SKU.thumbnail, count:SKU.count, category:SKU.category, dateDelivered:SKU.dateDelivered, dateSet:SKU.dateSet, deliverStatus:SKU.deliverStatus};
                         arr[i].products.push(product);
                     })
                 }
@@ -287,9 +287,9 @@ function addOrder(){
                                     return;
                                 }
                                 var resultOrders = [];
-                                var result = {'id': data.id, 'price':data.price, 'deposit': data.deposit};
+                                var result = {'id': data.id, 'price':data.price.toFixed(2), 'deposit': data.deposit.toFixed(2)};
                                 if (payment) {
-                                    result.payment = {'paymentId':payment.id, 'price':payment.price};
+                                    result.payment = {'paymentId':payment.id, 'price':payment.price.toFixed(2)};
                                 }
                                 resultOrders.push(result);
 
@@ -297,7 +297,7 @@ function addOrder(){
                                 var paymentId = payment && payment.id ? payment.id : data.paymentId;
                                 var price = data.price;
                                 var payPrice = payment && typeof(payment.price) != 'undefined' ? payment.price : data.deposit && data.deposit > 0 ? data.deposit : data.price;
-                                var response = {'code':1000, 'id': data.id, 'paymentId':paymentId, 'price':data.price, 'deposit':payPrice.toFixed(2)};
+                                var response = {'code':1000, 'id': data.id, 'paymentId':paymentId, 'price':data.price.toFixed(2), 'deposit':payPrice.toFixed(2)};
                                 if (order2) {
                                     OrderService.add(order2, function(err, data, payment) {
                                         if (err || !data) {
@@ -310,9 +310,9 @@ function addOrder(){
                                             });
                                             return;
                                         }
-                                        result = {'id': data.id, 'price':data.price, 'deposit': data.deposit};
+                                        result = {'id': data.id, 'price':data.price.toFixed(2), 'deposit': data.deposit.toFixed(2)};
                                         if (payment) {
-                                            result.payment = {'paymentId':payment.id, 'price':payment.price};
+                                            result.payment = {'paymentId':payment.id, 'price':payment.price.toFixed(2)};
                                         }
                                         resultOrders.push(result);
                                         response['orders'] = resultOrders;
@@ -542,7 +542,7 @@ function api10_getOrderDetails() {
                 order.paySubOrderType = data.paySubOrderType;
             }
             if (payment) {
-                order.payment       = {'paymentId':payment.id, 'price':payment.price, 'suborderId':payment.suborderId};
+                order.payment       = {'paymentId':payment.id, 'price':payment.price.toFixed(2), 'suborderId':payment.suborderId};
             }
 
             for (var i=0; i < productslength; i++) {
@@ -759,9 +759,9 @@ function addOrderBySKU(){
                                     return;
                                 }
                                 var resultOrders = [];
-                                var result = {'id': data.id, 'price':data.price, 'deposit': data.deposit, 'SKUs':data.SKUs || []};
+                                var result = {'id': data.id, 'price':data.price.toFixed(2), 'deposit': data.deposit.toFixed(2), 'SKUs':data.SKUs || []};
                                 if (payment) {
-                                    result.payment = {'paymentId':payment.id, 'price':payment.price};
+                                    result.payment = {'paymentId':payment.id, 'price':payment.price.toFixed(2)};
                                 }
                                 resultOrders.push(result);
 
@@ -769,7 +769,7 @@ function addOrderBySKU(){
                                 var paymentId = payment && payment.id ? payment.id : data.paymentId;
                                 var price = data.price;
                                 var payPrice = payment && typeof(payment.price) != 'undefined' ? payment.price : data.deposit && data.deposit > 0 ? data.deposit : data.price;
-                                var response = {'code':1000, 'id': data.id, 'paymentId':paymentId, 'price':data.price, 'deposit':payPrice.toFixed(2)};
+                                var response = {'code':1000, 'id': data.id, 'paymentId':paymentId, 'price':data.price.toFixed(2), 'deposit':payPrice.toFixed(2)};
                                 if (order2) {
                                     OrderService.add(order2, function(err, data, payment) {
                                         if (err || !data) {
@@ -782,9 +782,9 @@ function addOrderBySKU(){
                                             });
                                             return;
                                         }
-                                        result = {'id': data.id, 'price':data.price, 'deposit': data.deposit, 'SKUs':data.SKUs || []};
+                                        result = {'id': data.id, 'price':data.price.toFixed(2), 'deposit': data.deposit.toFixed(2), 'SKUs':data.SKUs || []};
                                         if (payment) {
-                                            result.payment = {'paymentId':payment.id, 'price':payment.price};
+                                            result.payment = {'paymentId':payment.id, 'price':payment.price.toFixed(2)};
                                         }
                                         resultOrders.push(result);
                                         response['orders'] = resultOrders;

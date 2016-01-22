@@ -110,127 +110,129 @@
 	</div>
 </div>
 
-<div data-component="form" data-title="@(订单详情)" data-component-path="common.form" data-if="value === 'orders'" data-width="1000px" data-component-id="orders.form" data-submitbutton="true">
+<div data-component="form" data-title="@(订单详情)" data-component-path="common.form" data-if="value === 'orders'" data-width="1200px" data-component-id="orders.form" data-submitbutton="true">
 	<br />
-	<div data-component="template" data-component-path="orders.form" class="padding">
-		<script type="text/html">
-		<table class="table table-bordered" border="0">
-			<tbody>
-				<tr>
-					<td class="col-xs-5 active">@(# 订单号)</td>
-					<td>{{ id }}</td>
-				</tr>
-				<tr>
-					<td class="col-xs-5 active">@(下单时间)</td>
-					<td>{{ dateCreated | format('@(yyyy-MM-dd HH:mm:ss)') }}</td>
-				</tr>
-				<tr>
-					<td class="col-xs-5 active">@(总价)</td>
-					<td>{{ price | price(2) }}</td>
-				</tr>
-                <tr>
-                    <td class="col-xs-5 active">@(订金)</td>
-                    <td>{{ deposit | price(2) }}</td>
-                </tr>
-                <tr>
-                    <td class="col-xs-5 active">@(尾款)</td>
-                    <td>{{ (price-deposit) | price(2) }}</td>
-                </tr>
-                <tr>
-                	<td class="col-xs-5 active">@(状态)</td>
-	                <td>
-			        	{{ if payStatus==1 }}
-			        		<span class="mr5 red">未付款</span>
-			        	{{ else }}
-			        		{{ if payStatus==2 }}
-			        			<span class="mr5 green">已付款</span>
-			        		{{ else }}
-				        		{{ if payStatus==3 }}
-				        			<span class="mr5 red">部分付款</span>
+	<div class="padding">
+		<div data-component="template" data-component-path="orders.form" class="padding">
+			<script type="text/html">
+			<table class="table table-bordered" border="0">
+				<tbody>
+					<tr>
+						<td class="col-xs-5 active">@(# 订单号)</td>
+						<td>{{ id }}</td>
+					</tr>
+					<tr>
+						<td class="col-xs-5 active">@(下单时间)</td>
+						<td>{{ dateCreated | format('@(yyyy-MM-dd HH:mm:ss)') }}</td>
+					</tr>
+					<tr>
+						<td class="col-xs-5 active">@(总价)</td>
+						<td>{{ price | price(2) }}</td>
+					</tr>
+	                <tr>
+	                    <td class="col-xs-5 active">@(订金)</td>
+	                    <td>{{ deposit | price(2) }}</td>
+	                </tr>
+	                <tr>
+	                    <td class="col-xs-5 active">@(尾款)</td>
+	                    <td>{{ (price-deposit) | toFixed(2) }}</td>
+	                </tr>
+	                <tr>
+	                	<td class="col-xs-5 active">@(状态)</td>
+		                <td>
+				        	{{ if payStatus==1 }}
+				        		<span class="mr5 red">未付款</span>
+				        	{{ else }}
+				        		{{ if payStatus==2 }}
+				        			<span class="mr5 green">已付款</span>
 				        		{{ else }}
-					        		<span class="mr5 red">其他</span>
+					        		{{ if payStatus==3 }}
+					        			<span class="mr5 red">部分付款</span>
+					        		{{ else }}
+						        		<span class="mr5 red">其他</span>
+					        		{{ fi }}
 				        		{{ fi }}
-			        		{{ fi }}
-			        	{{ fi }}
-			        	{{ if deliverStatus==1 }}
-			        		<span class="red">未发货</span>
-			        	{{ else }}
-			        		{{ if deliverStatus==2 }}
-			        			<span class="green">已发货</span>
-			        		{{ else }}
-			        			{{ if deliverStatus==3 }}
-			        				<span class="red">部分发货</span>
-			        			{{ else }}
-					        		<span class="mr5 red">其他</span>
-			        			{{ fi }}
-			        		{{ fi }}
-			        	{{ fi }}
-			        </td>
-		        </tr>
-		        <tr>
-		        	<td class="col-xs-5 active">@(是否关闭)</td>
-			        <td>
-			        	{{ if isClosed && payStatus == 1 }}
-			        		<span class="mr5 red">已关闭</span>
-			        	{{ else }}
-			        		<span class="mr5 green">未关闭</span>
-			        	{{ fi }}
-			        </td>
-			    </tr>
-		        <tr>
-		        	<td class="col-xs-5 active">@(订单状态类型)</td>
-				    <td>
-		        	{{ if order && order.orderStatus && order.orderStatus.value }}
-		        		{{ if order.orderStatus.type === 0 }}
-							<span class="red">
-						{{ else }}
-							<span class="green">
-						{{ fi }}
-						{{order.orderStatus.value}}</span>
-					{{ else }}
-						-		
-		        	{{ fi }}
-		        	</td>
-		        </tr>
-		        <tr>
-		        	<td class="col-xs-5 active">@(列表状态类型)</td>
-		        	<td>
-	        		{{ if orderType === 0 }}
-		        		<span class="red">已关闭</span>
-		        	{{ else }}
-			        	{{ if orderType === 1 }}
-		        			<span class="green">待付款</span>
-			        	{{ else }}
-			        		{{ if orderType === 2 }}
-		        				<span class="green">待发货</span>
-			        		{{ else }}
-			        			{{ if orderType === 3 }}
-		        					<span class="green">已发货</span>
-			        			{{ else }}
-			        				{{ if orderType === 4 }}
-		        						<span class="green">已完成</span>
-		        					{{ else }}
-				        				-
+				        	{{ fi }}
+				        	{{ if deliverStatus==1 }}
+				        		<span class="red">未发货</span>
+				        	{{ else }}
+				        		{{ if deliverStatus==2 }}
+				        			<span class="green">已发货</span>
+				        		{{ else }}
+				        			{{ if deliverStatus==3 }}
+				        				<span class="red">部分发货</span>
+				        			{{ else }}
+						        		<span class="mr5 red">其他</span>
 				        			{{ fi }}
-			        			{{ fi }}
-			        		{{ fi }}
+				        		{{ fi }}
+				        	{{ fi }}
+				        </td>
+			        </tr>
+			        <tr>
+			        	<td class="col-xs-5 active">@(是否关闭)</td>
+				        <td>
+				        	{{ if isClosed && payStatus == 1 }}
+				        		<span class="mr5 red">已关闭</span>
+				        	{{ else }}
+				        		<span class="mr5 green">未关闭</span>
+				        	{{ fi }}
+				        </td>
+				    </tr>
+			        <tr>
+			        	<td class="col-xs-5 active">@(订单状态类型)</td>
+					    <td>
+			        	{{ if order && order.orderStatus && order.orderStatus.value }}
+			        		{{ if order.orderStatus.type === 0 }}
+								<span class="red">
+							{{ else }}
+								<span class="green">
+							{{ fi }}
+							{{order.orderStatus.value}}</span>
+						{{ else }}
+							-		
 			        	{{ fi }}
-			        {{ fi }}
-		        	</td>
-		        </tr>
-		        <tr>
-		        	<td class="col-xs-5 active">@(待付金额)</td>
-		        	<td>
-		        		{{ if duePrice }}
-		        			<span class="green">{{ duePrice | price(2) }}</span>
-		        		{{ else }}
-	        				-
-	        			{{ fi }}
-		        	</td>
-		        </tr>
-			</tbody>
-		</table>
-		</script>
+			        	</td>
+			        </tr>
+			        <tr>
+			        	<td class="col-xs-5 active">@(列表状态类型)</td>
+			        	<td>
+		        		{{ if orderType === 0 }}
+			        		<span class="red">已关闭</span>
+			        	{{ else }}
+				        	{{ if orderType === 1 }}
+			        			<span class="green">待付款</span>
+				        	{{ else }}
+				        		{{ if orderType === 2 }}
+			        				<span class="green">待发货</span>
+				        		{{ else }}
+				        			{{ if orderType === 3 }}
+			        					<span class="green">已发货</span>
+				        			{{ else }}
+				        				{{ if orderType === 4 }}
+			        						<span class="green">已完成</span>
+			        					{{ else }}
+					        				-
+					        			{{ fi }}
+				        			{{ fi }}
+				        		{{ fi }}
+				        	{{ fi }}
+				        {{ fi }}
+			        	</td>
+			        </tr>
+			        <tr>
+			        	<td class="col-xs-5 active">@(待付金额)</td>
+			        	<td>
+			        		{{ if duePrice }}
+			        			<span class="green">{{ duePrice | price(2) }}</span>
+			        		{{ else }}
+		        				-
+		        			{{ fi }}
+			        	</td>
+			        </tr>
+				</tbody>
+			</table>
+			</script>
+		</div>
 	</div>
 	<hr />
 
@@ -323,7 +325,7 @@
 								</td>
 								<td class="ui-center col-xs-1" title="{{ s.price | price(2) }}">{{ s.price | price(2) }}</td>
 		                        <td class="ui-center col-xs-1" title="{{ s.paidPrice | price(2) }}">{{ s.paidPrice | price(2) }}</td>
-		                        <td class="ui-center col-xs-1" title="{{ (s.price - s.paidPrice) | price(2) }}">{{ (s.price - s.paidPrice) | price(2) }}</td>
+		                        <td class="ui-center col-xs-1" title="{{ (s.price - s.paidPrice) | toFixed(2) }}">{{ (s.price - s.paidPrice) | toFixed(2) }}</td>
 								<td class="ui-center col-xs-1">{{ s.paidTimes }}</td>
 								<td class="ui-center col-xs-1">{{ s.payments.length }}</td>
 								<td class="ui-center col-xs-1">{{ s.closedTimes }}</td>
@@ -382,7 +384,7 @@
 		                        </td>
 		                        <td class="ui-center col-xs-1">{{ price | price(2) }}</td>
 								<td class="ui-center col-xs-1">{{ deposit | price(2) }}</td>
-								<td class="ui-center col-xs-1">{{ (price-deposit) | price(2) }}</td>
+								<td class="ui-center col-xs-1">{{ (price - deposit) | toFixed(2) }}</td>
 								<td class="ui-center col-xs-1">
 									{{ if datePaid }}
 										{{ datePaid | format('@(yyyy-MM-dd HH:mm:ss)') }}
@@ -413,7 +415,7 @@
 			                        <td class="ui-center col-xs-1 active">@(支付方式)</td>
 									<td class="ui-center col-xs-1 active">@(支付状态)</td>
 									<td class="ui-center col-xs-1 active">@(是否关闭)</td>
-									<td class="ui-center col-xs-1 active">@(支付时间)</td>
+									<td class="ui-center col-xs-2 active">@(支付时间)</td>
 									<td class="ui-center col-xs-2 active">@(修改支付状态)</td>
 								</tr>
 								{{ foreach s in form.subOrders }}
@@ -437,7 +439,7 @@
 										<td class="ui-center">{{ $index+1 }}</td>
 										<td class="ui-center col-xs-1">{{ p.id }}</td>
 										<td class="ui-center col-xs-1">第{{ p.slice }}笔</td>
-				                        <td class="ui-center col-xs-1">{{ p.price }}</td>
+				                        <td class="ui-center col-xs-1">{{ p.price | price(2) }}</td>
 				                        <td class="ui-center col-xs-1">
 				                        {{ if p.payType }}
 											{{ if p.payType==1 }}
@@ -471,7 +473,7 @@
 							        		<span class="mr5 green">未关闭</span>
 							        	{{ fi }}
 										</td>
-										<td class="ui-center col-xs-1">
+										<td class="ui-center col-xs-2">
 										{{ if p.datePaid }}
 											{{ p.datePaid | format('@(yyyy-MM-dd HH:mm:ss)') }}
 										{{ else }}
