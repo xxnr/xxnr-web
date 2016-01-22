@@ -13,7 +13,7 @@ app.service('loginService', function($cookieStore, $timeout, BaseUrl, BaseDomain
 	        userType:''
 	    };
     }
-    this.user = _user;
+    this.user = $cookieStore.get(userKey);
     //console.log(this.user);
 //    var refresh = function(){
 //        var expires = new Date();
