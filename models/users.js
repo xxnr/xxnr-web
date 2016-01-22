@@ -1,31 +1,31 @@
-var mongoose = require('mongoose');
+var mongoose = require("mongoose");
 
 // Schema
 var UserSchema = new mongoose.Schema({
-    'id': {type:String, required: true, index: true, unique: true},         // 用户ID
-    'account': {type: String, required: true, index: true, unique: true},   // 用户账户（手机号）
-    'password': {type: String, required: true},                             // 用户密码
-    'datecreated': {type: Date, default: Date.now},                         // 注册时间
-    'nickname': String,                                                     // 用户昵称
-    'name': String,                                                         // 用户名称
-    'type': {type: String, default:"1"},                                    // 用户类型 1：其他 2：种植大户 3：村级经销商 4：乡镇经销商 5：县级经销商 it's configured in config file right now
-    'typeVerified': [{type: String}],                                         // 认证类型
-    'sex': {type: Boolean, default:false},                                  // 性别 0：男 1：女
-    'photo': String,                                                        // 用户头像
-    'regmethod': Boolean,                                                   // 注册方式 0：手机 1：web
-    'score': Number,                                                        // 用户积分
-    'inviterId': String,                                                    // 邀请人id
-    inviter:{type:mongoose.Schema.ObjectId, ref:'user'},                    // 邀请人
-    'dateinvited' : Date,                                                   //邀请时间
-    'webLoginId' : String,                                                  // web login id
-    'appLoginId' : String,                                                  // app login id
-    'registerAgent': String,                                                // 注册时的设备
-    isUserInfoFullFilled:{type: Boolean, default: false},                   // 是否完善用户信息并获取积分
-    address:{                                                               // 用户所在地
-        province:{type:mongoose.Schema.ObjectId, ref:'province'},
-        city:{type:mongoose.Schema.ObjectId, ref:'city'},
-        county:{type:mongoose.Schema.ObjectId, ref:'county'},
-        town:{type:mongoose.Schema.ObjectId, ref:'town'}
+    "id": {type:String, required: true, index: true, unique: true},         // 用户ID
+    "account": {type: String, required: true, index: true, unique: true},   // 用户账户（手机号）
+    "password": {type: String, required: true},                             // 用户密码
+    "datecreated": {type: Date, default: Date.now},                         // 注册时间
+    "nickname": String,                                                     // 用户昵称
+    "name": String,                                                         // 用户名称
+    "type": {type: String, default:"1"},                                    // 用户类型 1：其他 2：种植大户 3：村级经销商 4：乡镇经销商 5：县级经销商 it"s configured in config file right now
+    "typeVerified": [{type: String}],                                         // 认证类型
+    "sex": {type: Boolean, default:false},                                  // 性别 0：男 1：女
+    "photo": String,                                                        // 用户头像
+    "regmethod": Boolean,                                                   // 注册方式 0：手机 1：web
+    "score": Number,                                                        // 用户积分
+    "inviterId": String,                                                    // 邀请人id
+    inviter:{type:mongoose.Schema.ObjectId, ref:"user"},                    // 邀请人
+    "dateinvited" : Date,                                                   //邀请时间
+    "webLoginId" : String,                                                  // web login id
+    "appLoginId" : String,                                                  // app login id
+    "registerAgent": String,                                                // 注册时的设备
+    "isUserInfoFullFilled":{type: Boolean, default: false},                   // 是否完善用户信息并获取积分
+    "address":{                                                               // 用户所在地
+        province:{type:mongoose.Schema.ObjectId, ref:"province"},
+        city:{type:mongoose.Schema.ObjectId, ref:"city"},
+        county:{type:mongoose.Schema.ObjectId, ref:"county"},
+        town:{type:mongoose.Schema.ObjectId, ref:"town"}
     },
     "v1.0-data":{
         "id":String,
@@ -42,28 +42,64 @@ var UserSchema = new mongoose.Schema({
     }
 });
 
+var PotentialCustomerSchema = new mongoose.Schema({
+    "user":{type:mongoose.Schema.ObjectId, ref:"user"},  // 用户 reference
+    "name":{type:String, required:true},                // 姓名
+    "phone":{type:String, required:true},              // 手机号码
+    "sex":{type:Boolean, default:false},              // 性别 0：男 1：女
+    "address":{                                         // 用户所在地
+        province:{type:mongoose.Schema.ObjectId, ref:"province"},
+        city:{type:mongoose.Schema.ObjectId, ref:"city"},
+        county:{type:mongoose.Schema.ObjectId, ref:"county"},
+        town:{type:mongoose.Schema.ObjectId, ref:"town"}
+    },
+    "buyIntentions":[{type:mongoose.Schema.ObjectId, ref:"intention_product"}],                           // 购买意向商品
+    "remarks":{type:String},                             // 备注
+    "dateTimeAdded":{type:Date, default:Date.now},      // 添加时间
+    "dateAdded":{type:String},                            // 添加日期(北京时间)
+    "isRegistered":{type:Boolean, default:false}         // 是否注册
+});
+
+var IntentionProductSchema = new mongoose.Schema({
+    name:{type:String, required:true},                   // 商品名称
+    count:{type:Number, default:0}                      // 意向购买人数
+});
+
 // Indexes
 UserSchema.index({account:"text", nickname:"text", name:"text"});
 UserSchema.index({type:1});
+PotentialCustomerSchema.index({"phone":1, unique:true});
+PotentialCustomerSchema.index({"user":1, "dateAdded":1});
+IntentionProductSchema.index({"name":1, unique:true});
 
 var UserLogSchema = new mongoose.Schema({id: String, account: String, ip: String, date: String, loginAgent: String});
 
 var UserOrderNumberSchema = new mongoose.Schema({
-    'userId': {type:String, required:true, index: true, unique: true},  // 用户ID
-    'numberForInviter': {type:Number, default:1},                       // 用户上次被新农代表查看后的新增订单数
-    'dateUpdated': {type: Date, default: Date.now},
-    'dateCreated': {type: Date, default: Date.now}
+    "userId": {type:String, required:true, index: true, unique: true},  // 用户ID
+    "numberForInviter": {type:Number, default:1},                       // 用户上次被新农代表查看后的新增订单数
+    "dateUpdated": {type: Date, default: Date.now},
+    "dateCreated": {type: Date, default: Date.now}
 });
 
-
 // Model
-mongoose.model('user', UserSchema);
-mongoose.model('users-log', UserLogSchema);
-mongoose.model('userordersnumber', UserOrderNumberSchema);
+mongoose.model("user", UserSchema);
+mongoose.model("users-log", UserLogSchema);
+mongoose.model("userordersnumber", UserOrderNumberSchema);
+mongoose.model("intention_product", IntentionProductSchema);
+var PotentialCustomerModel = mongoose.model("potential_customer", PotentialCustomerSchema);
 
-//mongoose.set('debug', true);
+// hooks
+UserSchema.post('save', function(doc){
+    PotentialCustomerModel.findOneAndUpdate({phone:doc.account}, {$set:{isRegistered:true}}, function(err){
+        if(err){
+            console.error(err);
+        }
+    })
+});
+
+//mongoose.set("debug", true);
 //
-//userModel.on('index', function(err){
+//userModel.on("index", function(err){
 //    if(err){
 //        console.error(err);
 //    }else{

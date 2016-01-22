@@ -615,7 +615,6 @@ function api10_getOrderDetails() {
 
 function addOrderBySKU(){
     var self = this;
-
     var data = self.data;
     var userId = data['userId'];
     var shopCartId = data.shopCartId;

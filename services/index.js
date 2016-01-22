@@ -31,3 +31,9 @@ exports.brand = require('./brand');
 
 // category
 exports.category = require('./category');
+
+// intention products
+exports.intention_product = require('./intention_product');
+
+// potential customers
+exports.potential_customer = require('./potential_customer');

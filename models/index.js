@@ -57,6 +57,10 @@ exports.supplier = mongoose.model('supplier');
 exports.category = mongoose.model('category');
 // user white list
 exports.userwhitelist = mongoose.model('userwhitelist');
+// intention_product
+exports.intention_product = mongoose.model('intention_product');
+// potential_customer
+exports.potential_customer = mongoose.model('potential_customer');
 
 exports.getModel = function (name, options) {
     options = options || {};

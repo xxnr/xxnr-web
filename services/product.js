@@ -3,6 +3,7 @@
  */
 var mongoose = require('mongoose');
 var ProductModel = require('../models').product;
+var SKUModel = require('../models').SKU;
 var ProductAttributeModel = require('../models').productAttribute;
 var sortOptions = {"price-desc":{price:-1},"price-asc":{price:1}};
 var BrandModel = require('../models').brand;
@@ -215,29 +216,8 @@ ProductService.prototype.save = function(model, callback) {
             }
         })
     };
-    if(model.online) {
-        ProductModel.findOne({_id: model._id}, function (err, product) {
-            if (err) {
-                console.error(err);
-                callback(err);
-                return;
-            }
 
-            if (!product) {
-                callback('商品不存在');
-                return;
-            }
-
-            if (product.SKUAttributes && product.SKUAttributes.length > 0) {
-                updator()
-            } else {
-                callback('该商品没有上线的SKU，无法上线');
-                return;
-            }
-        })
-    } else{
-        updator();
-    }
+    onlineProduct(model._id, model.online, updator, callback);
 };
 
 // Gets a specific product
@@ -587,6 +567,10 @@ ProductService.prototype.updateStatus = function(_id, online, callback){
         })
     };
 
+    onlineProduct(_id, online, updator, callback);
+};
+
+function onlineProduct(_id, online, updator, callback){
     if(online){
         ProductModel.findOne({_id:_id}, function(err, product){
             if(err){
@@ -603,14 +587,14 @@ ProductService.prototype.updateStatus = function(_id, online, callback){
             if (product.SKUAttributes && product.SKUAttributes.length > 0){
                 updator()
             } else{
-                callback('请先添加并上线SKU');
+                callback('该商品没有上线的SKU，无法上线，请先添加并上线SKU');
                 return;
             }
         })
     } else {
-        updator()
+        updator();
     }
-};
+}
 
 // Refreshes internal information (categories)
 function refresh() {

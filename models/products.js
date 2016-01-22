@@ -67,6 +67,10 @@ var productSchema = new mongoose.Schema({
 			online: {type: Boolean, default: false}
 		},
 		required:false
+	},
+	referencePrice:{											// 参考价格区间
+		min:{type:Number},
+		max:{type:Number}
 	}
 });
 

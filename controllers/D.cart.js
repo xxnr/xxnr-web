@@ -109,20 +109,7 @@ function getShoppingCart(){
             return;
         }
 
-        var SKUs = [];
-        if(cart.SKU_items && cart.SKU_items.length>0) {
-            cart.SKU_items.forEach(function (item) {
-                if(item.SKU) {
-                    var SKU = item.SKU;
-                    SKU.product = item.product;
-                    SKU.count = item.count;
-                    SKU.additions = item.additions;
-                    SKUs.push(SKU);
-                }
-            });
-        }
-
-        self.respond(convertToShoppingCartFormatV_1_0(SKUs, cart.cartId, cart.userId));
+        self.respond(convertToShoppingCartFormatV_1_0(cart.SKU_items || [], cart.cartId, cart.userId));
     }, true)
 }
 
@@ -138,7 +125,7 @@ function getShoppingCartOffline(){
         if(err){
             self.respond({code:1001,message:err});
         }else {
-            self.respond(convertToShoppingCartFormatV_1_0(SKUs, null, null));
+            self.respond(convertToShoppingCartFormatV_1_0(SKUs || [], null, null));
         }
     });
 }
@@ -148,12 +135,16 @@ function convertToShoppingCartFormatV_1_0(SKUs, cartId, userId){
         "datas":{"total":0, "shopCartId":cartId, "DiscountPrice":0, "locationUserId":userId, "totalPrice":0, "rows":[
         ]}};
     var brands = [];
+    var brandsOfflineEntryCount = [];
     var brandNames = [];
     var totalCount = 0;
+    var offlineEntryCount = 0;
 
     for(var i=0; i<SKUs.length; i++) {
-        var SKU = SKUs[i];
+        var SKU = SKUs[i].SKU;
+        var count = SKUs[i].count;
         var product = api10.convertProduct(SKUs[i].product);
+        var additions = SKUs[i].additions;
         var SKUDetail = {"goodsId": product.id,
             "_id": SKU._id,
             "price": SKU.price.platform_price,
@@ -164,22 +155,33 @@ function convertToShoppingCartFormatV_1_0(SKUs, cartId, userId){
             "productName": product.name,
             "attributes": SKU.attributes,
             "deposit": product.deposit,
-            "count": SKU.count,
-            "additions": SKU.additions,
-            "online": SKU.online
-        };
+            "count":count,
+            additions:additions,
+            "online":SKU.online && product.online};
         var brandName = product.brandName;
         if(!brands[brandName]){
             brands[brandName] = [];
             brandNames.push(brandName);
         }
+
         totalCount += parseInt(SKUDetail.count);
+        if(!SKUDetail.online){
+            offlineEntryCount += 1;
+            if (brandsOfflineEntryCount[brandName]){
+                brandsOfflineEntryCount[brandName]++;
+            } else{
+                brandsOfflineEntryCount[brandName] = 1;
+            }
+        }
+
         brands[brandName].push(SKUDetail);
     }
+
     goodDetails.datas.total = SKUs.length;
     goodDetails.datas.totalCount = totalCount;
+    goodDetails.datas.offlineEntryCount = offlineEntryCount;
     for(var brandNameIndex=0; brandNameIndex<brandNames.length; brandNameIndex++) {
-        var brand = {"brandName":brandNames[brandNameIndex], "SKUList":brands[brandNames[brandNameIndex]]};
+        var brand = {"brandName":brandNames[brandNameIndex], "SKUList":brands[brandNames[brandNameIndex]], offlineEntryCount:brandsOfflineEntryCount[brandNames[brandNameIndex]] || 0};
         goodDetails.datas.rows.push(brand);
     }
 
