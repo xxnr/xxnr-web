@@ -6,7 +6,7 @@ var PotentialCustomerModel = require('../models').potential_customer;
 var UserModel = require('../models').user;
 var mongoose = require("mongoose");
 var moment = require('moment-timezone');
-
+const CountPerDay = 15;
 var PotentialCustomerService = function(){};
 
 // add potential customer
@@ -103,7 +103,7 @@ PotentialCustomerService.prototype.add = function(user, name, phone, sex, addres
                             return;
                         }
 
-                        if(count >= 15){
+                        if(count >= CountPerDay){
                             callback('今日名额已用完，请合理报备');
                             return;
                         }
@@ -157,6 +157,24 @@ PotentialCustomerService.prototype.query = function(user, callback){
 
         callback(null, customers);
     })
+};
+
+PotentialCustomerService.prototype.countLeftToday = function(user, callback){
+    if(!user){
+        callback('user required');
+        return;
+    }
+
+    var currentDate = moment().tz('Asia/Shanghai').format('YYYYMMDD');
+    PotentialCustomerModel.count({user:mongoose.Types.ObjectId(user._id), dateAdded:currentDate}, function(err, count){
+        if(err){
+            console.error(err);
+            callback(err);
+            return;
+        }
+
+        callback(null, CountPerDay-count);
+    });
 };
 
 PotentialCustomerService.prototype.getById = function(id, callback){
