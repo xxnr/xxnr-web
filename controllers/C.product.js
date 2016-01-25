@@ -56,6 +56,7 @@ function getProductsListPage() {
     var max = self.data["rowCount"] || self.data["max"];
     var category = self.data["classId"];
     var brandName = self.data["brandName"];
+    var brand = self.data.brand;
     var reservePrice = self.data["reservePrice"];
     var modelName = self.data["modelName"];
     var sort = self.data["sort"];
@@ -73,6 +74,9 @@ function getProductsListPage() {
 
     if (brandName)
         options.brandName = decodeURI(brandName).split(',');
+
+    if(brand)
+        options.brand = brand.split(',');
 
     if (reservePrice)
         options.reservePrice = decodeURI(reservePrice).split(',');
