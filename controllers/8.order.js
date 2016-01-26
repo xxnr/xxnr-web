@@ -137,13 +137,13 @@ function api10_getOders() {
                     'recipientName':item.consigneeName,
                     'recipientPhone':item.consigneePhone,
                     'typeLable':'',
-                    'deposit': item.duePrice ? item.duePrice.toFixed(2) : item.deposit.toFixed(2),
+                    'deposit': typeof(item.duePrice) != 'undefined' ? item.duePrice.toFixed(2) : item.deposit.toFixed(2),
                     'payType':item.payType,
                     'order': orderInfo,
                     'products': item.products || [],
                     'SKUs':item.SKUs || [],
                     'subOrders': item.subOrders || [],
-                    'duePrice': item.duePrice ? item.duePrice.toFixed(2) : null,
+                    'duePrice': typeof(data.duePrice) != 'undefined' ? item.duePrice.toFixed(2) : null,
                 };
 
                 if(arr[i].SKUs && arr[i].SKUs.length > 0){
@@ -742,11 +742,14 @@ function addOrderBySKU(){
                 if (orders && keys.length > 0) {
                     var order1, order2;
                     if (orders['deposit']) {
+                        orders['deposit'].duePrice = orders['deposit'].deposit;
                         order1 = orders['deposit'];
                         if (orders['full']) {
+                            orders['full'].duePrice = orders['full'].price;
                             order2 = orders['full'];
                         }
                     } else if (orders['full']) {
+                        orders['full'].duePrice = orders['full'].price;
                         order1 = orders['full'];
                     }
                     if (order1) {
