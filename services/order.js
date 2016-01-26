@@ -96,8 +96,9 @@ OrderService.prototype.query = function(options, callback) {
     }
 	// unpaid(including: part paid)
 	if (type === 1) {
-		mongoOptions["isClosed"] = { $ne: true };
-        mongoOptions["payStatus"] = { $ne: PAYMENTSTATUS.PAID };
+		// mongoOptions["isClosed"] = { $ne: true };
+		// mongoOptions["payStatus"] = { $ne: PAYMENTSTATUS.PAID };
+        mongoOptions["$or"] = [{isClosed: { $ne: true }, {payStatus: { $eq: PAYMENTSTATUS.UNPAID }}}, {payStatus: { $ne: PAYMENTSTATUS.PARTPAID }}];
     }
 	// paid and not delivered
 	if (type === 2) {
@@ -242,7 +243,6 @@ OrderService.prototype.get = function(options, callback) {
 	}
 
 	if (options.paymentId) {
-		// nor.push({paymentId:{$ne:options.paymentId}});
 		nor.push({'payments.id':{$ne:options.paymentId}});
 	}
 
@@ -256,7 +256,6 @@ OrderService.prototype.get = function(options, callback) {
 		
 		// update order paystatus
 		if (doc) {
-			// self.checkPayStatus(doc.id, function(err, order, payment) {
 			self.checkPayStatus({order:doc}, function(err, order, payment) {
 				if (err) {
 					console.error('OrderService get checkPayStatus err:', err);
@@ -372,10 +371,9 @@ OrderService.prototype.updatePayments = function(options, callback) {
 
 				callback(null);
 				if (needCheck) {
-					// self.checkPayStatus(doc.id, function(err, order, payment) {
 					self.checkPayStatus({order:doc}, function(err, order, payment) {
 						if (err)
-							console.log('OrderService updatePayments checkPayStatus err: ' + err);
+							console.error('OrderService updatePayments checkPayStatus err: ' + err);
 					});
 				}
 			});
@@ -384,33 +382,6 @@ OrderService.prototype.updatePayments = function(options, callback) {
 		}
 	});
 };
-// // Saves the order into the database
-// OrderService.prototype.save = function(options, callback) {
-
-// 	// check order deliverStatus by all products
-// 	var self = this;
-// 	// check order deliver status
-// 	var order = self.checkDeliverStatus(options);
-// 	// Update order in database
-// 	OrderModel.update({id:order.id}, {$set:order}, function(err, count) {
-//         if (err) {
-//             callback(err);
-//             return;
-//         }
-
-//         if (count.n == 0) {
-//             callback('订单未找到');
-//             return;
-//         }
-
-//         // update order paystatus
-//         // self.checkPayStatus(order.id, function(err, order, payment) {
-//         self.checkPayStatus({order:order}, function(err, order, payment) {
-// 			callback(null);	
-// 		});
-// 	});
-
-// };
 
 // Gets some stats from orders for Dashboard
 // Order.addOperation('dashboard', function(error, model, options, callback) {
@@ -445,7 +416,7 @@ OrderService.prototype.updatePayments = function(options, callback) {
 // 		    } 
 // 		} ], function(error, result){
 // 			if(error){
-// 				console.log('error occurred while aggregating orders, and error is ' + error);
+// 				console.error('error occurred while aggregating orders, and error is ' + error);
 // 				result = [];
 // 			}
 
@@ -492,7 +463,6 @@ OrderService.prototype.paid = function(id, paymentId, options, callback) {
         }
 
         // update order paystatus
-        // self.checkPayStatus(id, function(err, order, payment) {
         self.checkPayStatus({id:id}, function(err, order, payment) {
         	if (err) {
 	            callback(err);
