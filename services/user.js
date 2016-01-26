@@ -6,6 +6,7 @@ var crypto = require('crypto');
 var UserModel = require('../models').user;
 var UserLogModel = require('../models').userLog;
 var UseOrdersNumberModel = require('../models').userordersnumber;
+var UserWhiteListModel = require('../models').userwhitelist;
 
 // Service
 UserService = function(){};
@@ -328,6 +329,27 @@ UserService.prototype.emptyInviteeOrderNumber = function(options, callback) {
         }
     });
 };
+
+// check user in user white list
+UserService.prototype.inWhiteList = function(options, callback) {
+    if (!options.userid) {
+        callback('User inWhiteList err: no userid');
+        return;
+    }
+
+    var query = {userId: options.userid};
+    UserWhiteListModel.findOne(query, function (err, user) {
+        if (err) {
+            console.error('get white list user error:', err);
+            callback('获取白名单用户失败');
+            return;
+        }
+
+        // Returns response
+        return callback(null, user);
+    });
+};
+
 
 // ********************  only use for manager system  ********************
 

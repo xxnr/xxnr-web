@@ -23,4 +23,12 @@ const ZHIFUBAO = 1, UNIONPAY = 2;
         "ZHIFUBAO":ZHIFUBAO,
         "UNIONPAY":UNIONPAY
     });
+    exports.SUBORDERTYPE = Object.freeze({
+        "DEPOSIT":"deposit",
+        "BALANCE":"balance",
+        "FULL":"full"
+    });
+    exports.SUBORDERTYPEKEYS = Object.freeze(
+        ["DEPOSIT","BALANCE","FULL"]
+    );
 })(typeof exports === 'undefined'? this['defs']={}: exports);

@@ -8,7 +8,7 @@
 			</div>
 			<div class="col-md-3 col-sm-6 m">
 				<!--<div data-component="dropdown" data-component-path="orders.filter.type" data-options="@(全部订单)|0;@(Uncompleted)|1;@(Uncompleted and not paid)|2;@(Uncompleted and paid)|3;@(Completed)|4" data-component-type="number"></div>-->
-				<div data-component="dropdown" data-component-path="orders.filter.type" data-options="@(全部订单)|0;@(未付款)|1;@(已付款未发货)|2;@(已发货)|3;@(完成)|4" data-component-type="number">@(订单状态)</div>
+				<div data-component="dropdown" data-component-path="orders.filter.type" data-options="@(全部订单)|;@(未付款)|1;@(已付款未发货)|2;@(已发货)|3;@(完成)|4;@(已关闭)|0" data-empty="true" data-empty-text="@(全部订单)">@(订单状态)</div>
 			</div>
 		</div>
 	</div>
@@ -17,7 +17,7 @@
 	<div data-component="grid" data-component-path="orders.grid" data-max="auto" data-options-page="@(Page: #)" data-options-button="@(查看更多订单)" data-component-id="orders.grid">
 		<script type="text/html">
 		<tr{{ if confirmed }} class="order-completed"{{ fi }}>
-	        <td style="width:40px" class="silver hidden-xs">$index</td>
+	        <td style="width:40px" class="silver hidden-xs" data-title="序号">$index</td>
 	        <td style="width:80px" class="silver hidden-xs" data-title="订单号">{{ id }}</td>
 	        <!--<td style="width:80px" class="silver hidden-xs" data-title="商品" title="{{ if products && products.length > 0 }}{{ products[0].name }}{{ fi }}">-->
 	        	<!--{{ if products && products.length > 0 }}-->
@@ -29,12 +29,18 @@
 			<td style="width:80px" class="silver hidden-xs ui-center" data-title="下单用户">{{ buyerName }}</br>{{ buyerPhone }}</td>
 	        <td style="width:80px" class="ui-right active" data-title="总金额" title="{{price | price(2)}}">{{ price | price(2) }} </td>
 	        <td style="width:80px" class="ui-right active" data-title="定金" title="{{deposit | price(2)}}">{{ deposit | price(2) }} </td>
-	        <td style="width:90px" data-title="订单状态">
+	        <td style="width:90px" data-title="状态">
 	        	{{ if payStatus==1 }}
 	        		<span class="mr5 red">未付款</span>
 	        	{{ else }}
 	        		{{ if payStatus==2 }}
 	        			<span class="mr5 green">已付款</span>
+	        		{{ else }}
+		        		{{ if payStatus==3 }}
+		        			<span class="mr5 red">部分付款</span>
+		        		{{ else }}
+			        		<span class="mr5 red">其他</span>
+		        		{{ fi }}
 	        		{{ fi }}
 	        	{{ fi }}
 	        	{{ if deliverStatus==1 }}
@@ -44,12 +50,42 @@
 	        			<span class="green">已发货</span>
 	        		{{ else }}
 	        			{{ if deliverStatus==3 }}
-	        				<span class="green">部分发货</span>
+	        				<span class="red">部分发货</span>
+	        			{{ else }}
+			        		<span class="mr5 red">其他</span>
 	        			{{ fi }}
 	        		{{ fi }}
 	        	{{ fi }}
-	        	<!-- {{ if deliverStatus==2 }}<span class="green">已发货</span>{{ else }}未发货{{ fi }}
-	        	{{ if payStatus==2 }}<span class="green">已付款</span>{{ else }}未付款{{ fi }} -->
+	        </td>
+	        <td style="width:90px" data-title="是否关闭">
+	        	{{ if isClosed && payStatus == 1 }}
+	        		<span class="mr5 red">已关闭</span>
+	        	{{ else }}
+	        		<span class="mr5 green">未关闭</span>
+	        	{{ fi }}
+	        </td>
+	        <td style="width:90px" data-title="展示的状态类型">
+	        	{{ if isClosed && payStatus == 1 }}
+	        		<span class="mr5 red">已关闭</span>
+	        	{{ else }}
+	        		{{ if payStatus==1 || payStatus==3 }}
+		        		<span class="mr5 red">待付款</span>
+		        	{{ else }}
+			        	{{ if (deliverStatus==1 || deliverStatus==3) && payStatus==2 }}
+			        		<span class="red">待发货</span>
+			        	{{ else }}
+			        		{{ if deliverStatus==2 && !confirmed }}
+			        			<span class="green">已发货</span>
+			        		{{ else }}
+			        			{{ if confirmed }}
+			        				<span class="green">已完成</span>
+			        			{{ else }}
+			        				<span class="red">其他</span>
+			        			{{ fi }}
+			        		{{ fi }}
+			        	{{ fi }}
+			        {{ fi }}
+	        	{{ fi }}
 	        </td>
 	        <!-- <td style="width:20px" class="ui-right">
 				<button name="edit" title="@(修改状态)"><span class="fa fa-pencil"></span></button>
@@ -62,40 +98,20 @@
 	</div>
 </div>
 
-<div data-component="form" data-title="@(订单详情)" data-component-path="common.form" data-if="value === 'orders'" data-width="900px" data-component-id="orders.form">
+<div data-component="form" data-title="@(订单详情)" data-component-path="common.form" data-if="value === 'orders'" data-width="900px" data-component-id="orders.form" data-submitbutton="true">
 	<br />
 	<div data-component="template" data-component-path="orders.form" class="padding">
 		<script type="text/html">
 		<table class="table table-bordered" border="0">
 			<tbody>
 				<tr>
-					<td class="col-xs-5 active">@(# id)</td>
+					<td class="col-xs-5 active">@(# 订单号)</td>
 					<td>{{ id }}</td>
 				</tr>
 				<tr>
 					<td class="col-xs-5 active">@(下单时间)</td>
 					<td>{{ dateCreated | format('@(yyyy-MM-dd HH:mm:ss)') }}</td>
 				</tr>
-				{{ if payType }}
-				<tr>
-					<td class="col-xs-5 active">@(支付方式)</td>
-					<td>
-						{{ if payType==1 }}
-							支付宝
-						{{ else }}
-							{{ if payType==2 }}
-								银联
-							{{ fi }}
-						{{ fi }}
-					</td>
-				</tr>
-				{{ fi }}
-				{{ if payStatus==2 && datePaid }}
-				<tr>
-					<td class="col-xs-5 active">@(支付时间)</td>
-					<td>{{ datePaid | format('@(yyyy-MM-dd HH:mm:ss)') }}</td>
-				</tr>
-				{{ fi }}
 				<tr>
 					<td class="col-xs-5 active">@(总价)</td>
 					<td>{{ price | price(2) }}</td>
@@ -109,9 +125,22 @@
                     <td>{{ (price-deposit) | price(2) }}</td>
                 </tr>
                 <tr>
-                    <td class="col-xs-5 active">@(发货状态)</td>
-                    <td>
-	                    {{ if deliverStatus==1 }}
+                	<td class="col-xs-5 active">@(状态)</td>
+	                <td>
+			        	{{ if payStatus==1 }}
+			        		<span class="mr5 red">未付款</span>
+			        	{{ else }}
+			        		{{ if payStatus==2 }}
+			        			<span class="mr5 green">已付款</span>
+			        		{{ else }}
+				        		{{ if payStatus==3 }}
+				        			<span class="mr5 red">部分付款</span>
+				        		{{ else }}
+					        		<span class="mr5 red">其他</span>
+				        		{{ fi }}
+			        		{{ fi }}
+			        	{{ fi }}
+			        	{{ if deliverStatus==1 }}
 			        		<span class="red">未发货</span>
 			        	{{ else }}
 			        		{{ if deliverStatus==2 }}
@@ -119,106 +148,374 @@
 			        		{{ else }}
 			        			{{ if deliverStatus==3 }}
 			        				<span class="red">部分发货</span>
+			        			{{ else }}
+					        		<span class="mr5 red">其他</span>
 			        			{{ fi }}
 			        		{{ fi }}
 			        	{{ fi }}
-                    </td>
-                </tr>
+			        </td>
+		        </tr>
+		        <tr>
+		        	<td class="col-xs-5 active">@(是否关闭)</td>
+			        <td>
+			        	{{ if isClosed && payStatus == 1 }}
+			        		<span class="mr5 red">已关闭</span>
+			        	{{ else }}
+			        		<span class="mr5 green">未关闭</span>
+			        	{{ fi }}
+			        </td>
+			    </tr>
+		        <tr>
+		        	<td class="col-xs-5 active">@(展示的状态类型)</td>
+			        <td>
+			        	{{ if isClosed && payStatus == 1 }}
+			        		<span class="mr5 red">已关闭</span>
+			        	{{ else }}
+			        		{{ if payStatus==1 || payStatus==3 }}
+				        		<span class="mr5 red">待付款</span>
+				        	{{ else }}
+					        	{{ if (deliverStatus==1 || deliverStatus==3) && payStatus==2 }}
+					        		<span class="red">待发货</span>
+					        	{{ else }}
+					        		{{ if deliverStatus==2 && !confirmed }}
+					        			<span class="green">已发货</span>
+					        		{{ else }}
+					        			{{ if confirmed }}
+					        				<span class="green">已完成</span>
+					        			{{ else }}
+					        				<span class="red">其他</span>
+					        			{{ fi }}
+					        		{{ fi }}
+					        	{{ fi }}
+					        {{ fi }}
+			        	{{ fi }}
+			        </td>
+			    </tr>
 			</tbody>
 		</table>
 		</script>
 	</div>
-
-	<div class="padding bg-smoke">
-		<div class="row">
-			<div class="col-md-12">
-                <div data-component="dropdown" data-component-path="orders.form.payStatus" data-source="orders.payStatuses" data-source-value="value" class="b" data-required="true">@(支付状态)</div>
-            	<!-- <div data-component="dropdown" data-component-path="orders.form.deliverStatus" data-source="orders.deliverStatuses" data-source-value="value" class="b" data-required="true">@(发货状态)</div>
-				<br />
-				<div data-component="checkbox" data-component-path="orders.form.iscompleted" class="b red">@(Order is processed and closed)</div>
-				<div data-component="checkbox" data-component-path="orders.form.isemail">@(Send email to user about the order status)</div>
-				<div data-component="checkbox" data-component-path="orders.form.ispaid">@(Order is paid)</div> -->
-			</div>
-		</div>
-	</div>
-	<!-- <div class="padding" style="padding-bottom:10px">
-		<div class="row">
-			<div class="col-md-12">
-				<div data-component="textbox" data-component-path="orders.form.delivery" data-required="true" data-icon="fa fa-truck">@(Delivery type)</div>
-			</div>
-		</div>
-	</div>
-	<hr /> -->
-	<div class="padding" style="padding-bottom:0">
-		<div class="row">
-			<div class="col-md-6 m">
-				<div data-component="textbox" data-component-path="orders.form.consigneeName" data-required="true">@(收货人姓名)</div>
-			</div>
-			<div class="col-md-6 m">
-				<div data-component="textbox" data-component-path="orders.form.consigneePhone" data-required="true">@(收货人电话)</div>
-			</div>
-		</div>
-		<div class="row">
-			<div class="col-md-12 m">
-				<div data-component="textarea" data-component-path="orders.form.consigneeAddress" data-required="true" data-height="100px">@(收货地址)</div>
-			</div>
-		</div>
-
-		<!-- <div class="row">
-			<div class="col-md-12 m">
-				<div data-component="textarea" data-component-path="orders.form.message">@(备注)</div>
-			</div>
-			<div class="col-md-12 m">
-				<div data-component="textbox" data-component-path="orders.form.note" data-placeholder="@(Internal note only for you)">@(Internal note)</div>
-			</div>
-		</div> -->
-	</div>
 	<hr />
-	<div class="padding">
-		<div class="silver"><span class="fa fa-shopping-cart"></span> <strong>@(订单商品)</strong>:</div>
-		<br />
-		<table class="table table-bordered checkoutlist" border="0">
-			<!-- <tbody data-component="repeater" data-component-path="orders.form.products"> -->
-			<tbody data-component="template" data-component-path="orders">
+
+	<div class="padding" style="padding-bottom: 0px;padding-top: 0px;">
+		<div class="silver"><strong>@(订单信息)</strong></div>
+		<div class="padding">
+			<div class="silver"><strong>@(收货人信息)</strong></div>
+			<br />
+			<div data-component="template" data-component-path="orders.form">
 				<script type="text/html">
-					<tr>
-						<td class="col-xs-2 hidden-xs">@(商品名称)</td>
-						<td class="ui-right col-xs-3 hidden-xs">@(商品名称)</td>
-                        <td class="ui-right col-xs-2">@(单价)</td>
-                        <td class="ui-right col-xs-2">@(订金)</td>
-						<td class="ui-right col-xs-2 col-sm-1">@(数量)</td>
-						<td class="ui-right col-xs-2">@(发货状态)</td>
-					</tr>
-					{{ foreach p in form.products }}
-					<tr>
-						<td class="col-xs-2 hidden-xs">{{ p.id }}</td>
-						<td class="ui-right col-xs-3 hidden-xs" title="{{ p.name }}">{{ p.name }}</td>
-                        <td class="ui-right col-xs-2">{{ p.price | price(2) }}</td>
-                        <td class="ui-right col-xs-2">{{ p.deposit | price(2) }}</td>
-						<td class="ui-right col-xs-2 col-sm-1 active">{{ p.count }}x</td>
-						<td class="ui-right col-xs-2">
-							<select data-name="deliverStatus" data-id="{{ p.id }}">
-							{{ foreach d in deliverStatuses }}
-								<option value="{{ d.value }}" {{ if p.deliverStatus == d.value }}selected{{ fi }}>{{ d.name }}
-								</option>
-							{{ end }}
-							</select>
-						</td>
-						
-						<!-- <td class="ui-right col-xs-3 col-sm-2 b warning">{{ price | sum(2) }}<span class="fa fa-times-circle red" data-id="{{ id }}" style="cursor:pointer;margin-left:10px"></span></td> -->
-					</tr>
-					{{ end }}
+				<table class="table table-bordered" border="0">
+					<tbody>
+						<tr>
+							<td class="col-xs-5 active">@(收货人)</td>
+							<td>{{ consigneeName }}</td>
+						</tr>
+						<tr>
+							<td class="col-xs-5 active">@(电话)</td>
+							<td>{{ consigneePhone }}</td>
+						</tr>
+						<tr>
+							<td class="col-xs-5 active">@(收货地址)</td>
+							<td>{{ consigneeAddress }}</td>
+						</tr>
+						<!-- <tr>
+							<td class="col-xs-5 active">@(收货站点)</td>
+						</tr>
+						<tr>
+							<td class="col-xs-5 active">@(用户备注)</td>
+						</tr> -->
+					</tbody>
+				</table>
 				</script>
-			</tbody>
-		</table>
-		<!-- <div><a href="javascript:void(0)" data-component="click" data-component-path="orders_form_add"><span class="fa fa-plus-circle mr5"></span>@(添加新商品)</a></div> -->
-	</div>
-	<div data-component="error" data-component-path="orders.response"></div>
-	<div class="ui-form-buttons">
-		<div data-component="validation" data-component-path="orders.form" data-if="orders.form.products.length > 0">
-			<button name="submit">@(确定)</button>
+			</div>
 		</div>
-		<button name="cancel">@(取消)</button>
+		<hr />
+		<div class="padding" style="padding-top: 0px;">
+			<div class="silver"><strong>@(支付信息)</strong></div>
+			<br />
+			<div class="silver"><strong>@(子订单信息)</strong></div>
+			<br />
+			<table class="table table-bordered suborderslist" border="0">
+				<tbody data-component="template" data-component-path="orders.form">
+					<script type="text/html">
+						{{ if subOrders && subOrders.length > 0 }}
+							<tr>
+								<td class="ui-center active">@(序号)</td>
+								<td class="ui-center col-xs-2 active">@(支付内容)</td>
+								<td class="ui-center col-xs-1 active">@(支付状态)</td>
+		                        <td class="ui-center col-xs-1 active">@(应支付金额)</td>
+		                        <td class="ui-center col-xs-1 active">@(已支付金额)</td>
+								<td class="ui-center col-xs-1 active">@(未支付金额)</td>
+								<td class="ui-center col-xs-1 active">@(已支付次数)</td>
+								<td class="ui-center col-xs-1 active">@(总支付次数)</td>
+								<td class="ui-center col-xs-1 active">@(关闭支付次数)</td>
+								<td class="ui-center col-xs-2 active">@(最后一次支付时间)</td>
+							</tr>
+							{{ foreach s in subOrders }}
+							<tr>
+								<td class="ui-center">{{ $index+1 }}</td>
+								<td class="ui-center col-xs-2">
+									{{ if s.type == 'deposit' }}
+										阶段一：定金
+									{{ else }}
+										{{ if s.type == 'balance' }}
+											阶段二：尾款
+										{{ else }}
+											{{ if s.type == 'full' }}
+												全款
+											{{ else }}
+												其他
+											{{ fi }}
+										{{ fi }}
+									{{ fi }}
+								</td>
+								<td class="ui-center col-xs-1">
+									{{ if s.payStatus==1 }}
+						        		<span class="mr5 red">未付款</span>
+						        	{{ else }}
+						        		{{ if s.payStatus==2 }}
+						        			<span class="mr5 green">已付款</span>
+						        		{{ else }}
+							        		{{ if s.payStatus==3 }}
+							        			<span class="mr5 red">部分付款</span>
+							        		{{ else }}
+								        		<span class="mr5 red">其他</span>
+							        		{{ fi }}
+						        		{{ fi }}
+						        	{{ fi }}
+								</td>
+								<td class="ui-center col-xs-1" title="{{ s.price | price(2) }}">{{ s.price | price(2) }}</td>
+		                        <td class="ui-center col-xs-1" title="{{ s.paidPrice | price(2) }}">{{ s.paidPrice | price(2) }}</td>
+		                        <td class="ui-center col-xs-1" title="{{ (s.price - s.paidPrice) | price(2) }}">{{ (s.price - s.paidPrice) | price(2) }}</td>
+								<td class="ui-center col-xs-1">{{ s.paidTimes }}</td>
+								<td class="ui-center col-xs-1">{{ s.payments.length }}</td>
+								<td class="ui-center col-xs-1">{{ s.closedTimes }}</td>
+								<td class="ui-center col-xs-2">
+									{{ if s.datePaid }}
+										{{ s.datePaid | format('@(yyyy-MM-dd HH:mm:ss)') }}
+									{{ else }}
+										-
+									{{ fi }}
+								</td>
+							</tr>
+							{{ end }}
+						{{ else }}
+							<tr>
+								<td class="ui-center col-xs-1 active">@(订单ID)</td>
+								<td class="ui-center col-xs-1 active">@(支付ID)</td>
+								<td class="ui-center col-xs-1 active">@(支付方式)</td>
+								<td class="ui-center col-xs-1 active">@(支付状态)</td>
+		                        <td class="ui-center col-xs-1 active">@(应支付金额)</td>
+		                        <td class="ui-center col-xs-1 active">@(定金)</td>
+								<td class="ui-center col-xs-1 active">@(尾款)</td>
+								<td class="ui-center col-xs-1 active">@(支付完成时间)</td>
+							</tr>
+							<tr>
+								<td class="ui-center col-xs-1">{{ id }}</td>
+								<td class="ui-center col-xs-1">{{ paymentId }}</td>
+								<td class="ui-center col-xs-1">
+									{{ if payType }}
+										{{ if payType==1 }}
+											支付宝
+										{{ else }}
+											{{ if payType==2 }}
+												银联
+											{{ else }}
+												其他
+											{{ fi }}
+										{{ fi }}
+									{{ else }}
+										-
+									{{ fi }}
+								</td>
+		                        <td class="ui-center col-xs-1">
+		                        	{{ if payStatus==1 }}
+						        		<span class="mr5 red">未付款</span>
+						        	{{ else }}
+						        		{{ if payStatus==2 }}
+						        			<span class="mr5 green">已付款</span>
+						        		{{ else }}
+							        		{{ if payStatus==3 }}
+							        			<span class="mr5 red">部分付款</span>
+							        		{{ else }}
+								        		<span class="mr5 red">其他</span>
+							        		{{ fi }}
+						        		{{ fi }}
+						        	{{ fi }}
+		                        </td>
+		                        <td class="ui-center col-xs-1">{{ price | price(2) }}</td>
+								<td class="ui-center col-xs-1">{{ deposit | price(2) }}</td>
+								<td class="ui-center col-xs-1">{{ (price-deposit) | price(2) }}</td>
+								<td class="ui-center col-xs-1">
+									{{ if datePaid }}
+										{{ datePaid | format('@(yyyy-MM-dd HH:mm:ss)') }}
+									{{ else }}
+										-
+									{{ fi }}
+								</td>
+							</tr>
+						{{ fi }}
+					</script>
+				</tbody>
+			</table>
+			<div data-component="template" data-component-path="orders" class="paymentslist">
+				<script type="text/html">
+				{{ if form.subOrders && form.subOrders.length > 0 }}
+					<br />
+					<div class="silver"><strong>@(子订单支付详情)</strong></div>
+					<br />
+					<table class="table table-bordered" border="0">
+						<tbody>
+							
+								<tr>
+									<td class="ui-center active">@(支付内容)</td>
+									<td class="ui-center active">@(序号)</td>
+									<td class="ui-center col-xs-1 active">@(支付ID)</td>
+									<td class="ui-center col-xs-1 active">@(笔数)</td>
+			                        <td class="ui-center col-xs-1 active">@(支付金额)</td>
+			                        <td class="ui-center col-xs-1 active">@(支付方式)</td>
+									<td class="ui-center col-xs-1 active">@(支付状态)</td>
+									<td class="ui-center col-xs-1 active">@(是否关闭)</td>
+									<td class="ui-center col-xs-1 active">@(支付时间)</td>
+									<td class="ui-center col-xs-2 active">@(修改支付状态)</td>
+								</tr>
+								{{ foreach s in form.subOrders }}
+									{{ foreach p in s.payments }}
+									<tr>
+										<td class="ui-center">
+										{{ if s.type == 'deposit' }}
+											阶段一：定金
+										{{ else }}
+											{{ if s.type == 'balance' }}
+												阶段二：尾款
+											{{ else }}
+												{{ if s.type == 'full' }}
+													全款
+												{{ else }}
+													其他
+												{{ fi }}
+											{{ fi }}
+										{{ fi }}
+										</td>
+										<td class="ui-center">{{ $index+1 }}</td>
+										<td class="ui-center col-xs-1">{{ p.id }}</td>
+										<td class="ui-center col-xs-1">第{{ p.slice }}笔</td>
+				                        <td class="ui-center col-xs-1">{{ p.price }}</td>
+				                        <td class="ui-center col-xs-1">
+				                        {{ if p.payType }}
+											{{ if p.payType==1 }}
+												支付宝
+											{{ else }}
+												{{ if p.payType==2 }}
+													银联
+												{{ else }}
+													其他
+												{{ fi }}
+											{{ fi }}
+										{{ else }}
+											-
+										{{ fi }}
+				                        </td>
+										<td class="ui-center col-xs-1">
+										{{ if p.payStatus==1 }}
+							        		<span class="mr5 red">未付款</span>
+							        	{{ else }}
+							        		{{ if p.payStatus==2 }}
+							        			<span class="mr5 green">已付款</span>
+							        		{{ else }}
+							        			<span class="mr5 red">其他</span>
+							        		{{ fi }}
+							        	{{ fi }}
+										</td>
+										<td class="ui-center col-xs-1">
+										{{ if p.isClosed && p.payStatus == 1 }}
+							        		<span class="mr5 red">已关闭</span>
+							        	{{ else }}
+							        		<span class="mr5 green">未关闭</span>
+							        	{{ fi }}
+										</td>
+										<td class="ui-center col-xs-1">
+										{{ if p.datePaid }}
+											{{ p.datePaid | format('@(yyyy-MM-dd HH:mm:ss)') }}
+										{{ else }}
+											-
+										{{ fi }}
+										</td>
+										<td class="ui-center col-xs-2">
+											<select data-name="payStatus" data-id="{{ p.id }}" data-suborderid="{{ s.id }}" data-suborderindex="{{ s.$index }}" data-paymentindex="{{ $index }}">
+											{{ foreach ps in payStatuses }}
+												<option value="{{ ps.value }}" {{ if p.payStatus == ps.value }}selected{{ fi }}>{{ ps.name }}
+												</option>
+											{{ end }}
+											</select>
+										</td>
+									</tr>
+									{{ end }}
+								{{ end }}
+						</tbody>
+					</table>
+					
+					<!-- <div class="ui-buttons">
+						<button name="submit" data-name="suborders">@(提交修改)</button>
+					</div> -->
+				{{ fi }}
+				</script>
+			</div>
+			<div data-component="visible" class="ui-buttons" data-component-path="orders.form.subOrders" data-if="orders.form.subOrders && orders.form.subOrders.length > 0">
+				<button name="submit" data-name="subOrders">@(提交修改)</button>
+			</div>
+			<div data-component="error" data-component-path="orders.form.subOrders.response"></div>
+		</div>
+		<hr />
+		
+		<div class="padding" style="padding-top: 0px;">
+			<div class="silver"><strong>@(订单商品)</strong></div>
+			<br />
+			<table class="table table-bordered checkoutlist" border="0">
+				<tbody data-component="template" data-component-path="orders">
+					<script type="text/html">
+						<tr>
+							<td class="ui-center col-xs-2 hidden-xs active">@(商品ID)</td>
+							<td class="ui-center col-xs-3 hidden-xs active">@(商品名称)</td>
+	                        <td class="ui-center col-xs-2 active">@(单价)</td>
+	                        <td class="ui-center col-xs-2 active">@(订金)</td>
+							<td class="ui-center col-xs-2 col-sm-1 active">@(数量)</td>
+							<td class="ui-center col-xs-2 active">@(发货状态)</td>
+						</tr>
+						{{ foreach p in form.products }}
+						<tr>
+							<td class="ui-center col-xs-2 hidden-xs">{{ p.id }}</td>
+							<td class="ui-center col-xs-3 hidden-xs" title="{{ p.name }}">{{ p.name }}</td>
+	                        <td class="ui-center col-xs-2">{{ p.price | price(2) }}</td>
+	                        <td class="ui-center col-xs-2">{{ p.deposit | price(2) }}</td>
+							<td class="ui-center col-xs-2 col-sm-1 active">{{ p.count }}x</td>
+							<td class="ui-center col-xs-2">
+								<select data-name="deliverStatus" data-id="{{ p.id }}">
+								{{ foreach d in deliverStatuses }}
+									<option value="{{ d.value }}" {{ if p.deliverStatus == d.value }}selected{{ fi }}>{{ d.name }}
+									</option>
+								{{ end }}
+								</select>
+							</td>
+						</tr>
+						{{ end }}
+					</script>
+				</tbody>
+			</table>
+
+			<div class="ui-buttons">
+				<button name="submit" data-name="products">@(提交修改)</button>
+			</div>
+			<div data-component="error" data-component-path="orders.form.products.response"></div>
+			
+		</div>
+	</div>
+	<!-- <div data-component="error" data-component-path="orders.response"></div> -->
+	<div class="ui-form-buttons">
+		<!-- <div data-component="validation" data-component-path="orders.form" data-if="orders.form.products.length > 0">
+			<button name="submit">@(确定)</button>
+		</div> -->
+		<button name="cancel">@(关闭)</button>
 	</div>
 </div>
 
@@ -227,12 +524,11 @@
 
 	orders.filter = {};
 	orders.filter.page = 1;
-	orders.filter.type = 0;
 
 	orders.grid = [];
 	orders.form = {};
 	orders.info = {};
-	orders.deliverStatuses = [{name:'未发货',value:1},{name:'已发货',value:2}];
+	// orders.deliverStatuses = [{name:'未发货',value:1},{name:'已发货',value:2}];
 	// orders.form.payStatuses = [{name:'未支付',value:1},{name:'已支付',value:2}];
 	orders.response;
 
@@ -251,25 +547,12 @@
 							response = {};
 
 						SET('orders.form', $.extend({}, response), true);
-                        SET('orders.payStatuses',[{name:'未支付',value:1},{name:'已支付',value:2}], true);
+                        SET('orders.payStatuses',[{name:'未付款',value:1},{name:'已付款',value:2}], true);
                         SET('orders.deliverStatuses',[{name:'未发货',value:1},{name:'已发货',value:2}], true);
 						SET('orders.response', null);
 						SET('common.form', 'orders');
 					});
 					break;
-
-				// case 'remove':
-				// 	if (!confirm('@(你确认要删除选中订单？【删除后不能恢复】)'))
-				// 		return;
-				// 	$.components.DELETE(managerurl + '/api/orders', { id: row.id }, function() {
-				// 		orders_refresh(true);
-
-				// 		// Refresh dashboard informations
-				// 		if (window.dashboard_refresh)
-				// 			window.dashboard_refresh();
-
-				// 	});
-				// 	break;
 			}
 		};
 
@@ -281,39 +564,134 @@
 
 	ON('#orders.form', function(component) {
 		// Submits order form
-		component.submit = function(hide) {
-			var price = 0;
-			var count = 0;
-            var deposit = 0;
-			for (var i = 0, length = orders.form.products.length; i < length; i++) {
-				var product = orders.form.products[i];
-				if (product.count > 0) {
-                    price += (product.price * product.count);
-                    deposit += (product.deposit ? product.deposit : product.price) * product.count;
-                }
-				count += product.count;
+		// component.submit = function(hide) {
+		// 	var price = 0;
+		// 	var count = 0;
+  //           var deposit = 0;
+		// 	for (var i = 0, length = orders.form.products.length; i < length; i++) {
+		// 		var product = orders.form.products[i];
+		// 		if (product.count > 0) {
+  //                   price += (product.price * product.count);
+  //                   deposit += (product.deposit ? product.deposit : product.price) * product.count;
+  //               }
+		// 		count += product.count;
+		// 	}
+
+  //           orders.form.count = count;
+  //           orders.form.price = price;
+  //           orders.form.deposit = deposit;
+
+		// 	$.components.PUT(managerurl + '/api/orders/', orders.form, function(response) {
+
+		// 		// Error handling
+		// 		SET('orders.response', response);
+		// 		if (response instanceof Array)
+		// 			return;
+
+		// 		hide();
+		// 		orders_refresh(true);
+		// 		success();
+
+		// 		// Refreshes dashboard informations
+		// 		if (window.dashboard_refresh)
+		// 			window.dashboard_refresh();
+		// 	});
+		// };
+
+		component.submit = function(hide, button) {
+			// switch ($(button).attr('data-name')) {
+			// 	case 'products':
+			// 		if (!confirm('你确认要提交修改后的订单商品？'))
+			// 			return;
+			// 		var postdata = {'id':orders.form.id,'products':orders.form.products};
+			// 		$.components.PUT(managerurl + '/api/orders/products', postdata, function(response) {
+
+			// 			// Error handling
+			// 			SET('orders.form.products.response', response);
+			// 			if (response instanceof Array)
+			// 				return;
+			// 			hide();
+			// 			orders_refresh(true);
+			// 			success();
+			// 		});
+			// 		break;
+			// }
+			var dataname = $(button).attr('data-name');
+			if (dataname) {
+				if (orders.form[dataname]) {
+					var postdata = {};
+					var posturl = managerurl + '/api/orders/' + dataname;
+					postdata['id'] = orders.form.id;
+					postdata[dataname] = orders.form[dataname];
+					$.components.PUT(posturl, postdata, function(response) {
+
+						var responsekey = 'orders.form.' + dataname + '.response';
+						// Error handling
+						SET(responsekey, response);
+						if (response instanceof Array)
+							return;
+						hide();
+						orders_refresh(true);
+						success();
+					});
+
+				}
 			}
-
-            orders.form.count = count;
-            orders.form.price = price;
-            orders.form.deposit = deposit;
-
-			$.components.PUT(managerurl + '/api/orders/', orders.form, function(response) {
-
-				// Error handling
-				SET('orders.response', response);
-				if (response instanceof Array)
-					return;
-
-				hide();
-				orders_refresh(true);
-				success();
-
-				// Refreshes dashboard informations
-				if (window.dashboard_refresh)
-					window.dashboard_refresh();
-			});
 		};
+
+		$('.paymentslist').on('change', 'select', function() {
+			var el = $(this);
+			var paymentid = el.attr('data-id');
+			var name = el.attr('data-name');
+			var subOrderid = el.attr('data-suborderid');
+			switch (name) {
+				case 'payStatus':
+					var value = el.val();
+					orders_form_update(subOrderid, function(item) {
+						item[name] = parseInt(value);
+					},{'name':'subOrders','paymentid':paymentid});
+					component.changedisabled_botton('subOrders');
+					orders_form_refresh();
+					break;
+			}
+		});
+
+		$('.checkoutlist').on('change', 'select', function() {
+			var el = $(this);
+			var id = el.attr('data-id');
+			var name = el.attr('data-name');
+			switch (name) {
+				case 'deliverStatus':
+					var value = el.val();
+					orders_form_update(id, function(item) {
+						item[name] = parseInt(value);
+					});
+					component.changedisabled_botton('products');
+					orders_form_refresh();
+					break;
+			}
+		});
+
+		// Removes selected oredered item
+		$('.checkoutlist').on('click', '.fa-times-circle', function(e) {
+			orders_form_update($(this).attr('data-id'), function(item, index) {
+				orders.form.products.splice(index, 1);
+				orders_form_refresh();
+			});
+		});
+
+		component.changedisabled_botton = function (name) {
+			component.element.find('button').each(function() {
+				switch (this.name) {
+					case 'submit':
+						if ($(this).attr('data-name') === name) {
+							var el = $(this);
+							el.prop({ disabled: false });
+						}
+						break;
+				}
+			});
+		}
 
 		// Handles all inputs in ordered items
 		// $('.checkoutlist').on('change', 'input', function() {
@@ -342,32 +720,9 @@
 		// 			break;
 		// 	}
 		// });
-
-		$('.checkoutlist').on('change', 'select', function() {
-			var el = $(this);
-			var id = el.attr('data-id');
-			var name = el.attr('data-name');
-			switch (name) {
-				case 'deliverStatus':
-					var date = 'dateDelivered';
-					var value = el.val();
-					orders_form_update(id, function(item) {
-						item[name] = parseInt(value);
-						item[date] = new Date();
-					});
-					orders_form_refresh();
-					break;
-			}
-		});
-
-		// Removes selected oredered item
-		$('.checkoutlist').on('click', '.fa-times-circle', function(e) {
-			orders_form_update($(this).attr('data-id'), function(item, index) {
-				orders.form.products.splice(index, 1);
-				orders_form_refresh();
-			});
-		});
 	});
+
+	
 
 	// Method refreshes grid
 	function orders_refresh(reset) {
@@ -375,6 +730,9 @@
 		if (reset) {
 			orders.filter.page = 1;
 			orders.grid = [];
+		}
+		if (typeof(orders.filter.type) !== 'undefined' && orders.filter.type !== null && orders.filter.type.length == 0) {
+			delete orders.filter.type;
 		}
 
 		$.components.GET(managerurl + '/api/orders/', orders.filter, function(response) {
@@ -400,18 +758,40 @@
 	});
 
 	// Method finds ordered item by its id
-	function orders_form_update(id, callback) {
-		for (var i = 0, length = orders.form.products.length; i < length; i++) {
-			var p = orders.form.products[i];
-			if (p.id === id) {
-				callback(p, i);
+	function orders_form_update(id, callback, options) {
+		var name = options && options['name'] ? options['name']: '';
+		switch (name) {
+			case 'subOrders':
+				var paymentid = options && options['paymentid'] ? options['paymentid']: null;
+				if (!paymentid) break;
+				for (var i = 0, length = orders.form.subOrders.length; i < length; i++) {
+					var subOrder = orders.form.subOrders[i];
+					if (subOrder.id === id && subOrder.payments) {
+						for (var j = 0, length = subOrder.payments.length; j < length; j++) {
+							var payment = subOrder.payments[j];
+							if (payment.id === paymentid) {
+								callback(payment, i, j);
+								break;
+							}
+						}
+						break;
+					}
+				}
 				break;
-			}
+			default:
+				for (var i = 0, length = orders.form.products.length; i < length; i++) {
+					var p = orders.form.products[i];
+					if (p.id === id) {
+						callback(p, i);
+						break;
+					}
+				}
+				break;
 		}
 	}
 
 	// Method calculates prices and count in ordered items
-	function orders_form_refresh() {
+	function orders_form_refresh(attr) {
 		// var count = 0;
 		// var price = 0;
 
@@ -423,7 +803,13 @@
 
 		// orders.form.price = price;
 		// orders.form.count = count;
-		UPDATE('orders.form');
+		if (attr) {
+			var key = 'orders.form.' + attr;
+			UPDATE(key);
+		} else {
+			UPDATE('orders.form');
+		}
+		
 	}
 
 	Tangular.register('sum', function(value, format) {

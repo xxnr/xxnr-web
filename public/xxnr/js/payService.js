@@ -6,11 +6,13 @@ app.service('payService', function(BaseUrl){
     var _aliPayUrlBase = BaseUrl + 'alipay?orderId=';
     var _unionPayUrlBase = BaseUrl + 'unionpay?orderId=';
 
-    this.aliPayUrl = function(orderId){
-        return _aliPayUrlBase + orderId + '&notifyUrl=/alipay/success';
+    this.aliPayUrl = function(orderId,payPrice){
+        payPriceString = payPrice?"&price="+payPrice:"";
+        return _aliPayUrlBase + orderId + payPriceString + '&notifyUrl=/alipay/success';
     };
 
-    this.unionPayUrl = function(orderId){
-        return _unionPayUrlBase + orderId + '&notifyUrl=/alipay/success';
+    this.unionPayUrl = function(orderId,payPrice){
+        payPriceString = payPrice?"&price="+payPrice:"";
+        return _unionPayUrlBase + orderId + payPriceString +'&notifyUrl=/alipay/success';
     }
 });

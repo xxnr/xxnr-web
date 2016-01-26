@@ -12,9 +12,6 @@ var schema = new mongoose.Schema({
 	'consigneePhone': {type:String, required:false},
 	'consigneeAddress': {type:String, required:false},
 	'dateCreated': {type: Date, default: Date.now},
-	'dateCompleted': Date,
-	'datePaid': Date,
-	'dateDelivered': Date,
 	'price': Number,
 	'deposit': Number,
 	'products': {subschemaName:"OrderItem", type:
@@ -27,22 +24,63 @@ var schema = new mongoose.Schema({
 			'count': {type:Number, required: true},
             'category' : {type:String, required: false},
             'dateDelivered': Date,
+            'dateSet': Date,														// 人为设置的日期
             'deliverStatus': {type:Number, required:true, default: DELIVERSTATUS.UNDELIVERED}
 		}], required: true},
-	'payStatus': {type:Number, required:true},
-	'payType': {type:Number, required:true},
-	'deliverStatus': {type:Number, required:true}, // 主订单发货状态，从商品发货状态统计得来 分为无发货、部分发货、已发货三种
+	'payStatus': {type:Number, required:true, default: PAYMENTSTATUS.UNPAID},		// 主订单付款状态，从子订单付款状态统计得来 分为未付款、部分付款、已付款三种，只用来做查询
+	'datePaid': Date,
+	'deliverStatus': {type:Number, required:true}, 									// 主订单发货状态，从商品发货状态统计得来 分为无发货、部分发货、已发货三种，只用来做查询
+	'dateDelivered': Date,
 	'confirmed': {type:Boolean, default:false},
-	'paymentId': {type:String, required:true},
-    'isClosed': {type:Boolean, required:true, default:false}
+	'dateCompleted': Date,
+	'paymentId': {type:String, required:true},										// 最新一笔支付的ID
+	'payType': {type:Number, required:true},										// 最新一笔支付的支付方式
+    'isClosed': {type:Boolean, required:true, default:false},						// 本订单是否关闭
+    'payments': [{
+		'id': {type:String, index: true, unique: true, required: true},				// 支付ID
+		'stage': Number,															// 分期支付 第几期
+		'stagePrice': Number,														// 本次分期需付总金额
+        'slice': {type: Number, required: true},									// 支付的第几次
+        'price': {type: Number, required: true},									// 本次支付的金额
+        'payPrice': {type: Number},													// 用户选择支付的金额，用来判断是否需要生成新的payment
+        'suborderId': {type: String, index: true, required: true},					// 所属子订单ID
+        'dateCreated': {type: Date, default: new Date()},							// 生成日期
+		'datePaid': Date,															// 支付日期
+		'dateSet': Date,															// 人为设置的日期
+		'payStatus': {type:Number, required:true, default: PAYMENTSTATUS.UNPAID},	// 支付状态
+		'payType': {type:Number, required:true},									// 支付类型
+		'isClosed': {type:Boolean, required:true, default:false},					// 本支付是否关闭
+	}],
+	'subOrders': [{
+	    'id': {type: String, index: true, unique: true, required: true},			// 子订单ID
+	    'price': {type: Number, required: true},									// 子订单金额
+	    'type': {type: String, required: true},										// 子订单类型 'deposit' 'balance' 'full'
+	    'payStatus': {type:Number, required:true, default: PAYMENTSTATUS.UNPAID},	// 子订单支付状态，从子订单付款状态统计得来 分为未付款、部分付款、已付款三种，只用来做查询
+	    'stageId': String,															// 分期付款类型ID
+	}]
 });
 
 schema.index({dateCreated: -1});
+schema.index({buyerId: 1, dateCreated: -1});
+schema.index({isClosed: 1, payStatus: 1, buyerId: 1, dateCreated: -1});
+schema.index({payStatus: 1, deliverStatus: 1, buyerId: 1, dateCreated: -1});
+schema.index({confirmed: -1, deliverStatus: 1, buyerId: 1, dateCreated: -1});
 schema.index({id:"text", buyerId:"text", buyerName:"text", buyerPhone:"text", consigneeName:"text", consigneePhone:"text", paymentId:"text"});
 
 // Model
 mongoose.model('order', schema);
+// var orderModel = mongoose.model('order', schema);
 
+
+// mongoose.set('debug', true);
+
+// orderModel.on('index', function(err){
+//    if(err){
+//        console.error(err);
+//    }else{
+//        console.info()
+//    }
+// });
 
 // var Order = NEWSCHEMA('Order');
 // // var OrderItem = NEWSCHEMA('OrderItem');

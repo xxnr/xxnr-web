@@ -12,6 +12,7 @@ require('./orders');
 require('./products');
 require('./news');
 require('./carts');
+require('./whitelist');
 
 //user
 exports.user = mongoose.model('user');
@@ -39,6 +40,8 @@ exports.newsCategory = mongoose.model('newscategory');
 exports.cart = mongoose.model('cart');
 // user new orders number
 exports.userordersnumber = mongoose.model('userordersnumber');
+// user white list
+exports.userwhitelist = mongoose.model('userwhitelist');
 
 exports.getModel = function (name, options) {
     options = options || {};
