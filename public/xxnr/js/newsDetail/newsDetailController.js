@@ -9,24 +9,30 @@ app.controller('newsDetailController',function($scope, remoteApiService, commonS
     remoteApiService.getNewsCategories()
         .then(function(data) {
             $scope.categories = data.datas;
+            for(var i in $scope.categories){
+                $scope.categories[i].isSelected = false;
+            }
+            $scope.categories.splice(0, 0, {name:'全部',linker:"全部"});
+            $scope.categories[0].isSelected = true;
             remoteApiService.getNewsBody($scope.id)
                 .then(function(data){
                     $scope.newsTitle = data.datas.title;
                     $scope.category = data.datas.category;
-                    $scope.categoryId = findCategoryId($scope.category)+1;
+                    // $scope.categoryId = findCategoryId($scope.category)+1;
+                    $scope.categoryId = findCategoryId($scope.category);
                     $scope.newsAbstract = data.datas.abstract;
                     var d = new Date(commonService.parseDate(data.datas.datecreated));
                     $scope.createdDate = d.getFullYear()+'年'+ (d.getMonth()+1) +'月'+d.getDate()+'日';
                     $scope.newsBody = $sce.trustAsHtml(data.datas.newsbody);
 
-                    remoteApiService.getNewsCategories()
-                        .then(function(data) {
-                            $scope.categories = data.datas;
-                            $scope.categories.splice(0, 0, {name:'全部',linker:"全部"});
-                            for(var i in $scope.categories){
-                                $scope.categories[i].isSelected = false;
-                            }
-                            $scope.categories[0].isSelected = true;
+                    // remoteApiService.getNewsCategories()
+                    //     .then(function(data) {
+                    //         $scope.categories = data.datas;
+                    //         $scope.categories.splice(0, 0, {name:'全部',linker:"全部"});
+                    //         for(var i in $scope.categories){
+                    //             $scope.categories[i].isSelected = false;
+                    //         }
+                    //         $scope.categories[0].isSelected = true;
 
                             remoteApiService.getSpecificNewsList('',5,1)
                                 .then(function(articleList){
@@ -45,7 +51,7 @@ app.controller('newsDetailController',function($scope, remoteApiService, commonS
                                         $scope.sideArticles.push(article);
                                     }
                                 });
-                        });
+                        // });
                 });
 
         });

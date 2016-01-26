@@ -159,8 +159,10 @@ COMPONENT('dropdown', function() {
 		var kt = self.attr('data-source-text') || 'name';
 		var kv = self.attr('data-source-value') || 'id';
 
-		if (self.attr('data-empty') === 'true')
+
+		if (self.attr('data-empty') === 'true') {
 			builder.push('<option value="">' + (self.attr('data-empty-text') || '') + '</option>');
+		}
 
 		for (var i = 0, length = arr.length; i < length; i++) {
 			var item = arr[i];

@@ -2,7 +2,7 @@
  * Created by pepelu on 9/14/2015.
  */
 var app = angular.module('shop_cart', ['xxnr_common']);
-app.controller('shoppingCartController', function($scope, remoteApiService, commonService, loginService, sideService){
+app.controller('shoppingCartController', function($scope, remoteApiService, commonService, loginService, sideService, shoppingCartService){
 
     var sweetalert = commonService.sweetalert;
 
@@ -18,78 +18,99 @@ app.controller('shoppingCartController', function($scope, remoteApiService, comm
     $scope.$on('shoppingCartController', function(e,d) {
         //console.log(data);         //子级能得到值
         $scope.shoppingCartCount += d;
-        //console.log(d);
+        shoppingCartService.setSCart($scope.shoppingCartCount);
+        // console.log(d);
     });
 
     if(loginService.isLogin) {
-        remoteApiService.getShoppingCart()
-            .then(function (data) {
-                $scope.shoppingCartCount = 0;
-                if (!data || !data.datas) { // not logged on?
-                    if (!data) data = {};
-                    if (!data.datas) data.datas = {"rows": []};
-                }
-                $scope.shoppingCartId = data.datas.shopCartId || data.datas.cartId;
-                for (var shopIndex in data.datas.rows) {
-                    var shopData = data.datas.rows[shopIndex];
-                    var shop = {};
-                    shop.name = shopData.brandName;
-                    shop.allSelected = true;
-                    shop.items = [];
-                    var shopCount = 0;
-                    var shopTotalPrice = 0;
-                    var shopTotalDeposit = 0;
-                    var shopSaving = 0;
-                    for (var itemIndex in shopData.goodsList) {
-                        var itemData = shopData.goodsList[itemIndex];
-                        $scope.shoppingCartCount += itemData.goodsCount;
-
-                        if (typeof productFilter === 'function') {
-                            var result = productFilter(itemData);
-                            if (result[0]) {
-                                itemData = result[1];
-                            } else {
-                                continue;
+        // only cart page get shoppingCart api
+        if ((window.location.pathname.indexOf('cart.html') != -1) || (window.location.pathname.indexOf('confirmOrder.html') != -1)) {
+            remoteApiService.getShoppingCart()
+                .then(function (data) {
+                    $scope.shoppingCartCount = 0;
+                    if (!data || !data.datas) { // not logged on?
+                        if (!data) data = {};
+                        if (!data.datas) data.datas = {"rows": []};
+                    }
+                    $scope.shoppingCartId = data.datas.shopCartId || data.datas.cartId;
+                    for (var shopIndex in data.datas.rows) {
+                        var shopData = data.datas.rows[shopIndex];
+                        var shop = {};
+                        shop.name = shopData.brandName;
+                        shop.allSelected = true;
+                        shop.items = [];
+                        var shopCount = 0;
+                        var shopTotalPrice = 0;
+                        var shopTotalDeposit = 0;
+                        var shopSaving = 0;
+                        for (var itemIndex in shopData.SKUList) {
+                            var itemData = shopData.SKUList[itemIndex];
+                            $scope.shoppingCartCount += itemData.count;
+                            if (typeof productFilter === 'function') {
+                                var result = productFilter(itemData);
+                                if (result[0]) {
+                                    itemData = result[1];
+                                } else {
+                                    continue;
+                                }
                             }
+                            // console.log(itemData);
+                            var item = {};
+                            item.selected = true;
+                            item.SKU_id = itemData._id;
+
+                            item.detailPageUrl = "productDetail.html?goodsId=" + itemData.goodsId + '&type=' + shop.name;
+                            item.thumbnailUrl = commonService.baseUrl + itemData.imgUrl;
+                            item.onSale = (itemData.unitPrice == null || itemData.unitPrice == '') ? false : itemData.unitPrice != itemData.originalPrice;
+                            item.name = itemData.name;
+                            item.additions = itemData.additions;
+                            item.attributes = itemData.attributes;
+                            item.oldPrice = parseFloat(itemData.originalPrice).toFixed(2);
+                            // item.nowPrice = item.deposit ? parseFloat(itemData.unitPrice).toFixed(2) : item.oldPrice;
+                            item.nowPrice = Number(itemData.price).toFixed(2);
+                            item.point = itemData.point;
+                            // item.buyCount = parseInt(itemData.buyCount ? itemData.buyCount : itemData.goodsCount);
+                            item.buyCount = Number(itemData.count);
+                            // console.log(item.buyCount);
+                            item.oldBuyCount = item.buyCount;
+                            // item.count = parseInt(itemData.goodsCount);
+                            item.deposit = itemData.deposit;
+                            item.totalPrice = (item.buyCount * (item.nowPrice)).toFixed(2);
+                            item.totalDeposit = (item.buyCount * (item.deposit ? item.deposit : item.nowPrice)).toFixed(2);
+                            item.saving = item.buyCount * (item.oldPrice - item.nowPrice);
+                            item.hasDeposit = (item.deposit ? true : false);
+                            shopCount += item.buyCount;
+                            shopTotalPrice += item.totalPrice;
+                            shopTotalDeposit += item.totalDeposit;
+                            shopSaving += item.saving;
+                            // console.log(item);
+                            shop.items.push(item);
+                        }
+                        // set shoppingCartCount
+                        shoppingCartService.setSCart($scope.shoppingCartCount);
+
+                        $scope.$broadcast('dataloaded');
+
+                        shop.buyCount = shopCount;
+                        shop.totalPrice = shopTotalPrice;
+                        shop.totalDeposit = shopTotalDeposit;
+                        shop.Saving = shopSaving;
+                        if (shop.buyCount > 0) {
+                            $scope.shops.push(shop);
+                            calculateTotal();
                         }
 
-                        var item = {};
-                        item.selected = true;
-                        item.goodsId = itemData.goodsId;
-                        item.detailPageUrl = "productDetail.html?goodsId=" + itemData.goodsId + '&type=' + shop.name;
-                        item.thumbnailUrl = commonService.baseUrl + itemData.imgUrl;
-                        item.onSale = (itemData.unitPrice == null || itemData.unitPrice == '') ? false : itemData.unitPrice != itemData.originalPrice;
-                        item.name = itemData.goodsName;
-                        item.oldPrice = parseFloat(itemData.originalPrice).toFixed(2);
-                        item.nowPrice = item.onSale ? parseFloat(itemData.unitPrice).toFixed(2) : item.oldPrice;
-                        item.point = itemData.point;
-                        item.buyCount = parseInt(itemData.buyCount ? itemData.buyCount : itemData.goodsCount);
-                        item.oldBuyCount = item.buyCount;
-                        item.count = parseInt(itemData.goodsCount);
-                        item.deposit = itemData.deposit;
-                        item.totalPrice = (item.buyCount * (item.nowPrice)).toFixed(2);
-                        item.totalDeposit = (item.buyCount * (item.deposit ? item.deposit : item.nowPrice)).toFixed(2);
-                        item.saving = item.buyCount * (item.oldPrice - item.nowPrice);
-                        item.hasDeposit = (item.deposit ? true : false);
-                        shopCount += item.buyCount;
-                        shopTotalPrice += item.totalPrice;
-                        shopTotalDeposit += item.totalDeposit;
-                        shopSaving += item.saving;
-                        shop.items.push(item);
                     }
-                    $scope.$broadcast('dataloaded');
-
-                    shop.buyCount = shopCount;
-                    shop.totalPrice = shopTotalPrice;
-                    shop.totalDeposit = shopTotalDeposit;
-                    shop.Saving = shopSaving;
-                    if (shop.buyCount > 0) {
-                        $scope.shops.push(shop);
-                        calculateTotal();
-                    }
-
-                }
-            });
+                });
+        } else {
+            var count = shoppingCartService.getSCart();
+            // console.log(count);
+            if (count) {
+                $scope.shoppingCartCount = parseInt(count);
+            } else {
+                $scope.shoppingCartCount = 0;
+            }
+        }
     }else{
         $scope.shoppingCartCount = 0;
     }
@@ -151,7 +172,7 @@ app.controller('shoppingCartController', function($scope, remoteApiService, comm
             $scope.shops[shopIndex].items[itemIndex].buyCount++;
             $scope.shops[shopIndex].totalCount++;
             $scope.buyCountChange(shopIndex, itemIndex, $scope.shops[shopIndex].items[itemIndex].buyCount, $scope.shops[shopIndex].items[itemIndex].buyCount - 1);
-            submitChange($scope.shops[shopIndex].items[itemIndex].goodsId, $scope.shops[shopIndex].items[itemIndex].buyCount);
+            submitChange($scope.shops[shopIndex].items[itemIndex].SKU_id, $scope.shops[shopIndex].items[itemIndex].buyCount);
         }
     };
     $scope.reduce = function(shopIndex, itemIndex){
@@ -159,7 +180,7 @@ app.controller('shoppingCartController', function($scope, remoteApiService, comm
             $scope.shops[shopIndex].items[itemIndex].buyCount--;
             $scope.shops[shopIndex].totalCount--;
             $scope.buyCountChange(shopIndex, itemIndex, $scope.shops[shopIndex].items[itemIndex].buyCount, $scope.shops[shopIndex].items[itemIndex].buyCount + 1);
-            submitChange($scope.shops[shopIndex].items[itemIndex].goodsId, $scope.shops[shopIndex].items[itemIndex].buyCount);
+            submitChange($scope.shops[shopIndex].items[itemIndex].SKU_id, $scope.shops[shopIndex].items[itemIndex].buyCount);
         }
     };
     $scope.buyCountChange = function(shopIndex, itemIndex, newValue, oldValue){
@@ -207,13 +228,20 @@ app.controller('shoppingCartController', function($scope, remoteApiService, comm
         $scope.totalSaving = totalSaving.toFixed(2);
     };
 
-    var submitChange = function(goodId, newCount){
-        remoteApiService.changeCartNum(goodId, newCount);
+    var submitChange = function(SKU_id, newCount){
+        // remoteApiService.changeCartNum(goodId, newCount);
+        remoteApiService.changeCartNum(SKU_id, newCount)
+            .then(function (data) {
+                if (data && data.code == 1000) {
+                    // set shoppingCartCount
+                    shoppingCartService.setSCart($scope.shoppingCartCount);
+                }
+            });
     };
     $scope.submitChange = submitChange;
     $scope.deleteItem = function(shopIndex, itemIndex){
         $scope.shoppingCartCount -= $scope.shops[shopIndex].items[itemIndex].buyCount;
-        submitChange($scope.shops[shopIndex].items[itemIndex].goodsId, 0);
+        submitChange($scope.shops[shopIndex].items[itemIndex].SKU_id, 0);
         $scope.shops[shopIndex].items.splice(itemIndex, 1);
         if($scope.shops[shopIndex].items.length==0){
             $scope.shops.splice(shopIndex, 1);
@@ -225,15 +253,15 @@ app.controller('shoppingCartController', function($scope, remoteApiService, comm
     };
     $scope.buy = function(){
 
-        var products = [];
+        var SKUs = [];
 
         for(var shopIndex = 0; shopIndex<$scope.shops.length; shopIndex++){
             for(var itemIndex = 0; itemIndex < $scope.shops[shopIndex].items.length; itemIndex++){
                 if($scope.shops[shopIndex].items[itemIndex].selected){
-					var product = {};
-                    product.id = $scope.shops[shopIndex].items[itemIndex].goodsId;
-                    product.count = $scope.shops[shopIndex].items[itemIndex].buyCount;
-					products.push(product);
+					var SKU = {};
+                    SKU._id = $scope.shops[shopIndex].items[itemIndex].SKU_id;
+                    SKU.count = $scope.shops[shopIndex].items[itemIndex].buyCount;
+					SKUs.push(SKU);
                 }
             }
         }
@@ -241,13 +269,21 @@ app.controller('shoppingCartController', function($scope, remoteApiService, comm
             sweetalert("请填写您的收货地址");
             return;
         }
-        remoteApiService.addOrder($scope.shoppingCartId, $scope.$parent.selectedAddressId, products, 1)
+        remoteApiService.addOrder($scope.shoppingCartId, $scope.$parent.selectedAddressId, SKUs, 1)
             .then(function(datas){
                 $scope.data = datas;
                 if(datas.code == 1000) {
                     var commitUrl = "commitPay.html?";
                     for(var orderIndex in datas.orders){
                         commitUrl = commitUrl + "id" + '=' + datas.orders[orderIndex].id + '&';
+                        // set shoppingCartCount
+                        if (datas.orders[orderIndex] && datas.orders[orderIndex].SKUs) {
+                            for (var SKUIndex in datas.orders[orderIndex].SKUs) {
+                                var sku = datas.orders[orderIndex].SKUs[SKUIndex];
+                                $scope.shoppingCartCount -= sku.count;
+                            }
+                        }
+                        shoppingCartService.setSCart($scope.shoppingCartCount);
                     };
                     // console.log(commitUrl);
                     window.location.href = commitUrl;
@@ -262,9 +298,9 @@ app.controller('shoppingCartController', function($scope, remoteApiService, comm
             sweetalert("请至少选中一件商品进行结算");
         }
         else{
-            console.log( $scope.shoppingCartCount);
+            // console.log( $scope.shoppingCartCount);
             var products = [];
-            console.log($scope.shoppingCartCount);
+            // console.log($scope.shoppingCartCount);
             for(var shopIndex = 0; shopIndex<$scope.shops.length; shopIndex++){
                 for(var itemIndex = 0; itemIndex < $scope.shops[shopIndex].items.length; itemIndex++){
                     if($scope.shops[shopIndex].items[itemIndex].selected){
@@ -281,15 +317,13 @@ app.controller('shoppingCartController', function($scope, remoteApiService, comm
 
         }
     };
-    $scope.$on('$viewContentLoaded', function(){
-        // check if there is query in url
-        // and fire search in case its value is not empty
-        $footer = $(".options-box"),
-            originalTop = $footer.offset().top,
-            originalLeft = $footer.offset().left;
-        console.log(originalTop);
-        console.log(originalLeft);
-    });
-
-
+    // $scope.$on('$viewContentLoaded', function(){
+    //     // check if there is query in url
+    //     // and fire search in case its value is not empty
+    //     $footer = $(".options-box"),
+    //         originalTop = $footer.offset().top,
+    //         originalLeft = $footer.offset().left;
+    //     console.log(originalTop);
+    //     console.log(originalLeft);
+    // });
 });

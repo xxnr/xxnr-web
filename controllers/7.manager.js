@@ -8,7 +8,11 @@ var AuthService = services.auth;
 var OrderService = services.order;
 var ProductService = services.product;
 var NewsService = services.news;
+var SKUService = services.SKU;
+var BrandService = services.brand;
+var CategoryService = services.category;
 var PAYMENTSTATUS = require('../common/defs').PAYMENTSTATUS;
+var DELIVERSTATUS = require('../common/defs').DELIVERSTATUS;
 
 exports.install = function() {
 	// Auto-localize static HTML templates
@@ -37,8 +41,9 @@ exports.install = function() {
 	F.route(CONFIG('manager-url') + '/api/orders/',              			json_orders_query, ['get'], ['backend_auth']);
 	F.route(CONFIG('manager-url') + '/api/orders/{id}/',         			json_orders_read, ['get'], ['backend_auth']);
 	// F.route(CONFIG('manager-url') + '/api/orders/payments/',              	json_orders_payments_update, ['put'], ['backend_auth']);
+	F.route(CONFIG('manager-url') + '/api/orders/subOrders/',              	json_subOrders_payments_update, ['put'], ['backend_auth']);
 	F.route(CONFIG('manager-url') + '/api/orders/products/',              	json_orders_products_update, ['put'], ['backend_auth']);
-	F.route(CONFIG('manager-url') + '/api/orders/subOrders/',              	json_subOrders_products_update, ['put'], ['backend_auth']);
+	F.route(CONFIG('manager-url') + '/api/orders/SKUs/',              		json_orders_SKUs_update, ['put'], ['backend_auth']);
 	// F.route(CONFIG('manager-url') + '/api/orders/',              			json_orders_save, ['put'], ['backend_auth']);
 	// F.route(CONFIG('manager-url') + '/api/orders/',              			json_orders_remove, ['delete']);
 	// F.route(CONFIG('manager-url') + '/api/orders/clear/',        			json_orders_clear);
@@ -50,16 +55,22 @@ exports.install = function() {
 	// F.route(CONFIG('manager-url') + '/api/users/',              			json_users_remove, ['delete']);
 	// F.route(CONFIG('manager-url') + '/api/users/clear/',        			json_users_clear);
 
+	// BRANDS
+	F.route(CONFIG('manager-url') + '/api/brands/',							json_brands,	['get'],['backend_auth']);
+
 	// PRODUCTS
 	F.route(CONFIG('manager-url') + '/api/products/',            			json_products_query, ['get'], ['backend_auth']);
 	F.route(CONFIG('manager-url') + '/api/products/',            			json_products_save, ['post'], ['backend_auth']);
+	F.route(CONFIG('manager-url') + '/api/products/updateStatus',			process_products_updateStatus, ['post'], ['backend_auth']);
 	F.route(CONFIG('manager-url') + '/api/products/{id}/',       			json_products_read, ['get'], ['backend_auth']);
 	F.route(CONFIG('manager-url') + '/api/products/',            			json_products_remove, ['delete'], ['backend_auth']);
 	// F.route(CONFIG('manager-url') + '/api/products/clear/',      			json_products_clear);
 	F.route(CONFIG('manager-url') + '/api/products/import/',     			json_products_import, ['upload'], 1024, ['backend_auth']);
 	F.route(CONFIG('manager-url') + '/api/products/categories/', 			json_products_categories, ['get'], ['backend_auth']);
 	F.route(CONFIG('manager-url') + '/api/products/category/',   			json_products_category_replace, ['post'] ,['backend_auth']);
-	F.route(CONFIG('manager-url') + '/api/products/attr/{attributeName}/',	json_products_attributes, ['get'], ['backend_auth']);
+	F.route(CONFIG('manager-url') + '/api/products/attr/{attributeName}/',	json_products_attribute, ['get'], ['backend_auth']);
+	F.route(CONFIG('manager-url') + '/api/products/attribute/add',			process_product_attributes_add,	['post'], ['backend_auth']);
+	F.route(CONFIG('manager-url') + '/api/products/attributes/',			json_products_attributes, ['get'], ['backend_auth']);
 
 	// NEWS
 	F.route(CONFIG('manager-url') + '/api/news/',            				json_news_query, ['get'], ['backend_auth']);
@@ -116,6 +127,16 @@ exports.install = function() {
 
     // business
     F.route(CONFIG('manager-url') + '/api/businesses/',                     json_businesses,['get'], ['backend_auth']);
+
+	// SKU
+	F.route(CONFIG('manager-url') + '/api/v2.1/SKU/add/',               process_SKU_add,                ['post'], ['backend_auth']);
+	F.route(CONFIG('manager-url') + '/api/v2.1/SKU/update/{id}',               process_SKU_update,             ['post'], ['backend_auth']);
+	F.route(CONFIG('manager-url') + '/api/v2.1/SKU/attribute/add/',     process_SKU_Attribute_add,      ['post'], ['backend_auth']);
+	F.route(CONFIG('manager-url') + '/api/v2.1/SKU/attributes',         json_SKU_Attributes_get,        ['get'], ['backend_auth']);
+	F.route(CONFIG('manager-url') + '/api/v2.1/SKU/query',				json_SKU_get,					['get'], ['backend_auth']);
+	F.route(CONFIG('manager-url') + '/api/v2.1/SKU/online/{id}',			process_SKU_online,				['get'], ['backend_auth']);
+	F.route(CONFIG('manager-url') + '/api/v2.1/SKU/additions',				json_SKU_Additions_get,		['get'],['backend_auth']);
+	F.route(CONFIG('manager-url') + '/api/v2.1/SKU/addition/add',			process_SKU_Addition_add,	['post'],['backend_auth']);
 };
 
 var files = DB('files', null, require('total.js/database/database').BUILT_IN_DB).binary;
@@ -325,6 +346,7 @@ function json_dashboard_clear() {
 // Gets all products
 function json_products_query() {
 	var self = this;
+
 	ProductService.query(self.query, self.callback());
 }
 
@@ -332,12 +354,31 @@ function json_products_query() {
 function json_products_save() {
 	var self = this;
 
-    ProductService.save(self.body, self.callback());
+    ProductService.save(self.body, function(err, product){
+		if(err){
+			self.respond({code:1001, message:err});
+			return;
+		}
+
+		self.respond({code:1000, product:product});
+	});
 
 	// Clears view cache
 	setTimeout(function() {
 		F.cache.removeAll('cache.');
 	}, 2000);
+}
+
+function process_products_updateStatus(){
+	var self = this;
+	ProductService.updateStatus(self.body._id, self.body.online, function(err){
+		if(err){
+			self.respond({code:1001, message:err});
+			return;
+		}
+
+		self.respond({code:1000});
+	})
 }
 
 // Removes specific product
@@ -363,10 +404,14 @@ function json_products_import() {
 function json_products_categories() {
 	var self = this;
 
-	if (!F.global.categories)
-		F.global.categories = [];
+	CategoryService.all(function(err, categories){
+		if(err){
+			self.respond({code:1001, message:'fail to query category'});
+			return;
+		}
 
-	self.json(F.global.categories);
+		self.respond(categories);
+	})
 }
 
 // Replaces old category with new
@@ -376,30 +421,46 @@ function json_products_category_replace() {
 }
 
 // Reads all product attributes (brands models engines gearboxes levels etc.)
-function json_products_attributes(attributeName) {
+function json_products_attribute(attributeName) {
 	var self = this;
-	var category = self.query['category'];
+	var category = self.data.category;
+	var brand = self.data.brand;
+	ProductService.getAttributes(category, brand, attributeName, function (err, attributes) {
+		if (err) {
+			console.error('query attributes error', err);
+			self.respond({code: 1001, message: '获取商品属性列表失败', error: err});
+			return;
+		}
 
-	if (!F.global.attributes)
-        F.global.attributes = {};
+		self.respond(attributes.length > 0 ? attributes[0].values || [] : []);
+	})
+}
 
-	if (!F.global.attributes[attributeName]) {
-		self.json([]);
-		return;
-	}
-    
-    var arr = F.global.attributes[attributeName];
-    var result = [];
-    for (var i = 0; i < arr.length; i++) {
-        var item = arr[i];
-        if (category) {
-            if ((item['category'] && item['category'] == category) || (item['categoryid'] && item['categoryid'] == category))
-                result.push(item);
-        } else {
-            result.push(item);
-        }
-    }
-    self.json(result);
+function json_brands(){
+	var self = this;
+	var category = self.data.category;
+	BrandService.query(category, function(err, brands){
+		if(err){
+			console.error('query brands error', err);
+			self.respond({code:1001, message:'获取品牌列表失败', error:err});
+			return;
+		}
+
+		self.respond({code:1000, brands:brands});
+	})
+}
+
+function json_products_attributes(){
+	var self = this;
+	ProductService.getAttributes(self.data.category, self.data.brand, self.data.name, function(err, attributes){
+		if (err) {
+			console.error('query attributes error', err);
+			self.respond({code: 1001, message: '获取商品属性列表失败', error: err});
+			return;
+		}
+
+		self.respond({code:1000, message:'success', attributes:attributes});
+	}, 1)
 }
 
 // Reads a specific product by ID
@@ -423,12 +484,65 @@ function json_orders_query() {
 			self.json(err);
 			return;
 		}
-        // for(var i=0; i<orders.items.length; i++) {
-        //      var order = orders.items[i];
-        //      // convertOrderToShow(order);
-        // }
+        if (orders) {
+	        var items = orders.items;
+	        var length = items.length;
+	        for (var i = 0; i < length; i++) {
+                var item = items[i];
+                // 订单合成状态
+                item.typeValue = OrderService.orderType(item);
+                var orderInfo = {'totalPrice':item.price.toFixed(2), 'deposit':item.deposit.toFixed(2), 'dateCreated':item.dateCreated, 'orderStatus': OrderService.orderStatus(item)};
+                if (item.payStatus == PAYMENTSTATUS.PAID && item.datePaid) {
+                    orderInfo.datePaid = item.datePaid;
+                }
+                if (item.payStatus == DELIVERSTATUS.DELIVERED && item.dateDelivered) {
+                    orderInfo.dateDelivered = item.dateDelivered;
+                }
+                if (item.confirmed && item.dateCompleted) {
+                    orderInfo.dateCompleted = item.dateCompleted;
+                }
+                item.order = orderInfo;
+            }
+        }
         self.json(orders);
     });
+}
+
+// Updates specific order sub order payments
+function json_subOrders_payments_update() {
+	var self = this;
+	var orderid = self.body && self.body.id ? self.body.id: null;
+	var subOrders = self.body && self.body.subOrders ? self.body.subOrders: null;
+	if (!orderid) {
+		self.json([{'error':'更新失败，缺少订单ID'}]);
+		return;
+	}
+	if (!subOrders) {
+		self.json([{'error':'更新失败，缺少子订单列表'}]);
+		return;
+	}
+	var updatepayments = {};
+	if (subOrders && subOrders.length > 0) {
+       	for (var i = 0; i < subOrders.length; i++) {
+	    	var suborder = subOrders[i];
+	    	if (suborder.payments) {
+		    	for (var j = 0; j < suborder.payments.length; j++) {
+		    		var payment = suborder.payments[j];
+			    	if (!updatepayments.hasOwnProperty(payment.id)) {
+			    		updatepayments[payment.id] = payment;
+			    	}
+			    }
+			}
+       	}
+    }
+    OrderService.updatePayments({'id':orderid,'payments':updatepayments}, function(err) {
+		if (err) {
+			console.log('manager json_subOrders_payments_update err: ' + err);
+			self.json([{'error':'更新失败'}]);
+			return;
+		}
+		self.json(SUCCESS(true));
+	});
 }
 
 // Updates specific order products
@@ -464,36 +578,32 @@ function json_orders_products_update() {
 	});
 }
 
-// Updates specific order sub order payments
-function json_subOrders_products_update() {
+// Updates specific order SKUs
+function json_orders_SKUs_update() {
 	var self = this;
 	var orderid = self.body && self.body.id ? self.body.id: null;
-	var subOrders = self.body && self.body.subOrders ? self.body.subOrders: null;
+	var SKUs = self.body && self.body.SKUs ? self.body.SKUs: null;
 	if (!orderid) {
 		self.json([{'error':'更新失败，缺少订单ID'}]);
 		return;
 	}
-	if (!subOrders) {
-		self.json([{'error':'更新失败，缺少子订单列表'}]);
+	if (!SKUs) {
+		self.json([{'error':'更新失败，缺少商品列表'}]);
 		return;
 	}
-	var updatepayments = {};
-	if (subOrders && subOrders.length > 0) {
-       	for (var i = 0; i < subOrders.length; i++) {
-	    	var suborder = subOrders[i];
-	    	if (suborder.payments) {
-		    	for (var j = 0; j < suborder.payments.length; j++) {
-		    		var payment = suborder.payments[j];
-			    	if (!updatepayments.hasOwnProperty(payment.id)) {
-			    		updatepayments[payment.id] = payment;
-			    	}
-			    }
-			}
+	var updateSKUs = {};
+	if (SKUs && SKUs.length > 0) {
+       	for (var i = 0; i < SKUs.length; i++) {
+	    	var sku = SKUs[i];
+
+	    	if (!updateSKUs.hasOwnProperty(sku.ref)) {
+	    		updateSKUs[sku.ref] = sku;
+	    	}
        	}
     }
-    OrderService.updatePayments({'id':orderid,'payments':updatepayments}, function(err) {
+    OrderService.updateSKUs({'id':orderid,'SKUs':updateSKUs}, function(err) {
 		if (err) {
-			console.log('manager json_subOrders_products_update err: ' + err);
+			console.log('manager json_orders_SKUs_update err: ' + err);
 			self.json([{'error':'更新失败'}]);
 			return;
 		}
@@ -576,8 +686,10 @@ var convertOrderToShow = function(order){
 				if (typeof(payment.isClosed) != 'undefined' && payment.isClosed === true && parseInt(payment.payStatus) === PAYMENTSTATUS.UNPAID) {
 					closedTimes += 1;
 				}
+				payment.price = parseFloat(payment.price.toFixed(2));
 			}
-			subOrder.paidPrice = paidPrice;
+			subOrder.price = parseFloat(subOrder.price.toFixed(2));
+			subOrder.paidPrice = parseFloat(paidPrice.toFixed(2));
 			subOrder.paidTimes = paidTimes;
 			subOrder.closedTimes = closedTimes;
 			subOrder.payments = payments;
@@ -587,6 +699,26 @@ var convertOrderToShow = function(order){
 		order.subOrders = subOrders;
 	}
 	delete order.payments;
+
+	// order status and type
+	if (order) {
+		order.price = parseFloat(order.price.toFixed(2));
+		order.deposit = parseFloat(order.deposit.toFixed(2));
+		order.duePrice = parseFloat(order.duePrice.toFixed(2));
+		// 订单合成状态
+        order.orderType = OrderService.orderType(order);
+		var orderInfo = {'totalPrice':parseFloat(order.price.toFixed(2)),'deposit':parseFloat(order.deposit.toFixed(2)),'dateCreated':order.dateCreated, 'orderStatus': OrderService.orderStatus(order)};
+        if (order.payStatus == PAYMENTSTATUS.PAID && order.datePaid) {
+            orderInfo.datePaid = order.datePaid;
+        }
+        if (order.payStatus == DELIVERSTATUS.DELIVERED && order.dateDelivered) {
+            orderInfo.dateDelivered = order.dateDelivered;
+        }
+        if (order.confirmed && order.dateCompleted) {
+            orderInfo.dateCompleted = order.dateCompleted;
+        }
+        order.order = orderInfo;
+	}
 
     return order;
 };
@@ -598,42 +730,6 @@ var convertOrderToShow = function(order){
 // Reads all users
 function json_users_query() {
 	var self = this;
-    if(self.query.query){
-        switch(U.parseInt(self.query.query)){
-            case 1:
-                // 未认证
-                self.query.query = '!this.typeVerified || this.type !== this.typeVerified';
-                break;
-//            case 2:
-//                // 已认证
-//                self.query.query = "this.typeVerified && this.type === this.typeVerified && this.type !== '1'";
-//                break;
-            case 3:
-                // 申请认证
-                self.query.query = "this.type !== '1' && this.type !== this.typeVerified";
-                break;
-            case 4:
-                // 种植大户
-                self.query.query = "this.typeVerified && this.type === this.typeVerified && this.type === '2'";
-                break;
-            case 5:
-                // 村级经销商
-                self.query.query = "this.typeVerified && this.type === this.typeVerified && this.type === '3'";
-                break;
-            case 6:
-                // 乡镇经销商
-                self.query.query = "this.typeVerified && this.type === this.typeVerified && this.type === '4'";
-                break;
-            case 7:
-                // 县级经销商
-                self.query.query = "this.typeVerified && this.type === this.typeVerified && this.type === '5'";
-                break;
-            default:
-                // 全部
-                self.query.query = '';
-                break;
-        }
-    }
 
 	UserService.query(self.query, self.callback());
 }
@@ -651,8 +747,8 @@ function json_users_save() {
         options.id = self.data.id;
     if(self.data.type)
         options.type = self.data.type;
-    if(typeof self.data.isVerified != 'undefined')
-        options.isVerified = self.data.isVerified;
+	if(self.data.typeVerified)
+		options.typeVerified = self.data.typeVerified;
 
 	// self.body.$save(self.callback());
 	UserService.update(options, function(err){
@@ -1140,4 +1236,182 @@ function json_be_users_update(){
 function json_businesses(){
     var self= this;
     BackEndUserService.getBusinessList(self.callback());
+}
+
+function process_SKU_add() {
+	var self = this;
+	if (!self.data.name) {
+		self.respond({code: 1001, message: '请输入SKU名称'});
+		return;
+	}
+
+	if (!self.data.product) {
+		self.respond({code: 1001, message: '请选择商品'});
+		return;
+	}
+
+	if (!self.data.price || !self.data.price.platform_price) {
+		self.respond({code: 1001, message: '请输入平台价'});
+		return;
+	}
+
+	SKUService.addSKU(self.data.name, self.data.product, self.data.attributes, self.data.additions, self.data.price, function (err, SKU) {
+		if (err) {
+			console.error('process_SKU_add error', err);
+			if(11000 == err.code){
+				self.respond({code:1001, message:'相同属性的SKU已经添加过了'});
+			} else {
+				self.respond({code: 1001, message: '添加失败'});
+			}
+
+			return;
+		}
+
+		self.respond({code: 1000, message: 'success', SKU: SKU});
+	})
+}
+
+function process_SKU_update(id){
+	var self = this;
+	if(!self.data.price || !self.data.price.platform_price){
+		self.respond({code:1001, message:'请输入平台价'});
+		return;
+	}
+
+	SKUService.updateSKU(id, self.data.price, self.data.attributes, self.data.additions, self.data.name, function(err){
+		if(err){
+			console.error('updateSKU error', err);
+			if(11000 == err.code){
+				self.respond({code:1001, message:'相同属性的SKU已经添加过了'});
+			} else {
+				self.respond({code: 1001, message: '更新SKU失败'});
+			}
+			return;
+		}
+
+		self.respond({code:1000, message:'success'});
+	})
+}
+
+function process_SKU_Attribute_add(){
+	var self = this;
+	if(!self.data.category){
+		self.respond({code:1001, message:'请填写category'});
+		return;
+	}
+
+	if(!self.data.brand){
+		self.respond({code:1001, message:'请填写brand'});
+		return;
+	}
+
+	if(!self.data.name){
+		self.respond({code:1001, message:'请填写name'});
+		return;
+	}
+
+	if(!self.data.value){
+		self.respond({code:1001, message:'请填写value'});
+		return;
+	}
+
+	SKUService.addSKUAttribute(self.data.category, self.data.brand, self.data.name, self.data.value, null, function(err, attribute){
+		if(err){
+			console.error('process_SKU_Attribute_add error', err);
+			if(11000 == err.code){
+				self.respond({code:1001, message:'相同的SKU属性已经添加过了'});
+			} else {
+				self.respond({code: 1001, message: '添加SKU属性失败'});
+			}
+			return;
+		}
+
+		self.respond({code:1000, message:'success', attribute:attribute});
+	})
+}
+
+function json_SKU_Attributes_get(){
+	var self = this;
+	SKUService.querySKUAttributes(self.data.category, self.data.brand, function(err, attributes){
+		if(err){
+			console.error('json_SKU_Attributes_get error', err);
+			self.respond({code:1001, message:'获取SKU属性失败'});
+			return;
+		}
+
+		self.respond({code:1000, message:'success', attributes:attributes});
+	})
+}
+
+function process_product_attributes_add(){
+	var self = this;
+	ProductService.addAttribute(self.data.category, self.data.brand, self.data.name, self.data.value, null, function(err, new_attribute){
+		if(err){
+			if(11000 == err.code){
+				self.respond({code:1001, message:'相同的商品属性已经添加过了'});
+			} else {
+				self.respond({code: 1001, message: '保存商品属性失败'});
+			}
+			return;
+		}
+
+		self.respond({code:1000, message:'succcess', attribute:new_attribute});
+	})
+}
+
+function json_SKU_get(){
+	var self = this;
+	SKUService.querySKUByProductId(self.data.product, function(err, SKUs){
+		if(err){
+			console.log(err);
+			self.respond({code:1001, message:'查询SKU失败'});
+			return;
+		}
+
+		self.respond({code:1000, message:'success', SKUs:SKUs});
+	})
+}
+
+function process_SKU_online(id){
+	var self = this;
+	if(typeof self.data.online == 'undefiled'){
+		self.respond({code:1001, message:"请填写上架与否"});
+		return;
+	}
+
+	SKUService.online(id, self.data.online, function(err, doc){
+		if(err){
+			console.log(err);
+			self.respond({code:1001, message:'更新SKU失败'});
+			return;
+		}
+
+		self.respond({code:1000, message:'success', SKU:doc});
+	})
+}
+
+function json_SKU_Additions_get(){
+	var self = this;
+	SKUService.querySKUAdditions(self.data.category, self.data.brand, function(err, additions){
+		if(err){
+			console.error('json_SKU_Attributes_get error', err);
+			self.respond({code:1001, message:'获取SKU属性失败'});
+			return;
+		}
+
+		self.respond({code:1000, message:'success', additions:additions});
+	})
+}
+
+function process_SKU_Addition_add(){
+	var self = this;
+	SKUService.addSKUAddition(self.data.category, self.data.brand, self.data.name, self.data.price, function(err, addition){
+		if(err){
+			console.error('process_SKU_Addition_add error', err);
+			self.respond({code:1001, message:'添加SKU附加属性失败'});
+			return;
+		}
+
+		self.respond({code:1000, message:'success', addition:addition});
+	})
 }

@@ -36,11 +36,13 @@ app.controller('indexController', function($scope, remoteApiService, commonServi
         $scope.classes = data.categories;
         for(var c in $scope.classes){
             //c['imgUrl'].replace('/','/_new');
-            $scope.classes[c].imgUrl = $scope.classes[c].imgUrl.replace('/','/new_');
+            $scope.classes[c].imgUrl = 'images/new_' + $scope.classes[c].id + '.png';
+            //$scope.classes[c].imgUrl = $scope.classes[c].imgUrl.replace('/','/new_');
             //console.log($scope.classes[c].imgUrl);
         }
 
         for(var classIndex in $scope.classes) {
+            console.log($scope.classes[classIndex].id);
             remoteApiService.getProducts(1, 8, $scope.classes[classIndex].id)
                 .then(function (data) {
                     var categoryIndex = 0;

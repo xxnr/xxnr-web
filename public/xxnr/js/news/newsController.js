@@ -91,11 +91,13 @@ app.controller('newsController', function($scope,remoteApiService,sideService){
     if(window.location.pathname.indexOf('news_list')!=-1){
         remoteApiService.getNewsCategories()
             .then(function(data) {
-                $scope.categories = data.datas;
-                $scope.categories.splice(0, 0, {name:'全部',linker:"全部"});
-                for(var i in $scope.categories){
-                    $scope.categories[i].isSelected = false;
+                if (data && data.datas) {
+                    for(var i in data.datas){
+                        $scope.categories[i] = data.datas[i];
+                        $scope.categories[i].isSelected = false;
+                    }
                 }
+                $scope.categories.splice(0, 0, {name:'全部',linker:"全部"});
                 $scope.categories[0].isSelected = true;
 
                 if(Number(location.search[5]) | Number(location.search[5])===0) {
@@ -143,6 +145,10 @@ app.controller('newsController', function($scope,remoteApiService,sideService){
                         }
                     });
                 for(var i = 1; i<$scope.categories.length; i++){
+                    // home page news max category
+                    if (i > 4) {
+                        break;
+                    }
                     remoteApiService.getNewsList($scope.categories[i].name)
                         .then(function(articleList){
                             for(var index in articleList.datas.items){

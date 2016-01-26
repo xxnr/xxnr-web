@@ -25,6 +25,7 @@
     <script src="js/login/loginService.js"></script>
     <script src="js/remoteApiService.js"></script>
     <script src="js/payService.js"></script>
+    <script src="js/shoppingCart/shoppingCartService.js"></script>
     <script src="js/shoppingCart/shoppingCartController.js"></script>
     <script src="js/userCenter/userCenterController.js"></script>
     <script src="js/login/loginController.js"></script>
@@ -129,7 +130,7 @@
                         <li>商品详情</li>
                         <li>单价</li>
                         <li>数量</li>
-                        <li>实付款（元）</li>
+                        <li>合计（元）</li>
                         <li>状态</li>
                         <li>操作</li>
                     </ul>
@@ -144,25 +145,28 @@
                                     <ul>
                                         <li class="product clearfix" ng-repeat="product in order.products">
                                             <div class="p-info ng-cloak">
-                                                <div class="p-img">
-                                                    <a ng-href="productDetail.html?goodsId={{product.id}}" target="_blank">
-                                                        <img class="ng-cloak" ng-src={{product.thumbnail}}>
-                                                    </a>
+                                                <div class="product-row">
+                                                    <div class="p-img">
+                                                        <a ng-href="productDetail.html?goodsId={{product.id}}" target="_blank">
+                                                            <img class="ng-cloak" ng-src={{product.thumbnail}}>
+                                                        </a>
+                                                    </div>
+                                                    <div class="p-name">
+                                                        <a class="ng-cloak" ng-href="productDetail.html?goodsId={{product.id}}" ng-cloak target="_blank">{{product.name}}</a>
+                                                    </div>
+                                                    <div class="p-price">
+                                                        <!-- <p class="now" class="ng-cloak">¥{{product.deposit?product.deposit.toFixed(2):product.price.toFixed(2)}}{{product.deposit?"(订金)":""}}</p> -->
+                                                        <p class="now" class="ng-cloak">¥ {{product.price.toFixed(2)}}</p>
+                                                        <!--<p class="jifen">{{item.point}}积分抵价{{item.point}}元</p>-->
+                                                    </div>
+                                                    <div class="p-quantity ng-cloak">
+                                                        {{product.count}}
+                                                    </div>
                                                 </div>
-                                                <div class="p-name">
-                                                    <a class="ng-cloak" ng-href="productDetail.html?goodsId={{product.id}}" ng-cloak target="_blank">{{product.name}}</a>
+                                                <div class="pay-step" ng-show="{{product.deposit>0}}">
+                                                    <div class="pay-step-1"><span class="text-info">阶段一：订金</span><span class="pay-step-1-price">¥ {{product.deposit | fixedTwo}}</span><span class="right">{{product.count}}</span></div>
+                                                    <div class="pay-step-2"><span class="text-info">阶段二：尾款</span><span class="pay-step-2-price">¥ {{product.price-product.deposit | fixedTwo}}</span><span class="right">{{product.count}}</span></div>
                                                 </div>
-                                                <div class="p-price">
-                                                    <p class="now" class="ng-cloak">¥{{product.deposit?product.deposit.toFixed(2):product.price.toFixed(2)}}{{product.deposit?"(订金)":""}}</p>
-                                                    <!--<p class="jifen">{{item.point}}积分抵价{{item.point}}元</p>-->
-                                                </div>
-                                                <div class="p-quantity ng-cloak">
-                                                    {{product.count}}
-                                                </div>
-                                                <!--<div class="pay-step" ng-show="{{product.deposit>0}}">-->
-                                                <!--<div class="pay-step-1"><span class="text-info">阶段一： 预付款</span><span class="order-price">¥ {{product.deposit}}</span></div>-->
-                                                <!--<div class="pay-step-2"><span class="text-info">阶段二：尾款</span>¥ {{product.price-product.deposit}}</div>-->
-                                                <!--</div>-->
                                             </div>
                                         </li>
                                     </ul>
@@ -171,10 +175,10 @@
                                     <div class="pay-info">
 
                                         <p class="now" ng-cloak>￥{{order.totalPrice}}</p>
-                                        <p ng-cloak>{{order.payType}}</p>
+                                        <!-- <p ng-cloak>{{order.payType}}</p> -->
                                     </div>
                                     <div class="pay-status">
-                                        <p class="order-statusName" ng-cloak>{{order.statusName}}</p>
+                                        <p class="order-statusName" ng-cloak>{{order.order.orderStatus.value}}</p>
                                         <p class="order-detail" ng-cloak><a ng-href="orderDetail.html?id={{order.id}}" target="_blank">订单详情</a></p>
                                     </div>
                                     <div class="pay-action">
@@ -186,9 +190,8 @@
                     </div>
                 </div>
             </div>
-            <div class="pager">
-                <ul>
-                    <div id="pageIds">
+            <div class="xxnr_pager">
+                    <!-- <div id="pageIds">
                         <li class="pre_btn">
                             <a href="" ng-click="pre_page()">
                                 <em class="ban ban_8_0">&nbsp;</em>
@@ -200,8 +203,14 @@
                                 <em class="ban ban_9_0">&nbsp;</em>
                             </a>
                         </li>
-                    </div>
-                </ul>
+                    </div> -->
+                <div id="page_buttons">
+                    <ul class="row">
+                        <li ng-hide="current_page==1" class="pre_btn"><a href="" ng-click="pre_page()"><em class="ban ban_8_0">&nbsp;</em></a></li>
+                        <li ng-repeat="page in pages"><a href="" ng-click="show_page(page.id)" ng-class="{true:'current', false:''}[page.isSelected]">{{page.id}}</a></li>
+                        <li ng-hide="current_page==pages_count" class="next_btn"><a href="" ng-click="next_page()"><em class="ban ban_9_0">&nbsp;</em></a></li>
+                    </ul>
+                </div>
             </div>
         </div>
     </div>

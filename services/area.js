@@ -11,7 +11,7 @@ var SpecialprovinceModel = require('../models').specialprovince;
 
 
 // Service
-AreaService = function(){};
+var AreaService = function(){};
 
 // Method
 // ==========================================================================

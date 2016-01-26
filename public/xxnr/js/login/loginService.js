@@ -2,9 +2,10 @@
  * Created by pepelu on 2015/10/8.
  */
 var app = angular.module('xxnr_common');
-app.service('loginService', function($cookieStore, $timeout){
+app.service('loginService', function($cookieStore, $timeout, BaseUrl, BaseDomainREG){
 	var userKey = "__user";
     var tokenKey = "token";
+    var scartKey = "__scart";
 	var _user = $cookieStore.get(userKey);
     if(!_user){
 	    _user={
@@ -12,7 +13,7 @@ app.service('loginService', function($cookieStore, $timeout){
 	        userType:''
 	    };
     }
-    this.user = _user;
+    this.user = $cookieStore.get(userKey);
     //console.log(this.user);
 //    var refresh = function(){
 //        var expires = new Date();
@@ -21,12 +22,27 @@ app.service('loginService', function($cookieStore, $timeout){
 //        return _user;
 //    };
 
+    this.getUser = function() {
+        return $cookieStore.get(userKey);
+    };
+
+    this.setUser = function(value) {
+        if (BaseDomainREG.test(BaseUrl)) {
+            $cookieStore.put(userKey, value, {path:"/", domain:".xinxinnongren.com"});
+        } else {
+            $cookieStore.put(userKey, value, {path:"/"});
+        }
+    };
+
     this.logout = function(){
 //        $cookies.remove(userKey, {path:"/"});
         $cookieStore.remove(userKey, {path:"/", domain:".xinxinnongren.com"});
         $cookieStore.remove(tokenKey, {path:"/", domain:".xinxinnongren.com"});
         $cookieStore.remove(userKey, {path:"/"});
         $cookieStore.remove(tokenKey, {path:"/"});
+        // remove shopping cart
+        $cookieStore.remove(scartKey, {path:"/", domain:".xinxinnongren.com"});
+        $cookieStore.remove(scartKey, {path:"/"});
     };
 
     this.isLogin = (function(){

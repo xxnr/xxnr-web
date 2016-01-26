@@ -47,6 +47,7 @@ gulp.task('framework_js_minify', function() {
 gulp.task('index_js_minify', function() {
     var revAll = new RevAll();
     gulp.src([
+        './js/shoppingCart/shoppingCartService.js',
         './js/responsiveslides.min.js',
         './js/payService.js',
         './js/news/newsController.js',
@@ -75,6 +76,7 @@ gulp.task('index_js_minify', function() {
 gulp.task('car_js_minify', function() {
     var revAll = new RevAll();
     gulp.src([
+        './js/shoppingCart/shoppingCartService.js',
         './js/login/loginService.js',
         './js/payService.js',
         './js/category/categoryController.js',
@@ -99,6 +101,7 @@ gulp.task('car_js_minify', function() {
 gulp.task('huafei_js_minify', function() {
     var revAll = new RevAll();
     gulp.src([
+        './js/shoppingCart/shoppingCartService.js',
         './js/login/loginService.js',
         './js/payService.js',
         './js/category/categoryController.js',
@@ -123,6 +126,7 @@ gulp.task('huafei_js_minify', function() {
 gulp.task('company_js_minify', function() {
     var revAll = new RevAll();
     gulp.src([
+        './js/shoppingCart/shoppingCartService.js',
         './js/login/loginService.js',
         './js/payService.js',
         './js/shoppingCart/shoppingCartController.js',
@@ -146,6 +150,7 @@ gulp.task('company_js_minify', function() {
 gulp.task('commit_pay_js_minify', function() {
     var revAll = new RevAll();
     gulp.src([
+        './js/shoppingCart/shoppingCartService.js',
         './js/login/loginService.js',
         './js/payService.js',
         './js/login/loginController.js',
@@ -167,6 +172,7 @@ gulp.task('commit_pay_js_minify', function() {
 gulp.task('invitation_js_minify', function() {
     var revAll = new RevAll();
     gulp.src([
+        './js/shoppingCart/shoppingCartService.js',
         './js/login/loginService.js',
         './js/payService.js',
         './js/login/loginController.js',
@@ -190,6 +196,7 @@ gulp.task('invitation_js_minify', function() {
 gulp.task('jiesuan_js_minify', function() {
     var revAll = new RevAll();
     gulp.src([
+        './js/shoppingCart/shoppingCartService.js',
         './js/login/loginService.js',
         './js/payService.js',
         './js/login/loginController.js',
@@ -234,6 +241,7 @@ gulp.task('logon_js_minify', function() {
 gulp.task('news_js_minify', function() {
     var revAll = new RevAll();
     gulp.src([
+        './js/shoppingCart/shoppingCartService.js',
         './js/login/loginService.js',
         './js/payService.js',
         './js/shoppingCart/shoppingCartController.js',
@@ -255,6 +263,7 @@ gulp.task('news_js_minify', function() {
 gulp.task('news_detail_js_minify', function() {
     var revAll = new RevAll();
     gulp.src([
+        './js/shoppingCart/shoppingCartService.js',
         './js/login/loginService.js',
         './js/payService.js',
         './js/shoppingCart/shoppingCartController.js',
@@ -276,6 +285,7 @@ gulp.task('news_detail_js_minify', function() {
 gulp.task('order_detail_js_minify', function() {
     var revAll = new RevAll();
     gulp.src([
+        './js/shoppingCart/shoppingCartService.js',
         './js/login/loginService.js',
         './js/payService.js',
         './js/login/loginController.js',
@@ -297,6 +307,7 @@ gulp.task('order_detail_js_minify', function() {
 gulp.task('product_detail_js_minify', function() {
     var revAll = new RevAll();
     gulp.src([
+        './js/shoppingCart/shoppingCartService.js',
         './js/login/loginService.js',
         './js/payService.js',
         './js/login/loginController.js',
@@ -321,6 +332,7 @@ gulp.task('product_detail_js_minify', function() {
 gulp.task('shopping_cart_js_minify', function() {
     var revAll = new RevAll();
     gulp.src([
+        './js/shoppingCart/shoppingCartService.js',
         './js/login/loginService.js',
         './js/payService.js',
         './js/login/loginController.js',
@@ -343,6 +355,7 @@ gulp.task('shopping_cart_js_minify', function() {
 gulp.task('user_center_js_minify', function() {
     var revAll = new RevAll();
     gulp.src([
+        './js/shoppingCart/shoppingCartService.js',
         './js/login/loginService.js',
         './js/payService.js',
         './js/shoppingCart/shoppingCartController.js',
@@ -367,6 +380,7 @@ gulp.task('user_center_js_minify', function() {
 gulp.task('fill_profile_js_minify', function() {
     var revAll = new RevAll();
     gulp.src([
+        './js/shoppingCart/shoppingCartService.js',
         './js/login/loginService.js',
         './js/payService.js',
         './js/shoppingCart/shoppingCartController.js',
@@ -391,6 +405,7 @@ gulp.task('fill_profile_js_minify', function() {
 gulp.task('xxnr_bigdata_js_minify', function() {
     var revAll = new RevAll();
     gulp.src([
+        './js/shoppingCart/shoppingCartService.js',
         './js/login/loginService.js',
         './js/payService.js',
         './js/shoppingCart/shoppingCartController.js',
@@ -411,6 +426,7 @@ gulp.task('xxnr_bigdata_js_minify', function() {
 gulp.task('xxnr_finance_js_minify', function() {
     var revAll = new RevAll();
     gulp.src([
+        './js/shoppingCart/shoppingCartService.js',
         './js/login/loginService.js',
         './js/payService.js',
         './js/shoppingCart/shoppingCartController.js',
@@ -431,6 +447,7 @@ gulp.task('xxnr_finance_js_minify', function() {
 gulp.task('xxnr_institute_js_minify', function() {
     var revAll = new RevAll();
     gulp.src([
+        './js/shoppingCart/shoppingCartService.js',
         './js/login/loginService.js',
         './js/payService.js',
         './js/shoppingCart/shoppingCartController.js',

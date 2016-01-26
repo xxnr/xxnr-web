@@ -2,15 +2,16 @@ app.service('flyToCart',function (commonService) {
 
     this.fly = function(){
         var offset = $("#side_shoping_cart").offset();
-        $(".addcart").click(function(event){
+        // $(".addcart").click(function(event){
+        jQuery(function($) {
             var addcar = $(this);
             window.scrollTo(0, 0);
-            var img = $('.product_img').find('img').attr('src');
+            var img = $('.product_img_slider img:first-child').attr('src');
             var flyer = $('<img class="u-flyer" src="'+img+'">');
             flyer.fly({
                 start: {
                     left: event.pageX,
-                    top: event.screenY - 80
+                    top: event.screenY -180
                 },
                 end: {
                     left: offset.left,

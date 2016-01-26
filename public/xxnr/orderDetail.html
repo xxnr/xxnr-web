@@ -27,6 +27,7 @@
     <script src="js/payService.js"></script>
     <script src="js/remoteApiService.js"></script>
     <script src="js/login/loginController.js"></script>
+    <script src="js/shoppingCart/shoppingCartService.js"></script>
     <script src="js/shoppingCart/shoppingCartController.js"></script>
     <script src="js/orderDetail/orderDetailController.js"></script>
     <script src="js/headerFooterDirective.js"></script>
@@ -64,7 +65,7 @@
     <p class="guide">
         <a href="/">首页</a> ／ <a href="my_xxnr.html" ng-cloak>我的新农人</a> ／ <a href="" ng-cloak>订单详情</a>
     </p>
-    <div class="wrap clearfix">
+    <div class="wrap clearfix ng-hide" ng-show="wholePageShow">
         <div class="order-detail">
             <div ng-hide="order.orderType==0" class="status-graph ng-hide">
                 <ul class="row">
@@ -84,58 +85,128 @@
                 <div class="order-info">
                     <span class="order-number ng-cloak" ng-cloak>订单号:{{order.id}}</span>
                     <!--<span class="order-time" ng-cloak>{{order.createTime_local}}</span>-->
-                    <span class="order-statusName ng-cloak" ng-cloak>订单状态:<span>{{order.statusName}}</span></span>
+                    <span class="order-statusName ng-cloak" ng-cloak>订单状态:
+                        <span ng-class="{true:'payOrange'}[order.payStatus!=2]">{{order.orderStatus.value}}</span>
+                    </span>
+                    <span class="right more"  ng-mouseover="more_imgUrl = 'icon-up.png'" ng-mouseleave="more_imgUrl = 'icon-down.png'">
+                        更多<img ng-src="images/{{more_imgUrl}}" alt="">
+                        <img id="triangle" src="images/triangle.png" alt="" ng-show="more_imgUrl == 'icon-up.png'">
+                        <div class="order-time-sheet" ng-show="more_imgUrl == 'icon-up.png'">
+                            <ul>
+                                <li ng-show="order.dateCreated">下单时间：{{order.dateCreated}}</li>
+                                <li ng-show="order.datePaid">付款时间：{{order.datePaid}}</li>
+                                <li ng-show="order.dateDelivered">发货时间：{{order.dateDelivered}}</li>
+                                <li ng-show="order.dateCompleted">完成时间：{{order.dateCompleted}}</li>
+                            </ul>
+                        </div>
+                    </span>
+                    <p class="ng-cloak">{{order.orderStatus.type | payStatusToChineseText}}</p>
                 </div>
-                <div class="order-info-text">
-                    <p class="ng-cloak">{{order.statusText}}</p>
-                </div>
+
                 <div class="order-body">
                     <ul>
-                        <li class="title">收货人信息</li>
+                        <li class="title">收货信息</li>
                         <li class="address ng-cloak">
                             <p>收货人：{{order.receiver}}</p>
-                            <p>收货地址： {{order.address}}</p>
                             <p>联系电话：{{order.receiverPhone}}</p>
+                            <p>收货地址： {{order.address}}</p>
                         </li>
-                        <li class="title">支付及配送方式</li>
-                        <li class="pay_shipping">
-                            <p><span class="ng-cloak">支付方式：{{order.payType}}</span><a ng-show="order.showAction" href="" ng-click='order.action(order.id)' class="xxnr_btn pay_btn ng-cloak">{{order.actionName}}</a>
+                        <li class="title">支付信息</li>
+                        <li >
+                            <div class="payments_table">
+                                <ul class="row pay_table_title">
+                                    <li>支付内容</li>
+                                    <li>应支付金额（元）</li>
+                                    <li>已支付金额（元）</li>
+                                    <li>支付状态</li>
+                                    <li>付款方式</li>
+                                    <li>操作</li>
+                                </ul>
+                                <ul ng-repeat="subOrder in subOrders" class="row pay_table_content">
+                                    <li class="ng-clock">{{subOrder.type | subOrderTypeToChineseWording}}</li>
+                                    <li class="ng-clock">{{(subOrder.price) | toNumberFixedTwo}}</li>
+                                    <li class="ng-clock">{{subOrder.paidPrice | toNumberFixedTwo}}</li>
+                                    <li class="ng-clock" ng-class="{true:'payOrange'}[subOrder.payStatus != 2]">
+                                        <span>{{subOrder.statusName}}</span>
+                                    </li>
+                                    <li class="ng-clock">{{subOrder.payType | payTypeToChineseWording}}</li>
+                                    <li>
+                                        <a ng-show="subOrder.showAction && order.paySubOrderType == subOrder.type"  href="" ng-click='subOrder.action(subOrder.id)' class="xxnr_btn pay_btn ng-cloak">{{subOrder.actionName}}</a>
+                                        <p class="payments_detail" ng-show="subOrder.payments" ng-class="{true:'pad_t'}[subOrder.payStatus == 2]"><a href="" ng-click="payment_detaile_toggle($index)">{{subOrdersPaymentshowText[$index]}}<img ng-src="images/{{subOrdersPayments_detail_imgUrl[$index]}}" alt="" /></a></p>
+                                    </li>
+                                    <div ng-show="subOrdersPaymentshow[$index] && subOrder.payments" class="payment_detail">
+                                        <img id="triangle" src="images/triangle.png" alt="">
+                                        <ul>
+                                            <li class="payment_detail_title">
+                                                <ul class="payment_detail_title row">
+                                                    <li>支付次数</li>
+                                                    <li>支付金额（元）</li>
+                                                    <li>支付方式</li>
+                                                    <li>支付完成时间</li>
+                                                    <li>支付状态</li>
+                                                </ul>
+                                            </li>
+                                            <li ng-repeat="payment in subOrder.payments" class="payment_detail_content">
+                                                <ul>
+                                                    <li class="ng-clock">第{{payment.slice}}次</li>
+                                                    <li class="ng-clock">{{payment.price}}</li>
+                                                    <li class="ng-clock">{{payment.payType | payTypeToChineseWording}}</li>
+                                                    <li class="ng-clock">{{payment.FormattedDatePaid}}</li>
+                                                    <!-- <li class="ng-clock">{{payment.payStatus | payStatusToChineseWording}}</li> -->
+                                                    <li class="ng-clock">支付成功</li>
+                                                </ul>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </ul>
+                            </div>
+                        </li>
+                        <!-- <li class="pay_shipping">
+                            <p><span class="ng-cloak">支付方式：{{order.payType}}</span>
                             <p>运费：客户自理</p>
-                            <!--<p>发货日期：暂无</p>-->
-                        </li>
-                        <li>
+                            <p>发货日期：暂无</p>
+                        </li> -->
+                        <li class="title">
                             商品清单
                         </li>
                         <li>
                             <div class="orders-main">
                                 <ul class="order-titles row">
                                     <li>商品详情</li>
+                                    <li>发货状态</li>
                                     <li>单价（元）</li>
                                     <li>数量</li>
-                                    <li>合计（元）</li>
+                                    <li>小计（元）</li>
                                 </ul>
                                 <div class="order-list">
                                     <div class="products-section">
                                         <ul>
                                             <li class="product clearfix ng-cloak" ng-repeat="product in order.products">
-                                                <div class="p-info">
-                                                    <div class="p-img">
+                                                <ul class="p-info row">
+                                                    <li class="p-img">
                                                         <a ng-href="productDetail.html?goodsId={{product.goodsId}}" target="_blank">
                                                             <img ng-src={{product.imgs}}>
                                                         </a>
-                                                    </div>
-                                                    <div class="p-name">
+                                                    </li>
+                                                    <li class="p-name">
                                                         <a ng-href="productDetail.html?goodsId={{product.goodsId}}" class="ng-cloak" target="_blank">{{product.goodsName}}</a>
-                                                    </div>
-                                                    <div class="p-price ng-cloak">
-                                                        <p ng-cloak>¥{{product.deposit!=0?product.deposit:product.unitPrice}}{{product.deposit!=0?"(订金)":""}}</p>
-                                                    </div>
-                                                    <div class="p-quantity ng-cloak">
+                                                    </li>
+                                                    <li class="p-delivery ng-cloak">
+                                                        {{product.deliverStatus | deliverStatusToChineseWording}}
+                                                    </li>
+                                                    <li class="p-price ng-cloak">
+                                                        <p ng-cloak>{{product.unitPrice}}</p>
+                                                    </li>
+                                                    <li class="p-quantity ng-cloak">
                                                         {{product.goodsCount}}
-                                                    </div>
-                                                    <div class="p-total ng-cloak">
-                                                        <p>¥{{(product.goodsCount*(product.deposit!=0?product.deposit:product.unitPrice)).toFixed(2)}}</p>
-                                                    </div>
+                                                    </li>
+                                                    <li class="p-total ng-cloak">
+                                                        <p>{{(product.unitPrice*product.goodsCount).toFixed(2)}}</p>
+                                                    </li>
+                                                </ul>
+                                                <div class="pay-step" ng-show="{{product.deposit>0}}">
+                                                    <div class="pay-step-1"><span class="text-info">阶段一：订金</span><span class="pay-step-1-price">{{product.deposit | toNumberFixedTwo}}</span><span class="product_count">{{product.goodsCount}}</span><span class="sum">{{(product.deposit*product.goodsCount) | toNumberFixedTwo}}</span></div>
+                                                    <div class="pay-step-2"><span class="text-info">阶段二：尾款</span><span class="pay-step-2-price">{{(product.unitPrice-product.deposit) | toNumberFixedTwo}}</span><span class="product_count">{{product.goodsCount}}</span><span class="sum">{{((product.unitPrice-product.deposit)*product.goodsCount) | toNumberFixedTwo}}</span></div>
                                                 </div>
                                             </li>
                                         </ul>
@@ -147,7 +218,7 @@
                 </div>
             </div>
             <div class="right payPrice ng-cloak">
-                <p>应付金额：<span>¥{{order.deposit}}</span></p>
+                <p>合计：<span>¥{{order.totalPrice}}</span></p>
             </div>
         </div>
     </div>

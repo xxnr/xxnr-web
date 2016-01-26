@@ -12,6 +12,10 @@ require('./orders');
 require('./products');
 require('./news');
 require('./carts');
+require('./SKU');
+require('./brands');
+require('./Supplier');
+require('./categories');
 require('./whitelist');
 
 //user
@@ -33,6 +37,7 @@ exports.useraddress = mongoose.model('useraddress');
 exports.order = mongoose.model('order');
 // product
 exports.product = mongoose.model('product');
+exports.productAttribute = mongoose.model('productAttribute');
 // news
 exports.news = mongoose.model('news');
 exports.newsCategory = mongoose.model('newscategory');
@@ -40,8 +45,22 @@ exports.newsCategory = mongoose.model('newscategory');
 exports.cart = mongoose.model('cart');
 // user new orders number
 exports.userordersnumber = mongoose.model('userordersnumber');
+// SKU
+exports.SKU = mongoose.model('SKU');
+exports.SKUAttributes = mongoose.model('SKUAttribute');
+exports.SKUAddition = mongoose.model('SKUAddition');
+// brand
+exports.brand = mongoose.model('brand');
+// supplier
+exports.supplier = mongoose.model('supplier');
+// category
+exports.category = mongoose.model('category');
 // user white list
 exports.userwhitelist = mongoose.model('userwhitelist');
+// intention_product
+exports.intention_product = mongoose.model('intention_product');
+// potential_customer
+exports.potential_customer = mongoose.model('potential_customer');
 
 exports.getModel = function (name, options) {
     options = options || {};

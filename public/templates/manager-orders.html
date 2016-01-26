@@ -8,7 +8,7 @@
 			</div>
 			<div class="col-md-3 col-sm-6 m">
 				<!--<div data-component="dropdown" data-component-path="orders.filter.type" data-options="@(全部订单)|0;@(Uncompleted)|1;@(Uncompleted and not paid)|2;@(Uncompleted and paid)|3;@(Completed)|4" data-component-type="number"></div>-->
-				<div data-component="dropdown" data-component-path="orders.filter.type" data-options="@(全部订单)|;@(未付款)|1;@(已付款未发货)|2;@(已发货)|3;@(完成)|4;@(已关闭)|0" data-empty="true" data-empty-text="@(全部订单)">@(订单状态)</div>
+				<div data-component="dropdown" data-component-path="orders.filter.type" data-options="@(全部订单)|;@(待付款)|1;@(待发货)|2;@(已发货)|3;@(完成)|4;@(已关闭)|0" data-empty="true" data-empty-text="@(全部订单)">@(状态筛选)</div>
 			</div>
 		</div>
 	</div>
@@ -25,7 +25,7 @@
 	        	<!--{{ fi }}-->
 	        <!--</td>-->
             <td style="width:80px" class="silver hidden-xs ui-center" data-title="收货人">{{ consigneeName }}</br>{{ consigneePhone }}</td>
-	        <td style="width:110px" class="silver hidden-xs" data-title="下单时间" title="{{ dateCreated | format('@(yyyy-MM-dd HH:mm:ss)') }}">{{ dateCreated | format('@(yyyy-MM-dd HH:mm:ss)') }}</td>
+	        <td style="width:110px" class="silver hidden-xs ui-right" data-title="下单时间" title="{{ dateCreated | format('@(yyyy-MM-dd HH:mm:ss)') }}">{{ dateCreated | format('@(yyyy-MM-dd HH:mm:ss)') }}</td>
 			<td style="width:80px" class="silver hidden-xs ui-center" data-title="下单用户">{{ buyerName }}</br>{{ buyerPhone }}</td>
 	        <td style="width:80px" class="ui-right active" data-title="总金额" title="{{price | price(2)}}">{{ price | price(2) }} </td>
 	        <td style="width:80px" class="ui-right active" data-title="定金" title="{{deposit | price(2)}}">{{ deposit | price(2) }} </td>
@@ -57,35 +57,47 @@
 	        		{{ fi }}
 	        	{{ fi }}
 	        </td>
-	        <td style="width:90px" data-title="是否关闭">
+	        <td style="width:50px" data-title="是否关闭">
 	        	{{ if isClosed && payStatus == 1 }}
 	        		<span class="mr5 red">已关闭</span>
 	        	{{ else }}
 	        		<span class="mr5 green">未关闭</span>
 	        	{{ fi }}
 	        </td>
-	        <td style="width:90px" data-title="展示的状态类型">
-	        	{{ if isClosed && payStatus == 1 }}
-	        		<span class="mr5 red">已关闭</span>
-	        	{{ else }}
-	        		{{ if payStatus==1 || payStatus==3 }}
-		        		<span class="mr5 red">待付款</span>
-		        	{{ else }}
-			        	{{ if (deliverStatus==1 || deliverStatus==3) && payStatus==2 }}
-			        		<span class="red">待发货</span>
-			        	{{ else }}
-			        		{{ if deliverStatus==2 && !confirmed }}
-			        			<span class="green">已发货</span>
-			        		{{ else }}
-			        			{{ if confirmed }}
-			        				<span class="green">已完成</span>
-			        			{{ else }}
-			        				<span class="red">其他</span>
-			        			{{ fi }}
-			        		{{ fi }}
-			        	{{ fi }}
-			        {{ fi }}
+	        <td style="width:60px" data-title="订单状态类型">
+	        	{{ if order && order.orderStatus && order.orderStatus.value }}
+	        		{{ if order.orderStatus.type === 0 }}
+						<span class="red">
+					{{ else }}
+						<span class="green">
+					{{ fi }}
+					{{order.orderStatus.value}}</span>
+				{{ else }}
+					-		
 	        	{{ fi }}
+	        </td>
+	        <td style="width:60px" data-title="列表状态类型">
+        		{{ if typeValue === 0 }}
+	        		<span class="red">已关闭</span>
+	        	{{ else }}
+		        	{{ if typeValue === 1 }}
+	        			<span class="green">待付款</span>
+		        	{{ else }}
+		        		{{ if typeValue === 2 }}
+	        				<span class="green">待发货</span>
+		        		{{ else }}
+		        			{{ if typeValue === 3 }}
+	        					<span class="green">已发货</span>
+		        			{{ else }}
+		        				{{ if typeValue === 4 }}
+	        						<span class="green">已完成</span>
+	        					{{ else }}
+			        				-
+			        			{{ fi }}
+		        			{{ fi }}
+		        		{{ fi }}
+		        	{{ fi }}
+		        {{ fi }}
 	        </td>
 	        <!-- <td style="width:20px" class="ui-right">
 				<button name="edit" title="@(修改状态)"><span class="fa fa-pencil"></span></button>
@@ -98,102 +110,129 @@
 	</div>
 </div>
 
-<div data-component="form" data-title="@(订单详情)" data-component-path="common.form" data-if="value === 'orders'" data-width="900px" data-component-id="orders.form" data-submitbutton="true">
+<div data-component="form" data-title="@(订单详情)" data-component-path="common.form" data-if="value === 'orders'" data-width="1200px" data-component-id="orders.form" data-submitbutton="true">
 	<br />
-	<div data-component="template" data-component-path="orders.form" class="padding">
-		<script type="text/html">
-		<table class="table table-bordered" border="0">
-			<tbody>
-				<tr>
-					<td class="col-xs-5 active">@(# 订单号)</td>
-					<td>{{ id }}</td>
-				</tr>
-				<tr>
-					<td class="col-xs-5 active">@(下单时间)</td>
-					<td>{{ dateCreated | format('@(yyyy-MM-dd HH:mm:ss)') }}</td>
-				</tr>
-				<tr>
-					<td class="col-xs-5 active">@(总价)</td>
-					<td>{{ price | price(2) }}</td>
-				</tr>
-                <tr>
-                    <td class="col-xs-5 active">@(订金)</td>
-                    <td>{{ deposit | price(2) }}</td>
-                </tr>
-                <tr>
-                    <td class="col-xs-5 active">@(尾款)</td>
-                    <td>{{ (price-deposit) | price(2) }}</td>
-                </tr>
-                <tr>
-                	<td class="col-xs-5 active">@(状态)</td>
-	                <td>
-			        	{{ if payStatus==1 }}
-			        		<span class="mr5 red">未付款</span>
-			        	{{ else }}
-			        		{{ if payStatus==2 }}
-			        			<span class="mr5 green">已付款</span>
-			        		{{ else }}
-				        		{{ if payStatus==3 }}
-				        			<span class="mr5 red">部分付款</span>
-				        		{{ else }}
-					        		<span class="mr5 red">其他</span>
-				        		{{ fi }}
-			        		{{ fi }}
-			        	{{ fi }}
-			        	{{ if deliverStatus==1 }}
-			        		<span class="red">未发货</span>
-			        	{{ else }}
-			        		{{ if deliverStatus==2 }}
-			        			<span class="green">已发货</span>
-			        		{{ else }}
-			        			{{ if deliverStatus==3 }}
-			        				<span class="red">部分发货</span>
-			        			{{ else }}
-					        		<span class="mr5 red">其他</span>
-			        			{{ fi }}
-			        		{{ fi }}
-			        	{{ fi }}
-			        </td>
-		        </tr>
-		        <tr>
-		        	<td class="col-xs-5 active">@(是否关闭)</td>
-			        <td>
-			        	{{ if isClosed && payStatus == 1 }}
-			        		<span class="mr5 red">已关闭</span>
-			        	{{ else }}
-			        		<span class="mr5 green">未关闭</span>
-			        	{{ fi }}
-			        </td>
-			    </tr>
-		        <tr>
-		        	<td class="col-xs-5 active">@(展示的状态类型)</td>
-			        <td>
-			        	{{ if isClosed && payStatus == 1 }}
-			        		<span class="mr5 red">已关闭</span>
-			        	{{ else }}
-			        		{{ if payStatus==1 || payStatus==3 }}
-				        		<span class="mr5 red">待付款</span>
+	<div class="padding">
+		<div data-component="template" data-component-path="orders.form" class="padding">
+			<script type="text/html">
+			<table class="table table-bordered" border="0">
+				<tbody>
+					<tr>
+						<td class="col-xs-5 active">@(# 订单号)</td>
+						<td>{{ id }}</td>
+					</tr>
+					<tr>
+						<td class="col-xs-5 active">@(下单时间)</td>
+						<td>{{ dateCreated | format('@(yyyy-MM-dd HH:mm:ss)') }}</td>
+					</tr>
+					<tr>
+						<td class="col-xs-5 active">@(总价)</td>
+						<td>{{ price | price(2) }}</td>
+					</tr>
+	                <tr>
+	                    <td class="col-xs-5 active">@(订金)</td>
+	                    <td>{{ deposit | price(2) }}</td>
+	                </tr>
+	                <tr>
+	                    <td class="col-xs-5 active">@(尾款)</td>
+	                    <td>{{ (price-deposit) | toFixed(2) }}</td>
+	                </tr>
+	                <tr>
+	                	<td class="col-xs-5 active">@(状态)</td>
+		                <td>
+				        	{{ if payStatus==1 }}
+				        		<span class="mr5 red">未付款</span>
 				        	{{ else }}
-					        	{{ if (deliverStatus==1 || deliverStatus==3) && payStatus==2 }}
-					        		<span class="red">待发货</span>
-					        	{{ else }}
-					        		{{ if deliverStatus==2 && !confirmed }}
-					        			<span class="green">已发货</span>
+				        		{{ if payStatus==2 }}
+				        			<span class="mr5 green">已付款</span>
+				        		{{ else }}
+					        		{{ if payStatus==3 }}
+					        			<span class="mr5 red">部分付款</span>
 					        		{{ else }}
-					        			{{ if confirmed }}
-					        				<span class="green">已完成</span>
-					        			{{ else }}
-					        				<span class="red">其他</span>
-					        			{{ fi }}
+						        		<span class="mr5 red">其他</span>
 					        		{{ fi }}
-					        	{{ fi }}
-					        {{ fi }}
+				        		{{ fi }}
+				        	{{ fi }}
+				        	{{ if deliverStatus==1 }}
+				        		<span class="red">未发货</span>
+				        	{{ else }}
+				        		{{ if deliverStatus==2 }}
+				        			<span class="green">已发货</span>
+				        		{{ else }}
+				        			{{ if deliverStatus==3 }}
+				        				<span class="red">部分发货</span>
+				        			{{ else }}
+						        		<span class="mr5 red">其他</span>
+				        			{{ fi }}
+				        		{{ fi }}
+				        	{{ fi }}
+				        </td>
+			        </tr>
+			        <tr>
+			        	<td class="col-xs-5 active">@(是否关闭)</td>
+				        <td>
+				        	{{ if isClosed && payStatus == 1 }}
+				        		<span class="mr5 red">已关闭</span>
+				        	{{ else }}
+				        		<span class="mr5 green">未关闭</span>
+				        	{{ fi }}
+				        </td>
+				    </tr>
+			        <tr>
+			        	<td class="col-xs-5 active">@(订单状态类型)</td>
+					    <td>
+			        	{{ if order && order.orderStatus && order.orderStatus.value }}
+			        		{{ if order.orderStatus.type === 0 }}
+								<span class="red">
+							{{ else }}
+								<span class="green">
+							{{ fi }}
+							{{order.orderStatus.value}}</span>
+						{{ else }}
+							-		
 			        	{{ fi }}
-			        </td>
-			    </tr>
-			</tbody>
-		</table>
-		</script>
+			        	</td>
+			        </tr>
+			        <tr>
+			        	<td class="col-xs-5 active">@(列表状态类型)</td>
+			        	<td>
+		        		{{ if orderType === 0 }}
+			        		<span class="red">已关闭</span>
+			        	{{ else }}
+				        	{{ if orderType === 1 }}
+			        			<span class="green">待付款</span>
+				        	{{ else }}
+				        		{{ if orderType === 2 }}
+			        				<span class="green">待发货</span>
+				        		{{ else }}
+				        			{{ if orderType === 3 }}
+			        					<span class="green">已发货</span>
+				        			{{ else }}
+				        				{{ if orderType === 4 }}
+			        						<span class="green">已完成</span>
+			        					{{ else }}
+					        				-
+					        			{{ fi }}
+				        			{{ fi }}
+				        		{{ fi }}
+				        	{{ fi }}
+				        {{ fi }}
+			        	</td>
+			        </tr>
+			        <tr>
+			        	<td class="col-xs-5 active">@(待付金额)</td>
+			        	<td>
+			        		{{ if duePrice }}
+			        			<span class="green">{{ duePrice | price(2) }}</span>
+			        		{{ else }}
+		        				-
+		        			{{ fi }}
+			        	</td>
+			        </tr>
+				</tbody>
+			</table>
+			</script>
+		</div>
 	</div>
 	<hr />
 
@@ -286,7 +325,7 @@
 								</td>
 								<td class="ui-center col-xs-1" title="{{ s.price | price(2) }}">{{ s.price | price(2) }}</td>
 		                        <td class="ui-center col-xs-1" title="{{ s.paidPrice | price(2) }}">{{ s.paidPrice | price(2) }}</td>
-		                        <td class="ui-center col-xs-1" title="{{ (s.price - s.paidPrice) | price(2) }}">{{ (s.price - s.paidPrice) | price(2) }}</td>
+		                        <td class="ui-center col-xs-1" title="{{ (s.price - s.paidPrice) | toFixed(2) }}">{{ (s.price - s.paidPrice) | toFixed(2) }}</td>
 								<td class="ui-center col-xs-1">{{ s.paidTimes }}</td>
 								<td class="ui-center col-xs-1">{{ s.payments.length }}</td>
 								<td class="ui-center col-xs-1">{{ s.closedTimes }}</td>
@@ -345,7 +384,7 @@
 		                        </td>
 		                        <td class="ui-center col-xs-1">{{ price | price(2) }}</td>
 								<td class="ui-center col-xs-1">{{ deposit | price(2) }}</td>
-								<td class="ui-center col-xs-1">{{ (price-deposit) | price(2) }}</td>
+								<td class="ui-center col-xs-1">{{ (price - deposit) | toFixed(2) }}</td>
 								<td class="ui-center col-xs-1">
 									{{ if datePaid }}
 										{{ datePaid | format('@(yyyy-MM-dd HH:mm:ss)') }}
@@ -376,7 +415,7 @@
 			                        <td class="ui-center col-xs-1 active">@(支付方式)</td>
 									<td class="ui-center col-xs-1 active">@(支付状态)</td>
 									<td class="ui-center col-xs-1 active">@(是否关闭)</td>
-									<td class="ui-center col-xs-1 active">@(支付时间)</td>
+									<td class="ui-center col-xs-2 active">@(支付时间)</td>
 									<td class="ui-center col-xs-2 active">@(修改支付状态)</td>
 								</tr>
 								{{ foreach s in form.subOrders }}
@@ -400,7 +439,7 @@
 										<td class="ui-center">{{ $index+1 }}</td>
 										<td class="ui-center col-xs-1">{{ p.id }}</td>
 										<td class="ui-center col-xs-1">第{{ p.slice }}笔</td>
-				                        <td class="ui-center col-xs-1">{{ p.price }}</td>
+				                        <td class="ui-center col-xs-1">{{ p.price | price(2) }}</td>
 				                        <td class="ui-center col-xs-1">
 				                        {{ if p.payType }}
 											{{ if p.payType==1 }}
@@ -434,7 +473,7 @@
 							        		<span class="mr5 green">未关闭</span>
 							        	{{ fi }}
 										</td>
-										<td class="ui-center col-xs-1">
+										<td class="ui-center col-xs-2">
 										{{ if p.datePaid }}
 											{{ p.datePaid | format('@(yyyy-MM-dd HH:mm:ss)') }}
 										{{ else }}
@@ -467,47 +506,115 @@
 			<div data-component="error" data-component-path="orders.form.subOrders.response"></div>
 		</div>
 		<hr />
-		
-		<div class="padding" style="padding-top: 0px;">
-			<div class="silver"><strong>@(订单商品)</strong></div>
-			<br />
-			<table class="table table-bordered checkoutlist" border="0">
-				<tbody data-component="template" data-component-path="orders">
-					<script type="text/html">
-						<tr>
-							<td class="ui-center col-xs-2 hidden-xs active">@(商品ID)</td>
-							<td class="ui-center col-xs-3 hidden-xs active">@(商品名称)</td>
-	                        <td class="ui-center col-xs-2 active">@(单价)</td>
-	                        <td class="ui-center col-xs-2 active">@(订金)</td>
-							<td class="ui-center col-xs-2 col-sm-1 active">@(数量)</td>
-							<td class="ui-center col-xs-2 active">@(发货状态)</td>
-						</tr>
-						{{ foreach p in form.products }}
-						<tr>
-							<td class="ui-center col-xs-2 hidden-xs">{{ p.id }}</td>
-							<td class="ui-center col-xs-3 hidden-xs" title="{{ p.name }}">{{ p.name }}</td>
-	                        <td class="ui-center col-xs-2">{{ p.price | price(2) }}</td>
-	                        <td class="ui-center col-xs-2">{{ p.deposit | price(2) }}</td>
-							<td class="ui-center col-xs-2 col-sm-1 active">{{ p.count }}x</td>
-							<td class="ui-center col-xs-2">
-								<select data-name="deliverStatus" data-id="{{ p.id }}">
-								{{ foreach d in deliverStatuses }}
-									<option value="{{ d.value }}" {{ if p.deliverStatus == d.value }}selected{{ fi }}>{{ d.name }}
-									</option>
-								{{ end }}
-								</select>
-							</td>
-						</tr>
-						{{ end }}
-					</script>
-				</tbody>
-			</table>
 
-			<div class="ui-buttons">
+		<div class="padding" style="padding-top: 0px;">
+			<div data-component="template" data-component-path="orders" class="productslist">
+			<script type="text/html">
+			<!-- <div class="padding" style="padding-top: 0px;"> -->
+				{{ if form.products && form.products.length > 0 }}
+					<div class="silver"><strong>@(订单商品)</strong></div>
+					<br />
+					<table class="table table-bordered" border="0">
+					<!-- <table class="table table-bordered checkoutlist" border="0">
+						<tbody data-component="template" data-component-path="orders">
+							<script type="text/html"> -->
+						<tbody>
+							<tr>
+								<td class="ui-center col-xs-2 hidden-xs active">@(商品ID)</td>
+								<td class="ui-center col-xs-3 hidden-xs active">@(商品名称)</td>
+		                        <td class="ui-center col-xs-2 active">@(单价)</td>
+		                        <td class="ui-center col-xs-2 active">@(订金)</td>
+								<td class="ui-center col-xs-2 active">@(数量)</td>
+								<td class="ui-center col-xs-2 active">@(发货状态)</td>
+							</tr>
+							{{ foreach p in form.products }}
+							<tr>
+								<td class="ui-center col-xs-2 hidden-xs">{{ p.id }}</td>
+								<td class="ui-center col-xs-3 hidden-xs" title="{{ p.name }}">{{ p.name }}</td>
+		                        <td class="ui-center col-xs-2">{{ p.price | price(2) }}</td>
+		                        <td class="ui-center col-xs-2">{{ p.deposit | price(2) }}</td>
+								<td class="ui-center col-xs-2 active">{{ p.count }}x</td>
+								<td class="ui-center col-xs-2">
+									<select data-name="deliverStatus" data-id="{{ p.id }}">
+									{{ foreach d in deliverStatuses }}
+										<option value="{{ d.value }}" {{ if p.deliverStatus == d.value }}selected{{ fi }}>{{ d.name }}
+										</option>
+									{{ end }}
+									</select>
+								</td>
+							</tr>
+							{{ end }}
+						</tbody>
+					</table>
+				{{ fi }}
+			</script>
+			</div>
+
+			<!-- <div class="ui-buttons">
+				<button name="submit" data-name="products">@(提交修改)</button>
+			</div>
+			<div data-component="error" data-component-path="orders.form.products.response"></div> -->
+			<div data-component="visible" class="ui-buttons" data-component-path="orders.form.products" data-if="orders.form.products && orders.form.products.length > 0">
 				<button name="submit" data-name="products">@(提交修改)</button>
 			</div>
 			<div data-component="error" data-component-path="orders.form.products.response"></div>
-			
+		</div>
+
+		<div class="padding" style="padding-top: 0px;">
+			<div data-component="template" data-component-path="orders" class="SKUslist">
+			<script type="text/html">
+				{{ if form.SKUs && form.SKUs.length > 0 }}
+					<div class="silver"><strong>@(订单商品SKU)</strong></div>
+					<br />
+					<table class="table table-bordered" border="0">
+						<tbody>
+							<tr>
+								<td class="ui-center hidden-xs active">@(商品ID)</td>
+								<td class="ui-center hidden-xs active">@(商品SKU ID)</td>
+								<td class="ui-center col-xs-4 hidden-xs active">@(商品名称)</td>
+		                        <td class="ui-center col-xs-2 active">@(单价)</td>
+		                        <td class="ui-center col-xs-2 active">@(订金)</td>
+								<td class="ui-center col-xs-1 active">@(数量)</td>
+								<td class="ui-center col-xs-4 active">@(附加项)</td>
+								<td class="ui-center col-xs-2 active">@(发货状态)</td>
+							</tr>
+							{{ foreach s in form.SKUs }}
+							<tr>
+								<td class="ui-center hidden-xs">{{ s.productId }}</td>
+								<td class="ui-center hidden-xs">{{ s.ref }}</td>
+								<td class="ui-center col-xs-4 hidden-xs" title="{{ s.name }}">{{ s.name }}</td>
+		                        <td class="ui-center col-xs-2">{{ s.price | price(2) }}</td>
+		                        <td class="ui-center col-xs-2">{{ s.deposit | price(2) }}</td>
+								<td class="ui-center col-xs-1">{{ s.count }}x</td>
+								<td class="ui-center col-xs-4">
+									{{ if s.additions && s.additions.length > 0 }}
+										{{ foreach addition in s.additions }}
+											{{ addition.name }} - {{ addition.price | price(2) }}
+										{{ end }}
+									{{ else }}
+										-
+									{{ fi }}
+								</td>
+								<td class="ui-center col-xs-2">
+									<select data-name="deliverStatus" data-id="{{ s.ref }}">
+									{{ foreach d in deliverStatuses }}
+										<option value="{{ d.value }}" {{ if s.deliverStatus == d.value }}selected{{ fi }}>{{ d.name }}
+										</option>
+									{{ end }}
+									</select>
+								</td>
+							</tr>
+							{{ end }}
+						</tbody>
+					</table>
+				{{ fi }}
+			</script>
+			</div>
+
+			<div data-component="visible" class="ui-buttons" data-component-path="orders.form.SKUs" data-if="orders.form.SKUs && orders.form.SKUs.length > 0">
+				<button name="submit" data-name="SKUs">@(提交修改)</button>
+			</div>
+			<div data-component="error" data-component-path="orders.form.SKUs.response"></div>
 		</div>
 	</div>
 	<!-- <div data-component="error" data-component-path="orders.response"></div> -->
@@ -563,59 +670,8 @@
 	});
 
 	ON('#orders.form', function(component) {
-		// Submits order form
-		// component.submit = function(hide) {
-		// 	var price = 0;
-		// 	var count = 0;
-  //           var deposit = 0;
-		// 	for (var i = 0, length = orders.form.products.length; i < length; i++) {
-		// 		var product = orders.form.products[i];
-		// 		if (product.count > 0) {
-  //                   price += (product.price * product.count);
-  //                   deposit += (product.deposit ? product.deposit : product.price) * product.count;
-  //               }
-		// 		count += product.count;
-		// 	}
-
-  //           orders.form.count = count;
-  //           orders.form.price = price;
-  //           orders.form.deposit = deposit;
-
-		// 	$.components.PUT(managerurl + '/api/orders/', orders.form, function(response) {
-
-		// 		// Error handling
-		// 		SET('orders.response', response);
-		// 		if (response instanceof Array)
-		// 			return;
-
-		// 		hide();
-		// 		orders_refresh(true);
-		// 		success();
-
-		// 		// Refreshes dashboard informations
-		// 		if (window.dashboard_refresh)
-		// 			window.dashboard_refresh();
-		// 	});
-		// };
 
 		component.submit = function(hide, button) {
-			// switch ($(button).attr('data-name')) {
-			// 	case 'products':
-			// 		if (!confirm('你确认要提交修改后的订单商品？'))
-			// 			return;
-			// 		var postdata = {'id':orders.form.id,'products':orders.form.products};
-			// 		$.components.PUT(managerurl + '/api/orders/products', postdata, function(response) {
-
-			// 			// Error handling
-			// 			SET('orders.form.products.response', response);
-			// 			if (response instanceof Array)
-			// 				return;
-			// 			hide();
-			// 			orders_refresh(true);
-			// 			success();
-			// 		});
-			// 		break;
-			// }
 			var dataname = $(button).attr('data-name');
 			if (dataname) {
 				if (orders.form[dataname]) {
@@ -647,37 +703,52 @@
 			switch (name) {
 				case 'payStatus':
 					var value = el.val();
-					orders_form_update(subOrderid, function(item) {
-						item[name] = parseInt(value);
-					},{'name':'subOrders','paymentid':paymentid});
-					component.changedisabled_botton('subOrders');
-					orders_form_refresh();
+					orders_form_update(subOrderid, {'name':'subOrders','paymentid':paymentid}, function(item) {
+						if (item) {
+							item[name] = parseInt(value);
+							component.changedisabled_botton('subOrders');
+							orders_form_refresh();
+						}
+					});
+					
 					break;
 			}
 		});
 
-		$('.checkoutlist').on('change', 'select', function() {
+		$('.productslist').on('change', 'select', function() {
 			var el = $(this);
 			var id = el.attr('data-id');
 			var name = el.attr('data-name');
 			switch (name) {
 				case 'deliverStatus':
 					var value = el.val();
-					orders_form_update(id, function(item) {
-						item[name] = parseInt(value);
+					orders_form_update(id, {'name':'products'}, function(item) {
+						if (item) {
+							item[name] = parseInt(value);
+							component.changedisabled_botton('products');
+							orders_form_refresh();
+						}
 					});
-					component.changedisabled_botton('products');
-					orders_form_refresh();
 					break;
 			}
 		});
 
-		// Removes selected oredered item
-		$('.checkoutlist').on('click', '.fa-times-circle', function(e) {
-			orders_form_update($(this).attr('data-id'), function(item, index) {
-				orders.form.products.splice(index, 1);
-				orders_form_refresh();
-			});
+		$('.SKUslist').on('change', 'select', function() {
+			var el = $(this);
+			var id = el.attr('data-id');
+			var name = el.attr('data-name');
+			switch (name) {
+				case 'deliverStatus':
+					var value = el.val();
+					orders_form_update(id, {'name':'SKUs'}, function(item) {
+						if (item) {
+							item[name] = parseInt(value);
+							component.changedisabled_botton('SKUs');
+							orders_form_refresh();
+						}
+					});
+					break;
+			}
 		});
 
 		component.changedisabled_botton = function (name) {
@@ -692,6 +763,14 @@
 				}
 			});
 		}
+
+		// Removes selected oredered item
+		// $('.checkoutlist').on('click', '.fa-times-circle', function(e) {
+		// 	orders_form_update($(this).attr('data-id'), function(item, index) {
+		// 		orders.form.products.splice(index, 1);
+		// 		orders_form_refresh();
+		// 	});
+		// });
 
 		// Handles all inputs in ordered items
 		// $('.checkoutlist').on('change', 'input', function() {
@@ -751,19 +830,22 @@
 	}
 
 	// Watchs changes in order filter
-	WATCH('orders.filter.*', function(path, value) {
+	Delay_Search_WATCH('orders.filter.*', function(path, value) {
 		if (NOTMODIFIED('orders.filter', orders.filter))
 			return;
 		orders_refresh(path !== 'orders.filter.page');
 	});
 
 	// Method finds ordered item by its id
-	function orders_form_update(id, callback, options) {
+	function orders_form_update(id, options, callback) {
 		var name = options && options['name'] ? options['name']: '';
 		switch (name) {
 			case 'subOrders':
 				var paymentid = options && options['paymentid'] ? options['paymentid']: null;
-				if (!paymentid) break;
+				if (!paymentid) {
+					callback(null);
+					break;
+				}
 				for (var i = 0, length = orders.form.subOrders.length; i < length; i++) {
 					var subOrder = orders.form.subOrders[i];
 					if (subOrder.id === id && subOrder.payments) {
@@ -774,11 +856,13 @@
 								break;
 							}
 						}
+						callback(null);
 						break;
 					}
 				}
+				callback(null);
 				break;
-			default:
+			case 'products':
 				for (var i = 0, length = orders.form.products.length; i < length; i++) {
 					var p = orders.form.products[i];
 					if (p.id === id) {
@@ -786,6 +870,17 @@
 						break;
 					}
 				}
+				callback(null);
+				break;
+			case 'SKUs':
+				for (var i = 0, length = orders.form.SKUs.length; i < length; i++) {
+					var s = orders.form.SKUs[i];
+					if (s.ref === id) {
+						callback(s, i);
+						break;
+					}
+				}
+				callback(null);
 				break;
 		}
 	}
