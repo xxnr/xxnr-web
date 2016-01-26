@@ -98,7 +98,7 @@ OrderService.prototype.query = function(options, callback) {
 	if (type === 1) {
 		// mongoOptions["isClosed"] = { $ne: true };
 		// mongoOptions["payStatus"] = { $ne: PAYMENTSTATUS.PAID };
-        mongoOptions["$or"] = [{isClosed: { $ne: true }, payStatus: { $eq: PAYMENTSTATUS.UNPAID }}, {payStatus: { $ne: PAYMENTSTATUS.PARTPAID }}];
+        mongoOptions["$or"] = [{isClosed: { $ne: true }, payStatus: { $eq: PAYMENTSTATUS.UNPAID }}, {payStatus: { $eq: PAYMENTSTATUS.PARTPAID }}];
     }
 	// paid and not delivered
 	if (type === 2) {
