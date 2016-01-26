@@ -1598,7 +1598,14 @@ function json_potential_customer(){
             return;
         }
 
-        self.respond({code:1000, message:'success', potentialCustomers:potentialCustomers});
+        PotentialCustomerService.countLeftToday(self.user, function(err, count){
+            if(err){
+                self.respond({code:1001, message:'查询客户列表失败'});
+                return;
+            }
+
+            self.respond({code:1000, message:'success', potentialCustomers:potentialCustomers, countLeft:count});
+        })
     })
 }
 

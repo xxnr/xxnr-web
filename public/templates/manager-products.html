@@ -1001,7 +1001,18 @@
 			var value = el.val();
 			products.SKUs.forEach(function(SKU){
 				if(SKU._id == SKU_id || (typeof SKU._id == 'undefined' && SKU_id=="")){
-					SKU.attributes[attributeIndex] = {ref:ref, name:name, value:value, order:order};
+					var SKUSaved = false;
+					for(var j=0; j<SKU.attributes.length; j++){
+						if(name == SKU.attributes[j].name){
+							SKU.attributes[j] = {ref:ref, name:name, value:value, order:order};
+							SKUSaved = true;
+						}
+					}
+
+					if(!SKUSaved){
+						SKU.attributes.push({ref:ref, name:name, value:value, order:order});
+					}
+
 					if(!products.SKUExistAttributes[SKU._id]){
 						products.SKUExistAttributes[SKU._id]=[];
 					}
@@ -1085,6 +1096,8 @@
 		SKU.attributes.forEach(function(attribute){
 			products.SKUExistAttributes[SKU._id][attribute.name] = {ref:attribute.ref, value:attribute.value};
 		});
+
+
 
 		// initial additions
 		products.SKUExistAdditions[SKU._id]=[];
