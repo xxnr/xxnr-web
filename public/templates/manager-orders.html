@@ -58,7 +58,7 @@
 	        	{{ fi }}
 	        </td>
 	        <td style="width:50px" data-title="是否关闭">
-	        	{{ if isClosed && payStatus == 1 }}
+	        	{{ if isClosed }}
 	        		<span class="mr5 red">已关闭</span>
 	        	{{ else }}
 	        		<span class="mr5 green">未关闭</span>
@@ -171,7 +171,7 @@
 			        <tr>
 			        	<td class="col-xs-5 active">@(是否关闭)</td>
 				        <td>
-				        	{{ if isClosed && payStatus == 1 }}
+				        	{{ if isClosed }}
 				        		<span class="mr5 red">已关闭</span>
 				        	{{ else }}
 				        		<span class="mr5 green">未关闭</span>
