@@ -75,6 +75,8 @@ function getOders() {
             var arr = new Array(length);
             for (var i = 0; i < length; i++) {
                 var item = items[i];
+                // for old web page
+                item.deposit = typeof(item.duePrice) != 'undefined' ? item.duePrice.toFixed(2) : item.deposit.toFixed(2);
                 var typeValue = type;
                 // 订单合成状态
                 if (!typeValue) {
