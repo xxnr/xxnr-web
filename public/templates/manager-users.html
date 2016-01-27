@@ -468,6 +468,9 @@
 
 		if(!hasThisItemAlready) {
 			users.form.verifiedTypes.push({text: text, value: value});
+			if(users.form.typeVerified == null){
+				users.form.typeVerified = [];
+			}
 			users.form.typeVerified.push(value);
 		}
 
