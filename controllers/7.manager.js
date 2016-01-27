@@ -703,8 +703,10 @@ var convertOrderToShow = function(order){
 	// order status and type
 	if (order) {
 		order.price = parseFloat(order.price.toFixed(2));
-		order.deposit = parseFloat(order.deposit.toFixed(2));
-		order.duePrice = parseFloat(order.duePrice.toFixed(2));
+		if (order.deposit)
+			order.deposit = parseFloat(order.deposit.toFixed(2));
+		if (order.duePrice)
+			order.duePrice = parseFloat(order.duePrice.toFixed(2));
 		// 订单合成状态
         order.orderType = OrderService.orderType(order);
 		var orderInfo = {'totalPrice':parseFloat(order.price.toFixed(2)),'deposit':parseFloat(order.deposit.toFixed(2)),'dateCreated':order.dateCreated, 'orderStatus': OrderService.orderStatus(order)};
