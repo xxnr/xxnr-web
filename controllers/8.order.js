@@ -75,8 +75,6 @@ function getOders() {
             var arr = new Array(length);
             for (var i = 0; i < length; i++) {
                 var item = items[i];
-                // for old web page
-                item.deposit = typeof(item.duePrice) != 'undefined' ? item.duePrice.toFixed(2) : item.deposit.toFixed(2);
                 var typeValue = type;
                 // 订单合成状态
                 if (!typeValue) {
@@ -93,6 +91,12 @@ function getOders() {
                     orderInfo.dateCompleted = item.dateCompleted;
                 }
                 item.order = orderInfo;
+                // for old web page
+                if (item.payStatus == PAYMENTSTATUS.PAID) {
+                    item.deposit = typeof(item.price) != 'undefined' ? parseFloat(item.price.toFixed(2)) : parseFloat(item.deposit.toFixed(2));
+                } else {
+                    item.deposit = typeof(item.duePrice) != 'undefined' ? parseFloat(item.duePrice.toFixed(2)) : parseFloat(item.deposit.toFixed(2));
+                }
             }
             self.respond(data);
         } else {
