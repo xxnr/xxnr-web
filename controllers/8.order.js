@@ -696,7 +696,10 @@ function addOrderBySKU(){
                     SKU_to_add.count = cart.SKU_items[i].count;
                     SKU_to_add.category = product.category;
                     SKU_to_add.attributes = SKU.attributes;
-                    SKU_to_add.additions = additions;
+                    if(additions && additions.length > 0) {
+                        SKU_to_add.additions = additions;
+                    }
+
                     if (SKU_to_add.deposit) {
                         if (!orders['deposit']) {
                             orders['deposit'] = {
