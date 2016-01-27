@@ -681,7 +681,10 @@ function addOrderBySKU(){
                     var additionPrice = 0;
                     additions.forEach(function(addition){
                         additionPrice += addition.price;
-                        addition.ref = addition._id;
+                        if(!additions.ref) {
+                            addition.ref = addition._id;
+                        }
+                        
                         delete addition._id;
                     });
                     var SKU_to_add = {};
