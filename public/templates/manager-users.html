@@ -41,7 +41,7 @@
                     {{ fi }}
 				{{ fi }}
 			</td>
-            <td style="width:100px" class="hidden-xs fs11" data-title="新农代表昵称">{{if inviter }} {{ inviter.nickname }} {{fi}}</td>
+            <td style="width:100px" class="hidden-xs fs11 ui-center" data-title="新农代表">{{if inviter }} {{ inviter.nickname }}</br>{{ inviter.account }} {{fi}}</td>
             <td style="width:100px" class="hidden-xs fs11" data-title="认证用户">{{ typeNameVerified }}</td>
             <td style="width:80px" class="ui-right" data-title="会员信息">
                 <button name="edit" title="@(Show)"><span class="fa fa-search"></span></button>
@@ -106,10 +106,10 @@
 				</tr>
 				<tr>
 					<td class="col-xs-4 active">@(性别)</td>
-					{{ if form.sex == 0 }}
-						<td>@(男)</td>
-					{{ else }}
+					{{ if form.sex }}
 						<td>@(女)</td>
+					{{ else }}
+						<td>@(男)</td>
 					{{ fi }}
 				</tr>
 				<tr>
