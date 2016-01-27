@@ -15,7 +15,7 @@ var UserModel = require('../models').user;
 
 
 // Service
-UseraddressService = function(){};
+var UseraddressService = function(){};
 
 // Gets listing
 UseraddressService.prototype.query = function(options, callback) {

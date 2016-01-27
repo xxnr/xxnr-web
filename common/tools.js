@@ -8,6 +8,7 @@ var querystring = require('querystring');
 var JWT = require('jsonwebtoken');
 
 var regexpPhone = new RegExp('^(13[0-9]|15[012356789]|17[678]|18[0-9]|14[57])[0-9]{8}$');
+var regexpPrice = new RegExp('^[0-9]*(\.[0-9]{1,2})?$');
 
 /*
     Phone in china validation
@@ -19,6 +20,18 @@ exports.isPhone = function(str) {
         return false;
 
     return regexpPhone.test(str.toString());
+};
+
+/*
+    Price > 0
+    @str {String}
+    return {Boolean}
+*/
+exports.isPrice = function(str) {
+    if (!str)
+        return false;
+
+    return regexpPrice.test(str.toString());
 };
 
 exports.generateAuthCode = function () {

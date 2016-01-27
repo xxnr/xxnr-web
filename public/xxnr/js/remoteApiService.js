@@ -13,16 +13,16 @@ app.service('remoteApiService', function(commonService){
         return commonService.ajax(params);
     };
 
-    this.addOrder = function(shoppingCartId, addressId, products, payType){
-        var params = {
-            'methodname':'api/v2.0/order/addOrder',
+    this.addOrder = function(shoppingCartId, addressId, SKUs, payType){
+        var data = {
+            'methodname':'api/v2.1/order/addOrder',
             'shopCartId':shoppingCartId,
             'addressId':addressId,
-            'products':JSON.stringify(products),
+            'SKUs':SKUs,
             'payType':payType
         };
 
-        return commonService.ajax(params);
+        return commonService.sendPost(data);
     };
 
     this.getOrderList = function(page, type){
@@ -151,18 +151,18 @@ app.service('remoteApiService', function(commonService){
 
     this.getShoppingCart = function(){
         var params={
-            'methodname':'/api/v2.0/getShoppingCart'
+            'methodname':'api/v2.1/cart/getShoppingCart'
         };
         return commonService.ajax(params);
     };
 
-    this.changeCartNum = function(goodId, newCount){
-        var params={
-            methodname:'api/v2.0/updateShoppingCart',
-            goodsId:goodId,
-            quantity:newCount
+    this.changeCartNum = function(SKU_id, newCount){
+        var data={
+            'methodname':'api/v2.1/cart/changeNum',
+            'SKUId':SKU_id,
+            'quantity':newCount
         };
-        return commonService.ajax(params);
+        return commonService.sendPost(data);
     };
 
     this.cancleOrder = function(orderId){
@@ -332,31 +332,39 @@ app.service('remoteApiService', function(commonService){
         return commonService.ajax(params);
     };
     this.getGoodsListPage = function(page, rowCount, classId, brandName, modelName ,reservePrice){
-        var params={
-            methodname:'api/v2.0/product/getProductsListPage',
-            page:page,
-            rowCount:rowCount,
-            classId:classId,
-            brandName:brandName,
-            modelName:modelName,
-            reservePrice:reservePrice
+        var data={
+            'methodname':'api/v2.1/product/getProductsListPage',
+            'page':page,
+            'rowCount':rowCount,
+            'classId':classId,
+            'brandName':brandName,
+            'attributes':modelName,
+            'reservePrice':reservePrice
         };
-        return commonService.ajax(params);
+        return commonService.sendPost(data);
     };
-
-    this.addToShoppingCart = function(id, count, update_by_add){
+    this.querySKU = function(product_id,attributes){
+        var data={
+            'methodname':'api/v2.1/SKU/attributes_and_price/query',
+            'product':product_id,
+            'attributes':attributes
+        };
+        return commonService.sendPost(data);
+    };
+    this.addToShoppingCart = function(id, count, additions, update_by_add){
         if(!user || !user.userid){
             window.location.href="logon.html";
            return;
         }
 
-        var params = {
-            methodname:'/api/v2.0/shopCart/addToCart',
-            goodsId:id,
-            count:count,
-            update_by_add:update_by_add
+        var data = {
+            'methodname':'api/v2.1/cart/addToCart',
+            'SKUId':id,
+            'count':count,
+            'additions':additions,
+            'update_by_add':update_by_add
         };
-        return commonService.ajax(params);
+        return commonService.sendPost(data);
     };
 
     this.getPublicKey = function(){
@@ -439,6 +447,12 @@ app.service('remoteApiService', function(commonService){
         };
         return commonService.ajax(params);
 
-    }
+    };
+    this.isInWhiteList = function(){
+        var params = {
+            methodname:'api/v2.0/user/isInWhiteList'
+        };
+        return commonService.ajax(params);
+    };
 
 });

@@ -5,10 +5,10 @@ var fs = require('fs');
 var AuthService = require('../../services/auth');
 module.exports = function(callback){
     fs.readFile(__dirname + '/permission.txt', function (err, content) {
-        if (err) {
-            console.log(err);
-            return;
-        }
+            if (err) {
+                console.log(err);
+                return;
+            }
 
         // clear current permission table
         AuthService.clearPermissions(function (err) {
@@ -80,5 +80,5 @@ module.exports = function(callback){
                 });
         })
     });
-}
+};
 

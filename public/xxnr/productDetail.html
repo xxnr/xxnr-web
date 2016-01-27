@@ -26,6 +26,7 @@
     <script src="js/remoteApiService.js"></script>
     <script src="js/login/loginController.js"></script>
     <script src="js/productDetail/productDetailController.js"></script>
+    <script src="js/shoppingCart/shoppingCartService.js"></script>
     <script src="js/shoppingCart/shoppingCartController.js"></script>
     <script src="js/headerFooterDirective.js"></script>
     <script src="js/headerController.js"></script>
@@ -63,13 +64,23 @@
 </div>
 
 <a href="#" id="back-to-top" title="Back to top"><img src="images/backToTop.png" alt=""/></a>
-<div class="clear channel3 detail_news ng-cloak">
+<div class="clear channel3 product_detail ng-cloak">
     <p class="guide ng-hide" ng-show="initDisplay">
         <a href="/">首页</a> ／ <a href="" id="productType" ng-click="product_category()" ng-cloak>{{category}}</a> ／ <a href="#" id="product_title" ng-cloak>{{item.name}}</a>
     </p>
     <div class="wrap ng-hide" ng-show="initDisplay">
-        <div class="product_detail">
-            <div class="product_img"><img ng-src={{item.imgUrl}} alt=""></div>
+        <div class="product_detail clearfix">
+            <div class="product_img_slider">
+                <img class="mainImage" ng-repeat="imgUrl in item.imgUrls" ng-show="isActive($index)" ng-swipe-right="showPrev()" ng-swipe-left="showNext()" ng-src={{imgUrl}} alt="">
+                <ul class="imgNav row">
+                    <li ng-repeat="thumbnailImgUrl in item.thumbnailImgUrls" ng-class="{'active':isActive($index)}">
+                        <div class="overlay" ng-mouseover="showPhoto($index);">
+                        </div>
+                        <img src="{{thumbnailImgUrl}}" alt="{{photo.desc}}" title="{{photo.desc}}"/>
+                    </li>
+                </ul>
+            </div>
+
             <div class="product_info">
                 <div class="product_info_part1">
                     <h4 class="product_name" ng-cloak>{{item.name}}</h4>
@@ -78,13 +89,50 @@
                         <!--<li>市场价</li>-->
                         <!--<li><del style="color:#C0C0C0">￥{{item.oldPrice}}</del></li>-->
                     <!--</ul>-->
-                    <ul>
-                        <li class="ng-cloak" ng-hide="item.presale">促销价：</li>
-                        <li class="ng-cloak price"  ng-class="{true: 'presale',}[item.presale]">{{item.presale?"即将上线":'￥'+item.nowPrice}}</li>
+                    <ul class="price_list">
+                        <li class="ng-cloak" ng-hide="item.presale">新农价：</li>
+                        <li class="price">{{'￥'+item.minPrice}} {{item.maxPrice==item.minPrice?"":"-"}} {{(item.maxPrice==item.minPrice?"":item.maxPrice)}}</li>
+                        <li class="ng-cloak price" ng-show="item.presale" ng-class="{true: 'presale',}[item.presale]">即将上线</li>
                         <li ng-show="category=='化肥' && !item.presale" class="ng-cloak unitText">/吨</li>
-                        <li ng-show="item.deposit">预付定金</li>
+                        <li ng-show="item.deposit">预付定金：</li>
                         <li class="price" ng-show="item.deposit" ng-cloak>￥{{item.deposit}}</li>
                     </ul>
+                    <p ng-show="!item.online" class="offline-text">商品下架了</p>
+                    <div ng-show="item.online" class="SKUAttributes" ng-class="{true:'needToSelect'}[needToSelectMoreSKU]">
+                        <div ng-show="needToSelectMoreSKU" class="clearfix needToSelectTitle">
+                            <span class="left">请选择您要的商品信息</span>
+                            <img ng-click="needToSelectMoreSKU=false;clickedMethod = 0" class="right" src="images/shut-down-.png" alt="">
+                        </div>
+                        <ul>
+                            <li ng-repeat="SKUAttribute in item.SKUAttributes">
+                                <div class="SKUAttribute">
+                                    <ul class="row">
+                                        <li class="SKUAttributes-title">{{SKUAttribute.name}}</li>
+                                        <div class="SKUAttributes-options">
+                                            <li class="SKUAttributes-option" ng-repeat="value in SKUAttribute.values" ng-click="selectSKU($parent.$index,$index)" ng-class="{'selected':SKUAttribute.isSelected[$index]==true,'selectable':SKUAttribute.selectable[$index]==true,'unselectable':SKUAttribute.selectable[$index]==false}"><img ng-show="SKUAttribute.isSelected[$index]" src="images/choose.png" alt="">{{value}}</li>
+                                        </div>
+
+                                    </ul>
+                                </div>
+                            </li>
+                            <li class="SKUAdditions-title" ng-if="item.SKUAdditions">附加项目</li>
+                            <div class="SKUAdditions-options" ng-if="item.SKUAdditions">
+                                <ul class="row">
+                                    <li class="SKUAdditions-option" ng-repeat="SKUAddition in item.SKUAdditions" ng-click="selectAddition($index)" ng-class="{'selected':SKUAddition.isSelected==true}"><img ng-show="SKUAddition.isSelected" src="images/choose.png" alt="">{{SKUAddition.name}}（ +{{SKUAddition.price}} ）</li>
+                                </ul>
+                            </div>
+                            <li class="count" ng-hide="blockBuying">
+                                <span class="count-title">数量</span>
+                                <div class="buy_btn">
+                                    <a class="btn-reduce" href="" ng-click="reduce()">-</a>
+                                    <input maxlength="4" class="text" id="buy-num" ng-model="buy_count" ng-blur="buyCountBlur(buy_count)" ng-change="buyCountChange(buy_count)">
+                                    <a class="btn-add" href="" ng-click="add()">+</a>
+                                </div>
+                            </li>
+                        </ul>
+                        <a href="" ng-show="isAllSKUSelected() && needToSelectMoreSKU" ng-click="confirm()" class="reconfirm_SKU">确定</a>
+                    </div>
+
                 </div>
                 <!--<div class="search">
                     <div class="search_category">
@@ -96,28 +144,40 @@
                         </ul>
                     </div>
                 </div>-->
-                <div class="buy_box">
-                    <div class="left buy_btn">
-                        <a class="btn-reduce" href="" ng-click="reduce()">-</a>
-                        <a class="btn-add" href="" ng-click="add()">+</a>
-                        <input maxlength="4" class="text" id="buy-num" ng-model="buy_count" ng-change="buyCountChange(buy_count)">
-                    </div>
+                <div ng-show="item.online" class="buy_box clearfix">
                     <div ng-show="blockBuying" ng-cloak>
                         <a href="" class="product_not_allowed_btn">敬请期待</a>
                     </div>
                     <div ng-show="!blockBuying" ng-cloak>
-                        <a href=""  ng-click="buy($event)" class="buy" ng-cloak>{{item.buyActionName}}</a>
-                        <a href=""  ng-click="addToShoppingCart($event)" class="shopping_car addcart"><i id="end"></i>加入购物车</a>
+                        <a href="" ng-hide="needToSelectMoreSKU" ng-click="buy($event)" class="buy" ng-cloak>{{item.buyActionName}}</a>
+                        <a href="" ng-hide="needToSelectMoreSKU" ng-click="addToShoppingCart($event)" class="shopping_car addcart"><i id="end"></i>加入购物车</a>
                     </div>
+                </div>
+                <div class="advantages" ng-if="categoryId =='6C7D8F66'">
+                    <ul class="row">
+                        <li><img src="images/advantages_car_1.png" alt="">品牌授权体验店</li>
+                        <li><img src="images/advantages_car_2.png" alt="">专人全程服务</li>
+                        <li><img src="images/advantages_car_3.png" alt="">厂家质量保证</li>
+                    </ul>
+                </div>
+                <div class="advantages" ng-if="categoryId =='531680A5'">
+                    <ul class="row">
+                        <li><img src="images/advantages_huafei_1.png" alt="">优质厂家直供</li>
+                        <li><img src="images/advantages_huafei_2.png" alt="">县级站点配送</li>
+                        <li><img src="images/advantages_huafei_3.png" alt="">售后服务保障</li>
+                    </ul>
                 </div>
                 <!--<p><a href="" ng-click="showFreight()">我是运费规则</a></p>-->
             </div>
         </div>
     </div>
     <div class="wrap wrap_intro ng-hide" ng-show="initDisplay">
-        <ul class="details_tab">
-            <li ng-repeat="tab in tabs"><a href="" ng-click="show($index)" ng-class="{true:'current', false:''}[tab.isSelected]" ng-cloak>{{tab.name}}</a></li>
-        </ul>
+        <div class="details_tab">
+            <ul>
+                <li ng-repeat="tab in tabs"><a href="" ng-click="show($index)" ng-class="{true:'current', false:''}[tab.isSelected]" ng-cloak><div>{{tab.name}}</div></a></li>
+                <li><a href=""></a></li>
+            </ul>
+        </div>
         <div class="intro_list">
             <div class="intro_box" ng-show="tabs[0].isSelected">
                 <div class="intro" ng-bind-html="item.detail | trustHtml"></div>
@@ -147,5 +207,9 @@
 </div>
 <footer></footer>
 <!-- <custom-alert ng-hide="hiddenAlert"></custom-alert> -->
+<script>
+    // jQuery(".picScroll-left").slide({titCell:".hd ul",mainCell:".bd ul",autoPage:true,effect:"left",autoPlay:true,vis:4,pnLoop:false});
+
+</script>
 </body>
 </html>

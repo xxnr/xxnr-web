@@ -7,7 +7,7 @@
 				<div class="help" data-component="template" data-component-path="users.info"><script type="text/html">{{ count | pluralize(@('items','item','items','items')) }} / {{ pages | pluralize(@('pages','page','pages','pages')) }}</script></div>
 			</div>
             <div class="col-md-3" col-sm-6 m>
-                <div name="user_verify" data-component="dropdown" data-component-path="users.filter.query" data-options="@(全部)|0;@(未认证)|1;@(申请认证)|3;@(种植大户)|4;@(村级经销商)|5;@(乡镇经销商)|6;@(县级经销商)|7">@(认证用户)</div>
+                <div name="user_verify" data-component="dropdown" data-component-path="users.filter.query" data-options="@(全部)|0;@(申请认证)|3;@(种植大户)|4;@(村级经销商)|5;@(乡镇经销商)|6;@(县级经销商)|7;@(新农经纪人)|8">@(认证用户)</div>
             </div>
 		</div>
 	</div>
@@ -41,7 +41,7 @@
                     {{ fi }}
 				{{ fi }}
 			</td>
-            <td style="width:100px" class="hidden-xs fs11" data-title="新农代表昵称">{{if inviter }} {{ inviter.nickname }} {{fi}}</td>
+            <td style="width:100px" class="hidden-xs fs11 ui-center" data-title="新农代表">{{if inviter }} {{ inviter.nickname }}</br>{{ inviter.account }} {{fi}}</td>
             <td style="width:100px" class="hidden-xs fs11" data-title="认证用户">{{ typeNameVerified }}</td>
             <td style="width:80px" class="ui-right" data-title="会员信息">
                 <button name="edit" title="@(Show)"><span class="fa fa-search"></span></button>
@@ -56,106 +56,131 @@
 </div>
 <div data-component="form" data-title="@(会员信息)" data-component-path="common.form" data-if="value === 'users'" data-width="900px" data-component-id="users.form">
 	<br />
-	<div data-component="template" data-component-path="users.form" class="padding" style="padding-bottom:0">
+	<div data-component="template" data-component-path="users" class="padding" style="padding-bottom:0">
 		<script type="text/html">
 		<table class="table table-bordered" border="0">
 			<tbody>
 				<tr>
 					<td class="col-xs-4 active">@(# id)</td>
-					<td>{{ id }}</td>
+					<td>{{ form.id }}</td>
 				</tr>
 				<tr>
 					<td class="col-xs-4 active">@(账户)</td>
-					<td>{{ account }}</td>
+					<td>{{ form.account }}</td>
 				</tr>
 				<tr>
 					<td class="col-xs-4 active">@(姓名)</td>
-					<td>{{ name }}</td>
+					<td>{{ form.name }}</td>
 				</tr>
 				<tr>
 					<td class="col-xs-4 active">@(所在地区)</td>
-					<td>{{ addressShow }}</td>
+					<td>{{ form.addressShow }}</td>
 				</tr>
 				<tr>
 					<td class="col-xs-4 active">@(昵称)</td>
-					<td>{{ nickname }}</td>
+					<td>{{ form.nickname }}</td>
 				</tr>
 				<tr>
 					<td class="col-xs-4 active">@(用户积分)</td>
-					<td>{{ score }}</td>
+					<td>{{ form.score }}</td>
 				</tr>
-				{{ if datecreated }}
+				{{ if form.datecreated }}
 				<tr>
 					<td class="col-xs-4 active">@(注册时间)</td>
 					<td>
-					{{ if datecreated.charAt(datecreated.length-1) !== 'Z' }}
-						{{ datecreated }}
+					{{ if form.datecreated.charAt(form.datecreated.length-1) !== 'Z' }}
+						{{ form.datecreated }}
 					{{ else }}
-						{{ datecreated | format('yyyy-MM-dd hh:mm:ss') }}
+						{{ form.datecreated | format('yyyy-MM-dd hh:mm:ss') }}
 					{{ fi }}
 					</td>
 				</tr>
 				{{ fi }}
 				<tr>
 					<td class="col-xs-4 active">@(注册设备)</td>
-					{{ if registerAgent }}
-						<td>{{ registerAgent }}</td>
+					{{ if form.registerAgent }}
+						<td>{{ form.registerAgent }}</td>
 					{{ else }}
 						<td>@(无)</td>
 					{{ fi }}
 				</tr>
 				<tr>
 					<td class="col-xs-4 active">@(性别)</td>
-					{{ if sex == 0 }}
-						<td>@(男)</td>
-					{{ else }}
+					{{ if form.sex }}
 						<td>@(女)</td>
+					{{ else }}
+						<td>@(男)</td>
 					{{ fi }}
+				</tr>
+				<tr>
+					<td class="col-xs-4 active">@(申请类型)</td>
+					<td id="user_types">
+						<if usertypes>
+							<select>
+								<option selected disabled hidden value=''></option>
+								{{ foreach usertype in usertypes}}
+								<option value="{{ usertype.value}}" {{ if usertype.value == form.type }} selected {{ fi }}>{{ usertype.text }}</option>
+								{{ end }}
+							</select>
+						</if>
+					</td>
 				</tr>
                 <tr>
                     <td class="col-xs-4 active">@(已认证类型)</td>
-                    <td>{{ typeNameVerified }}</td>
+                    <td id="drop_in" ondrop="dropin(event)" ondragover="allowDrop(event)" >
+						{{ foreach verifiedType in form.verifiedTypes}}
+							<div id="{{verifiedType.value}}" class="drag" text="{{ verifiedType.text }}" draggable="true" ondragstart="drag(event)" >{{ verifiedType.text }}</div>
+						{{ end }}
+					</td>
                 </tr>
+				<tr>
+					<td class="col-xs-4 active">@(未认证类型)</td>
+					<td id="drop_out" ondrop="dropout(event)" ondragover="allowDrop(event)" >
+						{{ foreach notVerifiedType in form.notVerifiedTypes}}
+							<div id="{{notVerifiedType.value}}" class="drag" text="{{ notVerifiedType.text }}" draggable="true" ondragstart="drag(event)">{{ notVerifiedType.text }}</div>
+						{{ end }}
+					</td>
+				</tr>
 			</tbody>
 		</table>
 		</script>
 	</div>
 
-	<div class="padding" style="padding-bottom:0">
-		<!--<div class="row">-->
-			<!--<div class="col-md-4 m">-->
-				<!--<div data-component="textbox" data-component-path="users.form.name">@(姓名)</div>-->
-			<!--</div>-->
+	<!--<div class="padding" style="padding-bottom:0">-->
+		<!--&lt;!&ndash;<div class="row">&ndash;&gt;-->
+			<!--&lt;!&ndash;<div class="col-md-4 m">&ndash;&gt;-->
+				<!--&lt;!&ndash;<div data-component="textbox" data-component-path="users.form.name">@(姓名)</div>&ndash;&gt;-->
+			<!--&lt;!&ndash;</div>&ndash;&gt;-->
+            <!--&lt;!&ndash;<div class="col-md-4 m">&ndash;&gt;-->
+                <!--&lt;!&ndash;<div data-component="textbox" data-component-path="users.form.nickname">@(昵称)</div>&ndash;&gt;-->
+            <!--&lt;!&ndash;</div>&ndash;&gt;-->
+		<!--&lt;!&ndash;</div>&ndash;&gt;-->
+        <!--<div class="row">-->
             <!--<div class="col-md-4 m">-->
-                <!--<div data-component="textbox" data-component-path="users.form.nickname">@(昵称)</div>-->
+                <!--@(认证用户类型：)-->
             <!--</div>-->
-		<!--</div>-->
-        <div class="row">
-            <div class="col-md-4 m">
-                @(认证用户类型：)
-            </div>
-         </div>
-        <div class="row">
-            <div class="col-md-4 m">
-                <div data-component="dropdown" data-component-path="users.form.type" data-source="users.usertypes" data-source-value="value" data-source-text="text"></div>
-            </div>
-            <div class="col-md-4 m">
-                <!-- data-options="@(未认证)|1;@(种植大户)|2;@(村级经销商)|3;@(乡镇经销商)|4;@(县级经销商)|5"-->
-                <div data-component="checkbox" data-component-path="users.form.isVerified">@(<b>已认证</b>)</div>
-            </div>
-        </div>
-	</div>
-	<hr />
+         <!--</div>-->
+        <!--<div class="row">-->
+            <!--<div class="col-md-4 m">-->
+                <!--<div data-component="dropdown" data-component-path="users.form.type" data-source="users.usertypes" data-source-value="value" data-source-text="text"></div>-->
+            <!--</div>-->
+            <!--<div class="col-md-4 m">-->
+                <!--&lt;!&ndash; data-options="@(未认证)|1;@(种植大户)|2;@(村级经销商)|3;@(乡镇经销商)|4;@(县级经销商)|5"&ndash;&gt;-->
+                <!--<div data-component="checkbox" data-component-path="users.form.isVerified">@(<b>已认证</b>)</div>-->
+            <!--</div>-->
+        <!--</div>-->
+	<!--</div>-->
+	<!--<hr />-->
 
 	<div data-component="error" data-component-path="users.response"></div>
 	<div class="ui-form-buttons">
-		<div data-component="validation" data-component-path="users.form">
+		<div>
 			<button name="submit">@(提交)</button>
 		</div>
 		<button name="cancel">@(取消)</button>
 	</div>
 </div>
-<div data-component="form" data-title="@(订单信息)" data-component-path="common.form" data-if="value==='users_orders'" data-width="900px" data-component-id="users.orders.form">
+<div data-component="form" data-title="@(订单信息)" data-component-path="common.form" data-if="value==='users_orders'" data-width="1000px" data-component-id="users.orders.form">
     <div data-component="template" class="padding" data-component-path="users.orders.form">
         <script type="text/html">
             <table class="table table-bordered" border="0">
@@ -185,9 +210,12 @@
                             <td class="col-xs-2 hidden-xs ui-right">{{ order.id }}</td>
                             <td class="ui-right col-xs-4 hidden-xs">
                                 <ul>
-                            {{ foreach product in order.products }}
-                                    <li><div class="product-name" title="{{product.name}}">{{ product.name }}</div><sapn>({{ product.count }}x)</sapn></li>
-                            {{ end }}
+									{{ foreach product in order.products }}
+										<li><div class="product-name" title="{{product.name}}">{{ product.name }}</div><sapn>({{ product.count }}x)</sapn></li>
+									{{ end }}
+									{{ foreach SKU in order.SKUs }}
+										<li><div class="product-name" title="{{SKU.name}}">{{SKU.name}}</div><span>({{SKU.count}}x)</span></li>
+									{{ end }}
                                 </ul>
                             </td>
                             <td class="ui-right col-xs-3 hidden-xs">{{ order.dateCreated | format('yyyy-MM-dd hh:mm:ss') }}</td>
@@ -218,10 +246,6 @@
     users.usertypes = [];
 	users.response;
 
-    ON("#users.query", function(component){
-
-    });
-
 	ON('#users.grid', function(component) {
 
 		// Max items per page
@@ -237,7 +261,26 @@
                             return;
                         }
 
-                        response.user.typeNameVerified = usertypes[response.user.typeVerified];
+						response.user.verifiedTypes = [];
+						response.user.notVerifiedTypes = [];
+
+						for(var i in users.usertypes) {
+							if (usertypes.hasOwnProperty(i)) {
+								var usertype = users.usertypes[i];
+								if (response.user.typeVerified && response.user.typeVerified.indexOf(usertype.value) != -1) {
+									response.user.verifiedTypes.push({
+										value: usertype.value,
+										text: usertype.text
+									});
+								} else {
+									response.user.notVerifiedTypes.push({
+										value: usertype.value,
+										text: usertype.text
+									});
+								}
+							}
+						}
+
 						response.user.addressShow = '';
 						if(response.user.address){
 							if(response.user.address.province){
@@ -260,6 +303,7 @@
 						SET('users.form', $.extend({}, response.user), true);
 						SET('users.response', null);
 						SET('common.form', 'users');
+						on_user_form_changed();
 					});
 					break;
 
@@ -272,7 +316,6 @@
 				// 	break;
                 case 'order':
                     $.components.GET(managerurl + '/api/orders/?buyer=' + row.id, null, function(response) {
-                        console.log(response);
                         SET('users.orders.form', response);
                         SET('common.form','users_orders');
                     });
@@ -303,12 +346,6 @@
 		};
 	});
 
-    ON('#orders.form', function(component){
-        component.click = function(index, row, button){
-
-        }
-    });
-
 	// Method refreshes grid
 	function users_refresh(reset) {
 
@@ -319,10 +356,12 @@
 
 		$.components.GET(managerurl + '/api/users/', users.filter, function(response) {
             response.items.forEach(function(item){
-                if(item.type === item.typeVerified && item.type !=='1' ){
-                    item.typeNameVerified = usertypes[item.type];
-                    console.log(item.typeNameVerified);
-                }
+				if(item.typeVerified){
+					item.typeNameVerified = [];
+					item.typeVerified.forEach(function(typeVerified){
+						item.typeNameVerified.push(usertypes[typeVerified]);
+					})
+				}
             });
 
 			SET((reset ? '' : '+') + 'users.grid', response.items);
@@ -345,11 +384,109 @@
 	}
 
 	// Watchs changes in user filter
-	WATCH('users.filter.*', function(path, value) {
+	Delay_Search_WATCH('users.filter.*', function(path, value) {
 		if (NOTMODIFIED('users.filter', users.filter))
 			return;
 		users_refresh(path !== 'users.filter.page');
 	});
+
+	function drag(ev){
+		SET('test',ev);
+		ev.dataTransfer.setData("value", ev.target.id);
+		ev.dataTransfer.setData("text", ev.target.innerHTML);
+		ev.dataTransfer.setData("draggable", ev.target.getAttribute('draggable'));
+	}
+
+	function allowDrop(ev) {
+		ev.preventDefault();
+	}
+
+	function dropout(ev) {
+		ev.preventDefault();
+		var text = ev.dataTransfer.getData("text");
+		var value = ev.dataTransfer.getData("value");
+		var draggable = ev.dataTransfer.getData("draggable");
+		console.log(draggable);
+		if(!draggable){
+			return;
+		}
+
+		for(var i=0; i<users.form.verifiedTypes.length; i++){
+			if(users.form.verifiedTypes[i].value == value){
+				users.form.verifiedTypes.splice(i, 1);
+				break;
+			}
+		}
+
+		for(var k=0; k<users.form.typeVerified.length; k++){
+			if(users.form.typeVerified[k] == value){
+				users.form.typeVerified.splice(i, 1);
+				break;
+			}
+		}
+
+		var hasThisItemAlready = false;
+		for(var j=0; j<users.form.notVerifiedTypes.length; j++){
+			if(users.form.notVerifiedTypes[j].value == value){
+				hasThisItemAlready = true;
+				break;
+			}
+		}
+
+		if(!hasThisItemAlready) {
+			users.form.notVerifiedTypes.push({text: text, value: value});
+		}
+
+		SET('users.form.verifiedTypes', users.form.verifiedTypes);
+		SET('users.form.notVerifiedTypes', users.form.notVerifiedTypes);
+		on_user_form_changed();
+	}
+
+	function dropin(ev) {
+		ev.preventDefault();
+		var text = ev.dataTransfer.getData("text");
+		var value = ev.dataTransfer.getData("value");
+		var draggable = ev.dataTransfer.getData("draggable");
+		if(!draggable){
+			return;
+		}
+
+		for(var i=0; i<users.form.notVerifiedTypes.length; i++){
+			if(users.form.notVerifiedTypes[i].value == value){
+				users.form.notVerifiedTypes.splice(i, 1);
+				break;
+			}
+		}
+
+		var hasThisItemAlready = false;
+		for(var j=0; j<users.form.verifiedTypes.length; j++){
+			if(users.form.verifiedTypes[j].value == value){
+				hasThisItemAlready = true;
+				break;
+			}
+		}
+
+		if(!hasThisItemAlready) {
+			users.form.verifiedTypes.push({text: text, value: value});
+			if(users.form.typeVerified == null){
+				users.form.typeVerified = [];
+			}
+			users.form.typeVerified.push(value);
+		}
+
+		SET('users.form.verifiedTypes', users.form.verifiedTypes);
+		SET('users.form.notVerifiedTypes', users.form.notVerifiedTypes);
+		on_user_form_changed();
+	}
+
+	function on_user_form_changed() {
+		$('#user_types select').off('change').on('change', function () {
+			var el = $(this);
+			var userType = el.find('option:selected').attr('value');
+			SET('users.form.type', userType);
+			on_user_form_changed();
+		});
+	}
 
 	// Tangular.register('oauth2', function() {
 	// 	var prop = ['idfacebook', 'idlinkedin', 'idgoogle', 'iddropbox', 'idinstagram', 'idyandex', 'idyahoo', 'idvk', 'idlive'];

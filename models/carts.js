@@ -5,12 +5,16 @@ var schema = new mongoose.Schema({
     items:[{
         product:{type:mongoose.Schema.ObjectId, ref:'product', required:true},
         count:Number
+    }],
+    SKU_items:[{
+        SKU:{type:mongoose.Schema.ObjectId, ref:'SKU', required:true},
+        product:{type:mongoose.Schema.ObjectId, ref:'product', required:true},          // product reference for improving query performance
+        additions:[{type:mongoose.Schema.ObjectId, ref:'SKUAddition', required:true}],  // the additions added to cart
+        count:Number
     }]
 });
 
 mongoose.model('cart', schema);
-
-
 
 // Keep these old schema to do convert
 var cartItemSchema = new mongoose.Schema({

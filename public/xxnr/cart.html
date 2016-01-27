@@ -23,6 +23,7 @@
     <script src="js/login/loginService.js"></script>
     <script src="js/remoteApiService.js"></script>
     <script src="js/payService.js"></script>
+    <script src="js/shoppingCart/shoppingCartService.js"></script>
     <script src="js/shoppingCart/shoppingCartController.js"></script>
     <script src="js/login/loginController.js"></script>
     <script src="js/headerFooterDirective.js"></script>
@@ -117,6 +118,22 @@
                                                     <div class="p-name">
                                                         <a class="ng-cloak" ng-href={{item.detailPageUrl}}>{{item.name}}</a>
                                                     </div>
+                                                    <div class="p-skus">
+                                                        <ul>
+                                                            <li ng-repeat="attribute in item.attributes">
+                                                                {{attribute.name}}:{{attribute.value}}
+                                                            </li>
+                                                            <li>
+                                                                <ul class="row">
+                                                                附加项目:
+                                                                    <li ng-repeat="addition in item.additions">
+                                                                        {{addition.name}}&nbsp;
+                                                                    </li>
+                                                                </ul>
+                                                            </li>
+
+                                                        </ul>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -132,7 +149,7 @@
                                                 <div class="left buy_btn">
                                                     <a class="btn-reduce" href="" ng-click="reduce($parent.$index, $index)">-</a>
                                                     <a class="btn-add" href="" ng-click="add($parent.$index, $index)">+</a>
-                                                    <input maxLength=4 class="text" id="buy-num" ng-change="buyCountChange($parent.$index, $index, item.buyCount, item.oldBuyCount)" ng-Blur="submitChange(item.goodsId, item.buyCount)" ng-model="item.buyCount">
+                                                    <input maxLength=4 class="text" id="buy-num" ng-change="buyCountChange($parent.$index, $index, item.buyCount, item.oldBuyCount)" ng-Blur="submitChange(item.SKU_id, item.buyCount)" ng-model="item.buyCount">
                                                 </div>
                                             </div>
                                         </div>

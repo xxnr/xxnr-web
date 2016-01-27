@@ -5,7 +5,7 @@ var NewsModel = require('../models').news;
 var NewsCategoryModel = require('../models').newsCategory;
 
 // Service
-NewsService = function(){};
+var NewsService = function(){};
 
 // Methods
 // Gets listing

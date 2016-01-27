@@ -6,9 +6,10 @@ var crypto = require('crypto');
 var UserModel = require('../models').user;
 var UserLogModel = require('../models').userLog;
 var UseOrdersNumberModel = require('../models').userordersnumber;
+var UserWhiteListModel = require('../models').userwhitelist;
 
 // Service
-UserService = function(){};
+var UserService = function(){};
 
 // Method
 // Creates user
@@ -67,10 +68,8 @@ UserService.prototype.update = function(options, callback) {
         setValue.webLoginId = options.webLoginId;
     if (options.address)
         setValue.address = options.address;
-    if (options.isVerified && options.type != '1')
-        setValue.typeVerified = options.type;
-    if (options.isVerified === false)
-        setValue.typeVerified = null;
+    if (options.typeVerified)
+        setValue.typeVerified = options.typeVerified;
     if( typeof options.isUserInfoFullFilled != 'undefined')
         setValue.isUserInfoFullFilled = options.isUserInfoFullFilled;
 
@@ -136,10 +135,8 @@ UserService.prototype.login = function(options, callback) {
         }
 
         if(password_valid){
-            if(user.typeVerified && user.typeVerified === user.type && user.type != '1'){
-                user = user.toObject();
-                user.isVerified = true;
-            }
+            user = user.toObject();
+            user.isVerified = isUserTypeVerified(user);
 
             callback(null, user);
 
@@ -181,10 +178,8 @@ UserService.prototype.get = function(options, callback) {
                 return;
             }
 
-            if (user.typeVerified && user.typeVerified === user.type && user.type != '1') {
-                user = user.toObject();
-                user.isVerified = true;
-            }
+            user = user.toObject();
+            user.isVerified = isUserTypeVerified(user);
 
             // Returns response
             return callback(null, user);
@@ -329,6 +324,27 @@ UserService.prototype.emptyInviteeOrderNumber = function(options, callback) {
     });
 };
 
+// check user in user white list
+UserService.prototype.inWhiteList = function(options, callback) {
+    if (!options.userid) {
+        callback('User inWhiteList err: no userid');
+        return;
+    }
+
+    var query = {userId: options.userid};
+    UserWhiteListModel.findOne(query, function (err, user) {
+        if (err) {
+            console.error('get white list user error:', err);
+            callback('获取白名单用户失败');
+            return;
+        }
+
+        // Returns response
+        return callback(null, user);
+    });
+};
+
+
 // ********************  only use for manager system  ********************
 
 // Gets listing
@@ -351,8 +367,48 @@ UserService.prototype.query = function(options, callback) {
     var skip = U.parseInt(options.page * options.max);
 
     var query = {};
-    if (options.query){
-         query = {$where: options.query};
+
+    const isVerified = "this.typeVerified && this.typeVerified.indexOf(this.type) != -1 ";
+    if(options.query){
+        switch(U.parseInt(options.query)){
+            //case 1:
+            //    // 未认证
+            //    query.$where = '!this.typeVerified || this.typeVerified.length < 1';
+            //    break;
+//            case 2:
+//                // 已认证
+//                self.query.query = "this.typeVerified && this.type === this.typeVerified && this.type !== '1'";
+//                break;
+            case 3:
+                // 申请认证
+                query.type = {$ne:'1'};
+                query.$where = '!this.typeVerified || this.typeVerified.indexOf(this.type) == -1';
+                //self.query.query = "this.type !== '1' && this.typeVerified.indexOf(this.type) == -1 ";
+                break;
+            case 4:
+                // 种植大户
+                query.typeVerified = '2';
+                break;
+            case 5:
+                // 村级经销商
+                query.typeVerified = '3';
+                break;
+            case 6:
+                // 乡镇经销商
+                query.typeVerified = '4';
+                break;
+            case 7:
+                // 县级经销商
+                query.typeVerified = '5';
+                break;
+            case 8:
+                // 新农经纪人
+                query.typeVerified = '6';
+                break;
+            default:
+                // 全部
+                break;
+        }
     }
 
     // Prepares searching
@@ -393,3 +449,7 @@ UserService.prototype.query = function(options, callback) {
 };
 
 module.exports = new UserService();
+
+function isUserTypeVerified(user){
+    return user.typeVerified && user.typeVerified.indexOf(user.type) != -1 && user.type != '1'
+}

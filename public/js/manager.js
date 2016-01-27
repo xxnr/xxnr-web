@@ -149,6 +149,14 @@ Tangular.register('price', function(value, format) {
 	return value.format(format) + ' ' + currency;
 });
 
+Tangular.register('toFixed', function(value, format) {
+	if (value === undefined)
+		value = 0;
+	if (format === undefined)
+		format = (value.toString()).length();
+	return value.toFixed(format) + ' ' + currency;
+});
+
 Tangular.register('join', function(value) {
 	if (value instanceof Array)
 		return value.join(', ');
@@ -185,7 +193,27 @@ function getSelectionStartNode(context){
 	return startNode;
 }
 
-angular.module('xxnr_manager',['ngCookies'])
+Delay_Search_WATCH = function(field, callback, latency_in_millisecond){
+	if(typeof latency_in_millisecond == 'undefined'){
+		latency_in_millisecond = 1000;
+	}
+	var timer;
+	WATCH(field, function(path, value){
+		if(/.*filter\.search/.test(path)) {
+			if (timer) {
+				clearTimeout(timer);
+			}
+
+			timer = setTimeout(function (path, value) {
+				callback(path, value);
+			}, latency_in_millisecond);
+		} else{
+			callback(path, value);
+		}
+	})
+};
+
+var app = angular.module('xxnr.manager',['ngCookies'])
     .service('loginService', function($cookieStore) {
         var tokenKey = "be_token";
         this.logout = function () {
@@ -193,9 +221,12 @@ angular.module('xxnr_manager',['ngCookies'])
             $cookieStore.remove(tokenKey, {path: "/"});
         };
     })
-    .controller('managerController', function($scope, loginService) {
+    .controller('ManagerController', function($scope, loginService) {
         $scope.logout = function(){
             loginService.logout();
             window.location.reload();
         }
     });
+app.controller('ProductController', function($scope){
+		$scope.show_product_edit = false;
+	});

@@ -11,6 +11,8 @@ var UseraddressService = services.useraddress;
 var AreaService = services.area;
 var CartService = services.cart;
 var OrderService = services.order;
+var IntentionProductService = services.intention_product;
+var PotentialCustomerService = services.potential_customer;
 var REG_MOBILE = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|Tablet|IOS/i;
 
 exports.install = function() {
@@ -53,6 +55,16 @@ exports.install = function() {
     F.route('/api/v2.0/user/confirmUpload',             confirmUpload, ['get', 'post'], ['isLoggedIn']);
 
     F.route('/api/v2.0/user/isAlive',                   isAlive, ['get'], ['isLoggedIn']);
+
+    // check user in white list
+    F.route('/api/v2.0/user/isInWhiteList',             isInWhiteList, ['get', 'post'], ['isLoggedIn', 'isInWhiteList']);
+
+    // potential customer/intention products related APIs
+    F.route('/api/v2.1/intentionProducts',              json_intention_products, ['get'], ['isLoggedIn']);
+    F.route('/api/v2.1/potentialCustomer/isAvailable',  json_potential_customer_available, ['get'], ['isLoggedIn']);
+    F.route('/api/v2.1/potentialCustomer/add',          process_add_potential_customer, ['post'], ['isLoggedIn']);
+    F.route('/api/v2.1/potentialCustomer/query',        json_potential_customer, ['get'], ['isLoggedIn']);
+    F.route('/api/v2.1/potentialCustomer/get',          json_potential_customer_get, ['get'], ['isLoggedIn']);
 
 	// v1.0
 	// LOGIN
@@ -151,7 +163,14 @@ function process_login() {
 		user.userAddress = data.address;
         user.isVerified = data.isVerified;
         user.isUserInfoFullFilled = data.isUserInfoFullFilled;
-
+        user.verifiedTypes = data.typeVerified;
+        user.userTypeInName = F.global.usertypes[user.userType] || '其他';
+        if (user.verifiedTypes) {
+            user.verifiedTypesInJson = [];
+            user.verifiedTypes.forEach(function(type){
+                user.verifiedTypesInJson.push({typeId:type, typeName: F.global.usertypes[type] || '其他'});
+            });
+        }
         CartService.getOrAdd(user.userid, function(err, cart){
             if(err){
                 self.respond({code:1001, message:'获取购物车id失败'});
@@ -187,27 +206,59 @@ var setCookieAndResponse = function(user, keepLogin){
             return;
         }
 
+        var cookieUserInfo = {userid: user.userid, loginName: user.loginName};
+        if (user && user.nickname && user.nickname.length > 0) {
+            cookieUserInfo.nickName = encodeURIComponent(user.nickname);
+        }
         if(keepLogin){
-            if(F.isDebug){
-                self.res.cookie(F.config.usercookie, JSON.stringify({ userid: user.userid, loginName: user.loginName}), new Date().add(F.config.usercookie_expires_in));
+            if(F.isDebug){ 
+                self.res.cookie(F.config.usercookie, JSON.stringify(cookieUserInfo), new Date().add(F.config.usercookie_expires_in));
                 self.res.cookie(F.config.tokencookie, token, new Date().add(F.config.token_cookie_expires_in));
             }else {
-                self.res.cookie(F.config.usercookie, JSON.stringify({ userid: user.userid, loginName: user.loginName}), new Date().add(F.config.usercookie_expires_in), {domain: F.config.domain});
+                self.res.cookie(F.config.usercookie, JSON.stringify(cookieUserInfo), new Date().add(F.config.usercookie_expires_in), {domain: F.config.domain});
                 self.res.cookie(F.config.tokencookie, token, new Date().add(F.config.token_cookie_expires_in), {domain: F.config.domain});
             }
         }else{
             if(F.isDebug){
-                self.res.cookie(F.config.usercookie, JSON.stringify({ userid: user.userid, loginName: user.loginName}));
+                self.res.cookie(F.config.usercookie, JSON.stringify(cookieUserInfo));
                 self.res.cookie(F.config.tokencookie, token);
             }else {
-                self.res.cookie(F.config.usercookie, JSON.stringify({ userid: user.userid, loginName: user.loginName}), null, {domain: F.config.domain});
+                self.res.cookie(F.config.usercookie, JSON.stringify(cookieUserInfo), null, {domain: F.config.domain});
                 self.res.cookie(F.config.tokencookie, token, null, {domain: F.config.domain});
             }
         }
 
-        // Return results
-        var result = {'code': '1000', 'message': 'success', 'datas': user, token:token};
-        self.respond(result);
+        
+        // user shopping carts
+        CartService.getOrAdd(user.userid, function(err, cart) {
+            var shoppingCart_count = 0;
+            if (err) {
+                console.error('setCookieAndResponse CartService set shopoingcart err:', err);
+            } else {
+                if (cart && cart.SKU_items && cart.SKU_items.length>0) {
+                    cart.SKU_items.forEach(function (item) {
+                        if(item && item.count) {
+                            shoppingCart_count += item.count;
+                        }
+                    });
+                }
+            }
+
+            if (F.isDebug) {
+                self.res.cookie(F.config.shopingCartcookie, shoppingCart_count);
+            } else {
+                self.res.cookie(F.config.shopingCartcookie, shoppingCart_count, null, {domain: F.config.domain});
+            }
+
+            // Return results
+            var result = {'code': '1000', 'message': 'success', 'datas': user, token:token};
+            self.respond(result);
+            return;
+        }, true);
+
+        // // Return results
+        // var result = {'code': '1000', 'message': 'success', 'datas': user, token:token};
+        // self.respond(result);
     });
 };
 
@@ -373,11 +424,19 @@ function json_user_get() {
         user.sex = data.sex;
         user.photo = data.photo;
         user.userType = data.type;
-        user.pointLaterTrade = data.score;
+        user.pointLaterTrade = data.score || 0;
         user.dateinvited = data.dateinvited;
         user.address = data.address;
         user.isVerified = data.isVerified;
         user.isUserInfoFullFilled = data.isUserInfoFullFilled;
+        user.verifiedTypes = data.typeVerified || [];
+        user.userTypeInName = F.global.usertypes[user.userType] || '其他';
+        if (user.verifiedTypes) {
+            user.verifiedTypesInJson = [];
+            user.verifiedTypes.forEach(function(type){
+                user.verifiedTypesInJson.push({typeId:type, typeName: F.global.usertypes[type] || '其他'});
+            });
+        }
         if (data.inviter) {
             user.inviterId = data.inviter.id;
             user.inviter = data.inviter.account;
@@ -1092,53 +1151,34 @@ function process_user_sign(){
 // ==========================================================================
 
 // upload photo for app
-function uploadPhoto(){
+function uploadPhoto() {
     var self = this;
-//    var uploadRoute = F.findRoute('/files/upload');
-//
-//    if(!uploadRoute){
-//        var err = 'cannot find upload route which is expected to be registered previously';
-//        console.error(err);
-//        self.throw500(err);
-//    }
-//
-//    var upload = uploadRoute.execute();
-//
-//    upload.call(this, function(ids){
-//        if((!ids) || ids.length >1){
-//            self.throw500('returned image id is invalid!');
-//        }
-//
-//        var imgId = ids[0];
-//        self.respond({code: '1000', message: 'success', datas: getUrl(imgId)});
-//    });
-
     var id = '';
     var userId = self.query['userId'];
     var default_extension = '.jpg';
     var type_avail = ['png', 'jpg', "jpeg"];
-    if(!userId){
+    if (!userId) {
         self.respond({code:1001, message:'请填写用户ID'});
         return;
     }
 
     self.files.wait(function(file, next) {
         file.read(function(err, photo) {
-            if(err){
+            if (err) {
                 console.error('uploadPhoto fail:', err);
                 self.respond({code:1001,message:'上传失败'});
                 return;
             }
 
-            UserService.get({userid:userId}, function(err, data){
-                if(err){
+            UserService.get({userid:userId}, function(err, data) {
+                if (err) {
                     self.respond({code:1001, message:err});
                     return;
                 }
 
                 var index = file.filename.lastIndexOf('.');
                 file.extension = file.filename.substring(index + 1);
-                if(!type_avail.find(file.extension.toLowerCase())){
+                if (!type_avail.find(file.extension.toLowerCase())) {
                     self.respond({'code': 1001, 'message': '文件格式不正确（必须为.jpg/.png文件）'});
                     return;
                 }
@@ -1152,12 +1192,12 @@ function uploadPhoto(){
                 id = files.insert(file.filename, file.type, photo) + default_extension;
                 var imageurl = "/images/original/" + id;
                 var oldPhotoId = null;
-                if(data.photo) {
+                if (data.photo) {
                     oldPhotoId = data.photo.substring(data.photo.lastIndexOf('/')+1, data.photo.lastIndexOf('.'));
                 }
                 // start to update user info
-                UserService.update({userid:userId, photo:imageurl}, function(err){
-                    if(err){
+                UserService.update({userid:userId, photo:imageurl}, function(err) {
+                    if (err) {
                         console.error('User uploadPhoto fail:', err);
                         self.respond({code:1001, message:'上传失败'});
                         return;
@@ -1166,9 +1206,9 @@ function uploadPhoto(){
                     self.respond({code:1000, message:'上传成功', imageUrl:imageurl});
 
                     // success, delete old photo
-                    if(oldPhotoId) {
-                        files.remove(oldPhotoId, function(err, data){
-                            if(err){
+                    if (oldPhotoId) {
+                        files.remove(oldPhotoId, function(err, data) {
+                            if (err) {
                                 console.error('User uploadPhoto fail:', err);
                             }
                         });
@@ -1462,10 +1502,20 @@ function json_get_invitee_orders() {
                         'recipientPhone':item.consigneePhone,
                         'deposit':item.deposit.toFixed(2),
                         'dateCreated': item.dateCreated,
-                        'products': item.products || []
+                        'products': item.products || [],
+                        'SKUs': item.SKUs || []
                     };
+
+                    if(arr[i].SKUs && arr[i].SKUs.length > 0){
+                        // contains SKUs, need to convert into products to support old app
+                        arr[i].SKUs.forEach(function(SKU){
+                            var product = {id:SKU.productId, price:SKU.price, deposit:SKU.deposit, name:SKU.productName, thumbnail:SKU.thumbnail, count:SKU.count, category:SKU.category, dateDelivered:SKU.dateDelivered, dateSet:SKU.dateSet, deliverStatus:SKU.deliverStatus};
+                            arr[i].products.push(product);
+                        })
+                    }
                 }
-                result = {'code':'1000','message':'success',
+
+                result = {'code':1000,'message':'success',
                             'datas':{
                                 "account":user.account,
                                 "nickname":user.nickname,
@@ -1477,7 +1527,7 @@ function json_get_invitee_orders() {
                             }
                         };
             } else {
-                result = {'code':'1000','message':'success',
+                result = {'code':1000,'message':'success',
                             'datas':{
                                 "account":user.account,
                                 "nickname":user.nickname,
@@ -1498,7 +1548,122 @@ function isAlive() {
     self.respond({code:1000, message:'isAlive'});
 }
 
+function isInWhiteList() {
+    var self = this;
+    if (self.user && self.user.inWhiteList) {
+        self.respond({code:1000, message:'true'});
+        return;
+    }
+    self.respond({code:1001, message:'false'});
+}
+
 function json_usertypes_get() {
     var self = this;
     self.respond({code: 1000, data: F.global.usertypes});
+}
+
+function process_add_potential_customer(){
+    var self = this;
+    if(!self.data.name){
+        self.respond({code:1001, message:'请输入姓名'});
+        return;
+    }
+
+    if(!self.data.phone || !tools.isPhone(self.data.phone.toString())){
+        self.respond({code:1001, message:'请输入正确的手机号'});
+        return;
+    }
+
+    if(typeof self.data.sex == 'undefined'){
+        self.respond({code:1001, message:'请输入性别'});
+        return;
+    }
+
+    if(typeof self.data.sex == 'string'){
+        self.data.sex = (self.data.sex === 'true');
+    }
+
+    if(!self.data.address || !self.data.address.province || !self.data.address.city){
+        self.respond({code:1001, message:'请选择省市'});
+        return;
+    }
+
+    if(!self.data.buyIntentions || !self.data.buyIntentions.length < 0){
+        self.respond({code:1001, message:'请选择意向商品'});
+        return;
+    }
+
+    PotentialCustomerService.add(self.user, self.data.name, self.data.phone, self.data.sex, self.data.address, self.data.buyIntentions, self.data.remarks, function(err){
+        if(err){
+            self.respond({code:1001, message:err});
+            return;
+        }
+
+        self.respond({code:1000, message:'success'});
+    })
+}
+
+function json_potential_customer(){
+    var self = this;
+    PotentialCustomerService.query(self.user, function(err, potentialCustomers){
+        if(err){
+            self.respond({code:1001, message:'获取潜在客户列表失败'});
+            return;
+        }
+
+        PotentialCustomerService.countLeftToday(self.user, function(err, count){
+            if(err){
+                self.respond({code:1001, message:'查询客户列表失败'});
+                return;
+            }
+
+            self.respond({code:1000, message:'success', potentialCustomers:potentialCustomers, countLeft:count});
+        })
+    })
+}
+
+function json_intention_products(){
+    var self = this;
+    IntentionProductService.query(function(err, products){
+        if(err){
+            self.respond({code:1001, message:'获取意向商品列表失败'});
+            return;
+        }
+
+        self.respond({code:1000, message:'success', intentionProducts:products});
+    })
+}
+
+function json_potential_customer_available(){
+    var self = this;
+    if(!self.data.phone || !tools.isPhone(self.data.phone.toString())){
+        self.respond({code:1001, message:'请填写正确的手机号'});
+        return;
+    }
+
+    PotentialCustomerService.isAvailable(self.data.phone, function(err, available, message){
+        if(err){
+            self.respond({code:1001, message:'获取失败'});
+            return;
+        }
+
+        self.respond({code:1000, available:available, message:message});
+    })
+}
+
+function json_potential_customer_get(){
+    var self = this;
+    if(!self.data._id){
+        self.respond({code:1001, message:'请填写_id'});
+        return;
+    }
+
+    PotentialCustomerService.getById(self.data._id, function(err, doc){
+        if(err){
+            self.respond({code:1001, message:'获取客户信息失败'});
+            return;
+        }
+
+        self.respond({code:1000, message:'success', potentialCustomer:doc});
+    })
 }

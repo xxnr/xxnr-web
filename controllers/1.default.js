@@ -21,6 +21,7 @@ exports.install = function() {
 
     F.middleware('isLoggedIn', middleware.isLoggedIn_middleware);
     F.middleware('backend_auth', middleware.backend_auth);
+    F.middleware('isInWhiteList', middleware.isInWhiteList_middleware);
 };
 
 var files = DB('files', null, require('total.js/database/database').BUILT_IN_DB).binary;

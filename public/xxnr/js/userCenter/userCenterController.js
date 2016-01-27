@@ -2,6 +2,11 @@
  * Created by pepelu on 2015/9/8.
  */
 var app = angular.module('user_center', ['xxnr_common', 'shop_cart']);
+app.filter('fixedTwo', function () {
+    return function(input) {
+      return input = input.toFixed(2);
+    };
+});
 app.controller('userCenterController', function($scope, $rootScope, remoteApiService, payService, loginService, commonService, fileUpload, sideService) {
     var user = commonService.user;
 
@@ -100,10 +105,10 @@ app.controller('userCenterController', function($scope, $rootScope, remoteApiSer
         isSelected: false
     }];
 
-    remoteApiService.getPointList(1, 10)
-        .then(function(data) {
-            $scope.user.points = data.datas.pointLaterTrade;
-        });
+    // remoteApiService.getPointList(1, 10)
+    //     .then(function(data) {
+    //         $scope.user.points = data.datas.pointLaterTrade;
+    //     });
 
     remoteApiService.getBasicUserInfo()
         .then(function(data) {
@@ -119,6 +124,7 @@ app.controller('userCenterController', function($scope, $rootScope, remoteApiSer
             $scope.user.sex = data.datas.sex;
             $scope.user.typeNum = data.datas.userType;
             $scope.user.isVerified = data.datas.isVerified;
+            $scope.user.points = data.datas.pointLaterTrade;
             switch (data.datas.userType) {
                 case '2':
                     $scope.user.type = "种植大户";
@@ -134,6 +140,14 @@ app.controller('userCenterController', function($scope, $rootScope, remoteApiSer
                     break;
                 default:
                     $scope.user.type = "其他";
+            }
+            // set user nickname to cookie
+            if (data && data.datas && data.datas.nickname) {
+                var cookieUser = loginService.getUser();
+                if (cookieUser) {
+                    cookieUser['nickName'] = encodeURIComponent(data.datas.nickname);
+                    loginService.setUser(cookieUser);
+                }
             }
         });
 
@@ -191,6 +205,14 @@ app.controller('userCenterController', function($scope, $rootScope, remoteApiSer
                                 $scope.user.nickname_editing = false;
                                 $scope.user.nickname_action_name = '修改';
                                 sweetalert('修改昵称成功', 'my_xxnr.html');
+                                // set user nickname to cookie
+                                if ($scope.user.nickname) {
+                                    var cookieUser = loginService.getUser();
+                                    if (cookieUser) {
+                                        cookieUser['nickName'] = encodeURIComponent($scope.user.nickname);
+                                        loginService.setUser(cookieUser);
+                                    }
+                                }
                             } else {
                                 //submit fail
                                 sweetalert(data.message);
@@ -204,7 +226,7 @@ app.controller('userCenterController', function($scope, $rootScope, remoteApiSer
         }
     };
 
-    var current_page = 1;
+    $scope.current_page = 1;
     $scope.pages_count = 0;
 
     var generate_page = function() {
@@ -219,7 +241,7 @@ app.controller('userCenterController', function($scope, $rootScope, remoteApiSer
             $scope.pages[0].isSelected = true;
         }
         for (var pageIndex in $scope.pages) {
-            if ($scope.pages[pageIndex].id == current_page) {
+            if ($scope.pages[pageIndex].id == $scope.current_page) {
                 $scope.pages[pageIndex].isSelected = true;
             } else {
                 $scope.pages[pageIndex].isSelected = false;
@@ -227,7 +249,7 @@ app.controller('userCenterController', function($scope, $rootScope, remoteApiSer
         }
     };
     $scope.show_page = function(pageId) {
-        current_page = pageId;
+        $scope.current_page = pageId;
         for (var pageIndex in $scope.pages) {
             if ($scope.pages[pageIndex].id == pageId) {
                 $scope.pages[pageIndex].isSelected = true;
@@ -245,24 +267,24 @@ app.controller('userCenterController', function($scope, $rootScope, remoteApiSer
     };
 
     $scope.pre_page = function() {
-        if (current_page > 1) {
-            current_page--;
-            $scope.show_page(current_page);
+        if ($scope.current_page > 1) {
+            $scope.current_page--;
+            $scope.show_page($scope.current_page);
         }
     };
     $scope.next_page = function() {
-        if (current_page < $scope.pages_count) {
-            current_page++;
-            $scope.show_page(current_page);
+        if ($scope.current_page < $scope.pages_count) {
+            $scope.current_page++;
+            $scope.show_page($scope.current_page);
         }
     };
 
 
     $scope.show = function(showTypeId, index, reset) {
         if (reset > 0) {
-            current_page = 1;
+            $scope.current_page = 1;
         };
-        remoteApiService.getOrderList(current_page, showTypeId)
+        remoteApiService.getOrderList($scope.current_page, showTypeId)
             .then(function(data) {
                 $scope.orderList = [];
                 $scope.pages_count = data.pages;
@@ -297,7 +319,8 @@ app.controller('userCenterController', function($scope, $rootScope, remoteApiSer
 
                     order.id = orders[i].id;
                     order.orderNo = orders[i].paymentId;
-                    order.totalPrice = orders[i].deposit.toFixed(2) || -1;
+                    order.totalPrice = orders[i].price.toFixed(2);
+                    // order.totalPrice = orders[i].deposit?orders[i].deposit.toFixed(2):orders[i].price;
                     switch (parseInt(orders[i].payType)) {
                         case 1:
                             order.payType = '支付宝支付';
@@ -314,21 +337,29 @@ app.controller('userCenterController', function($scope, $rootScope, remoteApiSer
                     order.phone = orders[i].consigneePhone;
                     order.deliveryTime = orders[i].dateDelivered;
                     order.createTime = orders[i].dateCreated;
+                    order.order = orders[i].order;
                     var d = new Date(commonService.parseDate(orders[i].dateCreated));
                     order.createTime_local = d.toLocaleString();
-                    if (orders[i].payStatus == 1 && !orders[i].isClosed) {
-                        order.statusName = '待付款';
+
+                    if(order.order.orderStatus.type == 1){
                         order.actionName = '去付款';
                         order.showAction = true;
                         order.action = function(order) {
                             window.location.href = "commitPay.html?id=" + order.id;
                         }
-                    } else if (orders[i].payStatus == 2 && orders[i].deliverStatus == 1) {
-                        order.statusName = '待发货';
+                    }else if(order.order.orderStatus.type == 2){
+                        order.actionName = '去付款';
+                        order.showAction = true;
+                        order.action = function(order) {
+                            window.location.href = "commitPay.html?id=" + order.id;
+                        }
+                    }else if(order.order.orderStatus.type == 3){
                         order.actionName = '联系客服';
                         order.showAction = false;
-                    } else if (orders[i].payStatus == 2 && orders[i].deliverStatus == 2 && !orders[i].confirmed) {
-                        order.statusName = '已发货';
+                    }else if(order.order.orderStatus.type == 4){
+                        order.actionName = '联系客服';
+                        order.showAction = false;
+                    }else if(order.order.orderStatus.type == 5){
                         order.actionName = '确认收货';
                         order.showAction = false;
                         order.action = function(order) {
@@ -340,22 +371,54 @@ app.controller('userCenterController', function($scope, $rootScope, remoteApiSer
                                 //    })
                             }
                         }
-                    } else if(orders[i].payStatus == 3){
-                        order.statusName = '部分付款';
-                        order.actionName = '去付款';
-                        order.showAction = true;
-                        order.action = function(order){
-                            window.location.href = "commitPay.html?id=" + order.id;
-                        }
-                    } else if (orders[i].confirmed) {
+                    }else if(order.order.orderStatus.type == 6){
                         order.showAction = false;
-                        order.statusName = '已完成';
                         order.actionName = '联系客服';
-                    } else {
+                    } else if(order.order.orderStatus.type == 7){
                         order.showAction = false;
-                        order.statusName = '已关闭';
                         order.actionName = '联系客服';
                     }
+
+                    // if (orders[i].payStatus == 1 && !orders[i].isClosed) {
+                    //     order.statusName = '待付款';
+                    //     order.actionName = '去付款';
+                    //     order.showAction = true;
+                    //     order.action = function(order) {
+                    //         window.location.href = "commitPay.html?id=" + order.id;
+                    //     }
+                    // } else if (orders[i].payStatus == 2 && orders[i].deliverStatus == 1) {
+                    //     order.statusName = '待发货';
+                    //     order.actionName = '联系客服';
+                    //     order.showAction = false;
+                    // } else if (orders[i].payStatus == 2 && orders[i].deliverStatus == 2 && !orders[i].confirmed) {
+                    //     order.statusName = '已发货';
+                    //     order.actionName = '确认收货';
+                    //     order.showAction = false;
+                    //     order.action = function(order) {
+                    //         if (confirm('确认收货')) {
+                    //             //remoteApiService.confirmReceipt(order.id)
+                    //             //    .then(function (data) {
+                    //             //        alert("确认订单成功");
+                    //             //        window.location.reload();
+                    //             //    })
+                    //         }
+                    //     }
+                    // } else if(orders[i].payStatus == 3){
+                    //     order.statusName = '部分付款';
+                    //     order.actionName = '去付款';
+                    //     order.showAction = true;
+                    //     order.action = function(order){
+                    //         window.location.href = "commitPay.html?id=" + order.id;
+                    //     }
+                    // } else if (orders[i].confirmed) {
+                    //     order.showAction = false;
+                    //     order.statusName = '已完成';
+                    //     order.actionName = '联系客服';
+                    // } else {
+                    //     order.showAction = false;
+                    //     order.statusName = '已关闭';
+                    //     order.actionName = '联系客服';
+                    // }
 
                     $scope.searchIndex[order.id] = $scope.orderList.push(order) - 1;
                 }

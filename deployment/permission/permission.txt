@@ -12,6 +12,18 @@
 /$manager/api/products/categories, get, super_admin, business_admin, product_op
 /$manager/api/products/category, post, super_admin, business_admin, product_op
 /$manager/api/products/attr/{attributeName}/, get, super_admin, business_admin, product_op
+/$manager/api/products/attribute/add/, post, super_admin, business_admin, product_op
+/$manager/api/products/attributes/, get, super_admin, business_admin, product_op
+
+#SKUs
+/$manager/api/v2.1/SKU/add/, post, super_admin, business_admin, product_op
+/$manager/api/v2.1/SKU/update/{id}/, post, super_admin, business_admin, product_op
+/$manager/api/v2.1/SKU/attribute/add/, post, super_admin, business_admin, product_op
+/$manager/api/v2.1/SKU/attributes/, get, super_admin, business_admin, product_op
+/$manager/api/v2.1/SKU/query/, get, super_admin, business_admin, product_op
+/$manager/api/v2.1/SKU/remove/{id}/, get, super_admin, business_admin, product_op
+/$manager/api/v2.1/SKU/additions/, get, super_admin, business_admin, product_op
+/$manager/api/v2.1/SKU/addition/add/, post, super_admin, business_admin, product_op
 
 #news
 /$manager/news/uploadImage, post, super_admin, news_editor
