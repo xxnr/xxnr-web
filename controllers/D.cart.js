@@ -84,7 +84,7 @@ function updateShoppingCart() {
                 }
             }
 
-            CartService.updateSKUItems(cart.cartId, SKU._id, count, update_by_add, additions || [], function (err) {
+            CartService.updateSKUItems(cart.cartId, SKU._id, count, update_by_add, additions, function (err) {
                 if (err) {
                     console.log(err);
                     self.respond({code: 1001, message: "更新购物车失败"});
