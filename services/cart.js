@@ -195,7 +195,7 @@ CartService.prototype.updateSKUItems = function(cartId, SKU_id, count, update_by
 
         // update by replace
         var setOptions = {$set: {'SKU_items.$.count': count}};
-        if (additions && additions.length > 0) {
+        if (additions && additions.length >= 0) {
             setOptions = {$set: {'SKU_items.$.count': count, 'SKU_items.$.additions': additions}};
         }
         CartModel.update({cartId: cartId, 'SKU_items.SKU': SKU_id}, setOptions, function (err, numAffected) {
@@ -228,7 +228,7 @@ CartService.prototype.updateSKUItems = function(cartId, SKU_id, count, update_by
             }
 
             var newSKUItem = {SKU: SKU_id, count: count, product: SKU.product};
-            if (additions && additions.length > 0) {
+            if (additions && additions.length >= 0) {
                 newSKUItem.additions = additions;
             }
 
@@ -237,7 +237,7 @@ CartService.prototype.updateSKUItems = function(cartId, SKU_id, count, update_by
                 // we first update those who's count is greater than -count, using $inc
                 var options = {$inc: {'SKU_items.$.count': count}};
                 options.$set = {'SKU_items.$.product': SKU.product};
-                if (additions && additions.length > 0) {
+                if (additions && additions.length >= 0) {
                     options.$set['SKU_items.$.additions'] = additions;
                 }
                 CartModel.update({
@@ -295,7 +295,7 @@ CartService.prototype.updateSKUItems = function(cartId, SKU_id, count, update_by
 
                     options = {$inc: {'SKU_items.$.count': count}};
                     options.$set = {'SKU_items.$.product': SKU.product};
-                    if (additions && additions.length > 0) {
+                    if (additions && additions.length >= 0) {
                         options.$set['SKU_items.$.additions'] = additions;
                     }
 

@@ -67,19 +67,21 @@ function updateShoppingCart() {
                 return;
             }
 
-            if (SKU && SKU.product.presale) {
-                self.respond({code: 1001, message: "无法添加预售商品"});
-                return;
-            }
+            if(count != 0) {
+                if (SKU && SKU.product.presale) {
+                    self.respond({code: 1001, message: "无法添加或修改预售商品"});
+                    return;
+                }
 
-            if (SKU && !SKU.product.online){
-                self.respond({code: 1001, message: "无法添加下架商品"});
-                return
-            }
+                if (SKU && !SKU.product.online) {
+                    self.respond({code: 1001, message: "无法添加或修改下架商品"});
+                    return
+                }
 
-            if(!SKU.online){
-                self.respond({code: 1001, message: "无法添加下架SKU"});
-                return
+                if (!SKU.online) {
+                    self.respond({code: 1001, message: "无法添加或修改下架SKU"});
+                    return
+                }
             }
 
             CartService.updateSKUItems(cart.cartId, SKU._id, count, update_by_add, additions || [], function (err) {
