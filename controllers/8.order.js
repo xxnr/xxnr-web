@@ -92,7 +92,11 @@ function getOders() {
                 }
                 item.order = orderInfo;
                 // for old web page
-                item.deposit = typeof(item.duePrice) != 'undefined' ? parseFloat(item.duePrice.toFixed(2)) : parseFloat(item.deposit.toFixed(2));
+                if (item.payStatus == PAYMENTSTATUS.PAID) {
+                    item.deposit = typeof(item.price) != 'undefined' ? parseFloat(item.price.toFixed(2)) : parseFloat(item.deposit.toFixed(2));
+                } else {
+                    item.deposit = typeof(item.duePrice) != 'undefined' ? parseFloat(item.duePrice.toFixed(2)) : parseFloat(item.deposit.toFixed(2));
+                }
             }
             self.respond(data);
         } else {
