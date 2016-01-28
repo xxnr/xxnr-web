@@ -1050,7 +1050,7 @@
 //					break;
 				case 'addition':
 					var additions = [];
-					el.attr('checked', true);
+					el.attr('checked', !el.attr('checked'));
 					var existAdditions = [];
 					$('.SKUAdditions input').each(function(index){
 						var id = $(this).attr('data_SKU_id');
