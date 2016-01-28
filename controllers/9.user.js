@@ -164,7 +164,13 @@ function process_login() {
         user.isVerified = data.isVerified;
         user.isUserInfoFullFilled = data.isUserInfoFullFilled;
         user.verifiedTypes = data.typeVerified;
-
+        user.userTypeInName = F.global.usertypes[user.userType] || '其他';
+        if (user.verifiedTypes) {
+            user.verifiedTypesInJson = [];
+            user.verifiedTypes.forEach(function(type){
+                user.verifiedTypesInJson.push({typeId:type, typeName: F.global.usertypes[type] || '其他'});
+            });
+        }
         CartService.getOrAdd(user.userid, function(err, cart){
             if(err){
                 self.respond({code:1001, message:'获取购物车id失败'});
@@ -423,7 +429,14 @@ function json_user_get() {
         user.address = data.address;
         user.isVerified = data.isVerified;
         user.isUserInfoFullFilled = data.isUserInfoFullFilled;
-        user.verifiedTypes = data.typeVerified;
+        user.verifiedTypes = data.typeVerified || [];
+        user.userTypeInName = F.global.usertypes[user.userType] || '其他';
+        if (user.verifiedTypes) {
+            user.verifiedTypesInJson = [];
+            user.verifiedTypes.forEach(function(type){
+                user.verifiedTypesInJson.push({typeId:type, typeName: F.global.usertypes[type] || '其他'});
+            });
+        }
         if (data.inviter) {
             user.inviterId = data.inviter.id;
             user.inviter = data.inviter.account;
@@ -1598,7 +1611,14 @@ function json_potential_customer(){
             return;
         }
 
-        self.respond({code:1000, message:'success', potentialCustomers:potentialCustomers});
+        PotentialCustomerService.countLeftToday(self.user, function(err, count){
+            if(err){
+                self.respond({code:1001, message:'查询客户列表失败'});
+                return;
+            }
+
+            self.respond({code:1000, message:'success', potentialCustomers:potentialCustomers, countLeft:count});
+        })
     })
 }
 

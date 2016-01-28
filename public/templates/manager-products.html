@@ -48,27 +48,29 @@
 	</div>
 </div>
 
-<div data-component="form" data-title="@(新增商品)" data-component-path="common.form" data-if="value === 'products'" data-width="1500px" data-component-id="products.form">
-	<div data-component="visible" data-component-path="products.form.id">
-		<div data-component="template" data-component-path="products.form" class="padding" style="padding-bottom:0">
-			<script type="text/html">
-				<table class="table table-bordered" border="0">
-					<tbody>
-					<tr>
-						<td class="col-xs-5 active">@(# id)</td>
-						<td>{{ id }}</td>
-					</tr>
-					<tr>
-						<td class="col-xs-5 active">@(Created)</td>
-						<td>{{ datecreated | format('yyyy-MM-dd') }}</td>
-					</tr>
-					</tbody>
-				</table>
-			</script>
+<div data-component="form" data-title="@(新增商品)" data-component-path="common.form" data-if="value === 'products'" data-width="1200px" data-component-id="products.form">
+	<div class="padding">
+		<div data-component="visible" data-component-path="products.form.id">
+			<div data-component="template" data-component-path="products.form" class="padding" style="padding-bottom:0">
+				<script type="text/html">
+					<table class="table table-bordered" border="0">
+						<tbody>
+						<tr>
+							<td class="col-xs-5 active">@(# id)</td>
+							<td>{{ id }}</td>
+						</tr>
+						<tr>
+							<td class="col-xs-5 active">@(Created)</td>
+							<td>{{ datecreated | format('yyyy-MM-dd') }}</td>
+						</tr>
+						</tbody>
+					</table>
+				</script>
+			</div>
 		</div>
 	</div>
 
-	<div class="padding productinfo" style="padding-bottom:0">
+	<div class="productinfo" style="padding-bottom:0">
 		<div class="row">
 			<div class="col-md-2 m">
 				<h3 class="ui-center">@(商品属性)</h3>
@@ -114,7 +116,7 @@
 		</div>
 	</div>
 	<hr>
-	<div class="padding" style="padding-bottom:0">
+	<div>
 		<div class="row">
 			<div class="col-md-2 m">
 				<h3 class="ui-center">@(基本信息)</h3>
@@ -144,31 +146,29 @@
 	</div>
 	<hr>
 	<div>
-		<div class="row">
-			<div class="col-md-2 m">
-				<h3 class="ui-center">@(SKU)</h3>
-			</div>
+		<div class="silver padding" style="padding-bottom: 0px;padding-top: 0px;">
+			<h3>@(SKU)</h3>
 		</div>
-		<div data-component="template" class="padding" data-component-path="products">
+		<div data-component="template" class="padding" data-component-path="products" style="padding-top: 0px;">
 			<script type="text/html">
 				<table class="table table-bordered" border="0">
 					<tr>
-						<td class="col-xs-1 hidden-xs ui-center nopadding">@(序号)</td>
+						<td class="hidden-xs ui-center nopadding">@(序号)</td>
 						{{ foreach SKUAttribute in SKUAttributes}}
-						<td class="col-xs-1 hidden-xs ui-center nopadding">{{SKUAttribute.name}}</td>
+						<td class="hidden-xs ui-center">{{SKUAttribute.name}}</td>
 						{{ end }}
-						<td class="col-xs-2 hidden-xs ui-center">@(附加项目)</td>
-						<td class="col-xs-1 hidden-xs ui-center nopadding">@(市场价)</td>
-						<td class="col-xs-1 hidden-xs ui-center nopadding">@(平台价)</td>
+						<td class="col-xs-3 hidden-xs ui-center">@(附加项目)</td>
+						<td class="col-xs-1 hidden-xs ui-center">@(市场价)</td>
+						<td class="col-xs-1 hidden-xs ui-center">@(平台价)</td>
 						<td class="col-xs-2 hidden-xs ui-center nopadding">@(操作)</td>
 					</tr>
 					{{ foreach SKU in SKUs }}
 					<tr class="SKU">
-						<td class="col-xs-1 hidden-xs ui-center nopadding">
+						<td class="hidden-xs ui-center nopadding">
 							<h6 class="nopadding">{{$index+1}}</h6>
 						</td>
 						{{ foreach attribute in SKUAttributes}}
-						<td class="col-xs-1 hidden-xs ui-center nopadding">
+						<td class="hidden-xs ui-center">
 							<select data-index="{{$index}}" data_SKU_id="{{SKU._id}}">
 								<option selected disabled hidden value=''></option>
 								{{ foreach value in SKUQueryAttributes[attribute.name] }}
@@ -190,7 +190,7 @@
 							</select>
 						</td>
 						{{ end }}
-						<td class="col-xs-2 hidden-xs ui-center SKUAdditions">
+						<td class="col-xs-3 hidden-xs ui-center SKUAdditions">
 							<div class="multiselect">
 								<div class="selectBox" onclick="showCheckboxes({{$index}})">
 									<select>
@@ -216,8 +216,8 @@
 												{{ fi }}
 												/></td>
 											<td class="col-xs-4 ui-left nopadding"><h6 class="nopadding">{{addition.name}}</h6></td>
-											<td class="col-xs-5 nopadding"><h6 class="nopadding">加价（元）：</h6></td>
-											<td class="col-xs-2 ui-right nopadding"><h6 class="nopadding">{{addition.price}}</h6></td>
+											<td class="col-xs-4 nopadding"><h6 class="nopadding">加价（元）：</h6></td>
+											<td class="col-xs-3 ui-right nopadding"><h6 class="nopadding">{{addition.price}}</h6></td>
 										</tr>
 									</label>
 									{{ end }}
@@ -225,15 +225,15 @@
 								</div>
 							</div>
 						</td>
-						<td class="col-xs-1 hidden-xs ui-center nopadding">
+						<td class="col-xs-1 hidden-xs ui-center">
 							<input size="10" data_SKU_id="{{SKU._id}}" name="market_price" value="{{SKU.price.market_price}}"/>
 						</td>
-						<td class="col-xs-1 hidden-xs ui-center nopadding">
+						<td class="col-xs-1 hidden-xs ui-center">
 							<input size="10" data_SKU_id="{{SKU._id}}" name="platform_price" value="{{SKU.price.platform_price}}"/>
 						</td>
 						<td class="col-xs-2 hidden-xs ui-center nopadding">
 							{{ if SKU._id }}
-							<button name="ensure" onclick="update_SKU({{$index}})">@(提交修改)</button>
+							<button name="ensure" onclick="update_SKU({{$index}})">@(提交)</button>
 							{{ if SKU.online }}
 							<button name="offline" title="@(下架)" onclick="online_SKU('{{$index}}', false)"><span class="fa fa-stop"></span></button>
 							{{ else }}
@@ -241,20 +241,20 @@
 							{{ fi }}
 							<button name="copy" onclick="copy_SKU({{$index}})">@(复制)</button>
 							{{ else }}
-							<button name="new_SKU" onclick="add_SKU({{$index}})">@(确认添加)</button>
+							<button name="new_SKU" onclick="add_SKU({{$index}})">@(添加)</button>
 							<button name="cancel_new_SKU" onclick="cancel_new_SKU({{$index}})">@(取消)</button>
 							{{ fi }}
 						</td>
 					</tr>
 					{{ end }}
 					<tr class="new_SKU">
-						<td class="col-xs-1 hidden-xs ui-center">
+						<td class="col-xs-1 hidden-xs ui-center nopadding">
 							<a href="javascript:void(0)" onclick="new_SKU_in_page()">
-								<span class="fa fa-plus-circle">@(添加SKU)</span>
+								<span class="fa fa-plus-circle">@(SKU)</span>
 							</a>
 						</td>
 						{{ foreach attribute in SKUAttributes}}
-						<td class="col-xs-1 hidden-xs ui-center new_SKU_attribute">
+						<td class="hidden-xs ui-center new_SKU_attribute">
 							<div class="ui-textbox-with-button new_attribute">
 								<input class="col-md-9 nopadding" type="text"/>
 								<a class="col-md-2 account nopadding" href="javascript:void(0)" onclick="new_sku_attribute('{{attribute.name}}', {{$index}})">
@@ -263,11 +263,11 @@
 							</div>
 						</td>
 						{{ end }}
-						<td class="col-xs-2 hidden-xs ui-center new_SKU_addition">
+						<td class="col-xs-3 hidden-xs ui-center new_SKU_addition">
 							<div class="ui-textbox-with-button new_attribute">
 								<input class="col-md-4 nopadding h6" type="text"/>
-								<div class="col-md-3 nopadding"><h6 class="nopadding">@(加价(元):)</h6></div>
-								<input class="col-md-4 nopadding h6" type="text"/>
+								<div class="col-md-4 nopadding"><h6 class="nopadding">@(加价(元):)</h6></div>
+								<input class="col-md-3 nopadding h6" type="text"/>
 								<a class="col-md-1 account nopadding" href="javascript:void(0)" onclick="new_SKU_addition()">
 									<span class="fa fa-plus-circle"></span>
 								</a>
@@ -281,7 +281,7 @@
 			</script>
 		</div>
 	</div>
-	<hr>
+	<br>
 	<div class="padding bg-smoke">
 		<div class="row">
 			<div class="col-md-2 m">
@@ -1001,7 +1001,18 @@
 			var value = el.val();
 			products.SKUs.forEach(function(SKU){
 				if(SKU._id == SKU_id || (typeof SKU._id == 'undefined' && SKU_id=="")){
-					SKU.attributes[attributeIndex] = {ref:ref, name:name, value:value, order:order};
+					var SKUSaved = false;
+					for(var j=0; j<SKU.attributes.length; j++){
+						if(name == SKU.attributes[j].name){
+							SKU.attributes[j] = {ref:ref, name:name, value:value, order:order};
+							SKUSaved = true;
+						}
+					}
+
+					if(!SKUSaved){
+						SKU.attributes.push({ref:ref, name:name, value:value, order:order});
+					}
+
 					if(!products.SKUExistAttributes[SKU._id]){
 						products.SKUExistAttributes[SKU._id]=[];
 					}
@@ -1085,6 +1096,8 @@
 		SKU.attributes.forEach(function(attribute){
 			products.SKUExistAttributes[SKU._id][attribute.name] = {ref:attribute.ref, value:attribute.value};
 		});
+
+
 
 		// initial additions
 		products.SKUExistAdditions[SKU._id]=[];

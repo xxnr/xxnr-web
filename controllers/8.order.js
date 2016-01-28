@@ -55,7 +55,7 @@ function getOdersList(callback) {
 
 	OrderService.query(options, function(err, data) {
         if (err) {
-            console.log('Order getOrdersList err:' + err);
+            console.error('Order getOrdersList err:', err);
             callback();
             return;
         }
@@ -91,6 +91,12 @@ function getOders() {
                     orderInfo.dateCompleted = item.dateCompleted;
                 }
                 item.order = orderInfo;
+                // for old web page
+                if (item.payStatus == PAYMENTSTATUS.PAID) {
+                    item.deposit = typeof(item.price) != 'undefined' ? parseFloat(item.price.toFixed(2)) : parseFloat(item.deposit.toFixed(2));
+                } else {
+                    item.deposit = typeof(item.duePrice) != 'undefined' ? parseFloat(item.duePrice.toFixed(2)) : parseFloat(item.deposit.toFixed(2));
+                }
             }
             self.respond(data);
         } else {
@@ -137,13 +143,13 @@ function api10_getOders() {
                     'recipientName':item.consigneeName,
                     'recipientPhone':item.consigneePhone,
                     'typeLable':'',
-                    'deposit': item.duePrice ? item.duePrice.toFixed(2) : item.deposit.toFixed(2),
+                    'deposit': typeof(item.duePrice) != 'undefined' ? item.duePrice.toFixed(2) : item.deposit.toFixed(2),
                     'payType':item.payType,
                     'order': orderInfo,
                     'products': item.products || [],
                     'SKUs':item.SKUs || [],
                     'subOrders': item.subOrders || [],
-                    'duePrice': item.duePrice ? item.duePrice.toFixed(2) : null,
+                    'duePrice': typeof(data.duePrice) != 'undefined' ? item.duePrice.toFixed(2) : null,
                 };
 
                 if(arr[i].SKUs && arr[i].SKUs.length > 0){
@@ -353,7 +359,7 @@ function updateOrderPaytype() {
 
     OrderService.get({'buyer':buyer,'id':orderid}, function(err, data, payment) {
         if (err || !data) {
-            if (err) console.log('Order updateOrderPaytype err:' + err);
+            if (err) console.error('Order updateOrderPaytype err:', err);
             self.respond({'code':'1001','message':'未查询到订单'});
             return;
         }
@@ -365,14 +371,14 @@ function updateOrderPaytype() {
             if (!paymentid && data && data.paymentId) {
                 paymentid = data.paymentId;
             } else {
-                console.log('Order updateOrderPaytype err:' + err);
+                console.error('Order updateOrderPaytype err:', err);
                 self.respond({'code':'1001','message':'未查询到订单'});
                 return;
             }
         }
         OrderService.updatepayType({'paytype':paytype,'orderid':orderid,'paymentid':paymentid}, function(err) {
             if(err) {
-                console.log('Order updateOrderPaytype err:' + err);
+                console.error('Order updateOrderPaytype err:', err);
                 self.respond({'code':'1001','message':'修改支付方式出错'});
                 return;
             }
@@ -390,14 +396,14 @@ function confirmOrder() {
 
     OrderService.get({'buyer':buyer,'id':orderid}, function(err, data) {
         if (err || !data) {
-            if (err) console.log('Order confirmOrder err:' + err);
+            if (err) console.error('Order confirmOrder err:', err);
             self.respond({'code':'1001','message':'未查询到订单'});
             return;
         }
         if (data && data.deliverStatus === DELIVERSTATUS.DELIVERED && data.payStatus === PAYMENTSTATUS.PAID && !data.confirmed) {
             OrderService.confirm(orderid, function(err) {
                 if(err) {
-                    console.log('Order confirmOrder err:' + err);
+                    console.error('Order confirmOrder err:', err);
                     self.respond({'code':'1001','message':'确认订单出错'});
                     return;
                 }
@@ -423,7 +429,7 @@ function getOrder(callback) {
 
     OrderService.get({'buyer':buyer,'id':orderid}, function(err, data, returnPayment) {
         if (err) {
-            console.log('Order getOrder err:' + err);
+            console.error('Order getOrder err:', err);
             callback(err);
         } else {
             if (data) {
@@ -496,7 +502,7 @@ function api10_getOrderDetails() {
     getOrder.call(this, function(err, data, payment) {
         var result = {};
         if (err) {
-            console.log('Order api10_getOrderDetails err:' + err);
+            console.error('Order api10_getOrderDetails err:', err);
         }
         if (data) {
             var paymentId           = payment && payment.id ? payment.id : data.paymentId;
@@ -675,7 +681,10 @@ function addOrderBySKU(){
                     var additionPrice = 0;
                     additions.forEach(function(addition){
                         additionPrice += addition.price;
-                        addition.ref = addition._id;
+                        if(!additions.ref) {
+                            addition.ref = addition._id;
+                        }
+                        
                         delete addition._id;
                     });
                     var SKU_to_add = {};
@@ -690,7 +699,10 @@ function addOrderBySKU(){
                     SKU_to_add.count = cart.SKU_items[i].count;
                     SKU_to_add.category = product.category;
                     SKU_to_add.attributes = SKU.attributes;
-                    SKU_to_add.additions = additions;
+                    if(additions && additions.length > 0) {
+                        SKU_to_add.additions = additions;
+                    }
+
                     if (SKU_to_add.deposit) {
                         if (!orders['deposit']) {
                             orders['deposit'] = {
@@ -742,11 +754,14 @@ function addOrderBySKU(){
                 if (orders && keys.length > 0) {
                     var order1, order2;
                     if (orders['deposit']) {
+                        orders['deposit'].duePrice = orders['deposit'].deposit;
                         order1 = orders['deposit'];
                         if (orders['full']) {
+                            orders['full'].duePrice = orders['full'].price;
                             order2 = orders['full'];
                         }
                     } else if (orders['full']) {
+                        orders['full'].duePrice = orders['full'].price;
                         order1 = orders['full'];
                     }
                     if (order1) {

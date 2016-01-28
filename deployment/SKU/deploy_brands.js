@@ -55,7 +55,7 @@ module.exports = function(callback) {
 
                 Promise.all(supplierPromises)
                     .then(function(){
-                        var newBrand = new BrandModel({name:brandName, category: category, suppliers:supplier_to_insert});
+                        var newBrand = new BrandModel({name:brandName, categories: [category], suppliers:supplier_to_insert});
                         newBrand.save(function(err){
                             if(err){
                                 if(11000 == err.code){
