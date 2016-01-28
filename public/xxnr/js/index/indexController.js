@@ -26,10 +26,10 @@ app.controller('indexController', function($scope, remoteApiService, commonServi
 
         // show 化肥 first
         data.categories.sort(function(a,b){
-            if(a.name=='化肥'){
+            if(a.name=='汽车'){
                 return -1;
             }
-            if(b.name=='化肥'){
+            if(b.name=='汽车'){
                 return 1;
             }
         });
@@ -58,9 +58,9 @@ app.controller('indexController', function($scope, remoteApiService, commonServi
                         var product = data.products[i];
                         var item = {};
                         item.discount = product.discount || 1.0;
-                        item.name = product.name;
-                        item.id = product.id;
-                        item.shortName = item.name.length > 28 ? (item.name.substr(0, 22) + '...') : item.name;
+                        item.name = product.defaultSKU.name;
+                        item.id = product.defaultSKU.ref;
+                        item.shortName = item.name.length > 36 ? (item.name.substr(0, 33) + '...') : item.name;
                         item.detailUrl = 'productDetail.html?id=' + product.id;
                         item.imgUrl = commonService.baseUrl + product.thumbnail;
                         item.price = product.price;
@@ -80,7 +80,7 @@ app.controller('indexController', function($scope, remoteApiService, commonServi
 
     $scope.index_AddToShoppingCart = function(id,presale,event){
         if(!presale){
-            remoteApiService.addToShoppingCart(id, 1, true)
+            remoteApiService.addToShoppingCart(id, 1,[] ,true)
                 .then(function(data){
                     if(data.code == 1000){
                         //console.log(id);

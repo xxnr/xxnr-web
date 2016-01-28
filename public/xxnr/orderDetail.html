@@ -189,24 +189,47 @@
                                                         </a>
                                                     </li>
                                                     <li class="p-name">
-                                                        <a ng-href="productDetail.html?goodsId={{product.goodsId}}" class="ng-cloak" target="_blank">{{product.goodsName}}</a>
+                                                        <a ng-if="!product.attributes" ng-href="productDetail.html?goodsId={{product.goodsId}}" class="ng-cloak" target="_blank">{{product.goodsName}}</a>
+                                                        <a ng-if="product.attributes" ng-href="productDetail.html?goodsId={{product.goodsId}}" class="ng-cloak" target="_blank">{{product.productName}}</a>
+                                                        <div class="p-skus" ng-if="product.attributes">
+                                                            <ul>
+                                                                <li ng-repeat="attribute in product.attributes">
+                                                                    {{attribute.name}}:{{attribute.value}};
+                                                                </li>
+                                                                <li class="additions">
+                                                                    <!-- <ul ng-if="product.addition"> -->
+                                                                    <ul ng-if="product.additions">
+                                                                    附加项目:
+                                                                        <li ng-repeat="addition in product.additions">
+                                                                            {{addition.name}}&nbsp;
+                                                                        </li>
+                                                                    </ul>
+                                                                </li>
+
+                                                            </ul>
+                                                        </div>
                                                     </li>
                                                     <li class="p-delivery ng-cloak">
                                                         {{product.deliverStatus | deliverStatusToChineseWording}}
                                                     </li>
                                                     <li class="p-price ng-cloak">
-                                                        <p ng-cloak>{{product.unitPrice}}</p>
+                                                        <p ng-if="product.attributes" ng-cloak>{{product.price}}</p>
+                                                        <p ng-if="!product.attributes" ng-cloak>{{product.unitPrice}}</p>
                                                     </li>
                                                     <li class="p-quantity ng-cloak">
-                                                        {{product.goodsCount}}
+                                                        <span ng-if="!product.attributes">{{product.goodsCount}}</span>
+                                                        <span ng-if="product.attributes">{{product.count}}</span>
                                                     </li>
                                                     <li class="p-total ng-cloak">
-                                                        <p>{{(product.unitPrice*product.goodsCount).toFixed(2)}}</p>
+                                                        <p ng-if="!product.attributes">{{(product.unitPrice*product.goodsCount).toFixed(2)}}</p>
+                                                        <p ng-if="product.attributes">{{(product.price*product.count).toFixed(2)}}</p>
                                                     </li>
                                                 </ul>
                                                 <div class="pay-step" ng-show="{{product.deposit>0}}">
-                                                    <div class="pay-step-1"><span class="text-info">阶段一：订金</span><span class="pay-step-1-price">{{product.deposit | toNumberFixedTwo}}</span><span class="product_count">{{product.goodsCount}}</span><span class="sum">{{(product.deposit*product.goodsCount) | toNumberFixedTwo}}</span></div>
-                                                    <div class="pay-step-2"><span class="text-info">阶段二：尾款</span><span class="pay-step-2-price">{{(product.unitPrice-product.deposit) | toNumberFixedTwo}}</span><span class="product_count">{{product.goodsCount}}</span><span class="sum">{{((product.unitPrice-product.deposit)*product.goodsCount) | toNumberFixedTwo}}</span></div>
+                                                    <div ng-if="!product.attributes" class="pay-step-1"><span class="text-info">阶段一：订金</span><span class="pay-step-1-price">{{product.deposit | toNumberFixedTwo}}</span><span class="product_count">{{product.goodsCount}}</span><span class="sum">{{(product.deposit*product.goodsCount) | toNumberFixedTwo}}</span></div>
+                                                    <div ng-if="!product.attributes" class="pay-step-2"><span class="text-info">阶段二：尾款</span><span class="pay-step-2-price">{{(product.unitPrice-product.deposit) | toNumberFixedTwo}}</span><span class="product_count">{{product.goodsCount}}</span><span class="sum">{{((product.unitPrice-product.deposit)*product.goodsCount) | toNumberFixedTwo}}</span></div>
+                                                    <div ng-if="product.attributes" class="pay-step-1"><span class="text-info">阶段一：订金</span><span class="pay-step-1-price">{{product.deposit | toNumberFixedTwo}}</span><span class="product_count">{{product.count}}</span><span class="sum">{{(product.deposit*product.count) | toNumberFixedTwo}}</span></div>
+                                                    <div ng-if="product.attributes" class="pay-step-2"><span class="text-info">阶段二：尾款</span><span class="pay-step-2-price">{{(product.price-product.deposit) | toNumberFixedTwo}}</span><span class="product_count">{{product.count}}</span><span class="sum">{{((product.price-product.deposit)*product.count) | toNumberFixedTwo}}</span></div>
                                                 </div>
                                             </li>
                                         </ul>

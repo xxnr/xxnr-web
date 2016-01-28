@@ -79,7 +79,7 @@ app.controller('categoryController', function($scope, remoteApiService, commonSe
 
                     item.onSale = (good.unitPrice == null || good.unitPrice == '')? false:good.unitPrice!=good.originalPrice;
                     item.name = good.goodsName;
-                    item.shortName = item.name.length>28?(item.name.substr(0, 22) + '...') : item.name;
+                    item.shortName = item.name.length>28?(item.name.substr(0, 20) + '...') : item.name;
                     item.detailUrl = 'productDetail.html?goodsId='+good.goodsId;
                     item.imgUrl = commonService.baseUrl + good.thumbnail;
                     item.nowPrice = item.onSale?good.unitPrice:good.originalPrice;

@@ -100,12 +100,12 @@
                     </p>
                     <p>所在地区：{{user.address}}</p>
                     <p class="type">类型：{{user.type}}
-                        <img class="huizhang" ng-if="user.isVerified" src="images/huiyuan.png" alt="" /><a href="fillProfile.html">修改资料<img src="images/right-button.png" alt=""/></a></p>
+                        <img class="huizhang" ng-if="user.isVerified" src="images/huiyuan.png" alt="" /><a href="fillProfile.html">修改资料<img src="images/right-button2.png" alt=""/></a></p>
                 </div>
                 <div class="needToFillProfile ng-hide" ng-hide="user.isUserInfoFullFilled">
                     还没有完善资料哟，快去填写领积分！<a href="fillProfile.html">去完善资料<img src="images/right-button.png" alt=""/></a>
                 </div>
-                <p ng-cloak><a href="" ng-click="showModifyPwd()">修改密码</a></p>
+                <p ng-cloak><a href="" ng-click="showModifyPwd()" class="modifyPassword">修改密码</a></p>
             </div>
             <div class="jifen">
                 <p class="total">总积分：</p>
@@ -128,7 +128,7 @@
                     </ul>
                     <ul class="order-titles">
                         <li>商品详情</li>
-                        <li>单价</li>
+                        <li>单价（元）</li>
                         <li>数量</li>
                         <li>合计（元）</li>
                         <li>状态</li>
@@ -144,7 +144,7 @@
                                 <div class="products-section">
                                     <ul>
                                         <li class="product clearfix" ng-repeat="product in order.products">
-                                            <div class="p-info ng-cloak">
+                                            <div class="p-info ng-cloak clearfix">
                                                 <div class="product-row">
                                                     <div class="p-img">
                                                         <a ng-href="productDetail.html?goodsId={{product.id}}" target="_blank">
@@ -152,7 +152,25 @@
                                                         </a>
                                                     </div>
                                                     <div class="p-name">
-                                                        <a class="ng-cloak" ng-href="productDetail.html?goodsId={{product.id}}" ng-cloak target="_blank">{{product.name}}</a>
+                                                        <a ng-hide="product.productName" class="ng-cloak" ng-href="productDetail.html?goodsId={{product.id}}" ng-cloak target="_blank">{{product.name}}</a>
+                                                        <a ng-show="product.productName" class="ng-cloak" ng-href="productDetail.html?goodsId={{product.id}}" ng-cloak target="_blank">{{product.productName}}</a>
+                                                        <div class="p-skus clearfix" ng-if="product.attributes">
+                                                            <ul>
+                                                                <li ng-repeat="attribute in product.attributes">
+                                                                    {{attribute.name}}:{{attribute.value}};&nbsp;
+                                                                </li>
+                                                                <li class="additions">
+                                                                    <ul ng-if="product.additions">
+                                                                    <!-- <ul> -->
+                                                                    附加项目:
+                                                                        <li ng-repeat="addition in product.additions">
+                                                                            {{addition.name}}&nbsp;
+                                                                        </li>
+                                                                    </ul>
+                                                                </li>
+
+                                                            </ul>
+                                                        </div>
                                                     </div>
                                                     <div class="p-price">
                                                         <!-- <p class="now" class="ng-cloak">¥{{product.deposit?product.deposit.toFixed(2):product.price.toFixed(2)}}{{product.deposit?"(订金)":""}}</p> -->
@@ -179,10 +197,11 @@
                                     </div>
                                     <div class="pay-status">
                                         <p class="order-statusName" ng-cloak>{{order.order.orderStatus.value}}</p>
-                                        <p class="order-detail" ng-cloak><a ng-href="orderDetail.html?id={{order.id}}" target="_blank">订单详情</a></p>
+                                        <!-- <p class="duePrice" ng-show="order.duePrice">待付金额：￥{{order.duePrice.toFixed(2)}}</p> -->
                                     </div>
                                     <div class="pay-action">
                                         <p ng-show="{{order.showAction}}" ng-cloak><a href='' ng-click='order.action(order)' class="order-actionName">{{order.actionName}}</a></p>
+                                        <p class="order-detail" ng-cloak><a ng-href="orderDetail.html?id={{order.id}}" target="_blank">订单详情</a></p>
                                     </div>
                                 </div>
                             </div>
