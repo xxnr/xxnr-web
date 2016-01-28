@@ -69,7 +69,7 @@
         <a href="/">首页</a> ／ <a href="" id="productType" ng-click="product_category()" ng-cloak>{{category}}</a> ／ <a href="#" id="product_title" ng-cloak>{{item.name}}</a>
     </p>
     <div class="wrap ng-hide" ng-show="initDisplay">
-        <div class="product_detail clearfix">
+        <div class="product_detail">
             <div class="product_img_slider">
                 <img class="mainImage" ng-repeat="imgUrl in item.imgUrls" ng-show="isActive($index)" ng-swipe-right="showPrev()" ng-swipe-left="showNext()" ng-src={{imgUrl}} alt="">
                 <ul class="imgNav row">
@@ -91,11 +91,11 @@
                     <!--</ul>-->
                     <ul class="price_list">
                         <li class="ng-cloak" ng-hide="item.presale">新农价：</li>
-                        <li class="price">{{'￥'+item.minPrice}} {{item.maxPrice==item.minPrice?"":"-"}} {{(item.maxPrice==item.minPrice?"":item.maxPrice)}}</li>
+                        <li class="price" ng-hide="item.presale">{{'￥'+item.minPrice}} {{item.maxPrice==item.minPrice?"":"-"}} {{(item.maxPrice==item.minPrice?"":item.maxPrice)}}</li>
                         <li class="ng-cloak price" ng-show="item.presale" ng-class="{true: 'presale',}[item.presale]">即将上线</li>
-                        <li ng-show="category=='化肥' && !item.presale" class="ng-cloak unitText">/吨</li>
-                        <li ng-show="item.deposit">预付定金：</li>
-                        <li class="price" ng-show="item.deposit" ng-cloak>￥{{item.deposit}}</li>
+                        <!-- <li ng-show="category=='化肥' && !item.presale" class="ng-cloak unitText">/吨</li> -->
+                        <li ng-show="item.deposit && item.online && !item.presale">预付定金：</li>
+                        <li class="price" ng-show="item.deposit && item.online && !item.presale" ng-cloak>￥{{item.deposit}}</li>
                     </ul>
                     <p ng-show="!item.online" class="offline-text">商品下架了</p>
                     <div ng-show="item.online" class="SKUAttributes" ng-class="{true:'needToSelect'}[needToSelectMoreSKU]">
@@ -115,11 +115,13 @@
                                     </ul>
                                 </div>
                             </li>
-                            <li class="SKUAdditions-title" ng-if="item.SKUAdditions">附加项目</li>
-                            <div class="SKUAdditions-options" ng-if="item.SKUAdditions">
-                                <ul class="row">
-                                    <li class="SKUAdditions-option" ng-repeat="SKUAddition in item.SKUAdditions" ng-click="selectAddition($index)" ng-class="{'selected':SKUAddition.isSelected==true}"><img ng-show="SKUAddition.isSelected" src="images/choose.png" alt="">{{SKUAddition.name}}（ +{{SKUAddition.price}} ）</li>
-                                </ul>
+                            <div ng-if="isAllSKUSelected() && item.SKUAdditions">
+                                <li class="SKUAdditions-title">附加项目</li>
+                                <div class="SKUAdditions-options" ng-if="item.SKUAdditions">
+                                    <ul class="row">
+                                        <li class="SKUAdditions-option" ng-repeat="SKUAddition in item.SKUAdditions" ng-click="selectAddition($index)" ng-class="{'selected':SKUAddition.isSelected==true}"><img ng-show="SKUAddition.isSelected" src="images/choose.png" alt="">{{SKUAddition.name}}（ +{{SKUAddition.price}} ）</li>
+                                    </ul>
+                                </div>
                             </div>
                             <li class="count" ng-hide="blockBuying">
                                 <span class="count-title">数量</span>

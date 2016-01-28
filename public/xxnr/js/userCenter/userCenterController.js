@@ -35,7 +35,7 @@ app.controller('userCenterController', function($scope, $rootScope, remoteApiSer
     };
 
     $scope.confirmUploadAvatar = function() {
-        console.log($rootScope.uploaded);
+        // console.log($rootScope.uploaded);
         if ($rootScope.uploaded) {
             var newImageUrl = fileUpload.getNewImageUrl();
             var newImageName = newImageUrl.substr(newImageUrl.lastIndexOf('/') + 1, newImageUrl.length - 1);
@@ -301,7 +301,11 @@ app.controller('userCenterController', function($scope, $rootScope, remoteApiSer
                     //                        continue;
                     //                    }
 
-                    if (!orders[i].products || !(orders[i].products instanceof Array) || orders[i].products.length <= 0) {
+                    // if (!orders[i].products || !(orders[i].products instanceof Array) || orders[i].products.length <= 0) {
+                    //     continue;
+                    // }
+
+                    if ((!orders[i].products && !orders[i].SKUs) || (!(orders[i].products instanceof Array) && !(orders[i].SKUs instanceof Array)) || (orders[i].products.length <= 0 && orders[i].SKUs.length <= 0)){
                         continue;
                     }
 
@@ -316,7 +320,12 @@ app.controller('userCenterController', function($scope, $rootScope, remoteApiSer
                     //if(orders[i].products.length==0){
                     //    continue;
                     //}
-
+                    // console.log(orders[i].SKUs.length.toString() + " " +orders[i].products.length.toString());
+                    if(orders[i].SKUs){
+                        if(orders[i].SKUs.length>0){
+                            order.products = orders[i].SKUs;
+                        }
+                    }
                     order.id = orders[i].id;
                     order.orderNo = orders[i].paymentId;
                     order.totalPrice = orders[i].price.toFixed(2);
@@ -331,7 +340,6 @@ app.controller('userCenterController', function($scope, $rootScope, remoteApiSer
                             //order.payUrl = payService.unionPayUrl(order.id);
                             break;
                     }
-
                     order.receiver = orders[i].consigneeName;
                     order.address = orders[i].consigneeAddress;
                     order.phone = orders[i].consigneePhone;

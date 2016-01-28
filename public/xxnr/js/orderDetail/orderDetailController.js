@@ -30,6 +30,11 @@ app.controller('orderDetailController',function($scope, remoteApiService, common
                 $scope.order.address = data.datas.rows.address;
                 $scope.order.receiverPhone = data.datas.rows.recipientPhone;
                 $scope.order.products = data.datas.rows.orderGoodsList;
+                if(data.datas.rows.SKUList){
+                    if(data.datas.rows.SKUList.length>0){
+                        $scope.order.products = data.datas.rows.SKUList;
+                    }
+                }
                 $scope.order.deposit = data.datas.rows.deposit;
                 $scope.order.totalPrice = data.datas.rows.totalPrice;
                 $scope.order.payStatus = data.datas.rows.payStatus;

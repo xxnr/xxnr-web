@@ -72,9 +72,11 @@
                     <img src="images/full_Pay.png" alt="" />
                     <img class="selected" src="images/righticon.png" alt="" ng-show="payTimes == 0" />
                 </div>
-                <div class="multi_pay" ng-click="changePayTimes(1)" ng-show="more_toggle">
-                    <img src="images/multi_pay.png" alt="" />
-                    <img class="selected" src="images/righticon.png" alt="" ng-show="payTimes == 1" />
+                <div class="multi_pay"  ng-show="more_toggle">
+                    <div class="multi_pay_icon" ng-click="changePayTimes(1)">
+                        <img src="images/multi_pay.png" alt="" />
+                        <img class="selected" src="images/righticon.png" alt="" ng-show="payTimes == 1" />
+                    </div>
                     <span class="intro">选择本次支付金额</span>
                     <div class="buy_btn">
                         <a class="btn-reduce" href="" ng-click="multi_pay_amount_reduce()" ng-class="{true:'editable'}[amount_reduce_editable]">-</a>
