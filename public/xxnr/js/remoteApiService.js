@@ -234,7 +234,7 @@ app.service('remoteApiService', function(commonService){
 
     this.getProducts = function(page, max, categoryId){
         var params={
-            methodname:'/api/v2.0/products/',
+            methodname:'/api/v2.1/products/',
             page:page,
             max:max,
             category:categoryId

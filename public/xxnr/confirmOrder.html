@@ -54,11 +54,9 @@
             return returnProducts;
         }
         catch(err){
-            console.warn(err);
             return null;
         }
     }();
-    // console.log(products);
     var productFilter = products ? function(product){
         var productId = product._id;
         if(products[productId] != undefined){
@@ -187,13 +185,13 @@
                                             <div class="cell p-buy-count" ng-cloak>{{item.buyCount}}</div>
                                             <div class="cell p-sum">
                                                 <!--<div ng-cloak>{{item.totalDeposit}}<span ng-show="{{item.deposit}}">（订金）</span></div>-->
-                                                <div class="ng-cloak">¥ {{item.totalPrice}}</div>
+                                                <div class="ng-cloak">¥ {{item.totalPrice.toFixed(2)}}</div>
 
                                             </div>
                                         </div>
                                         <div class="pay-step" ng-show="{{item.hasDeposit}}">
-                                            <div class="ng-cloak pay-step-1"><span class="text-info">阶段一： 预付款</span><span class="order-price ng-cloak">¥ {{item.totalDeposit}}</span></div>
-                                            <div class="ng-cloak pay-step-2"><span class="text-info">阶段二：尾款</span>¥{{(item.totalPrice-item.totalDeposit).toFixed(2)}}</div>
+                                            <div class="ng-cloak pay-step-1"><span class="text-info">阶段一：预付款</span><span class="order-price ng-cloak">¥ {{item.totalDeposit.toFixed(2)}}</span></div>
+                                            <div class="ng-cloak pay-step-2"><span class="text-info">阶段二：尾款</span>¥ {{(item.totalPrice + item.additionsTotalPrice - item.totalDeposit).toFixed(2)}}</div>
                                         </div>
                                     </div>
                                 </div>

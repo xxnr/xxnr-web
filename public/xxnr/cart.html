@@ -79,9 +79,11 @@
                 <div class="cart-thead">
                     <div class="column t-checkbox">
                         <div class="cart-checkbox">
-                            <input type="checkbox" checked="checked" class="checkbox" ng-change="selectAll()" ng-model="allSelected">
+                            <input type="checkbox" checked="checked" class="checkbox" ng-change="selectAll()" ng-model="allSelected" ng-hide="onlyHasOfflineShop()">
                         </div>
-                        全选
+                        <div class="cart-all-text">
+                            全选
+                        </div>
                     </div>
                     <div class="column t-goods">商品信息</div>
                     <div class="column t-price">单价(元)</div>
@@ -94,19 +96,20 @@
                         <div class="cart-tbody" ng-repeat="shop in shops">
                             <div class="shop">
                                 <div class="cart-checkbox">
-                                    <input type="checkbox" checked="checked" class="checkbox"ng-change="selectShop($index)" ng-model="shop.allSelected" >
+                                    <input type="checkbox" checked="checked" class="checkbox" ng-change="selectShop($index)" ng-model="shop.allSelected" ng-hide="onlyHasOffline($index)">
                                 </div>
                                 <span class="shop-txt">
                                         <a class="shop-name ng-cloak" href="#" target="_blank">{{shop.name}}</a>
                                 </span>
                             </div>
                             <div class="item-list">
-                                <div class="item-item" ng-repeat="item in shop.items">
+                                <div class="item-item" ng-repeat="item in shop.items" ng-class="{false:'offline-item'}[item.online]">
                                     <div class="item-form">
 
                                         <div class="cell p-goods">
+                                            <span ng-show="!item.online" class="offline-text">已下架</span>
                                             <div class="cell p-checkbox">
-                                                <input type="checkbox" class="checkbox" ng-change="selectItem($parent.$index, $index)" ng-model="item.selected">
+                                                <input ng-show="item.online" type="checkbox" class="checkbox" ng-change="selectItem($parent.$index, $index)" ng-model="item.selected">
                                             </div>
                                             <div class="goods-item">
                                                 <div class="p-img">
@@ -124,7 +127,7 @@
                                                                 {{attribute.name}}:{{attribute.value}}
                                                             </li>
                                                             <li>
-                                                                <ul class="row">
+                                                                <ul class="row" ng-if="item.additions">
                                                                 附加项目:
                                                                     <li ng-repeat="addition in item.additions">
                                                                         {{addition.name}}&nbsp;
@@ -147,9 +150,10 @@
                                         <div class="cell p-props-quantity">
                                             <div class="buy_box">
                                                 <div class="left buy_btn">
-                                                    <a class="btn-reduce" href="" ng-click="reduce($parent.$index, $index)">-</a>
-                                                    <a class="btn-add" href="" ng-click="add($parent.$index, $index)">+</a>
-                                                    <input maxLength=4 class="text" id="buy-num" ng-change="buyCountChange($parent.$index, $index, item.buyCount, item.oldBuyCount)" ng-Blur="submitChange(item.SKU_id, item.buyCount)" ng-model="item.buyCount">
+                                                    <a ng-show="item.online" class="btn-reduce" href="" ng-click="reduce($parent.$index, $index)">-</a>
+                                                    <a ng-show="item.online" class="btn-add" href="" ng-click="add($parent.$index, $index)">+</a>
+                                                    <input ng-show="item.online" maxLength=4 class="text" id="buy-num" ng-change="buyCountChange($parent.$index, $index, item.buyCount, item.oldBuyCount)" ng-Blur="submitChange(item.SKU_id, item.buyCount)" ng-model="item.buyCount">
+                                                    <span ng-show="!item.online">{{item.buyCount}}</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -163,8 +167,8 @@
 
                                     </div>
                                     <div class="pay-step" ng-show="{{item.hasDeposit}}">
-                                        <div class="ng-cloak pay-step-1"><span class="text-info">阶段一： 预付款</span><span class="order-price ng-cloak">¥ {{item.totalDeposit}}</span></div>
-                                        <div class="ng-cloak pay-step-2"><span class="text-info">阶段二：尾款</span>¥{{(item.totalPrice-item.totalDeposit).toFixed(2)}}</div>
+                                        <div class="ng-cloak pay-step-1"><span class="text-info">阶段一：订金</span><span class="order-price ng-cloak">¥ {{item.totalDeposit}}</span></div>
+                                        <div class="ng-cloak pay-step-2"><span class="text-info">阶段二：尾款</span>¥ {{(item.totalPrice + item.additionsTotalPrice - item.totalDeposit).toFixed(2)}}</div>
                                     </div>
                                 </div>
 

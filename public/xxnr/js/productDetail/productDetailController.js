@@ -68,10 +68,18 @@ app.controller('productDetailController',function($scope, $timeout, remoteApiSer
             for(var i in item.SKUAttributes){
                 item.SKUAttributes[i].isSelected = [];
                 item.SKUAttributes[i].selectable = [];
-                for(var j in item.SKUAttributes[i].values){
-                    item.SKUAttributes[i].isSelected.push(false);
+                // console.log(item.SKUAttributes);
+                if(item.SKUAttributes[i].values.length==1){
+                    item.SKUAttributes[i].isSelected.push(true);
                     item.SKUAttributes[i].selectable.push(true);
-                };
+
+                }else{
+                    for(var j in item.SKUAttributes[i].values){
+                        item.SKUAttributes[i].isSelected.push(false);
+                        item.SKUAttributes[i].selectable.push(true);
+                    };
+                }
+
             }
             item.description = good.description;
             item.deposit = good.deposit;
@@ -88,6 +96,23 @@ app.controller('productDetailController',function($scope, $timeout, remoteApiSer
             $scope.item = item;
             for(var i=1; i<= item.level; i++){
                 $scope.stars[i] = true;
+            }
+            if($scope.isAllSKUSelected()){
+                $scope.selectedQuery = getSelectedQuery();
+                // for(var i in $scope.item.SKUAttributes){
+                //     for(var j in $scope.item.SKUAttributes[i].isSelected){
+                //         if($scope.item.SKUAttributes[i].isSelected[j] == true){
+                //             $scope.selectedQuery.push({name:$scope.item.SKUAttributes[i].name,value:$scope.item.SKUAttributes[i].values[j]});
+                //         }
+                //     }
+                // };
+                remoteApiService.querySKU($scope.item.product_id,$scope.selectedQuery)
+                    .then(function(data){
+                        if(data.data.SKU){
+                            // console.log("get SKU id");
+                            $scope.item.SKU_id = data.data.SKU._id;
+                        }
+                    });
             }
         });
     $scope.product_category = function(){
@@ -125,7 +150,7 @@ app.controller('productDetailController',function($scope, $timeout, remoteApiSer
     };
     $scope.buyCountChange = function(newValue){
         if(newValue == '0'){
-            console.log($timeout);
+            // console.log($timeout);
             $timeout(function() {
                 newValue = 1;
                 $scope.buy_count = parseInt(newValue);
@@ -159,7 +184,7 @@ app.controller('productDetailController',function($scope, $timeout, remoteApiSer
         addToShoppingCart(success_action,1);
     };
     $scope.addToShoppingCart = function(event){
-        if($scope.isAllSKUSelected()){
+        if($scope.isAllSKUSelected() && commonService.user){
             flyToCart.fly();
         }
         if(event && $scope.blockBuying){
@@ -187,20 +212,28 @@ app.controller('productDetailController',function($scope, $timeout, remoteApiSer
                 $scope.item.SKUAttributes[SKU_index].isSelected[i] = false;
             };
             $scope.item.SKUAttributes[SKU_index].isSelected[value_index] = !temp;
-            $scope.selectedQuery = [];
-            for(var i in $scope.item.SKUAttributes){
-                for(var j in $scope.item.SKUAttributes[i].isSelected){
-                    if($scope.item.SKUAttributes[i].isSelected[j] == true){
-                        $scope.selectedQuery.push({name:$scope.item.SKUAttributes[i].name,value:$scope.item.SKUAttributes[i].values[j]});
-                    }
-                }
-            };
+            $scope.selectedQuery = getSelectedQuery();
+            // for(var i in $scope.item.SKUAttributes){
+            //     for(var j in $scope.item.SKUAttributes[i].isSelected){
+            //         if($scope.item.SKUAttributes[i].isSelected[j] == true){
+            //             $scope.selectedQuery.push({name:$scope.item.SKUAttributes[i].name,value:$scope.item.SKUAttributes[i].values[j]});
+            //         }
+            //     }
+            // };
             queryOtherSKU();
         };
     };
     $scope.selectAddition = function(value_index){
+        if($scope.item.SKUAdditions[value_index].isSelected){
+            $scope.item.minPrice = Number($scope.item.minPrice) - Number($scope.item.SKUAdditions[value_index].price);
+            $scope.item.maxPrice = Number($scope.item.maxPrice) - Number($scope.item.SKUAdditions[value_index].price);
+        }else{
+            $scope.item.minPrice = Number($scope.item.minPrice) + Number($scope.item.SKUAdditions[value_index].price);
+            $scope.item.maxPrice = Number($scope.item.maxPrice) + Number($scope.item.SKUAdditions[value_index].price);
+        }
         var temp = $scope.item.SKUAdditions[value_index].isSelected;
         $scope.item.SKUAdditions[value_index].isSelected = !temp;
+
         $scope.selectedAdditions = [];
         for(var i in $scope.item.SKUAdditions){
             if($scope.item.SKUAdditions[i].isSelected == true){
@@ -215,6 +248,8 @@ app.controller('productDetailController',function($scope, $timeout, remoteApiSer
                     // console.log("get SKU id");
                     $scope.item.SKU_id = data.data.SKU._id;
                 }
+                $scope.item.minPrice = data.data.price.min;
+                $scope.item.maxPrice = data.data.price.max;
                 for(var i in data.data.attributes){
                     for(var j in $scope.item.SKUAttributes){
                         if(data.data.attributes[i].name == $scope.item.SKUAttributes[j].name){
@@ -228,14 +263,19 @@ app.controller('productDetailController',function($scope, $timeout, remoteApiSer
                         }
                     }
                 }
-                $scope.item.minPrice = data.data.price.min;
-                $scope.item.maxPrice = data.data.price.max;
+                if(data.data.additions){
+                    $scope.item.SKUAdditions = data.data.additions;
+                    for(var i in $scope.item.SKUAdditions){
+                        item.SKUAdditions[i].isSelected = false;
+                    }
+                }
                 // console.log(isAllSKUSelected());
             });
 
     };
     var addToShoppingCart = function(success_action,clickedMethod){
-        if(!$scope.isAllSKUSelected() && commonService.user.userid){
+        if(!$scope.isAllSKUSelected()){
+
             $scope.needToSelectMoreSKU = true;
             $scope.clickedMethod = clickedMethod;
             event.stopPropagation;
@@ -274,5 +314,15 @@ app.controller('productDetailController',function($scope, $timeout, remoteApiSer
             $scope.addToShoppingCart();
         }
     };
-
+    var getSelectedQuery = function() {
+        var SelectedQuery = [];
+        for(var i in $scope.item.SKUAttributes){
+            for(var j in $scope.item.SKUAttributes[i].isSelected){
+                if($scope.item.SKUAttributes[i].isSelected[j] == true){
+                    SelectedQuery.push({name:$scope.item.SKUAttributes[i].name,value:$scope.item.SKUAttributes[i].values[j]});
+                }
+            }
+        };
+        return SelectedQuery;
+    }
 });
