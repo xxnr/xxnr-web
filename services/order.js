@@ -246,8 +246,15 @@ OrderService.prototype.get = function(options, callback) {
 		nor.push({'payments.id':{$ne:options.paymentId}});
 	}
 
-	var mongoOptions = nor.length ? {$nor : nor} : {};
+	var mongoOptions = {};
 
+	if (nor.length > 0) {
+		mongoOptions = {$nor : nor};
+	} else {
+		callback(null, null, null);
+		return;
+	}
+	
 	OrderModel.findOne(mongoOptions, function(err, doc) {
 		if (err) {
 			callback(err);
@@ -684,14 +691,14 @@ OrderService.prototype.getPayOrderPaymentInfo = function(order, payment, payPric
         } else {
 			payment.id = U.GUID(10);
 			payment.dateCreated = new Date();
-			values['$set'] = {'payment.$.id':payment.id, 'payment.$.dateCreated': payment.dateCreated};
+			values['$set'] = {'payments.$.id':payment.id, 'payments.$.dateCreated': payment.dateCreated};
 			if (payPrice) {
 				payment.payPrice = parseFloat(payPrice).toFixed(2);
-				values['$set']['payment.$.payPrice'] = payment.payPrice;
+				values['$set']['payments.$.payPrice'] = payment.payPrice;
 			}
 			if (options && options.payType) {
 				payment.payType = options.payType;
-				values['$set']['payment.$.payType'] = payment.payType;
+				values['$set']['payments.$.payType'] = payment.payType;
 			}
 	    }
             
@@ -752,7 +759,7 @@ OrderService.prototype.getPayOrderPaymentInfo = function(order, payment, payPric
 // update the payment when the third-party platform recorded it
 OrderService.prototype.updateThirdpartyPayment = function(paymentId) {
 	var query = {'payments.id':paymentId};
-	var values = {'$set':{'payment.$.thirdPartyRecorded':true}};
+	var values = {'$set':{'payments.$.thirdPartyRecorded':true}};
 	OrderModel.update(query, values, function(err, count) {
 		if (err) {
             console.error('OrderService updateThirdpartyPayment update payment err:', err);
