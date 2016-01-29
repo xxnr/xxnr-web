@@ -62,18 +62,19 @@ var schema = new mongoose.Schema({
     'isClosed': {type:Boolean, required:true, default:false},						// 本订单是否关闭
     'payments': [{
 		'id': {type:String, index: true, unique: true, required: true},				// 支付ID
-		'stage': Number,															// 分期支付 第几期
-		'stagePrice': Number,														// 本次分期需付总金额
+		// 'stage': Number,															// 分期支付 第几期
+		// 'stagePrice': Number,													// 本次分期需付总金额
         'slice': {type: Number, required: true},									// 支付的第几次
         'price': {type: Number, required: true},									// 本次支付的金额
         'payPrice': {type: Number},													// 用户选择支付的金额，用来判断是否需要生成新的payment
         'suborderId': {type: String, index: true, required: true},					// 所属子订单ID
-        'dateCreated': {type: Date, default: new Date()},							// 生成日期
+        'dateCreated': {type: Date, default: Date.now},							// 生成日期
 		'datePaid': Date,															// 支付日期
 		'dateSet': Date,															// 人为设置的日期
 		'payStatus': {type:Number, required:true, default: PAYMENTSTATUS.UNPAID},	// 支付状态
 		'payType': {type:Number, required:true},									// 支付类型
 		'isClosed': {type:Boolean, required:true, default:false},					// 本支付是否关闭
+		'thirdPartyRecorded': {type:Boolean, default:false},						// 本支付是否在第三方支付平台生成
 	}],
 	'subOrders': [{
 	    'id': {type: String, index: true, unique: true, required: true},			// 子订单ID
