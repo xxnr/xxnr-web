@@ -769,9 +769,50 @@ OrderService.prototype.getPayOrderPaymentInfo = function(order, payment, payPric
     // the payment is existed in third-party platform Or the payment is unpaid. need close this payment and push a new payment.
     if (payment.thirdPartyRecorded || payment.payStatus !== PAYMENTSTATUS.UNPAID) {
         values = {'payments.$.isClosed':true};
+        OrderModel.update(query, {'$set':values}, function(err, count) {
+	    	if (err) {
+	            console.error('OrderService getPayOrderPaymentInfo update payment err:', err);
+	            callback(err);
+	            return;
+	        }
+	        if (count.n == 0) {
+	        	console.error('OrderService getPayOrderPaymentInfo update payment not find the doc.');
+	            callback('not find the doc');
+	            return;
+	        }
+	        var pushValues = {};
+	        var newPayment = payment;
+            newPayment.id = U.GUID(10);
+            if (payPrice) {
+            	newPayment.payPrice = parseFloat(payPrice).toFixed(2);
+            }
+            if (options && options.payType) {
+            	newPayment.payType = options.payType;
+            }
+            newPayment.payStatus = PAYMENTSTATUS.UNPAID;
+	        pushValues['$push'] = {'payments':newPayment};
+	        OrderModel.update(query, pushValues, function(err, count) {
+				if (err) {
+		            console.error('OrderService getPayOrderPaymentInfo update push payment err:', err);
+		            callback(err);
+		            return;
+		        }
+		        if (count.n == 0) {
+		        	console.error('OrderService getPayOrderPaymentInfo update push payment not find the doc.');
+		            callback('not find the doc');
+		            return;
+		        }
+
+		        if (!payPrice) {
+		        	payPrice = newPayment.price;
+		        }
+		        callback(null, newPayment, payPrice);
+		        return;
+		    });
+	    });
     } else {
     	// user input price is not null, price Regexp, > 0, <  payment price. use payPrice
-    	if (payPrice && tools.isPrice(payPrice.toString()) && parseFloat(payPrice) && parseFloat(payPrice) >= 0.01 && parseFloat(payPrice) < payment.price) {
+    	if (payPrice && tools.isPrice(payPrice.toString()) && parseFloat(payPrice) && parseFloat(parseFloat(payPrice).toFixed(2)) >= 0.01 && parseFloat(parseFloat(payPrice).toFixed(2)) < payment.price) {
     		payment.id = U.GUID(10);
 			payment.dateCreated = new Date();
 			values = {'payments.$.id':payment.id, 'payments.$.dateCreated': payment.dateCreated};
@@ -783,6 +824,24 @@ OrderService.prototype.getPayOrderPaymentInfo = function(order, payment, payPric
 				payment.payType = options.payType;
 				values['payments.$.payType'] = options.payType;
 			}
+			OrderModel.update(query, {'$set':values}, function(err, count) {
+		    	if (err) {
+		            console.error('OrderService getPayOrderPaymentInfo update payment err:', err);
+		            callback(err);
+		            return;
+		        }
+		        if (count.n == 0) {
+		        	console.error('OrderService getPayOrderPaymentInfo update payment not find the doc.');
+		            callback('not find the doc');
+		            return;
+		        }
+
+		        if (!payPrice) {
+		        	payPrice = payment.price;
+		        }
+		        callback(null, payment, payPrice);
+			    return;
+		    });
     	} else {
     		callback(null, payment, payment.price);
 	        if (options && options.payType) {
@@ -808,62 +867,6 @@ OrderService.prototype.getPayOrderPaymentInfo = function(order, payment, payPric
 	        return;
     	}
     }
-
-    if (!U.isEmpty(values)) {
-	    OrderModel.update(query, {'$set':values}, function(err, count) {
-	    	if (err) {
-	            console.error('OrderService getPayOrderPaymentInfo update payment err:', err);
-	            callback(err);
-	            return;
-	        }
-	        if (count.n == 0) {
-	        	console.error('OrderService getPayOrderPaymentInfo update payment not find the doc.');
-	            callback('not find the doc');
-	            return;
-	        }
-
-	        // the payment is existed in third-party platform Or the payment is unpaid. need close this payment and push a new payment.
-	        if (payment.thirdPartyRecorded || payment.payStatus !== PAYMENTSTATUS.UNPAID) {
-		        var pushValues = {};
-		        var newPayment = payment;
-	            newPayment.id = U.GUID(10);
-	            if (payPrice) {
-	            	newPayment.payPrice = parseFloat(payPrice).toFixed(2);
-	            }
-	            if (options && options.payType) {
-	            	newPayment.payType = options.payType;
-	            }
-	            newPayment.payStatus = PAYMENTSTATUS.UNPAID;
-		        pushValues['$push'] = {'payments':newPayment};
-		        OrderModel.update(query, pushValues, function(err, count) {
-					if (err) {
-			            console.error('OrderService getPayOrderPaymentInfo update push payment err:', err);
-			            callback(err);
-			            return;
-			        }
-			        if (count.n == 0) {
-			        	console.error('OrderService getPayOrderPaymentInfo update push payment not find the doc.');
-			            callback('not find the doc');
-			            return;
-			        }
-
-			        if (!payPrice) {
-			        	payPrice = newPayment.price;
-			        }
-			        callback(null, newPayment, payPrice);
-			        return;
-			    });
-			} else {
-				if (payPrice && tools.isPrice(payPrice.toString()) && parseFloat(payPrice) && parseFloat(payPrice) >= 0.01 && parseFloat(payPrice) < payment.price) {
-			        if (!payPrice) {
-			        	payPrice = payment.price;
-			        }
-			        callback(null, payment, payPrice);
-				    return;
-				}
-			}
-	    });
-	}
 };
 
 // update the payment when the third-party platform recorded it
