@@ -73,6 +73,10 @@ app.controller('jiesuanController', function($scope, remoteApiService, payServic
     };
 
     $scope.addNewAddress = function(){
+        $scope.modifyAddress.detailAddress = undefined;
+        $scope.modifyAddress.zipCode = undefined;
+        $scope.modifyAddress.receiptName = undefined;
+        $scope.modifyAddress.phone = undefined;
         $scope.showPop = true;
         $scope.showAddPop = true;
         $scope.getProvinceList();
