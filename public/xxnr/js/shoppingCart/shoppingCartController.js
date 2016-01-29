@@ -88,7 +88,7 @@ app.controller('shoppingCartController', function($scope, $timeout, remoteApiSer
                             item.oldBuyCount = item.buyCount;
                             // item.count = parseInt(itemData.goodsCount);
                             item.deposit = itemData.deposit;
-                            item.additionsTotalPrice = Number((item.buyCount * item.additionsTotalPrice).toFixed(2));
+                            item.additionsTotalPrice = Number((item.additionsTotalPrice).toFixed(2));
                             item.totalPrice = Number((item.buyCount * (item.nowPrice)).toFixed(2));
                             item.totalDeposit = Number((item.buyCount * (item.deposit ? item.deposit : item.nowPrice)).toFixed(2));
                             item.saving = item.buyCount * (item.oldPrice - item.nowPrice);
@@ -157,11 +157,13 @@ app.controller('shoppingCartController', function($scope, $timeout, remoteApiSer
         var shouldModifyAll = true;
         for (var i in $scope.shops) {
             if ($scope.shops[i].allSelected != $scope.shops[index].allSelected && !$scope.onlyHasOffline(i)) {
+
                 shouldModifyAll = false;
                 break;
             }
         }
         if(shouldModifyAll){
+            // console.log('test');
             $scope.allSelected = $scope.shops[index].allSelected;
             $scope.selectAll();
         }
@@ -171,6 +173,9 @@ app.controller('shoppingCartController', function($scope, $timeout, remoteApiSer
         if($scope.shops[shopIndex].allSelected){
             $scope.shops[shopIndex].allSelected = isSelected;
             // $scope.allSelected = isSelected;
+        }
+        if($scope.allSelected){
+            $scope.allSelected = isSelected;
         }
         var shouldModifyShop = true;
         for(var i in $scope.shops[shopIndex].items){
@@ -222,8 +227,8 @@ app.controller('shoppingCartController', function($scope, $timeout, remoteApiSer
 
     var calculateItemPrice = function(shopIndex, itemIndex){
         var item = $scope.shops[shopIndex].items[itemIndex];
-        $scope.shops[shopIndex].items[itemIndex].totalPrice = (item.buyCount * item.nowPrice).toFixed(2);
-        $scope.shops[shopIndex].items[itemIndex].totalDeposit = (item.buyCount * Number(item.deposit?item.deposit:item.nowPrice)).toFixed(2);
+        $scope.shops[shopIndex].items[itemIndex].totalPrice = Number((item.buyCount * item.nowPrice).toFixed(2));
+        $scope.shops[shopIndex].items[itemIndex].totalDeposit = Number((item.buyCount * Number(item.deposit?item.deposit:item.nowPrice)).toFixed(2));
     };
 
     var calculateTotal = function(){
@@ -354,13 +359,4 @@ app.controller('shoppingCartController', function($scope, $timeout, remoteApiSer
         }
         return result;
     };
-    // $scope.$on('$viewContentLoaded', function(){
-    //     // check if there is query in url
-    //     // and fire search in case its value is not empty
-    //     $footer = $(".options-box"),
-    //         originalTop = $footer.offset().top,
-    //         originalLeft = $footer.offset().left;
-    //     console.log(originalTop);
-    //     console.log(originalLeft);
-    // });
 });

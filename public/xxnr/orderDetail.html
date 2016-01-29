@@ -176,7 +176,7 @@
                                     <li>发货状态</li>
                                     <li>单价（元）</li>
                                     <li>数量</li>
-                                    <li>小计（元）</li>
+                                    <!-- <li>小计（元）</li> -->
                                 </ul>
                                 <div class="order-list">
                                     <div class="products-section">
@@ -194,16 +194,7 @@
                                                         <div class="p-skus" ng-if="product.attributes">
                                                             <ul>
                                                                 <li ng-repeat="attribute in product.attributes">
-                                                                    {{attribute.name}}:{{attribute.value}};
-                                                                </li>
-                                                                <li class="additions">
-                                                                    <!-- <ul ng-if="product.addition"> -->
-                                                                    <ul ng-if="product.additions">
-                                                                    附加项目:
-                                                                        <li ng-repeat="addition in product.additions">
-                                                                            {{addition.name}}&nbsp;
-                                                                        </li>
-                                                                    </ul>
+                                                                    {{attribute.name}}: {{attribute.value}};&nbsp;
                                                                 </li>
 
                                                             </ul>
@@ -213,23 +204,37 @@
                                                         {{product.deliverStatus | deliverStatusToChineseWording}}
                                                     </li>
                                                     <li class="p-price ng-cloak">
-                                                        <p ng-if="product.attributes" ng-cloak>{{product.price}}</p>
-                                                        <p ng-if="!product.attributes" ng-cloak>{{product.unitPrice}}</p>
+                                                        <p ng-if="product.attributes" ng-cloak>￥ {{product.price}}</p>
+                                                        <p ng-if="!product.attributes" ng-cloak>￥ {{product.unitPrice}}</p>
                                                     </li>
                                                     <li class="p-quantity ng-cloak">
                                                         <span ng-if="!product.attributes">{{product.goodsCount}}</span>
                                                         <span ng-if="product.attributes">{{product.count}}</span>
                                                     </li>
-                                                    <li class="p-total ng-cloak">
-                                                        <p ng-if="!product.attributes">{{(product.unitPrice*product.goodsCount).toFixed(2)}}</p>
-                                                        <p ng-if="product.attributes">{{(product.price*product.count).toFixed(2)}}</p>
-                                                    </li>
+                                                    <!-- <li class="p-total ng-cloak">
+                                                        <p ng-if="!product.attributes">￥ {{(product.unitPrice*product.goodsCount).toFixed(2)}}</p>
+                                                        <p ng-if="product.attributes">￥ {{(product.price*product.count).toFixed(2)}}</p>
+                                                    </li> -->
+                                                    <div class="p-additions" ng-if="product.additions" >
+                                                        <!-- <ul ng-if="product.addition"> -->
+                                                        <div class="p-additions-title">
+                                                            附加项目:
+                                                        </div>
+                                                        <div class="p-additions-contents">
+                                                            <p ng-repeat="addition in product.additions" class="p-additions-content">
+                                                                <span class="addition-name">{{addition.name}}</span>
+                                                                <span class="addition-price">￥ {{addition.price.toFixed(2)}}</span>
+                                                                <span class="addition-count">{{product.count}}</span>
+                                                            </p>
+                                                        </div>
+                                                    </div>
                                                 </ul>
                                                 <div class="pay-step" ng-show="{{product.deposit>0}}">
-                                                    <div ng-if="!product.attributes" class="pay-step-1"><span class="text-info">阶段一：订金</span><span class="pay-step-1-price">{{product.deposit | toNumberFixedTwo}}</span><span class="product_count">{{product.goodsCount}}</span><span class="sum">{{(product.deposit*product.goodsCount) | toNumberFixedTwo}}</span></div>
-                                                    <div ng-if="!product.attributes" class="pay-step-2"><span class="text-info">阶段二：尾款</span><span class="pay-step-2-price">{{(product.unitPrice-product.deposit) | toNumberFixedTwo}}</span><span class="product_count">{{product.goodsCount}}</span><span class="sum">{{((product.unitPrice-product.deposit)*product.goodsCount) | toNumberFixedTwo}}</span></div>
-                                                    <div ng-if="product.attributes" class="pay-step-1"><span class="text-info">阶段一：订金</span><span class="pay-step-1-price">{{product.deposit | toNumberFixedTwo}}</span><span class="product_count">{{product.count}}</span><span class="sum">{{(product.deposit*product.count) | toNumberFixedTwo}}</span></div>
-                                                    <div ng-if="product.attributes" class="pay-step-2"><span class="text-info">阶段二：尾款</span><span class="pay-step-2-price">{{(product.price-product.deposit) | toNumberFixedTwo}}</span><span class="product_count">{{product.count}}</span><span class="sum">{{((product.price-product.deposit)*product.count) | toNumberFixedTwo}}</span></div>
+                                                    <div ng-if="!product.attributes" class="pay-step-1"><span class="text-info">阶段一：订金</span><span class="pay-step-1-price">￥ {{product.deposit * product.count | toNumberFixedTwo}}</span></div>
+                                                    <div ng-if="!product.attributes" class="pay-step-2"><span class="text-info">阶段二：尾款</span><span class="pay-step-2-price">￥ {{(product.unitPrice-product.deposit)*product.count | toNumberFixedTwo}}</span></div>
+                                                    <div ng-if="product.attributes" ng-class="{true:'hasAdditions'}[product.additions!='']" class="pay-step-1"><span class="text-info">阶段一：订金</span><span class="pay-step-1-price">￥ {{product.deposit*product.count | toNumberFixedTwo}}</span></div>
+                                                    <div ng-if="product.attributes" class="pay-step-2"><span class="text-info">阶段二：尾款</span><span class="pay-step-2-price">￥ {{(product.price-product.deposit)*product.count | toNumberFixedTwo}}</span></div>
+                                                    <!-- <span class="product_count">{{product.count}}</span> -->
                                                 </div>
                                             </li>
                                         </ul>
