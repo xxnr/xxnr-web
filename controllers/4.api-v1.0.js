@@ -708,11 +708,11 @@ function unionPayOrder() {
     //     then go to right top corner => "my test" => "my product" => "not tested" => select one tet type => click "start to test"
     var self = this;
     self.payType = PAYTYPE.UNIONPAY;
-    payOrder.call(this, function(paymentId, totalPrice, ip, orderId){
+    payOrder.call(this, function(paymentId, totalPrice, ip, orderId) {
         var consumer = self.data['consumer']||'website';
         var phpPage = null;
 
-        switch(consumer){
+        switch(consumer) {
             case 'app':
                 phpPage = 'Form_6_2_AppConsume.php';
                 break;
@@ -728,27 +728,27 @@ function unionPayOrder() {
         var backNotifyUrl = host + '/' + unionPayConfig.notification.back;
         var php_processor = require("../common/php_processor");
         var commandLine = '\"' + require('path').resolve(__filename + '/../../external/unionPay/upacp_sdk_php/demo/utf8/' + phpPage) + '\"';
-        var returnPrice = (totalPrice * 100).toFixed(2);
+        var returnPrice = parseFloat((totalPrice * 100).toFixed(2));
 
-        if(F.isDebug){
+        if (F.isDebug) {
             commandLine += ' --test';
         }
 
         commandLine += ` --front-notify-url=${frontNotifyUrl} --back-notify-url=${backNotifyUrl} --payment-id=${paymentId} --total-price=${returnPrice} --order-id=${orderId}`;
 
-        new php_processor(commandLine).execute(function(output, error){
-            if(error){
-                console.error(error);
+        new php_processor(commandLine).execute(function(output, error) {
+            if (error) {
+                console.error('unionPayOrder php_processor err:', error);
             }
 
             var index = 0;
             const BOM = 65279; // include_once utf-8 php will invole BOM
 
-            while(output.charCodeAt(index) == BOM) index++;
+            while (output.charCodeAt(index) == BOM) index++;
 
             // console.log(output.substring(index));
 
-            switch(consumer){
+            switch(consumer) {
                 case 'app':
                     var phpResponse = JSON.parse(output.substring(index));
                     var response = phpResponse.response;
@@ -756,15 +756,15 @@ function unionPayOrder() {
                     response = qs.parse(response);
                     var responseAttributes = ['tn', 'orderId'];
 
-                    for(var i in response){
-                        if(response.hasOwnProperty(i)){
-                            if(responseAttributes.indexOf(i) < 0){
+                    for (var i in response) {
+                        if (response.hasOwnProperty(i)) {
+                            if (responseAttributes.indexOf(i) < 0) {
                                 delete response[i];
                             }
                         }
                     }
 
-                    if(self.data['option'] === 'raw-tn'){
+                    if (self.data['option'] === 'raw-tn') {
                         self.raw(response.tn);
                         break;
                     }
