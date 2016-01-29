@@ -164,17 +164,8 @@
                                                         <div class="p-skus">
                                                             <ul>
                                                                 <li ng-repeat="attribute in item.attributes">
-                                                                    {{attribute.name}}:{{attribute.value}}
+                                                                    {{attribute.name}}: {{attribute.value}}
                                                                 </li>
-                                                                <li>
-                                                                    <ul class="row">
-                                                                    附加项目:
-                                                                        <li ng-repeat="addition in item.additions">
-                                                                            {{addition.name}}&nbsp;
-                                                                        </li>
-                                                                    </ul>
-                                                                </li>
-
                                                             </ul>
                                                         </div>
                                                     </div>
@@ -185,13 +176,27 @@
                                             <div class="cell p-buy-count" ng-cloak>{{item.buyCount}}</div>
                                             <div class="cell p-sum">
                                                 <!--<div ng-cloak>{{item.totalDeposit}}<span ng-show="{{item.deposit}}">（订金）</span></div>-->
-                                                <div class="ng-cloak">¥ {{item.totalPrice.toFixed(2)}}</div>
+                                                <div class="ng-cloak" ng-class="{'hasDeposit':item.hasDeposit}">¥ {{item.totalPrice.toFixed(2)}}</div>
 
+                                            </div>
+                                        </div>
+                                        <div class="p-additions" ng-if="item.additions" >
+                                            <!-- <ul ng-if="product.addition"> -->
+                                            <div class="p-additions-title">
+                                                附加项目:
+                                            </div>
+                                            <div class="p-additions-contents">
+                                                <p ng-repeat="addition in item.additions" class="p-additions-content">
+                                                    <span class="addition-name">{{addition.name}}</span>
+                                                    <span class="addition-price">￥ {{addition.price.toFixed(2)}}</span>
+                                                    <span class="addition-count">{{item.buyCount}}</span>
+                                                    <span class="addition-totalPrice">￥ {{(item.buyCount*addition.price).toFixed(2)}}</span>
+                                                </p>
                                             </div>
                                         </div>
                                         <div class="pay-step" ng-show="{{item.hasDeposit}}">
                                             <div class="ng-cloak pay-step-1"><span class="text-info">阶段一：预付款</span><span class="order-price ng-cloak">¥ {{item.totalDeposit.toFixed(2)}}</span></div>
-                                            <div class="ng-cloak pay-step-2"><span class="text-info">阶段二：尾款</span>¥ {{(item.totalPrice + item.additionsTotalPrice - item.totalDeposit).toFixed(2)}}</div>
+                                            <div class="ng-cloak pay-step-2"><span class="text-info">阶段二：尾款</span>¥ {{(item.totalPrice + item.buyCount*item.additionsTotalPrice - item.totalDeposit).toFixed(2)}}</div>
                                         </div>
                                     </div>
                                 </div>

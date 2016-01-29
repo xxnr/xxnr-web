@@ -297,13 +297,6 @@ app.controller('userCenterController', function($scope, $rootScope, remoteApiSer
                 $scope.showTypes[index].isSelected = true;
 
                 for (var i = 0; i < orders.length; i++) {
-                    //                    if(showTypeIds != 0 && showTypeIds.indexOf(orders[i].type) == -1){
-                    //                        continue;
-                    //                    }
-
-                    // if (!orders[i].products || !(orders[i].products instanceof Array) || orders[i].products.length <= 0) {
-                    //     continue;
-                    // }
 
                     if ((!orders[i].products && !orders[i].SKUs) || (!(orders[i].products instanceof Array) && !(orders[i].SKUs instanceof Array)) || (orders[i].products.length <= 0 && orders[i].SKUs.length <= 0)){
                         continue;
@@ -316,16 +309,17 @@ app.controller('userCenterController', function($scope, $rootScope, remoteApiSer
                             order[j] = orders[i][j];
                         }
                     }
-
-                    //if(orders[i].products.length==0){
-                    //    continue;
-                    //}
-                    // console.log(orders[i].SKUs.length.toString() + " " +orders[i].products.length.toString());
                     if(orders[i].SKUs){
                         if(orders[i].SKUs.length>0){
                             order.products = orders[i].SKUs;
                         }
                     }
+                    for(var k in order.products){
+                        order.products[k].totalAdditionsPrice = $scope.calculateTotalAdditionsPrice(order.products[k].additions);
+                        // console.log(typeof order.products[k].totalAdditionsPrice);
+                    }
+
+
                     order.id = orders[i].id;
                     order.orderNo = orders[i].paymentId;
                     order.totalPrice = orders[i].price.toFixed(2);
@@ -444,5 +438,12 @@ app.controller('userCenterController', function($scope, $rootScope, remoteApiSer
         $scope.showPayPop = false;
 
     };
+    $scope.calculateTotalAdditionsPrice = function(additions){
+        var totalAdditionsPrice = 0;
+        for(var i in additions){
+            totalAdditionsPrice = totalAdditionsPrice + Number(additions[i].price);
+        }
+        return Number(totalAdditionsPrice.toFixed(2));
+    }
 
 });
