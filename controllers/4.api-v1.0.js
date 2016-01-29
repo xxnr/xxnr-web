@@ -64,6 +64,7 @@ var unionPayConfig = require('../configuration/unionPay_config');
 var api10 = converter.api10;
 var calculatePrice = require('../common/calculator').calculatePrice;
 var PAYMENTSTATUS = require('../common/defs').PAYMENTSTATUS;
+var PAYTYPE = require('../common/defs').PAYTYPE;
 var dri = require('../common/dri');
 // console.log('PAYMENTSTATUS=' + JSON.stringify(PAYMENTSTATUS));
 
@@ -483,32 +484,39 @@ function updateShoppingCart() {
 
 function payOrder(payExecutor){
     var self = this;
-    var callbackName = this.query['callback'];
-    var orderId = this.data['orderId'];
-    var payPrice = this.data['price'];
+    var callbackName = self.query['callback'];
+    var orderId = self.data['orderId'];
+    var payPrice = self.data['price'];
 
-    if(!orderId){
-        var response = ( {code:1001, message:'param orderId required'});
-        callbackName ? self.jsonp(callbackName, response) : self.json(response);
+    if (!orderId) {
+        self.respond({code:1001, message:'请提供订单ID'});
         return;
     }
 
-    // aliPay request creation
     var options = {};
     options.id = orderId;
     OrderService.get(options, function(err, order, payment) {
-        if(err) {
+        if (err) {
             console.error('api-v1.0 payOrder OrderService get err:', err);
             self.respond({code:1001, message:'支付出错'});
             return;
         }
 
-        if(order.isClosed){
+        if (!order) {
+            self.respond({code:1001, message:'未找到订单信息'});
+            return;
+        }
+
+        if (order.isClosed) {
             self.respond({code:1001, message:'订单已关闭'});
             return;
         }
 
         if (!payment || typeof(payment.id) === 'undefined' || typeof(payment.price) === 'undefined') {
+            if (order.payStatus === PAYMENTSTATUS.PAID) {
+                self.respond({code:1001, message:'订单已支付'});
+                return;
+            }
             self.respond({code:1001, message:'未找到支付信息'});
             return;
         }
@@ -525,7 +533,11 @@ function payOrder(payExecutor){
                     payPrice = minPayPrice;
                 }
             }
-            OrderService.getPayOrderPaymentInfo(order, payment, payPrice, function (err, resultPayment, resultPayPrice) {
+            var reqOptions = {};
+            if (self.payType) {
+                reqOptions.payType = self.payType;
+            }
+            OrderService.getPayOrderPaymentInfo(order, payment, payPrice, reqOptions, function (err, resultPayment, resultPayPrice) {
                 if (err) {
                     console.error('api-v1.0 payOrder OrderService getPayOrderPaymentInfo err:', err);
                     self.respond({code:1001, message:'获取支付信息出错'});
@@ -539,43 +551,14 @@ function payOrder(payExecutor){
             self.respond({"code":1001, "mesage":"获取支付信息出错"});
             return;
         }
-
-        // // user input price is null, not price Regexp, <= 0, > surplus price. use surplus price
-        // if (!payPrice || !tools.isPrice(payPrice.toString()) || !parseFloat(payPrice) || parseFloat(payPrice) <= 0 || parseFloat(payPrice) > payment.price) {
-        //     payPrice = payment.price;
-        //     payExecutor(payment.id, payPrice, self.ip, order.id);
-        //     return;
-        // } else {
-        //     // the price of user input, and equal last time inputted value.
-        //     if (payment.payPrice && parseFloat(payment.payPrice) === parseFloat(payPrice)) {
-        //         payExecutor(payment.id, payPrice, self.ip, order.id);
-        //         return; 
-        //     } else {
-        //         // the price of user input is a new one, not in the payment and not equal last time inputted value. need push one new payment
-        //         var query = {'id':order.id, 'payments.id':payment.id};
-        //         var values = {};
-        //         var newPayment = payment;
-        //         newPayment.id = U.GUID(10);
-        //         newPayment.payPrice = parseFloat(payPrice).toFixed(2);
-        //         values['$push'] = {'payments':newPayment};
-        //         values['$set'] = {'payments.$.isClosed':true};
-        //         OrderService.updateAndPushPayment(query, values, function (err) {
-        //             if (err) {
-        //                 console.error('api-v1.0 payOrder OrderService update and add new payment err:', err);
-        //                 self.respond({code:1001, message:'生成支付信息出错'});
-        //                 return;
-        //             }
-        //             payExecutor(newPayment.id, newPayment.payPrice, self.ip, order.id);
-        //             return;
-        //         });   
-        //     }
-        // }
     });
 }
 
 function alipayOrder(){
     var self = this;
     var consumer = self.data['consumer']||'website';
+    self.payType = PAYTYPE.ZHIFUBAO;
+
     payOrder.call(this, function(paymentId, totalPrice, ip) {
         switch(consumer) {
             case 'app':
@@ -608,7 +591,7 @@ function aliPaySuccess(){
 
 function payNotify(paymentId, options){
 
-    OrderService.get({"paymentId": paymentId}, function(err, order) {
+    OrderService.get({"payments.id": paymentId}, function(err, order) {
         // TODO: log err
         if (err) {
             console.error('api-v1.0 payNotify OrderService get err:', err);
@@ -618,6 +601,7 @@ function payNotify(paymentId, options){
             if ((order.payStatus||PAYMENTSTATUS.UNPAID) == PAYMENTSTATUS.UNPAID || order.payStatus == PAYMENTSTATUS.PARTPAID) {
                 OrderService.paid(order.id, paymentId, options, function(err) {
                     if(err){
+                        console.error('api-v1.0 payNotify OrderService paid err:', err);
                         // if err happen
                         // send sms to dri
                         dri.sendDRI('[DRI] Fail to update order in order payNotify: ', 'orderId:'+order.id, err);
@@ -628,35 +612,44 @@ function payNotify(paymentId, options){
     });
 }
 
-function alipayNotify(){
+function alipayNotify() {
     var self = this;
     var qs = require('querystring');
     var body = qs.parse(self.body);
     
-    AlipayNotify.verifyNotify(body, function(isValid){
-        if(!isValid){
+    AlipayNotify.verifyNotify(body, function(isValid) {
+        if (!isValid) {
             return;
         }
 
         var paymentId = body.out_trade_no;
         var status = body.trade_status;
         var price = body.total_fee || null;
-        if(status == 'TRADE_SUCCESS'){
+        if (status == 'TRADE_SUCCESS') {
             var options = {};
+            options.payType = PAYTYPE.ZHIFUBAO;
             if (price) {
                 options.price = price;
             }
             payNotify.call(self, paymentId, options);
+            self.content('success');
+            // alipay success log
+        } else {
+            self.content('success');
         }
-
-        self.content('success');
-    })
+        // update the third-party platform payment
+        if (status == 'TRADE_SUCCESS' || status == 'WAIT_BUYER_PAY' || status == 'TRADE_FINISHED' || status == 'TRADE_CLOSED') {
+            OrderService.updateThirdpartyPayment(paymentId);
+        } else {
+            console.error('alipayNotify status not find:, status:', status);
+        }
+    });
 }
 
-function unionpayNotify(){
+function unionpayNotify() {
     var self = this;
 
-    if(!self.body){
+    if (!self.body) {
         console.error('unionpayNotify cannot get unionpay notification body');
     }
 
@@ -672,8 +665,8 @@ function unionpayNotify(){
 
     commandLine += ` --data=${new Buffer(self.body).toString('base64')} --json=${new Buffer(JSON.stringify(body)).toString('base64')}`;
 
-    new php_processor(commandLine).execute(function(output, error){
-        if(error){
+    new php_processor(commandLine).execute(function(output, error) {
+        if (error) {
             console.error('unionpayNotify verification failure:', error);
             self.content('verification failure:' + error);
             return;
@@ -688,30 +681,33 @@ function unionpayNotify(){
 
         // console.log('result = ' + result + ', and result.length = ' + result.length);
 
-        if(result.substring(0, 'success'.length) === 'success'){
-            if(body['respCode'] === 00 || body['respCode'] === '00'){
+        if (result.substring(0, 'success'.length) === 'success') {
+            if (body['respCode'] === 00 || body['respCode'] === '00') {
                 var paymentInfo = JSON.parse(new Buffer(body.reqReserved, 'base64').toString());
                 var paymentId = paymentInfo.paymentId;
-                var options = {price: (parseFloat(paymentInfo.txnAmt)/100).toFixed(2), orderId:paymentInfo.orderId};
+                var options = {price: (parseFloat(paymentInfo.txnAmt)/100).toFixed(2), orderId:paymentInfo.orderId, payType:PAYTYPE.UNIONPAY};
                 payNotify.call(self, paymentId, options);
                 self.content('success');
-            }
-            else{
+                // update the third-party platform payment
+                OrderService.updateThirdpartyPayment(paymentId);
+                // unionpay success log
+
+            } else {
                 console.error('unionpayNotify error : respCode is ', body['respCode'], 'body:', body);
                 self.content('success'); // tell the notifier we successfully handled the notification
             }
-        }
-        else{
+        } else {
             console.error('unionpayNotify verification failure:', result);
             self.content('verification failure:' + result);
         }
     });
 }
 
-function unionPayOrder(){
+function unionPayOrder() {
     // before starting test, we have to enable test account : login http://open.unionpay.com with xxnr 12121312(our test parameters is bound with xxnr)
     //     then go to right top corner => "my test" => "my product" => "not tested" => select one tet type => click "start to test"
     var self = this;
+    self.payType = PAYTYPE.UNIONPAY;
     payOrder.call(this, function(paymentId, totalPrice, ip, orderId){
         var consumer = self.data['consumer']||'website';
         var phpPage = null;
