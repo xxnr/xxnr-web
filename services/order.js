@@ -771,13 +771,13 @@ OrderService.prototype.getPayOrderPaymentInfo = function(order, payment, payPric
         values = {'payments.$.isClosed':true};
     } else {
     	// user input price is not null, price Regexp, > 0, <  payment price. use payPrice
-    	if (payPrice && tools.isPrice(payPrice.toString()) && parseFloat(payPrice) && parseFloat(payPrice) > 0.01 && parseFloat(payPrice) < payment.price) {
+    	if (payPrice && tools.isPrice(payPrice.toString()) && parseFloat(payPrice) && parseFloat(payPrice) >= 0.01 && parseFloat(payPrice) < payment.price) {
     		payment.id = U.GUID(10);
 			payment.dateCreated = new Date();
 			values = {'payments.$.id':payment.id, 'payments.$.dateCreated': payment.dateCreated};
 			if (payPrice) {
-				payment.payPrice = parseFloat(payPrice).toFixed(2);
-				values['payments.$.payPrice'] = parseFloat(payPrice).toFixed(2);
+				payment.payPrice = parseFloat(payPrice);
+				values['payments.$.payPrice'] = parseFloat(payPrice);
 			}
 			if (options && options.payType) {
 				payment.payType = options.payType;
@@ -809,7 +809,7 @@ OrderService.prototype.getPayOrderPaymentInfo = function(order, payment, payPric
     	}
     }
 
-    if (!U.isEmpty(values)) {  
+    if (!U.isEmpty(values)) {
 	    OrderModel.update(query, {'$set':values}, function(err, count) {
 	    	if (err) {
 	            console.error('OrderService getPayOrderPaymentInfo update payment err:', err);
