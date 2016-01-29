@@ -681,7 +681,7 @@ function addOrderBySKU(){
                     var additionPrice = 0;
                     additions.forEach(function(addition){
                         additionPrice += addition.price;
-                        if(!additions.ref) {
+                        if(!addition.ref) {
                             addition.ref = addition._id;
                         }
                         
