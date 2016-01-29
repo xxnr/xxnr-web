@@ -728,12 +728,13 @@ function unionPayOrder() {
         var backNotifyUrl = host + '/' + unionPayConfig.notification.back;
         var php_processor = require("../common/php_processor");
         var commandLine = '\"' + require('path').resolve(__filename + '/../../external/unionPay/upacp_sdk_php/demo/utf8/' + phpPage) + '\"';
+        var returnPrice = (totalPrice * 100).toFixed(2);
 
         if(F.isDebug){
             commandLine += ' --test';
         }
 
-        commandLine += ` --front-notify-url=${frontNotifyUrl} --back-notify-url=${backNotifyUrl} --payment-id=${paymentId} --total-price=${totalPrice * 100} --order-id=${orderId}`;
+        commandLine += ` --front-notify-url=${frontNotifyUrl} --back-notify-url=${backNotifyUrl} --payment-id=${paymentId} --total-price=${returnPrice} --order-id=${orderId}`;
 
         new php_processor(commandLine).execute(function(output, error){
             if(error){
