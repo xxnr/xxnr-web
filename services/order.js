@@ -776,8 +776,8 @@ OrderService.prototype.getPayOrderPaymentInfo = function(order, payment, payPric
 			payment.dateCreated = new Date();
 			values = {'payments.$.id':payment.id, 'payments.$.dateCreated': payment.dateCreated};
 			if (payPrice) {
-				payment.payPrice = parseFloat(payPrice);
-				values['payments.$.payPrice'] = parseFloat(payPrice);
+				payment.payPrice = payPrice;
+				values['payments.$.payPrice'] = payPrice;
 			}
 			if (options && options.payType) {
 				payment.payType = options.payType;
