@@ -784,7 +784,7 @@ OrderService.prototype.getPayOrderPaymentInfo = function(order, payment, payPric
 	        var newPayment = payment;
             newPayment.id = U.GUID(10);
             if (payPrice) {
-            	newPayment.payPrice = parseFloat(payPrice).toFixed(2);
+            	newPayment.payPrice = parseFloat(parseFloat(payPrice).toFixed(2));
             }
             if (options && options.payType) {
             	newPayment.payType = options.payType;
@@ -815,10 +815,10 @@ OrderService.prototype.getPayOrderPaymentInfo = function(order, payment, payPric
     	if (payPrice && tools.isPrice(payPrice.toString()) && parseFloat(payPrice) && parseFloat(parseFloat(payPrice).toFixed(2)) >= 0.01 && parseFloat(parseFloat(payPrice).toFixed(2)) < payment.price) {
     		payment.id = U.GUID(10);
 			payment.dateCreated = new Date();
-			values = {'payments.$.id':payment.id, 'payments.$.dateCreated': payment.dateCreated};
+			values = {'payments.$.id':payment.id, 'payments.$.dateCreated': payment.dateCreated, 'payments.$.isClosed': false};
 			if (payPrice) {
-				payment.payPrice = payPrice;
-				values['payments.$.payPrice'] = payPrice;
+				payment.payPrice = parseFloat(parseFloat(payPrice).toFixed(2));
+				values['payments.$.payPrice'] = parseFloat(parseFloat(payPrice).toFixed(2));
 			}
 			if (options && options.payType) {
 				payment.payType = options.payType;
