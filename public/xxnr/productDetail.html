@@ -91,7 +91,7 @@
                     <!--</ul>-->
                     <ul class="price_list">
                         <li class="ng-cloak" ng-hide="item.presale">新农价：</li>
-                        <li class="price" ng-hide="item.presale">{{'￥'+item.minPrice}} {{item.maxPrice==item.minPrice?"":"-"}} {{(item.maxPrice==item.minPrice?"":item.maxPrice)}}</li>
+                        <li class="price" ng-hide="item.presale">{{'￥'+item.minPrice.toFixed(2)}} {{item.maxPrice==item.minPrice?"":"-"}} {{(item.maxPrice==item.minPrice?"":item.maxPrice.toFixed(2))}}</li>
                         <li class="ng-cloak price" ng-show="item.presale" ng-class="{true: 'presale',}[item.presale]">即将上线</li>
                         <!-- <li ng-show="category=='化肥' && !item.presale" class="ng-cloak unitText">/吨</li> -->
                         <li ng-show="item.deposit && item.online && !item.presale">预付定金：</li>
