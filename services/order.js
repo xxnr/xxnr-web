@@ -777,11 +777,11 @@ OrderService.prototype.getPayOrderPaymentInfo = function(order, payment, payPric
 			values = {'payments.$.id':payment.id, 'payments.$.dateCreated': payment.dateCreated};
 			if (payPrice) {
 				payment.payPrice = parseFloat(payPrice).toFixed(2);
-				values['payments.$.payPrice'] = payment.payPrice;
+				values['payments.$.payPrice'] = parseFloat(payPrice).toFixed(2);
 			}
 			if (options && options.payType) {
 				payment.payType = options.payType;
-				values['payments.$.payType'] = payment.payType;
+				values['payments.$.payType'] = options.payType;
 			}
     	} else {
     		callback(null, payment, payment.price);
