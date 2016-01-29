@@ -710,13 +710,13 @@ COMPONENT('form', function() {
 	var self = this;
 	var button;
 
-	if (!$cmanager.$$form) {
-		$cmanager.$$form = true;
-		$(document).on('click', '.ui-form-button-close', function() {
-			self.cancel(self.hide);
-			//SET($.components.findById($(this).attr('data-id')).path, '');
-		});
-	}
+	//if (!$cmanager.$$form) {
+	//	$cmanager.$$form = true;
+	//	$(document).on('click', '.ui-form-button-close', function() {
+	//		self.cancel(self.hide);
+	//		//SET($.components.findById($(this).attr('data-id')).path, '');
+	//	});
+	//}
 
 	var hide = self.hide = function() {
 		self.set('');
@@ -726,6 +726,7 @@ COMPONENT('form', function() {
 	self.noDirty();
 	self.submit = function(hide, button) { self.hide(); };
 	self.cancel = function(hide) { self.hide(); };
+	self.close = function(hide){ self.hide(); };
 
 	self.make = function() {
 		var content = self.element.html();
@@ -752,6 +753,10 @@ COMPONENT('form', function() {
 						self[this.name](hide);
 					break;
 			}
+		});
+
+		self.element.find('.ui-form-button-close').on('click', function(){
+			self.close(hide);
 		});
 
 		return true;

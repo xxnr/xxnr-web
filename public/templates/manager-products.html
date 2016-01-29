@@ -558,7 +558,7 @@
             });
         };
 
-        component.cancel = function(hide){
+        component.close = function(hide){
             if(formModified){
                 if (!confirm('您有未保存的修改，是否离开？'))
                     return;
@@ -577,6 +577,8 @@
             hide();
             products_refresh(true);
         };
+
+        component.cancel = component.close;
     });
 
     ON('#products.category', function(component) {
