@@ -713,7 +713,8 @@ COMPONENT('form', function() {
 	if (!$cmanager.$$form) {
 		$cmanager.$$form = true;
 		$(document).on('click', '.ui-form-button-close', function() {
-			SET($.components.findById($(this).attr('data-id')).path, '');
+			self.cancel(self.hide);
+			//SET($.components.findById($(this).attr('data-id')).path, '');
 		});
 	}
 
