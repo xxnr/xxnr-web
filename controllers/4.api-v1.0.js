@@ -591,7 +591,7 @@ function aliPaySuccess(){
 
 function payNotify(paymentId, options){
 
-    OrderService.get({"payments.id": paymentId}, function(err, order) {
+    OrderService.get({"paymentId": paymentId}, function(err, order) {
         // TODO: log err
         if (err) {
             console.error('api-v1.0 payNotify OrderService get err:', err);
