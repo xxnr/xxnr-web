@@ -147,7 +147,10 @@
                                             <div class="p-info ng-cloak clearfix">
                                                 <div class="product-row">
                                                     <div class="p-img">
-                                                        <a ng-href="productDetail.html?goodsId={{product.id}}" target="_blank">
+                                                        <a ng-if="!product.attributes" ng-href="productDetail.html?goodsId={{product.id}}" target="_blank">
+                                                            <img class="ng-cloak" ng-src={{product.thumbnail}}>
+                                                        </a>
+                                                        <a ng-if="product.attributes" ng-href="productDetail.html?goodsId={{product.productId}}" target="_blank">
                                                             <img class="ng-cloak" ng-src={{product.thumbnail}}>
                                                         </a>
                                                     </div>
@@ -157,16 +160,7 @@
                                                         <div class="p-skus clearfix" ng-if="product.attributes">
                                                             <ul>
                                                                 <li ng-repeat="attribute in product.attributes">
-                                                                    {{attribute.name}}:{{attribute.value}};&nbsp;
-                                                                </li>
-                                                                <li class="additions">
-                                                                    <ul ng-if="product.additions">
-                                                                    <!-- <ul> -->
-                                                                    附加项目:
-                                                                        <li ng-repeat="addition in product.additions">
-                                                                            {{addition.name}}&nbsp;
-                                                                        </li>
-                                                                    </ul>
+                                                                    {{attribute.name}}: {{attribute.value}};&nbsp;
                                                                 </li>
 
                                                             </ul>
@@ -180,10 +174,27 @@
                                                     <div class="p-quantity ng-cloak">
                                                         {{product.count}}
                                                     </div>
+                                                    <div class="additions" ng-if="product.additions">
+                                                        <div class="">
+                                                            附加项目 ：
+                                                        </div>
+                                                        <div class="addition-options">
+                                                            <span ng-repeat="addition in product.additions">
+                                                                {{addition.name}}&nbsp;;
+                                                            </span>
+                                                        </div>
+
+                                                        <div class="TotalAdditionsPrice">
+                                                            ¥ {{product.totalAdditionsPrice*product.count}}
+                                                        </div>
+                                                        <div class="additions-quantity ng-cloak">
+                                                            {{product.count}}
+                                                        </div>
+                                                    </div>
                                                 </div>
                                                 <div class="pay-step" ng-show="{{product.deposit>0}}">
                                                     <div class="pay-step-1"><span class="text-info">阶段一：订金</span><span class="pay-step-1-price">¥ {{product.deposit | fixedTwo}}</span><span class="right">{{product.count}}</span></div>
-                                                    <div class="pay-step-2"><span class="text-info">阶段二：尾款</span><span class="pay-step-2-price">¥ {{product.price-product.deposit | fixedTwo}}</span><span class="right">{{product.count}}</span></div>
+                                                    <div class="pay-step-2"><span class="text-info">阶段二：尾款</span><span class="pay-step-2-price">¥ {{ product.price-product.deposit + product.totalAdditionsPrice | fixedTwo}}</span><span class="right">{{product.count}}</span></div>
                                                 </div>
                                             </div>
                                         </li>

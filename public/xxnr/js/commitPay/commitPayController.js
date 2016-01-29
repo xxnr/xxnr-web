@@ -80,42 +80,51 @@ app.controller('commitPayController', function($scope, remoteApiService, payServ
 
     $scope.edit_multi_pay_num = function () {
         $scope.pay_price = $scope.multi_pay_amount;
+        payUrlSetting();
     };
 
     $scope.multi_pay_amount_reduce = function(){
         // if($scope.multi_pay_text_editing && (Number($scope.multi_pay_amount) - 500) >= 3000){
-        if((Number($scope.multi_pay_amount) - 500) >= 3000){
-            $scope.multi_pay_amount = (Number($scope.multi_pay_amount) - 500);
-            if($scope.multi_pay_amount == 3000){
+        if($scope.payTimes == 1){
+            if((Number($scope.multi_pay_amount) - 500) >= 3000){
+                $scope.multi_pay_amount = (Number($scope.multi_pay_amount) - 500);
+                $scope.pay_price = $scope.multi_pay_amount;
+                payUrlSetting();
+                if($scope.multi_pay_amount == 3000){
+                    $scope.amount_reduce_editable = false;
+                }
+                if($scope.multi_pay_amount > 3000){
+                    $scope.amount_reduce_editable = true;
+                }
+                if($scope.multi_pay_amount < Number($scope.orders[$scope.orderSelectedNum].duePrice)){
+                    $scope.amount_add_editable = true;
+                }
+            }else if (Number($scope.multi_pay_amount) - 500 < 3000 && $scope.multi_pay_amount != $scope.orders[$scope.orderSelectedNum].duePrice) {
                 $scope.amount_reduce_editable = false;
+                $scope.multi_pay_amount = 3000;
             }
-            if($scope.multi_pay_amount > 3000){
-                $scope.amount_reduce_editable = true;
-            }
-            if($scope.multi_pay_amount < Number($scope.orders[$scope.orderSelectedNum].duePrice)){
-                $scope.amount_add_editable = true;
-            }
-        }else if (Number($scope.multi_pay_amount) - 500 < 3000 && $scope.multi_pay_amount != $scope.orders[$scope.orderSelectedNum].duePrice) {
-            $scope.amount_reduce_editable = false;
-            $scope.multi_pay_amount = 3000;
         }
     };
     $scope.multi_pay_amount_add = function(){
         // if($scope.multi_pay_text_editing && (Number($scope.multi_pay_amount) + 500) <= $scope.orders[$scope.orderSelectedNum].deposit){
-        if((Number($scope.multi_pay_amount) + 500) <= $scope.orders[$scope.orderSelectedNum].duePrice){
-            $scope.multi_pay_amount = (Number($scope.multi_pay_amount) + 500);
-            if($scope.multi_pay_amount == $scope.orders[$scope.orderSelectedNum].duePrice){
+        if($scope.payTimes == 1){
+            if((Number($scope.multi_pay_amount) + 500) <= $scope.orders[$scope.orderSelectedNum].duePrice){
+                $scope.multi_pay_amount = (Number($scope.multi_pay_amount) + 500);
+                $scope.pay_price = $scope.multi_pay_amount;
+                payUrlSetting();
+                if($scope.multi_pay_amount == $scope.orders[$scope.orderSelectedNum].duePrice){
+                    $scope.amount_add_editable = false;
+                }
+                if($scope.multi_pay_amount > 3000){
+                    $scope.amount_reduce_editable = true;
+                }
+                if($scope.multi_pay_amount < Number($scope.orders[$scope.orderSelectedNum].duePrice)){
+                    $scope.amount_add_editable = true;
+                }
+            }else if (Number($scope.multi_pay_amount) + 500 > $scope.orders[$scope.orderSelectedNum].duePrice && $scope.multi_pay_amount != $scope.orders[$scope.orderSelectedNum].duePrice) {
+                $scope.multi_pay_amount = $scope.orders[$scope.orderSelectedNum].duePrice;
                 $scope.amount_add_editable = false;
             }
-            if($scope.multi_pay_amount > 3000){
-                $scope.amount_reduce_editable = true;
-            }
-            if($scope.multi_pay_amount < Number($scope.orders[$scope.orderSelectedNum].duePrice)){
-                $scope.amount_add_editable = true;
-            }
-        }else if (Number($scope.multi_pay_amount) + 500 > $scope.orders[$scope.orderSelectedNum].duePrice && $scope.multi_pay_amount != $scope.orders[$scope.orderSelectedNum].duePrice) {
-            $scope.multi_pay_amount = $scope.orders[$scope.orderSelectedNum].duePrice;
-            $scope.amount_add_editable = false;
         }
     };
 
@@ -233,7 +242,11 @@ app.controller('commitPayController', function($scope, remoteApiService, payServ
         }
         return params;
     };
-    function payTimesReset(){
-
+    function payUrlSetting(){
+        if($scope.selectedPayMethodIndex==0){
+            $scope.payUrl = payService.aliPayUrl($scope.orders[$scope.orderSelectedNum].id,$scope.pay_price);
+        }else if($scope.selectedPayMethodIndex==1){
+            $scope.payUrl = payService.unionPayUrl($scope.orders[$scope.orderSelectedNum].id,$scope.pay_price);
+        }
     };
 });

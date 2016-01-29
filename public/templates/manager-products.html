@@ -1,1045 +1,1107 @@
-<div class="filter">
-	<div class="container">
-		<div class="caption"><span class="fa fa-navicon mr5"></span> @(商品管理)</div>
-		<div class="row">
-			<div class="col-md-3 col-sm-6 m">
-				<div data-component="textbox" data-component-path="products.filter.search" data-placeholder="@(查找商品...)" data-control-icon="fa-search"></div>
-				<div class="help" data-component="template" data-component-path="products.info"><script type="text/html">{{ count | pluralize(@('items','item','items','items')) }} / {{ pages | pluralize(@('pages','page','pages','pages')) }}</script></div>
-			</div>
-			<div class="col-md-3 col-sm-6 m">
-				<div data-component="dropdown" data-component-path="products.filter.category" data-source="products.categories" data-empty="true" data-empty-text="@(全部商品)" data-source-value="id"></div>
-			</div>
-			<div class="col-md-6 m">
-				<div class="row">
-					<div class="col-xs-3"><a href="javascript:void(0)" data-component="click" class="linkbutton" data-component-path="products_huafei_new"><span class="fa fa-plus-circle"></span>@(新增化肥)</a></div>
-					<div class="col-xs-3"><a href="javascript:void(0)" data-component="click" class="linkbutton" data-component-path="products_qiche_new"><span class="fa fa-plus-circle"></span>@(新增汽车)</a></div>
-					<!-- <div class="col-xs-3"><a href="javascript:void(0)" data-component="click" class="linkbutton" data-component-path="products_import"><span class="fa fa-cloud-upload"></span>@(Import CSV)</a></div> -->
-					<div class="col-xs-3"><a href="javascript:void(0)" data-component="click" class="linkbutton" data-component-path="products_category"><span class="fa fa-folder"></span>@(更新分类)</a></div>
-				</div>
-			</div>
-		</div>
-	</div>
+﻿<div class="container">
+        <div class="caption"><span class="fa fa-navicon mr5"></span> @(商品管理)</div>
+        <div class="row">
+            <div class="col-md-3 col-sm-6 m">
+                <div data-component="textbox" data-component-path="products.filter.search" data-placeholder="@(查找商品...)" data-control-icon="fa-search"></div>
+                <div class="help" data-component="template" data-component-path="products.info"><script type="text/html">{{ count | pluralize(@('items','item','items','items')) }} / {{ pages | pluralize(@('pages','page','pages','pages')) }}</script></div>
+            </div>
+            <div class="col-md-3 col-sm-6 m">
+                <div data-component="dropdown" data-component-path="products.filter.category" data-source="products.categories" data-empty="true" data-empty-text="@(全部商品)" data-source-value="id"></div>
+            </div>
+            <div class="col-md-6 m">
+                <div class="row">
+                    <div class="col-xs-3"><a href="javascript:void(0)" data-component="click" class="linkbutton" data-component-path="products_huafei_new"><span class="fa fa-plus-circle"></span>@(新增化肥)</a></div>
+                    <div class="col-xs-3"><a href="javascript:void(0)" data-component="click" class="linkbutton" data-component-path="products_qiche_new"><span class="fa fa-plus-circle"></span>@(新增汽车)</a></div>
+                    <!-- <div class="col-xs-3"><a href="javascript:void(0)" data-component="click" class="linkbutton" data-component-path="products_import"><span class="fa fa-cloud-upload"></span>@(Import CSV)</a></div> -->
+                    <div class="col-xs-3"><a href="javascript:void(0)" data-component="click" class="linkbutton" data-component-path="products_category"><span class="fa fa-folder"></span>@(更新分类)</a></div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <div class="container">
-	<div data-component="grid" data-component-path="products.grid" data-max="auto" data-options-page="@(Page: #)" data-options-button="@(查看更多商品)" data-component-id="products.grid">
-		<script type="text/html">
-		<tr>
-			<td style="width:30px" class="silver hidden-xs">$index</td>
-            <td style="width:80px" class="silver hidden-xs" data-title="商品ID">{{ id }}</td>
-            <td style="width:60px" data-title="主图">{{ if pictures && pictures.length }}<img width="100%" src="/images/thumbnail/{{ pictures[0] }}.jpg"></img>{{ fi }}</td>
-			<td style="width:300px" class="hidden-xs" data-title="商品">{{ if online }}<b class="mr5 fs11 green">@(Online)</b>{{ fi}}{{ if istop }}<b class="mr5 fs11 red">@(TOP)</b>{{ fi }}{{ name }}</td>
-            <td style="width:50px" class="silver hidden-xs" data-title="类目"> {{ category }}</td>
-            <td style="width:60px" class="silver hidden-xs" data-title="品牌"> {{ if brand }} {{brand.name }} {{ fi }}</td>
-            <td style="width:60px" class="ui-right active" data-title="平台价">{{ if SKUPrice}} {{ SKUPrice.min | price(2) }} {{ fi }}</td>
-            <td style="width:60px" class="ui-right active" data-title="定金">{{ deposit | price(2) }}</td>
-            <td style="width:100px" class="ui-right active" data-title="创建时间">{{ datecreated | format('@(yyyy-MM-dd HH:mm:ss)') }}</td>
-            <td style="width:80px" class="ui-right">
-				<button name="edit" title="@(编辑)"><span class="fa fa-pencil"></span></button>
-				{{ if online }}
-				<button name="offline" title="@(下架)"><span class="fa fa-stop"></span></button>
-				{{ else }}
-				<button name="online" title="@(上架)"><span class="fa fa-play"></span></button>
-				{{ fi }}
-				<button name="remove" title="@(删除)"><span class="fa fa-times"></span></button>
-			</td>
-		</tr>
-		</script>
-	</div>
+    <div data-component="grid" data-component-path="products.grid" data-max="auto" data-options-page="@(Page: #)" data-options-button="@(查看更多商品)" data-component-id="products.grid">
+        <script type="text/html">
+            <tr>
+                <td style="width:30px" class="silver hidden-xs">$index</td>
+                <td style="width:80px" class="silver hidden-xs" data-title="商品ID">{{ id }}</td>
+                <td style="width:60px" data-title="主图">{{ if pictures && pictures.length }}<img width="100%" src="/images/thumbnail/{{ pictures[0] }}.jpg"></img>{{ fi }}</td>
+                <td style="width:300px" class="hidden-xs" data-title="商品">{{ if online }}<b class="mr5 fs11 green">@(Online)</b>{{ fi}}{{ if istop }}<b class="mr5 fs11 red">@(TOP)</b>{{ fi }}{{ name }}</td>
+                <td style="width:50px" class="silver hidden-xs" data-title="类目"> {{ category }}</td>
+                <td style="width:60px" class="silver hidden-xs" data-title="品牌"> {{ if brand }} {{brand.name }} {{ fi }}</td>
+                <td style="width:60px" class="ui-right active" data-title="平台价">{{ if SKUPrice}} {{ SKUPrice.min | price(2) }} {{ fi }}</td>
+                <td style="width:60px" class="ui-right active" data-title="定金">{{ deposit | price(2) }}</td>
+                <td style="width:100px" class="ui-right active" data-title="创建时间">{{ datecreated | format('@(yyyy-MM-dd HH:mm:ss)') }}</td>
+                <td style="width:80px" class="ui-right">
+                    <button name="edit" title="@(编辑)"><span class="fa fa-pencil"></span></button>
+                    {{ if online }}
+                    <button name="offline" title="@(下架)"><span class="fa fa-stop"></span></button>
+                    {{ else }}
+                    <button name="online" title="@(上架)"><span class="fa fa-play"></span></button>
+                    {{ fi }}
+                    <button name="remove" title="@(删除)"><span class="fa fa-times"></span></button>
+                </td>
+            </tr>
+        </script>
+    </div>
 </div>
 
 <div data-component="form" data-title="@(新增商品)" data-component-path="common.form" data-if="value === 'products'" data-width="1200px" data-component-id="products.form">
-	<div class="padding">
-		<div data-component="visible" data-component-path="products.form.id">
-			<div data-component="template" data-component-path="products.form" class="padding" style="padding-bottom:0">
-				<script type="text/html">
-					<table class="table table-bordered" border="0">
-						<tbody>
-						<tr>
-							<td class="col-xs-5 active">@(# id)</td>
-							<td>{{ id }}</td>
-						</tr>
-						<tr>
-							<td class="col-xs-5 active">@(Created)</td>
-							<td>{{ datecreated | format('yyyy-MM-dd') }}</td>
-						</tr>
-						</tbody>
-					</table>
-				</script>
-			</div>
-		</div>
-	</div>
+    <div class="padding">
+        <div data-component="visible" data-component-path="products.form.id">
+            <div data-component="template" data-component-path="products.form" class="padding" style="padding-bottom:0">
+                <script type="text/html">
+                    <table class="table table-bordered" border="0">
+                        <tbody>
+                        <tr>
+                            <td class="col-xs-5 active">@(# id)</td>
+                            <td>{{ id }}</td>
+                        </tr>
+                        <tr>
+                            <td class="col-xs-5 active">@(Created)</td>
+                            <td>{{ datecreated | format('yyyy-MM-dd') }}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </script>
+            </div>
+        </div>
+    </div>
 
-	<div class="productinfo" style="padding-bottom:0">
-		<div class="row">
-			<div class="col-md-2 m">
-				<h3 class="ui-center">@(商品属性)</h3>
-			</div>
-			<div class="col-md-10">
-				<div class="hidden" data-component="texthidden" data-component-path="products.form.category" data-readonly="readonly"></div>
-				<div class="brand col-md-7 m">
-					<div data-component="dropdown" data-component-path="products.form.brand._id" data-source="products.brands" data-source-value="_id" data-source-text="name">@(品牌)</div>
-				</div>
+    <div class="productinfo" style="padding-bottom:0">
+        <div class="row">
+            <div class="col-md-2 m">
+                <h3 class="ui-center">@(商品属性)</h3>
+            </div>
+            <div class="col-md-10">
+                <div class="hidden" data-component="texthidden" data-component-path="products.form.category" data-readonly="readonly"></div>
+                <div class="brand col-md-7 m">
+                    <div data-component="dropdown" data-component-path="products.form.brand._id" data-source="products.brands" data-source-value="_id" data-source-text="name">@(品牌)</div>
+                </div>
 
-				<div data-component="template" data-component-path="products" class="attribute_list">
-					<script type="text/html">
-						{{ foreach attribute in form.attributes }}
-						<div class="col-md-7 m">
-							<div class="ui-dropdown-label ui-dropdown-label-required">{{attribute.name}}:</div>
-							<div class="ui-dropdown-values">
-								<div class="ui-dropdown">
-									<span class="fa fa-sort"></span>
-									<select data-index="{{ $index }}" required>
-										<option selected disabled hidden value=''></option>
-										{{ if attributes }}
-										{{ foreach value in attributes[attribute.name].values }}
-										<option value="{{ value.value }}" ref="{{value.ref}}" name="{{attribute.name}}" {{ if value.ref==attribute.ref}} selected {{ fi }}>{{value.value}}</option>
-										{{ end }}
-										{{ fi }}
-									</select>
-								</div>
-							</div>
-						</div>
-						<div class="col-md-3 m">
-							<div class="ui-textbox-label">添加{{attribute.name}}:</div>
-							<div class="ui-textbox-with-button new_attribute">
-								<input class="col-md-10" type="text"/>
-								<a class="col-md-2 account" href="javascript:void(0)" onclick="new_attribute('{{attribute.name}}', {{$index}})">
-									<span class="fa fa-plus-circle"></span>
-								</a>
-							</div>
-						</div>
-						{{ end }}
-					</script>
-				</div>
-			</div>
-		</div>
-	</div>
-	<hr>
-	<div>
-		<div class="row">
-			<div class="col-md-2 m">
-				<h3 class="ui-center">@(基本信息)</h3>
-			</div>
-			<div class="col-md-10">
-				<div class="col-md-8">
-					<div class="mb10" data-component="textbox" data-component-path="products.form.name" data-required="true">@(商品名称)</div>
-					<div class="mb10" data-component="textbox" data-component-path="products.form.deposit" data-component-type="currency" data-increment="true" data-icon="fa-jpy">@(定金)</div>
-					<!--<div class="mb10" data-component="textbox" data-component-path="products.form.originprice">@(市场价格)</div>
-					<div class="mb10" data-component="textbox" data-component-path="products.form.stock">@(库存数量)</div>
-					<div class="mb10" data-component="textbox" data-component-path="products.form.reference">@(商品货号)</div>-->
-					<div class="mb10" data-component="textbox" data-component-path="products.form.description">@(商品描述)</div>
-					<div class="mb10" data-component="fileupload" data-component-path="products.form.pictures" data-placeholder="@(添加图片)" data-accept="image/png,image/jpeg" data-multiple="true" data-icon="fa-camera" data-extension="false">@(商品主图)</div>
-					<div class="mb10" data-component="pictures" data-component-path="products.form.pictures"></div>
-				</div>
-				<div class="col-md-8">
-					<div data-component="checkbox" data-component-path="products.form.istop" style="margin-top:10px" class="red">@(<b>置顶商品</b>)</div>
-				</div>
-				<div class="col-md-8">
-					<div data-component="checkbox" data-component-path="products.form.online" style="margin-top:10px" class="red">@(<b>商品上线</b>)</div>
-				</div>
-				<div class="col-md-8">
-					<div data-component="checkbox" data-component-path="products.form.presale" style="margin-top:10px" class="red">@(<b>预售商品</b>)</div>
-				</div>
-			</div>
-		</div>
-	</div>
-	<hr>
-	<div>
-		<div class="silver padding" style="padding-bottom: 0px;padding-top: 0px;">
-			<h3>@(SKU)</h3>
-		</div>
-		<div data-component="template" class="padding" data-component-path="products" style="padding-top: 0px;">
-			<script type="text/html">
-				<table class="table table-bordered" border="0">
-					<tr>
-						<td class="hidden-xs ui-center nopadding">@(序号)</td>
-						{{ foreach SKUAttribute in SKUAttributes}}
-						<td class="hidden-xs ui-center">{{SKUAttribute.name}}</td>
-						{{ end }}
-						<td class="col-xs-3 hidden-xs ui-center">@(附加项目)</td>
-						<td class="col-xs-1 hidden-xs ui-center">@(市场价)</td>
-						<td class="col-xs-1 hidden-xs ui-center">@(平台价)</td>
-						<td class="col-xs-2 hidden-xs ui-center nopadding">@(操作)</td>
-					</tr>
-					{{ foreach SKU in SKUs }}
-					<tr class="SKU">
-						<td class="hidden-xs ui-center nopadding">
-							<h6 class="nopadding">{{$index+1}}</h6>
-						</td>
-						{{ foreach attribute in SKUAttributes}}
-						<td class="hidden-xs ui-center">
-							<select data-index="{{$index}}" data_SKU_id="{{SKU._id}}">
-								<option selected disabled hidden value=''></option>
-								{{ foreach value in SKUQueryAttributes[attribute.name] }}
-								<option value="{{value.value}}"  ref="{{value.ref}}"  name="{{attribute.name}}" order="{{value.order}}"
-									{{ if SKU._id }}
-										{{ if SKUExistAttributes && SKUExistAttributes[SKU._id] && SKUExistAttributes[SKU._id][attribute.name] && value.ref == SKUExistAttributes[SKU._id][attribute.name].ref }} 
-											selected
-										{{ fi }}
-									{{ else }}
-										{{ foreach SKUAttribute in SKU.attributes }}
-											{{ if SKUAttribute.ref && value.ref == SKUAttribute.ref }} 
-												selected
-												{{ break }}
-											{{ fi }}
-										{{ end }}
-									{{ fi }}
-									>{{value.value}}</option>
-								{{ end }}
-							</select>
-						</td>
-						{{ end }}
-						<td class="col-xs-3 hidden-xs ui-center SKUAdditions">
-							<div class="multiselect">
-								<div class="selectBox" onclick="showCheckboxes({{$index}})">
-									<select>
-										<option>@(请选择附加选项)</option>
-									</select>
-									<div class="overSelect"></div>
-								</div>
-								<div id="checkboxes" {{ if expanded[$index] }} style="display:block;" {{ else }} style="display:none" {{ fi }}>
-									<table width="100%">
-									{{ foreach addition in SKUAdditions}}
-									<label for="{{addition.ref}}" class="ui-left">
-										<tr>
-											<td class="col-xs-1 nopadding"><input size="30" name="addition" data_SKU_id="{{SKU._id}}" data-ref="{{ addition._id }}" data-name="{{ addition.name }}" data-price="{{ addition.price }}" type="checkbox" 
-												{{ if SKU._id }}
-													{{ if SKUExistAdditions && SKUExistAdditions[SKU._id] && SKUExistAdditions[SKU._id][addition.name] }} checked="checked"  {{ fi }}
-												{{ else }}
-													{{ foreach SKUAddition in SKU.additions }}
-														{{ if SKUAddition.ref && addition._id == SKUAddition.ref }} 
-															checked="checked"
-															{{ break }}
-														{{ fi }}
-													{{ end }}
-												{{ fi }}
-												/></td>
-											<td class="col-xs-4 ui-left nopadding"><h6 class="nopadding">{{addition.name}}</h6></td>
-											<td class="col-xs-4 nopadding"><h6 class="nopadding">加价（元）：</h6></td>
-											<td class="col-xs-3 ui-right nopadding"><h6 class="nopadding">{{addition.price}}</h6></td>
-										</tr>
-									</label>
-									{{ end }}
-									</table>
-								</div>
-							</div>
-						</td>
-						<td class="col-xs-1 hidden-xs ui-center">
-							<input size="10" data_SKU_id="{{SKU._id}}" name="market_price" value="{{SKU.price.market_price}}"/>
-						</td>
-						<td class="col-xs-1 hidden-xs ui-center">
-							<input size="10" data_SKU_id="{{SKU._id}}" name="platform_price" value="{{SKU.price.platform_price}}"/>
-						</td>
-						<td class="col-xs-2 hidden-xs ui-center nopadding">
-							{{ if SKU._id }}
-							<button name="ensure" onclick="update_SKU({{$index}})">@(提交)</button>
-							{{ if SKU.online }}
-							<button name="offline" title="@(下架)" onclick="online_SKU('{{$index}}', false)"><span class="fa fa-stop"></span></button>
-							{{ else }}
-							<button name="online" title="@(上架)" onclick="online_SKU('{{$index}}', true)"><span class="fa fa-play"></span></button>
-							{{ fi }}
-							<button name="copy" onclick="copy_SKU({{$index}})">@(复制)</button>
-							{{ else }}
-							<button name="new_SKU" onclick="add_SKU({{$index}})">@(添加)</button>
-							<button name="cancel_new_SKU" onclick="cancel_new_SKU({{$index}})">@(取消)</button>
-							{{ fi }}
-						</td>
-					</tr>
-					{{ end }}
-					<tr class="new_SKU">
-						<td class="col-xs-1 hidden-xs ui-center nopadding">
-							<a href="javascript:void(0)" onclick="new_SKU_in_page()">
-								<span class="fa fa-plus-circle">@(SKU)</span>
-							</a>
-						</td>
-						{{ foreach attribute in SKUAttributes}}
-						<td class="hidden-xs ui-center new_SKU_attribute">
-							<div class="ui-textbox-with-button new_attribute">
-								<input class="col-md-9 nopadding" type="text"/>
-								<a class="col-md-2 account nopadding" href="javascript:void(0)" onclick="new_sku_attribute('{{attribute.name}}', {{$index}})">
-									<span class="fa fa-plus-circle"></span>
-								</a>
-							</div>
-						</td>
-						{{ end }}
-						<td class="col-xs-3 hidden-xs ui-center new_SKU_addition">
-							<div class="ui-textbox-with-button new_attribute">
-								<input class="col-md-4 nopadding h6" type="text"/>
-								<div class="col-md-4 nopadding"><h6 class="nopadding">@(加价(元):)</h6></div>
-								<input class="col-md-3 nopadding h6" type="text"/>
-								<a class="col-md-1 account nopadding" href="javascript:void(0)" onclick="new_SKU_addition()">
-									<span class="fa fa-plus-circle"></span>
-								</a>
-							</div>
-						</td>
-						<td class="col-xs-1 hidden-xs ui-center new_SKU_attribute"></td>
-						<td class="col-xs-1 hidden-xs ui-center new_SKU_attribute"></td>
-						<td class="col-xs-2 hidden-xs ui-center new_SKU_attribute"></td>
-					</tr>
-				</table>
-			</script>
-		</div>
-	</div>
-	<br>
-	<div class="padding bg-smoke">
-		<div class="row">
-			<div class="col-md-2 m">
-				<h3 class="ui-center">@(商品详情)</h3>
-			</div>
-			<div class="col-md-10">
-				<div class="m" data-component="textarea" data-component-path="products.form.body" data-height="100px" data-name="product_body">@(商品详情)</div>
-				<div class="m" data-component="textarea" data-component-path="products.form.standard" data-height="100px" data-name="product_standard">@(参数规格)</div>
-				<div class="m" data-component="textarea" data-component-path="products.form.support" data-height="100px" data-name="product_support">@(服务说明)</div>
-			</div>
-			<div class="col-md-2 m">
-				<h3 class="ui-center">@(APP商品详情)</h3>
-			</div>
-			<div class="col-md-10">
-				<div class="m" data-component="textarea" data-component-path="products.form.app_body" data-height="100px" data-name="product_app_body">@(APP商品详情)</div>
-				<div class="m" data-component="textarea" data-component-path="products.form.app_standard" data-height="100px" data-name="product_app_standard">@(APP参数规格)</div>
-				<div class="m" data-component="textarea" data-component-path="products.form.app_support" data-height="100px" data-name="product_app_support">@(APP服务说明)</div>
-			</div>
-		</div>
-	</div>
-	<div data-component="error" data-component-path="products.response"></div>
-	<div class="ui-form-buttons">
-		<!-- <div data-component="validation" data-component-path="products.form.qiche">
-			<button name="submit">@(确认)</button>
-		</div> -->
-		<button name="submit">@(确认)</button>
-		<button name="cancel">@(取消)</button>
-	</div>
+                <div data-component="template" data-component-path="products" class="attribute_list">
+                    <script type="text/html">
+                        {{ foreach attribute in form.attributes }}
+                        <div class="col-md-7 m">
+                            <div class="ui-dropdown-label ui-dropdown-label-required">{{attribute.name}}:</div>
+                            <div class="ui-dropdown-values">
+                                <div class="ui-dropdown">
+                                    <span class="fa fa-sort"></span>
+                                    <select data-index="{{ $index }}" required>
+                                        <option selected disabled hidden value=''></option>
+                                        {{ if attributes }}
+                                        {{ foreach value in attributes[attribute.name].values }}
+                                        <option value="{{ value.value }}" ref="{{value.ref}}" name="{{attribute.name}}" {{ if value.ref==attribute.ref}} selected {{ fi }}>{{value.value}}</option>
+                                        {{ end }}
+                                        {{ fi }}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 m">
+                            <div class="ui-textbox-label">添加{{attribute.name}}:</div>
+                            <div class="ui-textbox-with-button new_attribute">
+                                <input class="col-md-10" type="text"/>
+                                <a class="col-md-2 account" href="javascript:void(0)" onclick="new_attribute('{{attribute.name}}', {{$index}})">
+                                    <span class="fa fa-plus-circle"></span>
+                                </a>
+                            </div>
+                        </div>
+                        {{ end }}
+                    </script>
+                </div>
+            </div>
+        </div>
+    </div>
+    <hr>
+    <div>
+        <div class="row">
+            <div class="col-md-2 m">
+                <h3 class="ui-center">@(基本信息)</h3>
+            </div>
+            <div class="col-md-10">
+                <div class="col-md-8">
+                    <div class="mb10" data-component="textbox" data-component-path="products.form.name" data-required="true">@(商品名称)</div>
+                    <div class="mb10" data-component="textbox" data-component-path="products.form.deposit" data-component-type="currency" data-increment="true" data-icon="fa-jpy">@(定金)</div>
+                    <!--<div class="mb10" data-component="textbox" data-component-path="products.form.originprice">@(市场价格)</div>
+                    <div class="mb10" data-component="textbox" data-component-path="products.form.stock">@(库存数量)</div>
+                    <div class="mb10" data-component="textbox" data-component-path="products.form.reference">@(商品货号)</div>-->
+                    <div class="mb10" data-component="textbox" data-component-path="products.form.description">@(商品描述)</div>
+                    <div class="mb10" data-component="fileupload" data-component-path="products.form.pictures" data-placeholder="@(添加图片)" data-accept="image/png,image/jpeg" data-multiple="true" data-icon="fa-camera" data-extension="false">@(商品主图)</div>
+                    <div class="mb10" data-component="pictures" data-component-path="products.form.pictures"></div>
+                </div>
+                <div class="col-md-8">
+                    <div data-component="checkbox" data-component-path="products.form.istop" style="margin-top:10px" class="red">@(<b>置顶商品</b>)</div>
+                </div>
+                <!--<div class="col-md-8">-->
+                <!--<div data-component="checkbox" data-component-path="products.form.online" style="margin-top:10px" class="red">@(<b>商品上线</b>)</div>-->
+                <!--</div>-->
+                <div class="col-md-8">
+                    <div data-component="checkbox" data-component-path="products.form.presale" style="margin-top:10px" class="red">@(<b>预售商品</b>)</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <hr>
+    <div>
+        <div class="silver padding" style="padding-bottom: 0px;padding-top: 0px;">
+            <h3>@(SKU)</h3>
+        </div>
+        <div data-component="template" class="padding" data-component-path="products" style="padding-top: 0px;">
+            <script type="text/html">
+                <table class="table table-bordered" border="0">
+                    <tr>
+                        <td class="hidden-xs ui-center nopadding">@(序号)</td>
+                        {{ foreach SKUAttribute in SKUAttributes}}
+                        <td class="hidden-xs ui-center">{{SKUAttribute.name}}</td>
+                        {{ end }}
+                        <td class="col-xs-3 hidden-xs ui-center">@(附加项目)</td>
+                        <td class="col-xs-1 hidden-xs ui-center">@(市场价)</td>
+                        <td class="col-xs-1 hidden-xs ui-center">@(平台价)</td>
+                        <td class="col-xs-2 hidden-xs ui-center nopadding">@(操作)</td>
+                    </tr>
+                    {{ foreach SKU in SKUs }}
+                    <tr class="SKU">
+                        <td class="hidden-xs ui-center nopadding">
+                            <h6 class="nopadding">{{$index+1}}</h6>
+                        </td>
+                        {{ foreach attribute in SKUAttributes}}
+                        <td class="hidden-xs ui-center">
+                            <select data-index="{{$index}}" data_SKU_id="{{SKU._id}}">
+                                <option selected disabled hidden value=''></option>
+                                {{ foreach value in SKUQueryAttributes[attribute.name] }}
+                                <option value="{{value.value}}"  ref="{{value.ref}}"  name="{{attribute.name}}" order="{{value.order}}"
+                                        {{ if SKU._id }}
+                                        {{ if SKUExistAttributes && SKUExistAttributes[SKU._id] && SKUExistAttributes[SKU._id][attribute.name] && value.ref == SKUExistAttributes[SKU._id][attribute.name].ref }}
+                                        selected
+                                        {{ fi }}
+                                        {{ else }}
+                                        {{ foreach SKUAttribute in SKU.attributes }}
+                                        {{ if SKUAttribute.ref && value.ref == SKUAttribute.ref }}
+                                        selected
+                                        {{ break }}
+                                        {{ fi }}
+                                        {{ end }}
+                                        {{ fi }}
+                                >{{value.value}}</option>
+                                {{ end }}
+                            </select>
+                        </td>
+                        {{ end }}
+                        <td class="col-xs-3 hidden-xs ui-center SKUAdditions">
+                            <div class="multiselect">
+                                <div class="selectBox" onclick="showCheckboxes({{$index}})">
+                                    <select>
+                                        <option>@(请选择附加选项)</option>
+                                    </select>
+                                    <div class="overSelect"></div>
+                                </div>
+                                <div id="checkboxes" {{ if expanded[$index] }} style="display:block;" {{ else }} style="display:none" {{ fi }}>
+                                    <table width="100%">
+                                        {{ foreach addition in SKUAdditions}}
+                                        <label for="{{addition.ref}}" class="ui-left">
+                                            <tr>
+                                                <td class="col-xs-1 nopadding"><input size="30" name="addition" data_SKU_id="{{SKU._id}}" data-ref="{{ addition._id }}" data-name="{{ addition.name }}" data-price="{{ addition.price }}" type="checkbox"
+                                                                                      {{ if SKU._id }}
+                                                                                      {{ if SKUExistAdditions && SKUExistAdditions[SKU._id] && SKUExistAdditions[SKU._id][addition.name] }} checked="checked"  {{ fi }}
+                                                                                      {{ else }}
+                                                                                      {{ foreach SKUAddition in SKU.additions }}
+                                                                                      {{ if SKUAddition.ref && addition._id == SKUAddition.ref }}
+                                                                                      checked="checked"
+                                                                                      {{ break }}
+                                                                                      {{ fi }}
+                                                                                      {{ end }}
+                                                                                      {{ fi }}
+                                                /></td>
+                                                <td class="col-xs-4 ui-left nopadding"><h6 class="nopadding">{{addition.name}}</h6></td>
+                                                <td class="col-xs-4 nopadding"><h6 class="nopadding">加价（元）：</h6></td>
+                                                <td class="col-xs-3 ui-right nopadding"><h6 class="nopadding">{{addition.price}}</h6></td>
+                                            </tr>
+                                        </label>
+                                        {{ end }}
+                                    </table>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="col-xs-1 hidden-xs ui-center">
+                            <input size="10" data_SKU_id="{{SKU._id}}" name="market_price" value="{{SKU.price.market_price}}"/>
+                        </td>
+                        <td class="col-xs-1 hidden-xs ui-center">
+                            <input size="10" data_SKU_id="{{SKU._id}}" name="platform_price" value="{{SKU.price.platform_price}}"/>
+                        </td>
+                        <td class="col-xs-2 hidden-xs ui-center nopadding">
+                            {{ if SKU._id }}
+                                {{ if !SKUChanged[$index] }}
+                                    <button class="button_disabled" title="没有可提交的内容">@(提交)</button>
+                                {{ else }}
+                                    <button onclick="update_SKU({{$index}})" title="该SKU有未提交的修改">@(提交)</button>
+                                {{ fi }}
+                                {{ if SKU.online }}
+                                    <button name="offline" title="@(下架)" onclick="online_SKU('{{$index}}', false)"><span class="fa fa-stop"></span></button>
+                                {{ else }}
+                                    <button name="online" title="@(上架)" onclick="online_SKU('{{$index}}', true)"><span class="fa fa-play"></span></button>
+                                {{ fi }}
+                                <button name="copy" onclick="copy_SKU({{$index}})">@(复制)</button>
+                            {{ else }}
+                                <button name="new_SKU" onclick="add_SKU({{$index}})">@(添加)</button>
+                                <button name="cancel_new_SKU" onclick="cancel_new_SKU({{$index}})">@(取消)</button>
+                            {{ fi }}
+                        </td>
+                    </tr>
+                    {{ end }}
+                    <tr class="new_SKU">
+                        <td class="col-xs-1 hidden-xs ui-center nopadding">
+                            <a href="javascript:void(0)" onclick="new_SKU_in_page()">
+                                <span class="fa fa-plus-circle">@(SKU)</span>
+                            </a>
+                        </td>
+                        {{ foreach attribute in SKUAttributes}}
+                        <td class="hidden-xs ui-center new_SKU_attribute">
+                            <div class="ui-textbox-with-button new_attribute">
+                                <input class="col-md-9 nopadding" type="text"/>
+                                <a class="col-md-2 account nopadding" href="javascript:void(0)" onclick="new_sku_attribute('{{attribute.name}}', {{$index}})">
+                                    <span class="fa fa-plus-circle"></span>
+                                </a>
+                            </div>
+                        </td>
+                        {{ end }}
+                        <td class="col-xs-3 hidden-xs ui-center new_SKU_addition">
+                            <div class="ui-textbox-with-button new_attribute">
+                                <input class="col-md-4 nopadding h6" type="text"/>
+                                <div class="col-md-4 nopadding"><h6 class="nopadding">@(加价(元):)</h6></div>
+                                <input class="col-md-3 nopadding h6" type="text"/>
+                                <a class="col-md-1 account nopadding" href="javascript:void(0)" onclick="new_SKU_addition()">
+                                    <span class="fa fa-plus-circle"></span>
+                                </a>
+                            </div>
+                        </td>
+                        <td class="col-xs-1 hidden-xs ui-center new_SKU_attribute"></td>
+                        <td class="col-xs-1 hidden-xs ui-center new_SKU_attribute"></td>
+                        <td class="col-xs-2 hidden-xs ui-center new_SKU_attribute"></td>
+                    </tr>
+                </table>
+            </script>
+        </div>
+    </div>
+    <br>
+    <div class="padding bg-smoke">
+        <div class="row">
+            <div class="col-md-2 m">
+                <h3 class="ui-center">@(商品详情)</h3>
+            </div>
+            <div class="col-md-10">
+                <div class="m" data-component="textarea" data-component-path="products.form.body" data-height="100px" data-name="product_body">@(商品详情)</div>
+                <div class="m" data-component="textarea" data-component-path="products.form.standard" data-height="100px" data-name="product_standard">@(参数规格)</div>
+                <div class="m" data-component="textarea" data-component-path="products.form.support" data-height="100px" data-name="product_support">@(服务说明)</div>
+            </div>
+            <div class="col-md-2 m">
+                <h3 class="ui-center">@(APP商品详情)</h3>
+            </div>
+            <div class="col-md-10">
+                <div class="m" data-component="textarea" data-component-path="products.form.app_body" data-height="100px" data-name="product_app_body">@(APP商品详情)</div>
+                <div class="m" data-component="textarea" data-component-path="products.form.app_standard" data-height="100px" data-name="product_app_standard">@(APP参数规格)</div>
+                <div class="m" data-component="textarea" data-component-path="products.form.app_support" data-height="100px" data-name="product_app_support">@(APP服务说明)</div>
+            </div>
+        </div>
+    </div>
+    <div data-component="error" data-component-path="products.response"></div>
+    <div class="ui-form-buttons">
+        <!-- <div data-component="validation" data-component-path="products.form.qiche">
+            <button name="submit">@(确认)</button>
+        </div> -->
+        <button name="submit">@(确认)</button>
+        <button name="cancel">@(取消)</button>
+    </div>
 </div>
 
 <div data-component="form" data-title="@(更新分类)" data-component-path="common.form" data-if="value === 'products.category'" data-width="450px" data-top="true" data-component-id="products.category">
-	<div class="padding">
-		<div class="row">
-			<div class="col-md-12">
-				<div class="silver">@(Replacement old category with new category name in all products which have old category.)</div>
-				<hr />
-				<div data-component="dropdown" data-component-path="products.category.category_old" data-source="products.categories" data-required="true" data-empty="true" data-source-value="name" class="m">@(已存在的分类)</div>
-				<div data-component="textbox" data-component-path="products.category.category_new" data-required="true" class="m">@(新分类)</div>
-			</div>
-		</div>
-	</div>
-	<div class="ui-form-buttons">
-		<div data-component="validation" data-component-path="products.category">
-			<button name="submit">@(确认)</button>
-		</div>
-		<button name="cancel">@(取消)</button>
-	</div>
+    <div class="padding">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="silver">@(Replacement old category with new category name in all products which have old category.)</div>
+                <hr />
+                <div data-component="dropdown" data-component-path="products.category.category_old" data-source="products.categories" data-required="true" data-empty="true" data-source-value="name" class="m">@(已存在的分类)</div>
+                <div data-component="textbox" data-component-path="products.category.category_new" data-required="true" class="m">@(新分类)</div>
+            </div>
+        </div>
+    </div>
+    <div class="ui-form-buttons">
+        <div data-component="validation" data-component-path="products.category">
+            <button name="submit">@(确认)</button>
+        </div>
+        <button name="cancel">@(取消)</button>
+    </div>
 </div>
 
 <!-- IMPORT CSV FILE -->
 <input type="file" id="products_file_cvs" class="hidden" accept="text/csv" />
 
 <script>
-	const PRICE_REGEX = /^[0-9]*(\.[0-9]{1,2})?$/;
-	var productckeditors = ['product_body', 'product_standard', 'product_support', 'product_app_body', 'product_app_standard', 'product_app_support'];
-	var productattributes = [{'key':'huafei','name':'化肥','arr':['brands'], id:'531680A5'}, {'key':'qiche','name':'汽车','arr':['brands'], id:'6C7D8F66'}];
-	var products = {};
+    const PRICE_REGEX = /^[0-9]*(\.[0-9]{1,2})?$/;
+    var productckeditors = ['product_body', 'product_standard', 'product_support', 'product_app_body', 'product_app_standard', 'product_app_support'];
+    var productattributes = [{'key':'huafei','name':'化肥','arr':['brands'], id:'531680A5'}, {'key':'qiche','name':'汽车','arr':['brands'], id:'6C7D8F66'}];
+    var products = {};
+    var formModified = false;
 
-	products.filter = {};
-	products.filter.page = 1;
+    products.filter = {};
+    products.filter.page = 1;
 
-	products.grid = [];
-	products.info = {};
-	products.form = {};
-	products.categories = [];
-	products_init_allattributes();
-	products.response = null;
-	products.SKUQueryAttributes=[];
-	products.SKUExistAttributes=[];
-	products.SKUExistAdditions=[];
-	var SKU_attributes_all = [];
+    products.grid = [];
+    products.info = {};
+    products.form = {};
+    products.categories = [];
+    products_init_allattributes();
+    products.response = null;
+    products.SKUQueryAttributes=[];
+    products.SKUExistAttributes=[];
+    products.SKUExistAdditions=[];
+    var SKU_attributes_all = [];
+    products.SKUChanged = [];
+    products.category = {};
 
-	products.category = {};
+    function clear_SKU_attributes(){
+        if(products) {
+            SET('products.SKUAttributes', null);
+            SET('products.SKUAdditions', null);
+            products.SKUQueryAttributes=[];
+            products.SKUExistAttributes=[];
+            products.SKUExistAdditions=[];
+            SET('products.SKUs', null);
+        }
 
-	function clear_SKU_attributes(){
-		if(products) {
-			SET('products.SKUAttributes', null);
-			SET('products.SKUAdditions', null);
-			products.SKUQueryAttributes=[];
-			products.SKUExistAttributes=[];
-			products.SKUExistAdditions=[];
-			SET('products.SKUs', null);
-		}
+        SET('products.expanded', []);
+    }
 
-		SET('products.expanded', []);
-	}
+    ON('#products.grid', function(component) {
+        // Max items per page
+        products.filter.max = component.max;
+        products_refresh_categories();
+        products_refresh(true);
 
-	ON('#products.grid', function(component) {
-		// Max items per page
-		products.filter.max = component.max;
-		products_refresh_categories();
-		products_refresh(true);
+        component.click = function(index, row, button) {
+            switch ($(button).attr('name')) {
+                case 'edit':
+                    clear_SKU_attributes();
+                    products.SKUChanged = [];
+                    $.components.GET(managerurl + '/api/products/' + row.id, null, function(response, err) {
+                        // Error prevention
+                        if (response instanceof Array)
+                            response = {};
 
-		component.click = function(index, row, button) {
-			switch ($(button).attr('name')) {
-				case 'edit':
-					clear_SKU_attributes();
-					$.components.GET(managerurl + '/api/products/' + row.id, null, function(response, err) {
+                        if (response && response.category) {
+                            request_brands(response.linker_category, function() {
+                                request_product_attribute(response.linker_category, 0, function (product_attributes_without_brand) {
+                                    request_product_attribute(response.linker_category, response.brand._id, function (product_attributes_with_brand) {
+                                        // product_attributes is queried from product attributes
+                                        // and should be merged with current product attributes from product form
+                                        var product_attributes_all = [];
+                                        product_attributes_all = product_attributes_without_brand.concat(product_attributes_with_brand);
+                                        response.attributes.forEach(function (attribute) {
+                                            // remove attribute from product_attributes
+                                            for (var i = 0; i < product_attributes_all.length; i++) {
+                                                if (attribute.name === product_attributes_all[i].name) {
+                                                    product_attributes_all.splice(i, 1);
+                                                    return;
+                                                }
+                                            }
+                                        });
+                                        response.attributes = response.attributes.concat(product_attributes_all);
 
-						// Error prevention
-						if (response instanceof Array)
-							response = {};
+                                        var path_id = 'products.form';
+                                        SET(path_id, $.extend({$index: index}, response), true);
+                                        products_init_ckeditors(response);
+                                        SET('common.form', 'products');
+                                        formModified = false;
 
-						if (response && response.category) {
-							request_brands(response.linker_category, function() {
-								request_product_attribute(response.linker_category, 0, function (product_attributes_without_brand) {
-									request_product_attribute(response.linker_category, response.brand._id, function (product_attributes_with_brand) {
-										// product_attributes is queried from product attributes
-										// and should be merged with current product attributes from product form
-										var product_attributes_all = [];
-										product_attributes_all = product_attributes_without_brand.concat(product_attributes_with_brand);
-										response.attributes.forEach(function (attribute) {
-											// remove attribute from product_attributes
-											for (var i = 0; i < product_attributes_all.length; i++) {
-												if (attribute.name === product_attributes_all[i].name) {
-													product_attributes_all.splice(i, 1);
-													return;
-												}
-											}
-										});
-										response.attributes = response.attributes.concat(product_attributes_all);
+                                        request_SKU_attribute(response.linker_category, response.brand._id, function(SKU_attributes){
+                                            SKU_attributes_all = SKU_attributes_all.concat(SKU_attributes);
+                                            request_SKU_Addition(response.linker_category, response.brand._id, function(){
+                                                $.components.GET(managerurl + '/api/v2.1/SKU/query?product=' + response._id, null, function (response) {
+                                                    if (response.code == 1000) {
+                                                        products.SKUExistAttributes=[];
+                                                        products.SKUExistAdditions=[];
+                                                        response.SKUs.forEach(function (SKU) {
+                                                            SKU_refreshed(SKU);
+                                                        });
 
-										var path_id = 'products.form';
-										SET(path_id, $.extend({$index: index}, response), true);
-										products_init_ckeditors(response);
-										SET('common.form', 'products');
-										request_SKU_attribute(response.linker_category, response.brand._id, function(SKU_attributes){
-											SKU_attributes_all = SKU_attributes_all.concat(SKU_attributes);
-											request_SKU_Addition(response.linker_category, response.brand._id, function(){
-												$.components.GET(managerurl + '/api/v2.1/SKU/query?product=' + response._id, null, function (response) {
-													if (response.code == 1000) {
-														products.SKUExistAttributes=[];
-														products.SKUExistAdditions=[];
-														response.SKUs.forEach(function (SKU) {
-															SKU_refreshed(SKU);
-														});
+                                                        SET('products.SKUExistAttributes', products.SKUExistAttributes);
+                                                        SET('products.SKUExistAdditions', products.SKUExistAdditions);
+                                                        SET('products.SKUs', response.SKUs);
+                                                        SET('products.SKUChanged', products.SKUChanged);
+                                                        products_onchange();
+                                                    }
+                                                });
+                                            })
+                                        });
+                                    });
+                                });
+                            });
+                        }
+                        SET('products.response', null);
 
-														SET('products.SKUExistAttributes', products.SKUExistAttributes);
-														SET('products.SKUExistAdditions', products.SKUExistAdditions);
-														SET('products.SKUs', response.SKUs);
-														products_onchange();
-													}
-												});
-											})
-										});
-									});
-								});
-							});
-						}
-						SET('products.response', null);
-						
-					});
-					break;
-				case 'remove':
-					if (!confirm('@(你确认要删除") ' + row.name + '"？【删除后不能恢复】'))
-						return;
-					$.components.DELETE(managerurl + '/api/products', { id: row.id }, function() {
-						products_refresh(true);
-					});
-					break;
-				case 'online':
-					if (!confirm('@(你确定要上架你选择的商品吗?)'))
-						return;
-					$.components.POST(managerurl + '/api/products/updateStatus', { _id: row._id, online:true }, function(response) {
-						if(response.code == 1000) {
-							products_refresh(true);
-						} else{
-							alert(response.message);
-						}
-					});
-					break;
-				case 'offline':
-					if (!confirm('@(你确定要下架你选择的商品吗?)'))
-						return;
-					$.components.POST(managerurl + '/api/products/updateStatus', { _id:row._id, online:false }, function() {
-						products_refresh(true);
-					});
-					break;
-			}
-		};
+                    });
+                    break;
+                case 'remove':
+                    if (!confirm('@(你确认要删除") ' + row.name + '"？【删除后不能恢复】'))
+                        return;
+                    $.components.DELETE(managerurl + '/api/products', { id: row.id }, function() {
+                        products_refresh(true);
+                    });
+                    break;
+                case 'online':
+                    if (!confirm('@(你确定要上架你选择的商品吗?)'))
+                        return;
+                    $.components.POST(managerurl + '/api/products/updateStatus', { _id: row._id, online:true }, function(response) {
+                        if(response.code == 1000) {
+                            products_refresh(true);
+                        } else{
+                            alert(response.message);
+                        }
+                    });
+                    break;
+                case 'offline':
+                    if (!confirm('@(你确定要下架你选择的商品吗?)'))
+                        return;
+                    $.components.POST(managerurl + '/api/products/updateStatus', { _id:row._id, online:false }, function() {
+                        products_refresh(true);
+                    });
+                    break;
+            }
+        };
 
-		component.next = function(page) {
-			products.filter.page = page;
-			products_refresh();
-		};
+        component.next = function(page) {
+            products.filter.page = page;
+            products_refresh();
+        };
 
-		// CSV file uploading
-		$('#products_file_cvs').on('change', function(e) {
-			e.preventDefault();
-			e.stopPropagation();
-			loading(true);
-			var el = this;
-			var data = new FormData();
-			data.append('file', this.files[0]);
-			$.components.UPLOAD(managerurl + '/api/products/import/', data, function(response, err) {
-				el.value = '';
-				loading(false);
-				if (!response.success)
-					return;
-				products_refresh(true);
-				products_refresh_categories();
-			});
-		});
-	});
+        // CSV file uploading
+        $('#products_file_cvs').on('change', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            loading(true);
+            var el = this;
+            var data = new FormData();
+            data.append('file', this.files[0]);
+            $.components.UPLOAD(managerurl + '/api/products/import/', data, function(response, err) {
+                el.value = '';
+                loading(false);
+                if (!response.success)
+                    return;
+                products_refresh(true);
+                products_refresh_categories();
+            });
+        });
+    });
 
-	// Watch for changes in order filter
-	Delay_Search_WATCH('products.filter.*', function(path, value) {
-		if (NOTMODIFIED('products.filter', products.filter))
-			return;
-		products_refresh(path !== 'products.filter.page');
-	});
+    // Watch for changes in order filter
+    Delay_Search_WATCH('products.filter.*', function(path, value) {
+        if (NOTMODIFIED('products.filter', products.filter))
+            return;
+        products_refresh(path !== 'products.filter.page');
+    });
 
-	function add_product(callback){
-		var requiredlist = [{'key':'brand','name':'品牌'},
+    WATCH('products.form', function(path, value){
+        if(NOTMODIFIED('products.form', products.form))
+            return;
+        formModified = true;
+    });
+
+    function add_product(callback){
+        var requiredlist = [{'key':'brand','name':'品牌'},
 //				{'key':'model','name':'车系'},{'key':'engine','name':'排量'},{'key':'gearbox','name':'变速器'},{'key':'level','name':'车型'},
-			{'key':'name','name':'商品名称'},
+            {'key':'name','name':'商品名称'},
 //				{'key':'price','name':'平台价格','re':/^[0-9]*(\.[0-9]{1,2})?$/},
-			{'key':'deposit','name':'定金','re':/^[0-9]*(\.[0-9]{1,2})?$/}];
-		if (!required(requiredlist, products.form))
-			return;
+            {'key':'deposit','name':'定金','re':/^[0-9]*(\.[0-9]{1,2})?$/}];
+        if (!required(requiredlist, products.form))
+            return;
 
-		for(var i = 0; i<products.form.attributes.length; i++){
-			var attribute = products.form.attributes[i];
-			if(!attribute.name){
-				return;
-			}
-			if(!attribute.value){
-				alert('请填写'+attribute.name);
-				return;
-			}
-		}
-		var confirm_note = '你确认要新增"' + products.form.name + '"?';
-		if (products.form.id)
-			confirm_note = '你确认要提交修改后的"' + products.form.name + '"?';
-		if (!confirm(confirm_note))
-			return;
+        for(var i = 0; i<products.form.attributes.length; i++){
+            var attribute = products.form.attributes[i];
+            if(!attribute.name){
+                return;
+            }
+            if(!attribute.value){
+                alert('请填写'+attribute.name);
+                return;
+            }
+        }
+        var confirm_note = '你确认要新增"' + products.form.name + '"?';
+        if (products.form.id)
+            confirm_note = '你确认要提交修改后的"' + products.form.name + '"?';
+        if (!confirm(confirm_note))
+            return;
 
-		products_get_ckeditors(products.form);
+        products_get_ckeditors(products.form);
 
-		$.components.POST(managerurl + '/api/products/', products.form, function(response) {
+        $.components.POST(managerurl + '/api/products/', products.form, function(response) {
 
-			// Error handling
-			SET('products.response', response);
-			if (response instanceof Array)
-				return;
+            // Error handling
+            SET('products.response', response);
+            if (response instanceof Array)
+                return;
 
-			if(response.code==1000) {
-				callback(response.product);
-			} else{
-				alert(response.message);
-			}
-		})
-	}
+            if(response.code==1000) {
+                callback(response.product);
+            } else{
+                alert(response.message);
+            }
+        })
+    }
 
-	ON('#products.form', function(component) {
-		component.submit = function(hide) {
-			add_product(function(){
-				hide();
-				products_refresh(true);
-				success();
-			});
-		};
-	});
+    ON('#products.form', function(component) {
+        component.submit = function(hide) {
+            add_product(function(){
+                hide();
+                products_refresh(true);
+                success();
+            });
+        };
 
-	ON('#products.category', function(component) {
-		component.submit = function(hide) {
-			RESET('products.category.*');
-			$.components.POST(managerurl + '/api/products/category/', products.category, function(response) {
-				setTimeout(function() {
-					hide();
-					products_refresh_categories();
-					products_refresh(true);
-					success();
-				}, 1000);
-			});
-		};
-	});
+        component.close = function(hide){
+            if(formModified){
+                if (!confirm('您有未保存的修改，是否离开？'))
+                    return;
+            }
 
-	function products_huafei_new() {
-		//SET('products.nowcategory', 'huafei', true);
-		//console.log(products.nowcategory);
-		clear_SKU_attributes();
-		const category = '531680A5';
-		request_brands(category, function() {
-			SET('products.form', {'category': '化肥', linker_category: category}, true);
-			SET('products.response', null);
-			products_init_ckeditors();
-			SET('common.form', 'products');
-			initial_product_new_page(category, function () {
-			})
-		});
-	}
+            for(var i=0; i<products.SKUChanged.length; i++){
+                if(products.SKUChanged.hasOwnProperty(i)){
+                    if(products.SKUChanged[i]){
+                        if (!confirm('您有未保存的SKU，是否离开？'))
+                            return;
+                        break;
+                    }
+                }
+            }
 
-	function products_qiche_new() {
-		//SET('products.nowcategory', 'qiche', true);
-		//console.log(products.nowcategory);
-		clear_SKU_attributes();
-		const category = '6C7D8F66';
-		request_brands(category, function(){
-			SET('products.form', {'category':'汽车', linker_category:category}, true);
-			SET('products.response', null);
-			SET('products.SKUs', null);
-			products_init_ckeditors();
-			SET('common.form', 'products');
-			initial_product_new_page(category, function(){
-			});
-		});
-	}
+            hide();
+            products_refresh(true);
+        };
 
-	function initial_product_new_page(category_id, callback){
-		request_product_attribute(category_id, 0, function(product_attributes){
-			SET('products.form.attributes', product_attributes);
-			$('.productinfo .brand select').off('change').on('change', function(){
-				var el = $(this);
-				var brand_id = el.find('option:selected').val();
-				request_product_attribute(category_id, brand_id, function(product_attributes){
-					SET('+products.form.attributes', product_attributes);
-					request_SKU_attribute(category_id, brand_id, function(){
-						request_SKU_Addition(category_id, brand_id, function() {
-							products_onchange();
-						});
-					});
-				});
-			});
+        component.cancel = component.close;
+    });
 
-			products_onchange();
-			callback();
-		});
-	}
+    ON('#products.category', function(component) {
+        component.submit = function(hide) {
+            RESET('products.category.*');
+            $.components.POST(managerurl + '/api/products/category/', products.category, function(response) {
+                setTimeout(function() {
+                    hide();
+                    products_refresh_categories();
+                    products_refresh(true);
+                    success();
+                }, 1000);
+            });
+        };
+    });
 
-	function request_SKU_attribute(category_id, brand_id, callback) {
-		$.components.GET(managerurl + '/api/v2.1/SKU/attributes?category=' + category_id + '&brand=' + brand_id, null, function (SKUAttributesResponse) {
-			if (SKUAttributesResponse.code == 1000) {
+    function products_huafei_new() {
+        //SET('products.nowcategory', 'huafei', true);
+        //console.log(products.nowcategory);
+        clear_SKU_attributes();
+        const category = '531680A5';
+        request_brands(category, function() {
+            SET('products.form', {'category': '化肥', linker_category: category}, true);
+            SET('products.response', null);
+            products_init_ckeditors();
+            SET('common.form', 'products');
+            initial_product_new_page(category, function () {
+            })
+        });
+    }
+
+    function products_qiche_new() {
+        //SET('products.nowcategory', 'qiche', true);
+        //console.log(products.nowcategory);
+        clear_SKU_attributes();
+        const category = '6C7D8F66';
+        request_brands(category, function(){
+            SET('products.form', {'category':'汽车', linker_category:category}, true);
+            SET('products.response', null);
+            SET('products.SKUs', null);
+            products_init_ckeditors();
+            SET('common.form', 'products');
+            initial_product_new_page(category, function(){
+            });
+        });
+    }
+
+    function initial_product_new_page(category_id, callback){
+        request_product_attribute(category_id, 0, function(product_attributes){
+            SET('products.form.attributes', product_attributes);
+            $('.productinfo .brand select').off('change').on('change', function(){
+                var el = $(this);
+                var brand_id = el.find('option:selected').val();
+                request_product_attribute(category_id, brand_id, function(product_attributes){
+                    SET('+products.form.attributes', product_attributes);
+                    request_SKU_attribute(category_id, brand_id, function(){
+                        request_SKU_Addition(category_id, brand_id, function() {
+                            products_onchange();
+                        });
+                    });
+                });
+            });
+
+            products_onchange();
+            callback();
+        });
+    }
+
+    function request_SKU_attribute(category_id, brand_id, callback) {
+        $.components.GET(managerurl + '/api/v2.1/SKU/attributes?category=' + category_id + '&brand=' + brand_id, null, function (SKUAttributesResponse) {
+            if (SKUAttributesResponse.code == 1000) {
 //				SKUAttributesResponse.attributes.sort(function (a, b) {
 //					return a.order > b.order;
 //				});
 
-				var SKUQueryAttributes = [];
-				SKUAttributesResponse.attributes.forEach(function (attribute) {
-					SKUQueryAttributes[attribute.name] = attribute.values;
-				});
-				products.SKUQueryAttributes = SKUQueryAttributes;
-				SET('products.SKUAttributes', SKUAttributesResponse.attributes);
-				callback(SKUAttributesResponse.attributes);
-			}
-		});
-	}
+                var SKUQueryAttributes = [];
+                SKUAttributesResponse.attributes.forEach(function (attribute) {
+                    SKUQueryAttributes[attribute.name] = attribute.values;
+                });
+                products.SKUQueryAttributes = SKUQueryAttributes;
+                SET('products.SKUAttributes', SKUAttributesResponse.attributes);
+                callback(SKUAttributesResponse.attributes);
+            }
+        });
+    }
 
-	function request_SKU_Addition(category_id, brand_id, callback){
-		$.components.GET(managerurl + '/api/v2.1/SKU/additions?category=' + category_id + '&brand=' + brand_id, null, function(SKUAdditionResponse){
-			if(SKUAdditionResponse.code == 1000){
-				SET('products.SKUAdditions', SKUAdditionResponse.additions);
-				callback(SKUAdditionResponse);
-			}
-		})
-	}
+    function request_SKU_Addition(category_id, brand_id, callback){
+        $.components.GET(managerurl + '/api/v2.1/SKU/additions?category=' + category_id + '&brand=' + brand_id, null, function(SKUAdditionResponse){
+            if(SKUAdditionResponse.code == 1000){
+                SET('products.SKUAdditions', SKUAdditionResponse.additions);
+                callback(SKUAdditionResponse);
+            }
+        })
+    }
 
-	function request_product_attribute(category_id, brand_id, callback){
-		console.log(brand_id);
-		$.components.GET(managerurl + '/api/products/attributes?category=' + category_id+"&brand="+brand_id, null, function(response) {
-			if (response.code == 1000) {
-				var attributes = [];
-				var product_attributes = [];
-				for (var i = 0; i < response.attributes.length; i++) {
-					var attribute = response.attributes[i];
-					attributes[attribute._id.name] = {values: attribute.values, brand: attribute._id.brand};
-					product_attributes.push({name: attribute._id.name});
-				}
+    function request_product_attribute(category_id, brand_id, callback){
+        console.log(brand_id);
+        $.components.GET(managerurl + '/api/products/attributes?category=' + category_id+"&brand="+brand_id, null, function(response) {
+            if (response.code == 1000) {
+                var attributes = [];
+                var product_attributes = [];
+                for (var i = 0; i < response.attributes.length; i++) {
+                    var attribute = response.attributes[i];
+                    attributes[attribute._id.name] = {values: attribute.values, brand: attribute._id.brand};
+                    product_attributes.push({name: attribute._id.name});
+                }
 
-				SET('products.attributes', $.extend(products.attributes, attributes));
-				callback(product_attributes);
-			}
-		})
-	}
+                SET('products.attributes', $.extend(products.attributes, attributes));
+                callback(product_attributes);
+            }
+        })
+    }
 
-	function products_category() {
-		SET('products.category', {}, true);
-		SET('common.form', 'products.category');
-	}
+    function products_category() {
+        SET('products.category', {}, true);
+        SET('common.form', 'products.category');
+    }
 
-	// Method refreshes categories
-	function products_refresh_categories() {
-		$.components.GET(managerurl + '/api/products/categories/', null, function(response) {
-			response.sort(function(a, b) {
-				return a.name.localeCompare(b.name);
-			});
-			SET('products.categories', response);
-		});
-	}
+    // Method refreshes categories
+    function products_refresh_categories() {
+        $.components.GET(managerurl + '/api/products/categories/', null, function(response) {
+            response.sort(function(a, b) {
+                return a.name.localeCompare(b.name);
+            });
+            SET('products.categories', response);
+        });
+    }
 
-	// Method refreshes grid
-	function products_refresh(reset) {
+    // Method refreshes grid
+    function products_refresh(reset) {
 
-		if (reset) {
-			products.filter.page = 1;
-			products.grid = [];
-		}
+        if (reset) {
+            products.filter.page = 1;
+            products.grid = [];
+        }
 
-		$.components.GET(managerurl + '/api/products/', products.filter, function(response) {
-			SET((reset ? '' : '+') + 'products.grid', response.items);
-			if (!reset)
-				return;
-			products.info.count = response.count;
-			products.info.pages = response.pages;
-			UPDATE('products.info');
-		});
-	}
+        $.components.GET(managerurl + '/api/products/', products.filter, function(response) {
+            SET((reset ? '' : '+') + 'products.grid', response.items);
+            if (!reset)
+                return;
+            products.info.count = response.count;
+            products.info.pages = response.pages;
+            UPDATE('products.info');
+        });
+    }
 
-	function products_import() {
-		$('#products_file_cvs').click();
-	}
+    function products_import() {
+        $('#products_file_cvs').click();
+    }
 
-	function products_init_ckeditors(model) {
-		var ckeditors = productckeditors;
-		for (var i = 0, length = ckeditors.length; i < length; i++) {
-			ckeditor_add(ckeditors[i], model);
-		}
-	}
-	function ckeditor_add(id, model) {
-		var ckeditor = CKEDITOR.instances[id];
-		if (ckeditor) ckeditor.destroy(true); //销毁编辑器 ,然后新增一个
-		ckeditor = CKEDITOR.replace(id);
-	    if (model && model[id]) {
-	    	ckeditor.setData(model[id]);
-	    }
-	}
+    function products_init_ckeditors(model) {
+        var ckeditors = productckeditors;
+        for (var i = 0, length = ckeditors.length; i < length; i++) {
+            ckeditor_add(ckeditors[i], model);
+        }
+    }
+    function ckeditor_add(id, model) {
+        var ckeditor = CKEDITOR.instances[id];
+        if (ckeditor) ckeditor.destroy(true); //销毁编辑器 ,然后新增一个
+        ckeditor = CKEDITOR.replace(id);
+        if (model && model[id]) {
+            ckeditor.setData(model[id]);
+        }
+        ckeditor.on('change', function() {
+            formModified=true;
+        });
+    }
 
-	function products_get_ckeditors(model) {
-		var ckeditors = productckeditors;
-		for (var i = 0, length = ckeditors.length; i < length; i++) {
-			ckeditor_getdata(ckeditors[i], model);
-		}
-	}
+    function products_get_ckeditors(model) {
+        var ckeditors = productckeditors;
+        for (var i = 0, length = ckeditors.length; i < length; i++) {
+            ckeditor_getdata(ckeditors[i], model);
+        }
+    }
 
-	function ckeditor_getdata(id, model) {
-		var ckeditor = CKEDITOR.instances[id];
-		var value = id.split('product_')[1];
-		if (ckeditor) {
-			model[value] = ckeditor.getData();
-		}
-	}
+    function ckeditor_getdata(id, model) {
+        var ckeditor = CKEDITOR.instances[id];
+        var value = id.split('product_')[1];
+        if (ckeditor) {
+            model[value] = ckeditor.getData();
+        }
+    }
 
-	// init all attributes
-	function products_init_allattributes() {
-		for (var i = 0, length = productattributes.length; i < length; i++) {
-			var key = productattributes[i]['key'];
-			var arr = productattributes[i]['arr'];
-			products[key] = {};
-			for (var j = 0; j < arr.length; j++) {
-				var name = arr[j];
-				products[key][name] = [];
-			}
-		}
-	}
+    // init all attributes
+    function products_init_allattributes() {
+        for (var i = 0, length = productattributes.length; i < length; i++) {
+            var key = productattributes[i]['key'];
+            var arr = productattributes[i]['arr'];
+            products[key] = {};
+            for (var j = 0; j < arr.length; j++) {
+                var name = arr[j];
+                products[key][name] = [];
+            }
+        }
+    }
 
-	// Method refreshes all attributes
-	function products_refresh_allattributes() {
-		for (var i = 0, length = productattributes.length; i < length; i++) {
-			var key = productattributes[i]['key'];
-			var value = productattributes[i]['id'];
-			var arr = productattributes[i]['arr'];
-			for (var j = 0; j < arr.length; j++) {
-				var name = arr[j];
-				products_refresh_attribute(name, key, value);
-			}
-		}
-	}
+    // Method refreshes all attributes
+    function products_refresh_allattributes() {
+        for (var i = 0, length = productattributes.length; i < length; i++) {
+            var key = productattributes[i]['key'];
+            var value = productattributes[i]['id'];
+            var arr = productattributes[i]['arr'];
+            for (var j = 0; j < arr.length; j++) {
+                var name = arr[j];
+                products_refresh_attribute(name, key, value);
+            }
+        }
+    }
 
-	// Method refreshes attribute
-	function products_refresh_attribute(name, formid, category) {
-		var url = managerurl + '/api/products/attr/' + name;
-		if (category) {
-			url += '?category=' + category;
-		}
-		$.components.GET(url, null, function(response) {
-			response.sort(function(a, b) {
-				return a.name.localeCompare(b.name);
-			});
-			var key = 'products.' + formid + '.' + name;
+    // Method refreshes attribute
+    function products_refresh_attribute(name, formid, category) {
+        var url = managerurl + '/api/products/attr/' + name;
+        if (category) {
+            url += '?category=' + category;
+        }
+        $.components.GET(url, null, function(response) {
+            response.sort(function(a, b) {
+                return a.name.localeCompare(b.name);
+            });
+            var key = 'products.' + formid + '.' + name;
 
-			SET(key, response);
-		});
-	}
+            SET(key, response);
+        });
+    }
 
 
-	// Method required
-	function required(requiredlist, item) {
-		for (var i = 0; i < requiredlist.length; i++) {
-			var key = requiredlist[i]['key'];
-			var name = requiredlist[i]['name'];
-			var re = requiredlist[i]['re'] || null;
-			if (item[key] === undefined || item[key].length == 0) {
-				alert('请填写"' + name + '"后再提交');
-				return false;
-			}
-			if (re && !re.test(item[key])) {
-				alert('请填写正确的"' + name + '"后再提交');
-				return false;
-			}
-		}
-		return true;
-	}
+    // Method required
+    function required(requiredlist, item) {
+        for (var i = 0; i < requiredlist.length; i++) {
+            var key = requiredlist[i]['key'];
+            var name = requiredlist[i]['name'];
+            var re = requiredlist[i]['re'] || null;
+            if (item[key] === undefined || item[key].length == 0) {
+                alert('请填写"' + name + '"后再提交');
+                return false;
+            }
+            if (re && !re.test(item[key])) {
+                alert('请填写正确的"' + name + '"后再提交');
+                return false;
+            }
+        }
+        return true;
+    }
 
-	function update_SKU(index){
-		var SKU = products.SKUs[index];
-		SKU.name=products.form.name;
-		SKU.attributes.forEach(function(attribute){
-			SKU.name += ' - ' + attribute.value;
-		});
-		if(!PRICE_REGEX.test(SKU.price.market_price) || parseFloat(SKU.price.market_price) < 0){
-			alert('@(请填写正确的市场价)');
-			return;
-		}
-		if(!PRICE_REGEX.test(SKU.price.platform_price) || parseFloat(SKU.price.platform_price) <= 0){
-			alert('@(请填写正确的平台价)');
-			return;
-		}
-		if (!confirm('@(你确认要更新SKU？)'))
-			return;
-		var _id = products.SKUs[index]._id;
-		$.components.POST(managerurl+'/api/v2.1/SKU/update/' + _id, SKU, function(response){
-			if(response.code==1000) {
-				products.expanded[index]=true;
-				showCheckboxes(index);
-				success();
-			} else{
-				alert(response.message);
-			}
-		})
-	}
+    function update_SKU(index){
+        var SKU = products.SKUs[index];
+        SKU.name=products.form.name;
+        SKU.attributes.forEach(function(attribute){
+            SKU.name += ' - ' + attribute.value;
+        });
+        if(!PRICE_REGEX.test(SKU.price.market_price) || parseFloat(SKU.price.market_price) < 0){
+            alert('@(请填写正确的市场价)');
+            return;
+        }
+        if(!PRICE_REGEX.test(SKU.price.platform_price) || parseFloat(SKU.price.platform_price) <= 0){
+            alert('@(请填写正确的平台价)');
+            return;
+        }
+        if (!confirm('@(你确认要更新SKU？)'))
+            return;
+        var _id = products.SKUs[index]._id;
+        $.components.POST(managerurl+'/api/v2.1/SKU/update/' + _id, SKU, function(response){
+            if(response.code==1000) {
+                products.expanded[index]=true;
+                showCheckboxes(index);
+                checkSKU(index, false);
+                success();
+            } else{
+                alert(response.message);
+            }
+        })
+    }
 
-	function online_SKU(index, online){
-		var _id = products.SKUs[index]._id;
-		$.components.GET(managerurl+'/api/v2.1/SKU/online/' + _id, {online:online}, function(response){
-			if(response.code==1000) {
-				products.SKUs[index].online = response.SKU.online;
-				SET('products.SKUs', products.SKUs);
-				products_onchange();
-				success();
-			} else{
-				alert(response.message);
-			}
-		})
-	}
+    function online_SKU(index, online){
+        var _id = products.SKUs[index]._id;
+        $.components.GET(managerurl+'/api/v2.1/SKU/online/' + _id, {online:online}, function(response){
+            if(response.code==1000) {
+                products.SKUs[index].online = response.SKU.online;
+                SET('products.SKUs', products.SKUs);
+                products_onchange();
+                success();
+            } else{
+                alert(response.message);
+            }
+        })
+    }
 
-	function copy_SKU(index) {
-		var SKU = products.SKUs[index];
-		var CSKU = {attributes:[], price:{}, additions:[], product:products.form._id};
-		SKU.attributes.forEach(function(attribute) {
-			CSKU.attributes.push({name:attribute.name, value:attribute.value, ref:attribute.ref});
-		});
-		SKU.additions.forEach(function(addition) {
-			CSKU.additions.push({name:addition.name, ref:addition.ref, price: addition.price});
-		});
-		CSKU.price = {market_price:typeof(SKU.price.market_price) !== 'undefined' ? SKU.price.market_price : 0,
-					platform_price:typeof(SKU.price.platform_price) !== 'undefined' ? SKU.price.platform_price : 0
-		};
-		new_SKU_in_page(CSKU);
-	}
+    function copy_SKU(index) {
+        var SKU = products.SKUs[index];
+        var CSKU = {attributes:[], price:{}, additions:[], product:products.form._id};
+        SKU.attributes.forEach(function(attribute) {
+            CSKU.attributes.push({name:attribute.name, value:attribute.value, ref:attribute.ref});
+        });
+        SKU.additions.forEach(function(addition) {
+            CSKU.additions.push({name:addition.name, ref:addition.ref, price: addition.price});
+        });
+        CSKU.price = {market_price:typeof(SKU.price.market_price) !== 'undefined' ? SKU.price.market_price : 0,
+            platform_price:typeof(SKU.price.platform_price) !== 'undefined' ? SKU.price.platform_price : 0
+        };
+        new_SKU_in_page(CSKU);
+    }
 
-	function new_SKU_in_page(CSKU){
-		var newSKU = {attributes:[], price:{market_price:0, platform_price:0}, additions:[], product:products.form._id};
-		if (CSKU) {
-			newSKU = CSKU;
-		}
+    function new_SKU_in_page(CSKU){
+        var newSKU = {attributes:[], price:{market_price:0, platform_price:0}, additions:[], product:products.form._id};
+        if (CSKU) {
+            newSKU = CSKU;
+        }
 
-		products.SKUs.push(newSKU);
-		SET('products.SKUs', products.SKUs);
-		products_onchange();
-	}
+        products.SKUs.push(newSKU);
+        SET('products.SKUs', products.SKUs);
+        products_onchange();
+    }
 
-	function cancel_new_SKU(index){
-		products.SKUs.splice(index, 1);
-		SET('products.SKUs', products.SKUs);
-		products_onchange();
-	}
+    function cancel_new_SKU(index){
+        products.SKUs.splice(index, 1);
+        SET('products.SKUs', products.SKUs);
+        products_onchange();
+    }
 
-	function add_SKU(index){
-		var SKU = products.SKUs[index];
-		SKU.name=products.form.name;
-		SKU.attributes.forEach(function(attribute){
-			SKU.name += ' - ' + attribute.value;
-		});
-		if(!PRICE_REGEX.test(SKU.price.market_price) || parseFloat(SKU.price.market_price) < 0){
-			alert('@(请填写正确的市场价)');
-			return;
-		}
-		if(!PRICE_REGEX.test(SKU.price.platform_price) || parseFloat(SKU.price.platform_price) <= 0){
-			alert('@(请填写正确的平台价)');
-			return;
-		}
-		var add_SKU_processer = function() {
-			if (!confirm('@(你确认要添加SKU？)'))
-				return;
-			$.components.POST(managerurl + '/api/v2.1/SKU/add/', SKU, function (response) {
-				if (response.code == 1000) {
-					products.SKUs[index] = response.SKU;
-					SKU_refreshed(response.SKU);
-					SET('products.SKUs', products.SKUs);
-					products.expanded[index]=true;
-					showCheckboxes(index);
-					products_onchange();
-					success();
-				} else{
-					alert(response.message);
-				}
-			})
-		};
-		if (!SKU.product){
-			// no product yet, need to create product first
-			if(!confirm('@(商品尚未添加，是否添加商品？)')){
-				return;
-			}
+    function add_SKU(index){
+        var SKU = products.SKUs[index];
+        SKU.name=products.form.name;
+        SKU.attributes.forEach(function(attribute){
+            SKU.name += ' - ' + attribute.value;
+        });
+        if(!PRICE_REGEX.test(SKU.price.market_price) || parseFloat(SKU.price.market_price) < 0){
+            alert('@(请填写正确的市场价)');
+            return;
+        }
+        if(!PRICE_REGEX.test(SKU.price.platform_price) || parseFloat(SKU.price.platform_price) <= 0){
+            alert('@(请填写正确的平台价)');
+            return;
+        }
+        var add_SKU_processer = function() {
+            if (!confirm('@(你确认要添加SKU？)'))
+                return;
+            $.components.POST(managerurl + '/api/v2.1/SKU/add/', SKU, function (response) {
+                if (response.code == 1000) {
+                    products.SKUs[index] = response.SKU;
+                    SKU_refreshed(response.SKU);
+                    SET('products.SKUs', products.SKUs);
+                    products.expanded[index]=true;
+                    showCheckboxes(index);
+                    checkSKU(index, false);
+                    success();
+                } else{
+                    alert(response.message);
+                }
+            })
+        };
+        if (!SKU.product){
+            // no product yet, need to create product first
+            if(!confirm('@(商品尚未添加，是否添加商品？)')){
+                return;
+            }
 
-			// add product
-			add_product(function(product){
-				products.form = product;
-				SKU.product = product._id;
-				add_SKU_processer();
-			});
-		} else{
-			add_SKU_processer();
-		}
-	}
+            // add product
+            add_product(function(product){
+                products.form = product;
+                SKU.product = product._id;
+                add_SKU_processer();
+            });
+        } else{
+            add_SKU_processer();
+        }
+    }
 
-	function new_attribute(name, inputIndex){
-		var el=$('.new_attribute input')[inputIndex];
-		var category = products.form.linker_category;
-		var brand = products.attributes[name].brand;
-		var value = el.value;
-		$.components.POST(managerurl+'/api/products/attribute/add', {category:category, brand:brand, name:name, value:value}, function(response){
-			if(response.code==1000){
-				var new_attribute = response.attribute;
-				products.attributes[name].values.push({ref:new_attribute._id, value:new_attribute.value});
-				SET('products.attributes', products.attributes);
-				el.value = "";
-				products_onchange();
-				success();
-			} else{
-				alert(response.message);
-			}
-		});
-	}
+    function new_attribute(name, inputIndex){
+        var el=$('.new_attribute input')[inputIndex];
+        var category = products.form.linker_category;
+        var brand = products.attributes[name].brand;
+        var value = el.value;
+        $.components.POST(managerurl+'/api/products/attribute/add', {category:category, brand:brand, name:name, value:value}, function(response){
+            if(response.code==1000){
+                var new_attribute = response.attribute;
+                products.attributes[name].values.push({ref:new_attribute._id, value:new_attribute.value});
+                SET('products.attributes', products.attributes);
+                el.value = "";
+                products_onchange();
+                success();
+            } else{
+                alert(response.message);
+            }
+        });
+    }
 
-	function request_brands(category, callback){
-		SET('products.brands', null);
-		$.components.GET(managerurl+'/api/brands?category='+category, null, function(response){
-			if(response.code==1000){
-				SET('products.brands', response.brands);
-				callback();
-			}
-		})
-	}
+    function request_brands(category, callback){
+        SET('products.brands', null);
+        $.components.GET(managerurl+'/api/brands?category='+category, null, function(response){
+            if(response.code==1000){
+                SET('products.brands', response.brands);
+                callback();
+            }
+        })
+    }
 
-	function new_sku_attribute(name, inputIndex){
-		var el=$('.new_SKU_attribute input')[inputIndex];
-		var category = products.form.linker_category;
-		var brand = products.form.brand._id;
-		var value = el.value;
-		$.components.POST(managerurl+'/api/v2.1/SKU/attribute/add/', {category:category, brand:brand, name:name, value:value}, function(response){
-			if(response.code==1000){
-				var new_attribute = response.attribute;
-				products.SKUQueryAttributes[name].push({ref:new_attribute._id, value:new_attribute.value, order:new_attribute.order});
-				SET('products.SKUQueryAttributes', products.SKUQueryAttributes);
-				el.value = "";
-				products_onchange();
-				success();
-			} else{
-				alert(response.message);
-			}
-		});
-	}
+    function new_sku_attribute(name, inputIndex){
+        var el=$('.new_SKU_attribute input')[inputIndex];
+        var category = products.form.linker_category;
+        var brand = products.form.brand._id;
+        var value = el.value;
+        $.components.POST(managerurl+'/api/v2.1/SKU/attribute/add/', {category:category, brand:brand, name:name, value:value}, function(response){
+            if(response.code==1000){
+                var new_attribute = response.attribute;
+                products.SKUQueryAttributes[name].push({ref:new_attribute._id, value:new_attribute.value, order:new_attribute.order});
+                SET('products.SKUQueryAttributes', products.SKUQueryAttributes);
+                el.value = "";
+                products_onchange();
+                success();
+            } else{
+                alert(response.message);
+            }
+        });
+    }
 
-	function new_SKU_addition(){
-		var el=$('.new_SKU_addition input');
-		var category = products.form.linker_category;
-		var brand = products.form.brand._id;
-		var name = el[0].value;
-		var price = el[1].value;
-		$.components.POST(managerurl+'/api/v2.1/SKU/addition/add/', {category:category, brand:brand, name:name, price:price}, function(response){
-			if(response.code==1000){
-				var new_addition = response.addition;
-				products.SKUAdditions.push(new_addition);
-				SET('products.SKUAdditions', products.SKUAdditions);
-				el[0].value = "";
-				el[1].value = "";
-				products_onchange();
-				success();
-			}
-		});
-	}
+    function new_SKU_addition(){
+        var el=$('.new_SKU_addition input');
+        var category = products.form.linker_category;
+        var brand = products.form.brand._id;
+        var name = el[0].value;
+        var price = el[1].value;
+        $.components.POST(managerurl+'/api/v2.1/SKU/addition/add/', {category:category, brand:brand, name:name, price:price}, function(response){
+            if(response.code==1000){
+                var new_addition = response.addition;
+                products.SKUAdditions.push(new_addition);
+                SET('products.SKUAdditions', products.SKUAdditions);
+                el[0].value = "";
+                el[1].value = "";
+                products_onchange();
+                success();
+            }
+        });
+    }
 
-	function products_onchange(){
-		product_onchange();
-		SKU_onchange();
-	}
+    function products_onchange(){
+        product_onchange();
+        SKU_onchange();
+    }
 
-	function product_onchange(){
-		$('.attribute_list select').off('change').on('change', function(){
-			var el = $(this);
-			var index = el.attr('data-index');
-			var ref = el.find('option:selected').attr('ref');
-			var name = el.find('option:selected').attr('name');
-			var value = el.val();
-			products.form.attributes[index] = {ref:ref, name:name,value:value};
-		});
-	}
+    function product_onchange(){
+        $('.attribute_list select').off('change').on('change', function(){
+            var el = $(this);
+            var index = el.attr('data-index');
+            var ref = el.find('option:selected').attr('ref');
+            var name = el.find('option:selected').attr('name');
+            var value = el.val();
+            products.form.attributes[index] = {ref:ref, name:name,value:value};
+            formModified = true;
+        });
+    }
 
-	function SKU_onchange(){
-		$('.SKU select').off('change').on('change', function(){
-			var el = $(this);
-			var attributeIndex = el.attr('data-index');
-			var SKU_id = el.attr('data_SKU_id');
-			var ref = el.find('option:selected').attr('ref');
-			var name = el.find('option:selected').attr('name');
-			var order = el.find('option:selected').attr('order');
-			var value = el.val();
-			products.SKUs.forEach(function(SKU){
-				if(SKU._id == SKU_id || (typeof SKU._id == 'undefined' && SKU_id=="")){
-					var SKUSaved = false;
-					for(var j=0; j<SKU.attributes.length; j++){
-						if(name == SKU.attributes[j].name){
-							SKU.attributes[j] = {ref:ref, name:name, value:value, order:order};
-							SKUSaved = true;
-						}
-					}
+    function checkSKU(index, changed){
+        products.SKUChanged[index] = changed;
+        SET('products.SKUChanged', products.SKUChanged);
+        products_onchange();
+//        var checkBox = $('.SKU .fa-check-circle-o:eq('+index+')');
+//        console.log(checkBox);
+//        if(updated){
+//            checkBox.removeClass('green', index);
+//            checkBox.attr('title', '该SKU有未提交的修改');
+//        } else{
+//            checkBox.addClass('green');
+//            checkBox.attr('title', '已提交');
+//        }
+    }
 
-					if(!SKUSaved){
-						SKU.attributes.push({ref:ref, name:name, value:value, order:order});
-					}
+    function SKU_onchange(){
+        $('.SKU select').off('change').on('change', function(){
+            var el = $(this);
+            var attributeIndex = el.attr('data-index');
+            var SKU_id = el.attr('data_SKU_id');
+            var ref = el.find('option:selected').attr('ref');
+            var name = el.find('option:selected').attr('name');
+            var order = el.find('option:selected').attr('order');
+            var value = el.val();
+            for(var i=0; i<products.SKUs.length; i++){
+                var SKU = products.SKUs[i];
+                if(SKU._id == SKU_id || (typeof SKU._id == 'undefined' && SKU_id=="")){
+                    var SKUSaved = false;
+                    for(var j=0; j<SKU.attributes.length; j++){
+                        if(name == SKU.attributes[j].name){
+                            SKU.attributes[j] = {ref:ref, name:name, value:value, order:order};
+                            SKUSaved = true;
+                        }
+                    }
 
-					if(!products.SKUExistAttributes[SKU._id]){
-						products.SKUExistAttributes[SKU._id]=[];
-					}
+                    if(!SKUSaved){
+                        SKU.attributes.push({ref:ref, name:name, value:value, order:order});
+                    }
 
-					products.SKUExistAttributes[SKU._id][name] = {ref:ref, value:value};
-				}
-			});
-		});
+                    if(!products.SKUExistAttributes[SKU._id]){
+                        products.SKUExistAttributes[SKU._id]=[];
+                    }
 
-		$('.SKU input').off('change').on('change', function(){
-			var el = $(this);
-			var SKU_id = el.attr('data_SKU_id');
-			switch(el.attr('name')){
-				case 'platform_price':
-					products.SKUs.forEach(function(SKU){
-						if(SKU._id == SKU_id || (typeof SKU._id == 'undefined' && SKU_id=="")){
-							SKU.price.platform_price = el.val();
-						}
-					});
-					break;
-				case 'market_price':
-					products.SKUs.forEach(function(SKU){
-						if(SKU._id == SKU_id || (typeof SKU._id == 'undefined' && SKU_id=="")){
-							SKU.price.market_price = el.val();
-						}
-					});
-					break;
+                    products.SKUExistAttributes[SKU._id][name] = {ref:ref, value:value};
+
+                    checkSKU(i, true);
+                }
+            }
+        });
+
+        $('.SKU input').off('change').on('change', function(){
+            var el = $(this);
+            var SKU_id = el.attr('data_SKU_id');
+            switch(el.attr('name')){
+                case 'platform_price':
+                    for(var i=0; i<products.SKUs.length; i++){
+                        var SKU = products.SKUs[i];
+                        if(SKU._id == SKU_id || (typeof SKU._id == 'undefined' && SKU_id=="")){
+                            SKU.price.platform_price = el.val();
+                            checkSKU(i, true);
+                        }
+                    }
+                    break;
+                case 'market_price':
+                    for(var i=0; i<products.SKUs.length; i++){
+                        var SKU = products.SKUs[i];
+                        if(SKU._id == SKU_id || (typeof SKU._id == 'undefined' && SKU_id=="")){
+                            SKU.price.market_price = el.val();
+                            checkSKU(i, true);
+                        }
+                    }
+                    break;
 //				case 'name':
 //					products.SKUs.forEach(function(SKU){
 //						console.log(SKU._id, SKU_id, el.val());
@@ -1048,40 +1110,42 @@
 //						}
 //					});
 //					break;
-				case 'addition':
-					var additions = [];
-					el.attr('checked', !el.attr('checked'));
-					var existAdditions = [];
-					$('.SKUAdditions input').each(function(index){
-						var id = $(this).attr('data_SKU_id');
-						if(SKU_id == id && $(this).attr('checked')) {
-							var ref = $(this).attr('data-ref');
-							var name = $(this).attr('data-name');
-							var price = $(this).attr('data-price');
-							additions.push({ref: ref, name: name, price: price});
-							existAdditions[name]={ref:ref, price:price};
-						}
-					});
-					products.SKUs.forEach(function(SKU){
-						if(SKU._id == SKU_id || (typeof SKU._id == 'undefined' && SKU_id=="")){
-							if(!products.SKUExistAdditions[SKU._id]){
-								products.SKUExistAdditions[SKU._id] = [];
-							}
+                case 'addition':
+                    var additions = [];
+                    el.attr('checked', !el.attr('checked'));
+                    var existAdditions = [];
+                    $('.SKUAdditions input').each(function(index){
+                        var id = $(this).attr('data_SKU_id');
+                        if(SKU_id == id && $(this).attr('checked')) {
+                            var ref = $(this).attr('data-ref');
+                            var name = $(this).attr('data-name');
+                            var price = $(this).attr('data-price');
+                            additions.push({ref: ref, name: name, price: price});
+                            existAdditions[name]={ref:ref, price:price};
+                        }
+                    });
+                    for(var i=0; i<products.SKUs.length; i++){
+                        var SKU = products.SKUs[i];
+                        if(SKU._id == SKU_id || (typeof SKU._id == 'undefined' && SKU_id=="")){
+                            if(!products.SKUExistAdditions[SKU._id]){
+                                products.SKUExistAdditions[SKU._id] = [];
+                            }
 
-							products.SKUExistAdditions[SKU._id] = existAdditions;
-							SKU.additions = additions;
-						}
-					});
-					break;
-				default:
-					break;
-			}
-		})
-	}
+                            products.SKUExistAdditions[SKU._id] = existAdditions;
+                            SKU.additions = additions;
+                            checkSKU(i, true);
+                        }
+                    }
+                    break;
+                default:
+                    break;
+            }
+        })
+    }
 
-	function SKU_refreshed(SKU){
+    function SKU_refreshed(SKU){
 //		console.log(SKU_attributes_all);
-		// initial attributes
+        // initial attributes
 //		SKU.attributes.forEach(function (attribute) {
 //			for (var i = 0; i < SKU_attributes_all.length; i++) {
 //				if (attribute.name === SKU_attributes_all[i].name) {
@@ -1092,32 +1156,32 @@
 //		});
 //
 //		SKU.attributes = SKU.attributes.concat(SKU_attributes_all);
-		products.SKUExistAttributes[SKU._id]=[];
-		SKU.attributes.forEach(function(attribute){
-			products.SKUExistAttributes[SKU._id][attribute.name] = {ref:attribute.ref, value:attribute.value};
-		});
+        products.SKUExistAttributes[SKU._id]=[];
+        SKU.attributes.forEach(function(attribute){
+            products.SKUExistAttributes[SKU._id][attribute.name] = {ref:attribute.ref, value:attribute.value};
+        });
 
 
 
-		// initial additions
-		products.SKUExistAdditions[SKU._id]=[];
-		SKU.additions.forEach(function(addition){
-			products.SKUExistAdditions[SKU._id][addition.name] = {ref:addition.ref, price:addition.price};
-		})
-	}
+        // initial additions
+        products.SKUExistAdditions[SKU._id]=[];
+        SKU.additions.forEach(function(addition){
+            products.SKUExistAdditions[SKU._id][addition.name] = {ref:addition.ref, price:addition.price};
+        })
+    }
 
-	function showCheckboxes(index) {
-		var checkboxes = $('.multiselect #checkboxes')[index];
+    function showCheckboxes(index) {
+        var checkboxes = $('.multiselect #checkboxes')[index];
 //		var checkboxes = document.getElementById("checkboxes");
-		if (!products.expanded[index]) {
+        if (!products.expanded[index]) {
 //			checkboxes.style.display = "block";
-			products.expanded[index] = true;
-		} else {
+            products.expanded[index] = true;
+        } else {
 //			checkboxes.style.display = "none";
-			products.expanded[index] = false;
-		}
+            products.expanded[index] = false;
+        }
 
-		SET('products.expanded', products.expanded);
-		products_onchange();
-	}
+        SET('products.expanded', products.expanded);
+        products_onchange();
+    }
 </script>

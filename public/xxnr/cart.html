@@ -124,17 +124,8 @@
                                                     <div class="p-skus">
                                                         <ul>
                                                             <li ng-repeat="attribute in item.attributes">
-                                                                {{attribute.name}}:{{attribute.value}}
+                                                                {{attribute.name}}: {{attribute.value}}
                                                             </li>
-                                                            <li>
-                                                                <ul class="row" ng-if="item.additions">
-                                                                附加项目:
-                                                                    <li ng-repeat="addition in item.additions">
-                                                                        {{addition.name}}&nbsp;
-                                                                    </li>
-                                                                </ul>
-                                                            </li>
-
                                                         </ul>
                                                     </div>
                                                 </div>
@@ -159,16 +150,35 @@
                                         </div>
                                         <div class="cell p-sum">
                                             <!--<div ng-cloak>{{item.totalDeposit}}<span ng-show="{{item.deposit}}">（订金）</span></div>-->
-                                            <div class="ng-cloak">¥ {{item.totalPrice}}</div>
+                                            <div class="ng-cloak" ng-class="{'hasDeposit':item.hasDeposit}">¥ {{item.totalPrice.toFixed(2)}}</div>
 
                                         </div>
 
                                         <div class="cell p-ops"><a class="cart-remove" href="" ng-click="deleteItem($parent.$index, $index)">删除</a></div>
+                                    </div>
+                                    <div class="additions" ng-if="item.additions">
+                                        <div class="">
+                                            附加项目 ：
+                                        </div>
+                                        <div class="addition-options">
+                                            <span ng-repeat="addition in item.additions">
+                                                {{addition.name}}&nbsp;;
+                                            </span>
+                                        </div>
+                                        <div class="addition-price ng-cloak">
+                                            ¥ {{item.additionsTotalPrice.toFixed(2)}}
+                                        </div>
+                                        <div class="additions-quantity ng-cloak">
+                                            {{item.buyCount}}
+                                        </div>
 
+                                        <div class="TotalAdditionsPrice">
+                                            ¥ {{(item.additionsTotalPrice*item.buyCount).toFixed(2)}}
+                                        </div>
                                     </div>
                                     <div class="pay-step" ng-show="{{item.hasDeposit}}">
-                                        <div class="ng-cloak pay-step-1"><span class="text-info">阶段一：订金</span><span class="order-price ng-cloak">¥ {{item.totalDeposit}}</span></div>
-                                        <div class="ng-cloak pay-step-2"><span class="text-info">阶段二：尾款</span>¥ {{(item.totalPrice + item.additionsTotalPrice - item.totalDeposit).toFixed(2)}}</div>
+                                        <div class="ng-cloak pay-step-1"><span class="text-info">阶段一：订金</span><span class="order-price ng-cloak">¥ {{item.totalDeposit.toFixed(2)}}</span></div>
+                                        <div class="ng-cloak pay-step-2"><span class="text-info">阶段二：尾款</span>¥ {{(item.totalPrice + item.additionsTotalPrice * item.buyCount - item.totalDeposit).toFixed(2)}}</div>
                                     </div>
                                 </div>
 
@@ -184,7 +194,7 @@
         <div class="submit-btn right"><a href="" ng-click="checkout('confirmOrder.html')">去结算</a></div>
         <div class="price-total right">
             <p><label>已选择商品<span class="ng-cloak">{{totalCount}}</span>件</label></p>
-            <p><label>总价（不计运费）：</label><span class="total ng-cloak">¥{{totalPrice}}</span></p>
+            <p><label>总价（不计运费）：</label><span class="total ng-cloak">¥ {{totalPrice}}</span></p>
             <!--<p><label>已节省：</label><span ng-cloak>{{totalSaving}}元</span></p>-->
         </div>
 

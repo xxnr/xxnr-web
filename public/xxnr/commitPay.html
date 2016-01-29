@@ -79,8 +79,8 @@
                     </div>
                     <span class="intro">选择本次支付金额</span>
                     <div class="buy_btn">
-                        <a class="btn-reduce" href="" ng-click="multi_pay_amount_reduce()" ng-class="{true:'editable'}[amount_reduce_editable]">-</a>
-                        <a class="btn-add" href="" ng-click="multi_pay_amount_add()" ng-class="{true:'editable'}[amount_add_editable]">+</a>
+                        <a class="btn-reduce" href="" ng-click="multi_pay_amount_reduce()" ng-class="{'editable':amount_reduce_editable == true && payTimes == 1}" >-</a>
+                        <a class="btn-add" href="" ng-click="multi_pay_amount_add()" ng-class="{'editable':amount_add_editable == true && payTimes == 1}">+</a>
                         <input maxlength="4" class="text" id="buy-num" ng-model="multi_pay_amount" ng-change="buyCountChange(buy_count)" ng-readonly="!isInWhiteList">
                     </div>
                     <a class="xxnr_btn" href="" ng-click="edit_multi_pay_num()" ng-show="isInWhiteList">{{multi_pay_edit_bth}}</a>
