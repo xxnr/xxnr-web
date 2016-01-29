@@ -767,7 +767,7 @@ transition-delay: initial;
 .wrap_user_info .cart-tbody .item-item .f14{font-size:14px;color:#616161;}
 .xxnr_btn_gray{background:#eee;color:#757575;}
 .wrap_user_info .orders{padding: 20px;padding-top: 0px;background: #fff;}
-.wrap_user_info .orders .orders-main .details_tab{padding-left:0;background: #fff;font-weight: bold;border-bottom: 4px solid #d2d2d2;}
+.wrap_user_info .orders .orders-main .details_tab{padding-left:0;background: #fff;font-weight: bold;border-bottom: 4px solid #d2d2d2;font-family: "Microsoft YaHei Light"}
 .wrap_user_info .orders .orders-main .details_tab div{width: 200px;display: inline-block;}
 .wrap_user_info .orders .orders-main .details_tab li{display: inline-block;height: 20px;line-height: 20px;width: 136px;text-align: center;margin-bottom: -3px;padding: 15px 0;}
 .wrap_user_info .orders .orders-main .details_tab li a{font-size:14px;width: 136px;display: inline-block;border-right: 1px solid #c7c7c7;}
