@@ -854,7 +854,7 @@ OrderService.prototype.getPayOrderPaymentInfo = function(order, payment, payPric
 			        return;
 			    });
 			} else {
-				if (payPrice && tools.isPrice(payPrice.toString()) && parseFloat(payPrice) && parseFloat(payPrice) > 0.01 && parseFloat(payPrice) < payment.price) {
+				if (payPrice && tools.isPrice(payPrice.toString()) && parseFloat(payPrice) && parseFloat(payPrice) >= 0.01 && parseFloat(payPrice) < payment.price) {
 			        if (!payPrice) {
 			        	payPrice = payment.price;
 			        }
