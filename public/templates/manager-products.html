@@ -383,6 +383,7 @@
             switch ($(button).attr('name')) {
                 case 'edit':
                     clear_SKU_attributes();
+                    products.SKUChanged = [];
                     $.components.GET(managerurl + '/api/products/' + row.id, null, function(response, err) {
                         // Error prevention
                         if (response instanceof Array)
