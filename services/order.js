@@ -9,6 +9,7 @@ var SUBORDERTYPE = require('../common/defs').SUBORDERTYPE;
 var SUBORDERTYPEKEYS = require('../common/defs').SUBORDERTYPEKEYS;
 var OrderModel = require('../models').order;
 var UseOrdersNumberModel = require('../models').userordersnumber;
+var OrderPaidLog = require('../models').orderpaidlog;
 var moment = require('moment-timezone');
 
 // Service
@@ -456,7 +457,7 @@ OrderService.prototype.paid = function(id, paymentId, options, callback) {
 	// OrderModel.update({id:id}, {$set:{payStatus:PAYMENTSTATUS.PAID, datepaid:new Date()}}, function(err, count) {
 	var values = {'payments.$.payStatus':PAYMENTSTATUS.PAID, 'payments.$.datePaid':new Date()};
 	if (options && options.price) {
-		values['payments.$.price'] = options.price;
+		values['payments.$.price'] = parseFloat(parseFloat(options.price).toFixed(2));
 	}
 	if (options && options.payType) {
 		values['payments.$.payType'] = options.payType;
@@ -769,20 +770,79 @@ OrderService.prototype.getPayOrderPaymentInfo = function(order, payment, payPric
     // the payment is existed in third-party platform Or the payment is unpaid. need close this payment and push a new payment.
     if (payment.thirdPartyRecorded || payment.payStatus !== PAYMENTSTATUS.UNPAID) {
         values = {'payments.$.isClosed':true};
+        OrderModel.update(query, {'$set':values}, function(err, count) {
+	    	if (err) {
+	            console.error('OrderService getPayOrderPaymentInfo update payment err:', err);
+	            callback(err);
+	            return;
+	        }
+	        if (count.n == 0) {
+	        	console.error('OrderService getPayOrderPaymentInfo update payment not find the doc.');
+	            callback('not find the doc');
+	            return;
+	        }
+	        var pushValues = {};
+	        var newPayment = payment;
+            newPayment.id = U.GUID(10);
+            if (payPrice) {
+            	newPayment.payPrice = parseFloat(parseFloat(payPrice).toFixed(2));
+            }
+            if (options && options.payType) {
+            	newPayment.payType = options.payType;
+            }
+            newPayment.payStatus = PAYMENTSTATUS.UNPAID;
+	        pushValues['$push'] = {'payments':newPayment};
+	        OrderModel.update(query, pushValues, function(err, count) {
+				if (err) {
+		            console.error('OrderService getPayOrderPaymentInfo update push payment err:', err);
+		            callback(err);
+		            return;
+		        }
+		        if (count.n == 0) {
+		        	console.error('OrderService getPayOrderPaymentInfo update push payment not find the doc.');
+		            callback('not find the doc');
+		            return;
+		        }
+
+		        if (!payPrice) {
+		        	payPrice = newPayment.price;
+		        }
+		        callback(null, newPayment, payPrice);
+		        return;
+		    });
+	    });
     } else {
     	// user input price is not null, price Regexp, > 0, <  payment price. use payPrice
-    	if (payPrice && tools.isPrice(payPrice.toString()) && parseFloat(payPrice) && parseFloat(payPrice) >= 0.01 && parseFloat(payPrice) < payment.price) {
+    	if (payPrice && tools.isPrice(payPrice.toString()) && parseFloat(payPrice) && parseFloat(parseFloat(payPrice).toFixed(2)) >= 0.01 && parseFloat(parseFloat(payPrice).toFixed(2)) < payment.price) {
     		payment.id = U.GUID(10);
 			payment.dateCreated = new Date();
-			values = {'payments.$.id':payment.id, 'payments.$.dateCreated': payment.dateCreated};
+			values = {'payments.$.id':payment.id, 'payments.$.dateCreated': payment.dateCreated, 'payments.$.isClosed': false};
 			if (payPrice) {
-				payment.payPrice = payPrice;
-				values['payments.$.payPrice'] = payPrice;
+				payment.payPrice = parseFloat(parseFloat(payPrice).toFixed(2));
+				values['payments.$.payPrice'] = parseFloat(parseFloat(payPrice).toFixed(2));
 			}
 			if (options && options.payType) {
 				payment.payType = options.payType;
 				values['payments.$.payType'] = options.payType;
 			}
+			OrderModel.update(query, {'$set':values}, function(err, count) {
+		    	if (err) {
+		            console.error('OrderService getPayOrderPaymentInfo update payment err:', err);
+		            callback(err);
+		            return;
+		        }
+		        if (count.n == 0) {
+		        	console.error('OrderService getPayOrderPaymentInfo update payment not find the doc.');
+		            callback('not find the doc');
+		            return;
+		        }
+
+		        if (!payPrice) {
+		        	payPrice = payment.price;
+		        }
+		        callback(null, payment, payPrice);
+			    return;
+		    });
     	} else {
     		callback(null, payment, payment.price);
 	        if (options && options.payType) {
@@ -808,62 +868,6 @@ OrderService.prototype.getPayOrderPaymentInfo = function(order, payment, payPric
 	        return;
     	}
     }
-
-    if (!U.isEmpty(values)) {
-	    OrderModel.update(query, {'$set':values}, function(err, count) {
-	    	if (err) {
-	            console.error('OrderService getPayOrderPaymentInfo update payment err:', err);
-	            callback(err);
-	            return;
-	        }
-	        if (count.n == 0) {
-	        	console.error('OrderService getPayOrderPaymentInfo update payment not find the doc.');
-	            callback('not find the doc');
-	            return;
-	        }
-
-	        // the payment is existed in third-party platform Or the payment is unpaid. need close this payment and push a new payment.
-	        if (payment.thirdPartyRecorded || payment.payStatus !== PAYMENTSTATUS.UNPAID) {
-		        var pushValues = {};
-		        var newPayment = payment;
-	            newPayment.id = U.GUID(10);
-	            if (payPrice) {
-	            	newPayment.payPrice = parseFloat(payPrice).toFixed(2);
-	            }
-	            if (options && options.payType) {
-	            	newPayment.payType = options.payType;
-	            }
-	            newPayment.payStatus = PAYMENTSTATUS.UNPAID;
-		        pushValues['$push'] = {'payments':newPayment};
-		        OrderModel.update(query, pushValues, function(err, count) {
-					if (err) {
-			            console.error('OrderService getPayOrderPaymentInfo update push payment err:', err);
-			            callback(err);
-			            return;
-			        }
-			        if (count.n == 0) {
-			        	console.error('OrderService getPayOrderPaymentInfo update push payment not find the doc.');
-			            callback('not find the doc');
-			            return;
-			        }
-
-			        if (!payPrice) {
-			        	payPrice = newPayment.price;
-			        }
-			        callback(null, newPayment, payPrice);
-			        return;
-			    });
-			} else {
-				if (payPrice && tools.isPrice(payPrice.toString()) && parseFloat(payPrice) && parseFloat(payPrice) >= 0.01 && parseFloat(payPrice) < payment.price) {
-			        if (!payPrice) {
-			        	payPrice = payment.price;
-			        }
-			        callback(null, payment, payPrice);
-				    return;
-				}
-			}
-	    });
-	}
 };
 
 // update the payment when the third-party platform recorded it
@@ -913,7 +917,7 @@ OrderService.prototype.createSubOrders = function(order) {
 			order.subOrders = [];
 			if (order.deposit && order.deposit !== order.price) {
 				var deposit = {'id':U.GUID(10), 'price':order.deposit, 'type':SUBORDERTYPE.DEPOSIT};
-				var balance = {'id':U.GUID(10), 'price':(order.price-order.deposit), 'type':SUBORDERTYPE.BALANCE};
+				var balance = {'id':U.GUID(10), 'price':parseFloat((order.price-order.deposit).toFixed(2)), 'type':SUBORDERTYPE.BALANCE};
 				order.subOrders.push(deposit);
 				order.subOrders.push(balance);
 				order.firstsubOrder = {'id':deposit['id'],'price':deposit['price']};
@@ -1144,7 +1148,7 @@ OrderService.prototype.checkPayStatusDetail = function(order, callback) {
 					}
 
 					// get suborder paystatus
-					if (paidPrice >= subOrder.price) {
+					if (paidPrice >= parseFloat(parseFloat(subOrder.price).toFixed(2))) {
 						subOrder.payStatus = PAYMENTSTATUS.PAID;
 					} else {
 						subOrder.payStatus = PAYMENTSTATUS.UNPAID;
@@ -1163,7 +1167,7 @@ OrderService.prototype.checkPayStatusDetail = function(order, callback) {
 						paidCount += 1;
 					}
 
-					Payments[subOrder.type] = {'payment':suborderPayment,'suborder':subOrder,'payprice':(subOrder.price-paidPrice),'paidtimes':paidTimes};
+					Payments[subOrder.type] = {'payment':suborderPayment,'suborder':subOrder,'payprice':parseFloat((subOrder.price-paidPrice).toFixed(2)),'paidtimes':paidTimes};
 					if (subOrder.payStatus !== subOrderPayStatus) {
 						// set suborder paystatus
 						var key = 'subOrders.' + i + '.payStatus';
@@ -1430,5 +1434,19 @@ OrderService.prototype.checkPayStatusDetail = function(order, callback) {
 // 		}
 // 	});
 // };
+
+// save paid log for every pay
+OrderService.prototype.savePaidLog = function(paidLog, callback) {
+	try {
+		var orderPaidLog = new OrderPaidLog(paidLog);
+	    orderPaidLog.save(function(err) {
+			if (err) {
+				console.error('OrderService savePaidLog save err:', err);
+			}
+		});
+	} catch (e) {
+        console.error('OrderService savePaidLog err:', e);
+    }
+};
 
 module.exports = new OrderService();
