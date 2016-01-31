@@ -567,7 +567,7 @@ var refresh_product_SKUAttributes = function(product, callback){
         }
 
         SKUModel.find({product:product, online:true})
-            .sort({dateCreated:-1})
+            .sort({dateCreated:1})
             .limit(1)
             .lean()
             .exec(function(err, docs){
