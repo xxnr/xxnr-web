@@ -68,7 +68,7 @@ var schema = new mongoose.Schema({
         'price': {type: Number, required: true},									// 本次支付的金额
         'payPrice': {type: Number},													// 用户选择支付的金额，用来判断是否需要生成新的payment
         'suborderId': {type: String, index: true, required: true},					// 所属子订单ID
-        'dateCreated': {type: Date, default: Date.now},							// 生成日期
+        'dateCreated': {type: Date, default: Date.now},								// 生成日期
 		'datePaid': Date,															// 支付日期
 		'dateSet': Date,															// 人为设置的日期
 		'payStatus': {type:Number, required:true, default: PAYMENTSTATUS.UNPAID},	// 支付状态
