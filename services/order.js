@@ -456,7 +456,7 @@ OrderService.prototype.paid = function(id, paymentId, options, callback) {
 	// OrderModel.update({id:id}, {$set:{payStatus:PAYMENTSTATUS.PAID, datepaid:new Date()}}, function(err, count) {
 	var values = {'payments.$.payStatus':PAYMENTSTATUS.PAID, 'payments.$.datePaid':new Date()};
 	if (options && options.price) {
-		values['payments.$.price'] = options.price;
+		values['payments.$.price'] = parseFloat(parseFloat(options.price).toFixed(2));
 	}
 	if (options && options.payType) {
 		values['payments.$.payType'] = options.payType;
@@ -916,7 +916,7 @@ OrderService.prototype.createSubOrders = function(order) {
 			order.subOrders = [];
 			if (order.deposit && order.deposit !== order.price) {
 				var deposit = {'id':U.GUID(10), 'price':order.deposit, 'type':SUBORDERTYPE.DEPOSIT};
-				var balance = {'id':U.GUID(10), 'price':(order.price-order.deposit), 'type':SUBORDERTYPE.BALANCE};
+				var balance = {'id':U.GUID(10), 'price':parseFloat((order.price-order.deposit).toFixed(2)), 'type':SUBORDERTYPE.BALANCE};
 				order.subOrders.push(deposit);
 				order.subOrders.push(balance);
 				order.firstsubOrder = {'id':deposit['id'],'price':deposit['price']};
@@ -1147,7 +1147,7 @@ OrderService.prototype.checkPayStatusDetail = function(order, callback) {
 					}
 
 					// get suborder paystatus
-					if (paidPrice >= subOrder.price) {
+					if (paidPrice >= parseFloat(parseFloat(subOrder.price).toFixed(2))) {
 						subOrder.payStatus = PAYMENTSTATUS.PAID;
 					} else {
 						subOrder.payStatus = PAYMENTSTATUS.UNPAID;
@@ -1166,7 +1166,7 @@ OrderService.prototype.checkPayStatusDetail = function(order, callback) {
 						paidCount += 1;
 					}
 
-					Payments[subOrder.type] = {'payment':suborderPayment,'suborder':subOrder,'payprice':(subOrder.price-paidPrice),'paidtimes':paidTimes};
+					Payments[subOrder.type] = {'payment':suborderPayment,'suborder':subOrder,'payprice':parseFloat((subOrder.price-paidPrice).toFixed(2)),'paidtimes':paidTimes};
 					if (subOrder.payStatus !== subOrderPayStatus) {
 						// set suborder paystatus
 						var key = 'subOrders.' + i + '.payStatus';
