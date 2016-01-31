@@ -94,8 +94,19 @@ schema.index({payStatus: 1, deliverStatus: 1, buyerId: 1, dateCreated: -1});
 schema.index({confirmed: -1, payStatus: 1, deliverStatus: 1, buyerId: 1, dateCreated: -1});
 schema.index({id:"text", buyerId:"text", buyerName:"text", buyerPhone:"text", consigneeName:"text", consigneePhone:"text", paymentId:"text"});
 
+// Schema
+var orderPaidLogSchema = new mongoose.Schema({
+	'orderId': {type:String},
+	'suborderId': {type:String},
+	'paymentId': {type:String, required:true},
+	'payType': {type:Number, required:true},
+	'price': {type: Number, required: true},
+	'datePaid': {type: Date, default: Date.now}
+});
+            
 // Model
 mongoose.model('order', schema);
+mongoose.model('order_paid_log', orderPaidLogSchema);
 // var orderModel = mongoose.model('order', schema);
 
 

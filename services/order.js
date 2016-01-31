@@ -9,6 +9,7 @@ var SUBORDERTYPE = require('../common/defs').SUBORDERTYPE;
 var SUBORDERTYPEKEYS = require('../common/defs').SUBORDERTYPEKEYS;
 var OrderModel = require('../models').order;
 var UseOrdersNumberModel = require('../models').userordersnumber;
+var OrderPaidLog = require('../models').orderpaidlog;
 var moment = require('moment-timezone');
 
 // Service
@@ -1433,5 +1434,19 @@ OrderService.prototype.checkPayStatusDetail = function(order, callback) {
 // 		}
 // 	});
 // };
+
+// save paid log for every pay
+OrderService.prototype.savePaidLog = function(paidLog, callback) {
+	try {
+		var orderPaidLog = new OrderPaidLog(paidLog);
+	    orderPaidLog.save(function(err) {
+			if (err) {
+				console.error('OrderService savePaidLog save err:', err);
+			}
+		});
+	} catch (e) {
+        console.error('OrderService savePaidLog err:', e);
+    }
+};
 
 module.exports = new OrderService();

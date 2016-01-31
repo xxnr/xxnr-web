@@ -61,6 +61,9 @@ exports.userwhitelist = mongoose.model('userwhitelist');
 exports.intention_product = mongoose.model('intention_product');
 // potential_customer
 exports.potential_customer = mongoose.model('potential_customer');
+// order paid log
+exports.orderpaidlog = mongoose.model('order_paid_log');
+
 
 exports.getModel = function (name, options) {
     options = options || {};
