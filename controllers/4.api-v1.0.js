@@ -543,7 +543,7 @@ function payOrder(payExecutor){
                     self.respond({code:1001, message:'获取支付信息出错'});
                     return;
                 }
-                payExecutor(resultPayment.id, parseFloat(resultPayPrice).toFixed(2), self.ip, order.id);
+                payExecutor(resultPayment.id, parseFloat(resultPayPrice).toFixed(2), self.ip, order.id, resultPayment);
                 return;
             });
         } catch (e) {
@@ -559,7 +559,7 @@ function alipayOrder(){
     var consumer = self.data['consumer']||'website';
     self.payType = PAYTYPE.ZHIFUBAO;
 
-    payOrder.call(this, function(paymentId, totalPrice, ip) {
+    payOrder.call(this, function(paymentId, totalPrice, ip, orderId, payment) {
         switch(consumer) {
             case 'app':
                 var response = {"code":1000, "paymentId":paymentId, "price":totalPrice};
@@ -634,6 +634,8 @@ function alipayNotify() {
             payNotify.call(self, paymentId, options);
             self.content('success');
             // alipay success log
+            var payLog = {paymentId:paymentId, payType:PAYTYPE.ZHIFUBAO, price:price, datePaid: new Date()};
+            OrderService.savePaidLog(payLog);
         } else {
             self.content('success');
         }
@@ -691,7 +693,8 @@ function unionpayNotify() {
                 // update the third-party platform payment
                 OrderService.updateThirdpartyPayment(paymentId);
                 // unionpay success log
-
+                var payLog = {orderId:paymentInfo.orderId, paymentId:paymentId, payType:PAYTYPE.UNIONPAY, price:(parseFloat(paymentInfo.txnAmt)/100).toFixed(2), datePaid: new Date()};
+                OrderService.savePaidLog(payLog);
             } else {
                 console.error('unionpayNotify error : respCode is ', body['respCode'], 'body:', body);
                 self.content('success'); // tell the notifier we successfully handled the notification
@@ -708,7 +711,7 @@ function unionPayOrder() {
     //     then go to right top corner => "my test" => "my product" => "not tested" => select one tet type => click "start to test"
     var self = this;
     self.payType = PAYTYPE.UNIONPAY;
-    payOrder.call(this, function(paymentId, totalPrice, ip, orderId) {
+    payOrder.call(this, function(paymentId, totalPrice, ip, orderId, payment) {
         var consumer = self.data['consumer']||'website';
         var phpPage = null;
 
