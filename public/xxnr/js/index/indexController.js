@@ -63,8 +63,8 @@ app.controller('indexController', function($scope, remoteApiService, commonServi
                         item.shortName = item.name.length > 36 ? (item.name.substr(0, 33) + '...') : item.name;
                         item.detailUrl = 'productDetail.html?id=' + product.id;
                         item.imgUrl = commonService.baseUrl + product.thumbnail;
-                        item.price = product.defaultSKU.price?product.defaultSKU.price.platform_price:product.price;
-                        item.discountPrice = product.discountPrice;
+                        item.price = product.price;
+                        item.discountPrice = product.defaultSKU.price?product.defaultSKU.price.platform_price:product.discountPrice;
                         item.hasDiscount = (0 < product.discount && product.discount < 1.0);
                         item.presale = product.presale;
                         if ($scope.classes[categoryIndex].products === undefined) {
