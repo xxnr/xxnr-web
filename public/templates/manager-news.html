@@ -175,7 +175,7 @@
 							response = {};
 
 						SET('news.form', $.extend({}, response), true);
-						ckeditor_add('newsbody', response);
+						news_ckeditor_add('newsbody', response);
 						SET('news.response', null);
 						SET('common.form', 'news');
 					});
@@ -239,7 +239,8 @@
 			}
 			if (!confirm('@(你确认要提交") ' + news.form.title + ' "?'))
 				return;
-			ckeditor_getdata('newsbody', news.form);
+
+			news_ckeditor_getdata('newsbody', news.form);
 			$.components.POST(managerurl + '/api/news/', news.form, function(response) {
 
 				// Error handling
@@ -314,11 +315,11 @@
 	function news_add() {
 		SET('news.form', {}, true);
 		SET('news.response', null);
-		ckeditor_add('newsbody');
+		news_ckeditor_add('newsbody');
 		SET('common.form', 'news');
 	}
 	
-	function ckeditor_add(id, model) {
+	function news_ckeditor_add(id, model) {
 		var ckeditor = CKEDITOR.instances[id];
 		if (ckeditor) ckeditor.destroy(true); //销毁编辑器 ,然后新增一个
 		
@@ -328,12 +329,10 @@
 	    }
 	}
 
-	function ckeditor_getdata(id, model) {
+	function news_ckeditor_getdata(id, model) {
 		var ckeditor = CKEDITOR.instances[id];
 		if (ckeditor) {
-			console.log(id);
 			model[id] = ckeditor.getData();
-			console.log(model[id]);
 		}
 	}
 
