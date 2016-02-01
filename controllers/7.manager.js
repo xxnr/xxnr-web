@@ -1453,8 +1453,9 @@ function json_potential_customer_get(_id){
 
 				if(user && user.inviter) {
 					customer.inviter = user.inviter;
-					self.respond({code:1000, potentialCustomer:customer});
 				}
+
+				self.respond({code:1000, potentialCustomer:customer});
 			})
 		} else{
 			self.respond({code:1000, potentialCustomer:customer});
