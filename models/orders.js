@@ -96,12 +96,13 @@ schema.index({id:"text", buyerId:"text", buyerName:"text", buyerPhone:"text", co
 
 // Schema
 var orderPaidLogSchema = new mongoose.Schema({
-	'orderId': {type:String},
-	'suborderId': {type:String},
-	'paymentId': {type:String, required:true},
-	'payType': {type:Number, required:true},
-	'price': {type: Number, required: true},
-	'datePaid': {type: Date, default: Date.now}
+	'orderId': {type:String},						// 订单ID
+	'suborderId': {type:String},					// 子订单ID
+	'paymentId': {type:String, required:true},		// 支付ID
+	'payType': {type:Number, required:true},		// 支付类型
+	'price': {type: Number, required: true},		// 支付金额
+	'datePaid': {type: Date, default: Date.now},	// 交易日期
+	'queryId': {type:String}						// 银联或者支付宝的交易流水号
 });
             
 // Model
