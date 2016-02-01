@@ -11,6 +11,7 @@ var NewsService = services.news;
 var SKUService = services.SKU;
 var BrandService = services.brand;
 var CategoryService = services.category;
+var PotentialCustomerService = services.potential_customer;
 var PAYMENTSTATUS = require('../common/defs').PAYMENTSTATUS;
 var DELIVERSTATUS = require('../common/defs').DELIVERSTATUS;
 
@@ -137,6 +138,11 @@ exports.install = function() {
 	F.route(CONFIG('manager-url') + '/api/v2.1/SKU/online/{id}',			process_SKU_online,				['get'], ['backend_auth']);
 	F.route(CONFIG('manager-url') + '/api/v2.1/SKU/additions',				json_SKU_Additions_get,		['get'],['backend_auth']);
 	F.route(CONFIG('manager-url') + '/api/v2.1/SKU/addition/add',			process_SKU_Addition_add,	['post'],['backend_auth']);
+
+	// potential customer
+	F.route(CONFIG('manager-url') + '/api/v2.1/potentialCustomer/query',	json_potential_customer_query,	['get'], ['backend_auth']);
+	F.route(CONFIG('manager-url') + '/api/v2.1/potentialCustomer/{_id}',	json_potential_customer_get, ['get'], ['backend_auth']);
+	F.route(CONFIG('manager-url') + '/api/v2.1/agentinfo/{_id}',				json_agent_info_get, ['get'], ['backend_auth']);
 };
 
 var files = DB('files', null, require('total.js/database/database').BUILT_IN_DB).binary;
@@ -780,7 +786,7 @@ function json_users_read(id) {
             return;
         }
 
-        self.respond({code: 1000, user: user});
+		self.respond({code: 1000, user: user});
     });
 }
 
@@ -1415,5 +1421,63 @@ function process_SKU_Addition_add(){
 		}
 
 		self.respond({code:1000, message:'success', addition:addition});
+	})
+}
+
+function json_potential_customer_query(){
+	var self = this;
+	PotentialCustomerService.queryPage(null, self.data.page-1, self.data.max, function(err, customers, count, pageCount){
+		if(err){
+			self.respond({code:1001, message:'获取潜在客户列表失败'});
+			return;
+		}
+
+		self.respond({code:1000, message:'success', potentialCustomers:customers, count:count, pageCount:pageCount});
+	}, self.data.search, true)
+}
+
+function json_potential_customer_get(_id){
+	var self = this;
+	PotentialCustomerService.getById(_id, function(err, customer){
+		if(err){
+			self.respond({code:1001, message:'获取潜在客户详情失败'});
+			return;
+		}
+
+		if(customer.isRegistered){
+			UserService.getByAccount(customer.phone, function(err, user){
+				if(err){
+					self.respond({code:1001, message:'获取潜在客户信息失败'});
+					return;
+				}
+
+				if(user && user.inviter) {
+					customer.inviter = user.inviter;
+				}
+
+				self.respond({code:1000, potentialCustomer:customer});
+			})
+		} else{
+			self.respond({code:1000, potentialCustomer:customer});
+		}
+	})
+}
+
+function json_agent_info_get(id){
+	var self = this;
+	UserService.get({userid:id}, function(err, user){
+		if(err || !user){
+			self.respond({code:1001, message:'获取新农经纪人信息失败'});
+			return;
+		}
+
+		PotentialCustomerService.getStatistic(user._id, function(err, totalCount, registeredCount, registeredAndBindedCount){
+			if(err){
+				self.respond({code:1001, message:'获取新农经纪人信息失败'});
+				return;
+			}
+
+			self.respond({code:1000, agent:{name:user.name, phone: user.account, address:user.address, totalCount:totalCount, registeredCount:registeredCount, registeredAndBindedCount:registeredAndBindedCount}});
+		})
 	})
 }

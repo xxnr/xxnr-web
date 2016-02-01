@@ -57,7 +57,10 @@ var PotentialCustomerSchema = new mongoose.Schema({
     "remarks":{type:String},                             // 备注
     "dateTimeAdded":{type:Date, default:Date.now},      // 添加时间
     "dateAdded":{type:String},                            // 添加日期(北京时间)
-    "isRegistered":{type:Boolean, default:false}         // 是否注册
+    "isRegistered":{type:Boolean, default:false},         // 是否注册
+    "dateTimeRegistered":{type:Date},                       // 注册时间
+    "isBinded":{type:Boolean, default:false},           // 是否绑定该经纪人
+    "dateTimeBinded":{type:Date}                           // 绑定该经纪人时间
 });
 
 var IntentionProductSchema = new mongoose.Schema({
@@ -68,8 +71,13 @@ var IntentionProductSchema = new mongoose.Schema({
 // Indexes
 UserSchema.index({account:"text", nickname:"text", name:"text"});
 UserSchema.index({type:1});
+UserSchema.index({name:1});
+
 PotentialCustomerSchema.index({"phone":1, unique:true});
-PotentialCustomerSchema.index({"user":1, "dateAdded":1});
+PotentialCustomerSchema.index({"user":1, "dateAdded":1, "dateTimeAdded":1});
+PotentialCustomerSchema.index({"user":1, "isRegistered":1, "isBinded":1});
+PotentialCustomerSchema.index({"dateTimeAdded":1});
+
 IntentionProductSchema.index({"name":1, unique:true});
 
 var UserLogSchema = new mongoose.Schema({id: String, account: String, ip: String, date: String, loginAgent: String});
@@ -90,7 +98,7 @@ var PotentialCustomerModel = mongoose.model("potential_customer", PotentialCusto
 
 // hooks
 UserSchema.post('save', function(doc){
-    PotentialCustomerModel.findOneAndUpdate({phone:doc.account}, {$set:{isRegistered:true}}, function(err){
+    PotentialCustomerModel.findOneAndUpdate({phone:doc.account}, {$set:{isRegistered:true, dateTimeRegistered:new Date()}}, function(err){
         if(err){
             console.error(err);
         }
