@@ -60,11 +60,11 @@ exports.install = function() {
     F.route('/api/v2.0/user/isInWhiteList',             isInWhiteList, ['get', 'post'], ['isLoggedIn', 'isInWhiteList']);
 
     // potential customer/intention products related APIs
-    F.route('/api/v2.1/intentionProducts',              json_intention_products, ['get'], ['isLoggedIn']);
-    F.route('/api/v2.1/potentialCustomer/isAvailable',  json_potential_customer_available, ['get'], ['isLoggedIn']);
-    F.route('/api/v2.1/potentialCustomer/add',          process_add_potential_customer, ['post'], ['isLoggedIn']);
-    F.route('/api/v2.1/potentialCustomer/query',        json_potential_customer, ['get'], ['isLoggedIn']);
-    F.route('/api/v2.1/potentialCustomer/get',          json_potential_customer_get, ['get'], ['isLoggedIn']);
+    F.route('/api/v2.1/intentionProducts',              json_intention_products, ['get'], ['isLoggedIn', 'isXXNRAgent']);
+    F.route('/api/v2.1/potentialCustomer/isAvailable',  json_potential_customer_available, ['get'], ['isLoggedIn', 'isXXNRAgent']);
+    F.route('/api/v2.1/potentialCustomer/add',          process_add_potential_customer, ['post'], ['isLoggedIn', 'isXXNRAgent']);
+    F.route('/api/v2.1/potentialCustomer/query',        json_potential_customer, ['get'], ['isLoggedIn', 'isXXNRAgent']);
+    F.route('/api/v2.1/potentialCustomer/get',          json_potential_customer_get, ['get'], ['isLoggedIn', 'isXXNRAgent']);
 
 	// v1.0
 	// LOGIN
@@ -171,6 +171,7 @@ function process_login() {
                 user.verifiedTypesInJson.push({typeId:type, typeName: F.global.usertypes[type] || '其他'});
             });
         }
+        user.isXXNRAgent = data.isXXNRAgent;
         CartService.getOrAdd(user.userid, function(err, cart){
             if(err){
                 self.respond({code:1001, message:'获取购物车id失败'});
@@ -444,6 +445,7 @@ function json_user_get() {
             user.inviterNickname = data.inviter.nickname;
             user.inviterName = data.inviter.name;
         }
+        user.isXXNRAgent = data.isXXNRAgent;
 
         var flags = self.data['flags'];
         var respond = function (user) {
@@ -1605,21 +1607,34 @@ function process_add_potential_customer(){
 
 function json_potential_customer(){
     var self = this;
-    PotentialCustomerService.query(self.user, function(err, potentialCustomers){
-        if(err){
-            self.respond({code:1001, message:'获取潜在客户列表失败'});
-            return;
-        }
-
-        PotentialCustomerService.countLeftToday(self.user, function(err, count){
-            if(err){
-                self.respond({code:1001, message:'查询客户列表失败'});
+    var returnType = self.data.type;
+    if(!returnType) {
+        var page = U.parseInt(self.data.page, 1) - 1;
+        var max = U.parseInt(self.data.max, 20);
+        PotentialCustomerService.queryPage(self.user, page, max, function (err, potentialCustomers, totalCount, pageCount) {
+            if (err) {
+                self.respond({code: 1001, message: '获取潜在客户列表失败'});
                 return;
             }
 
-            self.respond({code:1000, message:'success', potentialCustomers:potentialCustomers, countLeft:count});
+            PotentialCustomerService.countLeftToday(self.user, function (err, count) {
+                if (err) {
+                    self.respond({code: 1001, message: '查询客户列表失败'});
+                    return;
+                }
+
+                self.respond({
+                    code: 1000,
+                    message: 'success',
+                    count: totalCount,
+                    potentialCustomers: potentialCustomers,
+                    countLeftToday: count,
+                    totalPageNo: pageCount,
+                    currentPageNo: page + 1
+                });
+            })
         })
-    })
+    }
 }
 
 function json_intention_products(){

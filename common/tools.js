@@ -203,3 +203,8 @@ exports.verify_token = function(token){
 
     return payload;
 };
+
+exports.isXXNRAgent = function(verifiedTypes){
+    const XXNRAgentId = '6';
+    return verifiedTypes && verifiedTypes.indexOf(XXNRAgentId) != -1;
+};

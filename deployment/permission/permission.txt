@@ -58,6 +58,11 @@
 /$manager/api/users/{id}/, get, super_admin, customer_op
 /$manager/api/users/, put, super_admin, customer_op
 
+#potential customer
+/api/v2.1/potentialCustomer/query, get, super_admin, customer_op
+/api/v2.1/potentialCustomer/{_id}, get, super_admin, customer_op
+/api/v2.1/agentinfo/{_id}, get, super_admin, customer_op
+
 #permission
 /api/permissions, get, super_admin
 

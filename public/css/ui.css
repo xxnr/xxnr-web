@@ -155,7 +155,7 @@ label span { vertical-align: middle; }
 
 .filter { border-bottom: 2px solid #F0F0F0; padding: 0 0 15px; margin-bottom: 20px; font-size: 11px; background: linear-gradient(white, #F8F8F8); }
 .filter {
-	.caption { font-size: 20px; margin-bottom: 20px; font-family: 'Source Sans Pro'; color: #AAB2BD; }
+	.caption { font-size: 20px; margin-bottom: 20px; font-family: 'Source Sans Pro'; color: #AAB2BD;}
 	.m { margin-bottom: 10px; }
 	.ui-dropdown { height: 26px; padding-top: 1px; }
 	.ui-dropdown select { height: 18px; font-size: 11px; }
@@ -169,6 +169,8 @@ label span { vertical-align: middle; }
 	.ui-dropdowncheckbox-selected { font-size: 11px; }
 	.ui-dropdowncheckbox .fa { margin-top: 5px; font-size: 14px; }
 }
+
+.filter .caption .inline {display:inline;}
 
 .ui-cookie { font-size: 11px; padding: 3px 20px 5px; border-bottom: 1px solid #F0F0F0; text-align: center; }
 .ui-cookie button { position: relative; display: inline-block; padding: 1px 5px; border-radius: 4px; font-size: 10px; background-color: black; color: white; border: 0; margin-left: 5px; cursor: pointer; outline: 0; }

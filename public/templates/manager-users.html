@@ -1,6 +1,6 @@
 <div class="filter" style="padding-bottom:9px">
 	<div class="container">
-		<div class="caption"><span class="fa fa-users mr5"></span> @(会员管理)</div>
+		<div class="caption"><span class="fa fa-users mr5"></span> @(会员管理)&nbsp;&nbsp;&nbsp;&nbsp;<a href="/$manager/potentialcustomers"><h6 class="nopadding inline">查看潜在用户</h6></a></div>
 		<div class="row">
 			<div class="col-md-3 col-sm-6 m">
 				<div data-component="textbox" data-component-path="users.filter.search" data-placeholder="@(姓名/昵称/手机号)" data-control-icon="fa-search">@(查询用户)</div>
@@ -14,7 +14,7 @@
 </div>
 
 <div class="container">
-	<div data-component="grid" data-component-path="users.grid" data-max="auto" data-options-page="@(Page: #)" data-options-button="@(查看更多用户)" data-component-id="users.grid" data-talble-width="">
+	<div data-component="grid" data-component-path="users.grid" data-max="auto" data-options-page="@(Page: #)" data-options-button="@(查看更多客户)" data-component-id="users.grid">
 		<!-- <tr>
 			<td>@(会员)</td>
 			<td style="width:220px" class="hidden-xs fs11">@(账号)</td>
@@ -55,129 +55,156 @@
 	<!-- <button name="remove" title="@(Remove)"><span class="fa fa-times"></span></button> -->
 </div>
 <div data-component="form" data-title="@(会员信息)" data-component-path="common.form" data-if="value === 'users'" data-width="900px" data-component-id="users.form">
-	<br />
-	<div data-component="template" data-component-path="users" class="padding" style="padding-bottom:0">
-		<script type="text/html">
-		<table class="table table-bordered" border="0">
-			<tbody>
-				<tr>
-					<td class="col-xs-4 active">@(# id)</td>
-					<td>{{ form.id }}</td>
-				</tr>
-				<tr>
-					<td class="col-xs-4 active">@(账户)</td>
-					<td>{{ form.account }}</td>
-				</tr>
-				<tr>
-					<td class="col-xs-4 active">@(姓名)</td>
-					<td>{{ form.name }}</td>
-				</tr>
-				<tr>
-					<td class="col-xs-4 active">@(所在地区)</td>
-					<td>{{ form.addressShow }}</td>
-				</tr>
-				<tr>
-					<td class="col-xs-4 active">@(昵称)</td>
-					<td>{{ form.nickname }}</td>
-				</tr>
-				<tr>
-					<td class="col-xs-4 active">@(用户积分)</td>
-					<td>{{ form.score }}</td>
-				</tr>
-				{{ if form.datecreated }}
-				<tr>
-					<td class="col-xs-4 active">@(注册时间)</td>
-					<td>
-					{{ if form.datecreated.charAt(form.datecreated.length-1) !== 'Z' }}
-						{{ form.datecreated }}
-					{{ else }}
-						{{ form.datecreated | format('yyyy-MM-dd hh:mm:ss') }}
-					{{ fi }}
-					</td>
-				</tr>
-				{{ fi }}
-				<tr>
-					<td class="col-xs-4 active">@(注册设备)</td>
-					{{ if form.registerAgent }}
-						<td>{{ form.registerAgent }}</td>
-					{{ else }}
-						<td>@(无)</td>
-					{{ fi }}
-				</tr>
-				<tr>
-					<td class="col-xs-4 active">@(性别)</td>
-					{{ if form.sex }}
-						<td>@(女)</td>
-					{{ else }}
-						<td>@(男)</td>
-					{{ fi }}
-				</tr>
-				<tr>
-					<td class="col-xs-4 active">@(申请类型)</td>
-					<td id="user_types">
-						<if usertypes>
-							<select>
-								<option selected disabled hidden value=''></option>
-								{{ foreach usertype in usertypes}}
-								<option value="{{ usertype.value}}" {{ if usertype.value == form.type }} selected {{ fi }}>{{ usertype.text }}</option>
-								{{ end }}
-							</select>
-						</if>
-					</td>
-				</tr>
-                <tr>
-                    <td class="col-xs-4 active">@(已认证类型)</td>
-                    <td id="drop_in" ondrop="dropin(event)" ondragover="allowDrop(event)" >
-						{{ foreach verifiedType in form.verifiedTypes}}
-							<div id="{{verifiedType.value}}" class="drag" text="{{ verifiedType.text }}" draggable="true" ondragstart="drag(event)" >{{ verifiedType.text }}</div>
-						{{ end }}
-					</td>
-                </tr>
-				<tr>
-					<td class="col-xs-4 active">@(未认证类型)</td>
-					<td id="drop_out" ondrop="dropout(event)" ondragover="allowDrop(event)" >
-						{{ foreach notVerifiedType in form.notVerifiedTypes}}
-							<div id="{{notVerifiedType.value}}" class="drag" text="{{ notVerifiedType.text }}" draggable="true" ondragstart="drag(event)">{{ notVerifiedType.text }}</div>
-						{{ end }}
-					</td>
-				</tr>
-			</tbody>
-		</table>
-		</script>
-	</div>
-
-	<!--<div class="padding" style="padding-bottom:0">-->
-		<!--&lt;!&ndash;<div class="row">&ndash;&gt;-->
-			<!--&lt;!&ndash;<div class="col-md-4 m">&ndash;&gt;-->
-				<!--&lt;!&ndash;<div data-component="textbox" data-component-path="users.form.name">@(姓名)</div>&ndash;&gt;-->
-			<!--&lt;!&ndash;</div>&ndash;&gt;-->
-            <!--&lt;!&ndash;<div class="col-md-4 m">&ndash;&gt;-->
-                <!--&lt;!&ndash;<div data-component="textbox" data-component-path="users.form.nickname">@(昵称)</div>&ndash;&gt;-->
-            <!--&lt;!&ndash;</div>&ndash;&gt;-->
-		<!--&lt;!&ndash;</div>&ndash;&gt;-->
-        <!--<div class="row">-->
-            <!--<div class="col-md-4 m">-->
-                <!--@(认证用户类型：)-->
-            <!--</div>-->
-         <!--</div>-->
-        <!--<div class="row">-->
-            <!--<div class="col-md-4 m">-->
-                <!--<div data-component="dropdown" data-component-path="users.form.type" data-source="users.usertypes" data-source-value="value" data-source-text="text"></div>-->
-            <!--</div>-->
-            <!--<div class="col-md-4 m">-->
-                <!--&lt;!&ndash; data-options="@(未认证)|1;@(种植大户)|2;@(村级经销商)|3;@(乡镇经销商)|4;@(县级经销商)|5"&ndash;&gt;-->
-                <!--<div data-component="checkbox" data-component-path="users.form.isVerified">@(<b>已认证</b>)</div>-->
-            <!--</div>-->
-        <!--</div>-->
-	<!--</div>-->
-	<!--<hr />-->
-
-	<div data-component="error" data-component-path="users.response"></div>
-	<div class="ui-form-buttons">
-		<div>
-			<button name="submit">@(提交)</button>
+	<div style="background:#F8F8F8">
+		<div class="multi_form">
+			<div class="form_tab">
+				<div id="user_info_button" class="form_tab_selected cornflowerblue">用户详情</div>
+				<div id="agent_info_button" class="hidden deeppink">新农经纪人</div>
+			</div>
+			<div id="user_info" class="form form_cornflowerblue">
+				<div data-component="template" data-component-path="users" class="padding" style="padding-bottom:0">
+					<script type="text/html">
+						<h3 class="nopadding">基本信息</h3>
+						<table class="table table-bordered" border="0">
+							<tbody>
+							<tr>
+								<td class="col-xs-4 active">@(# id)</td>
+								<td>{{ form.id }}</td>
+							</tr>
+							<tr>
+								<td class="col-xs-4 active">@(账户)</td>
+								<td>{{ form.account }}</td>
+							</tr>
+							<tr>
+								<td class="col-xs-4 active">@(姓名)</td>
+								<td>{{ form.name }}</td>
+							</tr>
+							<tr>
+								<td class="col-xs-4 active">@(所在地区)</td>
+								<td>{{ form.addressShow }}</td>
+							</tr>
+							<tr>
+								<td class="col-xs-4 active">@(昵称)</td>
+								<td>{{ form.nickname }}</td>
+							</tr>
+							<tr>
+								<td class="col-xs-4 active">@(用户积分)</td>
+								<td>{{ form.score }}</td>
+							</tr>
+							{{ if form.datecreated }}
+							<tr>
+								<td class="col-xs-4 active">@(注册时间)</td>
+								<td>
+									{{ if form.datecreated.charAt(form.datecreated.length-1) !== 'Z' }}
+									{{ form.datecreated }}
+									{{ else }}
+									{{ form.datecreated | format('yyyy-MM-dd hh:mm:ss') }}
+									{{ fi }}
+								</td>
+							</tr>
+							{{ fi }}
+							<tr>
+								<td class="col-xs-4 active">@(注册设备)</td>
+								{{ if form.registerAgent }}
+								<td>{{ form.registerAgent }}</td>
+								{{ else }}
+								<td>@(无)</td>
+								{{ fi }}
+							</tr>
+							<tr>
+								<td class="col-xs-4 active">@(性别)</td>
+								{{ if form.sex }}
+									<td>@(女)</td>
+								{{ else }}
+									<td>@(男)</td>
+								{{ fi }}
+							</tr>
+							<tr>
+								<td class="col-xs-4 active">@(申请类型)</td>
+								<td id="user_types">
+									<if usertypes>
+										<select>
+											<option selected disabled hidden value=''></option>
+											{{ foreach usertype in usertypes}}
+											<option value="{{ usertype.value}}" {{ if usertype.value == form.type }} selected {{ fi }}>{{ usertype.text }}</option>
+											{{ end }}
+										</select>
+									</if>
+								</td>
+							</tr>
+							<tr>
+								<td class="col-xs-4 active">@(已认证类型)</td>
+								<td id="drop_in" ondrop="dropin(event)" ondragover="allowDrop(event)" >
+									{{ foreach verifiedType in form.verifiedTypes}}
+									<div id="{{verifiedType.value}}" class="drag" text="{{ verifiedType.text }}" draggable="true" ondragstart="drag(event)" >{{ verifiedType.text }}</div>
+									{{ end }}
+								</td>
+							</tr>
+							<tr>
+								<td class="col-xs-4 active">@(未认证类型)</td>
+								<td id="drop_out" ondrop="dropout(event)" ondragover="allowDrop(event)" >
+									{{ foreach notVerifiedType in form.notVerifiedTypes}}
+									<div id="{{notVerifiedType.value}}" class="drag" text="{{ notVerifiedType.text }}" draggable="true" ondragstart="drag(event)">{{ notVerifiedType.text }}</div>
+									{{ end }}
+								</td>
+							</tr>
+							</tbody>
+						</table>
+					</script>
+				</div>
+				<div data-component="error" data-component-path="users.response"></div>
+				<div class="ui-form-buttons">
+					<div>
+						<button name="submit">@(提交)</button>
+					</div>
+					<button name="cancel">@(取消)</button>
+				</div>
+			</div>
+			<div id="agent_info" class="form form_deeppink hidden">
+				<div data-component="template" data-component-path="agent.form" class="padding" style="padding-bottom:0">
+					<script type="text/html">
+						<h3 class="nopadding">新农经纪人信息</h3>
+						<table class="table table-bordered" border="0">
+							<tbody>
+							<tr>
+								<td class="col-xs-4 active">@(姓名)</td>
+								<td>{{ name }}</td>
+							</tr>
+							<tr>
+								<td class="col-xs-4 active">@(手机号)</td>
+								<td>{{ phone }}</td>
+							</tr>
+							<tr>
+								<td class="col-xs-4 active">@(身份证号)</td>
+								<td>{{ identityNo }}</td>
+							</tr>
+							<tr>
+								<td class="col-xs-4 active">@(认证时间)</td>
+								<td>{{ dateTimeVerified }}</td>
+							</tr>
+							<tr>
+								<td class="col-xs-4 active">@(所在地区)</td>
+								<td>
+									{{ if address }}
+										{{ (address.province?address.province.name:'') + (address.city?address.city.name:'') + (address.county?address.county.name:'') + (address.town?address.town.name:'') }}
+									{{ fi }}
+								</td>
+							</tr>
+							</tbody>
+						</table>
+						<h3 class="nopadding">服务客户统计</h3>
+						<p>已登记的潜在用户数：{{ totalCount }}</p>
+						<p>已注册并绑定为新农代表的用户数：{{ registeredCount }}</p>
+					</script>
+				</div>
+				<div class="ui-form-buttons">
+					<div>
+						<button name="submit">@(提交)</button>
+					</div>
+					<button name="cancel">@(取消)</button>
+				</div>
+			</div>
 		</div>
-		<button name="cancel">@(取消)</button>
 	</div>
 </div>
 <div data-component="form" data-title="@(订单信息)" data-component-path="common.form" data-if="value==='users_orders'" data-width="1000px" data-component-id="users.orders.form">
@@ -246,6 +273,9 @@
     users.usertypes = [];
 	users.response;
 
+	var agent = {};
+	agent.form = {};
+
 	ON('#users.grid', function(component) {
 
 		// Max items per page
@@ -255,11 +285,18 @@
 		component.click = function(index, row, button) {
 			switch ($(button).attr('name')) {
 				case 'edit':
+					select_user_form_tab($('#user_info_button'));
 					$.components.GET(managerurl + '/api/users/' + row.id, null, function(response) {
                         if(response.code!=1000){
                             alert(response.message);
                             return;
                         }
+
+						if(response.user.isXXNRAgent){
+							show_form_button($('#agent_info_button'));
+						} else{
+							hide_form_button($('#agent_info_button'));
+						}
 
 						response.user.verifiedTypes = [];
 						response.user.notVerifiedTypes = [];
@@ -305,6 +342,14 @@
 						SET('common.form', 'users');
 						on_user_form_changed();
 					});
+					$.components.GET(managerurl+'/api/v2.1/agentinfo/'+row.id, null, function(response){
+						if(response.code!=1000){
+							alert(response.message);
+							return;
+						}
+
+						SET('agent.form', $.extend({}, response.agent), true);
+					});
 					break;
 
 				// case 'remove':
@@ -344,7 +389,37 @@
 				success();
 			});
 		};
+
+		$('.form_tab div').on('click', function(){
+			select_user_form_tab($(this));
+		})
 	});
+
+	function select_user_form_tab(el){
+		$('.form_tab div').each(function(){
+			$(this).removeClass('form_tab_selected');
+		});
+		el.addClass('form_tab_selected');
+		$('.multi_form .form').each(function(){
+			$(this).addClass('hidden');
+		});
+		switch(el.attr('id')){
+			case 'user_info_button':
+				$('#user_info').removeClass('hidden');
+				break;
+			case 'agent_info_button':
+				$('#agent_info').removeClass('hidden');
+				break;
+		}
+	}
+
+	function show_form_button(el){
+		el.removeClass('hidden');
+	}
+
+	function hide_form_button(el){
+		el.addClass('hidden');
+	}
 
 	// Method refreshes grid
 	function users_refresh(reset) {
@@ -391,7 +466,6 @@
 	});
 
 	function drag(ev){
-		SET('test',ev);
 		ev.dataTransfer.setData("value", ev.target.id);
 		ev.dataTransfer.setData("text", ev.target.innerHTML);
 		ev.dataTransfer.setData("draggable", ev.target.getAttribute('draggable'));
@@ -406,7 +480,6 @@
 		var text = ev.dataTransfer.getData("text");
 		var value = ev.dataTransfer.getData("value");
 		var draggable = ev.dataTransfer.getData("draggable");
-		console.log(draggable);
 		if(!draggable){
 			return;
 		}
