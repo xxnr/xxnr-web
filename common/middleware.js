@@ -218,7 +218,7 @@ exports.isXXNRAgent_middleware = function(req, res, next, options, controller){
         return;
     }
 
-    UserService.isXXNRAgent(user, XXNRAgentId, function(err, isXXNRAgent){
+    UserService.isXXNRAgent(user, function(err, isXXNRAgent){
         if(err || !isXXNRAgent){
             controller.respond({code:1403, message:'您没有权限这样操作'});
             return;
