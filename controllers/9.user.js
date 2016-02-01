@@ -1379,6 +1379,7 @@ function process_bind_inviter(){
                 }
 
                 self.respond({code:1000, message:'success'});
+                PotentialCustomerService.customerBinded(self.user.account, data._id, function(){})
             })
         });
     });

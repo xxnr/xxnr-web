@@ -58,7 +58,9 @@ var PotentialCustomerSchema = new mongoose.Schema({
     "dateTimeAdded":{type:Date, default:Date.now},      // 添加时间
     "dateAdded":{type:String},                            // 添加日期(北京时间)
     "isRegistered":{type:Boolean, default:false},         // 是否注册
-    "dateTimeRegistered":{type:Date}
+    "dateTimeRegistered":{type:Date},                       // 注册时间
+    "isBinded":{type:Boolean, default:false},           // 是否绑定该经纪人
+    "dateTimeBinded":{type:Date}                           // 绑定该经纪人时间
 });
 
 var IntentionProductSchema = new mongoose.Schema({
@@ -73,6 +75,7 @@ UserSchema.index({name:1});
 
 PotentialCustomerSchema.index({"phone":1, unique:true});
 PotentialCustomerSchema.index({"user":1, "dateAdded":1, "dateTimeAdded":1});
+PotentialCustomerSchema.index({"user":1, "isRegistered":1, "isBinded":1});
 PotentialCustomerSchema.index({"dateTimeAdded":1});
 
 IntentionProductSchema.index({"name":1, unique:true});

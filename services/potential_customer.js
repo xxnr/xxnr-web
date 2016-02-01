@@ -303,15 +303,40 @@ PotentialCustomerService.prototype.getStatistic = function(user, callback){
             return;
         }
 
-        PotentialCustomerModel.count({user:user, isRegistered:true}, function(err, registeredCount){
+        PotentialCustomerModel.count({user:user, isRegistered:true, isBinded:true}, function(err, registeredAndBindedCount){
             if(err){
                 console.error(err);
                 callback(err);
                 return;
             }
 
-            callback(null, totalCount, registeredCount);
+            callback(null, totalCount, registeredAndBindedCount);
         })
+    })
+};
+
+PotentialCustomerService.prototype.customerBinded = function(phone, inviter, callback){
+    PotentialCustomerModel.findOne({phone:phone}, function(err, customer){
+        if(err){
+            console.error(err);
+            callback(err);
+            return;
+        }
+
+        if(!customer){
+            callback('not found');
+            return;
+        }
+
+        if(customer.user.toString() == inviter.toString()){
+            customer.isBinded = true;
+            customer.dateTimeBinded = new Date();
+            customer.save(function(err){
+                if(err){
+                    console.error(err);
+                }
+            })
+        }
     })
 };
 
