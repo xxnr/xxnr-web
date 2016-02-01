@@ -9,9 +9,9 @@ var config = {
         '-----END PUBLIC KEY-----'
     ,seller_email:'it@xinxinnongren.com' //卖家支付宝帐户 必填 
     // ,host:'http://123.57.251.173:8070/'
-	,notify_host:null // public address for host
+	,notify_host:'http://www.xinxinnongren.com' // public address for host
 	,notify_host_port:80
-	,return_host:null // public address for host
+	,return_host:'http://www.xinxinnongren.com' // public address for host
 	,return_host_port:80
 	,cacert:'cacert.pem'//ca证书路径地址，用于curl中ssl校验 
 	,transport:'http' //访问模式,根据自己的服务器是否支持ssl访问，若支持请选择https；若不支持请选择http

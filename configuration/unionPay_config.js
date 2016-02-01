@@ -53,7 +53,7 @@ module.exports = Object.freeze({
 	}),
 	prod$:Object.freeze({}),
 	notification:Object.freeze({
-		host: null,
+		host: 'http://www.xinxinnongren.com',
 		port:80,
 		front:"/my_xxnr.html",
 		back:"/unionpay/nofity"
