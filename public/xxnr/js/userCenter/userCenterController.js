@@ -120,7 +120,9 @@ app.controller('userCenterController', function($scope, $rootScope, remoteApiSer
                 $scope.user.imgUrl = "images/default_avatar.png"
             }
             $scope.user.nickname = data.datas.nickname;
-            $scope.user.address = data.datas.address.province.name + " " + data.datas.address.city.name + " " + (data.datas.address.county?data.datas.address.county.name:'') + " " + (data.datas.address.town?data.datas.address.town.name:'');
+            if(data.datas.address) {
+                $scope.user.address = data.datas.address.province.name + " " + data.datas.address.city.name + " " + (data.datas.address.county ? data.datas.address.county.name : '') + " " + (data.datas.address.town ? data.datas.address.town.name : '');
+            }
             $scope.user.sex = data.datas.sex;
             $scope.user.typeNum = data.datas.userType;
             $scope.user.isVerified = data.datas.isVerified;
