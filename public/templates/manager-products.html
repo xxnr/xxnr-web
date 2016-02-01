@@ -732,10 +732,10 @@
     function products_init_ckeditors(model) {
         var ckeditors = productckeditors;
         for (var i = 0, length = ckeditors.length; i < length; i++) {
-            ckeditor_add(ckeditors[i], model);
+            products_ckeditor_add(ckeditors[i], model);
         }
     }
-    function ckeditor_add(id, model) {
+    function products_ckeditor_add(id, model) {
         var ckeditor = CKEDITOR.instances[id];
         if (ckeditor) ckeditor.destroy(true); //销毁编辑器 ,然后新增一个
         ckeditor = CKEDITOR.replace(id);
@@ -750,11 +750,12 @@
     function products_get_ckeditors(model) {
         var ckeditors = productckeditors;
         for (var i = 0, length = ckeditors.length; i < length; i++) {
-            ckeditor_getdata(ckeditors[i], model);
+            products_ckeditor_getdata(ckeditors[i], model);
         }
     }
 
-    function ckeditor_getdata(id, model) {
+    function products_ckeditor_getdata(id, model) {
+        console.log('wrong place');
         var ckeditor = CKEDITOR.instances[id];
         var value = id.split('product_')[1];
         if (ckeditor) {
