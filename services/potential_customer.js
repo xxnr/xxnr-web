@@ -296,21 +296,36 @@ PotentialCustomerService.prototype.isAvailable = function(phone, callback) {
 };
 
 PotentialCustomerService.prototype.getStatistic = function(user, callback){
-    PotentialCustomerModel.count({user:user}, function(err, totalCount){
-        if(err){
+    PotentialCustomerModel.count({user:user}, function(err, totalCount) {
+        if (err) {
             console.error(err);
             callback(err);
             return;
         }
 
-        PotentialCustomerModel.count({user:user, isRegistered:true, isBinded:true}, function(err, registeredAndBindedCount){
-            if(err){
+        PotentialCustomerModel.count({
+            user: user,
+            isRegistered: true
+        }, function (err, registeredCount) {
+            if (err) {
                 console.error(err);
                 callback(err);
                 return;
             }
 
-            callback(null, totalCount, registeredAndBindedCount);
+            PotentialCustomerModel.count({
+                user: user,
+                isRegistered: true,
+                isBinded: true
+            }, function (err, registeredAndBindedCount) {
+                if (err) {
+                    console.error(err);
+                    callback(err);
+                    return;
+                }
+
+                callback(null, totalCount, registeredCount, registeredAndBindedCount);
+            })
         })
     })
 };

@@ -1471,13 +1471,13 @@ function json_agent_info_get(id){
 			return;
 		}
 
-		PotentialCustomerService.getStatistic(user._id, function(err, totalCount, registeredAndBindedCount){
+		PotentialCustomerService.getStatistic(user._id, function(err, totalCount, registeredCount, registeredAndBindedCount){
 			if(err){
 				self.respond({code:1001, message:'获取新农经纪人信息失败'});
 				return;
 			}
 
-			self.respond({code:1000, agent:{name:user.name, phone: user.account, address:user.address, totalCount:totalCount, registeredAndBindedCount:registeredAndBindedCount}});
+			self.respond({code:1000, agent:{name:user.name, phone: user.account, address:user.address, totalCount:totalCount, registeredCount:registeredCount, registeredAndBindedCount:registeredAndBindedCount}});
 		})
 	})
 }
