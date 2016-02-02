@@ -14,8 +14,8 @@ app.config(['$locationProvider', function($locationProvider) {
 app.constant('BaseDomainREG', /.*\.xinxinnongren\.com.*/);
 
 //app.constant('BaseUrl', 'http://101.200.181.247/');
-//app.constant('BaseUrl', 'http://www.xinxinnongren.com/'); // app.constant('BaseUrl', 'http://123.57.251.173:8070/');
-app.constant('BaseUrl', 'http://101.200.194.203/');
+app.constant('BaseUrl', ''); // app.constant('BaseUrl', 'http://123.57.251.173:8070/');
+
 // app.constant('BaseUrl', 'http://127.0.0.1/');
 //app.constant('BaseUrl', 'http://127.0.0.1:8070/');
 //app.constant('BaseUrl', 'http://192.168.184.1:8070/');
