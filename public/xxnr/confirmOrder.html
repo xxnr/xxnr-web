@@ -195,7 +195,7 @@
                                             </div>
                                         </div>
                                         <div class="pay-step" ng-show="{{item.hasDeposit}}">
-                                            <div class="ng-cloak pay-step-1"><span class="text-info">阶段一：预付款</span><span class="order-price ng-cloak">¥ {{item.totalDeposit.toFixed(2)}}</span></div>
+                                            <div class="ng-cloak pay-step-1"><span class="text-info">阶段一：订金</span><span class="order-price ng-cloak">¥ {{item.totalDeposit.toFixed(2)}}</span></div>
                                             <div class="ng-cloak pay-step-2"><span class="text-info">阶段二：尾款</span><span class="balance ng-cloak">¥ {{(item.totalPrice + item.buyCount*item.additionsTotalPrice - item.totalDeposit).toFixed(2)}}</span></div>
                                         </div>
                                     </div>
@@ -212,7 +212,7 @@
             <div class="right submit-btn"><a href="" ng-click="buy()">提交订单</a></div>
             <div class="right price-total">
                 <p><label>商品数量：</label><span ng-cloak>{{totalCount}}</span></p>
-                <p><label>总价（不计运费）：</label><span class="total" ng-cloak>￥{{totalPrice}}</span></p>
+                <p><label>合计：</label><span class="total" ng-cloak>￥{{totalPrice}}</span></p>
                 <!--<p><label>已节省：</label><span ng-cloak>{{totalSaving}}元</span></p>-->
             </div>
         </div>
