@@ -577,6 +577,7 @@ function alipayOrder(){
                     // notify_url CANNOT be 127.0.0.1 because ailiy cannot send notification to 127.0.0.1
                     param.notify_url = ((alipay.alipay_config.notify_host || 'http://' + require("node-ip/lib/ip").address('public')) + ":" + alipay.alipay_config.notify_host_port + '/' + alipay.alipay_config.create_direct_pay_by_user_notify_url);
                     param.return_url = ((alipay.alipay_config.return_host || 'http://' + require("node-ip/lib/ip").address('public')) + ":" + alipay.alipay_config.return_host_port + '/' + alipay.alipay_config.create_direct_pay_by_user_return_url);
+                    param.extra_common_param = JSON.stringify({orderId:orderId});
                     self.view('alipay', alipay.build_direct_pay_by_user_param(param));
                 });
                 break;
@@ -635,6 +636,15 @@ function alipayNotify() {
             self.content('success');
             // alipay success log
             var payLog = {paymentId:paymentId, payType:PAYTYPE.ZHIFUBAO, price:price, datePaid: new Date()};
+            if (body.trade_no) {
+                payLog.queryId = body.trade_no;
+            }
+            if (body.extra_common_param && body.extra_common_param.length > 0) {
+                var extra_common_param = JSON.parse(body.extra_common_param);
+                if (extra_common_param && extra_common_param.orderId) {
+                    payLog.orderId = extra_common_param.orderId;
+                }
+            }
             OrderService.savePaidLog(payLog);
         } else {
             self.content('success');
@@ -694,6 +704,9 @@ function unionpayNotify() {
                 OrderService.updateThirdpartyPayment(paymentId);
                 // unionpay success log
                 var payLog = {orderId:paymentInfo.orderId, paymentId:paymentId, payType:PAYTYPE.UNIONPAY, price:(parseFloat(paymentInfo.txnAmt)/100).toFixed(2), datePaid: new Date()};
+                if (body.queryId) {
+                    payLog.queryId = body.queryId;
+                }
                 OrderService.savePaidLog(payLog);
             } else {
                 console.error('unionpayNotify error : respCode is ', body['respCode'], 'body:', body);

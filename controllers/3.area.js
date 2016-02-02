@@ -36,7 +36,7 @@ function json_province_query() {
 
 			for (var i = 0; i < count; i++) {
 				var item = items[i];
-				arr[i] = {"id":item.id,"name":item.name,"shortName":item.shortname};
+				arr[i] = {"id":item.id,"name":item.name,"shortName":item.shortname,"_id":item._id};
 			}
 			// Return results
 			self.respond({'code':'1000','message':'success','datas':{"total":count,"rows":arr}});
@@ -67,7 +67,7 @@ function json_city_query() {
 
 			for (var i = 0; i < count; i++) {
 				var item = items[i];
-				arr[i] = {"id":item.id,"name":item.name,"areaId":item.provinceid};
+				arr[i] = {"id":item.id,"name":item.name,"areaId":item.provinceid,"_id":item._id};
 			}
 			// Return results
 			self.respond({'code':'1000','message':'success','datas':{"total":count,"rows":arr}});
@@ -99,7 +99,7 @@ function json_county_query() {
 
 			for (var i = 0; i < count; i++) {
 				var item = items[i];
-				arr[i] = {"id":item.id,"name":item.name,"businessId":item.cityid,"areaId":item.provinceid};
+				arr[i] = {"id":item.id,"name":item.name,"businessId":item.cityid,"areaId":item.provinceid,"_id":item._id};
 			}
 			// Return results
 			self.respond({'code':'1000','message':'success','datas':{"total":count,"rows":arr}});
@@ -133,7 +133,7 @@ function json_town_query() {
 
 			for (var i = 0; i < count; i++) {
 				var item = items[i];
-				arr[i] = {"id":item.id,"name":item.name,"countyId":item.countyid,"cityId":item.cityid,"provinceId":item.provinceid};
+				arr[i] = {"id":item.id,"name":item.name,"countyId":item.countyid,"cityId":item.cityid,"provinceId":item.provinceid,"_id":item._id};
 			}
 			// Return results
 			self.respond({'code':'1000','message':'success','datas':{"total":count,"rows":arr}});

@@ -76,7 +76,7 @@
                     <li ng-repeat="thumbnailImgUrl in item.thumbnailImgUrls" ng-class="{'active':isActive($index)}">
                         <div class="overlay" ng-mouseover="showPhoto($index);">
                         </div>
-                        <img src="{{thumbnailImgUrl}}" alt="{{photo.desc}}" title="{{photo.desc}}"/>
+                        <img ng-src="{{thumbnailImgUrl}}" alt="{{photo.desc}}" title="{{photo.desc}}"/>
                     </li>
                 </ul>
             </div>

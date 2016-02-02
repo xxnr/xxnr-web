@@ -2,6 +2,7 @@
  * Created by pepelu on 2015/11/18.
  */
 var bcrypt = require('bcrypt-nodejs');
+var tools = require('../common/tools');
 var crypto = require('crypto');
 var UserModel = require('../models').user;
 var UserLogModel = require('../models').userLog;
@@ -137,6 +138,7 @@ UserService.prototype.login = function(options, callback) {
         if(password_valid){
             user = user.toObject();
             user.isVerified = isUserTypeVerified(user);
+            user.isXXNRAgent = tools.isXXNRAgent(user.typeVerified);
 
             callback(null, user);
 
@@ -180,6 +182,7 @@ UserService.prototype.get = function(options, callback) {
 
             user = user.toObject();
             user.isVerified = isUserTypeVerified(user);
+            user.isXXNRAgent = tools.isXXNRAgent(user.typeVerified);
 
             // Returns response
             return callback(null, user);
@@ -344,6 +347,48 @@ UserService.prototype.inWhiteList = function(options, callback) {
     });
 };
 
+UserService.prototype.isXXNRAgent = function(user, callback){
+    if(!user){
+        callback('user required');
+        return;
+    }
+
+    UserModel.findById(user._id, function(err, user){
+        if(err){
+            console.error(err);
+            callback(err);
+            return;
+        }
+
+        var isXXNRAgent = tools.isXXNRAgent(user.typeVerified);
+
+        callback(null, isXXNRAgent);
+    })
+};
+
+UserService.prototype.getByAccount = function(account, callback){
+    if(!account){
+        callback('account required');
+        return;
+    }
+
+    UserModel.findOne({account:account})
+        .populate({path:'inviter', select: 'id account photo nickname name'})
+        .exec(function(err, user){
+        if(err){
+            console.error(err);
+            callback(err);
+            return;
+        }
+
+        if(!user){
+            callback('no user found');
+            return;
+        }
+
+        callback(null, user);
+    })
+};
 
 // ********************  only use for manager system  ********************
 

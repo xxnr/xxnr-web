@@ -68,7 +68,7 @@
     } : null;
 </script>
 </head>
-<body ng-controller="jiesuanController" >
+<body ng-controller="jiesuanController" class="confirm-order">
 <header ng-controller="headerController"></header>
 <div class="wrap nav">
     <h1 class="left logo"><a href="/">新新农人</a></h1>
@@ -137,7 +137,7 @@
                         <div class="column t-goods t-goods2">商品信息</div>
                         <div class="column t-price">单价(元)</div>
                         <div class="column t-quantity">数量</div>
-                        <div class="column t-sum">合计(元)</div>
+                        <div class="column t-sum">小计(元)</div>
                     </div>
                     <div class="cart-list">
                         <div class="cart-item-list">
@@ -152,7 +152,7 @@
                                         <div class="item-form">
                                             <div class="cell p-goods p-goods2">
                                                 <div class="goods-item">
-                                                    <div class="item-msg">
+                                                    <div class="item-msg clearfix">
                                                         <div class="p-img">
                                                             <a ng-href={{item.detailPageUrl}}>
                                                                 <img ng-src={{item.thumbnailUrl}}>
@@ -164,7 +164,7 @@
                                                         <div class="p-skus">
                                                             <ul>
                                                                 <li ng-repeat="attribute in item.attributes">
-                                                                    {{attribute.name}}: {{attribute.value}}
+                                                                    {{attribute.name}}: {{attribute.value}} ;&nbsp;
                                                                 </li>
                                                             </ul>
                                                         </div>
@@ -195,8 +195,8 @@
                                             </div>
                                         </div>
                                         <div class="pay-step" ng-show="{{item.hasDeposit}}">
-                                            <div class="ng-cloak pay-step-1"><span class="text-info">阶段一：预付款</span><span class="order-price ng-cloak">¥ {{item.totalDeposit.toFixed(2)}}</span></div>
-                                            <div class="ng-cloak pay-step-2"><span class="text-info">阶段二：尾款</span>¥ {{(item.totalPrice + item.buyCount*item.additionsTotalPrice - item.totalDeposit).toFixed(2)}}</div>
+                                            <div class="ng-cloak pay-step-1"><span class="text-info">阶段一：订金</span><span class="order-price ng-cloak">¥ {{item.totalDeposit.toFixed(2)}}</span></div>
+                                            <div class="ng-cloak pay-step-2"><span class="text-info">阶段二：尾款</span><span class="balance ng-cloak">¥ {{(item.totalPrice + item.buyCount*item.additionsTotalPrice - item.totalDeposit).toFixed(2)}}</span></div>
                                         </div>
                                     </div>
                                 </div>
@@ -212,7 +212,7 @@
             <div class="right submit-btn"><a href="" ng-click="buy()">提交订单</a></div>
             <div class="right price-total">
                 <p><label>商品数量：</label><span ng-cloak>{{totalCount}}</span></p>
-                <p><label>总价（不计运费）：</label><span class="total" ng-cloak>￥{{totalPrice}}</span></p>
+                <p><label>合计：</label><span class="total" ng-cloak>￥{{totalPrice}}</span></p>
                 <!--<p><label>已节省：</label><span ng-cloak>{{totalSaving}}元</span></p>-->
             </div>
         </div>

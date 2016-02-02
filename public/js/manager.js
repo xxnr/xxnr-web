@@ -55,12 +55,21 @@ jRouting.route(managerurl + '/products/', function() {
 });
 
 jRouting.route(managerurl + '/users/', function() {
-    if (can('users')) {
-        SET('common.page', 'users');
-        return;
-    }
+	if (can('users')) {
+		SET('common.page', 'users');
+		return;
+	}
 
-    redirectToHomePage();
+	redirectToHomePage();
+});
+
+jRouting.route(managerurl + '/potentialcustomers/', function() {
+	if (can('users')) {
+		SET('common.page', 'potentialcustomers');
+		return;
+	}
+
+	redirectToHomePage();
 });
 
 jRouting.route(managerurl + '/news/', function() {
@@ -195,7 +204,7 @@ function getSelectionStartNode(context){
 
 Delay_Search_WATCH = function(field, callback, latency_in_millisecond){
 	if(typeof latency_in_millisecond == 'undefined'){
-		latency_in_millisecond = 1000;
+		latency_in_millisecond = 600;
 	}
 	var timer;
 	WATCH(field, function(path, value){
