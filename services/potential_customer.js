@@ -142,21 +142,78 @@ PotentialCustomerService.prototype.add = function(user, name, phone, sex, addres
 };
 
 // query potential customer
-PotentialCustomerService.prototype.query = function(user, callback){
+PotentialCustomerService.prototype.queryPage = function(user, page, max, callback, search, BESchema){
     var queryOptions = {};
     if(user){
         queryOptions.user = mongoose.Types.ObjectId(user._id);
     }
 
-    PotentialCustomerModel.find(queryOptions, {name:1, phone:1, remarks:1, isRegistered:1, sex:1}, function(err, customers){
-        if(err){
-            console.error(err);
-            callback(err);
-            return;
-        }
+    if(page<0 || !page){
+        page = 0;
+    }
 
-        callback(null, customers);
-    })
+    if(max<0 || !max){
+        max = 20;
+    }
+
+    if(max>50){
+        max = 50;
+    }
+
+    var querier = function() {
+        PotentialCustomerModel.count(queryOptions, function (err, count) {
+            if (err) {
+                console.error(err);
+                callback(err);
+                return;
+            }
+
+            var query = PotentialCustomerModel.find(queryOptions)
+                .skip(page * max)
+                .limit(max);
+            if(BESchema){
+                query = query.populate({path:'user', select:'-_id name typeVerified'})
+                    .populate('address.province')
+                    .populate('address.city')
+                    .populate('address.county')
+                    .populate('address.town')
+                    .select('name phone remarks isRegistered sex address dateTimeAdded dateTimeRegistered user');
+            } else{
+                query = query.select('name phone remarks isRegistered sex');
+            }
+
+            query.sort({dateTimeAdded:-1})
+                .exec(function (err, customers) {
+                    if (err) {
+                        console.error(err);
+                        callback(err);
+                        return;
+                    }
+
+                    var pageCount = Math.floor(count / max) + (count % max ? 1 : 0);
+                    callback(null, customers, count, pageCount);
+                })
+        });
+    };
+
+    if(search){
+        queryOptions['$or'] = [];
+        queryOptions['$or'].push({name:{$regex:new RegExp(search)}});
+        queryOptions['$or'].push({phone:{$regex:new RegExp(search)}});
+        UserModel.find({name:{$regex:new RegExp(search)}}, function(err, users){
+            if(users){
+                var userIds = [];
+                users.forEach(function(user){
+                    userIds.push(user._id);
+                });
+
+                queryOptions['$or'].push({user:{$in:userIds}});
+                querier();
+            }
+        });
+    } else{
+        querier();
+    }
 };
 
 PotentialCustomerService.prototype.countLeftToday = function(user, callback){
@@ -189,7 +246,9 @@ PotentialCustomerService.prototype.getById = function(id, callback){
         .populate({path:'address.city', select:'-_id -__v'})
         .populate({path:'address.county', select:'-_id -__v'})
         .populate({path:'address.town', select:'-_id -__v'})
-        .select('name phone sex address buyIntentions remarks')
+        .populate({path:'user', select:'-_id name'})
+        .select('name phone sex address buyIntentions remarks user isRegistered dateTimeRegistered')
+        .lean()
         .exec(function(err, doc){
         if(err){
             console.error(err);
@@ -234,6 +293,66 @@ PotentialCustomerService.prototype.isAvailable = function(phone, callback) {
             callback(null, true);
         });
     });
+};
+
+PotentialCustomerService.prototype.getStatistic = function(user, callback){
+    PotentialCustomerModel.count({user:user}, function(err, totalCount) {
+        if (err) {
+            console.error(err);
+            callback(err);
+            return;
+        }
+
+        PotentialCustomerModel.count({
+            user: user,
+            isRegistered: true
+        }, function (err, registeredCount) {
+            if (err) {
+                console.error(err);
+                callback(err);
+                return;
+            }
+
+            PotentialCustomerModel.count({
+                user: user,
+                isRegistered: true,
+                isBinded: true
+            }, function (err, registeredAndBindedCount) {
+                if (err) {
+                    console.error(err);
+                    callback(err);
+                    return;
+                }
+
+                callback(null, totalCount, registeredCount, registeredAndBindedCount);
+            })
+        })
+    })
+};
+
+PotentialCustomerService.prototype.customerBinded = function(phone, inviter, callback){
+    PotentialCustomerModel.findOne({phone:phone}, function(err, customer){
+        if(err){
+            console.error(err);
+            callback(err);
+            return;
+        }
+
+        if(!customer){
+            callback('not found');
+            return;
+        }
+
+        if(customer.user.toString() == inviter.toString()){
+            customer.isBinded = true;
+            customer.dateTimeBinded = new Date();
+            customer.save(function(err){
+                if(err){
+                    console.error(err);
+                }
+            })
+        }
+    })
 };
 
 module.exports = new PotentialCustomerService();

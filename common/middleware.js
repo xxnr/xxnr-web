@@ -219,6 +219,24 @@ exports.isInWhiteList_middleware = function(req, res, next, options, controller)
     }
 };
 
+exports.isXXNRAgent_middleware = function(req, res, next, options, controller){
+    var user = controller.user;
+    if(!user){
+        console.error('need login first');
+        controller.respond({code:1401, message:'请先登录'});
+        return;
+    }
+
+    UserService.isXXNRAgent(user, function(err, isXXNRAgent){
+        if(err || !isXXNRAgent){
+            controller.respond({code:1403, message:'您没有权限这样操作'});
+            return;
+        }
+
+        next();
+    })
+};
+
 /**
  * user auditing info
  * @param req

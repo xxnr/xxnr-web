@@ -1,0 +1,221 @@
+<div class="filter" style="padding-bottom:9px">
+    <div class="container">
+        <div class="caption"><span class="fa fa-users mr5"></span> @(会员管理 : 潜在客户)</div>
+        <div class="row">
+            <div class="col-md-3 col-sm-6 m">
+                <div data-component="textbox" data-component-path="customers.filter.search" data-placeholder="@(姓名/手机号/经纪人姓名)" data-control-icon="fa-search">@(查询用户)</div>
+                <div class="help" data-component="template" data-component-path="customers.info"><script type="text/html">{{ count | pluralize(@('items','item','items','items')) }} / {{ pages | pluralize(@('pages','page','pages','pages')) }}</script></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div data-component="grid" data-component-path="customers.grid" data-max="auto" data-options-page="@(Page: #)" data-options-button="@(查看更多用户)" data-component-id="customers.grid">
+        <script type="text/html">
+            <tr>
+                <td style="width:40px" class="silver hidden-xs">$index</td>
+                <td style="width:120px" class="hidden-xs fs11" data-title="姓名">{{ name }}</td>
+                <td style="width:120px" class="hidden-xs fs11" data-title="手机号">{{ phone }}</td>
+                <td style="width:80px" class="hidden-xs fs11" data-title="性别">
+                    {{ if sex }}
+                        @(女)
+                    {{ else }}
+                        @(男)
+                    {{ fi }}
+                </td>
+                <td style="width:200px" class="hidden-xs fs11" data-title="所属乡镇">
+                    {{ (address.province.name?address.province.name:'')
+                    + (address.city?address.city.name:'')
+                    + (address.county?address.county.name:'')
+                    + (address.town?address.town.name:'') }}
+                </td>
+                <td style="width:160px" class="hidden-xs fs11 ui-right" data-title="登记日期">
+                    {{ if dateTimeAdded }}
+                        {{ if dateTimeAdded.charAt(dateTimeAdded.length-1) !== 'Z' }}
+                            {{ dateTimeAdded }}
+                        {{ else }}
+                            {{ dateTimeAdded | format('yyyy-MM-dd hh:mm:ss') }}
+                        {{ fi }}
+                    {{ fi }}
+                </td>
+                <td style="width:120px" class="hidden-xs fs11" data-title="经纪人">{{ user.name }}</td>
+                <td style="width:160px" class="hidden-xs fs11" data-title="登记人认证类型" title="{{user.typeNameVerified}}">{{ user.typeNameVerified }}</td>
+                <td style="width:160px" class="hidden-xs fs11 ui-right" data-title="注册时间">
+                    {{ if dateTimeRegistered }}
+                        {{ if dateTimeRegistered.charAt(dateTimeRegistered.length-1) !== 'Z' }}
+                            {{ dateTimeRegistered }}
+                        {{ else }}
+                            {{ dateTimeRegistered | format('yyyy-MM-dd hh:mm:ss') }}
+                        {{ fi }}
+                    {{ else }}
+                        @(未注册)
+                    {{ fi }}
+                </td>
+                <td style="width:80px" class="ui-right" data-title="详细信息">
+                    <button name="details" title="@(Show)"><span class="fa fa-search"></span></button>
+                </td>
+            </tr>
+        </script>
+    </div>
+</div>
+
+<div data-component="form" data-title="@(客户信息)" data-component-path="common.form" data-if="value === 'customers'" data-width="900px" data-component-id="customers.form">
+    <br />
+    <div data-component="template" data-component-path="customers" class="padding" style="padding-bottom:0">
+        <script type="text/html">
+            <table class="table table-bordered" border="0">
+                <tbody>
+                <tr>
+                    <td class="col-xs-4 active">@(# id)</td>
+                    <td>{{ form._id }}</td>
+                </tr>
+                <tr>
+                    <td class="col-xs-4 active">@(手机号)</td>
+                    <td>{{ form.phone }}</td>
+                </tr>
+                <tr>
+                    <td class="col-xs-4 active">@(姓名)</td>
+                    <td>{{ form.name }}</td>
+                </tr>
+                <tr>
+                    <td class="col-xs-4 active">@(性别)</td>
+                    <td>
+                        {{ if form.sex }}
+                        @(女)
+                        {{ else }}
+                        @(男)
+                        {{ fi }}
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-xs-4 active">@(所在地区)</td>
+                    <td>
+                        {{ if form.address }}
+                        {{ (form.address.province.name?form.address.province.name:'')
+                        + (form.address.city?form.address.city.name:'')
+                        + (form.address.county?form.address.county.name:'')
+                        + (form.address.town?form.address.town.name:'') }}
+                        {{ fi }}
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-xs-4 active">@(关注产品)</td>
+                    <td>
+                        {{ foreach intentionProduct in form.buyIntentions}}
+                            {{ intentionProduct.name }}&nbsp;&nbsp;
+                        {{ end }}
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-xs-4 active">@(注册时间)</td>
+                    <td>
+                        {{ if form.dateTimeRegistered }}
+                            {{ if form.dateTimeRegistered.charAt(form.dateTimeRegistered.length-1) !== 'Z' }}
+                                {{ form.dateTimeRegistered }}
+                            {{ else }}
+                                {{ form.dateTimeRegistered | format('yyyy-MM-dd hh:mm:ss') }}
+                            {{ fi }}
+                        {{ fi }}
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-xs-4 active">@(新农代表)</td>
+                    <td>
+                        {{ if form.inviter }}
+                            {{ form.inviter.name }}(已绑定)
+                        {{ else }}
+                            {{ if form.user }}
+                                {{ form.user.name }}(未绑定)
+                            {{ fi }}
+                        {{ fi }}
+                    </td>
+                </tr>
+                <tr>
+                    <td class="col-xs-4 active">@(备注)</td>
+                    <td>{{ form.remarks }}</td>
+                </tr>
+                </tbody>
+            </table>
+        </script>
+    </div>
+    <div class="ui-form-buttons">
+        <div>
+            <button name="submit">@(确定)</button>
+        </div>
+        <!--<button name="cancel">@(取消)</button>-->
+    </div>
+</div>
+<script>
+    var customers = {};
+
+    customers.filter = {};
+    customers.filter.page = 1;
+
+    customers.grid = [];
+    customers.form = {};
+    customers.info = {};
+    customers.usertypes = [];
+
+    ON('#customers.grid', function(component) {
+
+        // Max items per page
+        customers.filter.max = component.max;
+        customers_refresh(true);
+
+        component.click = function(index, row, button) {
+            switch ($(button).attr('name')) {
+                case 'details':
+                    $.components.GET(managerurl + '/api/v2.1/potentialCustomer/' + row._id, null, function(response){
+                        if(response.code==1000){
+                            SET('customers.form', $.extend({}, response.potentialCustomer), true);
+                            SET('common.form', 'customers');
+                        } else{
+                            alert(response.message);
+                        }
+                    });
+                    break;
+            }
+        };
+
+        component.next = function(page) {
+            customers.filter.page = page;
+            customers_refresh();
+        };
+    });
+
+    function customers_refresh(reset) {
+        if (reset) {
+            customers.filter.page = 1;
+            customers.grid = [];
+        }
+
+        $.components.GET(managerurl + '/api/v2.1/potentialCustomer/query', customers.filter, function(response) {
+            if(response.code==1000){
+                response.potentialCustomers.forEach(function(customer){
+                    if(customer.user.typeVerified){
+                        customer.user.typeNameVerified = [];
+                        customer.user.typeVerified.forEach(function(typeVerified){
+                            customer.user.typeNameVerified.push(usertypes[typeVerified]);
+                        })
+                    }
+                });
+
+                SET((reset ? '' : '+') + 'customers.grid', response.potentialCustomers);
+                if (!reset)
+                    return;
+                customers.info.count = response.count;
+                customers.info.pages = response.pageCount;
+                UPDATE('customers.info');
+            } else{
+                alert(response.message);
+            }
+        })
+    }
+
+    Delay_Search_WATCH('customers.filter.*', function(path, value) {
+        if (NOTMODIFIED('customers.filter', customers.filter))
+            return;
+        customers_refresh(path !== 'customers.filter.page');
+    });
+</script>
