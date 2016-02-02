@@ -41,9 +41,9 @@ exports.install = function() {
 	F.route(CONFIG('manager-url') + '/api/orders/',              			json_orders_query, ['get'], ['backend_auth']);
 	F.route(CONFIG('manager-url') + '/api/orders/{id}/',         			json_orders_read, ['get'], ['backend_auth']);
 	// F.route(CONFIG('manager-url') + '/api/orders/payments/',              	json_orders_payments_update, ['put'], ['backend_auth']);
-	F.route(CONFIG('manager-url') + '/api/orders/subOrders/',              	json_subOrders_payments_update, ['put'], ['backend_auth']);
-	F.route(CONFIG('manager-url') + '/api/orders/products/',              	json_orders_products_update, ['put'], ['backend_auth']);
-	F.route(CONFIG('manager-url') + '/api/orders/SKUs/',              		json_orders_SKUs_update, ['put'], ['backend_auth']);
+	F.route(CONFIG('manager-url') + '/api/orders/subOrders/',              	json_subOrders_payments_update, ['put'], ['backend_auth', 'auditing']);
+	F.route(CONFIG('manager-url') + '/api/orders/products/',              	json_orders_products_update, ['put'], ['backend_auth', 'auditing']);
+	F.route(CONFIG('manager-url') + '/api/orders/SKUs/',              		json_orders_SKUs_update, ['put'], ['backend_auth', 'auditing']);
 	// F.route(CONFIG('manager-url') + '/api/orders/',              			json_orders_save, ['put'], ['backend_auth']);
 	// F.route(CONFIG('manager-url') + '/api/orders/',              			json_orders_remove, ['delete']);
 	// F.route(CONFIG('manager-url') + '/api/orders/clear/',        			json_orders_clear);
@@ -51,7 +51,7 @@ exports.install = function() {
 	// USERS
 	F.route(CONFIG('manager-url') + '/api/users/',              			json_users_query, ['get'], ['backend_auth']);
 	F.route(CONFIG('manager-url') + '/api/users/{id}/',         			json_users_read, ['get'], ['backend_auth']);
-    F.route(CONFIG('manager-url') + '/api/users/',              			json_users_save, ['put'], ['backend_auth']);
+    F.route(CONFIG('manager-url') + '/api/users/',              			json_users_save, ['put'], ['backend_auth', 'auditing']);
 	// F.route(CONFIG('manager-url') + '/api/users/',              			json_users_remove, ['delete']);
 	// F.route(CONFIG('manager-url') + '/api/users/clear/',        			json_users_clear);
 
@@ -60,26 +60,26 @@ exports.install = function() {
 
 	// PRODUCTS
 	F.route(CONFIG('manager-url') + '/api/products/',            			json_products_query, ['get'], ['backend_auth']);
-	F.route(CONFIG('manager-url') + '/api/products/',            			json_products_save, ['post'], ['backend_auth']);
-	F.route(CONFIG('manager-url') + '/api/products/updateStatus',			process_products_updateStatus, ['post'], ['backend_auth']);
+	F.route(CONFIG('manager-url') + '/api/products/',            			json_products_save, ['post'], ['backend_auth', 'auditing']);
+	F.route(CONFIG('manager-url') + '/api/products/updateStatus',			process_products_updateStatus, ['post'], ['backend_auth', 'auditing']);
 	F.route(CONFIG('manager-url') + '/api/products/{id}/',       			json_products_read, ['get'], ['backend_auth']);
-	F.route(CONFIG('manager-url') + '/api/products/',            			json_products_remove, ['delete'], ['backend_auth']);
+	F.route(CONFIG('manager-url') + '/api/products/',            			json_products_remove, ['delete'], ['backend_auth', 'auditing']);
 	// F.route(CONFIG('manager-url') + '/api/products/clear/',      			json_products_clear);
 	F.route(CONFIG('manager-url') + '/api/products/import/',     			json_products_import, ['upload'], 1024, ['backend_auth']);
 	F.route(CONFIG('manager-url') + '/api/products/categories/', 			json_products_categories, ['get'], ['backend_auth']);
-	F.route(CONFIG('manager-url') + '/api/products/category/',   			json_products_category_replace, ['post'] ,['backend_auth']);
+	F.route(CONFIG('manager-url') + '/api/products/category/',   			json_products_category_replace, ['post'] ,['backend_auth', 'auditing']);
 	F.route(CONFIG('manager-url') + '/api/products/attr/{attributeName}/',	json_products_attribute, ['get'], ['backend_auth']);
-	F.route(CONFIG('manager-url') + '/api/products/attribute/add',			process_product_attributes_add,	['post'], ['backend_auth']);
+	F.route(CONFIG('manager-url') + '/api/products/attribute/add',			process_product_attributes_add,	['post'], ['backend_auth', 'auditing']);
 	F.route(CONFIG('manager-url') + '/api/products/attributes/',			json_products_attributes, ['get'], ['backend_auth']);
 
 	// NEWS
 	F.route(CONFIG('manager-url') + '/api/news/',            				json_news_query, ['get'], ['backend_auth']);
-	F.route(CONFIG('manager-url') + '/api/news/',            				json_news_save, ['post'], ['backend_auth']);
+	F.route(CONFIG('manager-url') + '/api/news/',            				json_news_save, ['post'], ['backend_auth', 'auditing']);
 	F.route(CONFIG('manager-url') + '/api/news/{id}/',       				json_news_read, ['get'], ['backend_auth']);
-	F.route(CONFIG('manager-url') + '/api/news/updatestatus/',            	json_news_updatestatus, ['post'], ['backend_auth']);
-	F.route(CONFIG('manager-url') + '/api/news/',            				json_news_remove, ['delete'], ['backend_auth']);
+	F.route(CONFIG('manager-url') + '/api/news/updatestatus/',            	json_news_updatestatus, ['post'], ['backend_auth', 'auditing']);
+	F.route(CONFIG('manager-url') + '/api/news/',            				json_news_remove, ['delete'], ['backend_auth', 'auditing']);
 	F.route(CONFIG('manager-url') + '/api/news/categories/', 				json_news_categories, ['get'], ['backend_auth']);
-	F.route(CONFIG('manager-url') + '/api/news/category/',   				json_news_category_replace, ['post'], ['backend_auth']);
+	F.route(CONFIG('manager-url') + '/api/news/category/',   				json_news_category_replace, ['post'], ['backend_auth', 'auditing']);
 
 	// PAGES
 	F.route(CONFIG('manager-url') + '/api/pages/',               			json_pages_query, ['get'], ['backend_auth']);
@@ -99,25 +99,25 @@ exports.install = function() {
 	// F.route(CONFIG('manager-url') + '/api/widgets/clear/',       			json_widgets_clear);
 
 	// NEWSLETTER
-	F.route(CONFIG('manager-url') + '/api/newsletter/',          			json_newsletter, ['get'], ['backend_auth']);
-	F.route(CONFIG('manager-url') + '/api/newsletter/csv/',      			file_newsletter, ['get'], ['backend_auth']);
-	// F.route(CONFIG('manager-url') + '/api/newsletter/clear/',    			json_newsletter_clear);
+	// F.route(CONFIG('manager-url') + '/api/newsletter/',          			json_newsletter, ['get'], ['backend_auth']);
+	// F.route(CONFIG('manager-url') + '/api/newsletter/csv/',      			file_newsletter, ['get'], ['backend_auth']);
+	// // F.route(CONFIG('manager-url') + '/api/newsletter/clear/',    			json_newsletter_clear);
 
 	// SETTINGS
 	F.route(CONFIG('manager-url') + '/api/settings/',            			json_settings, ['get'], ['backend_auth']);
 	F.route(CONFIG('manager-url') + '/api/settings/',            			json_settings_save, ['put', '*Settings'], ['backend_auth']);
 
 	// SYSTEM
-	F.route(CONFIG('manager-url') + '/api/backup/website/',      			file_backup_website, [15000], ['backend_auth']);
-	F.route(CONFIG('manager-url') + '/api/backup/database/',     			file_backup_database, ['get'], ['backend_auth']);
-	F.route(CONFIG('manager-url') + '/api/restore/database/',    			file_restore_database, ['upload', 15000], 20000, ['backend_auth']);
+	// F.route(CONFIG('manager-url') + '/api/backup/website/',      			file_backup_website, [15000], ['backend_auth']);
+	// F.route(CONFIG('manager-url') + '/api/backup/database/',     			file_backup_database, ['get'], ['backend_auth']);
+	// F.route(CONFIG('manager-url') + '/api/restore/database/',    			file_restore_database, ['upload', 15000], 20000, ['backend_auth']);
 
     // backend user
-    F.route(CONFIG('manager-url') + '/api/login/',                          process_login, ['post']);
-    F.route(CONFIG('manager-url') + '/api/backend/user/create/',            process_createUser, ['post'], ['backend_auth']);
+    F.route(CONFIG('manager-url') + '/api/login/',                          process_login, ['post'], ['auditing']);
+    F.route(CONFIG('manager-url') + '/api/backend/user/create/',            process_createUser, ['post'], ['backend_auth', 'auditing']);
     F.route(CONFIG('manager-url') + '/api/backend/users',                   json_be_users, ['get'], ['backend_auth']);
-    F.route(CONFIG('manager-url') + '/api/backend/user/password/modify',    process_modify_password, ['post']);
-    F.route(CONFIG('manager-url') + '/api/backend/users/',                  json_be_users_update, ['post'], ['backend_auth']);
+    F.route(CONFIG('manager-url') + '/api/backend/user/password/modify',    process_modify_password, ['post'], ['auditing']);
+    F.route(CONFIG('manager-url') + '/api/backend/users/',                  json_be_users_update, ['post'], ['backend_auth', 'auditing']);
 
     // permission
     F.route(CONFIG('manager-url') + '/api/permissions/',                    json_permissions, ['get'], ['backend_auth']);
@@ -129,14 +129,14 @@ exports.install = function() {
     F.route(CONFIG('manager-url') + '/api/businesses/',                     json_businesses,['get'], ['backend_auth']);
 
 	// SKU
-	F.route(CONFIG('manager-url') + '/api/v2.1/SKU/add/',               process_SKU_add,                ['post'], ['backend_auth']);
-	F.route(CONFIG('manager-url') + '/api/v2.1/SKU/update/{id}',               process_SKU_update,             ['post'], ['backend_auth']);
-	F.route(CONFIG('manager-url') + '/api/v2.1/SKU/attribute/add/',     process_SKU_Attribute_add,      ['post'], ['backend_auth']);
-	F.route(CONFIG('manager-url') + '/api/v2.1/SKU/attributes',         json_SKU_Attributes_get,        ['get'], ['backend_auth']);
-	F.route(CONFIG('manager-url') + '/api/v2.1/SKU/query',				json_SKU_get,					['get'], ['backend_auth']);
+	F.route(CONFIG('manager-url') + '/api/v2.1/SKU/add/',               	process_SKU_add,                ['post'], ['backend_auth', 'auditing']);
+	F.route(CONFIG('manager-url') + '/api/v2.1/SKU/update/{id}',        	process_SKU_update,             ['post'], ['backend_auth', 'auditing']);
+	F.route(CONFIG('manager-url') + '/api/v2.1/SKU/attribute/add/',     	process_SKU_Attribute_add,      ['post'], ['backend_auth', 'auditing']);
+	F.route(CONFIG('manager-url') + '/api/v2.1/SKU/attributes',         	json_SKU_Attributes_get,        ['get'], ['backend_auth']);
+	F.route(CONFIG('manager-url') + '/api/v2.1/SKU/query',					json_SKU_get,					['get'], ['backend_auth']);
 	F.route(CONFIG('manager-url') + '/api/v2.1/SKU/online/{id}',			process_SKU_online,				['get'], ['backend_auth']);
-	F.route(CONFIG('manager-url') + '/api/v2.1/SKU/additions',				json_SKU_Additions_get,		['get'],['backend_auth']);
-	F.route(CONFIG('manager-url') + '/api/v2.1/SKU/addition/add',			process_SKU_Addition_add,	['post'],['backend_auth']);
+	F.route(CONFIG('manager-url') + '/api/v2.1/SKU/additions',				json_SKU_Additions_get,			['get'],['backend_auth']);
+	F.route(CONFIG('manager-url') + '/api/v2.1/SKU/addition/add',			process_SKU_Addition_add,		['post'],['backend_auth', 'auditing']);
 };
 
 var files = DB('files', null, require('total.js/database/database').BUILT_IN_DB).binary;
@@ -356,7 +356,7 @@ function json_products_save() {
 
     ProductService.save(self.body, function(err, product){
 		if(err){
-			self.respond({code:1001, message:err});
+			self.respond({code:1004, message:err});
 			return;
 		}
 
@@ -373,7 +373,7 @@ function process_products_updateStatus(){
 	var self = this;
 	ProductService.updateStatus(self.body._id, self.body.online, function(err){
 		if(err){
-			self.respond({code:1001, message:err});
+			self.respond({code:1004, message:err});
 			return;
 		}
 
@@ -406,7 +406,7 @@ function json_products_categories() {
 
 	CategoryService.all(function(err, categories){
 		if(err){
-			self.respond({code:1001, message:'fail to query category'});
+			self.respond({code:1004, message:'fail to query category'});
 			return;
 		}
 
@@ -428,7 +428,7 @@ function json_products_attribute(attributeName) {
 	ProductService.getAttributes(category, brand, attributeName, function (err, attributes) {
 		if (err) {
 			console.error('query attributes error', err);
-			self.respond({code: 1001, message: '获取商品属性列表失败', error: err});
+			self.respond({code: 1004, message: '获取商品属性列表失败', error: err});
 			return;
 		}
 
@@ -442,7 +442,7 @@ function json_brands(){
 	BrandService.query(category, function(err, brands){
 		if(err){
 			console.error('query brands error', err);
-			self.respond({code:1001, message:'获取品牌列表失败', error:err});
+			self.respond({code:1004, message:'获取品牌列表失败', error:err});
 			return;
 		}
 
@@ -455,7 +455,7 @@ function json_products_attributes(){
 	ProductService.getAttributes(self.data.category, self.data.brand, self.data.name, function(err, attributes){
 		if (err) {
 			console.error('query attributes error', err);
-			self.respond({code: 1001, message: '获取商品属性列表失败', error: err});
+			self.respond({code: 1004, message: '获取商品属性列表失败', error: err});
 			return;
 		}
 
@@ -480,8 +480,8 @@ function json_orders_query() {
     var self = this;
     OrderService.query(self.query, function (err, orders) {
     	if (err) {
-			console.log('manager json_orders_query err: ' + err);
-			self.json(err);
+			console.error('manager json_orders_query err:', err);
+			self.respond({code:1004, message:'系统错误，没有找到订单信息。'});
 			return;
 		}
         if (orders) {
@@ -504,7 +504,7 @@ function json_orders_query() {
                 item.order = orderInfo;
             }
         }
-        self.json(orders);
+        self.respond({code:1000, message:'success', datas:orders});
     });
 }
 
@@ -514,11 +514,11 @@ function json_subOrders_payments_update() {
 	var orderid = self.body && self.body.id ? self.body.id: null;
 	var subOrders = self.body && self.body.subOrders ? self.body.subOrders: null;
 	if (!orderid) {
-		self.json([{'error':'更新失败，缺少订单ID'}]);
+		self.respond({code:1001, message:'请求参数错误', error:[{'error':'更新失败，缺少订单ID'}]});
 		return;
 	}
 	if (!subOrders) {
-		self.json([{'error':'更新失败，缺少子订单列表'}]);
+		self.respond({code:1001, message:'请求参数错误', error:[{'error':'更新失败，缺少子订单列表'}]});
 		return;
 	}
 	var updatepayments = {};
@@ -538,10 +538,10 @@ function json_subOrders_payments_update() {
     OrderService.updatePayments({'id':orderid,'payments':updatepayments}, function(err) {
 		if (err) {
 			console.log('manager json_subOrders_payments_update err: ' + err);
-			self.json([{'error':'更新失败'}]);
+			self.respond({code:1004, message:'系统错误，更新失败', error:[{'error':'系统错误，更新失败'}]});
 			return;
 		}
-		self.json(SUCCESS(true));
+		self.respond({code:1000, message:'success', success: true});
 	});
 }
 
@@ -551,11 +551,11 @@ function json_orders_products_update() {
 	var orderid = self.body && self.body.id ? self.body.id: null;
 	var products = self.body && self.body.products ? self.body.products: null;
 	if (!orderid) {
-		self.json([{'error':'更新失败，缺少订单ID'}]);
+		self.respond({code:1001, message:'请求参数错误', error:[{'error':'更新失败，缺少订单ID'}]});
 		return;
 	}
 	if (!products) {
-		self.json([{'error':'更新失败，缺少商品列表'}]);
+		self.respond({code:1001, message:'请求参数错误', error:[{'error':'更新失败，缺少商品列表'}]});
 		return;
 	}
 	var updateproducts = {};
@@ -571,10 +571,10 @@ function json_orders_products_update() {
     OrderService.updateProducts({'id':orderid,'products':updateproducts}, function(err) {
 		if (err) {
 			console.log('manager json_orders_products_update err: ' + err);
-			self.json([{'error':'更新失败'}]);
+			self.respond({code:1004, message:'系统错误，更新失败', error:[{'error':'系统错误，更新失败'}]});
 			return;
 		}
-		self.json(SUCCESS(true));
+		self.respond({code:1000, message:'success', success: true});
 	});
 }
 
@@ -584,11 +584,11 @@ function json_orders_SKUs_update() {
 	var orderid = self.body && self.body.id ? self.body.id: null;
 	var SKUs = self.body && self.body.SKUs ? self.body.SKUs: null;
 	if (!orderid) {
-		self.json([{'error':'更新失败，缺少订单ID'}]);
+		self.respond({code:1001, message:'请求参数错误', error:[{'error':'更新失败，缺少订单ID'}]});
 		return;
 	}
 	if (!SKUs) {
-		self.json([{'error':'更新失败，缺少商品列表'}]);
+		self.respond({code:1001, message:'请求参数错误', error:[{'error':'更新失败，缺少商品列表'}]});
 		return;
 	}
 	var updateSKUs = {};
@@ -604,38 +604,12 @@ function json_orders_SKUs_update() {
     OrderService.updateSKUs({'id':orderid,'SKUs':updateSKUs}, function(err) {
 		if (err) {
 			console.log('manager json_orders_SKUs_update err: ' + err);
-			self.json([{'error':'更新失败'}]);
+			self.respond({code:1004, message:'系统错误，更新失败', error:[{'error':'系统错误，更新失败'}]});
 			return;
 		}
-		self.json(SUCCESS(true));
+		self.respond({code:1000, message:'success', success: true});
 	});
 }
-
-// Saves specific order (order must exist)
-// function json_orders_save() {
-// 	var self = this;
-// 	OrderService.save(self.body, function(err) {
-// 		if (err) {
-// 			console.log('manager json_orders_save err' + err);
-// 			self.json([err]);
-// 			return;
-// 		}
-// 		self.json(SUCCESS(true));
-// 	});
-
-// }
-
-// // Removes specific order
-// function json_orders_remove() {
-// 	var self = this;
-// 	OrderService.remove(self.body.id, self.callback());
-// }
-
-// // Clears all orders
-// function json_orders_clear() {
-// 	var self = this;
-// 	GETSCHEMA('Order').workflow('clear', null, null, self.callback(), true);
-// }
 
 // Reads a specific order by ID
 function json_orders_read(id) {
@@ -644,7 +618,11 @@ function json_orders_read(id) {
 	options.id = id;
 	
 	OrderService.get(options, function(err, order){
-        self.json(convertOrderToShow(order));
+		if (err) {
+			self.respond({code:1004, message:'系统错误，没有找到订单信息', error:[{'error':'系统错误，没有找到订单信息'}]});
+			return;
+		}
+        self.respond({code:1000, message:'success', datas: convertOrderToShow(order)});
     });
 }
 
@@ -755,7 +733,7 @@ function json_users_save() {
 	// self.body.$save(self.callback());
 	UserService.update(options, function(err){
         if(err){
-            self.respond({code:1001, message:err});
+            self.respond({code:1004, message:err});
             return;
         }
 
@@ -776,7 +754,7 @@ function json_users_read(id) {
 	options.userid = id;
 	UserService.get(options, function(err, user) {
         if (err) {
-            self.respond({code: 1001, message: 'get user err:' + err});
+            self.respond({code: 1004, message: 'get user err:' + err});
             return;
         }
 
@@ -1097,7 +1075,7 @@ function process_createUser(){
 
     BackEndUserService.create(self.data, function(err, user){
         if(err){
-            self.respond({code:1001, message:err});
+            self.respond({code:1004, message:err});
             return;
         }
 
@@ -1123,7 +1101,7 @@ var setCookieAndResponse = function(user, keepLogin){
     BackEndUserService.update(options, function(err){
         if(err){
             console.log('setCookieAndResponse err: ' + err);
-            self.respond({code:1001, message:'登录失败'});
+            self.respond({code:1004, message:'登录失败'});
             return;
         }
 
@@ -1142,7 +1120,7 @@ var setCookieAndResponse = function(user, keepLogin){
         }
 
         // Return results
-        var result = {'code': '1000', 'message': 'success', 'datas': user, token:token};
+        var result = {code: 1000, message: 'success', datas: user, token:token};
         self.respond(result);
     });
 };
@@ -1182,16 +1160,16 @@ function process_modify_password(){
     var decryptedNewPwd = tools.decrypt_password(decodeURI(self.data.newPwd));
     var decryptedOldPwd = tools.decrypt_password(decodeURI(self.data.oldPwd));
     if (decryptedNewPwd.length < 6) {
-        self.respond({'code': '1001', 'message': '新密码长度需不小于6位'});
+        self.respond({code: 1001, 'message': '新密码长度需不小于6位'});
         return;
     }
     if (decryptedNewPwd === decryptedOldPwd) {
-        self.respond({'code': '1001', 'message': '新密码与旧密码不能一致'});
+        self.respond({code: 1001, 'message': '新密码与旧密码不能一致'});
         return;
     }
     BackEndUserService.validate_password(self.data.account, decryptedOldPwd, function(err, valid){
         if(err){
-            self.respond({code:1001, message:err});
+            self.respond({code:1004, message:err});
             return;
         }
 
@@ -1202,7 +1180,7 @@ function process_modify_password(){
 
         BackEndUserService.update(self.data, function(err){
             if(err){
-                self.respond({code:1001, message:'更新失败'});
+                self.respond({code:1004, message:'更新失败'});
                 return;
             }
 
@@ -1227,7 +1205,7 @@ function json_be_users_update(){
 
     BackEndUserService.update(self.data, function(err){
         if(err){
-            self.respond({code:1001, message:err});
+            self.respond({code:1004, message:err});
             return;
         }
 
@@ -1263,7 +1241,7 @@ function process_SKU_add() {
 			if(11000 == err.code){
 				self.respond({code:1001, message:'相同属性的SKU已经添加过了'});
 			} else {
-				self.respond({code: 1001, message: '添加失败'});
+				self.respond({code: 1004, message: '添加失败'});
 			}
 
 			return;
@@ -1286,7 +1264,7 @@ function process_SKU_update(id){
 			if(11000 == err.code){
 				self.respond({code:1001, message:'相同属性的SKU已经添加过了'});
 			} else {
-				self.respond({code: 1001, message: '更新SKU失败'});
+				self.respond({code: 1004, message: '更新SKU失败'});
 			}
 			return;
 		}
@@ -1323,7 +1301,7 @@ function process_SKU_Attribute_add(){
 			if(11000 == err.code){
 				self.respond({code:1001, message:'相同的SKU属性已经添加过了'});
 			} else {
-				self.respond({code: 1001, message: '添加SKU属性失败'});
+				self.respond({code: 1004, message: '添加SKU属性失败'});
 			}
 			return;
 		}
@@ -1337,7 +1315,7 @@ function json_SKU_Attributes_get(){
 	SKUService.querySKUAttributes(self.data.category, self.data.brand, function(err, attributes){
 		if(err){
 			console.error('json_SKU_Attributes_get error', err);
-			self.respond({code:1001, message:'获取SKU属性失败'});
+			self.respond({code:1004, message:'获取SKU属性失败'});
 			return;
 		}
 
@@ -1352,7 +1330,7 @@ function process_product_attributes_add(){
 			if(11000 == err.code){
 				self.respond({code:1001, message:'相同的商品属性已经添加过了'});
 			} else {
-				self.respond({code: 1001, message: '保存商品属性失败'});
+				self.respond({code: 1004, message: '保存商品属性失败'});
 			}
 			return;
 		}
@@ -1366,7 +1344,7 @@ function json_SKU_get(){
 	SKUService.querySKUByProductId(self.data.product, function(err, SKUs){
 		if(err){
 			console.log(err);
-			self.respond({code:1001, message:'查询SKU失败'});
+			self.respond({code:1004, message:'查询SKU失败'});
 			return;
 		}
 
@@ -1384,7 +1362,7 @@ function process_SKU_online(id){
 	SKUService.online(id, self.data.online, function(err, doc){
 		if(err){
 			console.log(err);
-			self.respond({code:1001, message:'更新SKU失败'});
+			self.respond({code:1004, message:'更新SKU失败'});
 			return;
 		}
 
@@ -1397,7 +1375,7 @@ function json_SKU_Additions_get(){
 	SKUService.querySKUAdditions(self.data.category, self.data.brand, function(err, additions){
 		if(err){
 			console.error('json_SKU_Attributes_get error', err);
-			self.respond({code:1001, message:'获取SKU属性失败'});
+			self.respond({code:1004, message:'获取SKU属性失败'});
 			return;
 		}
 
@@ -1410,7 +1388,7 @@ function process_SKU_Addition_add(){
 	SKUService.addSKUAddition(self.data.category, self.data.brand, self.data.name, self.data.price, function(err, addition){
 		if(err){
 			console.error('process_SKU_Addition_add error', err);
-			self.respond({code:1001, message:'添加SKU附加属性失败'});
+			self.respond({code:1004, message:'添加SKU附加属性失败'});
 			return;
 		}
 

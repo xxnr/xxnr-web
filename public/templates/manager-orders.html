@@ -650,8 +650,15 @@
 				case 'edit':
 					$.components.GET(managerurl + '/api/orders/' + row.id, null, function(response, err) {
 						// Error prevention
-						if (response instanceof Array)
+						if (response instanceof Array) {
 							response = {};
+						} else {
+							if (response && response.code && response.code==1000 && response.datas) {
+								response = response.datas;
+							} else {
+								response = {};
+							}
+						}
 
 						SET('orders.form', $.extend({}, response), true);
                         SET('orders.payStatuses',[{name:'未付款',value:1},{name:'已付款',value:2}], true);
@@ -682,6 +689,13 @@
 					$.components.PUT(posturl, postdata, function(response) {
 
 						var responsekey = 'orders.form.' + dataname + '.response';
+
+						if (response && response.code && parseInt(response.code) !== 1000) {
+							if (response.error)
+								response = response.error;
+							else
+								response = [];
+						}
 						// Error handling
 						SET(responsekey, response);
 						if (response instanceof Array)
@@ -815,6 +829,16 @@
 		}
 
 		$.components.GET(managerurl + '/api/orders/', orders.filter, function(response) {
+			// Error prevention
+			if (response instanceof Array) {
+				response = {};
+			} else {
+				if (response && response.code && response.code==1000 && response.datas) {
+					response = response.datas;
+				} else {
+					response = {};
+				}
+			}
 			SET((reset ? '' : '+') + 'orders.grid', response.items);
 			if (!reset)
 				return;
