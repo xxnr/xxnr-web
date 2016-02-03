@@ -19,6 +19,7 @@ var AuditLogSchema = new mongoose.Schema({
 // Indexes
 AuditLogSchema.index({actorName:1});
 AuditLogSchema.index({dateCreated: -1});
+AuditLogSchema.index({action:"text", actorName:"text", actorId:"text"});
 
 // Model
 mongoose.model('auditlog', AuditLogSchema);

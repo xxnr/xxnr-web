@@ -30,6 +30,14 @@ AuditService.prototype.query = function(options, callback) {
 
     var query = {};
 
+    if (typeof(options.status) !== 'undefined') {
+    	if (options.status == 1) {
+    		query.succeeded = true;
+    	} else {
+    		query.succeeded = false;
+    	}
+    }
+
     // Prepares searching
     if (options.search)
         query.$text = {$search:options.search};
@@ -40,7 +48,7 @@ AuditService.prototype.query = function(options, callback) {
             return;
         }
 
-        AuditLogModel.find(query, { _id: 0, __v: 0, parameters: 0 })
+        AuditLogModel.find(query, { __v: 0, parameters: 0 })
             .sort({dateCreated: -1})
             .skip(skip)
             .limit(take)
@@ -64,6 +72,24 @@ AuditService.prototype.query = function(options, callback) {
                 callback(null, data);
             });
     });
+};
+
+// Gets a specific new
+AuditService.prototype.get = function(options, callback) {
+
+    // Gets a specific document from DB
+    var queryoptions = {};
+    if (options.id)
+        queryoptions._id = options.id;
+    AuditLogModel.findOne(queryoptions, function(err, doc){
+        if(err){
+            console.error(err);
+            callback(err);
+            return;
+        }
+
+        callback(null, doc);
+    })
 };
 
 // audit info

@@ -1,0 +1,173 @@
+<div class="filter" style="padding-bottom:9px">
+	<div class="container">
+		<div class="caption"><span class="fa fa-history mr5"></span> @(操作记录)</div>
+		<div class="row">
+			<div class="col-md-3 col-sm-6 m">
+				<div data-component="textbox" data-component-path="auditlogs.filter.search" data-placeholder="@(用户/用户ID/请求)" data-control-icon="fa-search"></div>
+				<div class="help" data-component="template" data-component-path="auditlogs.info"><script type="text/html">{{ count | pluralize(@('items','item','items','items')) }} / {{ pages | pluralize(@('pages','page','pages','pages')) }}</script></div>
+			</div>
+			<div class="col-md-3 col-sm-6 m">
+				<div data-component="dropdown" data-component-path="auditlogs.filter.status" data-options="@(所有状态)|;@(成功)|1;@(失败)|0" data-empty="true" data-empty-text="@(所有状态)"></div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="container">
+	<div data-component="grid" data-component-path="auditlogs.grid" data-max="auto" data-options-page="@(Page: #)" data-options-button="@(查看更多LOGS)" data-component-id="auditlogs.grid">
+		<script type="text/html">
+		<tr>
+			<td style="width:40px" class="silver hidden-xs" data-title="序号">$index</td>
+			<td style="width:320px" class="silver hidden-xs" data-title="请求头" title="{{action}}">{{ action }}</td>
+			<td style="width:50px" class="silver" data-title="请求方式"><span class="green">{{ actionMethod }}</span></td>
+			<td style="width:50px" class="silver" data-title="用户">{{ if actorName }}{{actorName}}{{ else }}-{{ fi }}</td>
+			<td style="width:200px" class="silver hidden-xs" data-title="用户ID">{{ if actorId }}{{actorId}}{{ else }}-{{ fi }}</td>
+			<td style="width:80px" class="silver" data-title="用户IP">{{ if actorIp }}{{actorIp}}{{ else }}-{{ fi }}</td>
+			<td style="width:120px" class="silver hidden-xs ui-right" data-title="时间">{{ dateCreated | format('yyyy-MM-dd hh:mm:ss') }}</td>
+			<td style="width:80px" class="silver ui-right" data-title="状态">{{ if succeeded }}<span class="green">成功</span>{{ else }}<span class="red">失败</span>{{fi}}</td>
+			<td style="width:50px" class="ui-right">
+				<button name="edit" title="@(查看)"><span class="fa fa-search"></span></button>
+			</td>
+		</tr>
+		</script>
+	</div>
+</div>
+<div data-component="form" data-title="@(查看详情)" data-component-path="common.form" data-if="value === 'auditlogs'" data-width="1000px" data-component-id="auditlogs.form">
+	<br />
+	<div class="padding">
+		<div data-component="visible" data-component-path="auditlogs.form._id">
+			<div data-component="template" data-component-path="auditlogs.form" class="padding" style="padding-bottom:0">
+				<script type="text/html">
+				<table class="table table-bordered" border="0">
+					<tbody>
+						<tr>
+							<td class="col-xs-4 active">@(# id)</td>
+							<td>{{ _id }}</td>
+						</tr>
+						<tr>
+							<td class="col-xs-4 active">@(请求头)</td>
+							<td>{{ action }}</td>
+						</tr>
+						<tr>
+							<td class="col-xs-4 active">@(请求方式)</td>
+							<td>{{ actionMethod }}</td>
+						</tr>
+						<tr>
+							<td class="col-xs-4 active">@(用户)</td>
+							<td>{{ if actorName }}{{actorName}}{{ else }}-{{ fi }}</td>
+						</tr>
+						<tr>
+							<td class="col-xs-4 active">@(用户ID)</td>
+							<td>{{ if actorId }}{{actorId}}{{ else }}-{{ fi }}</td>
+						</tr>
+						<tr>
+							<td class="col-xs-4 active">@(用户ID)</td>
+							<td>{{ if actorIp }}{{actorIp}}{{ else }}-{{ fi }}</td>
+						</tr>
+						<tr>
+							<td class="col-xs-4 active">@(时间)</td>
+							<td>{{ dateCreated | format('yyyy-MM-dd hh:mm:ss') }}</td>
+						</tr>
+						<tr>
+							<td class="col-xs-4 active">@(状态)</td>
+							<td>{{ if succeeded }}<span class="green">成功</span>{{ else }}<span class="red">失败</span>{{fi}}</td>
+						</tr>
+						<tr>
+							<td class="col-xs-4 active">@(参数详情)</td>
+							<td>
+								{{ if parameters && parameters.length > 0 }}
+									<ul>
+									{{ foreach parameter in parameters }}
+										<li><span class="green" style="float:left;padding-right:5px;">{{ parameter.name }}:</span><p style="word-wrap:break-word;word-break:break-all;">{{ parameter.value }}</p></li>
+									{{ end }}
+									</ul>
+								{{ fi }}
+							</td>
+						</tr>
+					</tbody>
+				</table>
+				</script>
+			</div>
+		</div>
+	</div>
+
+	<div data-component="error" data-component-path="auditlogs.response"></div>
+	<div class="ui-form-buttons">
+		<button name="cancel">@(关闭)</button>
+	</div>
+</div>
+
+<script>
+	var auditlogs = {};
+
+	auditlogs.filter = {};
+	auditlogs.filter.page = 1;
+
+	auditlogs.grid = [];
+	auditlogs.form = {};
+	auditlogs.info = {};
+	auditlogs.response = null;
+
+	ON('#auditlogs.grid', function(component) {
+
+		// Max items per page
+		auditlogs.filter.max = component.max;
+		auditlogs_refresh(true);
+
+		component.click = function(index, row, button) {
+			switch ($(button).attr('name')) {
+				case 'edit':
+					$.components.GET(managerurl + '/api/auditlogs/' + row._id, null, function(response, err) {
+
+						// Error prevention
+						if (response && response.code && response.code==1000 && response.datas) {
+							response = response.datas;
+						} else {
+							response = {};
+						}
+
+						SET('auditlogs.form', $.extend({}, response), true);
+						SET('auditlogs.response', null);
+						SET('common.form', 'auditlogs');
+					});
+					break;
+			}
+		};
+
+		component.next = function(page) {
+			auditlogs.filter.page = page;
+			auditlogs_refresh();
+		};
+	});
+
+	// Watchs changes in auditlogs filter
+	Delay_Search_WATCH('auditlogs.filter.*', function(path, value) {
+		if (NOTMODIFIED('auditlogs.filter', auditlogs.filter))
+			return;
+		auditlogs_refresh(path !== 'auditlogs.filter.page');
+	});
+	
+	// Method refreshes grid
+	function auditlogs_refresh(reset) {
+
+		if (reset) {
+			auditlogs.filter.page = 1;
+			auditlogs.grid = [];
+		}
+
+		$.components.GET(managerurl + '/api/auditlogs/', auditlogs.filter, function(response) {
+			if (response && response.code && response.code==1000 && response.datas) {
+				response = response.datas;
+			} else {
+				response = {};
+			}
+			SET((reset ? '' : '+') + 'auditlogs.grid', response.items);
+			if (!reset)
+				return;
+			auditlogs.info.count = response.count;
+			auditlogs.info.pages = response.pages;
+			UPDATE('auditlogs.info');
+		});
+	}
+
+</script>

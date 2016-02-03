@@ -12,6 +12,7 @@ var SKUService = services.SKU;
 var BrandService = services.brand;
 var CategoryService = services.category;
 var PotentialCustomerService = services.potential_customer;
+var AuditlogService = services.auditservice;
 var PAYMENTSTATUS = require('../common/defs').PAYMENTSTATUS;
 var DELIVERSTATUS = require('../common/defs').DELIVERSTATUS;
 
@@ -81,6 +82,10 @@ exports.install = function() {
 	F.route(CONFIG('manager-url') + '/api/news/',            				json_news_remove, ['delete'], ['backend_auth', 'auditing']);
 	F.route(CONFIG('manager-url') + '/api/news/categories/', 				json_news_categories, ['get'], ['backend_auth']);
 	F.route(CONFIG('manager-url') + '/api/news/category/',   				json_news_category_replace, ['post'], ['backend_auth', 'auditing']);
+
+	// Audit logs
+	F.route(CONFIG('manager-url') + '/api/auditlogs/',            			json_auditlog_query, ['get'], ['backend_auth']);
+	F.route(CONFIG('manager-url') + '/api/auditlogs/{id}/',       			json_auditlog_read, ['get'], ['backend_auth']);
 
 	// PAGES
 	F.route(CONFIG('manager-url') + '/api/pages/',               			json_pages_query, ['get'], ['backend_auth']);
@@ -832,6 +837,36 @@ function json_news_read(id) {
 	var options = {};
 	options.id = id;
     NewsService.get(options, self.callback());
+}
+
+// ==========================================================================
+// Audit logs
+// ==========================================================================
+
+// Gets all audit logs
+function json_auditlog_query() {
+	var self = this;
+	AuditlogService.query(self.query, function(err, datas){
+		if (err) {
+			self.respond({code: 1004, message: 'query audit logs err:' + err});
+			return;
+		}
+		self.respond({code:1000, message:'success', datas:datas});
+	});
+}
+
+// Reads a specific audit log by ID
+function json_auditlog_read(id) {
+	var self = this;
+	var options = {};
+	options.id = id;
+    AuditlogService.get(options, function(err, datas){
+		if (err) {
+			self.respond({code: 1004, message: 'get audit logs err:' + err});
+			return;
+		}
+		self.respond({code:1000, message:'success', datas:datas});
+	});
 }
 
 // ==========================================================================
