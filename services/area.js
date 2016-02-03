@@ -23,7 +23,7 @@ AreaService.prototype.queryProvince = function(options, callback) {
 	var queryoptions = {};
 
 	// only get the special province
-	SpecialprovinceModel.find({}, { _id: 0, __v: 0, tid: 0 }, function(err, docs) {
+	SpecialprovinceModel.find({}, { __v: 0, tid: 0 }, function(err, docs) {
 		var ProvinceIds = [];
 		for (var i = 0; i < docs.length; i++) {
 			ProvinceIds[i] = docs[i].id;
@@ -31,7 +31,7 @@ AreaService.prototype.queryProvince = function(options, callback) {
 		if (ProvinceIds && ProvinceIds.length > 0) {
 			queryoptions.id = {'$in': ProvinceIds};
 		}
-		ProvinceModel.find(queryoptions, { _id: 0, __v: 0, tid: 0 }).sort({shortname:1}).exec(
+		ProvinceModel.find(queryoptions, { __v: 0, tid: 0 }).sort({shortname:1}).exec(
 			function (err, docs) {
 				if (err) {
 	                callback(err);
@@ -72,7 +72,7 @@ AreaService.prototype.getProvince = function(options, callback) {
 
 // Gets listing
 AreaService.prototype.queryCity = function(options, callback) {
-    CityModel.find({provinceid: options.provinceid}, { _id: 0, __v: 0, tid: 0 }, function (err, docs) {
+    CityModel.find({provinceid: options.provinceid}, { __v: 0, tid: 0 }, function (err, docs) {
     	if (err) {
             callback(err);
             return;
@@ -121,7 +121,7 @@ AreaService.prototype.queryCounty = function(options, callback) {
     if (options.provinceid) {
         query.provinceid = options.provinceid;
     }
-	CountyModel.find(query, { _id: 0, __v: 0, tid: 0 }, function(err, docs) {
+	CountyModel.find(query, { __v: 0, tid: 0 }, function(err, docs) {
 		if (err) {
             callback(err);
             return;
@@ -174,7 +174,7 @@ AreaService.prototype.queryTown = function(options, callback) {
     if (options.provinceid) {
         query.provinceid = options.provinceid;
     }
-	TownModel.find(query, { _id: 0, __v: 0, tid: 0 }, function(err, docs) {
+	TownModel.find(query, { __v: 0, tid: 0 }, function(err, docs) {
 		if (err){
             callback(err);
             return;
