@@ -1646,6 +1646,13 @@ function json_intention_products(){
             return;
         }
 
+        products.sort(function(a, b){
+            if(a.name=='其他')
+                return 1;
+            else
+                return -1;
+        });
+
         self.respond({code:1000, message:'success', intentionProducts:products});
     })
 }
