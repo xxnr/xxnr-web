@@ -35,6 +35,10 @@
 /$manager/api/news/categories, get, super_admin, news_editor
 /$manager/api/news/category, post, super_admin, news_editor
 
+#auditlogs
+/$manager/api/auditlogs/, get, super_admin
+/$manager/api/auditlogs/{id}, get, super_admin
+
 #files
 /$manager/api/files/clear, get, super_admin
 
