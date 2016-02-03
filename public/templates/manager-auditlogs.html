@@ -21,8 +21,8 @@
 			<td style="width:320px" class="silver hidden-xs" data-title="请求头" title="{{action}}">{{ action }}</td>
 			<td style="width:50px" class="silver" data-title="请求方式"><span class="green">{{ actionMethod }}</span></td>
 			<td style="width:50px" class="silver" data-title="用户">{{ if actorName }}{{actorName}}{{ else }}-{{ fi }}</td>
-			<td style="width:200px" class="silver hidden-xs" data-title="用户ID">{{ if actorId }}{{actorId}}{{ else }}-{{ fi }}</td>
-			<td style="width:80px" class="silver" data-title="用户IP">{{ if actorIp }}{{actorIp}}{{ else }}-{{ fi }}</td>
+			<td style="width:180px" class="silver hidden-xs" data-title="用户ID">{{ if actorId }}{{actorId}}{{ else }}-{{ fi }}</td>
+			<td style="width:100px" class="silver" data-title="用户IP">{{ if actorIp }}{{actorIp}}{{ else }}-{{ fi }}</td>
 			<td style="width:120px" class="silver hidden-xs ui-right" data-title="时间">{{ dateCreated | format('yyyy-MM-dd hh:mm:ss') }}</td>
 			<td style="width:80px" class="silver ui-right" data-title="状态">{{ if succeeded }}<span class="green">成功</span>{{ else }}<span class="red">失败</span>{{fi}}</td>
 			<td style="width:50px" class="ui-right">
@@ -61,7 +61,7 @@
 							<td>{{ if actorId }}{{actorId}}{{ else }}-{{ fi }}</td>
 						</tr>
 						<tr>
-							<td class="col-xs-4 active">@(用户ID)</td>
+							<td class="col-xs-4 active">@(用户IP)</td>
 							<td>{{ if actorIp }}{{actorIp}}{{ else }}-{{ fi }}</td>
 						</tr>
 						<tr>
@@ -146,7 +146,7 @@
 			return;
 		auditlogs_refresh(path !== 'auditlogs.filter.page');
 	});
-	
+
 	// Method refreshes grid
 	function auditlogs_refresh(reset) {
 
