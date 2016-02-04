@@ -405,92 +405,91 @@
 					<br />
 					<table class="table table-bordered" border="0">
 						<tbody>
-							
+							<tr>
+								<td class="ui-center active">@(支付内容)</td>
+								<td class="ui-center active">@(序号)</td>
+								<td class="ui-center col-xs-1 active">@(支付ID)</td>
+								<td class="ui-center col-xs-1 active">@(笔数)</td>
+		                        <td class="ui-center col-xs-1 active">@(支付金额)</td>
+		                        <td class="ui-center col-xs-1 active">@(支付方式)</td>
+								<td class="ui-center col-xs-1 active">@(支付状态)</td>
+								<td class="ui-center col-xs-1 active">@(是否关闭)</td>
+								<td class="ui-center col-xs-2 active">@(支付时间)</td>
+								<td class="ui-center col-xs-2 active">@(修改支付状态)</td>
+							</tr>
+							{{ foreach s in form.subOrders }}
+								{{ foreach p in s.payments }}
 								<tr>
-									<td class="ui-center active">@(支付内容)</td>
-									<td class="ui-center active">@(序号)</td>
-									<td class="ui-center col-xs-1 active">@(支付ID)</td>
-									<td class="ui-center col-xs-1 active">@(笔数)</td>
-			                        <td class="ui-center col-xs-1 active">@(支付金额)</td>
-			                        <td class="ui-center col-xs-1 active">@(支付方式)</td>
-									<td class="ui-center col-xs-1 active">@(支付状态)</td>
-									<td class="ui-center col-xs-1 active">@(是否关闭)</td>
-									<td class="ui-center col-xs-2 active">@(支付时间)</td>
-									<td class="ui-center col-xs-2 active">@(修改支付状态)</td>
+									<td class="ui-center">
+									{{ if s.type == 'deposit' }}
+										阶段一：定金
+									{{ else }}
+										{{ if s.type == 'balance' }}
+											阶段二：尾款
+										{{ else }}
+											{{ if s.type == 'full' }}
+												全款
+											{{ else }}
+												其他
+											{{ fi }}
+										{{ fi }}
+									{{ fi }}
+									</td>
+									<td class="ui-center">{{ $index+1 }}</td>
+									<td class="ui-center col-xs-1">{{ p.id }}</td>
+									<td class="ui-center col-xs-1">第{{ p.slice }}笔</td>
+			                        <td class="ui-center col-xs-1">{{ p.price | price(2) }}</td>
+			                        <td class="ui-center col-xs-1">
+			                        {{ if p.payType }}
+										{{ if p.payType==1 }}
+											支付宝
+										{{ else }}
+											{{ if p.payType==2 }}
+												银联
+											{{ else }}
+												其他
+											{{ fi }}
+										{{ fi }}
+									{{ else }}
+										-
+									{{ fi }}
+			                        </td>
+									<td class="ui-center col-xs-1">
+									{{ if p.payStatus==1 }}
+						        		<span class="mr5 red">未付款</span>
+						        	{{ else }}
+						        		{{ if p.payStatus==2 }}
+						        			<span class="mr5 green">已付款</span>
+						        		{{ else }}
+						        			<span class="mr5 red">其他</span>
+						        		{{ fi }}
+						        	{{ fi }}
+									</td>
+									<td class="ui-center col-xs-1">
+									{{ if p.isClosed && p.payStatus == 1 }}
+						        		<span class="mr5 red">已关闭</span>
+						        	{{ else }}
+						        		<span class="mr5 green">未关闭</span>
+						        	{{ fi }}
+									</td>
+									<td class="ui-center col-xs-2">
+									{{ if p.datePaid }}
+										{{ p.datePaid | format('@(yyyy-MM-dd HH:mm:ss)') }}
+									{{ else }}
+										-
+									{{ fi }}
+									</td>
+									<td class="ui-center col-xs-2">
+										<select data-name="payStatus" data-id="{{ p.id }}" data-suborderid="{{ s.id }}" data-suborderindex="{{ s.$index }}" data-paymentindex="{{ $index }}">
+										{{ foreach ps in payStatuses }}
+											<option value="{{ ps.value }}" {{ if p.payStatus == ps.value }}selected{{ fi }}>{{ ps.name }}
+											</option>
+										{{ end }}
+										</select>
+									</td>
 								</tr>
-								{{ foreach s in form.subOrders }}
-									{{ foreach p in s.payments }}
-									<tr>
-										<td class="ui-center">
-										{{ if s.type == 'deposit' }}
-											阶段一：定金
-										{{ else }}
-											{{ if s.type == 'balance' }}
-												阶段二：尾款
-											{{ else }}
-												{{ if s.type == 'full' }}
-													全款
-												{{ else }}
-													其他
-												{{ fi }}
-											{{ fi }}
-										{{ fi }}
-										</td>
-										<td class="ui-center">{{ $index+1 }}</td>
-										<td class="ui-center col-xs-1">{{ p.id }}</td>
-										<td class="ui-center col-xs-1">第{{ p.slice }}笔</td>
-				                        <td class="ui-center col-xs-1">{{ p.price | price(2) }}</td>
-				                        <td class="ui-center col-xs-1">
-				                        {{ if p.payType }}
-											{{ if p.payType==1 }}
-												支付宝
-											{{ else }}
-												{{ if p.payType==2 }}
-													银联
-												{{ else }}
-													其他
-												{{ fi }}
-											{{ fi }}
-										{{ else }}
-											-
-										{{ fi }}
-				                        </td>
-										<td class="ui-center col-xs-1">
-										{{ if p.payStatus==1 }}
-							        		<span class="mr5 red">未付款</span>
-							        	{{ else }}
-							        		{{ if p.payStatus==2 }}
-							        			<span class="mr5 green">已付款</span>
-							        		{{ else }}
-							        			<span class="mr5 red">其他</span>
-							        		{{ fi }}
-							        	{{ fi }}
-										</td>
-										<td class="ui-center col-xs-1">
-										{{ if p.isClosed && p.payStatus == 1 }}
-							        		<span class="mr5 red">已关闭</span>
-							        	{{ else }}
-							        		<span class="mr5 green">未关闭</span>
-							        	{{ fi }}
-										</td>
-										<td class="ui-center col-xs-2">
-										{{ if p.datePaid }}
-											{{ p.datePaid | format('@(yyyy-MM-dd HH:mm:ss)') }}
-										{{ else }}
-											-
-										{{ fi }}
-										</td>
-										<td class="ui-center col-xs-2">
-											<select data-name="payStatus" data-id="{{ p.id }}" data-suborderid="{{ s.id }}" data-suborderindex="{{ s.$index }}" data-paymentindex="{{ $index }}">
-											{{ foreach ps in payStatuses }}
-												<option value="{{ ps.value }}" {{ if p.payStatus == ps.value }}selected{{ fi }}>{{ ps.name }}
-												</option>
-											{{ end }}
-											</select>
-										</td>
-									</tr>
-									{{ end }}
 								{{ end }}
+							{{ end }}
 						</tbody>
 					</table>
 					
@@ -650,8 +649,15 @@
 				case 'edit':
 					$.components.GET(managerurl + '/api/orders/' + row.id, null, function(response, err) {
 						// Error prevention
-						if (response instanceof Array)
+						if (response instanceof Array) {
 							response = {};
+						} else {
+							if (response && response.code && response.code==1000 && response.datas) {
+								response = response.datas;
+							} else {
+								response = {};
+							}
+						}
 
 						SET('orders.form', $.extend({}, response), true);
                         SET('orders.payStatuses',[{name:'未付款',value:1},{name:'已付款',value:2}], true);
@@ -682,6 +688,13 @@
 					$.components.PUT(posturl, postdata, function(response) {
 
 						var responsekey = 'orders.form.' + dataname + '.response';
+
+						if (response && response.code && parseInt(response.code) !== 1000) {
+							if (response.error)
+								response = response.error;
+							else
+								response = [];
+						}
 						// Error handling
 						SET(responsekey, response);
 						if (response instanceof Array)
@@ -815,6 +828,16 @@
 		}
 
 		$.components.GET(managerurl + '/api/orders/', orders.filter, function(response) {
+			// Error prevention
+			if (response instanceof Array) {
+				response = {};
+			} else {
+				if (response && response.code && response.code==1000 && response.datas) {
+					response = response.datas;
+				} else {
+					response = {};
+				}
+			}
 			SET((reset ? '' : '+') + 'orders.grid', response.items);
 			if (!reset)
 				return;
