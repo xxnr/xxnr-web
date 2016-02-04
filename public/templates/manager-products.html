@@ -505,6 +505,7 @@
         if(NOTMODIFIED('products.form', products.form))
             return;
         formModified = true;
+        products_onchange();
     });
 
     function add_product(callback){
