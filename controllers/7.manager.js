@@ -368,6 +368,7 @@ function json_products_save() {
 
     ProductService.save(self.body, function(err, product){
 		if(err){
+			console.error('manager json_products_save err:', err);
 			self.respond({code:1004, message:err});
 			return;
 		}
@@ -385,6 +386,7 @@ function process_products_updateStatus(){
 	var self = this;
 	ProductService.updateStatus(self.body._id, self.body.online, function(err){
 		if(err){
+			console.error('manager process_products_updateStatus err:', err);
 			self.respond({code:1004, message:err});
 			return;
 		}
@@ -439,7 +441,7 @@ function json_products_attribute(attributeName) {
 	var brand = self.data.brand;
 	ProductService.getAttributes(category, brand, attributeName, function (err, attributes) {
 		if (err) {
-			console.error('query attributes error', err);
+			console.error('manager json_products_attribute query attributes err:', err);
 			self.respond({code: 1004, message: '获取商品属性列表失败', error: err});
 			return;
 		}
@@ -453,7 +455,7 @@ function json_brands(){
 	var category = self.data.category;
 	BrandService.query(category, function(err, brands){
 		if(err){
-			console.error('query brands error', err);
+			console.error('manager json_brands query brands err:', err);
 			self.respond({code:1004, message:'获取品牌列表失败', error:err});
 			return;
 		}
@@ -466,7 +468,7 @@ function json_products_attributes(){
 	var self = this;
 	ProductService.getAttributes(self.data.category, self.data.brand, self.data.name, function(err, attributes){
 		if (err) {
-			console.error('query attributes error', err);
+			console.error('manager json_products_attributes err:', err);
 			self.respond({code: 1004, message: '获取商品属性列表失败', error: err});
 			return;
 		}
@@ -549,7 +551,7 @@ function json_subOrders_payments_update() {
     }
     OrderService.updatePayments({'id':orderid,'payments':updatepayments}, function(err) {
 		if (err) {
-			console.log('manager json_subOrders_payments_update err: ' + err);
+			console.error('manager json_subOrders_payments_update err:', err);
 			self.respond({code:1004, message:'系统错误，更新失败', error:[{'error':'系统错误，更新失败'}]});
 			return;
 		}
@@ -582,7 +584,7 @@ function json_orders_products_update() {
     }
     OrderService.updateProducts({'id':orderid,'products':updateproducts}, function(err) {
 		if (err) {
-			console.log('manager json_orders_products_update err: ' + err);
+			console.error('manager json_orders_products_update err:', err);
 			self.respond({code:1004, message:'系统错误，更新失败', error:[{'error':'系统错误，更新失败'}]});
 			return;
 		}
@@ -615,7 +617,7 @@ function json_orders_SKUs_update() {
     }
     OrderService.updateSKUs({'id':orderid,'SKUs':updateSKUs}, function(err) {
 		if (err) {
-			console.log('manager json_orders_SKUs_update err: ' + err);
+			console.error('manager json_orders_SKUs_update err:', err);
 			self.respond({code:1004, message:'系统错误，更新失败', error:[{'error':'系统错误，更新失败'}]});
 			return;
 		}
@@ -629,8 +631,9 @@ function json_orders_read(id) {
 	var options = {};
 	options.id = id;
 	
-	OrderService.get(options, function(err, order){
+	OrderService.get(options, function(err, order) {
 		if (err) {
+			console.error('manager json_orders_read error:', err);
 			self.respond({code:1004, message:'系统错误，没有找到订单信息', error:[{'error':'系统错误，没有找到订单信息'}]});
 			return;
 		}
@@ -745,7 +748,8 @@ function json_users_save() {
 	// self.body.$save(self.callback());
 	UserService.update(options, function(err){
         if(err){
-            self.respond({code:1004, message:err});
+        	console.error('manager json_users_save err:', err);
+            self.respond({code:1004, message:'系统错误，更新失败'});
             return;
         }
 
@@ -766,6 +770,7 @@ function json_users_read(id) {
 	options.userid = id;
 	UserService.get(options, function(err, user) {
         if (err) {
+        	console.error('manager json_users_read err:', err);
             self.respond({code: 1004, message: 'get user err:' + err});
             return;
         }
@@ -787,19 +792,43 @@ function json_news_query() {
 // Saves (update or create) specific new
 function json_news_save() {
 	var self = this;
-    NewsService.save(self.body, self.callback());
+    NewsService.save(self.body, function(err){
+        if(err){
+            console.error('manager json_news_save err:', err);
+			self.respond({code:1004, message:'系统错误，更新失败', error:[{'error':'系统错误，更新失败'}]});
+            return;
+        }
+
+        self.respond({code:1000, message:'success', success:true});
+    });
 }
 
 // Update specific new status
 function json_news_updatestatus() {
 	var self = this;
-    NewsService.updatestatus(self.body, self.callback());
+    NewsService.updatestatus(self.body, function(err){
+        if(err){
+            console.error('manager json_news_updatestatus err:', err);
+			self.respond({code:1004, message:'系统错误，更新失败', error:[{'error':'系统错误，更新失败'}]});
+            return;
+        }
+
+        self.respond({code:1000, message:'success', success:true});
+    });
 }
 
 // Removes specific new
 function json_news_remove() {
 	var self = this;
-    NewsService.remove(self.body, self.callback());
+    NewsService.remove(self.body, function(err){
+        if(err){
+            console.error('manager json_news_remove err:', err);
+			self.respond({code:1004, message:'系统错误，删除失败', error:[{'error':'系统错误，删除失败'}]});
+            return;
+        }
+
+        self.respond({code:1000, message:'success', success:true});
+    });
 }
 
 // Reads all news categories
@@ -828,7 +857,15 @@ function json_news_categories() {
 // Replaces old category with new
 function json_news_category_replace() {
 	var self = this;
-    NewsService.category(self.body, self.callback());
+    NewsService.category(self.body, function(err){
+        if(err){
+            console.error('manager json_news_category_replace err:', err);
+			self.respond({code:1004, message:'系统错误，替换失败', error:[{'error':'系统错误，替换失败'}]});
+            return;
+        }
+
+        self.respond({code:1000, message:'success', success:true});
+    });
 }
 
 // Reads a specific new by ID
@@ -848,6 +885,7 @@ function json_auditlog_query() {
 	var self = this;
 	AuditlogService.query(self.query, function(err, datas){
 		if (err) {
+			console.error('manager json_auditlog_query err:', err);
 			self.respond({code: 1004, message: 'query audit logs err:' + err});
 			return;
 		}
@@ -862,6 +900,7 @@ function json_auditlog_read(id) {
 	options.id = id;
     AuditlogService.get(options, function(err, datas){
 		if (err) {
+			console.error('manager json_auditlog_read err:', err);
 			self.respond({code: 1004, message: 'get audit logs err:' + err});
 			return;
 		}
@@ -1377,7 +1416,7 @@ function process_product_attributes_add(){
 			return;
 		}
 
-		self.respond({code:1000, message:'succcess', attribute:new_attribute});
+		self.respond({code:1000, message:'success', attribute:new_attribute});
 	})
 }
 
@@ -1385,7 +1424,7 @@ function json_SKU_get(){
 	var self = this;
 	SKUService.querySKUByProductId(self.data.product, function(err, SKUs){
 		if(err){
-			console.log(err);
+			console.error('manager json_SKU_get err:', err);
 			self.respond({code:1004, message:'查询SKU失败'});
 			return;
 		}
@@ -1403,7 +1442,7 @@ function process_SKU_online(id){
 
 	SKUService.online(id, self.data.online, function(err, doc){
 		if(err){
-			console.log(err);
+			console.error('manager process_SKU_online err:', err);
 			self.respond({code:1004, message:'更新SKU失败'});
 			return;
 		}
