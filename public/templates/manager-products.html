@@ -505,6 +505,12 @@
         if(NOTMODIFIED('products.form', products.form))
             return;
         formModified = true;
+
+        // JComponent will re-created DOM when there are two-way-bind.
+        // This should be a bug of JComponent, to workaround this problem,
+        // we re-bind our event when two-way-bind component changed
+        // This is definite a downside to website perf, we should consider using other FE framework
+        products_onchange();
     });
 
     function add_product(callback){
