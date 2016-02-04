@@ -30,7 +30,7 @@ AuditService.prototype.query = function(options, callback) {
 
     var query = {};
 
-    if (typeof(options.status) !== 'undefined') {
+    if (options.status) {
     	if (options.status == 1) {
     		query.succeeded = true;
     	} else {
