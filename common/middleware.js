@@ -6,6 +6,7 @@ var UserService = services.user;
 var AuthService = services.auth;
 var BackEndUserService = services.backenduser;
 var AuditService = services.auditservice;
+var ThrottleService = services.throttle;
 var tools = require('./tools');
 
 exports.isLoggedIn_middleware = function(req, res, next, options, controller){
@@ -255,3 +256,27 @@ exports.auditing_middleware = function(req, res, next, options, controller) {
         next();
     }
 };
+
+exports.throttle = function(req, res, next, options, controller){
+    var user = controller.user;
+    var route = controller.route.name.trim();
+    if (route.endsWith('/'))
+        route = route.substring(0, route.length - 1);
+    var method = controller.route.method.trim().toLowerCase();
+    var ip = controller.ip.trim();
+    ThrottleService.requireAccess(route, method, ip, user?user._id:null, function(pass, reason){
+        if(!pass){
+            switch(reason){
+                case ThrottleService.THROTTLE_BY_HITS_PER_USER:
+                case ThrottleService.THROTTLE_BY_HITS_PER_IP:
+                    controller.respond({code:1429, message:'您操作的太频繁了，请稍后再试'});
+                    break;
+                default:
+                    controller.respond({code:1429, message:'系统繁忙，请稍后再试'});
+            }
+        } else{
+            next();
+        }
+    })
+};
+

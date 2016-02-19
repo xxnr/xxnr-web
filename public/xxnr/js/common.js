@@ -39,6 +39,9 @@ app.service('commonService',function($q,$http,BaseUrl,loginService){
                 loginService.logout();
                 sweetalert('你已被登出，请重新登录', "logon.html");
             }
+            if(data.code == 1429){
+                sweetalert(data.message);
+            }
             deferred.resolve(data);
         }).error(function(data, error){
             console.error('error = ' + error + ', and data = ' + data + ', and methodname = ' + params.methodname + ', and BaseUrl = ' + BaseUrl);
@@ -56,6 +59,14 @@ app.service('commonService',function($q,$http,BaseUrl,loginService){
             },
             data: data
         }).success(function(data){
+            if(data.code == 1401){
+                // Unauthorized
+                loginService.logout();
+                sweetalert('你已被登出，请重新登录', "logon.html");
+            }
+            if(data.code == 1429){
+                sweetalert(data.message);
+            }
             deferred.resolve(data);
         }).error(function(data, error){
             console.error('error = ' + error + ', and data = ' + data + ', and methodname = ' + data.methodname + ', and BaseUrl = ' + BaseUrl);
