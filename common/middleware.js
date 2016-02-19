@@ -21,6 +21,11 @@ exports.isLoggedIn_middleware = function(req, res, next, options, controller){
         token = controller.req.cookie(F.config.tokencookie);
     }
 
+    if(!token){
+        controller.respond({code:1401, message:'请先登录'});
+        return;
+    }
+
     try {
         var payload = tools.verify_token(token);
         // token verify success, still need to check if the login id matches the current one in db
@@ -55,7 +60,7 @@ exports.isLoggedIn_middleware = function(req, res, next, options, controller){
     }catch(e){
         // authentication fail
         console.error('Token verification fail:', e);
-        controller.respond({code: 1401, message: e});
+        controller.respond({code: 1401, message: '用户信息验证错误，请重新登录'});
     }
 };
 
