@@ -40,3 +40,6 @@ exports.potential_customer = require('./potential_customer');
 
 // audit service
 exports.auditservice = require('./audit');
+
+// throttle
+exports.throttle = require('./throttle');
