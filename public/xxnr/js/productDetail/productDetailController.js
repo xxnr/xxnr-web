@@ -39,7 +39,7 @@ app.controller('productDetailController',function($scope, $timeout, remoteApiSer
             item.product_id = good._id;
             $scope.category = good.category;
             $scope.categoryId = good.categoryId;
-            item.onSale = (good.unitPrice == null || good.unitPrice == '')? false:good.unitPrice!=good.originalPrice;
+            item.onSale = (good.unitPrice === null || good.unitPrice === '')? false:good.unitPrice!=good.originalPrice;
             item.name = good.goodsName;
             item.shortName = item.name.length>28?(item.name.substr(0, 22) + '...') : item.name;
             item.detailUrl = 'productDetail.html?goodsId='+good.goodsId+'&type='+good.typeName;
@@ -49,7 +49,7 @@ app.controller('productDetailController',function($scope, $timeout, remoteApiSer
                 // console.log(good.pictures[i]);
                 item.imgUrls.push(commonService.baseUrl + good.pictures[i].imgUrl.slice(1));
                 item.thumbnailImgUrls.push(commonService.baseUrl + good.pictures[i].imgUrl.slice(1));
-            };
+            }
             item.online = good.online;
             item.brand = good.brandName;
             item.detail = good.productDesc;

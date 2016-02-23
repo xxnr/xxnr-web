@@ -2,10 +2,30 @@
  * Created by pepelu on 9/14/2015.
  */
 var app = angular.module('shop_cart', ['xxnr_common']);
+// app.config(function ($stateProvider, $urlRouterProvider, $locationProvider) {
+//     $locationProvider.html5Mode(false);
+//     // $urlRouterProvider.otherwise(function ($injector, $location) {
+//     //   templateUrl : 'test.html'
+//     // });
+//     $stateProvider.state('test', {
+//         url: '',
+//         templateUrl: 'test.html'
+//     });
+// });
 app.controller('shoppingCartController', function($scope, $timeout, remoteApiService, commonService, loginService, sideService, shoppingCartService){
-
+    // $scope.$watch('$viewContentLoaded', function(event) {
+    //     console.log("loaded");
+    //     $footer = $(".options-box");
+    //     // var originalTop = $footer.offset().top;
+    //     // var originalLeft = $footer.offset().left;
+    //     // console.log(originalTop);
+    //     // console.log(originalLeft);
+    //     console.log($footer);
+    // });
+    // $scope.$on('$viewContentLoaded',function(event) {
+    //         console.log("loaded");
+    // });
     var sweetalert = commonService.sweetalert;
-
     /////////////////////////////////////
 
     $scope.allSelected = true;

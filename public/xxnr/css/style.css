@@ -186,9 +186,9 @@ body{font-family:"Microsoft YaHei","Lucida Sans Unicode","Myriad Pro","Hiragino 
 
 /*#custom-pagers .pager_line{height: 8px;width: 80px;background: #FFFFFF;}*/
 .channel3{background: #f2f2f2;padding-bottom: 20px;}
-.index .slide_tabs{position:absolute;bottom:20px;left:560px;z-index:10;}
-.index .slide_tabs li{float:left;width:10px;height:10px;background:#c4c5c9;text-indent:-9999px;border-radius:10px;margin-left:10px;}
-.index .slide_tabs li.slide_here{background:#fff;}
+.index .slide_tabs{position:absolute;bottom:20px;left:425px;z-index:10;}
+.index .slide_tabs li{float:left;width:80px;height:8px;background:#fff;text-indent:-9999px;margin-left:20px;}
+.index .slide_tabs li.slide_here{background:#ff8000;}
 .index .slide_tabs li a{width:15px;height:15px;display:block;}
 .index .slide_nav {position: absolute;-webkit-tap-highlight-color: rgba(0,0,0,0);top: 165px;left: 0;opacity: 0.6;z-index: 3;text-indent: -9999px;overflow: hidden;text-decoration: none;height:90px; width: 40px;opacity: 1.0;background: rgba(0,0,0,0.3) url(../images/arrow.png) no-repeat -12px 7px}
 .index .slide_nav.next {left: auto;background-position:-10px -102px;right: 0;}
@@ -309,7 +309,7 @@ body{font-family:"Microsoft YaHei","Lucida Sans Unicode","Myriad Pro","Hiragino 
 .search .search_category{overflow:hidden;}
 .search .search_category ul{width:900px;font-size:14px;}
 .search .search_category ul li{float:left;/* width:150px */;line-height:60px;}
-.search .search_category ul li a{display:inline-block;*display:inline;zoom:1;height:25px;line-height:25px;color:#616161;padding:0 15px;}
+.search .search_category ul li a{display:inline-block;*display:inline;zoom:1;height:25px;line-height:25px;color:#616161;padding:0 15px;margin-right: 20px;}
 .search .search_category ul li a.current{background:#00913a;color:#fff;}
 .fenye .channel3_body{height:auto;overflow: hidden;min-height: 440px;margin-left: -22px;}
 .fenye .channel3_body ul{width:auto;}
@@ -709,7 +709,7 @@ transition-delay: initial;
 
 .jifen_box{margin-bottom:30px;padding:50px 50px;width:1100px;overflow:hidden;background: #fff;height: 190px;}
 .jifen_box .user_img{float:left;width:170px;padding-right:30px;position: relative;}
-.jifen_box .user_img img{width:170px;height:170px;border-radius:100px;}
+.jifen_box .user_img img{width:170px;height:170px;-webkit-border-radius: 100px;-moz-border-radius: 100px;border-radius: 100px;behavior: url(./PIE.htc);}
 .jifen_box .user_img #hover-content {display:none;position: absolute;left: 45px;}
 .jifen_box .user_img:hover #hover-content {display:block;margin-top: 5px;}
 .jifen_box .user_img:hover {opacity:.7}

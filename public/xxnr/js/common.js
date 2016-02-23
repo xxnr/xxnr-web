@@ -54,8 +54,13 @@ app.service('commonService',function($q,$http,BaseUrl,loginService){
             headers: {
                 'Content-Type': 'application/json'
             },
-            data: data
+            data: JSON.stringify(data)
         }).success(function(data){
+            if(data.code == 1401){
+                // Unauthorized
+                loginService.logout();
+                sweetalert('你已被登出，请重新登录', "logon.html");
+            }
             deferred.resolve(data);
         }).error(function(data, error){
             console.error('error = ' + error + ', and data = ' + data + ', and methodname = ' + data.methodname + ', and BaseUrl = ' + BaseUrl);

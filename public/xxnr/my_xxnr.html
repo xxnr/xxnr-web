@@ -36,6 +36,7 @@
     <script src="js/uploadService.js"></script>
     <script src="js/jquery.uploadify.min.js"></script>
     <script src="js/sideService.js"></script>
+    <script src="js/me-lazyload.js"></script>
     <!-- endbuild -->
 </head>
 
@@ -148,10 +149,10 @@
                                                 <div class="product-row">
                                                     <div class="p-img">
                                                         <a ng-if="!product.attributes" ng-href="productDetail.html?goodsId={{product.id}}" target="_blank">
-                                                            <img class="ng-cloak" ng-src={{product.thumbnail}}>
+                                                            <img class="ng-cloak" lazy-src="{{product.thumbnail}}">
                                                         </a>
                                                         <a ng-if="product.attributes" ng-href="productDetail.html?goodsId={{product.productId}}" target="_blank">
-                                                            <img class="ng-cloak" ng-src={{product.thumbnail}}>
+                                                            <img class="ng-cloak" lazy-src="{{product.thumbnail}}">
                                                         </a>
                                                     </div>
                                                     <div class="p-name">

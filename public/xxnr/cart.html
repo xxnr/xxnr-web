@@ -29,9 +29,9 @@
     <script src="js/headerFooterDirective.js"></script>
     <script src="js/headerController.js"></script>
     <script src="js/sweetalert.min.js"></script>
-    <script src="js/angular-ui-router.min.js"></script>
     <script src="js/adaptiveOptBoxDirective.js"></script>
     <script src="js/sideService.js"></script>
+    <!-- <script src="js/angular-ui-router.min.js"></script> -->
     <!-- endbuild -->
 </head>
 <body ng-controller="shoppingCartController">
@@ -189,7 +189,7 @@
             </div>
         </div>
     </div>
-    <ng-view>
+    <!-- <div ui-view></div> -->
     <div class="wrap options-box ng-hide" ng-show="shoppingCartCount>0">
         <div class="submit-btn right"><a href="" ng-click="checkout('confirmOrder.html')">去结算</a></div>
         <div class="price-total right">
@@ -197,9 +197,7 @@
             <p><label>合计：</label><span class="total ng-cloak">¥ {{totalPrice}}</span></p>
             <!--<p><label>已节省：</label><span ng-cloak>{{totalSaving}}元</span></p>-->
         </div>
-
     </div>
-    </ng-view>
     <div class="wrap emptyCart ng-hide" ng-show="shoppingCartCount===0">
         <div class="emptyCartContent">
             <div class="cartImage left">
