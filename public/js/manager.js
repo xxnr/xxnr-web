@@ -81,6 +81,15 @@ jRouting.route(managerurl + '/news/', function() {
     redirectToHomePage();
 });
 
+jRouting.route(managerurl + '/auditlogs/', function() {
+    if (can('auditlogs')) {
+        SET('common.page', 'auditlogs');
+        return;
+    }
+
+    redirectToHomePage();
+});
+
 jRouting.route(managerurl + '/newsletter/', function() {
     if (can('newsletter')) {
         SET('common.page', 'newsletter');

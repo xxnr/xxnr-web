@@ -120,11 +120,11 @@ NewsService.prototype.save = function(model, callback) {
                 callback();
                 setTimeout(refresh(category), 1000);
             });
+        } else {
+            callback();
+            setTimeout(refresh(category), 1000);
         }
-
-        callback();
-        setTimeout(refresh(category), 1000);
-    })
+    });
 };
 
 // Gets a specific new

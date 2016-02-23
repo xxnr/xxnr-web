@@ -79,7 +79,7 @@ app.controller('newsController', function($scope,remoteApiService,sideService){
                     article.category = articleList.datas.items[index].category;
                     var d = Date.fromISO(articleList.datas.items[index].datecreated);
                     article.createdTime = d.getFullYear().toString()+'年'+ (d.getMonth()+1).toString() +'月'+d.getDate().toString()+'日';
-                    article.abstract = articleList.datas.items[index].abstract;
+                    article.abstract = articleList.datas.items[index].newsabstract;
                     article.abstract = article.abstract.length > 90 ? (article.abstract.substr(0, 90) + '...') : article.abstract;
                     $scope.articles.push(article);
                 }

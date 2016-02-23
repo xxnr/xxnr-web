@@ -5,6 +5,8 @@ var services = require('../services');
 var UserService = services.user;
 var AuthService = services.auth;
 var BackEndUserService = services.backenduser;
+var AuditService = services.auditservice;
+var ThrottleService = services.throttle;
 var tools = require('./tools');
 
 exports.isLoggedIn_middleware = function(req, res, next, options, controller){
@@ -19,13 +21,18 @@ exports.isLoggedIn_middleware = function(req, res, next, options, controller){
         token = controller.req.cookie(F.config.tokencookie);
     }
 
+    if(!token){
+        controller.respond({code:1401, message:'请先登录'});
+        return;
+    }
+
     try {
         var payload = tools.verify_token(token);
         // token verify success, still need to check if the login id matches the current one in db
         UserService.get({userid:payload.userId}, function(err, data) {
             if (err) {
                 // perhaps no user find
-                console.log('isLogin_middleware user not found: ' + err);
+                console.error('isLogin_middleware user not found:', err);
                 controller.respond({code: 1401, message: '用户不存在'});
                 return;
             }
@@ -52,8 +59,8 @@ exports.isLoggedIn_middleware = function(req, res, next, options, controller){
         })
     }catch(e){
         // authentication fail
-        console.log('Token verification fail:' + e);
-        controller.respond({code: 1401, message: e});
+        console.error('Token verification fail:', e);
+        controller.respond({code: 1401, message: '用户信息验证错误，请重新登录'});
     }
 };
 
@@ -86,7 +93,7 @@ exports.backend_auth = function(req, res, next, options, controller){
         BackEndUserService.get({_id:payload.userId}, function(err, data) {
             if (err) {
                 // perhaps no user find
-                console.log('user not found: ' + err);
+                console.error('user not found:', err);
                 controller.view('login');
                 return;
             }
@@ -121,7 +128,7 @@ exports.backend_auth = function(req, res, next, options, controller){
             AuthService.auth_backend(data._id, route, method, function (err, hasPermission) {
                 if (err || !hasPermission) {
                     if (err)
-                        console.log('auth_middleware err: ' + err);
+                        console.error('auth_middleware err:', err);
                     controller.respond({code: 1403, message: '您没有权限这样操作'});
                     return;
                 }
@@ -149,15 +156,23 @@ exports.backend_auth = function(req, res, next, options, controller){
     }
 };
 
-exports.isInWhiteList_middleware = function(req, res, next, options, controller){
+/**
+ * check user in user white list
+ * @param req
+ * @param res
+ * @param next
+ * @param options
+ * @param controller
+ */
+exports.isInWhiteList_middleware = function(req, res, next, options, controller) {
     var token = null;
     // check if token is valid
     var data = req.method === 'GET' ? controller.query : controller.body;
-    if(data.token){
+    if (data.token) {
         // if data contains token
         // it means the request is from app
         token = data.token;
-    }else if (controller.req.cookie(F.config.tokencookie)){
+    } else if (controller.req.cookie(F.config.tokencookie)) {
         token = controller.req.cookie(F.config.tokencookie);
     }
 
@@ -199,13 +214,13 @@ exports.isInWhiteList_middleware = function(req, res, next, options, controller)
                 }
             } catch(e) {
                 // white list check fail
-                console.log('White list check fail:' + e);
+                console.error('White list check fail:', e);
                 next();
             }
         });
-    } catch(e){
+    } catch(e) {
         // white list check fail
-        console.log('White list check fail:' + e);
+        console.error('White list check fail:', e);
         next();
     }
 };
@@ -227,3 +242,46 @@ exports.isXXNRAgent_middleware = function(req, res, next, options, controller){
         next();
     })
 };
+
+/**
+ * user auditing info
+ * @param req
+ * @param res
+ * @param next
+ * @param options
+ * @param controller
+ */
+exports.auditing_middleware = function(req, res, next, options, controller) {
+    try {
+        AuditService.auditInfo(req, controller);
+        next();
+    } catch(e) {
+        // auditing fail
+        console.error('auditing fail:', e);
+        next();
+    }
+};
+
+exports.throttle = function(req, res, next, options, controller){
+    var user = controller.user;
+    var route = controller.route.name.trim();
+    if (route.endsWith('/'))
+        route = route.substring(0, route.length - 1);
+    var method = controller.route.method.trim().toLowerCase();
+    var ip = controller.ip.trim();
+    ThrottleService.requireAccess(route, method, ip, user?user._id:null, function(pass, reason){
+        if(!pass){
+            switch(reason){
+                case ThrottleService.THROTTLE_BY_HITS_PER_USER:
+                case ThrottleService.THROTTLE_BY_HITS_PER_IP:
+                    controller.respond({code:1429, message:'您操作的太频繁了，请稍后再试'});
+                    break;
+                default:
+                    controller.respond({code:1429, message:'系统繁忙，请稍后再试'});
+            }
+        } else{
+            next();
+        }
+    })
+};
+

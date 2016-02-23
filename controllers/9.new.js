@@ -37,7 +37,7 @@ function json_news_query() {
                     'datecreated': item.datecreated,
                     'url': prevurl + item.id,
                     'id': item.id,
-                    'abstract': item.abstract || ''
+                    'newsabstract': item.abstract || ''
                 };
             }
             result.items = arr;

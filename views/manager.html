@@ -35,10 +35,11 @@
 				<a class="jrouting" href="@{CONFIG('manager-url')}/products/" title="@(Products)" data-role="products"><span class="fa fa-navicon"></span></a>
 				<a class="jrouting" href="@{CONFIG('manager-url')}/users/" title="@(Users)" data-role="users"><span class="fa fa-users"></span></a>
 				<a class="jrouting" href="@{CONFIG('manager-url')}/news/" title="@(News)" data-role="news"><span class="fa fa-newspaper-o"></span></a>
-				<a class="jrouting" href="@{CONFIG('manager-url')}/pages/" title="@(Pages)" data-role="pages"><span class="fa fa-file-text"></span></a>
-				<a class="jrouting" href="@{CONFIG('manager-url')}/newsletter/" title="@(Newsletter)" data-role="newsletter"><span class="fa fa-envelope"></span></a>
+				<a class="jrouting" href="@{CONFIG('manager-url')}/auditlogs/" title="@(Auditllog)" data-role="auditlogs"><span class="fa fa-history"></span></a>
 				<a class="jrouting" href="@{CONFIG('manager-url')}/settings/" title="@(Settings)" data-role="settings"><span class="fa fa-cog"></span></a>
-				<a class="jrouting" href="@{CONFIG('manager-url')}/system/" title="@(System)" data-role="system"><span class="fa fa-database"></span></a>
+				<!-- <a class="jrouting" href="@{CONFIG('manager-url')}/pages/" title="@(Pages)" data-role="pages"><span class="fa fa-file-text"></span></a>
+				<a class="jrouting" href="@{CONFIG('manager-url')}/newsletter/" title="@(Newsletter)" data-role="newsletter"><span class="fa fa-envelope"></span></a>
+				<a class="jrouting" href="@{CONFIG('manager-url')}/system/" title="@(System)" data-role="system"><span class="fa fa-database"></span></a> -->
                 <div class="account">账户：@{user.account}    <a href="" ng-click="logout()"><span class="fa fa-sign-out"></span></a></div>
 			</nav>
 		</div>
@@ -51,6 +52,7 @@
 		<div data-component="page" data-component-path="common.page" data-if="users" data-template="/templates/manager-users.html"></div>
 		<div data-component="page" data-component-path="common.page" data-if="potentialcustomers" data-template="/templates/manager-potentialcustomers.html"></div>
 		<div data-component="page" data-component-path="common.page" data-if="news" data-template="/templates/manager-news.html"></div>
+		<div data-component="page" data-component-path="common.page" data-if="auditlogs" data-template="/templates/manager-auditlogs.html"></div>
 		<div data-component="page" data-component-path="common.page" data-if="pages" data-template="/templates/manager-pages.html"></div>
 		<div data-component="page" data-component-path="common.page" data-if="newsletter" data-template="/templates/manager-newsletter.html"></div>
 		<div data-component="page" data-component-path="common.page" data-if="settings" data-template="/templates/manager-settings.html"></div>
@@ -58,8 +60,8 @@
 	</div>
 
 	<footer>
-		<div>&copy; 2015 <a href="http://www.xinxinnongren.com">@{config.author}</a>.</div>
-		<div class="fs11 silver">All rights reserved for you.</div>
+		<div>&copy; 2016 <a href="http://www.xinxinnongren.com">@{config.author}</a>.</div>
+		<div class="fs11 silver">All rights reserved for @{config.author}.</div>
 	</footer>
 
 	<script src="/3rd-party/js/jquery/2.1.3/jquery.min.js"></script>
