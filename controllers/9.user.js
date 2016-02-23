@@ -66,6 +66,8 @@ exports.install = function() {
     F.route('/api/v2.1/potentialCustomer/query',        json_potential_customer, ['get'], ['isLoggedIn', 'isXXNRAgent']);
     F.route('/api/v2.1/potentialCustomer/get',          json_potential_customer_get, ['get'], ['isLoggedIn', 'isXXNRAgent']);
 
+    F.route('/api/v2.1/user/getNominatedInviter',       json_nominated_inviter_get, ['get'], ['isLoggedIn']);
+
 	// v1.0
 	// LOGIN
 	//fix api// F.route('/app/user/login/', 				        process_login, ['get', 'post']);
@@ -113,6 +115,7 @@ if(!F.global.key){
 }
 
 F.global.usertypes = JSON.parse(F.config.user_types);
+F.global.default_user_type = JSON.parse(F.config.default_user_type);
 
 // ==========================================================================
 // LOGIN
@@ -159,19 +162,12 @@ function process_login() {
         user.phone = data.phone || data.account;
         user.sex = data.sex;
         user.photo = data.photo;
-        user.userType = data.type;
 		user.userAddress = data.address;
         user.isVerified = data.isVerified;
         user.isUserInfoFullFilled = data.isUserInfoFullFilled;
-        user.verifiedTypes = data.typeVerified;
-        user.userTypeInName = F.global.usertypes[user.userType] || '其他';
-        if (user.verifiedTypes) {
-            user.verifiedTypesInJson = [];
-            user.verifiedTypes.forEach(function(type){
-                user.verifiedTypesInJson.push({typeId:type, typeName: F.global.usertypes[type] || '其他'});
-            });
-        }
         user.isXXNRAgent = data.isXXNRAgent;
+
+        convert_user_type_info(user, data);
         CartService.getOrAdd(user.userid, function(err, cart){
             if(err){
                 self.respond({code:1001, message:'获取购物车id失败'});
@@ -424,20 +420,13 @@ function json_user_get() {
         user.phone = data.phone || data.account;
         user.sex = data.sex;
         user.photo = data.photo;
-        user.userType = data.type;
         user.pointLaterTrade = data.score || 0;
         user.dateinvited = data.dateinvited;
         user.address = data.address;
         user.isVerified = data.isVerified;
         user.isUserInfoFullFilled = data.isUserInfoFullFilled;
-        user.verifiedTypes = data.typeVerified || [];
-        user.userTypeInName = F.global.usertypes[user.userType] || '其他';
-        if (user.verifiedTypes) {
-            user.verifiedTypesInJson = [];
-            user.verifiedTypes.forEach(function(type){
-                user.verifiedTypesInJson.push({typeId:type, typeName: F.global.usertypes[type] || '其他'});
-            });
-        }
+        user.isXXNRAgent = data.isXXNRAgent;
+        convert_user_type_info(user, data);
         if (data.inviter) {
             user.inviterId = data.inviter.id;
             user.inviter = data.inviter.account;
@@ -445,7 +434,6 @@ function json_user_get() {
             user.inviterNickname = data.inviter.nickname;
             user.inviterName = data.inviter.name;
         }
-        user.isXXNRAgent = data.isXXNRAgent;
 
         var flags = self.data['flags'];
         var respond = function (user) {
@@ -1688,5 +1676,45 @@ function json_potential_customer_get(){
         }
 
         self.respond({code:1000, message:'success', potentialCustomer:doc});
+    })
+}
+
+function convert_user_type_info(user, data){
+    // selected user type
+    if(!F.global.usertypes[data.type]){
+        user.isVerified = false;
+        data.type = F.global.default_user_type;
+    }
+
+    user.userType = data.type;
+    user.userTypeInName = F.global.usertypes[user.userType] || '其他';
+
+    // verified user types
+    user.verifiedTypes = data.typeVerified || [];
+    if (user.verifiedTypes) {
+        user.verifiedTypesInJson = [];
+        user.verifiedTypes.forEach(function(type){
+            if(F.global.usertypes[type]){
+                user.verifiedTypesInJson.push({typeId:type, typeName: F.global.usertypes[type] || '其他'});
+            }
+        });
+    }
+}
+
+function json_nominated_inviter_get(){
+    var self = this;
+    var user = self.user;
+    PotentialCustomerService.getByPhone(user.account, function(err, customer){
+        if(err){
+            self.respond({code:1001, message:'查询失败'});
+            return;
+        }
+
+        if(!customer || !customer || !customer.user || !customer.user){
+            self.respond({code:1404, message:'没有推荐的新农代表'});
+            return;
+        }
+
+        self.respond({code:1000, message:'success', nominated_inviter:{phone:customer.user.account, name:customer.user.name}});
     })
 }

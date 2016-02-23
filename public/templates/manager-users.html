@@ -7,7 +7,7 @@
 				<div class="help" data-component="template" data-component-path="users.info"><script type="text/html">{{ count | pluralize(@('items','item','items','items')) }} / {{ pages | pluralize(@('pages','page','pages','pages')) }}</script></div>
 			</div>
             <div class="col-md-3" col-sm-6 m>
-                <div name="user_verify" data-component="dropdown" data-component-path="users.filter.query" data-options="@(全部)|0;@(申请认证)|3;@(种植大户)|4;@(村级经销商)|5;@(乡镇经销商)|6;@(县级经销商)|7;@(新农经纪人)|8">@(认证用户)</div>
+                <div name="user_verify" data-component="dropdown" data-component-path="users.filter.query" data-options="@(全部)|0;@(申请认证)|3;@(县级经销商)|7;@(新农经纪人)|8">@(认证用户)</div>
             </div>
 		</div>
 	</div>
@@ -26,7 +26,7 @@
 		<script type="text/html">
 		<tr>
 			<td style="width:40px" class="silver hidden-xs">$index</td>
-			<td style="width:120px" class="hidden-xs fs11" data-title="会员">{{ id }}</td>
+			<td style="width:120px" class="hidden-xs fs11" data-title="会员" title="{{ id }}">{{ id }}</td>
             <td style="width:120px" class="hidden-xs fs11" data-title="手机号">{{ account }}</td>
             <td style="width:120px" class="hidden-xs fs11" data-title="姓名">{{ name }}</td>
 			<td style="width:120px" class="hidden-xs fs11" data-title="昵称">{{ nickname }}</td>
@@ -42,7 +42,7 @@
 				{{ fi }}
 			</td>
             <td style="width:100px" class="hidden-xs fs11 ui-center" data-title="新农代表">{{if inviter }} {{ inviter.nickname }}</br>{{ inviter.account }} {{fi}}</td>
-            <td style="width:100px" class="hidden-xs fs11" data-title="认证用户">{{ typeNameVerified }}</td>
+            <td style="width:100px" class="hidden-xs fs11" data-title="认证用户" title="{{ typeNameVerified }}">{{ typeNameVerified }}</td>
             <td style="width:80px" class="ui-right" data-title="会员信息">
                 <button name="edit" title="@(Show)"><span class="fa fa-search"></span></button>
             </td>
@@ -303,7 +303,7 @@
 						response.user.notVerifiedTypes = [];
 
 						for(var i in users.usertypes) {
-							if (usertypes.hasOwnProperty(i)) {
+							if (users.usertypes.hasOwnProperty(i)) {
 								var usertype = users.usertypes[i];
 								if (response.user.typeVerified && response.user.typeVerified.indexOf(usertype.value) != -1) {
 									response.user.verifiedTypes.push({
@@ -435,7 +435,9 @@
 				if(item.typeVerified){
 					item.typeNameVerified = [];
 					item.typeVerified.forEach(function(typeVerified){
-						item.typeNameVerified.push(usertypes[typeVerified]);
+						if(usertypes[typeVerified]) {
+							item.typeNameVerified.push(usertypes[typeVerified]);
+						}
 					})
 				}
             });

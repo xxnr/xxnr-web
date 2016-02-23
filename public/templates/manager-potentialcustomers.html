@@ -196,7 +196,9 @@
                     if(customer.user.typeVerified){
                         customer.user.typeNameVerified = [];
                         customer.user.typeVerified.forEach(function(typeVerified){
-                            customer.user.typeNameVerified.push(usertypes[typeVerified]);
+                            if(usertypes[typeVerified]) {
+                                customer.user.typeNameVerified.push(usertypes[typeVerified]);
+                            }
                         })
                     }
                 });
