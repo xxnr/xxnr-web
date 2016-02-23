@@ -127,22 +127,8 @@ app.controller('userCenterController', function($scope, $rootScope, remoteApiSer
             $scope.user.typeNum = data.datas.userType;
             $scope.user.isVerified = data.datas.isVerified;
             $scope.user.points = data.datas.pointLaterTrade;
-            switch (data.datas.userType) {
-                case '2':
-                    $scope.user.type = "种植大户";
-                    break;
-                case '3':
-                    $scope.user.type = "村级经销商";
-                    break;
-                case '4':
-                    $scope.user.type = "乡镇经销商";
-                    break;
-                case '5':
-                    $scope.user.type = "县级经销商";
-                    break;
-                default:
-                    $scope.user.type = "其他";
-            }
+            $scope.user.type = data.datas.userTypeInName;
+
             // set user nickname to cookie
             if (data && data.datas && data.datas.nickname) {
                 var cookieUser = loginService.getUser();

@@ -141,7 +141,7 @@ PotentialCustomerService.prototype.add = function(user, name, phone, sex, addres
         })
 };
 
-// query potential customer
+// query potential customers
 PotentialCustomerService.prototype.queryPage = function(user, page, max, callback, search, BESchema){
     var queryOptions = {};
     if(user){
@@ -350,9 +350,31 @@ PotentialCustomerService.prototype.customerBinded = function(phone, inviter, cal
                 if(err){
                     console.error(err);
                 }
+
+                callback();
             })
         }
     })
+};
+
+PotentialCustomerService.prototype.getByPhone = function(phone, callback){
+    if(!phone){
+        callback('phone required');
+        return;
+    }
+
+    PotentialCustomerModel.findOne({phone:phone})
+        .populate('user')
+        .lean()
+        .exec(function(err, customer){
+            if(err){
+                console.error(err);
+                callback('查询失败');
+                return;
+            }
+
+            callback(null, customer);
+        })
 };
 
 module.exports = new PotentialCustomerService();
