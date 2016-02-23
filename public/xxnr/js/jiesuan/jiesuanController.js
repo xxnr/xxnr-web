@@ -43,7 +43,7 @@ app.controller('jiesuanController', function($scope, remoteApiService, payServic
             }
 
              if($scope.contacts.length==0){
-                 $scope.undefinedAddressMsg = "您还没有没有地址，请添加新地址";
+                 $scope.undefinedAddressMsg = "您还没有收货地址，请添加新地址";
              }else{
                  $scope.undefinedAddressMsg = "";
                  if(!$scope.selectedAddressId){

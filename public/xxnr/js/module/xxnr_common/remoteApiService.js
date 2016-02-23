@@ -253,13 +253,13 @@ app.service('remoteApiService', function(commonService){
         };
         return commonService.ajax(params);
     };
-	
+
 	this.getCategories = function(){
         var params={
             methodname:'/api/v2.0/products/categories/'
         };
-		
-        return commonService.ajax(params);	    
+
+        return commonService.ajax(params);
 	};
     this.login = function(userName, password){
         var params={
@@ -315,7 +315,7 @@ app.service('remoteApiService', function(commonService){
         };
         return commonService.ajax(params);
     };
-    
+
     this.addToShoppingCart = function(id, count, update_by_add){
         if(!user || !user.userid){
             window.location.href="logon.html";

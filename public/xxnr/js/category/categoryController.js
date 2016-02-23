@@ -1,55 +1,91 @@
 /**
  * Created by pepelu on 9/19/2015.
  */
-var app = angular.module('product_category', ['xxnr_common','shop_cart']);
+var app = angular.module('product_category', ['xxnr_common','shop_cart','me-lazyload']);
 app.controller('categoryController', function($scope, remoteApiService, commonService){
     var current_page = 1;
     var product_count_per_page = 20;
     $scope.pages_count = 0;
     var price;
     var brand;
-    var model;
+    var queryAttributes = [];
     var all_products = [];
+    var hasAttributes = false;
+
     $scope.$parent.select = function(categoryIndex, choiceIndex){
-        for(var i in $scope.$parent.search_categories[categoryIndex].choices){
-            $scope.$parent.search_categories[categoryIndex].choices[i].isSelected = false;
+        $scope.$parent.brandsStr = null;
+        if(categoryIndex== ($scope.$parent.search_categories.length - 1)){
+            if($scope.$parent.search_categories[categoryIndex].choices[choiceIndex].isSelected == true){
+                $scope.$parent.search_categories[categoryIndex].choices[choiceIndex].isSelected = false;
+                $scope.$parent.search_categories.slice(-1)[0].current_query = "";
+            }else{
+                for(var i in $scope.$parent.search_categories[categoryIndex].choices){
+                    $scope.$parent.search_categories[categoryIndex].choices[i].isSelected = false;
+                }
+                $scope.$parent.search_categories[categoryIndex].choices[choiceIndex].isSelected = true;
+                $scope.$parent.search_categories[categoryIndex].current_query = $scope.$parent.search_categories[categoryIndex].choices[choiceIndex].name;
+            }
+        }else{
+            $scope.$parent.search_categories[categoryIndex].choices[choiceIndex].isSelected = !$scope.$parent.search_categories[categoryIndex].choices[choiceIndex].isSelected;
+            // $scope.$parent.search_categories[categoryIndex].current_query.push($scope.$parent.search_categories[categoryIndex].choices[choiceIndex].name);
+            if(categoryIndex === 0){
+                // var brandsStr = $scope.$parent.getSelectedBrands($scope.$parent.search_categories[categoryIndex].choices,false);
+                // brandsStr = $scope.$parent.stringifyBrands(brandsStr,false).slice(0,-1);
+                $scope.$parent.getAttributes(false,true);
+            }
         }
-
-        $scope.$parent.search_categories[categoryIndex].choices[choiceIndex].isSelected = true;
-        $scope.$parent.search_categories[categoryIndex].current_query = $scope.$parent.search_categories[categoryIndex].choices[choiceIndex].name;
-
+        $scope.$parent.brandsStr = $scope.getSelectedBrands($scope.search_categories[0].choices,false);
+        $scope.$parent.brandsStr = $scope.stringifyBrands($scope.brandsStr,false).slice(0,-1);
+        if(!$scope.$parent.brandsStr){
+            $scope.$parent.brandsStr = null;
+        }
         current_page = 1;
         $scope.$parent.current_items = [];
 
-        if($scope.$parent.search_categories['brand'].current_query != '' && $scope.$parent.search_categories['brand'].current_query != '全部'){
-            brand = $scope.$parent.search_categories['brand'].current_query;
-        }else{
-            brand= "";
+        queryAttributes = [];
+        hasAttributes = false;
+
+        for(var j = 1;j<$scope.$parent.search_categories.length-1;j++){
+            var a = {
+                name:"",
+                value:
+                {
+                    '$in':[]
+                }
+            };
+            for(var k in $scope.$parent.search_categories[j].choices){
+                if($scope.$parent.search_categories[j].choices[k].isSelected === true){
+                    a.name = $scope.$parent.search_categories[j].name;
+                    // console.log($scope.$parent.search_categories[j].choices[k].name);
+                    // console.log(a.value);
+                    a.value['$in'].push($scope.$parent.search_categories[j].choices[k].name);
+                    hasAttributes = true;
+                }
+
+            }
+            if(a.name){
+                queryAttributes.push(a);
+            }
+
         }
 
-        if($scope.$parent.search_categories['model'] && $scope.$parent.search_categories['model'].current_query != '' && $scope.$parent.search_categories['model'].current_query != '全部'){
-            model = [];
-            var _model = {};
-            _model.name = "车系";
-            _model.value = $scope.$parent.search_categories['model'].current_query;
-            model.push(_model);
-            console.log(typeof model);
-            // [{"name":"车系","value":"和悦A30"},...]
-        }else{
-            model= "";
+        // console.log(queryAttributes);
+        if(!hasAttributes){
+            queryAttributes = null;
         }
 
 
-        if($scope.$parent.search_categories['price'].current_query != '' && $scope.$parent.search_categories['price'].current_query != '全部'){
-            var matches = $scope.$parent.search_categories['price'].current_query.match(/\d+/g);
+        if($scope.$parent.search_categories.slice(-1)[0].current_query != '' && $scope.$parent.search_categories.slice(-1)[0].current_query != '全部'){
+            var matches = $scope.$parent.search_categories.slice(-1)[0].current_query.match(/\d+/g);
             var lowPrice = matches.length > 0 ? matches[0] : 0;
             var highPrice = matches.length > 1 ? matches[1] : 10000000;
             price = lowPrice+","+highPrice;
         }else{
-            price = "全部";
+            price = null;
         }
-
-        getPagedGoods(current_page,product_count_per_page,$scope.$parent.categoryId,brand,model,price);
+        // console.log(queryAttributes);
+        console.log(price);
+        getPagedGoods(current_page,product_count_per_page,$scope.$parent.categoryId,$scope.$parent.brandsStr, queryAttributes, price);
         generate_page();
     };
     var generate_page = function(){
@@ -68,8 +104,8 @@ app.controller('categoryController', function($scope, remoteApiService, commonSe
             }
         }
     };
-    var getPagedGoods = function(page,count_per_page,categoryId,brandName, modelName ,reservePrice){
-        remoteApiService.getGoodsListPage(page, count_per_page, categoryId,brandName,modelName ,reservePrice)
+    var getPagedGoods = function(page,count_per_page,categoryId,brandsStr, queryAttributesArray ,reservePrice){
+        remoteApiService.getGoodsListPage(page, count_per_page, categoryId,brandsStr,queryAttributesArray ,reservePrice)
             .then(function(data){
                 all_products = [];
                 $scope.pages_count = data.datas.pages;
@@ -122,5 +158,5 @@ app.controller('categoryController', function($scope, remoteApiService, commonSe
             current_page++;
             $scope.$parent.show_page(current_page);
         }
-    }
+    };
 });
