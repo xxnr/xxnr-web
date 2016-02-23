@@ -10,7 +10,8 @@ angular.module('me-lazyload', [])
     function getUid(el){
         var __uid = el.data("__uid");
         if (! __uid) {
-            el.data("__uid", (__uid = '' + (++uid)));
+            uid = uid + 1;
+            el.data("__uid", (__uid = '' + (uid)));
         }
         return __uid;
     }
