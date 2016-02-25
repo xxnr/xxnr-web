@@ -32,8 +32,7 @@ gulp.task('framework_js_minify', function() {
         './js/angular-cookies.min.js',
         './js/common.js',
         './js/remoteApiService.js',
-        './js/sideService.js',
-        './js/me-lazyload.js'])
+        './js/sideService.js'])
         .pipe(concat('framework_js.js'))
         .pipe(ngmin())
         .pipe(uglify({mangle: false}))

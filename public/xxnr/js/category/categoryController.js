@@ -1,7 +1,7 @@
 /**
  * Created by pepelu on 9/19/2015.
  */
-var app = angular.module('product_category', ['xxnr_common','shop_cart','me-lazyload']);
+var app = angular.module('product_category', ['xxnr_common','shop_cart']);
 app.controller('categoryController', function($scope, remoteApiService, commonService){
     var current_page = 1;
     var product_count_per_page = 20;

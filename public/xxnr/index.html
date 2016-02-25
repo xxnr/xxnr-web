@@ -37,7 +37,7 @@
     <script src="js/jquery.fly.min.js"></script>
     <script src="js/jquery.SuperSlide.2.1.1.js"></script>
     <script src="js/sideService.js"></script>
-    <script src="js/me-lazyload.js"></script>
+    <!-- <script src="js/me-lazyload.js"></script> -->
     <!-- endbuild -->
 </head>
 <body ng-controller="indexController">
@@ -70,9 +70,9 @@
     <div class="clear wrap">
         <div class="banner">
             <ul class="rslides">
-                <img lazy-src="images/banner_2016_new_year.png" alt="" />
-                <a href="car_list.html"><img lazy-src="images/new_banner2.jpg" alt="" /></a>
-                <a href="huafei_list.html"><img lazy-src="images/new_banner3.jpg" alt="" /></a>
+                <img ng-src="images/banner_2016_new_year.png" alt="" />
+                <a href="car_list.html"><img ng-src="images/new_banner2.jpg" alt="" /></a>
+                <a href="huafei_list.html"><img ng-src="images/new_banner3.jpg" alt="" /></a>
             </ul>
             <!--<ul id="custom-pagers">-->
                 <!--<li><div class="pager_line"></div></li>-->
@@ -93,7 +93,7 @@
                     <!--{{category.name}}-->
                     <li class="ng-cloak" ng-repeat="article in articles | filter: {tabNum:tab} | limitTo: 4">
                         <a class="news_body" href="{{article.url}}">
-                            <img lazy-src={{article.imageUrl}}>
+                            <img ng-src={{article.imageUrl}}>
                             <div>{{article.name}}</div>
                         </a>
                     </li>
@@ -108,7 +108,7 @@
             <div ng-repeat="class in classes">
                 <div class="title ng-cloak">
                     <!--<h4 class="left" ng-cloak>{{class.title}}</h4>-->
-                    <img lazy-src='images/index_{{class.id}}_title.png' alt=""/>
+                    <img ng-src='images/index_{{class.id}}_title.png' alt=""/>
                     <a ng-href={{class.url}} class="right more">更多商品<img src="images/more.png" alt=""/></a>
                 </div>
                 <div class="channel3_body ng-cloak">
@@ -124,7 +124,7 @@
                                     <p ng-class="{true: 'presale', false: 'price'}[product.presale==true]">{{product.presale?"即将上线":'￥'+product.discountPrice}}<del style="color:#C0C0C0" ng-hide="{{!product.hasDiscount}}">{{product.price}}</del></p>
                                 </div>
                                 <a class="image" ng-href={{product.detailUrl}}>
-                                    <img lazy-src={{product.imgUrl}} data-rid="134749" width="220px" height="220px" data-index="0" data-max-height="172" data-max-width="172"  alt="" />
+                                    <img src={{product.imgUrl}} data-rid="134749" width="220px" height="220px" data-index="0" data-max-height="172" data-max-width="172"  alt="" />
                                 </a>
                                 <!--<div class="cover"></div>-->
                             </div>
@@ -162,12 +162,12 @@
             </div>
             <div class="related_product_list bd">
                 <ul class="picList">
-                    <li><a><img lazy-src="images/about_brand1.png" alt=""></a></li>
-                    <li><a><img lazy-src="images/about_brand2.png" alt=""></a></li>
-                    <li><a><img lazy-src="images/about_brand3.png" alt=""></a></li>
-                    <li><a><img lazy-src="images/about_brand4.png" alt=""></a></li>
-                    <li><a><img lazy-src="images/about_brand5.png" alt=""></a></li>
-                    <li><a><img lazy-src="images/about_brand6.png" alt=""></a></li>
+                    <li><a><img src="images/about_brand1.png" alt=""></a></li>
+                    <li><a><img src="images/about_brand2.png" alt=""></a></li>
+                    <li><a><img src="images/about_brand3.png" alt=""></a></li>
+                    <li><a><img src="images/about_brand4.png" alt=""></a></li>
+                    <li><a><img src="images/about_brand5.png" alt=""></a></li>
+                    <li><a><img src="images/about_brand6.png" alt=""></a></li>
                 </ul>
             </div>
         </div>
@@ -183,10 +183,10 @@
         </div>
         <div class="icons">
             <ul class="row">
-                <li class="icon"><img lazy-src="images/brand.png" alt=""/><span>厂家品牌直供</span></li>
-                <li class="icon"><img lazy-src="images/preferential.png" alt=""/><span>价格优惠保证</span></li>
-                <li class="icon"><img lazy-src="images/county.png" alt=""/><span>县级网点服务</span></li>
-                <li class="icon"><img lazy-src="images/service.png" alt=""/><span>专人客服售后</span></li>
+                <li class="icon"><img src="images/brand.png" alt=""/><span>厂家品牌直供</span></li>
+                <li class="icon"><img src="images/preferential.png" alt=""/><span>价格优惠保证</span></li>
+                <li class="icon"><img src="images/county.png" alt=""/><span>县级网点服务</span></li>
+                <li class="icon"><img src="images/service.png" alt=""/><span>专人客服售后</span></li>
             </ul>
         </div>
     </div>

@@ -138,8 +138,11 @@ app.controller('fillProfileController', function($scope, remoteApiService, commo
                         //}
                         $scope.userName = data.datas.name;
                         $scope.sex = data.datas.sex?'female':'male';
-
-                        $scope.selectedIdentity = $scope.identities[data.datas.userType-1];
+                        for(var i in $scope.identities){
+                            if($scope.identities[i].id == data.datas.userType){
+                                $scope.selectedIdentity = $scope.identities[i];
+                            }
+                        }
                         if(data.datas.isUserInfoFullFilled){
                             getProvinceList(data.datas.address.province.id,data.datas.address.city.id,data.datas.address.county?data.datas.address.county.id:'',data.datas.address.town?data.datas.address.town.id:'');
                         }else{
