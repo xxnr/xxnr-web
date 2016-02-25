@@ -1,7 +1,7 @@
 /**
  * Created by pepelu on 9/16/2015.
  */
-var app = angular.module('index', ['xxnr_common','news','shop_cart','me-lazyload']);
+var app = angular.module('index', ['xxnr_common','news','shop_cart']);
 app.controller('indexController', function($scope, remoteApiService, commonService, loginService){
     //TODO: hot brands list from server
     $scope.brands = [{src:'images/brand1.png'},
