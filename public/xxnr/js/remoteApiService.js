@@ -249,7 +249,22 @@ app.service('remoteApiService', function(commonService){
         };
         return commonService.ajax(params);
     };
+    this.getBrands = function(categoryId){
+        var params={
+            methodname:'api/v2.1/brands/',
+            category:categoryId
+        };
 
+        return commonService.ajax(params);
+	};
+    this.getAttributes = function(categoryId,brand){
+        var params={
+            methodname:'api/v2.1/products/attributes',
+            category:categoryId,
+            brand:brand
+        };
+        return commonService.ajax(params);
+	};
     this.isAlive = function(){
         var params= {
             methodname: '/api/v2.0/user/isAlive/'
@@ -331,14 +346,15 @@ app.service('remoteApiService', function(commonService){
         };
         return commonService.ajax(params);
     };
-    this.getGoodsListPage = function(page, rowCount, classId, brandName, modelName ,reservePrice){
+    this.getGoodsListPage = function(page, rowCount, classId, brand, queryAttributesArray ,reservePrice){
+        // console.log(queryAttributesArray);
         var data={
             'methodname':'api/v2.1/product/getProductsListPage',
             'page':page,
             'rowCount':rowCount,
             'classId':classId,
-            'brandName':brandName,
-            'attributes':modelName,
+            'brand':brand,
+            'attributes':queryAttributesArray,
             'reservePrice':reservePrice
         };
         return commonService.sendPost(data);

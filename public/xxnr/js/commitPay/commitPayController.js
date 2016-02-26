@@ -87,7 +87,7 @@ app.controller('commitPayController', function($scope, remoteApiService, payServ
         // if($scope.multi_pay_text_editing && (Number($scope.multi_pay_amount) - 500) >= 3000){
         if($scope.payTimes == 1){
             if((Number($scope.multi_pay_amount) - 500) >= 3000){
-                $scope.multi_pay_amount = (Number($scope.multi_pay_amount) - 500);
+                $scope.multi_pay_amount = (Number($scope.multi_pay_amount) - 500).toFixed(2);
                 $scope.pay_price = $scope.multi_pay_amount;
                 payUrlSetting();
                 if($scope.multi_pay_amount == 3000){
@@ -102,6 +102,7 @@ app.controller('commitPayController', function($scope, remoteApiService, payServ
             }else if (Number($scope.multi_pay_amount) - 500 < 3000 && $scope.multi_pay_amount != $scope.orders[$scope.orderSelectedNum].duePrice) {
                 $scope.amount_reduce_editable = false;
                 $scope.multi_pay_amount = 3000;
+                $scope.pay_price = $scope.multi_pay_amount;
             }
         }
     };
@@ -109,7 +110,7 @@ app.controller('commitPayController', function($scope, remoteApiService, payServ
         // if($scope.multi_pay_text_editing && (Number($scope.multi_pay_amount) + 500) <= $scope.orders[$scope.orderSelectedNum].deposit){
         if($scope.payTimes == 1){
             if((Number($scope.multi_pay_amount) + 500) <= $scope.orders[$scope.orderSelectedNum].duePrice){
-                $scope.multi_pay_amount = (Number($scope.multi_pay_amount) + 500);
+                $scope.multi_pay_amount = (Number($scope.multi_pay_amount) + 500).toFixed(2);
                 $scope.pay_price = $scope.multi_pay_amount;
                 payUrlSetting();
                 if($scope.multi_pay_amount == $scope.orders[$scope.orderSelectedNum].duePrice){
@@ -123,6 +124,7 @@ app.controller('commitPayController', function($scope, remoteApiService, payServ
                 }
             }else if (Number($scope.multi_pay_amount) + 500 > $scope.orders[$scope.orderSelectedNum].duePrice && $scope.multi_pay_amount != $scope.orders[$scope.orderSelectedNum].duePrice) {
                 $scope.multi_pay_amount = $scope.orders[$scope.orderSelectedNum].duePrice;
+                $scope.pay_price = $scope.multi_pay_amount;
                 $scope.amount_add_editable = false;
             }
         }

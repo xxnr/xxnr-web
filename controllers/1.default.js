@@ -24,6 +24,7 @@ exports.install = function() {
     F.middleware('isInWhiteList', middleware.isInWhiteList_middleware);
 	F.middleware('isXXNRAgent', middleware.isXXNRAgent_middleware);
 	F.middleware('auditing', middleware.auditing_middleware);
+	F.middleware('throttle', middleware.throttle);
 };
 
 var files = DB('files', null, require('total.js/database/database').BUILT_IN_DB).binary;

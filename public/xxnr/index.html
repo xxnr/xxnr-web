@@ -37,6 +37,7 @@
     <script src="js/jquery.fly.min.js"></script>
     <script src="js/jquery.SuperSlide.2.1.1.js"></script>
     <script src="js/sideService.js"></script>
+    <!-- <script src="js/me-lazyload.js"></script> -->
     <!-- endbuild -->
 </head>
 <body ng-controller="indexController">
@@ -69,9 +70,9 @@
     <div class="clear wrap">
         <div class="banner">
             <ul class="rslides">
-                <img src="images/banner_2016_new_year.png" alt="" />
-                <a href="car_list.html"><img src="images/new_banner2.jpg" alt="" /></a>
-                <a href="huafei_list.html"><img src="images/new_banner3.jpg" alt="" /></a>
+                <img ng-src="images/banner_2016_new_year.png" alt="" />
+                <a href="car_list.html"><img ng-src="images/new_banner2.jpg" alt="" /></a>
+                <a href="huafei_list.html"><img ng-src="images/new_banner3.jpg" alt="" /></a>
             </ul>
             <!--<ul id="custom-pagers">-->
                 <!--<li><div class="pager_line"></div></li>-->
@@ -123,7 +124,7 @@
                                     <p ng-class="{true: 'presale', false: 'price'}[product.presale==true]">{{product.presale?"即将上线":'￥'+product.discountPrice}}<del style="color:#C0C0C0" ng-hide="{{!product.hasDiscount}}">{{product.price}}</del></p>
                                 </div>
                                 <a class="image" ng-href={{product.detailUrl}}>
-                                    <img data-rid="134749" width="220px" height="220px" data-index="0" data-max-height="172" data-max-width="172" ng-src={{product.imgUrl}} alt="" />
+                                    <img src={{product.imgUrl}} data-rid="134749" width="220px" height="220px" data-index="0" data-max-height="172" data-max-width="172"  alt="" />
                                 </a>
                                 <!--<div class="cover"></div>-->
                             </div>

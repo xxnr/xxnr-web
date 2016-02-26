@@ -18,6 +18,7 @@ require('./Supplier');
 require('./categories');
 require('./whitelist');
 require('./auditlogs');
+require('./frontendUserAccess');
 
 //user
 exports.user = mongoose.model('user');
@@ -66,7 +67,8 @@ exports.potential_customer = mongoose.model('potential_customer');
 exports.orderpaidlog = mongoose.model('order_paid_log');
 // audit logs
 exports.auditlog = mongoose.model('auditlog');
-
+// frontend user access
+exports.frontendUserAccess = mongoose.model('frontendUserAccess');
 
 exports.getModel = function (name, options) {
     options = options || {};

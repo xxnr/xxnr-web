@@ -3,7 +3,7 @@
         <div class="search_category" ng-repeat="search_category in search_categories">
             <span class="left search_key">{{search_category.name}}：</span>
             <ul class="left" id="brand">
-                <li ng-repeat="choice in search_category.choices"><a href="" ng-class="{true:'current', false:''}[choice.isSelected]" ng-click="select(search_category.index,$index)">{{choice.name}}</a></li>
+                <li ng-repeat="choice in search_category.choices"><a href="" ng-class="{true:'current', false:''}[choice.isSelected]" ng-click="select($parent.$index,$index)">{{choice.name}}</a></li>
             </ul>
         </div>
     </div>

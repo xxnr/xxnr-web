@@ -2,9 +2,7 @@
  * Created by pepelu on 9/16/2015.
  */
 var app = angular.module('index', ['xxnr_common','news','shop_cart']);
-
 app.controller('indexController', function($scope, remoteApiService, commonService, loginService){
-
     //TODO: hot brands list from server
     $scope.brands = [{src:'images/brand1.png'},
         {src:'images/brand2.png'},
@@ -42,7 +40,7 @@ app.controller('indexController', function($scope, remoteApiService, commonServi
         }
 
         for(var classIndex in $scope.classes) {
-            console.log($scope.classes[classIndex].id);
+            // console.log($scope.classes[classIndex].id);
             remoteApiService.getProducts(1, 8, $scope.classes[classIndex].id)
                 .then(function (data) {
                     var categoryIndex = 0;

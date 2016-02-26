@@ -168,7 +168,7 @@
 		component.click = function(index, row, button) {
 			switch ($(button).attr('name')) {
 				case 'edit':
-					$.components.GET(managerurl + '/api/news/' + row.id, null, function(response, err) {
+					$.components.GET(managerurl + '/api/news/' + row.id, null, function(response) {
 
 						// Error prevention
 						if (response instanceof Array)
@@ -184,7 +184,18 @@
 				case 'preonline':
 					if (!confirm('@(你确定要预上线你选择的资讯吗?)'))
 						return;
-					$.components.POST(managerurl + '/api/news/updatestatus', { id: row.id, category: row.category, status: '1' }, function() {
+					$.components.POST(managerurl + '/api/news/updatestatus', { id: row.id, category: row.category, status: '1' }, function(response) {
+						if (response && response.code && parseInt(response.code) !== 1000) {
+							if (response.error)
+								response = response.error;
+							else
+								response = [];
+							if (response.message) {
+								alert(response.message);
+							}
+							return;
+						}
+						
 						news_refresh_categories();
 				 		news_refresh(true);
 					});
@@ -192,7 +203,17 @@
 				case 'online':
 					if (!confirm('@(你确定要上线你选择的资讯吗?)'))
 						return;
-					$.components.POST(managerurl + '/api/news/updatestatus', { id: row.id, category: row.category, status: '2' }, function() {
+					$.components.POST(managerurl + '/api/news/updatestatus', { id: row.id, category: row.category, status: '2' }, function(response) {
+						if (response && response.code && parseInt(response.code) !== 1000) {
+							if (response.error)
+								response = response.error;
+							else
+								response = [];
+							if (response.message) {
+								alert(response.message);
+							}
+							return;
+						}
 						news_refresh_categories();
 				 		news_refresh(true);
 					});
@@ -200,7 +221,17 @@
 				case 'offline':
 					if (!confirm('@(你确定要下线你选择的资讯吗?)'))
 						return;
-					$.components.POST(managerurl + '/api/news/updatestatus', { id: row.id, category: row.category, status: '3' }, function() {
+					$.components.POST(managerurl + '/api/news/updatestatus', { id: row.id, category: row.category, status: '3' }, function(response) {
+						if (response && response.code && parseInt(response.code) !== 1000) {
+							if (response.error)
+								response = response.error;
+							else
+								response = [];
+							if (response.message) {
+								alert(response.message);
+							}
+							return;
+						}
 						news_refresh_categories();
 				 		news_refresh(true);
 					});
@@ -208,7 +239,17 @@
 				case 'remove':
 					if (!confirm('@(你确定要删除你选择的资讯吗?【删除后不能恢复】)'))
 						return;
-					$.components.DELETE(managerurl + '/api/news', { id: row.id, category: row.category }, function() {
+					$.components.DELETE(managerurl + '/api/news', { id: row.id, category: row.category }, function(response) {
+						if (response && response.code && parseInt(response.code) !== 1000) {
+							if (response.error)
+								response = response.error;
+							else
+								response = [];
+							if (response.message) {
+								alert(response.message);
+							}
+							return;
+						}
 						news_refresh_categories();
 				 		news_refresh(true);
 					});
@@ -243,6 +284,12 @@
 			news_ckeditor_getdata('newsbody', news.form);
 			$.components.POST(managerurl + '/api/news/', news.form, function(response) {
 
+				if (response && response.code && parseInt(response.code) !== 1000) {
+					if (response.error)
+						response = response.error;
+					else
+						response = [];
+				}
 				// Error handling
 				SET('news.response', response);
 				if (response instanceof Array)
@@ -262,6 +309,16 @@
 		component.submit = function(hide) {
 			RESET('news.category.*');
 			$.components.POST(managerurl + '/api/news/category/', news.category, function(response) {
+				if (response && response.code && parseInt(response.code) !== 1000) {
+					if (response.error)
+						response = response.error;
+					else
+						response = [];
+					if (response.message) {
+						alert(response.message);
+					}
+					return;
+				}
 				setTimeout(function() {
 					hide();
 					news_refresh_categories();

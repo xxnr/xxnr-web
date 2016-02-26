@@ -23,7 +23,7 @@ app.service('fileUpload',function (commonService,$rootScope) {
         'fileSizeLimit' : '2MB',
         'onSelectError' : function(file, errorCode, errorMsg){
             if(errorCode == SWFUpload.QUEUE_ERROR.FILE_EXCEEDS_SIZE_LIMIT){
-                this.queueData.errorMsg = "文件超出大小!!"
+                this.queueData.errorMsg = "文件超出大小!!";
             }
         },
         'onUploadSuccess' : function(file, data, response) {

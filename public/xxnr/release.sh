@@ -57,7 +57,7 @@ ln -s $DIR/production_html $ROOTDIR/public/xxnrpro
 now_time=$(date +%Y-%m-%d-%H:%M:%S)
 echo "-------- restart pm2... time:$now_time"
 export NODE_PATH=$ROOTDIR
-pm2 restart release.js -i 4
+pm2 restart release.js -i 4 --log-date-format="YYYY-MM-DD HH:mm Z"
 
 now_time=$(date +%Y-%m-%d-%H:%M:%S)
 echo "-------- EDN... time:$now_time"

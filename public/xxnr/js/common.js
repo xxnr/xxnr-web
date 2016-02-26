@@ -4,9 +4,9 @@
 
 
 /*************************************************************************************************
-**                                    common configuration                                      **
-*************************************************************************************************/
-var app = angular.module('xxnr_common',['ngCookies']);
+ **                                    common configuration                                      **
+ *************************************************************************************************/
+var app = angular.module('xxnr_common', ['ngCookies']);
 app.config(['$locationProvider', function($locationProvider) {
     $locationProvider.html5Mode(true);
 }]);
@@ -24,40 +24,51 @@ app.constant('BaseUrl', ''); // app.constant('BaseUrl', 'http://123.57.251.173:8
 /*************************************************************************************************
  **                                    common service                                            **
  *************************************************************************************************/
-app.service('commonService',function($q,$http,BaseUrl,loginService){
+app.service('commonService', function($q, $http, BaseUrl, loginService) {
     this.baseUrl = BaseUrl;
-    this.ajax = function(params){
+    this.ajax = function(params) {
         var deferred = $q.defer();
         var time = new Date().getTime(); // IE8 will cache the request and its response, so we make a different request each time
         $http({
-            method:'JSONP',
-            url:BaseUrl+params.methodname+'?time=' + time + '&callback=JSON_CALLBACK',
-            params:params
-        }).success(function(data){
-            if(data.code == 1401){
+            method: 'JSONP',
+            url: BaseUrl + params.methodname + '?time=' + time + '&callback=JSON_CALLBACK',
+            params: params
+        }).success(function(data) {
+            if (data.code == 1401) {
                 // Unauthorized
                 loginService.logout();
                 sweetalert('你已被登出，请重新登录', "logon.html");
             }
+            if (data.code == 1429) {
+                sweetalert(data.message);
+            }
             deferred.resolve(data);
-        }).error(function(data, error){
+        }).error(function(data, error) {
             console.error('error = ' + error + ', and data = ' + data + ', and methodname = ' + params.methodname + ', and BaseUrl = ' + BaseUrl);
         });
         return deferred.promise;
     };
 
-    this.sendPost = function(data){
+    this.sendPost = function(data) {
         var deferred = $q.defer();
         $http({
             method: 'POST',
-            url:BaseUrl+data.methodname,
+            url: BaseUrl + data.methodname,
             headers: {
                 'Content-Type': 'application/json'
             },
-            data: data
-        }).success(function(data){
+            data: JSON.stringify(data)
+        }).success(function(data) {
+            if (data.code == 1401) {
+                // Unauthorized
+                loginService.logout();
+                sweetalert('你已被登出，请重新登录', "logon.html");
+            }
+            if (data.code == 1429) {
+                sweetalert(data.message);
+            }
             deferred.resolve(data);
-        }).error(function(data, error){
+        }).error(function(data, error) {
             console.error('error = ' + error + ', and data = ' + data + ', and methodname = ' + data.methodname + ', and BaseUrl = ' + BaseUrl);
         });
         return deferred.promise;
@@ -65,11 +76,11 @@ app.service('commonService',function($q,$http,BaseUrl,loginService){
 
     var _user = loginService.user;
     this.user = _user;
-    this.accessShoppingCart = function(){
-        if(loginService.isLogin){
-            window.location.href="cart.html";
-        }else{
-            window.location.href="logon.html";
+    this.accessShoppingCart = function() {
+        if (loginService.isLogin) {
+            window.location.href = "cart.html";
+        } else {
+            window.location.href = "logon.html";
         }
     };
 
@@ -88,15 +99,15 @@ app.service('commonService',function($q,$http,BaseUrl,loginService){
         return '';
     };
 
-    var sweetalert = function(alerttext, href_link){
-//        if(navigator.appName == "Microsoft Internet Explorer" && navigator.appVersion.match(/8./i)=="8."){
-//            alert(alerttext);
-//            if (href_link) {
-//                window.location.href = href_link;
-//            } else {
-//                return false;
-//            }
-//        }else {
+    var sweetalert = function(alerttext, href_link) {
+        //        if(navigator.appName == "Microsoft Internet Explorer" && navigator.appVersion.match(/8./i)=="8."){
+        //            alert(alerttext);
+        //            if (href_link) {
+        //                window.location.href = href_link;
+        //            } else {
+        //                return false;
+        //            }
+        //        }else {
         swal({
                 title: "新新农人",
                 text: alerttext,
@@ -106,33 +117,34 @@ app.service('commonService',function($q,$http,BaseUrl,loginService){
                 confirmButtonText: '确定',
                 closeOnConfirm: true
             },
-            function () {
+            function() {
                 if (href_link) {
                     window.location.href = href_link;
                 } else {
                     return false;
                 }
             });
-//        }
+        //        }
     };
 
     this.sweetalert = sweetalert;
 
-    this.parseDate = function(str){
+    this.parseDate = function(str) {
         return Date.parse(
-            str.replace(/-/g,"/").replace('T',' ').substr(0, str.indexOf('.'))
-            +
-            ((str[str.length-1]>='0' && str[str.length-1]<='9')? '':str[str.length-1]));
+            str.replace(/-/g, "/").replace('T', ' ').substr(0, str.indexOf('.')) +
+            ((str[str.length - 1] >= '0' && str[str.length - 1] <= '9') ? '' : str[str.length - 1]));
     };
 
 });
 
 app.directive('focusMe', function($timeout) {
     return {
-        scope: { trigger: '@focusMe' },
+        scope: {
+            trigger: '@focusMe'
+        },
         link: function(scope, element) {
             scope.$watch('trigger', function(value) {
-                if(value === "true") {
+                if (value === "true") {
                     $timeout(function() {
                         element[0].focus();
                     });
@@ -146,9 +158,9 @@ app.directive('focusMe', function($timeout) {
  **                                    common controller                                        **
  *************************************************************************************************/
 
-app.controller('needLoginController', function(loginService){
+app.controller('needLoginController', function(loginService) {
     // if not login
-    if(!loginService.isLogin) {
+    if (!loginService.isLogin) {
         window.location.href = "logon.html";
     }
 });
@@ -156,12 +168,12 @@ app.controller('needLoginController', function(loginService){
 /*************************************************************************************************
  **                                    common filter                                             **
  *************************************************************************************************/
-app.filter('trustHtml', function ($sce) {
-    return function (input) {
+app.filter('trustHtml', function($sce) {
+    return function(input) {
         return $sce.trustAsHtml(input);
     }
 });
-app.filter('subOrderTypeToChineseWording', function () {
+app.filter('subOrderTypeToChineseWording', function() {
     return function(input) {
         var output = "";
         switch (input) {
@@ -180,7 +192,7 @@ app.filter('subOrderTypeToChineseWording', function () {
         return input = output;
     };
 });
-app.filter('payStatusToChineseWording', function () {
+app.filter('payStatusToChineseWording', function() {
     return function(input) {
         var output = "";
         switch (input) {
@@ -199,7 +211,7 @@ app.filter('payStatusToChineseWording', function () {
         return input = output;
     };
 });
-app.filter('orderTypeToChineseWording', function () {
+app.filter('orderTypeToChineseWording', function() {
     return function(input) {
         var output = "";
         switch (input) {
@@ -225,7 +237,7 @@ app.filter('orderTypeToChineseWording', function () {
     };
 });
 
-app.filter('deliverStatusToChineseWording', function () {
+app.filter('deliverStatusToChineseWording', function() {
     return function(input) {
         var output = "";
         switch (input) {
@@ -242,7 +254,7 @@ app.filter('deliverStatusToChineseWording', function () {
     };
 });
 
-app.filter('payTypeToChineseWording', function () {
+app.filter('payTypeToChineseWording', function() {
     return function(input) {
         var output = "";
         switch (input) {
@@ -259,7 +271,7 @@ app.filter('payTypeToChineseWording', function () {
     };
 });
 
-app.filter('payStatusToChineseText', function () {
+app.filter('payStatusToChineseText', function() {
     return function(input) {
         var output = "";
         switch (input) {
@@ -293,39 +305,39 @@ app.filter('payStatusToChineseText', function () {
 app.filter('toNumberFixedTwo', function() {
     return function(input) {
         var output = Number(input).toFixed(2);
-      return output;
+        return output;
     };
 });
 
 
 
 /*************************************************************************************************
-**                                    common fix for IE8                                        **
-*************************************************************************************************/
-if (!window.console || !console.firebug){
+ **                                    common fix for IE8                                        **
+ *************************************************************************************************/
+if (!window.console || !console.firebug) {
     var names = ["log", "debug", "info", "warn", "error", "assert", "dir", "dirxml", "group", "groupEnd", "time", "timeEnd", "count", "trace", "profile", "profileEnd"];
 
     window.console = {};
     for (var i = 0; i < names.length; ++i)
         window.console[names[i]] = function() {}
 }
-Date.fromISO= function(s){
+Date.fromISO = function(s) {
     var day, tz,
-        rx=/^(\d{4}\-\d\d\-\d\d([tT ][\d:\.]*)?)([zZ]|([+\-])(\d\d):(\d\d))?$/,
-        p= rx.exec(s) || [];
-    if(p[1]){
-        day= p[1].split(/\D/);
-        for(var i= 0, L= day.length; i<L; i++){
-            day[i]= parseInt(day[i], 10) || 0;
+        rx = /^(\d{4}\-\d\d\-\d\d([tT ][\d:\.]*)?)([zZ]|([+\-])(\d\d):(\d\d))?$/,
+        p = rx.exec(s) || [];
+    if (p[1]) {
+        day = p[1].split(/\D/);
+        for (var i = 0, L = day.length; i < L; i++) {
+            day[i] = parseInt(day[i], 10) || 0;
         };
-        day[1]-= 1;
-        day= new Date(Date.UTC.apply(Date, day));
-        if(!day.getDate()) return NaN;
-        if(p[5]){
-            tz= (parseInt(p[5], 10)*60);
-            if(p[6]) tz+= parseInt(p[6], 10);
-            if(p[4]== '+') tz*= -1;
-            if(tz) day.setUTCMinutes(day.getUTCMinutes()+ tz);
+        day[1] -= 1;
+        day = new Date(Date.UTC.apply(Date, day));
+        if (!day.getDate()) return NaN;
+        if (p[5]) {
+            tz = (parseInt(p[5], 10) * 60);
+            if (p[6]) tz += parseInt(p[6], 10);
+            if (p[4] == '+') tz *= -1;
+            if (tz) day.setUTCMinutes(day.getUTCMinutes() + tz);
         }
         return day;
     }
@@ -334,8 +346,8 @@ Date.fromISO= function(s){
 
 
 /*************************************************************************************************
-**                                    common fix for baidu tongji                                        **
-*************************************************************************************************/
+ **                                    common fix for baidu tongji                                        **
+ *************************************************************************************************/
 var _hmt = _hmt || [];
 (function() {
     var hm = document.createElement("script");

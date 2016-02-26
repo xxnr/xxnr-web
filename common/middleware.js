@@ -6,6 +6,7 @@ var UserService = services.user;
 var AuthService = services.auth;
 var BackEndUserService = services.backenduser;
 var AuditService = services.auditservice;
+var ThrottleService = services.throttle;
 var tools = require('./tools');
 
 exports.isLoggedIn_middleware = function(req, res, next, options, controller){
@@ -18,6 +19,11 @@ exports.isLoggedIn_middleware = function(req, res, next, options, controller){
         token = data.token;
     }else if (controller.req.cookie(F.config.tokencookie)){
         token = controller.req.cookie(F.config.tokencookie);
+    }
+
+    if(!token){
+        controller.respond({code:1401, message:'请先登录'});
+        return;
     }
 
     try {
@@ -54,7 +60,7 @@ exports.isLoggedIn_middleware = function(req, res, next, options, controller){
     }catch(e){
         // authentication fail
         console.error('Token verification fail:', e);
-        controller.respond({code: 1401, message: e});
+        controller.respond({code: 1401, message: '用户信息验证错误，请重新登录'});
     }
 };
 
@@ -255,3 +261,27 @@ exports.auditing_middleware = function(req, res, next, options, controller) {
         next();
     }
 };
+
+exports.throttle = function(req, res, next, options, controller){
+    var user = controller.user;
+    var route = controller.route.name.trim();
+    if (route.endsWith('/'))
+        route = route.substring(0, route.length - 1);
+    var method = controller.route.method.trim().toLowerCase();
+    var ip = controller.ip.trim();
+    ThrottleService.requireAccess(route, method, ip, user?user._id:null, function(pass, reason){
+        if(!pass){
+            switch(reason){
+                case ThrottleService.THROTTLE_BY_HITS_PER_USER:
+                case ThrottleService.THROTTLE_BY_HITS_PER_IP:
+                    controller.respond({code:1429, message:'您操作的太频繁了，请稍后再试'});
+                    break;
+                default:
+                    controller.respond({code:1429, message:'系统繁忙，请稍后再试'});
+            }
+        } else{
+            next();
+        }
+    })
+};
+
