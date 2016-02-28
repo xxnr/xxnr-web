@@ -1,0 +1,77 @@
+@{layout('')}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>@{model.title} - 新新农人</title>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=10" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=0.5, maximum-scale=2.0, user-scalable=yes" />
+    <meta name="robots" content="all,follow" />
+    @{head}
+    <style>
+        body, ul, ol, li, p, h1, h2, h3, h4, h5, button, input, optgroup, select, textarea {margin: 0;padding: 0;}
+        a {text-decoration: none;}
+        body{font-family: "microsoft yahei",'Helvetica Neue',Helvetica,Arial,sans-serif;margin: 0 auto;padding-top: 70px;}
+        .top{position: fixed;top: 0;left: 0;z-index: 20;width: 100%;height: 50px;padding: 10px 0;border-bottom: 1px solid #c7c7c7;background: #ffffff;}
+        .top .top-wrap{margin: 0 auto;width: 95%;height: 50px;overflow: hidden;font-size: 14px;}
+        .top .top-wrap .top-wrap-info{float:left;}
+        .top .top-wrap .top-wrap-info img{float: left;width: 50px;height: 50px;}
+        .top .top-wrap .top-wrap-info .app-desc{float: left;margin-left: 5px;}
+        .top .top-wrap .top-wrap-info .app-desc p.title{font-size: 16px;line-height: 28px;}
+        .top .top-wrap .top-wrap-info .app-desc p.describe{color: #909090;line-height: 18px;}
+        /*.top .top-wrap .download-app{float: right;background-color: #fe9b00;color: #ffffff;width: 70px;height: 22px;padding-top: 8px;margin-top: 10px;text-align: center;cursor: pointer;border-radius: 5px;white-space: nowrap;font-size: 13px;line-height: 1;}*/
+        .top .top-wrap .download-app{float: right;background: #fe9b00;color: #ffffff;width: 70px;height: 30px;margin-top: 10px;cursor: pointer;border-radius: 5px;line-height: 1;outline: none;border: none;}
+        .top .top-wrap .download-app a{position: static;color: #fff;font-size: 13px;font-family: "microsoft yahei",'Helvetica Neue',Helvetica,Arial,sans-serif;}
+        .container{margin: 20px auto;width: 95%;}
+        .container .title h2{text-align: left;font-size: 20px;}
+        .container .info{margin: 5px 0 10px;display: inline-block;width: 100%;font-size: 16px;}
+        .container .info div{color: rgb(102, 102, 102);display: inline-block;margin-right: 10px;}
+        .container #news_body{margin-top: 5px;padding-left: 5px;padding-right: 5px;padding-bottom: 5px;line-height: 1.6em;}
+        .container #news_body img{display: block;max-width: 90%;width: 90%;-ms-interpolation-mode: bicubic;height:auto;margin: 0 auto;}
+        .container #news_body p{text-align: justify;display: inline-block;}
+    </style>
+</head>
+
+<body>
+    <div class="top">
+        <div class="top-wrap">
+            <div class="top-wrap-info">
+                <img src="/images/app_logo.png" />
+                <div class="app-desc">
+                    <p class="title">新新农人</p>
+                    <p class="describe">农业互联网综合服务领先者</p>
+                </div>
+            </div>
+            <!-- <a class="download-app" href="http://a.app.qq.com/o/simple.jsp?pkgname=com.ksfc.newfarmer">下载APP</a> -->
+            <button class="download-app">
+                <a href="http://a.app.qq.com/o/simple.jsp?pkgname=com.ksfc.newfarmer">下载APP</a>
+            </button>
+        </div>
+    </div>
+	<div class="container">
+        <div class="title">
+            <h2>@{model.title}</h2>
+        </div>
+        <div class="info">
+            <div id="createdate"></div>
+            <div id="tags"></div>
+        </div>
+        <div id="news_body"></div>
+    </div>
+            
+    @{json(model, 'news')}
+
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/moment.min.js"></script>
+    <script  type="text/javascript">
+        var data = JSON.parse($('#news').html());
+        var time_s = new Date(data.datecreated);
+        $("#createdate").html(moment(time_s).format('YYYY-MM-DD HH:mm:ss'));
+        $("#tags").html('标签：' + data.category);
+        $("#news_body").html(data.newsbody);
+    </script>
+  
+</body>
+</html>
