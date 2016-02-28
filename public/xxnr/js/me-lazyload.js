@@ -65,6 +65,26 @@ angular.module('me-lazyload', [])
     };
 
     function checkImage(){
+        if (!Object.keys) {
+            Object.keys = function(obj) {
+                var keys = [];
+
+                for (var i in obj) {
+                    if (obj.hasOwnProperty(i)) {
+                        keys.push(i);
+                    }
+                }
+
+                return keys;
+            };
+        }
+        if (typeof Array.prototype.forEach != 'function') {
+            Array.prototype.forEach = function(callback) {
+                for (var i = 0; i < this.length; i++) {
+                    callback.apply(this, [this[i], i, this]);
+                }
+            };
+        }
         Object.keys(elements).forEach(function(key){
             var obj = elements[key],
                 iElement = obj.iElement,

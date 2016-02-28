@@ -1,7 +1,7 @@
 /**
  * Created by pepelu on 2015/9/8.
  */
-var app = angular.module('user_center', ['xxnr_common', 'shop_cart','me-lazyload']);
+var app = angular.module('user_center', ['xxnr_common', 'shop_cart']);
 app.filter('fixedTwo', function () {
     return function(input) {
       return input = input.toFixed(2);

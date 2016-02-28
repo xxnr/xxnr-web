@@ -12,7 +12,7 @@
             <li ng-repeat="item in current_items">
                 <a ng-href={{item.detailUrl}}>
                     <p class="img">
-                        <img data-rid="134749" width="190px" height="190px" data-index="0" data-max-height="172" data-max-width="211" lazy-src="{{item.imgUrl}}" alt="" />
+                        <img data-rid="134749" width="190px" height="190px" data-index="0" data-max-height="172" data-max-width="211" ng-src={{item.imgUrl}} alt="" />
                     </p>
                     <p class="product-name" title={{item.name}} >{{item.shortName}}</p>
                     <p class="" ng-class="{true: 'presale', false: 'price'}[item.presale]">{{item.presale?"即将上线":'￥'+item.nowPrice}} <del style="color:#C0C0C0" ng-hide="{{!item.onSale}}">{{item.oldPrice}}</del></p>

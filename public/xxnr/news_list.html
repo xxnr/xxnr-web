@@ -32,7 +32,7 @@
     <script src="js/headerController.js"></script>
     <script src="js/sweetalert.min.js"></script>
     <script src="js/sideService.js"></script>
-    <script src="js/me-lazyload.js"></script>
+    <!-- <script src="js/me-lazyload.js"></script> -->
     <!-- endbuild -->
 </head>
 <body>
@@ -82,7 +82,7 @@
             <ul class="ng-cloak list_min_height">
                 <li class="single-news " ng-repeat="article in articles">
                     <a href="{{article.url}}" class="image">
-                        <img lazy-src="{{article.imageUrl}}" alt=""/>
+                        <img ng-src={{article.imageUrl}} alt=""/>
                     </a>
                     <div class="news_info">
                         <div class="news_category" ng-class="{'智慧农业':'zhihuinongye','行情分析':'hangqingfenxi','公司动态':'gongsidongtai','农业新闻':'nongyexinwen','新新农人':'xinxinnongren','新农致富':'xinnongzhifu'}[article.category]"></div>

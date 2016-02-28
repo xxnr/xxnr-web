@@ -1,7 +1,7 @@
 /**
  * Created by xxnr-cd on 15/12/16.
  */
-var app = angular.module('news', ['xxnr_common', 'shop_cart','me-lazyload']);
+var app = angular.module('news', ['xxnr_common', 'shop_cart']);
 app.controller('newsController', function($scope,remoteApiService,sideService){
     $scope.tabNum = 0;
     $scope.indexTabNum = 0;
