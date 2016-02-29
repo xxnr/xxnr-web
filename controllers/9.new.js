@@ -10,7 +10,7 @@ exports.install = function() {
     // NEWS detail view
     F.route('/news/{id}/',                               view_news_detail);
     // NEWS detail share view
-    F.route('/newsshare/{id}/',                          view_newsshare_detail);
+    F.route('/sharenews/{id}/',                          view_newsshare_detail);
 };
 
 // Gets all news
@@ -25,7 +25,7 @@ function json_news_query() {
 
         if (result && result.count && result.count > 0) {
             var prevurl = 'http://' + self.req.uri.host + '/news/';
-            var prevshareurl = 'http://' + self.req.uri.host + '/news/';
+            var prevshareurl = 'http://' + self.req.uri.host + '/sharenews/';
             var previmg = 'http://' + self.req.uri.host + '/images/original/';
             var imgtype = '.jpg';
             var items = result.items || [];
@@ -138,6 +138,7 @@ function view_newsshare_detail(id) {
             self.throw404();
             return;
         }
-        self.view('newsAppDetailShareTemplate', result);
+        result['shareurl'] = 'http://' + self.req.uri.host + '/newsshare/' + id;
+        self.view('newsAppDetailTemplate', result);
     });
 }

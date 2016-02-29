@@ -989,7 +989,7 @@ function getMinPayPrice() {
     var self = this;
     var minPayPrice = F.config.minPayPrice;
     if (minPayPrice) {
-        self.respond({'code': '1000', 'message': 'success', 'datas': {'payprice': minPayPrice}});
+        self.respond({'code': '1000', 'message': 'success', 'payprice': minPayPrice});
     } else {
         self.respond({'code': '1002', 'message': '未查询到数据'});
     }
