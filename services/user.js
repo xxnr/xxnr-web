@@ -39,6 +39,7 @@ UserService.prototype.update = function(options, callback) {
     // generate query
     var query = options.userid ? {id: options.userid} : options.id ? {id: options.id} : options.account ? {account: options.account} : {};
     if (query == {}) {
+        //TODO:this condition cannot judge whether query is empty!!!!!!!
         // if no userid or account provided, not support.
         callback('need userid or accountid');
         return;
@@ -73,6 +74,17 @@ UserService.prototype.update = function(options, callback) {
         setValue.typeVerified = options.typeVerified;
     if( typeof options.isUserInfoFullFilled != 'undefined')
         setValue.isUserInfoFullFilled = options.isUserInfoFullFilled;
+    if(options.IDNo)
+        setValue.IDNo = options.IDNo;
+    if(options.RSCInfo){
+        if(options.RSCInfo.companyName){
+            setValue['RSCInfo.companyName'] = options.RSCInfo.companyName;
+        }
+
+        if(options.RSCInfo.companyAddress){
+            setValue['RSCInfo.companyAddress'] = options.RSCInfo.companyAddress;
+        }
+    }
 
     UserModel.update(query, {$set: setValue}, {new: true, multi: false}, function (err, numAffected) {
         if (err) {
@@ -82,8 +94,8 @@ UserService.prototype.update = function(options, callback) {
         }
 
         if (numAffected.n == 0) {
-            console.error('User Service update err: user not exists');
-            callback('用户不存在');
+            console.error('User Service update err: update fail');
+            callback('更新失败');
             return;
         }
 
@@ -181,8 +193,6 @@ UserService.prototype.get = function(options, callback) {
             }
 
             user = user.toObject();
-            user.isVerified = isUserTypeVerified(user);
-            user.isXXNRAgent = tools.isXXNRAgent(user.typeVerified);
 
             // Returns response
             return callback(null, user);
@@ -366,6 +376,58 @@ UserService.prototype.isXXNRAgent = function(user, callback){
     })
 };
 
+UserService.prototype.isRSC = function(user, callback){
+    if(!user){
+        callback('user required');
+        return;
+    }
+
+    UserModel.findById(user._id, function(err, user){
+        if(err){
+            console.error(err);
+            callback(err);
+            return;
+        }
+
+        var isXXNRAgent = tools.isRSC(user.typeVerified);
+
+        callback(null, isXXNRAgent);
+    })
+};
+
+UserService.prototype.getRSCInfoById = function(_id, callback){
+    if(!_id){
+        callback('need _id');
+        return;
+    }
+
+    UserModel.findById(_id)
+        .populate({path: 'RSCInfo.companyAddress.province', select: ' -__v'})
+        .populate({path: 'RSCInfo.companyAddress.city', select: ' -__v'})
+        .populate({path: 'RSCInfo.companyAddress.county', select: ' -__v'})
+        .populate({path: 'RSCInfo.companyAddress.town', select: ' -__v'})
+        .select('-_id name IDNo RSCInfo')
+        .exec(function(err, user){
+            if(err){
+                console.error(err);
+                callback('error find user');
+                return;
+            }
+
+            if(!user){
+                callback('user not find');
+                return;
+            }
+
+            callback(null, user);
+        })
+};
+
+/**
+ * get user info by account(phone), with inviter populated by default
+ * @param account
+ * @param callback
+ */
 UserService.prototype.getByAccount = function(account, callback){
     if(!account){
         callback('account required');
@@ -387,6 +449,28 @@ UserService.prototype.getByAccount = function(account, callback){
         }
 
         callback(null, user);
+    })
+};
+
+UserService.prototype.getById = function(_id, callback){
+    if(!_id){
+        callback('need _id');
+        return;
+    }
+
+    UserModel.findById(_id, function(err, user){
+        if(err){
+            console.error(err);
+            callback('error find user');
+            return;
+        }
+
+        if(!user){
+            callback('user not found');
+            return;
+        }
+
+        callback(null, user.toObject());
     })
 };
 
@@ -494,7 +578,3 @@ UserService.prototype.query = function(options, callback) {
 };
 
 module.exports = new UserService();
-
-function isUserTypeVerified(user){
-    return user.typeVerified && user.typeVerified.indexOf(user.type) != -1 && user.type != '1'
-}

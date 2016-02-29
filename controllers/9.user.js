@@ -68,6 +68,12 @@ exports.install = function() {
 
     F.route('/api/v2.1/user/getNominatedInviter',       json_nominated_inviter_get, ['get'], ['isLoggedIn']);
 
+    // Regional Service Centre apis
+    F.route('/api/v2.2/RSC/info/get',                   json_RSC_info_get,          ['get'],    ['isLoggedIn', 'isRSC']);
+    F.route('/api/v2.2/RSC/info/fill',                  process_RSC_info_fill,      ['post'],   ['isLoggedIn', 'isRSC']);
+    F.route('/api/v2.2/RSC/orders',                     json_RSC_orders_get,        ['get'],    ['isLoggedIn', 'isRSC']);
+    F.route('/api/v2.2/RSC/order/deliverStatus/modify', process_RSC_order_deliverStatus_modify, ['post'],    ['isLoggedIn', 'isRSC']);
+
 	// v1.0
 	// LOGIN
 	//fix api// F.route('/app/user/login/', 				        process_login, ['get', 'post']);
@@ -163,9 +169,7 @@ function process_login() {
         user.sex = data.sex;
         user.photo = data.photo;
 		user.userAddress = data.address;
-        user.isVerified = data.isVerified;
         user.isUserInfoFullFilled = data.isUserInfoFullFilled;
-        user.isXXNRAgent = data.isXXNRAgent;
 
         convert_user_type_info(user, data);
         CartService.getOrAdd(user.userid, function(err, cart){
@@ -423,9 +427,7 @@ function json_user_get() {
         user.pointLaterTrade = data.score || 0;
         user.dateinvited = data.dateinvited;
         user.address = data.address;
-        user.isVerified = data.isVerified;
         user.isUserInfoFullFilled = data.isUserInfoFullFilled;
-        user.isXXNRAgent = data.isXXNRAgent;
         convert_user_type_info(user, data);
         if (data.inviter) {
             user.inviterId = data.inviter.id;
@@ -1680,6 +1682,10 @@ function json_potential_customer_get(){
 }
 
 function convert_user_type_info(user, data){
+    user.isVerified = isUserTypeVerified(data);
+    user.isXXNRAgent = tools.isXXNRAgent(data.typeVerified);
+    user.isRSC = tools.isRSC(data.typeVerified);
+
     // selected user type
     if(!F.global.usertypes[data.type]){
         user.isVerified = false;
@@ -1701,6 +1707,10 @@ function convert_user_type_info(user, data){
     }
 }
 
+function isUserTypeVerified(user){
+    return user.typeVerified && user.typeVerified.indexOf(user.type) != -1 && user.type != '1'
+}
+
 function json_nominated_inviter_get(){
     var self = this;
     var user = self.user;
@@ -1717,4 +1727,107 @@ function json_nominated_inviter_get(){
 
         self.respond({code:1000, message:'success', nominated_inviter:{phone:customer.user.account, name:customer.user.name}});
     })
+}
+
+/**
+ * fill RSC info. All RSC related info can only be filled once.
+ */
+function process_RSC_info_fill(){
+    var self = this;
+    var user = self.user;
+    if(!user){
+        self.respond({code:1001, message:'需要登录'});
+        return;
+    }
+
+    var options = {};
+    UserService.getById(user._id, function(err, user){
+        if(!user.name){
+            if(!self.data.name) {
+                self.respond({code: 1001, message: '请填写真实姓名'});
+                return;
+            } else{
+                options.name = self.data.name;
+            }
+        }
+
+        if(!user.IDNo){
+            if(!tools.isValidIdentityNo(self.data.IDNo)){
+                self.respond({code:1001, message:'请填写正确的身份证号'});
+                return;
+            } else{
+                options.IDNo = self.data.IDNo;
+            }
+        }
+
+        if(!user.RSCInfo || !user.RSCInfo.companyName){
+            if(!self.data.companyName){
+                self.respond({code:1001, message:'请填写公司门店名称'});
+                return;
+            } else{
+                options.RSCInfo = {companyName:self.data.companyName};
+            }
+        }
+
+        if(!user.RSCInfo || !user.RSCInfo.companyAddress){
+            if(!self.data.companyAddress){
+                self.respond({code:1001, message:'请填写网点地址'});
+                return;
+            } else if(!self.data.companyAddress.province){
+                self.respond({code:1001, message:'请选择省份'});
+                return;
+            } else if (!self.data.companyAddress.city){
+                self.respond({code:1001, message:'请选择城市'});
+                return;
+            } else{
+                if(options.RSCInfo){
+                    options.RSCInfo.companyAddress = self.data.companyAddress;
+                } else{
+                    options.RSCInfo = {companyAddress: self.data.companyAddress};
+                }
+            }
+        }
+
+        if(tools.isEmptyObject(options)){
+            self.respond({code:1001, message:'没有可以更新的内容'});
+            return;
+        } else{
+            options.userid = user.id;
+        }
+
+        UserService.update(options, function(err){
+            if(err){
+                self.respond({code:1001, message:'更新失败'});
+                return;
+            }
+
+            self.respond({code:1000, message:'success'});
+        })
+    })
+}
+
+function json_RSC_info_get(){
+    var self = this;
+    if(!self.user){
+        self.respond({code:1001, message:'需要登录'});
+        return;
+    }
+
+    UserService.getRSCInfoById(self.user, function(err, user){
+        if(err){
+            self.respond({code:1001, message:'查询失败'});
+            return;
+        }
+
+        self.respond({code:1001, message:'success', RSCInfo:user});
+    })
+}
+
+function json_RSC_orders_get(){
+    //TODO:get order RSC should serve
+    // return fields: 下单时间、订单号、收货人姓名、电话、商品名称及属性、总额、配送方式、订单状态
+}
+
+function process_RSC_order_deliverStatus_modify(){
+    //TODO:modify order deliver status by given order
 }

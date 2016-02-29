@@ -9,6 +9,7 @@ var JWT = require('jsonwebtoken');
 
 var regexpPhone = new RegExp('^(13[0-9]|15[012356789]|17[678]|18[0-9]|14[57])[0-9]{8}$');
 var regexpPrice = new RegExp('^[0-9]*(\.[0-9]{1,2})?$');
+var regexIdentityNo = /^(\d{15}$|^\d{18}$|^\d{17}(\d|X|x))$/;
 
 /*
     Phone in china validation
@@ -207,4 +208,19 @@ exports.verify_token = function(token){
 exports.isXXNRAgent = function(verifiedTypes){
     const XXNRAgentId = '6';
     return verifiedTypes && verifiedTypes.indexOf(XXNRAgentId) != -1;
+};
+
+exports.isRSC = function(verifiedTypes){
+    const RSCId = '5';
+    return verifiedTypes && verifiedTypes.indexOf(RSCId) != -1;
+};
+
+exports.isValidIdentityNo = function(identityNo){
+    return regexIdentityNo.test(identityNo);
+};
+
+exports.regexIdentityNo = regexIdentityNo;
+
+exports.isEmptyObject = function isEmptyObject(obj) {
+    return !Object.keys(obj).length;
 };

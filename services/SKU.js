@@ -385,7 +385,6 @@ SKUService.prototype.removeSKUAttributesByName = function(name, callback){
             console.error(err);
             callback(err);
         }
-        console.log(numAffected);
 
         // delete from SKU attributes
         SKUAttributeModel.find({name:name}).remove(function(err){

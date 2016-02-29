@@ -25,6 +25,7 @@ exports.install = function() {
 	F.middleware('isXXNRAgent', middleware.isXXNRAgent_middleware);
 	F.middleware('auditing', middleware.auditing_middleware);
 	F.middleware('throttle', middleware.throttle);
+	F.middleware('isRSC', middleware.isRSC_middleware);
 };
 
 var files = DB('files', null, require('total.js/database/database').BUILT_IN_DB).binary;

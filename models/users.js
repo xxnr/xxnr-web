@@ -1,4 +1,5 @@
 var mongoose = require("mongoose");
+var tools = require("../common/tools");
 
 // Schema
 var UserSchema = new mongoose.Schema({
@@ -39,6 +40,17 @@ var UserSchema = new mongoose.Schema({
         "update_date":String,
         "birth_date":String,
         "age":String
+    },
+    "IDNo":{type:String, validate:tools.regexIdentityNo},                              // identity number
+    "RSCInfo":{                                                                  // regional service centre info
+        "companyName":String,                                                    // company name
+        "companyAddress":{                                                       // RSC address
+            province:{type:mongoose.Schema.ObjectId, ref:"province"},
+            city:{type:mongoose.Schema.ObjectId, ref:"city"},
+            county:{type:mongoose.Schema.ObjectId, ref:"county"},
+            town:{type:mongoose.Schema.ObjectId, ref:"town"},
+            details:String
+        }
     }
 });
 

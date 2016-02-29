@@ -71,7 +71,14 @@ var productSchema = new mongoose.Schema({
 	referencePrice:{											// 参考价格区间
 		min:{type:Number},
 		max:{type:Number}
-	}
+	},
+	RSCAddress:[{													// the address list of RSC that serves this product
+		RSC:{type:mongoose.Schema.ObjectId, ref:'user'},			// this field to keep reference to user in case RSC change the company address.
+		province:{type:mongoose.Schema.ObjectId, ref:'province'},
+		city:{type:mongoose.Schema.ObjectId, ref:"city"},
+		county:{type:mongoose.Schema.ObjectId, ref:"county"},
+		town:{type:mongoose.Schema.ObjectId, ref:"town"}
+	}]
 });
 
 var productAttributeSchema = new mongoose.Schema({

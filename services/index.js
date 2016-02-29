@@ -43,3 +43,6 @@ exports.auditservice = require('./audit');
 
 // throttle
 exports.throttle = require('./throttle');
+
+// RSC
+exports.RSC = require('./RSC');
