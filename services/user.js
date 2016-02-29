@@ -149,9 +149,6 @@ UserService.prototype.login = function(options, callback) {
 
         if(password_valid){
             user = user.toObject();
-            user.isVerified = isUserTypeVerified(user);
-            user.isXXNRAgent = tools.isXXNRAgent(user.typeVerified);
-
             callback(null, user);
 
             // Save login log
