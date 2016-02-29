@@ -11,7 +11,7 @@ var CartService = services.cart;
 exports.install = function() {
 	F.route('/api/v2.0/order/getOderList',         getOders, ['post', 'get'], ['isLoggedIn']);
 	F.route('/api/v2.0/order/getAppOrderList',     api10_getOders, ['post', 'get'], ['isLoggedIn']);
-	F.route('/api/v2.0/order/addOrder',            addOrder, ['post', 'get'], ['isLoggedIn']);
+	F.route('/api/v2.0/order/addOrder',            addOrder, ['get'], ['isLoggedIn', 'throttle']);
     F.route('/api/v2.0/order/getOrderDetails',     api10_getOrderDetails, ['post', 'get'], ['isLoggedIn']);
     F.route('/api/v2.0/order/updateOrderPaytype',  updateOrderPaytype, ['post', 'get'], ['isLoggedIn']);
     F.route('/api/v2.0/order/confirmeOrder',       confirmOrder, ['post', 'get'], ['isLoggedIn']);
