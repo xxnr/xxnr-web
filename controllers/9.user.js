@@ -1742,21 +1742,25 @@ function process_RSC_info_fill(){
 
     var options = {};
     UserService.getById(user._id, function(err, user){
-        if(!user.name){
+        if(!user.RSCInfo || !user.RSCInfo.name){
             if(!self.data.name) {
                 self.respond({code: 1001, message: '请填写真实姓名'});
                 return;
             } else{
-                options.name = self.data.name;
+                options.RSCInfo = {name:self.data.name};
             }
         }
 
-        if(!user.IDNo){
+        if(!user.RSCInfo || !user.RSCInfo.IDNo){
             if(!tools.isValidIdentityNo(self.data.IDNo)){
                 self.respond({code:1001, message:'请填写正确的身份证号'});
                 return;
             } else{
-                options.IDNo = self.data.IDNo;
+                if(options.RSCInfo){
+                    options.RSCInfo.IDNo = self.data.IDNo;
+                } else{
+                    options.RSCInfo = {IDNo:self.data.IDNo};
+                }
             }
         }
 
@@ -1764,8 +1768,12 @@ function process_RSC_info_fill(){
             if(!self.data.companyName){
                 self.respond({code:1001, message:'请填写公司门店名称'});
                 return;
-            } else{
-                options.RSCInfo = {companyName:self.data.companyName};
+            } else {
+                if(options.RSCInfo){
+                    options.RSCInfo.companyName = self.data.companyName;
+                } else{
+                    options.RSCInfo = {companyName:self.data.companyName};
+                }
             }
         }
 

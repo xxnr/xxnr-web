@@ -41,8 +41,9 @@ var UserSchema = new mongoose.Schema({
         "birth_date":String,
         "age":String
     },
-    "IDNo":{type:String, validate:tools.regexIdentityNo},                              // identity number
     "RSCInfo":{                                                                  // regional service centre info
+        "name":String,                                                           // true name
+        "IDNo":{type:String, validate:tools.regexIdentityNo},                    // identity number
         "companyName":String,                                                    // company name
         "companyAddress":{                                                       // RSC address
             province:{type:mongoose.Schema.ObjectId, ref:"province"},

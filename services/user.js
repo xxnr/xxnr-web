@@ -74,9 +74,17 @@ UserService.prototype.update = function(options, callback) {
         setValue.typeVerified = options.typeVerified;
     if( typeof options.isUserInfoFullFilled != 'undefined')
         setValue.isUserInfoFullFilled = options.isUserInfoFullFilled;
-    if(options.IDNo)
-        setValue.IDNo = options.IDNo;
+
+    // RSC info
     if(options.RSCInfo){
+        if(options.RSCInfo.name) {
+            setValue['RSCInfo.name'] = options.RSCInfo.name;
+        }
+
+        if(options.RSCInfo.IDNo) {
+            setValue['RSCInfo.IDNo'] = options.RSCInfo.IDNo;
+        }
+
         if(options.RSCInfo.companyName){
             setValue['RSCInfo.companyName'] = options.RSCInfo.companyName;
         }
@@ -403,7 +411,7 @@ UserService.prototype.getRSCInfoById = function(_id, callback){
         .populate({path: 'RSCInfo.companyAddress.city', select: ' -__v'})
         .populate({path: 'RSCInfo.companyAddress.county', select: ' -__v'})
         .populate({path: 'RSCInfo.companyAddress.town', select: ' -__v'})
-        .select('-_id name IDNo RSCInfo')
+        .select('-_id RSCInfo')
         .exec(function(err, user){
             if(err){
                 console.error(err);
