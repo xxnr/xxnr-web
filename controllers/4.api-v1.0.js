@@ -46,6 +46,9 @@ exports.install = function() {
     F.route('/api/v2.0/product/getAppProductDetails/', getAppProductDetails, ['post', 'get']);
     // product app info page (app_body app_standard app_support)
     F.route('/product/{productInfo}/{productId}/', view_product_info);
+    // get min pay price
+    // F.route('/api/v2.0/getMinPayPrice/',       getMinPayPrice, ['get'], ['isLoggedIn']);
+    F.route('/api/v2.0/getMinPayPrice/',       getMinPayPrice, ['post', 'get'], ['isLoggedIn']);
 
 	// v1.0
     //fix api// F.route('/app/shopCart/getShopCartList', getShoppingCart, ['post', 'get']);
@@ -978,5 +981,16 @@ function getAttributes(attributeName) {
 
             self.respond({'code': '1000', 'message': 'success', 'datas': attributes.length > 0 ? attributes[0].values || [] : []});
         })
+    }
+}
+
+// Get min pay price
+function getMinPayPrice() {
+    var self = this;
+    var minPayPrice = F.config.minPayPrice;
+    if (minPayPrice) {
+        self.respond({'code': '1000', 'message': 'success', 'payprice': minPayPrice});
+    } else {
+        self.respond({'code': '1002', 'message': '未查询到数据'});
     }
 }
