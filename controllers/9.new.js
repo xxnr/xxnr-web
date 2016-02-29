@@ -8,7 +8,9 @@ exports.install = function() {
     F.route('/api/v2.0/news/categories/',                json_news_categories);
 
     // NEWS detail view
-    F.route('/article/{id}/',                            view_news_detail);
+    F.route('/news/{id}/',                               view_news_detail);
+    // NEWS detail share view
+    F.route('/sharenews/{id}/',                          view_newsshare_detail);
 };
 
 // Gets all news
@@ -22,7 +24,8 @@ function json_news_query() {
         }
 
         if (result && result.count && result.count > 0) {
-            var prevurl = 'http://' + self.req.uri.host + '/article/';
+            var prevurl = 'http://' + self.req.uri.host + '/news/';
+            var prevshareurl = 'http://' + self.req.uri.host + '/sharenews/';
             var previmg = 'http://' + self.req.uri.host + '/images/original/';
             var imgtype = '.jpg';
             var items = result.items || [];
@@ -36,6 +39,7 @@ function json_news_query() {
                     'title': item.title,
                     'datecreated': item.datecreated,
                     'url': prevurl + item.id,
+                    'shareurl': prevshareurl + item.id,
                     'id': item.id,
                     'newsabstract': item.abstract || ''
                 };
@@ -114,10 +118,27 @@ function view_news_detail(id) {
     // only get online news
     options.status = '2';
     NewsService.get(options, function (err, result) {
-        if (err) {
+        if (err || !result) {
             self.throw404();
             return;
         }
+        self.view('newsAppDetailTemplate', result);
+    });
+}
+
+// Gets news detail share page for app
+function view_newsshare_detail(id) {
+    var self = this;
+    var options = {};
+    options.id = id;
+    // only get online news
+    options.status = '2';
+    NewsService.get(options, function (err, result) {
+        if (err || !result) {
+            self.throw404();
+            return;
+        }
+        result['shareurl'] = 'http://' + self.req.uri.host + '/newsshare/' + id;
         self.view('newsAppDetailTemplate', result);
     });
 }
