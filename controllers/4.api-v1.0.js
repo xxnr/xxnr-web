@@ -48,7 +48,7 @@ exports.install = function() {
     F.route('/product/{productInfo}/{productId}/', view_product_info);
     // get min pay price
     // F.route('/api/v2.0/getMinPayPrice/',       getMinPayPrice, ['get'], ['isLoggedIn']);
-    F.route('/api/v2.0/getMinPayPrice/',       getMinPayPrice, ['get']);
+    F.route('/api/v2.0/getMinPayPrice/',       getMinPayPrice, ['post', 'get'], ['isLoggedIn']);
 
 	// v1.0
     //fix api// F.route('/app/shopCart/getShopCartList', getShoppingCart, ['post', 'get']);
