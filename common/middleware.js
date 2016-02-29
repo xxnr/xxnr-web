@@ -122,7 +122,7 @@ exports.backend_auth = function(req, res, next, options, controller){
             }
 
             var route = controller.route.name.trim().toLowerCase();
-            var method = controller.route.method.trim().toLowerCase();
+            var method = req.method.trim().toLowerCase();
             if (route.endsWith('/'))
                 route = route.substring(0, route.length - 1);
             AuthService.auth_backend(data._id, route, method, function (err, hasPermission) {
@@ -267,7 +267,7 @@ exports.throttle = function(req, res, next, options, controller){
     var route = controller.route.name.trim();
     if (route.endsWith('/'))
         route = route.substring(0, route.length - 1);
-    var method = controller.route.method.trim().toLowerCase();
+    var method = req.method.trim().toLowerCase();
     var ip = controller.ip.trim();
     ThrottleService.requireAccess(route, method, ip, user?user._id:null, function(pass, reason){
         if(!pass){
