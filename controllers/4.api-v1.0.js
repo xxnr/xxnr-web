@@ -510,7 +510,7 @@ function payOrder(payExecutor){
             return;
         }
 
-        if (order.isClosed) {
+        if (order.isClosed && order.payStatus === PAYMENTSTATUS.UNPAID) {
             self.respond({code:1001, message:'订单已关闭'});
             return;
         }
