@@ -2,7 +2,7 @@
  * Created by pepelu on 2015/10/8.
  */
 var app = angular.module('xxnr_common');
-app.service('loginService', function($cookieStore, $timeout, BaseUrl, BaseDomainREG){
+app.service('loginService', function($cookieStore, $timeout, BaseUrl, BaseDomainREG, hostnameService){
 	var userKey = "__user";
     var tokenKey = "token";
     var scartKey = "__scart";
@@ -27,7 +27,8 @@ app.service('loginService', function($cookieStore, $timeout, BaseUrl, BaseDomain
     };
 
     this.setUser = function(value) {
-        if (BaseDomainREG.test(BaseUrl)) {
+        var hostname = hostnameService.getHostname();
+        if (BaseDomainREG.test(hostname)) {
             $cookieStore.put(userKey, value, {path:"/", domain:".xinxinnongren.com"});
         } else {
             $cookieStore.put(userKey, value, {path:"/"});

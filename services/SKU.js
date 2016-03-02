@@ -741,62 +741,77 @@ SKUService.prototype.querySKUAttributesAndPrice = function(productId, attributes
                     remainAttributes.push(result);
                 });
 
-                SKUModel.aggregate({$match: matchOptions}
-                    , {$unwind: '$additions'}
-                    , {
-                        $group: {
-                            _id: '$product',
-                            additions: {
-                                $addToSet: {
-                                    ref: '$additions.ref',
-                                    name: '$additions.name',
-                                    price: '$additions.price'
-                                }
-                            },
+                SKUModel.aggregate({$match:matchOptions}
+                ,{
+                        $group:{
+                            _id:'$product',
                             pricemin: {$min: '$price.platform_price'},
                             pricemax: {$max: '$price.platform_price'},
                             marketpricemin: {$min:'$price.market_price'},
                             marketpricemax: {$max:'$price.market_price'}
                         }
                     })
-                    .exec(function (err, additionsResult) {
+                    .exec(function(err, priceResult){
                         if (err) {
                             console.error(err);
                             callback(err);
                             return;
                         }
 
-                        var additions = [];
                         var pricemin = 0, pricemax = 0, marketpricemin = 0, marketpricemax = 0;
-                        if (additionsResult && additionsResult.length > 0) {
-                            additions = additionsResult[0].additions;
-                            pricemin = additionsResult[0].pricemin;
-                            pricemax = additionsResult[0].pricemax;
-                            marketpricemin = additionsResult[0].marketpricemin;
-                            marketpricemax = additionsResult[0].marketpricemax;
-                        }
+                        pricemin = priceResult[0].pricemin;
+                        pricemax = priceResult[0].pricemax;
+                        marketpricemin = priceResult[0].marketpricemin;
+                        marketpricemax = priceResult[0].marketpricemax;
 
-                        var callbackValue = {attributes: remainAttributes,
-                            price: {min: pricemin, max: pricemax},
-                            market_price:{min: marketpricemin, max: marketpricemax},
-                            additions:additions};
-                        if(allAttributesSelected) {
-                            // should query one SKU here
-                            SKUModel.findOne(matchOptions)
-                                .lean()
-                                .exec(function (err, SKU) {
+                        SKUModel.aggregate({$match: matchOptions}
+                            , {$unwind: '$additions'}
+                            , {
+                                $group: {
+                                    _id: '$product',
+                                    additions: {
+                                        $addToSet: {
+                                            ref: '$additions.ref',
+                                            name: '$additions.name',
+                                            price: '$additions.price'
+                                        }
+                                    }
+                                }
+                            })
+                            .exec(function (err, additionsResult) {
                                 if (err) {
                                     console.error(err);
                                     callback(err);
                                     return;
                                 }
 
-                                callbackValue.SKU = SKU;
-                                callback(null, callbackValue);
-                            });
-                        } else {
-                            callback(null, callbackValue);
-                        }
+                                var additions = [];
+                                if (additionsResult && additionsResult.length > 0) {
+                                    additions = additionsResult[0].additions;
+                                }
+
+                                var callbackValue = {attributes: remainAttributes,
+                                    price: {min: pricemin, max: pricemax},
+                                    market_price:{min: marketpricemin, max: marketpricemax},
+                                    additions:additions};
+                                if(allAttributesSelected) {
+                                    // should query one SKU here
+                                    SKUModel.findOne(matchOptions)
+                                        .lean()
+                                        .exec(function (err, SKU) {
+                                            if (err) {
+                                                console.error(err);
+                                                callback(err);
+                                                return;
+                                            }
+
+                                            callbackValue.SKU = SKU;
+                                            callback(null, callbackValue);
+                                        });
+                                } else {
+                                    callback(null, callbackValue);
+                                }
+                            })
                     })
             })
             .catch(function (err) {
