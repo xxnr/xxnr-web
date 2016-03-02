@@ -44,6 +44,10 @@ var productSchema = new mongoose.Schema({
 		min: {type: Number},
 		max: {type: Number}
 	},
+	SKUMarketPrice:{
+		min:{type:Number},
+		max:{type:Number}
+	},
 	online:{type:Boolean, default:false},
 	defaultSKU: {
 		type: {
