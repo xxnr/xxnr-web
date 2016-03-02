@@ -43,11 +43,13 @@ queryAttributesAndPrice = function(product, attributes, callback, online) {
                 values: {$addToSet: '$attributes.value'},
                 pricemin: {$min: '$price.platform_price'},
                 pricemax: {$max: '$price.platform_price'},
+                marketpricemin: {$min:'$price.market_price'},
+                marketpricemax: {$max:'$price.market_price'},
                 order: {$max: '$attributes.order'}
             }
         }
         , {$sort: {order: 1}}
-        , {$project: {_id: 0, name: '$_id', values: 1, pricemin: 1, pricemax: 1}}
+        , {$project: {_id: 0, name: '$_id', values: 1, pricemin: 1, pricemax: 1, marketpricemin:1, marketpricemax:1}}
         )
         .exec(function (err, docs) {
             if (err) {
@@ -78,7 +80,7 @@ queryAttributesAndPrice = function(product, attributes, callback, online) {
                     }
 
                     var returns = [];
-                    var minPrice = 0, maxPrice = 0;
+                    var minPrice = 0, maxPrice = 0, marketMinPrice = 0, marketMaxPrice = 0;
                     docs.forEach(function (doc) {
                         if (names.indexOf(doc.name) != -1) {
                             return;
@@ -86,8 +88,12 @@ queryAttributesAndPrice = function(product, attributes, callback, online) {
 
                         minPrice = doc.pricemin;
                         maxPrice = doc.pricemax;
+                        marketMinPrice = doc.marketpricemin;
+                        marketMaxPrice = doc.marketpricemax;
                         delete doc.pricemin;
                         delete doc.pricemax;
+                        delete doc.marketpricemin;
+                        delete doc.marketpricemax;
                         returns.push(doc);
                     });
 
@@ -97,6 +103,7 @@ queryAttributesAndPrice = function(product, attributes, callback, online) {
                     }
                     var callbackValue = {
                         price: {min: minPrice, max: maxPrice},
+                        market_price: {min:marketMinPrice, max:marketMaxPrice},
                         attributes: returns,
                             additions: additions
                     };
@@ -113,6 +120,8 @@ queryAttributesAndPrice = function(product, attributes, callback, online) {
                                 callbackValue.SKU = SKU.toObject();
                                 callbackValue.price.min = SKU.price.platform_price;
                                 callbackValue.price.max = SKU.price.platform_price;
+                                callbackValue.market_price.min = SKU.price.market_price;
+                                callbackValue.market_price.max = SKU.price.market_price;
                                 callback(null, callbackValue);
                             } else {
                                 callback(null, callbackValue);
@@ -576,7 +585,7 @@ var refresh_product_SKUAttributes = function(product, callback){
                     return;
                 }
 
-                var setOption = {SKUPrice:data.price, SKUAttributes:data.attributes, SKUAdditions:data.additions, price:data.price.min};
+                var setOption = {SKUPrice:data.price, SKUMarketPrice:data.market_price, SKUAttributes:data.attributes, SKUAdditions:data.additions, price:data.price.min};
                 if(docs && docs.length == 1){
                     var defaultSKU = docs[0];
                     defaultSKU.ref = defaultSKU._id;
@@ -698,12 +707,10 @@ SKUService.prototype.querySKUAttributesAndPrice = function(productId, attributes
                             $group: {
                                 _id: '$attributes.name',
                                 values: {$addToSet: '$attributes.value'},
-                                pricemin: {$min: '$price.platform_price'},
-                                pricemax: {$max: '$price.platform_price'},
                                 queryKey: {$max: j}
                             }
                         }
-                        , {$project: {_id: 0, name: '$_id', values: 1, pricemin: 1, pricemax: 1, queryKey: 1}}
+                        , {$project: {_id: 0, name: '$_id', values: 1, queryKey: 1}}
                         )
                         .exec(function (err, docs) {
                             if (err) {
@@ -727,21 +734,9 @@ SKUService.prototype.querySKUAttributesAndPrice = function(productId, attributes
 
         Promise.all(promises)
             .then(function () {
-                var minPrice = Number.MIN_VALUE;
-                var maxPrice = Number.MAX_VALUE;
                 var remainAttributes = [];
                 results.forEach(function (result) {
-                    if (result.pricemin > minPrice) {
-                        minPrice = result.pricemin;
-                    }
-
-                    if (result.pricemax < maxPrice) {
-                        maxPrice = result.pricemax;
-                    }
-
                     delete result.queryKey;
-                    delete result.pricemin;
-                    delete result.pricemax;
                     remainAttributes.push(result);
                 });
 
@@ -756,7 +751,11 @@ SKUService.prototype.querySKUAttributesAndPrice = function(productId, attributes
                                     name: '$additions.name',
                                     price: '$additions.price'
                                 }
-                            }
+                            },
+                            pricemin: {$min: '$price.platform_price'},
+                            pricemax: {$max: '$price.platform_price'},
+                            marketpricemin: {$min:'$price.market_price'},
+                            marketpricemax: {$max:'$price.market_price'}
                         }
                     })
                     .exec(function (err, additionsResult) {
@@ -767,11 +766,19 @@ SKUService.prototype.querySKUAttributesAndPrice = function(productId, attributes
                         }
 
                         var additions = [];
+                        var pricemin = 0, pricemax = 0, marketpricemin = 0, marketpricemax = 0;
                         if (additionsResult && additionsResult.length > 0) {
                             additions = additionsResult[0].additions;
+                            pricemin = additionsResult[0].pricemin;
+                            pricemax = additionsResult[0].pricemax;
+                            marketpricemin = additionsResult[0].marketpricemin;
+                            marketpricemax = additionsResult[0].marketpricemax;
                         }
 
-                        var callbackValue = {attributes: remainAttributes, price: {min: minPrice, max: maxPrice}, additions:additions};
+                        var callbackValue = {attributes: remainAttributes,
+                            price: {min: pricemin, max: pricemax},
+                            market_price:{min: marketpricemin, max: marketpricemax},
+                            additions:additions};
                         if(allAttributesSelected) {
                             // should query one SKU here
                             SKUModel.findOne(matchOptions)
