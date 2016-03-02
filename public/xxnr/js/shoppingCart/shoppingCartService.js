@@ -2,7 +2,7 @@
  * Created by zhouxin on 2016/01/18.
  */
 var app = angular.module('xxnr_common');
-app.service('shoppingCartService', function($cookieStore, BaseUrl, BaseDomainREG){
+app.service('shoppingCartService', function($cookieStore, BaseUrl, BaseDomainREG, hostnameService){
 	var scartKey = "__scart";
 
     this.getSCart = function() {
@@ -14,7 +14,8 @@ app.service('shoppingCartService', function($cookieStore, BaseUrl, BaseDomainREG
     };
 
     this.setSCart = function(value) {
-        if (BaseDomainREG.test(BaseUrl)) {
+        var hostname = hostnameService.getHostname();
+        if (BaseDomainREG.test(hostname)) {
             $cookieStore.put(scartKey, value, {path:"/", domain:".xinxinnongren.com"});
         } else {
             $cookieStore.put(scartKey, value, {path:"/"});
