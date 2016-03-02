@@ -84,7 +84,7 @@ app.controller('categoryController', function($scope, remoteApiService, commonSe
             price = null;
         }
         // console.log(queryAttributes);
-        console.log(price);
+        // console.log(price);
         getPagedGoods(current_page,product_count_per_page,$scope.$parent.categoryId,$scope.$parent.brandsStr, queryAttributes, price);
         generate_page();
     };
@@ -105,6 +105,16 @@ app.controller('categoryController', function($scope, remoteApiService, commonSe
         }
     };
     var getPagedGoods = function(page,count_per_page,categoryId,brandsStr, queryAttributesArray ,reservePrice){
+        if(!hasAttributes){
+            queryAttributes = null;
+        }
+        if(!price){
+            prive = null;
+        }
+        if($scope.$parent.brandsStr == 0){
+            $scope.$parent.brandsStr = null;
+        }
+
         remoteApiService.getGoodsListPage(page, count_per_page, categoryId,brandsStr,queryAttributesArray ,reservePrice)
             .then(function(data){
                 all_products = [];
@@ -143,7 +153,7 @@ app.controller('categoryController', function($scope, remoteApiService, commonSe
             }
         }
         $scope.$parent.current_items = [];
-        getPagedGoods(current_page,product_count_per_page,$scope.$parent.categoryId,brand,model,price);
+        getPagedGoods(current_page,product_count_per_page,$scope.$parent.categoryId,$scope.$parent.brandsStr, queryAttributes, price);
     };
     getPagedGoods(current_page,product_count_per_page,$scope.$parent.categoryId);
 
