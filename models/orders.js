@@ -83,8 +83,14 @@ var schema = new mongoose.Schema({
 	    'payStatus': {type:Number, required:true, default: PAYMENTSTATUS.UNPAID},	// 子订单支付状态，从子订单付款状态统计得来 分为未付款、部分付款、已付款三种，只用来做查询
 	    'stageId': String,															// 分期付款类型ID
 	}],
-	'duePrice': {type:Number}														// 剩余金额
-
+	'duePrice': {type:Number},														// 剩余金额
+	'delivery':{type:mongoose.Schema.ObjectId, ref:'delivery'},						// 订单的配送方式
+	'RSCInfo':{																		// 订单选择的自提点信息
+		'RSC':{type:mongoose.Schema.ObjectId, ref:'user'},							// 自提点的reference
+		'companyName':{type:String},												// 自提点公司名
+		'RSCAddress': {type:String},												// 自提点地址
+		'RSCPhone': {type:String}													// 自提点联系电话
+	}
 });
 
 schema.index({dateCreated: -1});
