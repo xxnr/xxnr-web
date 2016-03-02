@@ -15,7 +15,7 @@ exports.install = function() {
     F.route('/api/v2.1/cart/getShoppingCartOffline', getShoppingCartOffline, ['post']);
 
     // jiesuan
-    F.route('/api/v2.2/cart/getSKUDeliveries', getSKUDeliveries, ['post'], ['isLoggedIn']);
+    F.route('/api/v2.2/cart/getDeliveries', getSKUDeliveries, ['post'], ['isLoggedIn']);
 };
 
 function updateShoppingCart() {
