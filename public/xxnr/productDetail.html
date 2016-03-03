@@ -85,16 +85,19 @@
                 <div class="product_info_part1">
                     <h4 class="product_name" ng-cloak>{{item.name}}</h4>
                     <p class="sub_tit" ng-cloak>{{item.description}}</p>
-                    <!--<ul>-->
-                        <!--<li>市场价</li>-->
-                        <!--<li><del style="color:#C0C0C0">￥{{item.oldPrice}}</del></li>-->
-                    <!--</ul>-->
-                    <ul class="price_list">
-                        <li class="ng-cloak" ng-hide="item.presale">新农价：</li>
+
+                    <ul class="price_list clearfix">
+                        <div class="marketPrice" ng-hide="!item.marketPriceDisplay || (item.marketMinPrice == 0 && item.marketMaxPrice == 0)">
+                            <ul>
+                                <li>市场价</li>
+                                <li><del style="color:#C0C0C0">{{'￥ '+item.marketMinPrice.toFixed(2)}} {{item.marketMaxPrice==item.marketMinPrice?"":"-"}} {{(item.marketMaxPrice==item.marketMinPrice?"":item.marketMaxPrice.toFixed(2))}}</del></li>
+                            </ul>
+                        </div>
+                        <li class="ng-cloak" ng-hide="item.presale">新农价&nbsp;&nbsp;&nbsp;</li>
                         <li class="price" ng-hide="item.presale">{{'￥'+item.minPrice.toFixed(2)}} {{item.maxPrice==item.minPrice?"":"-"}} {{(item.maxPrice==item.minPrice?"":item.maxPrice.toFixed(2))}}</li>
                         <li class="ng-cloak price" ng-show="item.presale" ng-class="{true: 'presale',}[item.presale]">即将上线</li>
                         <!-- <li ng-show="category=='化肥' && !item.presale" class="ng-cloak unitText">/吨</li> -->
-                        <li ng-show="item.deposit && item.online && !item.presale">预付定金：</li>
+                        <li ng-show="item.deposit && item.online && !item.presale">预付定金&nbsp;&nbsp;</li>
                         <li class="price" ng-show="item.deposit && item.online && !item.presale" ng-cloak>￥{{item.deposit}}</li>
                     </ul>
                     <p ng-show="!item.online" class="offline-text">商品下架了</p>
