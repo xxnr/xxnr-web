@@ -65,6 +65,15 @@ app.controller('productDetailController',function($scope, $timeout, remoteApiSer
             // item.priceRange = good.SKUPrice;
             item.minPrice = good.SKUPrice?good.SKUPrice.min:0;
             item.maxPrice = good.SKUPrice?good.SKUPrice.max:0;
+            if(good.SKUMarketPrice){
+                item.marketPriceDisplay = true;
+                item.marketMinPrice = good.SKUMarketPrice.min;
+                item.marketMaxPrice = good.SKUMarketPrice.max;
+            }else{
+                item.marketPriceDisplay = false;
+                item.marketMinPrice = 0;
+                item.marketMaxPrice = 0;
+            }
             for(var i in item.SKUAttributes){
                 item.SKUAttributes[i].isSelected = [];
                 item.SKUAttributes[i].selectable = [];
@@ -231,8 +240,16 @@ app.controller('productDetailController',function($scope, $timeout, remoteApiSer
             $scope.item.minPrice = Number($scope.item.minPrice) + Number($scope.item.SKUAdditions[value_index].price);
             $scope.item.maxPrice = Number($scope.item.maxPrice) + Number($scope.item.SKUAdditions[value_index].price);
         }
-        var temp = $scope.item.SKUAdditions[value_index].isSelected;
-        $scope.item.SKUAdditions[value_index].isSelected = !temp;
+        if($scope.item.marketMinPrice != 0 && $scope.item.marketMaxPrice !=0){
+            if($scope.item.SKUAdditions[value_index].isSelected){
+                $scope.item.marketMinPrice = Number($scope.item.marketMinPrice) - Number($scope.item.SKUAdditions[value_index].price);
+                $scope.item.marketMaxPrice = Number($scope.item.marketMaxPrice) - Number($scope.item.SKUAdditions[value_index].price);
+            }else{
+                $scope.item.marketMinPrice = Number($scope.item.marketMinPrice) + Number($scope.item.SKUAdditions[value_index].price);
+                $scope.item.marketMaxPrice = Number($scope.item.marketMaxPrice) + Number($scope.item.SKUAdditions[value_index].price);
+            }
+        }
+        $scope.item.SKUAdditions[value_index].isSelected = !$scope.item.SKUAdditions[value_index].isSelected;
 
         $scope.selectedAdditions = [];
         for(var i in $scope.item.SKUAdditions){
@@ -248,8 +265,19 @@ app.controller('productDetailController',function($scope, $timeout, remoteApiSer
                     // console.log("get SKU id");
                     $scope.item.SKU_id = data.data.SKU._id;
                 }
-                $scope.item.minPrice = data.data.price.min;
-                $scope.item.maxPrice = data.data.price.max;
+                if(data.data.price){
+                    $scope.item.minPrice = data.data.price.min;
+                    $scope.item.maxPrice = data.data.price.max;
+                }
+                if(data.data.market_price){
+                    $scope.item.marketPriceDisplay = true;
+                    $scope.item.marketMinPrice = data.data.market_price.min;
+                    $scope.item.marketMaxPrice = data.data.market_price.max;
+                }else{
+                    $scope.item.marketPriceDisplay = false;
+                    $scope.item.marketMinPrice = 0;
+                    $scope.item.marketMaxPrice = 0;
+                }
                 for(var i in data.data.attributes){
                     for(var j in $scope.item.SKUAttributes){
                         if(data.data.attributes[i].name == $scope.item.SKUAttributes[j].name){
@@ -266,7 +294,7 @@ app.controller('productDetailController',function($scope, $timeout, remoteApiSer
                 if(data.data.additions){
                     $scope.item.SKUAdditions = data.data.additions;
                     for(var i in $scope.item.SKUAdditions){
-                        item.SKUAdditions[i].isSelected = false;
+                        $scope.item.SKUAdditions[i].isSelected = false;
                     }
                 }
                 // console.log(isAllSKUSelected());

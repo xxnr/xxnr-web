@@ -108,7 +108,7 @@
                                 <input type="password" id="password_cf" my-placeholder="请输入您的确认密码" placeholder="请输入您的确认密码" ng-model="confirm_newPassword" ng-keydown="regist_keydown($event)">
                             </li>
                             <li class="policy">
-                                <input type="checkbox" name="readPolicy" ng-model="policyChecked" /> <span>我已阅读并同意<a href="" ng-click="showPolicy()">《新新农人网站使用协议》</a></span>
+                                <input type="checkbox" checked="true" name="readPolicy" ng-model="policyChecked" /> <span>我已阅读并同意<a href="" ng-click="showPolicy()">《新新农人网站使用协议》</a></span>
                             </li>
                             <li class="reg_btn">
                                 <a href="" ng-click="regist()">立即注册</a>
@@ -153,13 +153,13 @@
                 <li>
                     <label for="" class="left label">新密码：</label>
                     <div class="left">
-                        <input type="password" id="password" class="input" value="" ng-model="newPassword">
+                        <input type="password" id="pop_password" class="input" value="" ng-model="newPassword">
                     </div>
                 </li>
                 <li>
                     <label for="" class="left label">确认密码：</label>
                     <div class="left">
-                        <input type="password" id="password_cf" class="input" value="" ng-model="confirm_newPassword" ng-keydown="confirm_newPassword_keydown($event)">
+                        <input type="password" id="pop_password_cf" class="input" value="" ng-model="confirm_newPassword" ng-keydown="confirm_newPassword_keydown($event)">
                     </div>
                 </li>
                 <li>

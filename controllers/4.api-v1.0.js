@@ -525,15 +525,18 @@ function payOrder(payExecutor){
         }
 
         try {
-            // if user not in white list, the price of one time must more than config minPayPrice
-            if ((self.user && !self.user.inWhiteList) || !self.user) {
-                var minPayPrice = F.config.minPayPrice;
-                // one time pay price must more than minPayPrice
-                if (minPayPrice > payment.price) {
-                    payPrice = payment.price;
-                }
-                if (payPrice && tools.isPrice(payPrice.toString()) && parseFloat(payPrice) && minPayPrice > parseFloat(payPrice)) {
-                    payPrice = minPayPrice;
+            if (payPrice) {
+                // if user not in white list, the price of one time must more than config minPayPrice
+                if ((self.user && !self.user.inWhiteList) || !self.user) {
+                    var minPayPrice = F.config.minPayPrice;
+                    // one time pay price must more than minPayPrice
+                    if (minPayPrice > payment.price) {
+                        minPayPrice = payment.price;
+                    }
+                    // one time pay price must more than minPayPrice
+                    if (payPrice && tools.isPrice(payPrice.toString()) && parseFloat(payPrice) && minPayPrice > parseFloat(payPrice)) {
+                        payPrice = minPayPrice;
+                    }
                 }
             }
             var reqOptions = {};
