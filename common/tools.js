@@ -9,6 +9,7 @@ var JWT = require('jsonwebtoken');
 
 var regexpPhone = new RegExp('^(13[0-9]|15[012356789]|17[678]|18[0-9]|14[57])[0-9]{8}$');
 var regexpPrice = new RegExp('^[0-9]*(\.[0-9]{1,2})?$');
+var regexpXXNRHost = new RegExp('(.*\.|^)xinxinnongren\.com.*');
 
 /*
     Phone in china validation
@@ -207,4 +208,16 @@ exports.verify_token = function(token){
 exports.isXXNRAgent = function(verifiedTypes){
     const XXNRAgentId = '6';
     return verifiedTypes && verifiedTypes.indexOf(XXNRAgentId) != -1;
+};
+
+// get xxnr host
+exports.getXXNRHost = function(url){
+    if (!url)
+        return 'www.xinxinnongren.com';
+
+    if (regexpXXNRHost.test(url.toString())) {
+        return 'www.xinxinnongren.com';
+    } else {
+        return url;
+    }
 };
