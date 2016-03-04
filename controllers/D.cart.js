@@ -4,6 +4,7 @@
 var services = require('../services');
 var CartService = services.cart;
 var SKUService = services.SKU;
+var CategoryService = services.category;
 var converter = require('../common/converter');
 var api10 = converter.api10;
 
@@ -12,6 +13,9 @@ exports.install = function() {
     F.route('/api/v2.1/cart/addToCart', updateShoppingCart, ['post'], ['isLoggedIn']);
     F.route('/api/v2.1/cart/changeNum', updateShoppingCart, ['post'], ['isLoggedIn']);
     F.route('/api/v2.1/cart/getShoppingCartOffline', getShoppingCartOffline, ['post']);
+
+    // jiesuan
+    F.route('/api/v2.2/cart/getDeliveries', getSKUDeliveries, ['post'], ['isLoggedIn']);
 };
 
 function updateShoppingCart() {
@@ -28,7 +32,7 @@ function updateShoppingCart() {
     }
 
     if (!SKUId) {
-        var response = ( {code: 1001, message: "param goodsId required"});
+        var response = {code: 1001, message: "param goodsId required"};
         self.respond(response);
         return;
     }
@@ -188,4 +192,36 @@ function convertToShoppingCartFormatV_1_0(SKUs, cartId, userId){
     }
 
     return goodDetails;
+}
+
+// get the deliveries of post SKUs in shopping cart
+function getSKUDeliveries() {
+    var self = this;
+    var userId = self.data.userId;
+    var checkoutSKUs = self.data.SKUs;
+    if (!userId) {
+        self.respond({code:1001, message:'请提供正确的参数'});
+        return;
+    }
+    if(!checkoutSKUs || !Array.isArray(checkoutSKUs) || !(checkoutSKUs.length > 0)){
+        self.respond({code:1001, message:'请提供正确的参数'});
+        return;
+    }
+    
+    CartService.getSKUCategoriesInCart(userId, checkoutSKUs, function(err, categories) {
+        if (err || !categories) {
+            if (err) console.error('Cart getSKUDeliveries getSKUCategoriesInCart err:', err);
+            self.respond({code:1001, message:'查询SKU分类失败'});
+            return;
+        }
+        CategoryService.getDeliveries(categories, function(err, results) {
+            if (err || !results) {
+                if (err) console.error('Cart getSKUDeliveries getDeliveries err:', err);
+                self.respond({code:1001, message:'查询SKU配送方式失败'});
+                return;
+            }
+            self.respond({code:1000, message:'success', datas:{count:results.length, items:results}});
+            return;
+        });
+    });
 }

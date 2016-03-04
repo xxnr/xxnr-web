@@ -9,6 +9,7 @@ var schema = new mongoose.Schema({
     SKU_items:[{
         SKU:{type:mongoose.Schema.ObjectId, ref:'SKU', required:true},
         product:{type:mongoose.Schema.ObjectId, ref:'product', required:true},          // product reference for improving query performance
+        category:{type:mongoose.Schema.ObjectId, ref:'category', required:true},        // category reference for improving query performance
         additions:[{type:mongoose.Schema.ObjectId, ref:'SKUAddition', required:true}],  // the additions added to cart
         count:Number
     }]
