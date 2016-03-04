@@ -85,6 +85,10 @@ UserService.prototype.update = function(options, callback) {
             setValue['RSCInfo.IDNo'] = options.RSCInfo.IDNo;
         }
 
+        if(options.RSCInfo.phone){
+            setValue['RSCInfo.phone'] = options.RSCInfo.phone;
+        }
+
         if(options.RSCInfo.companyName){
             setValue['RSCInfo.companyName'] = options.RSCInfo.companyName;
         }

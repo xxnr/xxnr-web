@@ -224,3 +224,7 @@ exports.regexIdentityNo = regexIdentityNo;
 exports.isEmptyObject = function isEmptyObject(obj) {
     return !Object.keys(obj).length;
 };
+
+exports.isArray = function(obj) {
+    return obj instanceof Array;
+};

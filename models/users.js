@@ -44,6 +44,7 @@ var UserSchema = new mongoose.Schema({
     "RSCInfo":{                                                                  // regional service centre info
         "name":String,                                                           // true name
         "IDNo":{type:String, validate:tools.regexIdentityNo},                    // identity number
+        "phone":String,                                                          // RSC phone
         "companyName":String,                                                    // company name
         "companyAddress":{                                                       // RSC address
             province:{type:mongoose.Schema.ObjectId, ref:"province"},
@@ -51,7 +52,8 @@ var UserSchema = new mongoose.Schema({
             county:{type:mongoose.Schema.ObjectId, ref:"county"},
             town:{type:mongoose.Schema.ObjectId, ref:"town"},
             details:String
-        }
+        },
+        "products":[{type:mongoose.Schema.ObjectId, ref:"province"}]            // products RSC served
     }
 });
 
@@ -85,6 +87,7 @@ var IntentionProductSchema = new mongoose.Schema({
 UserSchema.index({account:"text", nickname:"text", name:"text"});
 UserSchema.index({type:1});
 UserSchema.index({name:1});
+UserSchema.index({'RSCInfo.products':1});
 
 PotentialCustomerSchema.index({"phone":1, unique:true});
 PotentialCustomerSchema.index({"user":1, "dateAdded":1, "dateTimeAdded":1});
