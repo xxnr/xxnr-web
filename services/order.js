@@ -365,10 +365,24 @@ OrderService.prototype.updatePayments = function(options, callback) {
 		}
 		if (doc) {
 			doc.payments.forEach(function (payment) {
-				if (options.payments[payment.id] && options.payments[payment.id].suborderId && options.payments[payment.id].suborderId == payment.suborderId && payment.payStatus !== options.payments[payment.id].payStatus) {
-					payment.payStatus = options.payments[payment.id].payStatus;
-					payment.dateSet = new Date();
-					needCheck = true;
+				if (options.payments[payment.id] && options.payments[payment.id].suborderId && options.payments[payment.id].suborderId == payment.suborderId) {
+					if (payment.payStatus !== options.payments[payment.id].payStatus || payment.payType !== options.payments[payment.id].payType) {
+						if (payment.payStatus !== options.payments[payment.id].payStatus) {
+							payment.payStatus = options.payments[payment.id].payStatus;
+							needCheck = true;
+							if (options.payments[payment.id].payStatus == PAYMENTSTATUS.PAID) {
+								payment.datePaid = new Date();
+							}
+						}
+						if (payment.payType !== options.payments[payment.id].payType) {
+							payment.payType = options.payments[payment.id].payType;
+						}
+						payment.dateSet = new Date();
+						if (options.user) {
+							payment.backendUser = options.user._id;
+							payment.backendUserAccount = options.user.account;
+						}
+					}
 				}
 			});
 			doc.save(function(err) {
