@@ -440,7 +440,7 @@
 									<td class="ui-center col-xs-1">第{{ p.slice }}笔</td>
 			                        <td class="ui-center col-xs-1">{{ p.price | price(2) }}</td>
 			                        <td class="ui-center col-xs-1">
-			                        {{ if p.payType }}
+			                        <!-- {{ if p.payType }}
 										{{ if p.payType==1 }}
 											支付宝
 										{{ else }}
@@ -450,6 +450,16 @@
 												其他
 											{{ fi }}
 										{{ fi }}
+									{{ else }}
+										-
+									{{ fi }} -->
+									{{ if p.payType }}
+										<select data-name="payType" data-id="{{ p.id }}" data-suborderid="{{ s.id }}" data-suborderindex="{{ s.$index }}" data-paymentindex="{{ $index }}">
+										{{ foreach pt in payTypes }}
+											<option value="{{ pt.value }}" {{ if p.payType == pt.value }}selected{{ fi }}>{{ pt.name }}
+											</option>
+										{{ end }}
+										</select>
 									{{ else }}
 										-
 									{{ fi }}
@@ -662,6 +672,7 @@
 						SET('orders.form', $.extend({}, response), true);
                         SET('orders.payStatuses',[{name:'未付款',value:1},{name:'已付款',value:2}], true);
                         SET('orders.deliverStatuses',[{name:'未发货',value:1},{name:'已发货',value:2}], true);
+                        SET('orders.payTypes',[{name:'支付宝',value:1},{name:'银联',value:2},{name:'线下付款',value:3}], true);
 						SET('orders.response', null);
 						SET('common.form', 'orders');
 					});
@@ -715,6 +726,7 @@
 			var subOrderid = el.attr('data-suborderid');
 			switch (name) {
 				case 'payStatus':
+				case 'payType':
 					var value = el.val();
 					orders_form_update(subOrderid, {'name':'subOrders','paymentid':paymentid}, function(item) {
 						if (item) {
