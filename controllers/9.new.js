@@ -1,4 +1,5 @@
 var services = require('../services');
+var tools = require('../common/tools');
 var NewsService = services.news;
 
 exports.install = function() {
@@ -24,9 +25,15 @@ function json_news_query() {
         }
 
         if (result && result.count && result.count > 0) {
-            var prevurl = 'http://' + self.req.uri.host + '/news/';
-            var prevshareurl = 'http://' + self.req.uri.host + '/sharenews/';
-            var previmg = 'http://' + self.req.uri.host + '/images/original/';
+            var hosturl = self.req.uri.host;
+            if (hosturl) {
+                hosturl = tools.getXXNRHost(hosturl);
+            } else {
+                hosturl = 'www.xinxinnongren.com';
+            }
+            var prevurl = 'http://' + hosturl + '/news/';
+            var prevshareurl = 'http://' + hosturl + '/sharenews/';
+            var previmg = 'http://' + hosturl + '/images/original/';
             var imgtype = '.jpg';
             var items = result.items || [];
             var length = items.length || 0;

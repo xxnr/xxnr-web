@@ -570,7 +570,7 @@ UserService.prototype.query = function(options, callback) {
             .sort({datecreated: -1})
             .skip(skip)
             .limit(take)
-            .populate({path:'inviter', select:'-_id id account photo nickname'})
+            .populate({path:'inviter', select:'-_id id account photo nickname name'})
             .exec(function (err, docs) {
                 if (err) {
                     callback(err);

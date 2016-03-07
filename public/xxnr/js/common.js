@@ -11,7 +11,7 @@ app.config(['$locationProvider', function($locationProvider) {
     $locationProvider.html5Mode(true);
 }]);
 // base domain regx
-app.constant('BaseDomainREG', /.*\.xinxinnongren\.com.*/);
+app.constant('BaseDomainREG', /(.*\.|^)xinxinnongren\.com.*/);
 
 //app.constant('BaseUrl', 'http://101.200.181.247/');
 app.constant('BaseUrl', ''); // app.constant('BaseUrl', 'http://123.57.251.173:8070/');
@@ -355,3 +355,13 @@ var _hmt = _hmt || [];
     var s = document.getElementsByTagName("script")[0];
     s.parentNode.insertBefore(hm, s);
 })();
+
+
+/*************************************************************************************************
+ **                                    common window laction hostname                           **
+ *************************************************************************************************/
+app.service('hostnameService', function() {
+    this.getHostname = function() {
+        return window.location.hostname;
+    };
+});

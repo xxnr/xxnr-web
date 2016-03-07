@@ -10,6 +10,7 @@ var JWT = require('jsonwebtoken');
 var regexpPhone = new RegExp('^(13[0-9]|15[012356789]|17[678]|18[0-9]|14[57])[0-9]{8}$');
 var regexpPrice = new RegExp('^[0-9]*(\.[0-9]{1,2})?$');
 var regexIdentityNo = /^(\d{15}$|^\d{18}$|^\d{17}(\d|X|x))$/;
+var regexpXXNRHost = new RegExp('(.*\.|^)xinxinnongren\.com.*');
 
 /*
     Phone in china validation
@@ -223,6 +224,18 @@ exports.regexIdentityNo = regexIdentityNo;
 
 exports.isEmptyObject = function isEmptyObject(obj) {
     return !Object.keys(obj).length;
+};
+
+// get xxnr host
+exports.getXXNRHost = function(url){
+    if (!url)
+        return 'www.xinxinnongren.com';
+
+    if (regexpXXNRHost.test(url.toString())) {
+        return 'www.xinxinnongren.com';
+    } else {
+        return url;
+    }
 };
 
 exports.isArray = function(obj) {
