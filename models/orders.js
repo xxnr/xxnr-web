@@ -75,6 +75,8 @@ var schema = new mongoose.Schema({
 		'payType': {type:Number, required:true},									// 支付类型
 		'isClosed': {type:Boolean, required:true, default:false},					// 本支付是否关闭
 		'thirdPartyRecorded': {type:Boolean, default:false},						// 本支付是否在第三方支付平台生成
+		'backendUser':{type: mongoose.Schema.ObjectId, ref:'backenduser'},			// 设置本条信息的后台用户
+		'backendUserAccount':{type: String},										// 设置本条信息的后台用户账户
 	}],
 	'subOrders': [{
 	    'id': {type: String, index: true, unique: true, required: true},			// 子订单ID
@@ -84,7 +86,6 @@ var schema = new mongoose.Schema({
 	    'stageId': String,															// 分期付款类型ID
 	}],
 	'duePrice': {type:Number}														// 剩余金额
-
 });
 
 schema.index({dateCreated: -1});
