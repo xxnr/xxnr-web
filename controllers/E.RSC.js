@@ -10,7 +10,7 @@ var OrderService = services.order;
 exports.install = function() {
     // Regional Service Centre apis
     F.route('/api/v2.2/RSC/info/get',                   json_RSC_info_get,          ['get'],    ['isLoggedIn', 'isRSC']);
-    F.route('/api/v2.2/RSC/info/fill',                  process_RSC_info_fill,      ['post'],   ['isLoggedIn', 'isRSC']);
+    F.route('/api/v2.2/RSC/info/fill',                  process_RSC_info_fill,      ['post'],   ['isLoggedIn']);
     F.route('/api/v2.2/RSC/orders',                     json_RSC_orders_get,        ['get'],    ['isLoggedIn', 'isRSC']);
     F.route('/api/v2.2/RSC/order/deliverStatus/modify', process_RSC_order_deliverStatus_modify, ['post'],    ['isLoggedIn', 'isRSC']);
     F.route('/api/v2.2/RSC/address/province',           json_RSC_address_province_query,     ['get'],    ['isLoggedIn']);

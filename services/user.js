@@ -161,6 +161,7 @@ UserService.prototype.login = function(options, callback) {
 
         if(password_valid){
             user = user.toObject();
+            getMoreUserInfo(user);
             callback(null, user);
 
             // Save login log
@@ -202,14 +203,18 @@ UserService.prototype.get = function(options, callback) {
             }
 
             user = user.toObject();
-            user.isVerified = isUserTypeVerified(user);
-            user.isXXNRAgent = tools.isXXNRAgent(user.typeVerified);
-            user.isRSC = tools.isRSC(user.typeVerified);
+            getMoreUserInfo(user);
 
             // Returns response
             return callback(null, user);
         });
 };
+
+function getMoreUserInfo(user){
+    user.isVerified = isUserTypeVerified(user);
+    user.isXXNRAgent = tools.isXXNRAgent(user.typeVerified);
+    user.isRSC = tools.isRSC(user.typeVerified);
+}
 
 function isUserTypeVerified(user){
     return user.typeVerified && user.typeVerified.indexOf(user.type) != -1 && user.type != '1'

@@ -1676,6 +1676,11 @@ function json_potential_customer_get(){
 }
 
 function convert_user_type_info(user, data){
+    user.isVerified = data.isVerified;
+    user.isXXNRAgent = data.isXXNRAgent;
+    user.isRSC = data.isRSC;
+    user.RSCInfoVerifing = data.isRSC ? false : (data.RSCInfo ? true : false);
+
     // selected user type
     if(!F.global.usertypes[data.type]){
         user.isVerified = false;
