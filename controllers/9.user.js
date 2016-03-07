@@ -206,7 +206,7 @@ var setCookieAndResponse = function(user, keepLogin){
             cookieUserInfo.nickName = encodeURIComponent(user.nickname);
         }
         if(keepLogin){
-            if(F.isDebug){ 
+            if(F.isDebug){
                 self.res.cookie(F.config.usercookie, JSON.stringify(cookieUserInfo), new Date().add(F.config.usercookie_expires_in));
                 self.res.cookie(F.config.tokencookie, token, new Date().add(F.config.token_cookie_expires_in));
             }else {
@@ -223,7 +223,7 @@ var setCookieAndResponse = function(user, keepLogin){
             }
         }
 
-        
+
         // user shopping carts
         CartService.getOrAdd(user.userid, function(err, cart) {
             var shoppingCart_count = 0;
@@ -1676,10 +1676,6 @@ function json_potential_customer_get(){
 }
 
 function convert_user_type_info(user, data){
-    user.isVerified = isUserTypeVerified(data);
-    user.isXXNRAgent = tools.isXXNRAgent(data.typeVerified);
-    user.isRSC = tools.isRSC(data.typeVerified);
-
     // selected user type
     if(!F.global.usertypes[data.type]){
         user.isVerified = false;
@@ -1699,10 +1695,6 @@ function convert_user_type_info(user, data){
             }
         });
     }
-}
-
-function isUserTypeVerified(user){
-    return user.typeVerified && user.typeVerified.indexOf(user.type) != -1 && user.type != '1'
 }
 
 function json_nominated_inviter_get(){

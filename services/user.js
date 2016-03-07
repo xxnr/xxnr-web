@@ -202,11 +202,18 @@ UserService.prototype.get = function(options, callback) {
             }
 
             user = user.toObject();
+            user.isVerified = isUserTypeVerified(user);
+            user.isXXNRAgent = tools.isXXNRAgent(user.typeVerified);
+            user.isRSC = tools.isRSC(user.typeVerified);
 
             // Returns response
             return callback(null, user);
         });
 };
+
+function isUserTypeVerified(user){
+    return user.typeVerified && user.typeVerified.indexOf(user.type) != -1 && user.type != '1'
+}
 
 UserService.prototype.increaseScore = function(options, callback){
     if(!options.userid){

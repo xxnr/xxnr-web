@@ -168,9 +168,11 @@ canvas { display: block; }
 .form_tab_selected { color: #303030; text-decoration: none; }
 .form_tab .deeppink {background:hotpink; border:1px solid hotpink}
 .form_tab .cornflowerblue  {background:cornflowerblue; border:1px solid cornflowerblue;}
+.form_tab .orangered  {background:#ff9100; border:1px solid #ff9100;}
 
 .multi_form .form_cornflowerblue {border:1px solid cornflowerblue; background:white;}
 .multi_form .form_deeppink {border: 1px solid hotpink; background:white;}
+.multi_form .form_orangered {border: 1px solid #ff9100; background:white;}
 
 .button_disabled {background-color: #F5F5F5 !important;
 	border: 1px solid #E0E0E0 !important;

@@ -148,7 +148,10 @@ exports.install = function() {
 	// potential customer
 	F.route(CONFIG('manager-url') + '/api/v2.1/potentialCustomer/query',	json_potential_customer_query,	['get'], ['backend_auth']);
 	F.route(CONFIG('manager-url') + '/api/v2.1/potentialCustomer/{_id}',	json_potential_customer_get, ['get'], ['backend_auth']);
-	F.route(CONFIG('manager-url') + '/api/v2.1/agentinfo/{_id}',				json_agent_info_get, ['get'], ['backend_auth']);
+	F.route(CONFIG('manager-url') + '/api/v2.1/agentinfo/{_id}',			json_agent_info_get, ['get'], ['backend_auth']);
+
+	// RSC
+	F.route(CONFIG('manager-url') + '/api/v2.2/RSCInfo/{_id}',				json_RSC_info_get, ['get'], ['backend_auth']);
 };
 
 var files = DB('files', null, require('total.js/database/database').BUILT_IN_DB).binary;
@@ -1532,5 +1535,17 @@ function json_agent_info_get(id){
 
 			self.respond({code:1000, agent:{name:user.name, phone: user.account, address:user.address, totalCount:totalCount, registeredCount:registeredCount, registeredAndBindedCount:registeredAndBindedCount}});
 		})
+	})
+}
+
+function json_RSC_info_get(id){
+	var self = this;
+	UserService.getRSCInfoById(id, function(err, user){
+		if(err){
+			self.respond({code:1001, message:'查询失败'});
+			return;
+		}
+
+		self.respond({code:1000, message:'success', RSCInfo:user.RSCInfo});
 	})
 }
