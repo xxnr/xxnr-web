@@ -59,6 +59,7 @@
 		<div class="multi_form">
 			<div class="form_tab">
 				<div id="user_info_button" class="form_tab_selected cornflowerblue">用户详情</div>
+				<div id="RSC_info_button" class="hidden orangered">县级经销商</div>
 				<div id="agent_info_button" class="hidden deeppink">新农经纪人</div>
 			</div>
 			<div id="user_info" class="form form_cornflowerblue">
@@ -158,6 +159,47 @@
 						<button name="submit">@(提交)</button>
 					</div>
 					<button name="cancel">@(取消)</button>
+				</div>
+			</div>
+			<div id="RSC_info" class="form form_orangered hidden">
+				<div data-component="template" data-component-path="RSC.form" class="padding" style="padding-bottom:0">
+					<script type="text/html">
+						<h3 class="nopadding">县级网点信息</h3>
+						<table class="table table-bordered" border="0">
+							<tr>
+								<td class="col-xs-4 active">@(真实姓名)</td>
+								<td>{{ name }}</td>
+							</tr>
+							<tr>
+								<td class="col-xs-4 active">@(身份证号)</td>
+								<td>{{ IDNo }}</td>
+							</tr>
+							<tr>
+								<td class="col-xs-4 active">@(网点名称)</td>
+								<td>{{ companyName }}</td>
+							</tr>
+							<tr>
+								<td class="col-xs-4 active">@(网点地区)</td>
+								<td>
+									{{ if companyAddress }}
+									{{ (companyAddress.province?companyAddress.province.name:'') + (companyAddress.city?companyAddress.city.name:'') + (companyAddress.county?companyAddress.county.name:'') + (companyAddress.town?companyAddress.town.name:'') }}
+									{{ fi }}
+								</td>
+							</tr>
+							<tr>
+								<td class="col-xs-4 active">@(网点详细地址)</td>
+								<td>
+									{{ if companyAddress }}
+									{{ companyAddress.details}}
+									{{ fi }}
+								</td>
+							</tr>
+							<tr>
+								<td class="col-xs-4 active">@(网点电话)</td>
+								<td>{{ phone }}</td>
+							</tr>
+						</table>
+					</script>
 				</div>
 			</div>
 			<div id="agent_info" class="form form_deeppink hidden">
@@ -277,6 +319,9 @@
 	var agent = {};
 	agent.form = {};
 
+	var RSC = {};
+	RSC.form = {};
+
 	ON('#users.grid', function(component) {
 
 		// Max items per page
@@ -292,6 +337,12 @@
                             alert(response.message);
                             return;
                         }
+
+						if(response.user.isRSC){
+							show_form_button($('#RSC_info_button'));
+						} else{
+							hide_form_button($('#RSC_info_button'));
+						}
 
 						if(response.user.isXXNRAgent){
 							show_form_button($('#agent_info_button'));
@@ -350,6 +401,14 @@
 						}
 
 						SET('agent.form', $.extend({}, response.agent), true);
+					});
+					$.components.GET(managerurl+'/api/v2.2/RSCInfo/'+row._id, null, function(response){
+						if(response.code!=1000){
+							alert(response.message);
+							return;
+						}
+
+						SET('RSC.form', $.extend({}, response.RSCInfo), true);
 					});
 					break;
 
@@ -410,6 +469,9 @@
 				break;
 			case 'agent_info_button':
 				$('#agent_info').removeClass('hidden');
+				break;
+			case 'RSC_info_button':
+				$('#RSC_info').removeClass('hidden');
 				break;
 		}
 	}

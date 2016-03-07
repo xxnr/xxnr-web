@@ -237,3 +237,7 @@ exports.getXXNRHost = function(url){
         return url;
     }
 };
+
+exports.isArray = function(obj) {
+    return obj instanceof Array;
+};
