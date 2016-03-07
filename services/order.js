@@ -370,6 +370,9 @@ OrderService.prototype.updatePayments = function(options, callback) {
 						if (payment.payStatus !== options.payments[payment.id].payStatus) {
 							payment.payStatus = options.payments[payment.id].payStatus;
 							needCheck = true;
+							if (options.payments[payment.id].payStatus == PAYMENTSTATUS.PAID) {
+								payment.datePaid = new Date();
+							}
 						}
 						if (payment.payType !== options.payments[payment.id].payType) {
 							payment.payType = options.payments[payment.id].payType;
