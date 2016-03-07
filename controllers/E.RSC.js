@@ -5,6 +5,7 @@ var tools = require('../common/tools');
 var services = require('../services');
 var UserService = services.user;
 var RSCService = services.RSC;
+var OrderService = services.order;
 
 exports.install = function() {
     // Regional Service Centre apis
@@ -16,7 +17,6 @@ exports.install = function() {
     F.route('/api/v2.2/RSC/address/city',               json_RSC_address_city_query,     ['get'],    ['isLoggedIn']);
     F.route('/api/v2.2/RSC/address/county',             json_RSC_address_county_query,     ['get'],    ['isLoggedIn']);
     F.route('/api/v2.2/RSC/address/town',               json_RSC_address_town_query,     ['get'],    ['isLoggedIn']);
-
 };
 
 /**
@@ -135,12 +135,26 @@ function json_RSC_info_get(){
 }
 
 function json_RSC_orders_get(){
-    // TODO:get order RSC should serve
-    // return fields: 下单时间、订单号、收货人姓名、电话、商品名称及属性、总额、配送方式、订单状态
+    var self = this;
+    var RSC = self.user;
+
+    var page = U.parseInt(self.data.page, 1) - 1;
+    var max = U.parseInt(self.data.max, 20);
+    OrderService.getByRSC(RSC, page, max, function(err, orders, count, pageCount){
+        if(err){
+            self.respond({code:1002, message:'获取订单失败'});
+            return;
+        }
+
+        self.respond({code:1000, message:'success', orders:orders, count:count, pageCount:pageCount});
+    })
 }
 
 function process_RSC_order_deliverStatus_modify(){
     // TODO:modify order deliver status by given order
+    // 2 cases:
+    // 1. 用户自提：商品发货状态为已到服务站->支付状态为已付款->输入自提码->验证自提码->修改状态（需要确认状态？？？）
+    // 2. 送货到家：支付状态为已付款->发货->修改状态为配送中
 }
 
 function json_RSC_address_province_query(){

@@ -33,7 +33,7 @@ CategoryService.prototype.getDeliveries = function(categoryIds, callback) {
     	, {$unwind: '$deliveries'}
     	, {
             $group: {
-                _id: '$deliveries.delivery',
+                _id: '$deliveries.deliveryType',
                 name: {$first: '$deliveries.deliveryName'},
                 weights: {$sum: '$deliveries.deliveryWeight'},
                 count: {$sum: 1}
@@ -52,11 +52,11 @@ CategoryService.prototype.getDeliveries = function(categoryIds, callback) {
             var deliveries = [];
             docs.forEach(function (doc) {
             	if (doc.count === categoryIds.length) {
-            		deliveries.push({deliveryId: doc.id,deliveryName: doc.name});
+            		deliveries.push({deliveryType: doc.id,deliveryName: doc.name});
             	}
             });
         	callback(null, deliveries);
     });
-}
+};
 
 module.exports = new CategoryService();

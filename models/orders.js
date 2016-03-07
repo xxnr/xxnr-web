@@ -84,7 +84,7 @@ var schema = new mongoose.Schema({
 	    'stageId': String,															// 分期付款类型ID
 	}],
 	'duePrice': {type:Number},														// 剩余金额
-	'delivery':{type:mongoose.Schema.ObjectId, ref:'delivery'},						// 订单的配送方式
+	'deliveryType':{type:Number},													// 订单的配送方式
 	'RSCInfo':{																		// 订单选择的自提点信息
 		'RSC':{type:mongoose.Schema.ObjectId, ref:'user'},							// 自提点的reference
 		'companyName':{type:String},												// 自提点公司名
@@ -99,6 +99,7 @@ schema.index({isClosed: 1, payStatus: 1, buyerId: 1, dateCreated: -1});
 schema.index({payStatus: 1, deliverStatus: 1, buyerId: 1, dateCreated: -1});
 schema.index({confirmed: -1, payStatus: 1, deliverStatus: 1, buyerId: 1, dateCreated: -1});
 schema.index({id:"text", buyerId:"text", buyerName:"text", buyerPhone:"text", consigneeName:"text", consigneePhone:"text", paymentId:"text"});
+schema.index({'RSCInfo.RSC': 1, dateCreated: -1});
 
 // Schema
 var orderPaidLogSchema = new mongoose.Schema({

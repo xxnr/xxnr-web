@@ -1449,4 +1449,49 @@ OrderService.prototype.savePaidLog = function(paidLog, callback) {
     }
 };
 
+OrderService.prototype.getByRSC = function(RSC, page, max, callback){
+	if(!RSC){
+		callback('RSC needed');
+		return;
+	}
+
+	var query = {'RSCInfo.RSC':RSC};
+
+	if(page<0 || !page){
+		page = 0;
+	}
+
+	if(max<0 || !max){
+		max = 20;
+	}
+
+	if(max>50){
+		max = 50;
+	}
+
+	OrderModel.count(query, function(err, count){
+		if(err){
+			console.error(err);
+			callback('error query order:', err);
+			return;
+		}
+
+		OrderModel.find(query)
+			.select('dateCreated id consigneeName consigneePhone SKUs price subOrders deliveryType')
+			.sort({dateCreated:-1})
+			.skip(page * max)
+			.limit(max)
+			.exec(function (err, orders) {
+				if (err) {
+					console.error(err);
+					callback('error query order');
+					return;
+				}
+
+				var pageCount = Math.floor(count / max) + (count % max ? 1 : 0);
+				callback(null, orders || [], count, pageCount);
+			})
+	});
+};
+
 module.exports = new OrderService();
