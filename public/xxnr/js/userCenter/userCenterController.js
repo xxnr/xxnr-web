@@ -7,9 +7,9 @@ app.filter('fixedTwo', function () {
       return input = input.toFixed(2);
     };
 });
-app.controller('userCenterController', function($scope, $rootScope, remoteApiService, payService, loginService, commonService, fileUpload, sideService) {
+app.controller('userCenterController', function($scope, $rootScope,$timeout ,remoteApiService, payService, loginService, commonService, fileUpload, sideService) {
     var user = commonService.user;
-
+    $scope.nickname_adding = false;
     $scope.avatarChange = false;
     $scope.uploaded = false;
 
@@ -60,7 +60,7 @@ app.controller('userCenterController', function($scope, $rootScope, remoteApiSer
                 sweetalert('密码长度需大于6位');
             }
         } else {
-            sweetalert('请输入密码');
+            sweetalert('请输入新密码');
         }
         return false;
     };
@@ -76,7 +76,7 @@ app.controller('userCenterController', function($scope, $rootScope, remoteApiSer
                 sweetalert('密码长度需大于6位');
             }
         } else {
-            $scope.showAlert('请再次输入密码');
+            sweetalert('请填写确认密码');
         }
     };
 
@@ -121,6 +121,7 @@ app.controller('userCenterController', function($scope, $rootScope, remoteApiSer
                 $scope.user.imgUrl = "images/default_avatar.png"
             }
             $scope.user.nickname = data.datas.nickname;
+            $scope.user.hasNickname = Boolean(data.datas.nickname);
             if(data.datas.address) {
                 $scope.user.address = data.datas.address.province.name + " " + data.datas.address.city.name + " " + (data.datas.address.county ? data.datas.address.county.name : '') + " " + (data.datas.address.town ? data.datas.address.town.name : '');
             }
@@ -211,7 +212,6 @@ app.controller('userCenterController', function($scope, $rootScope, remoteApiSer
                                 // submit success, change to not editing, show changed nick name
                                 $scope.user.nickname_editing = false;
                                 $scope.user.nickname_action_name = '修改';
-                                sweetalert('修改昵称成功', 'my_xxnr.html');
                                 // set user nickname to cookie
                                 if ($scope.user.nickname) {
                                     var cookieUser = loginService.getUser();
@@ -231,6 +231,10 @@ app.controller('userCenterController', function($scope, $rootScope, remoteApiSer
             $scope.user.nickname_editing = true;
             $scope.user.nickname_action_name = '提交';
         }
+    };
+    $scope.addNickname = function(){
+        $scope.nickname_adding = true;
+        $scope.modifyNickname();
     };
 
     $scope.current_page = 1;
