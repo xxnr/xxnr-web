@@ -1679,7 +1679,7 @@ function convert_user_type_info(user, data){
     user.isVerified = data.isVerified;
     user.isXXNRAgent = data.isXXNRAgent;
     user.isRSC = data.isRSC;
-    user.RSCInfoVerifing = data.isRSC ? false : (data.RSCInfo ? true : false);
+    user.RSCInfoVerifing = data.isRSC ? false : (data.RSCInfo ? (data.RSCInfo.name ? true : false) : false);
 
     // selected user type
     if(!F.global.usertypes[data.type]){

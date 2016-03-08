@@ -53,7 +53,7 @@ var UserSchema = new mongoose.Schema({
             town:{type:mongoose.Schema.ObjectId, ref:"town"},
             details:String
         },
-        "products":[{type:mongoose.Schema.ObjectId, ref:"province"}]            // products RSC served
+        "products":[{type:mongoose.Schema.ObjectId, ref:"province"}]             // products RSC served
     }
 });
 
