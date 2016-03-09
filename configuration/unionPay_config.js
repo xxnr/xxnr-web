@@ -56,7 +56,8 @@ module.exports = Object.freeze({
 		host: null,
 		port:80,
 		front:"/my_xxnr.html",
-		back:"/unionpay/nofity"
+		back:"/unionpay/notify",
+		refundback:"/unionpay/refundnotify"
 	})
 });
 

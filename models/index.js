@@ -65,6 +65,8 @@ exports.intention_product = mongoose.model('intention_product');
 exports.potential_customer = mongoose.model('potential_customer');
 // order paid log
 exports.orderpaidlog = mongoose.model('order_paid_log');
+// order payments refund
+exports.orderpaymentsrefund = mongoose.model('order_payments_refund');
 // audit logs
 exports.auditlog = mongoose.model('auditlog');
 // frontend user access
