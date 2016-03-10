@@ -92,33 +92,48 @@
             <p ng-cloak>地址： {{user.address}}</p> -->
 
             <div class="user_info" ng-class="{false:'notFilledTop'}[user.isUserInfoFullFilled]">
-                <p class="nickname">昵称：</p>
-                <input type="text" ng-class="{true:'editable_input_editing', false:'editable_input_not_editing'}[user.nickname_editing]" ng-model="user.nickname" ng-readonly="!user.nickname_editing" focus-me="{{user.nickname_editing}}">
-                <a href="" ng-class="{true:'editable_button_editing',false:'editable_button_not_editing'}[user.nickname_editing]" ng-click="modifyNickname()" ng-cloak>{{user.nickname_action_name}}</a>
+                <div class="displayNickname">
+                    <p class="NicknameAddinglink" ng-hide="user.hasNickname || nickname_adding " ng-click="addNickname()">添加昵称</p>
+                    <p class="nickname" ng-hide="!user.hasNickname || user.nickname_editing">{{user.nickname}}<span ng-click="modifyNickname()">修改</span></p>
+                </div>
+                <div class="editNickname" ng-show="nickname_adding || user.nickname_editing">
+                    <input type="text" ng-class="{true:'editable_input_editing', false:'editable_input_not_editing'}[user.nickname_editing]" ng-model="user.nickname" ng-readonly="!user.nickname_editing" focus-me="{{user.nickname_editing}}">
+                    <a href="" ng-class="{true:'editable_button_editing',false:'editable_button_not_editing'}[user.nickname_editing]" ng-mousedown="modifyNickname()" ng-cloak>{{user.nickname_action_name}}</a>
+                </div>
                 <div class="userProfile ng-hide" ng-hide="!user.isUserInfoFullFilled">
-                    <p class="name">姓名: {{user.name}}
+                    <p class="name">姓名：{{user.name}}
                         <span ng-class="{true:'female',false:'male'}[user.sex]">{{user.sex}}</span>
                     </p>
-                    <p>所在地区：{{user.address}}</p>
+                    <p>地区：{{user.address}}</p>
                     <p class="type">类型：{{user.type}}
-                        <img class="huizhang" ng-if="user.isVerified" src="images/huiyuan.png" alt="" /><a href="fillProfile.html">修改资料<img src="images/right-button2.png" alt=""/></a></p>
+                        <img class="huizhang" ng-if="user.isVerified" src="images/huiyuan.png" alt="" /><a href="fillProfile.html" class="modifyInfo">修改资料</a></p>
                 </div>
                 <div class="needToFillProfile ng-hide" ng-hide="user.isUserInfoFullFilled">
-                    还没有完善资料哟，快去填写领积分！<a href="fillProfile.html">去完善资料<img src="images/right-button.png" alt=""/></a>
+                    <a href="fillProfile.html">去完善资料领积分</a>
                 </div>
-                <p ng-cloak><a href="" ng-click="showModifyPwd()" class="modifyPassword">修改密码</a></p>
+                <p ng-cloak class="modifyBlock"><a href="" ng-click="showModifyPwd()" class="modifyPassword">修改密码</a></p>
             </div>
             <div class="jifen">
-                <p class="total">总积分：</p>
-                <p class="num" ng-cloak>{{user.points}}</p>
+                <p>
+                    <span class="total">积分 :&nbsp;</span><span class="num" ng-cloak>{{user.points}}</span>
+                </p>
+
                 <!--<div class="jifen_input">-->
                 <!--<div class="left input">-->
                 <!--<input placeholder="输入新农币兑换码" type="text">-->
                 <!--</div>-->
                 <!--<div class="left"><a href="#" class="xxnr_btn">兑换成积分</a></div>-->
                 <!--</div>-->
-
-                <div class="invitation_btn"><a href="invitationCenter.html" class="xxnr_btn">新农代表</a></div>
+                <div class="subSections">
+                    <div class="subSection invitation_btn">
+                        <a href="invitationCenter.html">
+                            <img src="images/farmer_behalf.png" alt="" />
+                            <p>
+                                新农代表
+                            </p>
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="wrap wrap_user_info">
@@ -279,13 +294,13 @@
                 <li>
                     <label for="" class="left label">新密码：</label>
                     <div class="left">
-                        <input type="password" id="password" class="input" value="" ng-model="newPassword">
+                        <input type="password" id="new_password" class="input" value="" ng-model="newPassword">
                     </div>
                 </li>
                 <li>
                     <label for="" class="left label">确认密码：</label>
                     <div class="left">
-                        <input type="password" id="password_cf" class="input" value="" ng-model="confirm_newPassword" ng-keydown="confirm_newPassword_keydown($event)">
+                        <input type="password" id="new_password_cf" class="input" value="" ng-model="confirm_newPassword" ng-keydown="confirm_newPassword_keydown($event)">
                     </div>
                 </li>
                 <li>
