@@ -21,9 +21,14 @@ var PayService = function(){};
 // save order payments refund
 PayService.prototype.savePaymentRefund = function(paymentOptions, callback) {
 	try {
-		if (!paymentOptions.batch_no) {
-			paymentOptions.batch_no = moment(paymentOptions.dateCreated).format("YYYYMMDD") + paymentOptions.paymentId;
-		}
+        if (options.payType && options.payType === PAYTYPE.ZHIFUBAO) {
+    		if (!paymentOptions.batch_no) {
+    			paymentOptions.batch_no = moment(paymentOptions.dateCreated).format("YYYYMMDD") + paymentOptions.paymentId;
+    		}
+        }
+        if (paymentOptions.notify_time) {
+            delete paymentOptions.notify_time;
+        }
 		paymentOptions.dateCreated = new Date();
 		var orderPaymentRefund = new OrderPaymentsRefund(paymentOptions);
 	    orderPaymentRefund.save(function(err) {
@@ -75,7 +80,9 @@ PayService.prototype.updatePaymentRefund = function(options, callback) {
 		}
 		if (options.dateNotify) {
 			setValues.dateNotify = options.dateNotify;
-		}
+		} else {
+            setValues.dateNotify = new Date();
+        }
 		if (options.notify_time) {
 			setValues.notify_time = options.notify_time;
 		}
