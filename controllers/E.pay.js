@@ -225,7 +225,7 @@ function payNotify(paymentId, options){
     var self = this;
     // pay success log
     var payLog = options;
-    payLog.paymnetId = paymentId;
+    payLog.paymentId = paymentId;
     OrderService.savePaidLog(payLog);
     // order paid
     OrderService.get({"paymentId": paymentId}, function(err, order) {

@@ -473,25 +473,6 @@ OrderService.prototype.updatePayments = function(options, callback) {
 // Sets the payment status to paid
 OrderService.prototype.paid = function(id, paymentId, options, callback) {
 	var self = this;
-	// OrderModel.findOne({id: id, 'payments.id': paymentId}, function(err, order) {
-	// 	if (err) {
- //            callback(err);
- //            return;
- //        }
- //        if (!order) {
- //            callback('订单不存在', {refund: true, refundReason: 1});
- //            return;
- //        }
-
-	// 	var payment = {paymentId: paymentId};
-	// 	if (options && options.price) {
-	// 		payment.price = parseFloat(parseFloat(options.price).toFixed(2));;
-	// 	}
-	// 	var result = self.judgePaymentRefund(order, payment);
-	// 	if (result && result.refund) {
-	// 		callback('refund payment', result);
-	// 		return;
-	// 	}
 
 	// Updates database file
 	// OrderModel.update({id:id}, {$set:{payStatus:PAYMENTSTATUS.PAID, datepaid:new Date()}}, function(err, count) {
@@ -524,7 +505,6 @@ OrderService.prototype.paid = function(id, paymentId, options, callback) {
 			callback(null);
 		});
 	});
-	// });
 };
 
 
@@ -1041,6 +1021,7 @@ OrderService.prototype.checkPayStatusDetail = function(order, callback) {
 		var Payments = {};							// order payments
 		var orderClosed = false;					// default order closed status is false
 		var orderPayment = null;					// order payment info
+		var closePayments = [];						// need closed payments
 
 		if (order && order.payments && order.payments.length > 0) {
 			// if the order's all payments is closed, the order changes to closed
@@ -1058,7 +1039,7 @@ OrderService.prototype.checkPayStatusDetail = function(order, callback) {
 		    	// }
 		    	// subOrdersPayments[payment.suborderId].push(payment);
 		    	if (!subOrdersInfo.hasOwnProperty(payment.suborderId)) {
-		    		subOrdersInfo[payment.suborderId] = {paidPrice: 0, paidTimes: 0};
+		    		subOrdersInfo[payment.suborderId] = {paidPrice: 0, paidTimes: 0, payments:[]};
 		    	}
 		    	if (parseInt(payment.payStatus) === PAYMENTSTATUS.PAID) {
 					if (subOrdersInfo[payment.suborderId].paidPrice) {
@@ -1066,6 +1047,8 @@ OrderService.prototype.checkPayStatusDetail = function(order, callback) {
 					} else {
 						subOrdersInfo[payment.suborderId].paidPrice = payment.price;
 					}
+				}
+				if (parseInt(payment.payStatus) !== PAYMENTSTATUS.UNPAID) {
 					if (subOrdersInfo[payment.suborderId].paidTimes) {
 						subOrdersInfo[payment.suborderId].paidTimes += 1;
 					} else {
@@ -1074,7 +1057,7 @@ OrderService.prototype.checkPayStatusDetail = function(order, callback) {
 				}
 
 				if (typeof(payment.isClosed) != 'undefined' && payment.isClosed === false && parseInt(payment.payStatus) === PAYMENTSTATUS.UNPAID)
-					subOrdersInfo[payment.suborderId].payment = payment;
+					subOrdersInfo[payment.suborderId].payments.push(payment);
 	       	}
 	    }
 
@@ -1088,40 +1071,48 @@ OrderService.prototype.checkPayStatusDetail = function(order, callback) {
 					var subOrderInfo = subOrdersInfo[subOrder.id] || {};
 					var paidPrice = subOrderInfo.paidPrice || 0;
 					var paidTimes = subOrderInfo.paidTimes || 0;
-					var suborderPayment = subOrderInfo.payment || null;
-					// for (var j = 0; j < payments.length; j++) {
-					// 	var payment = payments[j];
-
-					// 	if (parseInt(payment.payStatus) === PAYMENTSTATUS.PAID) {
-					// 		paidPrice += payment.price;
-					// 		paidTimes += 1;
-					// 	}
-
-					// 	if (typeof(payment.isClosed) != 'undefined' && payment.isClosed === false && parseInt(payment.payStatus) === PAYMENTSTATUS.UNPAID)
-					// 		suborderPayment = payment;
-					// }
+					var payPrice = parseFloat((subOrder.price-paidPrice).toFixed(2));
+					var suborderPayment = null;
 
 					// get suborder paystatus
 					if (paidPrice >= parseFloat(parseFloat(subOrder.price).toFixed(2))) {
 						subOrder.payStatus = PAYMENTSTATUS.PAID;
+						// get order paystatus
+						orderPayStatus = PAYMENTSTATUS.PARTPAID;
+						paidCount += 1;
 					} else {
 						subOrder.payStatus = PAYMENTSTATUS.UNPAID;
 						if (paidPrice > 0) {
 							subOrder.payStatus = PAYMENTSTATUS.PARTPAID;
 						}
-					}
-					// get order paystatus
-					if (subOrder.payStatus === PAYMENTSTATUS.UNPAID || subOrder.payStatus === PAYMENTSTATUS.PARTPAID) {
+						// get order paystatus
 						if (subOrder.payStatus === PAYMENTSTATUS.PARTPAID || orderPayStatus === PAYMENTSTATUS.PAID || orderPayStatus === PAYMENTSTATUS.PARTPAID)
 							orderPayStatus = PAYMENTSTATUS.PARTPAID;
 						else
 							orderPayStatus = PAYMENTSTATUS.UNPAID;
-					} else {
-						orderPayStatus = PAYMENTSTATUS.PARTPAID;
-						paidCount += 1;
 					}
-
-					Payments[subOrder.type] = {'payment':suborderPayment,'suborder':subOrder,'payprice':parseFloat((subOrder.price-paidPrice).toFixed(2)),'paidtimes':paidTimes};
+					// // get order paystatus
+					// if (subOrder.payStatus === PAYMENTSTATUS.PAID) {
+					// 	orderPayStatus = PAYMENTSTATUS.PARTPAID;
+					// 	paidCount += 1;
+					// } else {
+					// 	if (subOrder.payStatus === PAYMENTSTATUS.PARTPAID || orderPayStatus === PAYMENTSTATUS.PAID || orderPayStatus === PAYMENTSTATUS.PARTPAID)
+					// 		orderPayStatus = PAYMENTSTATUS.PARTPAID;
+					// 	else
+					// 		orderPayStatus = PAYMENTSTATUS.UNPAID;
+					// }
+					if (subOrderInfo.payments) {
+						for (var j = 0; j < subOrderInfo.payments.length; j++) {
+						 	var payment = subOrderInfo.payments[j];
+						 	
+							if (!suborderPayment && payPrice == payment.price) {
+								suborderPayment = payment;
+							} else {
+						 		closePayments.push(payment);
+						 	}
+						}
+					}
+					Payments[subOrder.type] = {'payment':suborderPayment,'suborder':subOrder,'payprice':payPrice,'paidtimes':paidTimes};
 					if (subOrder.payStatus !== subOrderPayStatus) {
 						// set suborder paystatus
 						var key = 'subOrders.' + i + '.payStatus';
@@ -1173,6 +1164,7 @@ OrderService.prototype.checkPayStatusDetail = function(order, callback) {
 					setValues['duePrice'] = 0;
 				}
 				orderPayment = null;
+				pushValues = {};
 			}
 		}
 		// update and return order info
@@ -1192,11 +1184,22 @@ OrderService.prototype.checkPayStatusDetail = function(order, callback) {
 		        }
 		
 		        callback(null, order.toObject(), orderPayment);
-		        return;
 			});
 		} else {
 			callback(null, order.toObject(), orderPayment);
-	        return;
+		}
+		// close the need closed payments
+		if (closePayments && closePayments.length > 0) {
+			for (var i = 0; i < closePayments.length; i++) {
+				var payment = closePayments[i];
+				var query = {'id':order.id, 'payments.id':payment.id};
+				var values = {'payments.$.isClosed':true};
+	        	OrderModel.update(query, {'$set':values}, function(err, count) {
+			    	if (err) {
+			            console.error('OrderService checkPayStatus close payment err:', err);
+			        }
+			    });
+			}
 		}
 	} else {
 		callback(null, order, null);
@@ -1215,7 +1218,7 @@ OrderService.prototype.savePaidLog = function(paidLog, callback) {
 				var orderPaidLog = new OrderPaidLog(paidLog);
 			    orderPaidLog.save(function(err) {
 					if (err) {
-						console.error('OrderService savePaidLog save err:', err);
+						console.error('OrderService savePaidLog save err:', err, paidLog);
 					}
 				});
 			});
@@ -1223,12 +1226,12 @@ OrderService.prototype.savePaidLog = function(paidLog, callback) {
 			var orderPaidLog = new OrderPaidLog(paidLog);
 		    orderPaidLog.save(function(err) {
 				if (err) {
-					console.error('OrderService savePaidLog save err:', err);
+					console.error('OrderService savePaidLog save err:', err, paidLog);
 				}
 			});
 		}
 	} catch (e) {
-        console.error('OrderService savePaidLog err:', e);
+        console.error('OrderService savePaidLog err:', e, paidLog);
     }
 };
 
