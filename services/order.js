@@ -696,11 +696,12 @@ OrderService.prototype.addUserOrderNumber = function(options, callback) {
 
 // get payment info when payorder
 OrderService.prototype.getPayOrderPaymentInfo = function(order, payment, payPrice, options, callback) {
+	var self = this;
     var query = {'id':order.id, 'payments.id':payment.id};
     var values = {};
     if (payPrice && (tools.isPrice(payPrice.toString()) && parseFloat(payPrice) && parseFloat(parseFloat(payPrice).toFixed(2)) >= 0.01 && parseFloat(parseFloat(payPrice).toFixed(2)) < payment.price)) {
     // if (!payPrice || (tools.isPrice(payPrice.toString()) && parseFloat(payPrice) && parseFloat(parseFloat(payPrice).toFixed(2)) < 0.01 && parseFloat(parseFloat(payPrice).toFixed(2)) >= payment.price)) {
-    	if (!payment.payPrice || parseFloat(parseFloat(payment.payPrice).toFixed(2)) == parseFloat(parseFloat(payPrice).toFixed(2))) {
+    	if ((!payment.payPrice && parseFloat(parseFloat(payment.price).toFixed(2)) == parseFloat(parseFloat(payPrice).toFixed(2))) || (payment.payPrice && parseFloat(parseFloat(payment.payPrice).toFixed(2)) == parseFloat(parseFloat(payPrice).toFixed(2)))) {
     		callback(null, payment, payPrice);
     		if (options && options.payType) {
 	        	if (!payment.payType || payment.payType !== options.payType) {
@@ -737,14 +738,14 @@ OrderService.prototype.getPayOrderPaymentInfo = function(order, payment, payPric
 		            return;
 		        }
 		        var pushValues = {};
-		        var newPayment = payment;
-	            newPayment.id = U.GUID(10);
-	            newPayment.dateCreated = new Date();
-	            newPayment.payPrice = parseFloat(parseFloat(payPrice).toFixed(2));
-	            if (options && options.payType) {
-	            	newPayment.payType = options.payType;
+	         	var paymentOption = {paymentId: U.GUID(10), slice: payment.slice, price: payment.price, suborderId: payment.suborderId};
+				if (options && options.payType) {
+	            	paymentOption.payType = options.payType;
+	            } else {
+	            	paymentOption.payType = payment.payType;
 	            }
-	            newPayment.payStatus = PAYMENTSTATUS.UNPAID;
+				var newPayment = self.createPayment(paymentOption);
+				newPayment.payPrice = parseFloat(parseFloat(payPrice).toFixed(2));
 		        pushValues['$push'] = {'payments':newPayment};
 		        OrderModel.update(query, pushValues, function(err, count) {
 					if (err) {
@@ -798,14 +799,13 @@ OrderService.prototype.getPayOrderPaymentInfo = function(order, payment, payPric
 		            return;
 		        }
 		        var pushValues = {};
-		        var newPayment = payment;
-	            newPayment.id = U.GUID(10);
-	            newPayment.dateCreated = new Date();
-	            newPayment.payPrice = parseFloat(parseFloat(payPrice).toFixed(2));
-	            if (options && options.payType) {
-	            	newPayment.payType = options.payType;
+				var paymentOption = {paymentId: U.GUID(10), slice: payment.slice, price: payment.price, suborderId: payment.suborderId};
+				if (options && options.payType) {
+	            	paymentOption.payType = options.payType;
+	            } else {
+	            	paymentOption.payType = payment.payType;
 	            }
-	            newPayment.payStatus = PAYMENTSTATUS.UNPAID;
+				var newPayment = self.createPayment(paymentOption);
 		        pushValues['$push'] = {'payments':newPayment};
 		        OrderModel.update(query, pushValues, function(err, count) {
 					if (err) {
@@ -819,7 +819,7 @@ OrderService.prototype.getPayOrderPaymentInfo = function(order, payment, payPric
 			            return;
 			        }
 			    
-			        callback(null, newPayment, payPrice);
+			        callback(null, newPayment, newPayment.price);
 			        return;
 			    });
 		    });
