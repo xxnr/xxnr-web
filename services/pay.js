@@ -97,9 +97,13 @@ PayService.prototype.updatePaymentRefund = function(options, callback) {
     }
 };
 
-// alipay nopwd refund
-PayService.prototype.alipayRefundNopwd = function (options, callback) {
+// alipay refund
+PayService.prototype.alipayRefund = function (refundType, options, callback) {
     var self = this;
+    if (!refundType) {
+        callback('request refund type');
+        return;
+    }
     if (!options.paymentId) {
     	callback('request paymentId');
     	return;
@@ -130,80 +134,44 @@ PayService.prototype.alipayRefundNopwd = function (options, callback) {
     alipay.alipaySubmitService.query_timestamp(function(encrypt_key) {
         var param = {};
         param.anti_phishing_key = encrypt_key;
-        // notify_url CANNOT be 127.0.0.1 because ailiy cannot send notification to 127.0.0.1
-        param.notify_url = ((alipay.alipay_config.notify_host || 'http://' + require("node-ip/lib/ip").address('public')) + ":" + alipay.alipay_config.notify_host_port + alipay.alipay_config.refund_fastpay_by_platform_nopwd_notify_url);
         param.refund_date = options.dateCreated ? moment(options.dateCreated).format("YYYY-MM-DD HH:mm:ss") : moment(new Date()).format("YYYY-MM-DD HH:mm:ss");
 		param.batch_no = options.batch_no;
 		param.batch_num = 1;
 		param.detail_data = options.queryId + '^' + parseFloat(options.price).toFixed(2) + '^' + refundReason;
-        refundData = alipay.build_refund_fastpay_by_platform_nopwd_param(param);
+        if (refundType && refundType == 'nopwd') {
+            // notify_url CANNOT be 127.0.0.1 because ailiy cannot send notification to 127.0.0.1
+            param.notify_url = ((alipay.alipay_config.notify_host || 'http://' + require("node-ip/lib/ip").address('public')) + ":" + alipay.alipay_config.notify_host_port + alipay.alipay_config.refund_fastpay_by_platform_nopwd_notify_url);
         
-        var httpOptions = {
-          hostname: alipay.alipay_config['alipay_api_host'],
-          port: 443,
-          path: '/gateway.do?' + querystring.stringify(refundData),
-          method: 'GET'
-        };
+            refundData = alipay.build_refund_fastpay_by_platform_nopwd_param(param);
+        
+            var httpOptions = {
+              hostname: alipay.alipay_config['alipay_api_host'],
+              port: 443,
+              path: '/gateway.do?' + querystring.stringify(refundData),
+              method: 'GET'
+            };
 
-        console.log(httpOptions);
-        var req = https.request(httpOptions, function (res) {
-            res.setEncoding('utf8');
-            res.on('data', function (chunk) {
-                // console.log(chunk);
-                callback(null, chunk);
+            console.log(httpOptions);
+            var req = https.request(httpOptions, function (res) {
+                res.setEncoding('utf8');
+                res.on('data', function (chunk) {
+                    // console.log(chunk);
+                    callback(null, chunk);
+                });
             });
-        });
 
-        req.on('error', function (e) {
-            // console.log('problem with request: ', e);
-            callback(e);
-        });
+            req.on('error', function (e) {
+                // console.log('problem with request: ', e);
+                callback(e);
+            });
 
-        req.end();
-    });
-};
-
-// alipay pwd refund
-PayService.prototype.alipayRefundpwd = function (options, callback) {
-    var self = this;
-    if (!options.paymentId) {
-    	callback('request paymentId');
-    	return;
-    }
-    if (!options.price) {
-    	callback('request price');
-    	return;
-    }
-    if (!options.queryId) {
-    	callback('request queryId');
-    	return;
-    }
-    if (!options.batch_no) {
-    	callback('request batch_no');
-    	return;
-    }
-    var refundReason = '协议退款';
-    if (options.refundReason) {
-    	if (options.refundReason == 1) {
-    		refundReason = '重复支付';
-    	} else if (options.refundReason == 2) {
-    		refundReason = '超额支付';
-    	} else if (options.refundReason == 3) {
-    		refundReason = '未知订单';
-    	}
-    }
-
-    alipay.alipaySubmitService.query_timestamp(function(encrypt_key) {
-        var param = {};
-        param.anti_phishing_key = encrypt_key;
-        // notify_url CANNOT be 127.0.0.1 because ailiy cannot send notification to 127.0.0.1
-        param.notify_url = ((alipay.alipay_config.notify_host || 'http://' + require("node-ip/lib/ip").address('public')) + ":" + alipay.alipay_config.notify_host_port + alipay.alipay_config.refund_fastpay_by_platform_pwd_notify_url);
-        param.refund_date = options.dateCreated ? moment(options.dateCreated).format("YYYY-MM-DD HH:mm:ss") : moment(new Date()).format("YYYY-MM-DD HH:mm:ss");
-		param.batch_no = options.batch_no;
-		param.batch_num = 1;
-		param.detail_data = options.queryId + '^' + parseFloat(options.price).toFixed(2) + '^' + refundReason;
-        refundData = alipay.build_refund_fastpay_by_platform_nopwd_param(param);
-        callback(refundData);
+            req.end();
+        } else if (refundType && refundType == 'pwd') {
+            // notify_url CANNOT be 127.0.0.1 because ailiy cannot send notification to 127.0.0.1
+            param.notify_url = ((alipay.alipay_config.notify_host || 'http://' + require("node-ip/lib/ip").address('public')) + ":" + alipay.alipay_config.notify_host_port + alipay.alipay_config.refund_fastpay_by_platform_pwd_notify_url);
+            refundData = alipay.build_refund_fastpay_by_platform_pwd_param(param);
+            callback(null, refundData);
+        }
     });
 };
 

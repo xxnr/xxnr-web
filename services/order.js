@@ -302,6 +302,9 @@ OrderService.prototype.updateProducts = function(options, callback) {
 			});
 			// check order deliver status
 			var order = self.checkDeliverStatus(doc);
+			if (parseInt(order.deliverStatus) === DELIVERSTATUS.DELIVERED) {
+				order.dateDelivered = new Date();
+			}
 			order.save(function(err) {
 				if (err) {
 					callback(err);
@@ -338,6 +341,9 @@ OrderService.prototype.updateSKUs = function(options, callback) {
 			});
 			// check order deliver status
 			var order = self.checkDeliverStatus(doc);
+			if (parseInt(order.deliverStatus) === DELIVERSTATUS.DELIVERED) {
+				order.dateDelivered = new Date();
+			}
 			order.save(function(err) {
 				if (err) {
 					callback(err);
@@ -688,113 +694,6 @@ OrderService.prototype.addUserOrderNumber = function(options, callback) {
 	});
 };
 
-// // get payment info when payorder
-// OrderService.prototype.getPayOrderPaymentInfo = function(order, payment, payPrice, options, callback) {
-//     var query = {'id':order.id, 'payments.id':payment.id};
-//     var values = {};
-//     // the payment is existed in third-party platform Or the payment is unpaid. need close this payment and push a new payment.
-//     if (payment.thirdPartyRecorded || payment.payStatus !== PAYMENTSTATUS.UNPAID) {
-//         values = {'payments.$.isClosed':true};
-//         OrderModel.update(query, {'$set':values}, function(err, count) {
-// 	    	if (err) {
-// 	            console.error('OrderService getPayOrderPaymentInfo update payment err:', err);
-// 	            callback(err);
-// 	            return;
-// 	        }
-// 	        if (count.n == 0) {
-// 	        	console.error('OrderService getPayOrderPaymentInfo update payment not find the doc.');
-// 	            callback('not find the doc');
-// 	            return;
-// 	        }
-// 	        var pushValues = {};
-// 	        var newPayment = payment;
-//             newPayment.id = U.GUID(10);
-//             if (payPrice) {
-//             	newPayment.payPrice = parseFloat(parseFloat(payPrice).toFixed(2));
-//             }
-//             if (options && options.payType) {
-//             	newPayment.payType = options.payType;
-//             }
-//             newPayment.payStatus = PAYMENTSTATUS.UNPAID;
-// 	        pushValues['$push'] = {'payments':newPayment};
-// 	        OrderModel.update(query, pushValues, function(err, count) {
-// 				if (err) {
-// 		            console.error('OrderService getPayOrderPaymentInfo update push payment err:', err);
-// 		            callback(err);
-// 		            return;
-// 		        }
-// 		        if (count.n == 0) {
-// 		        	console.error('OrderService getPayOrderPaymentInfo update push payment not find the doc.');
-// 		            callback('not find the doc');
-// 		            return;
-// 		        }
-
-// 		        if (!payPrice) {
-// 		        	payPrice = newPayment.price;
-// 		        }
-// 		        callback(null, newPayment, payPrice);
-// 		        return;
-// 		    });
-// 	    });
-//     } else {
-//     	// user input price is not null, price Regexp, > 0, <  payment price. use payPrice
-//     	if (payPrice && tools.isPrice(payPrice.toString()) && parseFloat(payPrice) && parseFloat(parseFloat(payPrice).toFixed(2)) >= 0.01 && parseFloat(parseFloat(payPrice).toFixed(2)) < payment.price) {
-//     		payment.id = U.GUID(10);
-// 			payment.dateCreated = new Date();
-// 			values = {'payments.$.id':payment.id, 'payments.$.dateCreated': payment.dateCreated, 'payments.$.isClosed': false};
-// 			if (payPrice) {
-// 				payment.payPrice = parseFloat(parseFloat(payPrice).toFixed(2));
-// 				values['payments.$.payPrice'] = parseFloat(parseFloat(payPrice).toFixed(2));
-// 			}
-// 			if (options && options.payType) {
-// 				payment.payType = options.payType;
-// 				values['payments.$.payType'] = options.payType;
-// 			}
-// 			OrderModel.update(query, {'$set':values}, function(err, count) {
-// 		    	if (err) {
-// 		            console.error('OrderService getPayOrderPaymentInfo update payment err:', err);
-// 		            callback(err);
-// 		            return;
-// 		        }
-// 		        if (count.n == 0) {
-// 		        	console.error('OrderService getPayOrderPaymentInfo update payment not find the doc.');
-// 		            callback('not find the doc');
-// 		            return;
-// 		        }
-
-// 		        if (!payPrice) {
-// 		        	payPrice = payment.price;
-// 		        }
-// 		        callback(null, payment, payPrice);
-// 			    return;
-// 		    });
-//     	} else {
-//     		callback(null, payment, payment.price);
-// 	        if (options && options.payType) {
-// 	        	if (!payment.payType || payment.payType !== options.payType) {
-// 		            values['$set'] = {'payments.$.payType': options.payType};
-// 		        }
-// 		    }
-// 	    	if (payment.payPrice) {
-// 	    		values['$unset'] = {'payments.$.payPrice': ""};
-// 	    	}
-// 		    if (!U.isEmpty(values)) {
-// 	            OrderModel.update(query, values, function(err, count) {
-// 	            	if (err) {
-// 			            console.error('OrderService getPayOrderPaymentInfo update payment payType or payPrice err:', err);
-// 			            return;
-// 			        }
-// 			        if (count.n == 0) {
-// 			        	console.error('OrderService getPayOrderPaymentInfo update payment payType or payPrice not find the doc.');
-// 			            return;
-// 			        }
-// 	            });
-// 	        }
-// 	        return;
-//     	}
-//     }
-// };
-
 // get payment info when payorder
 OrderService.prototype.getPayOrderPaymentInfo = function(order, payment, payPrice, options, callback) {
     var query = {'id':order.id, 'payments.id':payment.id};
@@ -1049,64 +948,41 @@ OrderService.prototype.createPayment = function(suborderPayment) {
 
 // Check order deliver status by all products or SKUs deliver status
 OrderService.prototype.checkDeliverStatus = function(order) {
+	var items = null;
 	if (order && order.SKUs && order.SKUs.length > 0) {
-		for (var i=0; i < order.SKUs.length; i++) {
-			var sku = order.SKUs[i];
-			if (!sku.deliverStatus) continue;
+		items = order.SKUs;
+	} else {
+		if (order && order.products && order.products.length > 0) {
+			items = order.products;
+		}
+	}
+	if (items && items.length > 0) {
+		for (var i=0; i < items.length; i++) {
+			var item = items[i];
+			if (!item.deliverStatus) continue;
 
 			if (i == 0) {
-				order.deliverStatus = sku.deliverStatus;
+				order.deliverStatus = item.deliverStatus;
 				continue
 			}
 
-			if (parseInt(sku.deliverStatus) === DELIVERSTATUS.UNDELIVERED) {
+			if (parseInt(item.deliverStatus) === DELIVERSTATUS.UNDELIVERED) {
 				if (order.deliverStatus && (parseInt(order.deliverStatus) === DELIVERSTATUS.DELIVERED || parseInt(order.deliverStatus) === DELIVERSTATUS.PARTDELIVERED))
 					order.deliverStatus = DELIVERSTATUS.PARTDELIVERED;
 				else
 					order.deliverStatus = DELIVERSTATUS.UNDELIVERED;
 			} else {
-				if (order.deliverStatus && (parseInt(order.deliverStatus) === DELIVERSTATUS.UNDELIVERED || parseInt(order.deliverStatus) === DELIVERSTATUS.PARTDELIVERED))
-					order.deliverStatus = DELIVERSTATUS.PARTDELIVERED;
-				else
-					order.deliverStatus = DELIVERSTATUS.DELIVERED;
-			}
-		}
-		if (!order.deliverStatus) {
-			order.deliverStatus = DELIVERSTATUS.UNDELIVERED;
-		}
-		if (parseInt(order.deliverStatus) === DELIVERSTATUS.DELIVERED) {
-			order.dateDelivered = new Date();
-		}
-	} else {
-		if (order && order.products) {
-			for (var i=0; i < order.products.length; i++) {
-				var product = order.products[i];
-				if (!product.deliverStatus) continue;
-
-				if (i == 0) {
-					order.deliverStatus = product.deliverStatus;
-					continue
-				}
-
-				if (parseInt(product.deliverStatus) === DELIVERSTATUS.UNDELIVERED) {
-					if (order.deliverStatus && (parseInt(order.deliverStatus) === DELIVERSTATUS.DELIVERED || parseInt(order.deliverStatus) === DELIVERSTATUS.PARTDELIVERED))
-						order.deliverStatus = DELIVERSTATUS.PARTDELIVERED;
-					else
-						order.deliverStatus = DELIVERSTATUS.UNDELIVERED;
-				} else {
+				if (parseInt(item.deliverStatus) === DELIVERSTATUS.DELIVERED) {
 					if (order.deliverStatus && (parseInt(order.deliverStatus) === DELIVERSTATUS.UNDELIVERED || parseInt(order.deliverStatus) === DELIVERSTATUS.PARTDELIVERED))
 						order.deliverStatus = DELIVERSTATUS.PARTDELIVERED;
 					else
 						order.deliverStatus = DELIVERSTATUS.DELIVERED;
 				}
 			}
-			if (!order.deliverStatus) {
-				order.deliverStatus = DELIVERSTATUS.UNDELIVERED;
-			}
-			if (parseInt(order.deliverStatus) === DELIVERSTATUS.DELIVERED) {
-				order.dateDelivered = new Date();
-			}
 		}
+	}
+	if (!order.deliverStatus) {
+		order.deliverStatus = DELIVERSTATUS.UNDELIVERED;
 	}
 	return order;
 };
@@ -1160,7 +1036,8 @@ OrderService.prototype.checkPayStatusDetail = function(order, callback) {
 		var pushValues = {};						// order need push values
 		var orderPayStatus = PAYMENTSTATUS.UNPAID;	// default order paystatus
 		var paidCount = 0;							// suborder paid count
-		var subOrdersPayments = {};					// suborder all payments
+		// var subOrdersPayments = {};					// suborder all payments
+		var subOrdersInfo = {};						// suborder pay info
 		var Payments = {};							// order payments
 		var orderClosed = false;					// default order closed status is false
 		var orderPayment = null;					// order payment info
@@ -1176,10 +1053,28 @@ OrderService.prototype.checkPayStatusDetail = function(order, callback) {
 		    		orderClosed = false;
 		    	}
 
-		    	if (!subOrdersPayments.hasOwnProperty(payment.suborderId)) {
-		    		subOrdersPayments[payment.suborderId] = [];
+		    	// if (!subOrdersPayments.hasOwnProperty(payment.suborderId)) {
+		    	// 	subOrdersPayments[payment.suborderId] = [];
+		    	// }
+		    	// subOrdersPayments[payment.suborderId].push(payment);
+		    	if (!subOrdersInfo.hasOwnProperty(payment.suborderId)) {
+		    		subOrdersInfo[payment.suborderId] = {paidPrice: 0, paidTimes: 0};
 		    	}
-		    	subOrdersPayments[payment.suborderId].push(payment);
+		    	if (parseInt(payment.payStatus) === PAYMENTSTATUS.PAID) {
+					if (subOrdersInfo[payment.suborderId].paidPrice) {
+						subOrdersInfo[payment.suborderId].paidPrice += payment.price;
+					} else {
+						subOrdersInfo[payment.suborderId].paidPrice = payment.price;
+					}
+					if (subOrdersInfo[payment.suborderId].paidTimes) {
+						subOrdersInfo[payment.suborderId].paidTimes += 1;
+					} else {
+						subOrdersInfo[payment.suborderId].paidTimes = 1;
+					}
+				}
+
+				if (typeof(payment.isClosed) != 'undefined' && payment.isClosed === false && parseInt(payment.payStatus) === PAYMENTSTATUS.UNPAID)
+					subOrdersInfo[payment.suborderId].payment = payment;
 	       	}
 	    }
 
@@ -1189,21 +1084,22 @@ OrderService.prototype.checkPayStatusDetail = function(order, callback) {
 				for (var i=0; i < order.subOrders.length; i++) {
 					var subOrder = order.subOrders[i];
 					var subOrderPayStatus = subOrder.payStatus;
-					var payments = subOrdersPayments[subOrder.id] || [];
-					var paidPrice = 0;
-					var paidTimes = 0;
-					var suborderPayment = null;
-					for (var j = 0; j < payments.length; j++) {
-						var payment = payments[j];
+					// var payments = subOrdersPayments[subOrder.id] || [];
+					var subOrderInfo = subOrdersInfo[subOrder.id] || {};
+					var paidPrice = subOrderInfo.paidPrice || 0;
+					var paidTimes = subOrderInfo.paidTimes || 0;
+					var suborderPayment = subOrderInfo.payment || null;
+					// for (var j = 0; j < payments.length; j++) {
+					// 	var payment = payments[j];
 
-						if (parseInt(payment.payStatus) === PAYMENTSTATUS.PAID) {
-							paidPrice += payment.price;
-							paidTimes += 1;
-						}
+					// 	if (parseInt(payment.payStatus) === PAYMENTSTATUS.PAID) {
+					// 		paidPrice += payment.price;
+					// 		paidTimes += 1;
+					// 	}
 
-						if (typeof(payment.isClosed) != 'undefined' && payment.isClosed === false && parseInt(payment.payStatus) === PAYMENTSTATUS.UNPAID)
-							suborderPayment = payment;
-					}
+					// 	if (typeof(payment.isClosed) != 'undefined' && payment.isClosed === false && parseInt(payment.payStatus) === PAYMENTSTATUS.UNPAID)
+					// 		suborderPayment = payment;
+					// }
 
 					// get suborder paystatus
 					if (paidPrice >= parseFloat(parseFloat(subOrder.price).toFixed(2))) {
@@ -1308,191 +1204,6 @@ OrderService.prototype.checkPayStatusDetail = function(order, callback) {
 	}
 };
 
-// OrderService.prototype.checkPayStatus = function(orderId, callback) {
-
-// 	var self = this;
-// 	OrderModel.mapReduce({
-// 		map: function () {
-// 			var order = this;
-// 			var setValues = {};							// order need set values
-// 			var pushValues = {};						// order need push values
-// 			var orderPayStatus = PAYMENTSTATUS.UNPAID;	// default order paystatus
-// 			var paidCount = 0;							// suborder paid count
-// 			var subOrdersPayments = {};					// suborder all payments
-// 			var Payments = {};							// order payments
-// 			var orderClosed = false;					// default order closed status is false
-
-// 			if (order && order.payments && order.payments.length > 0) {
-// 				// if the order's all payments is closed, the order changes to closed
-// 				orderClosed = true;
-// 		       	for (var i = 0; i < order.payments.length; i++) {
-// 			    	var payment = order.payments[i];
-
-// 			    	// if the order's one payment is not closed, the order changes to not closed
-// 			    	if (!payment.isClosed || payment.payStatus === PAYMENTSTATUS.PAID) {
-// 			    		orderClosed = false;
-// 			    	}
-
-// 			    	if (!subOrdersPayments.hasOwnProperty(payment.suborderId)) {
-// 			    		subOrdersPayments[payment.suborderId] = [];
-// 			    	}
-// 			    	subOrdersPayments[payment.suborderId].push(payment);
-// 		       	}
-// 		    }
-
-// 		    // if the order is not closed, fix order paystatus
-// 		    if (!orderClosed) {
-// 				if (order && order.subOrders) {
-// 					for (var i=0; i < order.subOrders.length; i++) {
-// 						var subOrder = order.subOrders[i];
-// 						var subOrderPayStatus = subOrder.payStatus;
-// 						var payments = subOrdersPayments[subOrder.id] || [];
-// 						var paidPrice = 0;
-// 						var paidTimes = 0;
-// 						var orderPayment = null;
-// 						for (var j = 0; j < payments.length; j++) {
-// 							var payment = payments[j];
-
-// 							if (parseInt(payment.payStatus) === PAYMENTSTATUS.PAID) {
-// 								paidPrice += payment.price;
-// 								paidTimes += 1;
-// 							}
-
-// 							if (typeof(payment.isClosed) != 'undefined' && payment.isClosed === false && parseInt(payment.payStatus) === PAYMENTSTATUS.UNPAID)
-// 								orderPayment = payment;
-// 						}
-
-// 						// get suborder paystatus
-// 						if (paidPrice >= subOrder.price) {
-// 							subOrder.payStatus = PAYMENTSTATUS.PAID;
-// 						} else {
-// 							subOrder.payStatus = PAYMENTSTATUS.UNPAID;
-// 							if (paidPrice > 0) {
-// 								subOrder.payStatus = PAYMENTSTATUS.PARTPAID;
-// 							}
-// 						}
-// 						// get order paystatus
-// 						if (subOrder.payStatus === PAYMENTSTATUS.UNPAID || subOrder.payStatus === PAYMENTSTATUS.PARTPAID) {
-// 							if (subOrder.payStatus === PAYMENTSTATUS.PARTPAID || orderPayStatus === PAYMENTSTATUS.PAID || orderPayStatus === PAYMENTSTATUS.PARTPAID)
-// 								orderPayStatus = PAYMENTSTATUS.PARTPAID;
-// 							else
-// 								orderPayStatus = PAYMENTSTATUS.UNPAID;
-// 						} else {
-// 							orderPayStatus = PAYMENTSTATUS.PARTPAID;
-// 							paidCount += 1;
-// 						}
-
-// 						Payments[subOrder.type] = {'payment':orderPayment,'suborder':subOrder,'payprice':(subOrder.price-paidPrice),'paidtimes':paidTimes};
-// 						if (subOrder.payStatus !== subOrderPayStatus) {
-// 							// set suborder paystatus
-// 							var key = 'subOrders.' + i + '.payStatus';
-// 							setValues[key] = subOrder.payStatus;
-// 						}
-// 					}
-// 					if (order.subOrders.length > 0 && paidCount === order.subOrders.length) {
-// 						orderPayStatus = PAYMENTSTATUS.PAID;
-// 					}
-// 				}
-
-// 				// get order payment by suborder types
-// 				// var typekeys = ['deposit','balance','full'];
-// 				var typekeysSort = SUBORDERTYPEKEYS;
-// 				var orderPayment = null;
-// 				// for (var i=0; i < typekeys.length; i++) {
-// 				for (var i=0; i < typekeysSort.length; i++) {
-// 					var key = SUBORDERTYPE[typekeysSort[i]];
-// 					if (Payments[key]) {
-// 						var subOrder = Payments[key].suborder;
-// 						var payment = Payments[key].payment;
-// 						if (subOrder['payStatus'] !== PAYMENTSTATUS.PAID) {
-// 							// create new payment
-// 							if (!payment) {
-// 								payment = createPayment({'paymentId':U.GUID(10),'slice':(Payments[key].paidtimes+1),'price':Payments[key].payprice,'suborderId':subOrder.id});
-// 								pushValues = {'payments':payment};
-// 							}
-// 							if (!orderPayment) {
-// 								if (order.paymentId !== payment.id) {
-// 									setValues['paymentId'] = payment.id;
-// 								}
-// 								if (!payment.payType || order.payType !== payment.payType) {
-// 									setValues['payType'] = payment.payType || PAYTYPE.ZHIFUBAO;
-// 								}
-// 								if (order.duePrice !== payment.price) {
-// 									setValues['duePrice'] = payment.price;
-// 								}
-// 								orderPayment = payment;
-// 								break
-// 							}
-// 						}
-// 					}
-// 				}
-// 				if (orderPayStatus !== order.payStatus) {
-// 					setValues['payStatus'] = orderPayStatus;
-// 					if (orderPayStatus === PAYMENTSTATUS.PAID) {
-// 						setValues['datePaid'] = new Date();
-// 					}
-// 				}
-// 			}
-// 			emit(order.id, {'id':order.id, 'setValues':setValues, 'pushValues':pushValues, 'orderPayment':orderPayment, 'order':order});
-// 		},
-// 		reduce: function (key, values) {
-// 			var result = {};
-// 			for (var idx = 0; idx < values.length; idx++) {
-// 				var value = values[idx];
-// 				result[value.id] = {'setValues':value.setValues, 'pushValues':value.pushValues, 'orderPayment':value.orderPayment, 'order':value.order};
-// 			}
-// 			return result;
-// 		},
-// 		scope: {U:U, PAYTYPE:PAYTYPE, PAYMENTSTATUS:PAYMENTSTATUS, SUBORDERTYPE:SUBORDERTYPE, SUBORDERTYPEKEYS:SUBORDERTYPEKEYS, createPayment: self.createPayment},
-// 		query: {id:orderId},
-// 		out: {inline:1},
-// 	}, function (err, results) {
-// 		if (err) {
-// 			console.error('OrderService checkPayStatus map reduce err:', err);
-// 			callback(err);
-// 			return;
-// 		}
-// 		var orderPayment = null;
-// 		if (results && results.length > 0) {
-// 			var result = results[0].value || null;
-// 			var values = {};
-
-// 			if (result && result.orderPayment) {
-// 				orderPayment = result.orderPayment;
-// 			}
-// 			if (result && result.setValues && !U.isEmpty(result.setValues)) {
-// 				values['$set'] = result.setValues;
-// 			}
-// 			if (result && result.pushValues && !U.isEmpty(result.pushValues)) {
-// 				values['$push'] = result.pushValues;
-// 			}
-// 			if (!U.isEmpty(values)) {
-// 				OrderModel.findOneAndUpdate({id:orderId}, values, {new: true}, function(err, order) {
-// 					if (err) {
-// 			            console.error('OrderService checkPayStatus findOneAndUpdate err:', err);
-// 			            callback(err);
-// 			            return;
-// 			        }
-			
-// 			        callback(null, order.toObject(), orderPayment);
-// 			        return;
-// 				});
-// 			} else {
-// 				if (result && result['order']) {
-// 					callback(null, result['order'], orderPayment);
-// 			        return;
-// 				} else {
-// 					callback(null, null, orderPayment);
-// 			        return;
-// 				}
-// 			}
-// 		} else {
-// 			callback(null, null, orderPayment);
-// 			return;
-// 		}
-// 	});
-// };
-
 // save paid log for every pay notify
 OrderService.prototype.savePaidLog = function(paidLog, callback) {
 	try {
@@ -1522,7 +1233,8 @@ OrderService.prototype.savePaidLog = function(paidLog, callback) {
 };
 
 // judge whether the order payment need refund
-// order: the order of the payment; thePayment: {paymentId:String, price:Number}
+// params: order: the order of the payment; thePayment: {paymentId:String, price:Number}
+// return: refund Object {refund:Bool, refundReason:Number}
 OrderService.prototype.judgePaymentRefund = function(order, thePayment) {
 	var self = this;
 	if (order) {

@@ -9,8 +9,8 @@ var PayService = services.pay;
 
 exports.install = function() {
     // pay
-    F.route('/alipay', alipayOrder, ['post', 'get'], ['isInWhiteList']);
-    F.route('/unionpay', unionPayOrder, ['post', 'get'], ['isInWhiteList']);
+    F.route('/alipay', alipayOrder, ['post', 'get'], ['isInWhiteList', 'throttle']);
+    F.route('/unionpay', unionPayOrder, ['post', 'get'], ['isInWhiteList', 'throttle']);
     // pay notify
     F.route('/dynamic/alipay/notify.asp', alipayNotify, ['post','raw']);
     F.route('/unionpay/notify', unionpayNotify, ['post','raw']);
@@ -543,7 +543,8 @@ function payRefund(options) {
             //     // TODO refund
             //     // console.log(orderPaymentRefund);
             //     if (orderPaymentRefund.payType === PAYTYPE.ZHIFUBAO) {
-            //         PayService.alipayRefundNopwd(orderPaymentRefund, function(err, result) {
+            //         var type = 'nopwd';
+            //         PayService.alipayRefund(type, orderPaymentRefund, function(err, result) {
             //            if (err) {
             //                console.error('payRefund PayService alipayRefundNopwd err:', err);
             //                return;
