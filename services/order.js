@@ -676,21 +676,20 @@ OrderService.prototype.addUserOrderNumber = function(options, callback) {
 
 // get payment info when payorder
 OrderService.prototype.getPayOrderPaymentInfo = function(order, payment, payPrice, options, callback) {
+	// if (!payPrice || (tools.isPrice(payPrice.toString()) && parseFloat(payPrice) && parseFloat(parseFloat(payPrice).toFixed(2)) < 0.01 && parseFloat(parseFloat(payPrice).toFixed(2)) >= payment.price))
+	// if ((payment.payPrice && parseFloat(parseFloat(payment.payPrice).toFixed(2)) == parseFloat(parseFloat(payPrice).toFixed(2))) || (!payment.payPrice && parseFloat(parseFloat(payment.price).toFixed(2)) == parseFloat(parseFloat(payPrice).toFixed(2))))
+	
 	var self = this;
     var query = {'id':order.id, 'payments.id':payment.id};
-    var values = {};
     if (payPrice && (tools.isPrice(payPrice.toString()) && parseFloat(payPrice) && parseFloat(parseFloat(payPrice).toFixed(2)) >= 0.01 && parseFloat(parseFloat(payPrice).toFixed(2)) < payment.price)) {
-    // if (!payPrice || (tools.isPrice(payPrice.toString()) && parseFloat(payPrice) && parseFloat(parseFloat(payPrice).toFixed(2)) < 0.01 && parseFloat(parseFloat(payPrice).toFixed(2)) >= payment.price)) {
-    	if ((!payment.payPrice && parseFloat(parseFloat(payment.price).toFixed(2)) == parseFloat(parseFloat(payPrice).toFixed(2))) || (payment.payPrice && parseFloat(parseFloat(payment.payPrice).toFixed(2)) == parseFloat(parseFloat(payPrice).toFixed(2)))) {
+    	if (payment.payPrice && parseFloat(parseFloat(payment.payPrice).toFixed(2)) == parseFloat(parseFloat(payPrice).toFixed(2))) {
     		callback(null, payment, payPrice);
+    		var values = {};
     		if (options && options.payType) {
 	        	if (!payment.payType || payment.payType !== options.payType) {
 		            values['$set'] = {'payments.$.payType': options.payType};
 		        }
 		    }
-    		if (!payment.payPrice) {
-	    		values['$set'] = {'payments.$.payPrice': parseFloat(parseFloat(payPrice).toFixed(2))};
-	    	}
 		    if (!U.isEmpty(values)) {
 	            OrderModel.update(query, values, function(err, count) {
 	            	if (err) {
@@ -705,6 +704,7 @@ OrderService.prototype.getPayOrderPaymentInfo = function(order, payment, payPric
 	            });
 	        }
     	} else {
+    		var values = {};
     		values = {'payments.$.isClosed':true};
 	        OrderModel.update(query, {'$set':values}, function(err, count) {
 		    	if (err) {
@@ -747,6 +747,7 @@ OrderService.prototype.getPayOrderPaymentInfo = function(order, payment, payPric
     } else {
     	if (!payment.payPrice || parseFloat(parseFloat(payment.payPrice).toFixed(2)) == parseFloat(parseFloat(payment.price).toFixed(2))) {
 	    	callback(null, payment, payment.price);
+	    	var values = {};
 	    	if (options && options.payType) {
 	        	if (!payment.payType || payment.payType !== options.payType) {
 		            values['$set'] = {'payments.$.payType': options.payType};
@@ -766,6 +767,7 @@ OrderService.prototype.getPayOrderPaymentInfo = function(order, payment, payPric
 	            });
 	        }
 	    } else {
+	    	var values = {};
     		values = {'payments.$.isClosed':true};
 	        OrderModel.update(query, {'$set':values}, function(err, count) {
 		    	if (err) {
