@@ -1,10 +1,15 @@
 ﻿<?php
 header ( 'Content-type:text/html;charset=utf-8' );
- include_once $_SERVER ['DOCUMENT_ROOT'] . '/upacp_sdk_php/utf8/func/common.php';
-include_once $_SERVER ['DOCUMENT_ROOT'] . '/upacp_sdk_php/utf8/func/SDKConfig.php';
-include_once $_SERVER ['DOCUMENT_ROOT'] . '/upacp_sdk_php/utf8/func/secureUtil.php';
-include_once $_SERVER ['DOCUMENT_ROOT'] . '/upacp_sdk_php/utf8/func/httpClient.php';
-include_once $_SERVER ['DOCUMENT_ROOT'] . '/upacp_sdk_php/utf8/func/log.class.php';
+// include_once $_SERVER ['DOCUMENT_ROOT'] . '/upacp_sdk_php/utf8/func/common.php';
+// include_once $_SERVER ['DOCUMENT_ROOT'] . '/upacp_sdk_php/utf8/func/SDKConfig.php';
+// include_once $_SERVER ['DOCUMENT_ROOT'] . '/upacp_sdk_php/utf8/func/secureUtil.php';
+// include_once $_SERVER ['DOCUMENT_ROOT'] . '/upacp_sdk_php/utf8/func/httpClient.php';
+// include_once $_SERVER ['DOCUMENT_ROOT'] . '/upacp_sdk_php/utf8/func/log.class.php';
+
+include_once dirname(__FILE__) . DIRECTORY_SEPARATOR . '../../utf8/func/common.php';
+include_once dirname(__FILE__) . DIRECTORY_SEPARATOR . '../../utf8/func/config.php';
+include_once dirname(__FILE__) . DIRECTORY_SEPARATOR . '../../utf8/func/secureUtil.php';
+include_once dirname(__FILE__) . DIRECTORY_SEPARATOR . '../../utf8/func/log.class.php';
 
 echo "{ \"comment\":\""; // make all output commented out in returned JSON
 /**
