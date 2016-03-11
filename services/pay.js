@@ -21,7 +21,7 @@ var PayService = function(){};
 // save order payments refund
 PayService.prototype.savePaymentRefund = function(paymentOptions, callback) {
 	try {
-        if (options.payType && options.payType === PAYTYPE.ZHIFUBAO) {
+        if (paymentOptions.payType && paymentOptions.payType === PAYTYPE.ZHIFUBAO) {
     		if (!paymentOptions.batch_no) {
     			paymentOptions.batch_no = moment(paymentOptions.dateCreated).format("YYYYMMDD") + paymentOptions.paymentId;
     		}
