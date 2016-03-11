@@ -87,7 +87,11 @@ PayService.prototype.updatePaymentRefund = function(options, callback) {
 			setValues.notify_time = options.notify_time;
 		}
 		if (options.result_detail) {
-			setValues.notifyInfo = options.result_detail;
+            if (options.result_detail instanceof Object) {
+                setValues.notifyInfo = JSON.stringify(options.result_detail);
+            } else {
+                setValues.notifyInfo = options.result_detail;
+            }
 		}
 		if (options.status) {
 			setValues.status = options.status;
