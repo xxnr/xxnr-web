@@ -17,7 +17,7 @@ echo "{ \"comment\":\""; // make all output commented out in returned JSON
  */
 
 // 初始化日志
-$log = new PhpLog ( SDK_LOG_FILE_PATH, "PRC", SDK_LOG_LEVEL );
+$log = new PhpLog ( $SDK_LOG_FILE_PATH, "PRC", SDK_LOG_LEVEL );
 $log->LogInfo ( "===========处理后台请求开始============" );
 
 $orderId = null;
