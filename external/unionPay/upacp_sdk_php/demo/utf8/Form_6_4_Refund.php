@@ -1,5 +1,5 @@
 ﻿<?php
-header ( 'Content-type:text/html;charset=utf-8' );
+// header ( 'Content-type:text/html;charset=utf-8' );
 // include_once $_SERVER ['DOCUMENT_ROOT'] . '/upacp_sdk_php/utf8/func/common.php';
 // include_once $_SERVER ['DOCUMENT_ROOT'] . '/upacp_sdk_php/utf8/func/SDKConfig.php';
 // include_once $_SERVER ['DOCUMENT_ROOT'] . '/upacp_sdk_php/utf8/func/secureUtil.php';

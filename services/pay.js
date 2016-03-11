@@ -227,6 +227,8 @@ PayService.prototype.unionpayRefund = function (options, callback) {
         	callback(null, phpResponse.response);
         } else if (phpResponse.error) {
         	callback(phpResponse.error);
+        } else {
+            callback(null, phpResponse);
         }
     }, false);
 };

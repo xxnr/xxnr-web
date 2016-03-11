@@ -493,12 +493,12 @@ function unionRefundNotify() {
             if (body['respCode'] === 00 || body['respCode'] === '00') {
                 self.content('success');
                 var paymentInfo = JSON.parse(new Buffer(body.reqReserved, 'base64').toString());
-                var options = {paymentId: body.orderId || paymentInfo.paymentId, notifyPrice: (parseFloat(body.txnAmt)/100).toFixed(2), orderId:paymentInfo.orderId, payType:PAYTYPE.UNIONPAY};
-                options.notify_time = moment(body.txnTime,"YYYYMMDDHHmmss").format("YYYY-MM-DD HH:mm:ss");
-                options.queryId = body.origQryId || paymentInfo.queryId;
-                options.notify_id = body.queryId;
-                options.result_detail = paymentInfo;
-                options.dateNotify = new Date();
+                var refundOptions = {paymentId: body.orderId || paymentInfo.paymentId, notifyPrice: (parseFloat(body.txnAmt)/100).toFixed(2), orderId:paymentInfo.orderId, payType:PAYTYPE.UNIONPAY};
+                refundOptions.notify_time = moment(body.txnTime,"YYYYMMDDHHmmss").format("YYYY-MM-DD HH:mm:ss");
+                refundOptions.queryId = body.origQryId || paymentInfo.queryId;
+                refundOptions.notify_id = body.queryId;
+                refundOptions.result_detail = paymentInfo;
+                refundOptions.dateNotify = new Date();
                 // update payment refund
                 PayService.updatePaymentRefund(refundOptions);
             } else {
@@ -516,7 +516,7 @@ var OrderPaidLog = require('../models').orderpaidlog;
 function refundTest() {
     var self = this;
     var paymentId = '2c5170d47f';
-    OrderPaidLog.findOne({paymentId: paymentId}, function(err, doc){
+    OrderPaidLog.findOne({paymentId: paymentId, payType: 2}, function(err, doc){
         if (doc) {
             var paymentOptions = {paymentId: doc.paymentId, price: parseFloat(doc.price).toFixed(2), payType: doc.payType, datePaid: doc.datePaid};
             if (doc.orderId) {
@@ -543,10 +543,11 @@ function payRefund(options) {
             } else {
                 console.log(orderPaymentRefund);
             }
-            // if (orderPaymentRefund && orderPaymentRefund.refundReason !== 3) {
-            //     // TODO refund
-            //     // console.log(orderPaymentRefund);
-            //     if (orderPaymentRefund.payType === PAYTYPE.ZHIFUBAO) {
+            if (orderPaymentRefund && orderPaymentRefund.refundReason !== 3) {
+                // TODO refund
+                // console.log(orderPaymentRefund);
+                if (orderPaymentRefund.payType === PAYTYPE.ZHIFUBAO) {
+                    console.log('zhifubao refund:', orderPaymentRefund);
             //         var type = 'nopwd';
             //         PayService.alipayRefund(type, orderPaymentRefund, function(err, result) {
             //            if (err) {
@@ -555,17 +556,20 @@ function payRefund(options) {
             //            }
             //            console.log(reuslt);
             //        });
-            //     } else if (orderPaymentRefund.payType === PAYTYPE.UNIONPAY) {
-            //        console.log(orderPaymentRefund);
-            //        PayService.unionpayRefund(orderPaymentRefund, function(err, result) {
-            //            if (err) {
-            //                console.error('payRefund PayService unionpayRefund err:', err);
-            //                return;
-            //            }
-            //            console.log(reuslt);
-            //        });
-            //     }
-            // }
+                } else if (orderPaymentRefund.payType === PAYTYPE.UNIONPAY) {
+                   // console.log(orderPaymentRefund);
+                   PayService.unionpayRefund(orderPaymentRefund, function(err, result) {
+                        if (err) {
+                            console.error('payRefund PayService unionpayRefund err:', err);
+                            return;
+                        }
+                        if (reuslt) {
+                            console.log(reuslt);
+                        }
+                        return;
+                   });
+                }
+            }
         });
     }
 }
