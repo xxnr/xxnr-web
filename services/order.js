@@ -681,7 +681,9 @@ OrderService.prototype.getPayOrderPaymentInfo = function(order, payment, payPric
 	
 	var self = this;
     var query = {'id':order.id, 'payments.id':payment.id};
+    // pay price is logical
     if (payPrice && (tools.isPrice(payPrice.toString()) && parseFloat(payPrice) && parseFloat(parseFloat(payPrice).toFixed(2)) >= 0.01 && parseFloat(parseFloat(payPrice).toFixed(2)) < payment.price)) {
+    	// this pay price must equal last time pay price
     	if (payment.payPrice && parseFloat(parseFloat(payment.payPrice).toFixed(2)) == parseFloat(parseFloat(payPrice).toFixed(2))) {
     		callback(null, payment, payPrice);
     		var values = {};
@@ -745,6 +747,7 @@ OrderService.prototype.getPayOrderPaymentInfo = function(order, payment, payPric
 		    });
     	}
     } else {
+    	// last time pay price is null or must equal the payment price
     	if (!payment.payPrice || parseFloat(parseFloat(payment.payPrice).toFixed(2)) == parseFloat(parseFloat(payment.price).toFixed(2))) {
 	    	callback(null, payment, payment.price);
 	    	var values = {};

@@ -13,7 +13,11 @@ exports.install = function() {
     F.route('/unionpay', unionPayOrder, ['post', 'get'], ['isInWhiteList', 'throttle']);
     // pay notify
     F.route('/dynamic/alipay/notify.asp', alipayNotify, ['post','raw']);
+    // old url
+    F.route('/dynamic/alipay/nofity.asp', alipayNotify, ['post','raw']);
     F.route('/unionpay/notify', unionpayNotify, ['post','raw']);
+    // old url
+    F.route('/unionpay/nofity', unionpayNotify, ['post','raw']);
     // pay refund
     F.route('/dynamic/alipay/refund_fastpay_by_platform_nopwd_notify.asp', alipayRefundNotify, ['post','raw']);
     F.route('/unionpay/refundnotify', unionRefundNotify, ['post','raw']);

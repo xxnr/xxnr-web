@@ -33,13 +33,15 @@ exports.install = function() {
     F.route('/api/v2.0/getShoppingCartOffline', getShoppingCartOffline, ['get', 'post']);
     // // pay
     // F.route('/alipay', alipayOrder, ['post', 'get'], ['isInWhiteList']);
+    // F.route('/dynamic/alipay/notify.asp', alipayNotify, ['post','raw']);
     // F.route('/dynamic/alipay/nofity.asp', alipayNotify, ['post','raw']);
     // F.route('/unionpay', unionPayOrder, ['post', 'get'], ['isInWhiteList']);
+    // F.route('/unionpay/notify', unionpayNotify, ['post','raw']);
     // F.route('/unionpay/nofity', unionpayNotify, ['post','raw']);
     // F.route('/alipay/success', aliPaySuccess);
     // // pay refund
-    // F.route('/dynamic/alipay/refund_fastpay_by_platform_nopwd_nofity.asp', alipayRefundNotify, ['post','raw']);
-    // F.route('/unionpay/refundnofity', unionRefundNotify, ['post','raw']);
+    // F.route('/dynamic/alipay/refund_fastpay_by_platform_nopwd_notify.asp', alipayRefundNotify, ['post','raw']);
+    // F.route('/unionpay/refundnotify', unionRefundNotify, ['post','raw']);
 
     // F.route('/notify_alipay.asp', alipayNotify);
     //fix api// F.route('/unionPay', unionPayOrder, ['post', 'get']);
