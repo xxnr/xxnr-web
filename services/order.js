@@ -1218,7 +1218,7 @@ OrderService.prototype.savePaidLog = function(paidLog, callback) {
 		if (paidLog && !paidLog.orderId) {
 			OrderModel.findOne({'payments.id':{$ne:paidLog.paymentId}}, function(err, doc) {
 				if (doc) {
-					paidLog.orderId = order.id;
+					paidLog.orderId = doc.id;
 				}
 				var orderPaidLog = new OrderPaidLog(paidLog);
 			    orderPaidLog.save(function(err) {

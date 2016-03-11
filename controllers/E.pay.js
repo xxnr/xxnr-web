@@ -535,7 +535,7 @@ function refundTest() {
                //         console.error('payRefund PayService alipayRefundNopwd err:', err);
                //         return;
                //     }
-               //     console.log(reuslt);
+               //     console.log(result);
                // });
             } else if (orderPaymentRefund.payType === PAYTYPE.UNIONPAY) {
                console.log('unionpay refund:', orderPaymentRefund);
@@ -544,8 +544,8 @@ function refundTest() {
                //          console.error('payRefund PayService unionpayRefund err:', err);
                //          return;
                //      }
-               //      if (reuslt) {
-               //          console.log(reuslt);
+               //      if (result) {
+               //          console.log(result);
                //      }
                //      return;
                // });
@@ -576,7 +576,7 @@ function payRefund(options) {
             //                console.error('payRefund PayService alipayRefundNopwd err:', err);
             //                return;
             //            }
-            //            console.log(reuslt);
+            //            console.log(result);
             //        });
             //     } else if (orderPaymentRefund.payType === PAYTYPE.UNIONPAY) {
             //        // console.log(orderPaymentRefund);
@@ -585,8 +585,8 @@ function payRefund(options) {
             //                 console.error('payRefund PayService unionpayRefund err:', err);
             //                 return;
             //             }
-            //             if (reuslt) {
-            //                 console.log(reuslt);
+            //             if (result) {
+            //                 console.log(result);
             //             }
             //             return;
             //        });
