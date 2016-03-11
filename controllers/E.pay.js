@@ -513,21 +513,43 @@ function unionRefundNotify() {
 }
 
 var OrderPaidLog = require('../models').orderpaidlog;
+var OrderPaymentsRefund = require('../models').orderpaymentsrefund;
 function refundTest() {
     var self = this;
-    var paymentId = '2c5170d47f';
-    OrderPaidLog.findOne({paymentId: paymentId, payType: 2}, function(err, doc){
-        if (doc) {
-            var paymentOptions = {paymentId: doc.paymentId, price: parseFloat(doc.price).toFixed(2), payType: doc.payType, datePaid: doc.datePaid};
-            if (doc.orderId) {
-                paymentOptions.orderId = doc.orderId;
+    var paymentId = '9561ec5220';
+
+    OrderPaymentsRefund.findOne({paymentId: paymentId, payType: 2}, function(err, orderPaymentRefund){
+        if (err) {
+            self.respond('not find refund');
+            return;
+        }
+        self.respond('refund success');
+        if (orderPaymentRefund && orderPaymentRefund.refundReason !== 3) {
+            // TODO refund
+            // console.log(orderPaymentRefund);
+            if (orderPaymentRefund.payType === PAYTYPE.ZHIFUBAO) {
+                console.log('zhifubao refund:', orderPaymentRefund);
+               //  var type = 'nopwd';
+               //  PayService.alipayRefund(type, orderPaymentRefund, function(err, result) {
+               //     if (err) {
+               //         console.error('payRefund PayService alipayRefundNopwd err:', err);
+               //         return;
+               //     }
+               //     console.log(reuslt);
+               // });
+            } else if (orderPaymentRefund.payType === PAYTYPE.UNIONPAY) {
+               console.log('unionpay refund:', orderPaymentRefund);
+               // PayService.unionpayRefund(orderPaymentRefund, function(err, result) {
+               //      if (err) {
+               //          console.error('payRefund PayService unionpayRefund err:', err);
+               //          return;
+               //      }
+               //      if (reuslt) {
+               //          console.log(reuslt);
+               //      }
+               //      return;
+               // });
             }
-            if (doc.queryId) {
-                paymentOptions.queryId = doc.queryId;
-            }
-            paymentOptions.refundReason = 4;
-            payRefund.call(self, paymentOptions);
-            self.respond('refund success');
         }
     });
 }
@@ -543,11 +565,11 @@ function payRefund(options) {
             } else {
                 console.log(orderPaymentRefund);
             }
-            if (orderPaymentRefund && orderPaymentRefund.refundReason !== 3) {
-                // TODO refund
-                // console.log(orderPaymentRefund);
-                if (orderPaymentRefund.payType === PAYTYPE.ZHIFUBAO) {
-                    console.log('zhifubao refund:', orderPaymentRefund);
+            // if (orderPaymentRefund && orderPaymentRefund.refundReason !== 3) {
+            //     // TODO refund
+            //     // console.log(orderPaymentRefund);
+            //     if (orderPaymentRefund.payType === PAYTYPE.ZHIFUBAO) {
+            //         console.log('zhifubao refund:', orderPaymentRefund);
             //         var type = 'nopwd';
             //         PayService.alipayRefund(type, orderPaymentRefund, function(err, result) {
             //            if (err) {
@@ -556,20 +578,20 @@ function payRefund(options) {
             //            }
             //            console.log(reuslt);
             //        });
-                } else if (orderPaymentRefund.payType === PAYTYPE.UNIONPAY) {
-                   // console.log(orderPaymentRefund);
-                   PayService.unionpayRefund(orderPaymentRefund, function(err, result) {
-                        if (err) {
-                            console.error('payRefund PayService unionpayRefund err:', err);
-                            return;
-                        }
-                        if (reuslt) {
-                            console.log(reuslt);
-                        }
-                        return;
-                   });
-                }
-            }
+            //     } else if (orderPaymentRefund.payType === PAYTYPE.UNIONPAY) {
+            //        // console.log(orderPaymentRefund);
+            //        PayService.unionpayRefund(orderPaymentRefund, function(err, result) {
+            //             if (err) {
+            //                 console.error('payRefund PayService unionpayRefund err:', err);
+            //                 return;
+            //             }
+            //             if (reuslt) {
+            //                 console.log(reuslt);
+            //             }
+            //             return;
+            //        });
+            //     }
+            // }
         });
     }
 }
