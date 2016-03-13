@@ -205,7 +205,7 @@ PayService.prototype.unionpayRefund = function (options, callback) {
     //     then go to right top corner => "my test" => "my product" => "not tested" => select one tet type => click "start to test"
     var phpPage = 'Form_6_4_Refund.php';
     var host = (unionPayConfig.notification.host||'http://' + require("node-ip/lib/ip").address('public')) + ":" + unionPayConfig.notification.port;
-    var refundbackNotifyUrl = host + '/' + unionPayConfig.notification.refundback;
+    var refundbackNotifyUrl = host + unionPayConfig.notification.refundback;
     var php_processor = require("../common/php_processor");
     var commandLine = '\"' + require('path').resolve(__filename + '/../../external/unionPay/upacp_sdk_php/demo/utf8/' + phpPage) + '\"';
     var refundPrice = parseFloat((options.price * 100).toFixed(2));

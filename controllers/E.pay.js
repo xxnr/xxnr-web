@@ -133,8 +133,8 @@ function alipayOrder(){
                     param.anti_phishing_key = encrypt_key;
                     param.exter_invoke_ip = ip;
                     // notify_url CANNOT be 127.0.0.1 because ailiy cannot send notification to 127.0.0.1
-                    param.notify_url = ((alipay.alipay_config.notify_host || 'http://' + require("node-ip/lib/ip").address('public')) + ":" + alipay.alipay_config.notify_host_port + '/' + alipay.alipay_config.create_direct_pay_by_user_notify_url);
-                    param.return_url = ((alipay.alipay_config.return_host || 'http://' + require("node-ip/lib/ip").address('public')) + ":" + alipay.alipay_config.return_host_port + '/' + alipay.alipay_config.create_direct_pay_by_user_return_url);
+                    param.notify_url = ((alipay.alipay_config.notify_host || 'http://' + require("node-ip/lib/ip").address('public')) + ":" + alipay.alipay_config.notify_host_port + alipay.alipay_config.create_direct_pay_by_user_notify_url);
+                    param.return_url = ((alipay.alipay_config.return_host || 'http://' + require("node-ip/lib/ip").address('public')) + ":" + alipay.alipay_config.return_host_port + alipay.alipay_config.create_direct_pay_by_user_return_url);
                     param.extra_common_param = JSON.stringify({orderId:orderId});
                     self.view('alipay', alipay.build_direct_pay_by_user_param(param));
                 });
@@ -164,8 +164,8 @@ function unionPayOrder() {
         }
 
         var host = (unionPayConfig.notification.host||'http://' + require("node-ip/lib/ip").address('public')) + ":" + unionPayConfig.notification.port;
-        var frontNotifyUrl = host + '/' + unionPayConfig.notification.front;
-        var backNotifyUrl = host + '/' + unionPayConfig.notification.back;
+        var frontNotifyUrl = host + unionPayConfig.notification.front;
+        var backNotifyUrl = host + unionPayConfig.notification.back;
         var php_processor = require("../common/php_processor");
         var commandLine = '\"' + require('path').resolve(__filename + '/../../external/unionPay/upacp_sdk_php/demo/utf8/' + phpPage) + '\"';
         var returnPrice = parseFloat((totalPrice * 100).toFixed(2));
@@ -516,7 +516,10 @@ var OrderPaidLog = require('../models').orderpaidlog;
 var OrderPaymentsRefund = require('../models').orderpaymentsrefund;
 function refundTest() {
     var self = this;
-    var paymentId = '9561ec5220';
+    //var paymentId = '9561ec5220';
+    //var paymentId = '4573828f46';
+    //var paymentId = 'e546c378ca';
+    var paymentId = '3b074a1876';
 
     OrderPaymentsRefund.findOne({paymentId: paymentId, payType: 2}, function(err, orderPaymentRefund){
         if (err) {

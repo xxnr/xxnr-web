@@ -18,7 +18,7 @@ var config = {
 	,transport:'http' //访问模式,根据自己的服务器是否支持ssl访问，若支持请选择https；若不支持请选择http
 	,input_charset:'utf-8'//字符编码格式 目前支持 gbk 或 utf-8	
 	,create_direct_pay_by_user_return_url: '/alipay/success'
-	,create_direct_pay_by_user_notify_url: 'dynamic/alipay/notify.asp'
+	,create_direct_pay_by_user_notify_url: '/dynamic/alipay/notify.asp'
 	,refund_fastpay_by_platform_nopwd_notify_url: '/dynamic/alipay/refund_fastpay_by_platform_nopwd_notify.asp'
 	,refund_fastpay_by_platform_pwd_notify_url: '/dynamic/alipay/refund_fastpay_by_platform_pwd_notify.asp'
 	,input_charset:'UTF-8'//字符编码格式 目前支持 gbk 或 utf-8
