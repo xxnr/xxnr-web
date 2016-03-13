@@ -33,6 +33,7 @@ var PAYMENTSTATUS = require('../common/defs').PAYMENTSTATUS;
 var DELIVERSTATUS = require('../common/defs').DELIVERSTATUS;
 var PAYTYPE = require('../common/defs').PAYTYPE;
 var tools = require('../common/tools');
+var DELIVERYTYPE = require('../common/defs').DELIVERYTYPE;
 
 function getOdersList(callback) {
 	var self = this;
@@ -627,6 +628,8 @@ function addOrderBySKU(){
     var addressId = data['addressId'];
     var SKUs = data['SKUs'] || [];
     var payType = data['payType'] || PAYTYPE.ZHIFUBAO;
+    var deliveryType = data['deliveryType'] || null;
+    var RSCId = data['RSCId'] || null;
 
     if (!shopCartId) {
         self.respond({"code":1001, "mesage":"请选择购物车"});
@@ -636,6 +639,18 @@ function addOrderBySKU(){
     if (!addressId) {
         self.respond({"code":1001, "mesage":"请先填写收货地址"});
         return;
+    }
+
+    if (!deliveryType) {
+        self.respond({"code":1001, "mesage":"请先填写配送方式"});
+        return;
+    }
+
+    if (deliveryType && deliveryType === DELIVERYTYPE['ZITI'].id) {
+        if (!RSCId) {
+            self.respond({"code":1001, "mesage":"请先选择自提点"});
+            return;
+        }
     }
 
     UserService.get({"userid":userId}, function(err, user) {
@@ -660,6 +675,8 @@ function addOrderBySKU(){
                     self.respond({code:1001, message:'购物车为空'});
                     return;
                 }
+
+                //UserService.getRSCInfoById(self.user, function(err, user)
 
                 // 拆单 定金的商品和全款的商品拆分支付
                 var orders = {};
