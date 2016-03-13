@@ -6,17 +6,25 @@ var services = require('../services');
 var UserService = services.user;
 var RSCService = services.RSC;
 var OrderService = services.order;
+var PAYMENTSTATUS = require('../common/defs').PAYMENTSTATUS;
+var DELIVERSTATUS = require('../common/defs').DELIVERSTATUS;
+var DELIVERYTYPE = require('../common/defs').DELIVERYTYPE;
 
 exports.install = function() {
-    // Regional Service Centre apis
+    // RSC info related
     F.route('/api/v2.2/RSC/info/get',                   json_RSC_info_get,          ['get'],    ['isLoggedIn']);
     F.route('/api/v2.2/RSC/info/fill',                  process_RSC_info_fill,      ['post'],   ['isLoggedIn']);
-    F.route('/api/v2.2/RSC/orders',                     json_RSC_orders_get,        ['get'],    ['isLoggedIn', 'isRSC']);
-    F.route('/api/v2.2/RSC/order/deliverStatus/modify', process_RSC_order_deliverStatus_modify, ['post'],    ['isLoggedIn', 'isRSC']);
+
+    // RSC address query related
     F.route('/api/v2.2/RSC/address/province',           json_RSC_address_province_query,     ['get'],    ['isLoggedIn']);
     F.route('/api/v2.2/RSC/address/city',               json_RSC_address_city_query,     ['get'],    ['isLoggedIn']);
     F.route('/api/v2.2/RSC/address/county',             json_RSC_address_county_query,     ['get'],    ['isLoggedIn']);
     F.route('/api/v2.2/RSC/address/town',               json_RSC_address_town_query,     ['get'],    ['isLoggedIn']);
+
+    // RSC order related
+    // TODO: not tested/documented apis,
+    F.route('/api/v2.2/RSC/orders',                         json_RSC_orders_get,        ['get'],    ['isLoggedIn', 'isRSC']);
+    F.route('/api/v2.2/RSC/order/deliverStatus/delivering', process_RSC_order_deliverStatus_delivering, ['post'],    ['isLoggedIn', 'isRSC']);
 };
 
 /**
@@ -137,24 +145,94 @@ function json_RSC_info_get(){
 function json_RSC_orders_get(){
     var self = this;
     var RSC = self.user;
-
     var page = U.parseInt(self.data.page, 1) - 1;
     var max = U.parseInt(self.data.max, 20);
-    OrderService.getByRSC(RSC, page, max, function(err, orders, count, pageCount){
+    var type = self.data.type;
+    OrderService.getByRSC(RSC, page, max, type, function(err, orders, count, pageCount){
         if(err){
             self.respond({code:1002, message:'获取订单失败'});
             return;
         }
 
+        generate_RSC_order_type(orders);
         self.respond({code:1000, message:'success', orders:orders, count:count, pageCount:pageCount});
     })
 }
 
-function process_RSC_order_deliverStatus_modify(){
-    // TODO:modify order deliver status by given order
-    // 2 cases:
-    // 1. 用户自提：商品发货状态为已到服务站->支付状态为已付款->输入自提码->验证自提码->修改状态（需要确认状态？？？）
-    // 2. 送货到家：支付状态为已付款->发货->修改状态为配送中
+function process_RSC_order_deliverStatus_delivering(){
+    var self = this;
+    var user = self.user;
+    var orderId = self.data.orderId;
+    var SKURef = self.data.SKURef;
+    if(!orderId){
+        self.respond({code:1001, message:'需要订单号'});
+        return;
+    }
+
+    OrderService.get({id:orderId}, function(err, order){
+        if(err || !order){
+            self.respond({code:1002, message:'获取订单失败'});
+            return;
+        }
+
+        // check current status to see if the current status is OK for change deliver status
+        // check if order belongs to this RSC
+        if(!order.RSCInfo || !order.RSCInfo.RSC || user._id != order.RSCInfo.RSC){
+            self.respond({code:1002, message:'没有权利修改这个订单'});
+            return;
+        }
+
+        // check if the order ispaid
+        if(order.payStatus != PAYMENTSTATUS.PAID){
+            self.respond({code:1002, message:'该订单尚未完全支付'});
+            return;
+        }
+
+        // check if order deliver status is deliver to home
+        if(order.deliveryType != DELIVERYTYPE.SONGHUO.id){
+            self.respond({code:1002, message:'该订单非送货到家'});
+            return;
+        }
+
+        // check if the SKU belongs to this order and if this SKU is delivered to RSC
+        if(!tools.isArray(orders.SKUs)){
+            self.respond({code:1002, message:'该订单无SKU'});
+            return;
+        }
+
+        var SKUBelongsToOrder = false;
+        var SKUtoDeliver;
+        for(var i = 0; i < orders.SKUs.length; i++){
+            var SKU = orders.SKUs[i];
+            if(SKU.ref == SKURef){
+                SKUBelongsToOrder = true;
+                if(SKU.deliverStatus != DELIVERSTATUS.RSCRECEIVED){
+                    self.respond({code:1002, message:'该SKU还未到达服务站'});
+                    return;
+                } else{
+                    SKUtoDeliver = SKU;
+                    break;
+                }
+            }
+        }
+
+        if(!SKUBelongsToOrder){
+            self.respond({code:1002, message:'该SKU不属于该订单'});
+            return;
+        }
+
+        // all check done, start to update status
+        var options = {id:order.id, SKUs:[]};
+        options.SKUs[SKUtoDeliver.ref] = {deliverStatus: DELIVERSTATUS.DELIVERED};
+        OrderService.updateSKUs(options, function(err){
+            if(err){
+                self.respond({code:1002, message:'更新订单失败'});
+                return;
+            }
+
+            self.respond({code:1000, message:'success'});
+        })
+    })
 }
 
 function json_RSC_address_province_query(){
@@ -255,5 +333,52 @@ function json_RSC_address_town_query(){
         }
 
         self.respond({code:1000, message:'success', townList: townList, RSCs: RSCs, count:count, pageCount:pageCount});
+    })
+}
+
+function generate_RSC_order_type(orders){
+    /**
+     * Order types
+     * -1   :   已关闭
+     * 1    :   待付款
+     * 2    :   待审核
+     * 3    :   待发货
+     * 4    :   待配送(有一件商品为已到服务站，且配送方式为送货到家, 订单状态为已到服务站)
+     * 5    :   待自提(有一件商品为已到服务站，且配送方式为自提, 订单状态为已到服务站)
+     * 6    :   待收货(有一件商品为已发货(配送中),订单状态为部分发货或者已发货)
+     * 7    :   已完成(全部商品为确认收货)
+     */
+    orders.forEach(function(order) {
+        if (order.payStatus === PAYMENTSTATUS.PARTPAID) {
+            if (order.pendingApprove) {
+                order.type = 2;
+            } else {
+                order.type = 1;
+            }
+        } else if (order.payStatus === PAYMENTSTATUS.PAID) {
+            if (order.deliverStatus === DELIVERSTATUS.RSCRECEIVED) {
+                if (order.deliveryType === DELIVERYTYPE.ZITI.id) {
+                    order.type = 5;
+                } else if (order.deliveryType === DELIVERYTYPE.SONGHUO.id) {
+                    order.type = 4;
+                }
+            } else if (order.deliverStatus === DELIVERSTATUS.PARTDELIVERED || order.deliverStatus === DELIVERSTATUS.DELIVERED) {
+                if (order.confirmed) {
+                    order.type = 7;
+                } else {
+                    order.type = 6;
+                }
+            } else {
+                order.type = 3;
+            }
+        } else {
+            if (order.pendingApprove) {
+                order.type = 2;
+            } else if (order.isClosed) {
+                order.type = -1;
+            } else {
+                order.type = 1;
+            }
+        }
     })
 }
