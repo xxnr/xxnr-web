@@ -12,6 +12,8 @@ var UseOrdersNumberModel = require('../models').userordersnumber;
 var OrderPaidLog = require('../models').orderpaidlog;
 var moment = require('moment-timezone');
 var DELIVERYTYPE = require('../common/defs').DELIVERYTYPE;
+var converter = require('../common/converter');
+var api10 = converter.api10;
 
 // Service
 var OrderService = function(){};
@@ -227,6 +229,230 @@ OrderService.prototype.add = function(options, callback) {
 		MODULE('webcounter').increment('orders');
 	});
 
+};
+
+// 拆单（定金的商品和全款的商品拆分支付），并提交订单
+OrderService.prototype.splitAndaddOrder = function(options, callback) {
+	var self = this;
+    var orders = {};
+    var orderSKUs = [];
+    var payType = options.payType || PAYTYPE.ZHIFUBAO;
+    var addressInfo = null;
+    var RSCInfo = null;
+    if (!options.user) {
+    	callback("用户不存在");
+        return;
+    }
+    if (!options.SKU_items) {
+    	callback("购物车为空");
+        return;
+    }
+    if (options.deliveryType && options.deliveryType === DELIVERYTYPE['SONGHUO'].id) {
+        if (!options.address) {
+            callback("请先填写收货地址");
+            return;
+        } else {
+        	addressInfo = {
+        		"consigneeName": options.address.receiptpeople,
+        		"consigneePhone": options.address.receiptphone,
+        		"consigneeAddress": options.address.provincename + options.address.cityname + (options.address.countyname || '') + (options.address.townname || '') + options.address.address
+        	};
+        }
+    } else if (options.deliveryType && options.deliveryType === DELIVERYTYPE['ZITI'].id) {
+        if (!options.RSC || !options.RSCId) {
+            callback("请先选择自提点");
+            return;
+        } else {
+        	RSCInfo = {RSC: options.RSCId};
+        	if (!options.RSC.RSCInfo || !options.RSC.RSCInfo.companyAddress || !options.RSC.RSCInfo.companyAddress.province.name || !options.RSC.RSCInfo.companyAddress.city.name) {
+        		callback("自提点地址不完整");
+            	return;
+            }
+        	RSCInfo.RSCAddress = options.RSC.RSCInfo.companyAddress.province.name + options.RSC.RSCInfo.companyAddress.city.name;
+        	if (options.RSC.RSCInfo.companyAddress.county && options.RSC.RSCInfo.companyAddress.county.name) {
+        		RSCInfo.RSCAddress += options.RSC.RSCInfo.companyAddress.county.name;
+        	}
+        	if (options.RSC.RSCInfo.companyAddress.town && options.RSC.RSCInfo.companyAddress.town.name) {
+        		RSCInfo.RSCAddress += options.RSC.RSCInfo.companyAddress.town.name;
+        	}
+        	if (options.RSC.RSCInfo.companyAddress.details) {
+        		RSCInfo.RSCAddress += options.RSC.RSCInfo.companyAddress.details;
+        	}
+        	if (options.RSC.RSCInfo.companyName) {
+        		RSCInfo.companyName = options.RSC.RSCInfo.companyName;
+        	}
+        	if (options.RSC.RSCInfo.RSCPhone) {
+        		RSCInfo.RSCPhone = options.RSC.RSCInfo.RSCPhone;
+        	}
+        }
+        if (!options.consigneeName) {
+            callback("请先填写收货人姓名");
+            return;
+        }
+        if (!options.consigneePhone) {
+            callback("请先填写收货人手机号");
+            return;
+        }
+    } else {
+        callback("请先选择正确的配送方式");
+        return;
+    }
+
+    for (var i=0; i<options.SKU_items.length; i++) {
+        var SKU = options.SKU_items[i].SKU;
+        var product = options.SKU_items[i].product;
+        if (!product.online) {
+        	callback('无法添加下架商品');
+            return;
+        }
+
+        if (!SKU.online) {
+        	callback('无法添加下架SKU');
+            return;
+        }
+
+        var additions = options.SKU_items[i].additions;
+        var additionPrice = 0;
+        additions.forEach(function(addition) {
+            additionPrice += addition.price;
+            if (!addition.ref) {
+                addition.ref = addition._id;
+            }
+            
+            delete addition._id;
+        });
+        product = api10.convertProduct(product);
+        var SKU_to_add = {
+        	ref: SKU._id,
+        	productId: product.id,
+	        price: SKU.price.platform_price,
+	        deposit: product.deposit,
+	        productName: product.name,
+	        name: SKU.name,
+	        thumbnail: product.thumbnail,
+	        count: options.SKU_items[i].count,
+	        category: product.category,
+	        attributes: SKU.attributes
+        };
+        if (additions && additions.length > 0) {
+            SKU_to_add.additions = additions;
+        }
+
+        var orderKey = "full";
+        if (SKU_to_add.deposit) {
+        	orderKey = "deposit";
+        }
+        if (!orders[orderKey]) {
+            orders[orderKey] = {
+                "buyerName":options.user.name,
+                "buyerPhone":options.user.account,
+                "buyerId":options.user.id,
+                "price":0,
+                "deposit":0,
+                "SKUs":[],
+                "payType":payType,
+                "payStatus":PAYMENTSTATUS.UNPAID,
+                "deliverStatus":DELIVERSTATUS.UNDELIVERED
+            };
+            orders[orderKey].id = U.GUID(10);
+            orders[orderKey].paymentId = U.GUID(10);
+            if (options.deliveryType === DELIVERYTYPE['ZITI'].id) {
+            	orders[orderKey].RSCInfo = RSCInfo;
+            	orders[orderKey].consigneeName = options.consigneeName;
+                orders[orderKey].consigneePhone = options.consigneePhone;
+                orders[orderKey].deliveryType = DELIVERYTYPE['ZITI'].id;
+            } else {
+            	orders[orderKey].consigneeName = addressInfo.consigneeName;
+                orders[orderKey].consigneePhone = addressInfo.consigneePhone;
+                orders[orderKey].consigneeAddress = addressInfo.consigneeAddress;
+                orders[orderKey].deliveryType = DELIVERYTYPE['SONGHUO'].id;
+            }
+        }
+        orders[orderKey].price +=  SKU_to_add.count * (SKU_to_add.price+additionPrice);
+        if (SKU_to_add.deposit) {
+        	orders[orderKey].deposit += SKU_to_add.count * SKU_to_add.deposit;
+        }
+        orders[orderKey].SKUs.push(SKU_to_add);
+    	// need remove SKUs from shopcart
+        orderSKUs.push(SKU_to_add);
+    }
+
+    var keys = Object.keys(orders);
+    if (orders && keys.length > 0) {
+        var order1, order2;
+        if (orders['deposit']) {
+            orders['deposit'].duePrice = orders['deposit'].deposit;
+            order1 = orders['deposit'];
+            if (orders['full']) {
+                orders['full'].duePrice = orders['full'].price;
+                order2 = orders['full'];
+            }
+        } else if (orders['full']) {
+            orders['full'].duePrice = orders['full'].price;
+            order1 = orders['full'];
+        }
+        if (order1) {
+            try {
+                self.add(order1, function(err, data, payment) {
+                    if (err || !data) {
+                        if (err) console.error('Order Service splitAndaddOrder order1 add err:', err);
+                        callback('保存订单出错');
+                        return;
+                    }
+                    var resultOrders = [];
+                    var result = {'id': data.id, 'price':data.price.toFixed(2), 'deposit': data.deposit.toFixed(2), 'SKUs':data.SKUs || []};
+                    if (payment) {
+                        result.payment = {'paymentId':payment.id, 'price':payment.price.toFixed(2)};
+                    }
+                    resultOrders.push(result);
+
+                    var orderId = data.id;
+                    var paymentId = payment && payment.id ? payment.id : data.paymentId;
+                    var price = data.price;
+                    var payPrice = payment && typeof(payment.price) != 'undefined' ? payment.price : data.deposit && data.deposit > 0 ? data.deposit : data.price;
+                    var response = {'code':1000, 'id': data.id, 'paymentId':paymentId, 'price':data.price.toFixed(2), 'deposit':payPrice.toFixed(2)};
+                    if (order2) {
+                        self.add(order2, function(err, data, payment) {
+                            if (err || !data) {
+                                if (err) console.error('Order Service splitAndaddOrder order2 add err:', err);
+                                callback('保存订单出错');
+                                self.remove({id:orderId}, function(err) {
+                                    if (err) {
+                                        console.error('Order Service splitAndaddOrder remove order1 err:', err);
+                                    }
+                                });
+                                return;
+                            }
+                            result = {'id': data.id, 'price':data.price.toFixed(2), 'deposit': data.deposit.toFixed(2), 'SKUs':data.SKUs || []};
+                            if (payment) {
+                                result.payment = {'paymentId':payment.id, 'price':payment.price.toFixed(2)};
+                            }
+                            resultOrders.push(result);
+                            response['orders'] = resultOrders;
+                            callback(null, response, orderSKUs);
+                            return;
+                        });
+                    } else {
+                        response['orders'] = resultOrders;
+                        callback(null, response, orderSKUs);
+                        return;
+                    }
+                });
+            } catch (e) {
+                console.error('Order Service splitAndaddOrder orders err:', e);
+                callback('保存订单出错');
+                return;
+            }
+        } else {
+            console.error('Order Service splitAndaddOrder err: not get the order..');
+            callback('没有要保存的订单');
+            return;
+        }
+    } else {
+        console.error('Order Service splitAndaddOrder err: no orders info..');
+        callback('获取订单信息出错');
+        return;
+    }
 };
 
 // Gets a specific order
