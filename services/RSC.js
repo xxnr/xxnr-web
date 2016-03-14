@@ -1,8 +1,6 @@
 /**
  * Created by pepelu on 2016/2/26.
  */
-var mongoose = require('mongoose');
-var ProductModel = require('../models').product;
 var UserModel = require('../models').user;
 var tools = require('../common/tools');
 
