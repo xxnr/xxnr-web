@@ -24,6 +24,9 @@ exports.install = function() {
     // v2.1
     F.route('/api/v2.1/order/addOrder',            addOrderBySKU, ['post'], ['isLoggedIn', 'throttle']);
 
+    // v2.2
+    // TODO : not tested and documented apis
+    F.route('/api/v2.2/order/confirmSKUReceived',   process_confirm_SKU_received, ['get'], ['isLoggedIn']);
 };
 
 var converter = require('../common/converter');
@@ -392,29 +395,7 @@ function updateOrderPaytype() {
 // user confirm order
 function confirmOrder() {
     var self = this;
-    var buyer = self.data.userId || null;
-    var orderid = self.data.orderId || null;
-
-    OrderService.get({'buyer':buyer,'id':orderid}, function(err, data) {
-        if (err || !data) {
-            if (err) console.error('Order confirmOrder err:', err);
-            self.respond({'code':'1001','message':'未查询到订单'});
-            return;
-        }
-        if (data && data.deliverStatus === DELIVERSTATUS.DELIVERED && data.payStatus === PAYMENTSTATUS.PAID && !data.confirmed) {
-            OrderService.confirm(orderid, function(err) {
-                if(err) {
-                    console.error('Order confirmOrder err:', err);
-                    self.respond({'code':'1001','message':'确认订单出错'});
-                    return;
-                }
-                self.respond({'code':'1000','message':'success'});
-                return;
-            });
-        } else {
-            self.respond({'code':'1001','message':'此订单不能确认'});
-        }
-    });
+    self.respond({code:1009, message:'API retired'});
 }
 
 // get order detail
@@ -848,4 +829,35 @@ function addOrderBySKU(){
         });
     });
 }
+
+function process_confirm_SKU_received(){
+    var self = this;
+    var orderId = self.data.orderId;
+    var SKURef = self.data.SKURef;
+    var user = self.user;
+    if(!orderId){
+        self.respond({code:1001, message:'orderId required'});
+        return;
+    }
+
+    if(!SKURef){
+        self.respond({code:1001, message:'SKURef required'});
+        return;
+    }
+
+    if(!user){
+        self.respond({code:1001, message:'请先登录'});
+        return;
+    }
+
+    OrderService.confirm(orderId, SKURef, user.id, function(err){
+        if(err){
+            self.respond({code:1002, message:err});
+            return;
+        }
+
+        self.respond({code:1000, message:'success'});
+    })
+}
+
 exports.getOders = getOdersList;

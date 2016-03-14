@@ -49,13 +49,15 @@ var schema = new mongoose.Schema({
 			'ref':{type:mongoose.Schema.ObjectId, ref:'SKUAddition', required:true},
 			'name':{type:String, required:true},
 			'price':{type:Number, required:true}
-		}]
+		}],
+		'confirmed': {type:Boolean, default:false},								// 用户确认收货
+		'dateConfirmed':Date
 	}],
 	'payStatus': {type:Number, required:true, default: PAYMENTSTATUS.UNPAID},		// 主订单付款状态，从子订单付款状态统计得来 分为未付款、部分付款、已付款三种，只用来做查询
 	'datePaid': Date,
 	'deliverStatus': {type:Number, required:true}, 									// 主订单发货状态，从商品发货状态统计得来 分为无发货、部分发货、已发货三种，只用来做查询
 	'dateDelivered': Date,
-	'confirmed': {type:Boolean, default:false},
+	'confirmed': {type:Boolean, default:false},									// 主订单确认完毕
 	'dateCompleted': Date,
 	'paymentId': {type:String, required:true},										// 最新一笔支付的ID
 	'payType': {type:Number, required:true},										// 最新一笔支付的支付方式
@@ -92,7 +94,9 @@ var schema = new mongoose.Schema({
 		'companyName':{type:String},												// 自提点公司名
 		'RSCAddress': {type:String},												// 自提点地址
 		'RSCPhone': {type:String}													// 自提点联系电话
-	}
+	},
+	'depositPaid':{type:Boolean, default: false},									// 订金是否已付
+	'pendingApprove':{type:Boolean, default: false}								// 付款是否待审核
 });
 
 schema.index({dateCreated: -1});

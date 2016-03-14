@@ -11,6 +11,7 @@ var OrderModel = require('../models').order;
 var UseOrdersNumberModel = require('../models').userordersnumber;
 var OrderPaidLog = require('../models').orderpaidlog;
 var moment = require('moment-timezone');
+var DELIVERYTYPE = require('../common/defs').DELIVERYTYPE;
 
 // Service
 var OrderService = function(){};
@@ -469,7 +470,7 @@ OrderService.prototype.paid = function(id, paymentId, options, callback) {
 	var self = this;
 	// Updates database file
 	// OrderModel.update({id:id}, {$set:{payStatus:PAYMENTSTATUS.PAID, datepaid:new Date()}}, function(err, count) {
-	var values = {'payments.$.payStatus':PAYMENTSTATUS.PAID, 'payments.$.datePaid':new Date()};
+	var values = {'payments.$.payStatus':PAYMENTSTATUS.PAID, 'payments.$.datePaid':new Date(), pendingApprove:false};
 	if (options && options.price) {
 		values['payments.$.price'] = parseFloat(parseFloat(options.price).toFixed(2));
 	}
@@ -500,21 +501,62 @@ OrderService.prototype.paid = function(id, paymentId, options, callback) {
 
 
 // Sets order to confirmed 
-OrderService.prototype.confirm = function(id, callback) {
+OrderService.prototype.confirm = function(orderId, SKURef, userId, callback) {
+	if(!orderId){
+		callback('orderId required');
+		return;
+	}
 
-	// Updates database file
-	OrderModel.update({id:id}, {$set:{confirmed: true, dateCompleted: new Date()}}, function(err, count) {
-		if (err) {
-            callback(err);
-            return;
-        }
+	if(!SKURef){
+		callback('SKURef required');
+		return;
+	}
 
-        if (count.n == 0) {
-            callback('订单不存在');
-            return;
-        }
+	if(!userId){
+		callback('userId required');
+		return;
+	}
 
-        callback(null);
+	OrderModel.findOne({id:orderId, buyerId:userId}, function(err, order){
+		if(err){
+			console.error(err);
+			callback('查询订单失败');
+			return;
+		}
+
+		if(!order){
+			callback('未找到订单');
+			return;
+		}
+
+		var allConfirmed = true;
+		order.SKUs.forEach(function (sku) {
+			if (SKURef == sku.ref) {
+				// we don't check if the deliver status is delivered right now to keep it's flexibility
+				// if we find strong reason to check, we can add the check here
+				sku.confirmed = true;
+				sku.dateConfirmed = new Date();
+			}
+
+			if(!sku.confirmed){
+				allConfirmed = false;
+			}
+		});
+
+		if(allConfirmed){
+			order.confirmed = true;
+			order.dateCompleted = new Date();
+		}
+
+		order.save(function(err) {
+			if (err) {
+				console.error(err);
+				callback('保存订单失败');
+				return;
+			}
+
+			callback(null);
+		});
 	});
 };
 
@@ -1463,7 +1505,7 @@ OrderService.prototype.savePaidLog = function(paidLog, callback) {
     }
 };
 
-OrderService.prototype.getByRSC = function(RSC, page, max, callback){
+OrderService.prototype.getByRSC = function(RSC, page, max, type, callback){
 	if(!RSC){
 		callback('RSC needed');
 		return;
@@ -1483,6 +1525,37 @@ OrderService.prototype.getByRSC = function(RSC, page, max, callback){
 		max = 50;
 	}
 
+	if(type){
+		switch(type){
+			case 1:		//待付款
+				query.payStatus = {$or:[PAYMENTSTATUS.UNPAID, PAYMENTSTATUS.PARTPAID]};
+				query.pendingApprove = {$not:true};
+				query.isClosed = false;
+				break;
+			case 2:		//待审核
+				query.pendingApprove = true;
+				break;
+			case 3:		//待配送
+				query.payStatus = PAYMENTSTATUS.PAID;
+				query.deliverStatus = DELIVERSTATUS.RSCRECEIVED;
+				query.deliveryType = DELIVERYTYPE.SONGHUO.id;
+				break;
+			case 4:		//待自提
+				query.payStatus = PAYMENTSTATUS.PAID;
+				query.deliverStatus = DELIVERSTATUS.RSCRECEIVED;
+				query.deliveryType = DELIVERYTYPE.ZITI.id;
+				break;
+			case 5:		//已完成
+				query.payStatus = PAYMENTSTATUS.PAID;
+				query.deliverStatus = DELIVERSTATUS.DELIVERED;
+				query.deliveryType = DELIVERYTYPE.ZITI.id;
+				query.confirmed = true;
+				break;
+			default:
+				break;
+		}
+	}
+
 	OrderModel.count(query, function(err, count){
 		if(err){
 			console.error(err);
@@ -1491,10 +1564,11 @@ OrderService.prototype.getByRSC = function(RSC, page, max, callback){
 		}
 
 		OrderModel.find(query)
-			.select('dateCreated id consigneeName consigneePhone SKUs price subOrders deliveryType')
+			.select('dateCreated id consigneeName consigneePhone SKUs price subOrders payments deliveryType pendingApprove confirmed')
 			.sort({dateCreated:-1})
 			.skip(page * max)
 			.limit(max)
+			.lean()
 			.exec(function (err, orders) {
 				if (err) {
 					console.error(err);
@@ -1506,6 +1580,28 @@ OrderService.prototype.getByRSC = function(RSC, page, max, callback){
 				callback(null, orders || [], count, pageCount);
 			})
 	});
+};
+
+OrderService.prototype.changeToPendingApprove = function(orderId, callback){
+	if(!orderId){
+		callback('orderId required');
+		return;
+	}
+
+	OrderModel.update({id:orderId}, {$set:{pendingApprove:true}}, function(err, numAffected){
+		if(err){
+			console.error(err);
+			callback('update order error');
+			return;
+		}
+
+		if(numAffected.updated <= 0){
+			callback('no order updated');
+			return;
+		}
+
+		callback();
+	})
 };
 
 module.exports = new OrderService();
