@@ -108,6 +108,98 @@ PayService.prototype.updatePaymentRefund = function(options, callback) {
     }
 };
 
+// query payment refund
+PayService.prototype.queryPaymentRefund = function(options, callback) {
+
+    // options.search {String}
+    // options.page {String or Number}
+    // options.max {String or Number}
+
+    // page max num
+    var pagemax = 50;
+    var max = U.parseInt(options.max, 20);
+    options.page = U.parseInt(options.page) - 1;
+    options.max = max > pagemax ? pagemax : max;
+
+    if (options.page < 0)
+        options.page = 0;
+
+    var take = U.parseInt(options.max);
+    var skip = U.parseInt(options.page * options.max);
+
+    var query = {};
+
+    if (typeof(options.status) != 'undefined' && options.status != '') {
+        query.status = options.status;
+    }
+    if (options.refundreason) {
+        query.refundReason = options.refundreason;
+    }
+
+    OrderPaymentsRefund.count(query, function (err, count) {
+        if (err) {
+            callback(err);
+            return;
+        }
+
+        OrderPaymentsRefund.find(query, { __v: 0 })
+            .sort({dateCreated: -1})
+            .skip(skip)
+            .limit(take)
+            .exec(function (err, docs) {
+                if (err) {
+                    callback(err);
+                    return;
+                }
+
+                var data = {};
+                data.count = count;
+                data.items = docs;
+
+                // Gets page count
+                data.pages = Math.floor(count / options.max) + (count % options.max ? 1 : 0);
+                if (data.pages === 0)
+                    data.pages = 1;
+                data.page = options.page + 1;
+
+                // Returns data
+                callback(null, data);
+            });
+    });
+};
+
+// Gets a specific payment refund
+PayService.prototype.getPaymentRefund = function(options, callback) {
+    // options.id {String}
+
+    var self = this;
+    if (!options.id) {
+        callback('need id');
+        return;
+    }
+
+    var query = {};
+
+    if (options.id) {
+        query._id = options.id;
+    }
+
+    OrderPaymentsRefund.findOne(query, function(err, doc) {
+        if (err) {
+            callback(err);
+            return;
+        }
+        
+        // update order paystatus
+        if (doc) {
+            callback(null, doc.toObject());
+            return;
+        } else {
+            callback(null, null);
+        }
+    });
+};
+
 // alipay refund
 PayService.prototype.alipayRefund = function (refundType, options, callback) {
     var self = this;

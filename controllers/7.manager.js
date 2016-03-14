@@ -13,6 +13,7 @@ var BrandService = services.brand;
 var CategoryService = services.category;
 var PotentialCustomerService = services.potential_customer;
 var AuditlogService = services.auditservice;
+var PayService = services.pay;
 var PAYMENTSTATUS = require('../common/defs').PAYMENTSTATUS;
 var DELIVERSTATUS = require('../common/defs').DELIVERSTATUS;
 
@@ -148,7 +149,13 @@ exports.install = function() {
 	// potential customer
 	F.route(CONFIG('manager-url') + '/api/v2.1/potentialCustomer/query',	json_potential_customer_query,	['get'], ['backend_auth']);
 	F.route(CONFIG('manager-url') + '/api/v2.1/potentialCustomer/{_id}',	json_potential_customer_get, ['get'], ['backend_auth']);
-	F.route(CONFIG('manager-url') + '/api/v2.1/agentinfo/{_id}',				json_agent_info_get, ['get'], ['backend_auth']);
+	F.route(CONFIG('manager-url') + '/api/v2.1/agentinfo/{_id}',			json_agent_info_get, ['get'], ['backend_auth']);
+
+	// pay refund
+	F.route(CONFIG('manager-url') + '/api/payrefunds/',            			json_payrefund_query, ['get'], ['backend_auth']);
+	F.route(CONFIG('manager-url') + '/api/payrefunds/{id}/',       			json_payrefund_read, ['get'], ['backend_auth']);
+	//F.route(CONFIG('manager-url') + '/api/payrefunds/update/',       		json_payrefund_update, ['put'], ['backend_auth']);
+
 };
 
 var files = DB('files', null, require('total.js/database/database').BUILT_IN_DB).binary;
@@ -1537,4 +1544,36 @@ function json_agent_info_get(id){
 			self.respond({code:1000, agent:{name:user.name, phone: user.account, address:user.address, totalCount:totalCount, registeredCount:registeredCount, registeredAndBindedCount:registeredAndBindedCount}});
 		})
 	})
+}
+
+// ==========================================================================
+// Pay Refund
+// ==========================================================================
+
+// Gets all pay refund
+function json_payrefund_query() {
+	var self = this;
+	PayService.queryPaymentRefund(self.query, function(err, datas){
+		if (err) {
+			console.error('manager json_payrefund_query err:', err);
+			self.respond({code: 1004, message: 'query pay refund err:' + err});
+			return;
+		}
+		self.respond({code:1000, message:'success', datas:datas});
+	});
+}
+
+// Reads a specific pay refund by ID
+function json_payrefund_read(id) {
+	var self = this;
+	var options = {};
+	options.id = id;
+    PayService.getPaymentRefund(options, function(err, datas){
+		if (err) {
+			console.error('manager json_payrefund_read err:', err);
+			self.respond({code: 1004, message: 'get pay refund err:' + err});
+			return;
+		}
+		self.respond({code:1000, message:'success', datas:datas});
+	});
 }

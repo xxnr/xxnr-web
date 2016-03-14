@@ -39,6 +39,10 @@
 /$manager/api/auditlogs/, get, super_admin
 /$manager/api/auditlogs/{id}, get, super_admin
 
+#payrefunds
+/$manager/api/payrefunds/, get, super_admin
+/$manager/api/payrefunds/{id}, get, super_admin
+
 #files
 /$manager/api/files/clear, get, super_admin
 
