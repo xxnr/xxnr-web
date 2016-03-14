@@ -25,7 +25,6 @@ exports.install = function() {
     F.route('/api/v2.1/order/addOrder',            addOrderBySKU, ['post'], ['isLoggedIn', 'throttle']);
 
     // v2.2
-    // TODO : not tested and documented apis
     F.route('/api/v2.2/order/confirmSKUReceived',   process_confirm_SKU_received, ['get'], ['isLoggedIn']);
 };
 

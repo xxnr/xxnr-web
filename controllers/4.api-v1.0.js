@@ -59,9 +59,9 @@ exports.install = function() {
 	F.route('/app/goods/getWebGoodsDetails', api10_getProductDetail, ['post', 'get', 'upload'], 8);
     F.route('/app/ad/getAdList', api10_getBanners, ['post', 'get', 'upload'], 8);
 
-    // TODO: not tested and documented apis
     F.route('/api/v2.2/getOfflinePayType',              json_offline_pay_type, ['get']);
-    F.route('/offlinepay', offlinePay, ['get']);
+    F.route('/offlinepay', offlinePay, ['get', 'isLoggedIn']);
+    // TODO: not tested and documented apis, add more conditions, need more tests
     F.route('/api/v2.2/RSC/confirmOfflinePay',          process_RSC_confirm_OfflinePay, ['get'],    ['isLoggedIn', 'isRSC']);
 };
 
@@ -1030,6 +1030,7 @@ function process_RSC_confirm_OfflinePay(){
     var paymentId = self.data.paymentId;
     var price = self.data.price;
     var offlinePayType = self.data.offlinePayType;
+    var RSC = self.user;
     if(!paymentId){
         self.respond({code:1001, message:'paymentId required'});
         return;
@@ -1048,6 +1049,11 @@ function process_RSC_confirm_OfflinePay(){
     OrderService.get({"paymentId": paymentId}, function(err, order) {
         if (err) {
             self.respond({code:1002, message:'获取订单失败'});
+            return;
+        }
+
+        if(!order.RSCInfo || order.RSCInfo.RSC.toString() == RSC._id.toString()){
+            self.respond({code:1002, message:'该订单未分配到县级网点'});
             return;
         }
 

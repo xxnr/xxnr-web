@@ -14,7 +14,7 @@ var moment = require('moment-timezone');
 var DELIVERYTYPE = require('../common/defs').DELIVERYTYPE;
 var converter = require('../common/converter');
 var api10 = converter.api10;
-
+var mongoose = require('mongoose');
 // Service
 var OrderService = function(){};
 
@@ -1754,27 +1754,26 @@ OrderService.prototype.getByRSC = function(RSC, page, max, type, callback){
 	if(type){
 		switch(type){
 			case 1:		//待付款
-				query.payStatus = {$or:[PAYMENTSTATUS.UNPAID, PAYMENTSTATUS.PARTPAID]};
-				query.pendingApprove = {$not:true};
+				query.payStatus = {$in:[PAYMENTSTATUS.UNPAID, PAYMENTSTATUS.PARTPAID]};
+				query.pendingApprove = {$ne:true};
 				query.isClosed = false;
 				break;
 			case 2:		//待审核
 				query.pendingApprove = true;
 				break;
-			case 3:		//待配送
+			case 4:		//待配送
 				query.payStatus = PAYMENTSTATUS.PAID;
 				query.deliverStatus = DELIVERSTATUS.RSCRECEIVED;
 				query.deliveryType = DELIVERYTYPE.SONGHUO.id;
 				break;
-			case 4:		//待自提
+			case 5:		//待自提
 				query.payStatus = PAYMENTSTATUS.PAID;
 				query.deliverStatus = DELIVERSTATUS.RSCRECEIVED;
 				query.deliveryType = DELIVERYTYPE.ZITI.id;
 				break;
-			case 5:		//已完成
+			case 7:		//已完成
 				query.payStatus = PAYMENTSTATUS.PAID;
 				query.deliverStatus = DELIVERSTATUS.DELIVERED;
-				query.deliveryType = DELIVERYTYPE.ZITI.id;
 				query.confirmed = true;
 				break;
 			default:
@@ -1790,7 +1789,7 @@ OrderService.prototype.getByRSC = function(RSC, page, max, type, callback){
 		}
 
 		OrderModel.find(query)
-			.select('dateCreated id consigneeName consigneePhone SKUs price subOrders payments deliveryType pendingApprove confirmed')
+			.select('dateCreated id consigneeName consigneePhone SKUs price subOrders payments deliveryType pendingApprove confirmed payStatus deliverStatus')
 			.sort({dateCreated:-1})
 			.skip(page * max)
 			.limit(max)
