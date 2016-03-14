@@ -22,7 +22,6 @@ exports.install = function() {
     F.route('/api/v2.2/RSC/address/town',               json_RSC_address_town_query,     ['get'],    ['isLoggedIn']);
 
     // RSC order related
-    // TODO: not tested/documented apis,
     F.route('/api/v2.2/RSC/orders',                         json_RSC_orders_get,        ['get'],    ['isLoggedIn', 'isRSC']);
     F.route('/api/v2.2/RSC/order/deliverStatus/delivering', process_RSC_order_deliverStatus_delivering, ['post'],    ['isLoggedIn', 'isRSC']);
 };
@@ -147,7 +146,7 @@ function json_RSC_orders_get(){
     var RSC = self.user;
     var page = U.parseInt(self.data.page, 1) - 1;
     var max = U.parseInt(self.data.max, 20);
-    var type = self.data.type;
+    var type = U.parseInt(self.data.type);
     OrderService.getByRSC(RSC, page, max, type, function(err, orders, count, pageCount){
         if(err){
             self.respond({code:1002, message:'获取订单失败'});
@@ -169,6 +168,11 @@ function process_RSC_order_deliverStatus_delivering(){
         return;
     }
 
+    if(!SKURef){
+        self.respond({code:1001, message:'需要SKURef'});
+        return;
+    }
+
     OrderService.get({id:orderId}, function(err, order){
         if(err || !order){
             self.respond({code:1002, message:'获取订单失败'});
@@ -177,7 +181,7 @@ function process_RSC_order_deliverStatus_delivering(){
 
         // check current status to see if the current status is OK for change deliver status
         // check if order belongs to this RSC
-        if(!order.RSCInfo || !order.RSCInfo.RSC || user._id != order.RSCInfo.RSC){
+        if(!order.RSCInfo || !order.RSCInfo.RSC || user._id.toString() != order.RSCInfo.RSC.toString()){
             self.respond({code:1002, message:'没有权利修改这个订单'});
             return;
         }
@@ -195,15 +199,15 @@ function process_RSC_order_deliverStatus_delivering(){
         }
 
         // check if the SKU belongs to this order and if this SKU is delivered to RSC
-        if(!tools.isArray(orders.SKUs)){
+        if(!tools.isArray(order.SKUs)){
             self.respond({code:1002, message:'该订单无SKU'});
             return;
         }
 
         var SKUBelongsToOrder = false;
         var SKUtoDeliver;
-        for(var i = 0; i < orders.SKUs.length; i++){
-            var SKU = orders.SKUs[i];
+        for(var i = 0; i < order.SKUs.length; i++){
+            var SKU = order.SKUs[i];
             if(SKU.ref == SKURef){
                 SKUBelongsToOrder = true;
                 if(SKU.deliverStatus != DELIVERSTATUS.RSCRECEIVED){

@@ -40,7 +40,7 @@ RSCService.prototype.getProvinceList = function(products, page, max, callback) {
             .populate('RSCInfo.companyAddress.city')
             .populate('RSCInfo.companyAddress.county')
             .populate('RSCInfo.companyAddress.town')
-            .select('RSCInfo')
+            .select('RSCInfo.name RSCInfo.phone RSCInfo.companyName RSCInfo.companyAddress')
             .skip(page * max)
             .limit(max)
             .exec(function (err, RSCs) {
@@ -97,7 +97,7 @@ RSCService.prototype.getCityList = function(products, province, page, max, callb
             .populate('RSCInfo.companyAddress.city')
             .populate('RSCInfo.companyAddress.county')
             .populate('RSCInfo.companyAddress.town')
-            .select('RSCInfo')
+            .select('RSCInfo.name RSCInfo.phone RSCInfo.companyName RSCInfo.companyAddress')
             .skip(page * max)
             .limit(max)
             .exec(function (err, RSCs) {
@@ -158,7 +158,7 @@ RSCService.prototype.getCountyList = function(products, province, city, page, ma
             .populate('RSCInfo.companyAddress.city')
             .populate('RSCInfo.companyAddress.county')
             .populate('RSCInfo.companyAddress.town')
-            .select('RSCInfo')
+            .select('RSCInfo.name RSCInfo.phone RSCInfo.companyName RSCInfo.companyAddress')
             .skip(page * max)
             .limit(max)
             .exec(function (err, RSCs) {
@@ -223,7 +223,7 @@ RSCService.prototype.getTownList = function(products, province, city, county, pa
             .populate('RSCInfo.companyAddress.city')
             .populate('RSCInfo.companyAddress.county')
             .populate('RSCInfo.companyAddress.town')
-            .select('RSCInfo')
+            .select('RSCInfo.name RSCInfo.phone RSCInfo.companyName RSCInfo.companyAddress')
             .skip(page * max)
             .limit(max)
             .exec(function (err, RSCs) {
