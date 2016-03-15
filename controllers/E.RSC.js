@@ -162,14 +162,14 @@ function process_RSC_order_deliverStatus_delivering(){
     var self = this;
     var user = self.user;
     var orderId = self.data.orderId;
-    var SKURef = self.data.SKURef;
+    var SKURefs = self.data.SKURefs;
     if(!orderId){
         self.respond({code:1001, message:'需要订单号'});
         return;
     }
 
-    if(!SKURef){
-        self.respond({code:1001, message:'需要SKURef'});
+    if(!SKURefs){
+        self.respond({code:1001, message:'需要SKURefs'});
         return;
     }
 
@@ -204,30 +204,25 @@ function process_RSC_order_deliverStatus_delivering(){
             return;
         }
 
-        var SKUBelongsToOrder = false;
-        var SKUtoDeliver;
+        var needUpdate = false;
+        var options = {id:order.id, SKUs:[]};
         for(var i = 0; i < order.SKUs.length; i++){
             var SKU = order.SKUs[i];
-            if(SKU.ref == SKURef){
-                SKUBelongsToOrder = true;
-                if(SKU.deliverStatus != DELIVERSTATUS.RSCRECEIVED){
-                    self.respond({code:1002, message:'该SKU还未到达服务站'});
-                    return;
-                } else{
-                    SKUtoDeliver = SKU;
+            if(SKURefs.indexOf(SKU.ref.toString()) != -1){
+                if(SKU.deliverStatus == DELIVERSTATUS.RSCRECEIVED){
+                    needUpdate = true;
+                    options.SKUs[SKU.ref] = {deliverStatus:DELIVERSTATUS.DELIVERED};
                     break;
                 }
             }
         }
 
-        if(!SKUBelongsToOrder){
-            self.respond({code:1002, message:'该SKU不属于该订单'});
+        if(!needUpdate){
+            self.respond({code:1002, message:'没有需要发货的订单'});
             return;
         }
 
         // all check done, start to update status
-        var options = {id:order.id, SKUs:[]};
-        options.SKUs[SKUtoDeliver.ref] = {deliverStatus: DELIVERSTATUS.DELIVERED};
         OrderService.updateSKUs(options, function(err){
             if(err){
                 self.respond({code:1002, message:'更新订单失败'});
