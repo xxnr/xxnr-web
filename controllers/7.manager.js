@@ -154,7 +154,7 @@ exports.install = function() {
 	// pay refund
 	F.route(CONFIG('manager-url') + '/api/payrefunds/',            			json_payrefund_query, ['get'], ['backend_auth']);
 	F.route(CONFIG('manager-url') + '/api/payrefunds/{id}/',       			json_payrefund_read, ['get'], ['backend_auth']);
-	F.route(CONFIG('manager-url') + '/api/payrefunds/refundsubmit/',       	json_payrefund_update, ['put'], ['backend_auth']);
+	F.route(CONFIG('manager-url') + '/api/payrefunds/refundsubmit/',       	json_payrefund_update, ['put'], ['backend_auth', 'auditing']);
 
 };
 
