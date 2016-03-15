@@ -163,7 +163,8 @@ function convertToShoppingCartFormatV_1_0(SKUs, cartId, userId){
             "deposit": product.deposit,
             "count":count,
             additions:additions,
-            "online":SKU.online && product.online};
+            "online":SKU.online && product.online,
+            "product_id":product._id};
         var brandName = product.brandName;
         if(!brands[brandName]){
             brands[brandName] = [];
