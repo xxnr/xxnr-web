@@ -19,6 +19,7 @@ require('./categories');
 require('./whitelist');
 require('./auditlogs');
 require('./frontendUserAccess');
+require('./userrelevances');
 
 //user
 exports.user = mongoose.model('user');
@@ -27,6 +28,10 @@ exports.role = mongoose.model('role');
 exports.permission = mongoose.model('permission');
 exports.backenduser = mongoose.model('backenduser');
 exports.business = mongoose.model('business');
+// userconsignee
+exports.userconsignee = mongoose.model('userconsignee');
+// userRSC
+exports.userRSC = mongoose.model('userRSC');
 // area
 exports.province = mongoose.model('province');
 exports.city = mongoose.model('city');
