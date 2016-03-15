@@ -681,98 +681,59 @@ OrderService.prototype.getPayOrderPaymentInfo = function(order, payment, payPric
 	
 	var self = this;
     var query = {'id':order.id, 'payments.id':payment.id};
+    var type = 1; // 1: only update 2: update and push
+    var setValues = {};
+    var newPayment = {};
     // pay price is logical
     if (payPrice && (tools.isPrice(payPrice.toString()) && parseFloat(payPrice) && parseFloat(parseFloat(payPrice).toFixed(2)) >= 0.01 && parseFloat(parseFloat(payPrice).toFixed(2)) < payment.price)) {
     	// this pay price must equal last time pay price
     	if (payment.payPrice && parseFloat(parseFloat(payment.payPrice).toFixed(2)) == parseFloat(parseFloat(payPrice).toFixed(2))) {
     		callback(null, payment, payPrice);
-    		var values = {};
+    		type = 1;
     		if (options && options.payType) {
 	        	if (!payment.payType || payment.payType !== options.payType) {
-		            values['$set'] = {'payments.$.payType': options.payType};
+		            setValues = {'payments.$.payType': options.payType};
 		        }
 		    }
-		    if (!U.isEmpty(values)) {
-	            OrderModel.update(query, values, function(err, count) {
-	            	if (err) {
-			            console.error('OrderService getPayOrderPaymentInfo update payment payType or payPrice err:', err);
-			            return;
-			        }
-			        if (count.n == 0) {
-			        	console.error('OrderService getPayOrderPaymentInfo update payment payType or payPrice not find the doc.');
-			            return;
-			        }
-			        return;
-	            });
-	        }
     	} else {
-    		var values = {};
-    		values = {'payments.$.isClosed':true};
-	        OrderModel.update(query, {'$set':values}, function(err, count) {
-		    	if (err) {
-		            console.error('OrderService getPayOrderPaymentInfo update payment err:', err);
-		            callback(err);
-		            return;
-		        }
-		        if (count.n == 0) {
-		        	console.error('OrderService getPayOrderPaymentInfo update payment not find the doc.');
-		            callback('not find the doc');
-		            return;
-		        }
-		        var pushValues = {};
-	         	var paymentOption = {paymentId: U.GUID(10), slice: payment.slice, price: payment.price, suborderId: payment.suborderId};
-				if (options && options.payType) {
-	            	paymentOption.payType = options.payType;
-	            } else {
-	            	paymentOption.payType = payment.payType;
-	            }
-				var newPayment = self.createPayment(paymentOption);
-				newPayment.payPrice = parseFloat(parseFloat(payPrice).toFixed(2));
-		        pushValues['$push'] = {'payments':newPayment};
-		        OrderModel.update(query, pushValues, function(err, count) {
-					if (err) {
-			            console.error('OrderService getPayOrderPaymentInfo update push payment err:', err);
-			            callback(err);
-			            return;
-			        }
-			        if (count.n == 0) {
-			        	console.error('OrderService getPayOrderPaymentInfo update push payment not find the doc.');
-			            callback('not find the doc');
-			            return;
-			        }
-			    
-			        callback(null, newPayment, payPrice);
-			        return;
-			    });
-		    });
+    		type = 2;
+    		setValues = {'payments.$.isClosed':true};
+         	var paymentOption = {paymentId: U.GUID(10), slice: payment.slice, price: payment.price, suborderId: payment.suborderId};
+			if (options && options.payType) {
+            	paymentOption.payType = options.payType;
+            } else {
+            	paymentOption.payType = payment.payType;
+            }
+			newPayment = self.createPayment(paymentOption);
+			newPayment.payPrice = parseFloat(parseFloat(payPrice).toFixed(2));
     	}
     } else {
     	// last time pay price is null or must equal the payment price
     	if (!payment.payPrice || parseFloat(parseFloat(payment.payPrice).toFixed(2)) == parseFloat(parseFloat(payment.price).toFixed(2))) {
 	    	callback(null, payment, payment.price);
-	    	var values = {};
-	    	if (options && options.payType) {
+	    	type = 1;
+    		if (options && options.payType) {
 	        	if (!payment.payType || payment.payType !== options.payType) {
-		            values['$set'] = {'payments.$.payType': options.payType};
+		            setValues = {'payments.$.payType': options.payType};
 		        }
 		    }
-		    if (!U.isEmpty(values)) {
-	            OrderModel.update(query, values, function(err, count) {
-	            	if (err) {
-			            console.error('OrderService getPayOrderPaymentInfo update payment payType or payPrice err:', err);
-			            return;
-			        }
-			        if (count.n == 0) {
-			        	console.error('OrderService getPayOrderPaymentInfo update payment payType or payPrice not find the doc.');
-			            return;
-			        }
-			        return;
-	            });
-	        }
 	    } else {
-	    	var values = {};
-    		values = {'payments.$.isClosed':true};
-	        OrderModel.update(query, {'$set':values}, function(err, count) {
+	    	type = 2;
+    		setValues = {'payments.$.isClosed':true};
+			var paymentOption = {paymentId: U.GUID(10), slice: payment.slice, price: payment.price, suborderId: payment.suborderId};
+			if (options && options.payType) {
+            	paymentOption.payType = options.payType;
+            } else {
+            	paymentOption.payType = payment.payType;
+            }
+			newPayment = self.createPayment(paymentOption);
+    	}
+	}
+
+	// update payment
+	if (type === 2) {
+		if (!U.isEmpty(setValues)) {
+			OrderModel.update(query, {'$set':setValues}, function(err, count) {
 		    	if (err) {
 		            console.error('OrderService getPayOrderPaymentInfo update payment err:', err);
 		            callback(err);
@@ -783,16 +744,14 @@ OrderService.prototype.getPayOrderPaymentInfo = function(order, payment, payPric
 		            callback('not find the doc');
 		            return;
 		        }
-		        var pushValues = {};
-				var paymentOption = {paymentId: U.GUID(10), slice: payment.slice, price: payment.price, suborderId: payment.suborderId};
-				if (options && options.payType) {
-	            	paymentOption.payType = options.payType;
-	            } else {
-	            	paymentOption.payType = payment.payType;
-	            }
-				var newPayment = self.createPayment(paymentOption);
-		        pushValues['$push'] = {'payments':newPayment};
-		        OrderModel.update(query, pushValues, function(err, count) {
+		        
+		        if (U.isEmpty(newPayment)) {
+		        	console.error('OrderService getPayOrderPaymentInfo push payment not find newPayment(type=2).');
+		            callback('not find the newPayment');
+		            return;
+		        }
+
+		        OrderModel.update(query, {'$push':{'payments':newPayment}}, function(err, count) {
 					if (err) {
 			            console.error('OrderService getPayOrderPaymentInfo update push payment err:', err);
 			            callback(err);
@@ -804,11 +763,33 @@ OrderService.prototype.getPayOrderPaymentInfo = function(order, payment, payPric
 			            return;
 			        }
 			    
-			        callback(null, newPayment, newPayment.price);
+			    	if (newPayment.payPrice) {
+			        	callback(null, newPayment, newPayment.payPrice);
+			        } else {
+			        	callback(null, newPayment, newPayment.price);
+			        }
 			        return;
 			    });
 		    });
-    	}
+		} else {
+			console.error('OrderService getPayOrderPaymentInfo update payment not find setValues(type=2).');
+            callback('not find the setValues');
+            return;
+		}
+	} else {
+		if (!U.isEmpty(setValues)) {
+            OrderModel.update(query, {'$set':setValues}, function(err, count) {
+            	if (err) {
+		            console.error('OrderService getPayOrderPaymentInfo update payment payType or payPrice err:', err);
+		            return;
+		        }
+		        if (count.n == 0) {
+		        	console.error('OrderService getPayOrderPaymentInfo update payment payType or payPrice not find the doc.');
+		            return;
+		        }
+		        return;
+            });
+		}
 	}
 };
 
@@ -1067,7 +1048,7 @@ OrderService.prototype.checkPayStatusDetail = function(order, callback) {
 	    }
 
 	    // if the order is not closed, fix order paystatus
-	    if (!orderClosed) {
+	    if (!orderClosed || !order.isClosed) {
 			if (order && order.subOrders) {
 				for (var i=0; i < order.subOrders.length; i++) {
 					var subOrder = order.subOrders[i];
@@ -1106,6 +1087,7 @@ OrderService.prototype.checkPayStatusDetail = function(order, callback) {
 					// 	else
 					// 		orderPayStatus = PAYMENTSTATUS.UNPAID;
 					// }
+					// payment price must eq the subOrder dueprice
 					if (subOrderInfo.payments) {
 						for (var j = 0; j < subOrderInfo.payments.length; j++) {
 						 	var payment = subOrderInfo.payments[j];
