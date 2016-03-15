@@ -25,7 +25,7 @@ exports.install = function() {
     F.route('/api/v2.1/order/addOrder',            addOrderBySKU, ['post'], ['isLoggedIn', 'throttle']);
 
     // v2.2
-    F.route('/api/v2.2/order/confirmSKUReceived',   process_confirm_SKU_received, ['get'], ['isLoggedIn']);
+    F.route('/api/v2.2/order/confirmSKUReceived',   process_confirm_SKU_received, ['post'], ['isLoggedIn']);
 };
 
 var converter = require('../common/converter');
@@ -912,14 +912,14 @@ function addOrderBySKU(){
 function process_confirm_SKU_received(){
     var self = this;
     var orderId = self.data.orderId;
-    var SKURef = self.data.SKURef;
+    var SKURefs = self.data.SKURefs;
     var user = self.user;
     if(!orderId){
         self.respond({code:1001, message:'orderId required'});
         return;
     }
 
-    if(!SKURef){
+    if(!SKURefs){
         self.respond({code:1001, message:'SKURef required'});
         return;
     }
@@ -929,7 +929,7 @@ function process_confirm_SKU_received(){
         return;
     }
 
-    OrderService.confirm(orderId, SKURef, user.id, function(err){
+    OrderService.confirm(orderId, SKURefs, user.id, function(err){
         if(err){
             self.respond({code:1002, message:err});
             return;

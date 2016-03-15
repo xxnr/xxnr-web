@@ -730,14 +730,14 @@ OrderService.prototype.paid = function(id, paymentId, options, callback) {
 
 
 // Sets order to confirmed 
-OrderService.prototype.confirm = function(orderId, SKURef, userId, callback) {
+OrderService.prototype.confirm = function(orderId, SKURefs, userId, callback) {
 	if(!orderId){
 		callback('orderId required');
 		return;
 	}
 
-	if(!SKURef){
-		callback('SKURef required');
+	if(!SKURefs){
+		callback('SKURefs required');
 		return;
 	}
 
@@ -760,7 +760,7 @@ OrderService.prototype.confirm = function(orderId, SKURef, userId, callback) {
 
 		var allConfirmed = true;
 		order.SKUs.forEach(function (sku) {
-			if (SKURef == sku.ref) {
+			if (SKURefs.indexOf(sku.ref.toString()) != -1) {
 				// we don't check if the deliver status is delivered right now to keep it's flexibility
 				// if we find strong reason to check, we can add the check here
 				sku.confirmed = true;
