@@ -16,9 +16,9 @@
 		<script type="text/html">
 		<tr>
 	        <td style="width:30px" class="silver hidden-xs" data-title="序号">$index</td>
-	        <td style="width:60px" class="silver hidden-xs" data-title="订单号" title="{{ orderId }}">{{ orderId }}</td>
-	        <td style="width:60px" class="silver hidden-xs" data-title="支付ID" title="{{ paymentId }}">{{ paymentId }}</td>
-	        <td style="width:50px" class="silver hidden-xs" data-title="支付类型">
+	        <td style="width:50px" class="silver hidden-xs" data-title="订单号" title="{{ orderId }}">{{ orderId }}</td>
+	        <td style="width:50px" class="silver hidden-xs" data-title="支付ID" title="{{ paymentId }}">{{ paymentId }}</td>
+	        <td style="width:40px" class="silver hidden-xs" data-title="支付类型">
 	        	{{ if payType }}
 					{{ if payType==1 }}
 						支付宝
@@ -33,10 +33,10 @@
 					-
 				{{ fi }}
 	        </td>
+	        <td style="width:120px" class="silver hidden-xs" data-title="交易流水号" title="{{ queryId }}">{{ queryId }}</td>
 	        <td style="width:50px" class="ui-right" data-title="金额" title="{{price | price(2)}}">{{ price | price(2) }} </td>
-	        <td style="width:90px" class="silver hidden-xs ui-right" data-title="创建时间" title="{{ dateCreated | format('@(yyyy-MM-dd HH:mm:ss)') }}">{{ dateCreated | format('@(yyyy-MM-dd HH:mm:ss)') }}</td>
-	        <td style="width:80px" class="silver hidden-xs" data-title="交易流水号" title="{{ queryId }}">{{ queryId }}</td>
-	        <td style="width:60px" data-title="退款原因">
+	        <td style="width:80px" class="silver hidden-xs ui-right" data-title="创建时间" title="{{ dateCreated | format('@(yyyy-MM-dd HH:mm:ss)') }}">{{ dateCreated | format('@(yyyy-MM-dd HH:mm:ss)') }}</td>
+	        <td style="width:40px" data-title="退款原因">
 	        	{{ if refundReason }}
 		        	{{ if refundReason==1 }}
 		        		重复支付
@@ -55,14 +55,14 @@
 					其他
 				{{ fi }}
 	        </td>
-	        <td style="width:50px" data-title="状态">
+	        <td style="width:40px" data-title="状态">
 	        	{{ if status==0 }}
 	        		<span class="mr5 red">待退款</span>
 	        	{{ else }}
 	        		{{ if status==1 }}
 	        			<span class="mr5 green">已退款</span>
 	        		{{ else }}
-		        		{{ if refundReason==2 }}
+		        		{{ if status==2 }}
 		        			<span class="mr5 red">退款失败</span>
 		        		{{ else }}
 			        		<span class="mr5 red">其他</span>
@@ -72,33 +72,244 @@
 	        </td>
 	        <td style="width:50px" class="ui-right active" data-title="已退金额" {{ if notifyPrice }}title="{{notifyPrice | price(2)}}"{{ fi }}>
 	        	{{ if notifyPrice }}
-	        		{{ notifyPrice | price(2) }}
+	        		<span class="green">{{ notifyPrice | price(2) }}</span>
 	        	{{ else }}
 	        		-
 	        	{{ fi }}
 	        </td>
-	        <td style="width:90px" class="silver hidden-xs ui-right" data-title="退款日期" {{ if dateNotify }}title="{{ dateNotify | format('@(yyyy-MM-dd HH:mm:ss)') }}" {{ fi }}>
+	        <td style="width:80px" class="silver hidden-xs ui-right" data-title="退款日期" {{ if dateNotify }}title="{{ dateNotify | format('@(yyyy-MM-dd HH:mm:ss)') }}" {{ fi }}>
 	        	{{ if dateNotify }}
 	        		{{ dateNotify | format('@(yyyy-MM-dd HH:mm:ss)') }}
 	        	{{ else }}
 	        		-
 	        	{{ fi }}
 	        </td>
-	        <td style="width:90px" class="silver hidden-xs ui-right" data-title="退款通知日期" {{ if notify_time }}title="{{ notify_time | format('@(yyyy-MM-dd HH:mm:ss)') }}"{{ fi }}>
-	        	{{ if notify_time }}
-	        		{{ notify_time | format('@(yyyy-MM-dd HH:mm:ss)') }}
-	        	{{ else }}
-	        		-
-	        	{{ fi }}
-	        </td>
-	        <!-- <td style="width:20px" class="ui-right">
-				<button name="edit" title="@(查看退款)"><span class="fa fa-pencil"></span></button>
-			</td> -->
-			<td style="width:20px" class="ui-right">
+	        <td style="width:40px" class="ui-right" data-title="查看退款">
+				<button name="edit" title="@(查看退款)"><span class="fa fa-search"></span></button>
+			</td>
+			<td style="width:40px" class="ui-right" data-title="相关订单">
 				<button name="order" title="@(查看订单信息)"><span class="fa fa-search"></span></button>
 			</td>
 		</tr>
 		</script>
+	</div>
+</div>
+
+<div data-component="form" data-title="@(退款详情)" data-component-path="common.form" data-if="value === 'payrefunds'" data-width="1000px" data-component-id="payrefunds.form" data-submitbutton="true">
+	<br />
+	<div class="padding">
+		<div data-component="template" data-component-path="payrefunds.form" class="padding">
+			<script type="text/html">
+			<table class="table table-bordered" border="0">
+				<tbody>
+					<tr>
+						<td class="col-xs-5 active">@(# 订单号)</td>
+						<td>{{ orderId }}</td>
+					</tr>
+					<tr>
+						<td class="col-xs-5 active">@(# 支付ID)</td>
+						<td>{{ paymentId }}</td>
+					</tr>
+					<tr>
+						<td class="col-xs-5 active">@(支付类型)</td>
+						<td>
+						{{ if payType }}
+							{{ if payType==1 }}
+								支付宝
+							{{ else }}
+								{{ if payType==2 }}
+									银联
+								{{ else }}
+									其他
+								{{ fi }}
+							{{ fi }}
+						{{ else }}
+							-
+						{{ fi }}
+						</td>
+					</tr>
+					<tr>
+						<td class="col-xs-5 active">@(交易流水号)</td>
+						<td>{{ queryId }}</td>
+					</tr>
+					<tr>
+						<td class="col-xs-5 active">@(金额)</td>
+						<td>{{ price | price(2) }}</td>
+					</tr>
+					<tr>
+						<td class="col-xs-5 active">@(创建时间)</td>
+						<td>{{ dateCreated | format('@(yyyy-MM-dd HH:mm:ss)') }}</td>
+					</tr>			
+	                <tr>
+	                    <td class="col-xs-5 active">@(退款原因)</td>
+	                    <td>
+                    	{{ if refundReason }}
+				        	{{ if refundReason==1 }}
+				        		重复支付
+				        	{{ else }}
+				        		{{ if refundReason==2 }}
+				        			超额支付
+				        		{{ else }}
+					        		{{ if refundReason==3 }}
+					        			未找到订单
+					        		{{ else }}
+						        		其他
+					        		{{ fi }}
+				        		{{ fi }}
+				        	{{ fi }}
+				        {{ else }}
+							其他
+						{{ fi }}
+	                    </td>
+	                </tr>
+	                <tr>
+	                	<td class="col-xs-5 active">@(状态)</td>
+		                <td>
+			        	{{ if status==0 }}
+			        		<span class="mr5 red">待退款</span>
+			        	{{ else }}
+			        		{{ if status==1 }}
+			        			<span class="mr5 green">已退款</span>
+			        		{{ else }}
+				        		{{ if status==2 }}
+				        			<span class="mr5 red">退款失败</span>
+				        		{{ else }}
+					        		<span class="mr5 red">其他</span>
+				        		{{ fi }}
+			        		{{ fi }}
+			        	{{ fi }}
+				        </td>
+			        </tr>
+			        <tr>
+			        	<td class="col-xs-5 active">@(已退金额)</td>
+				        <td>
+			        	{{ if notifyPrice }}
+			        		<span class="green">{{ notifyPrice | price(2) }}</span>
+			        	{{ else }}
+			        		-
+			        	{{ fi }}
+				        </td>
+				    </tr>
+			        <tr>
+			        	<td class="col-xs-5 active">@(退款日期)</td>
+					    <td>
+			        	{{ if dateNotify }}
+			        		{{ dateNotify | format('@(yyyy-MM-dd HH:mm:ss)') }}
+			        	{{ else }}
+			        		-
+			        	{{ fi }}
+			        	</td>
+			        </tr>
+			        {{ if backendUser }}
+			        	<tr>
+			        		<td class="col-xs-5 active">@(退款操作的后台用户)</td>
+						    <td>
+				        	{{ if backendUserAccount }}
+				        		<span class="green">{{ backendUserAccount }}</span>
+				        	{{ else }}
+				        		<span class="green">{{ backendUser }}</span>
+				        	{{ fi }}
+				        	</td>
+				        	<td class="col-xs-5 active">@(最新修改时间)</td>
+						    <td>
+				        	{{ if dateSet }}
+				        		{{ dateSet | format('@(yyyy-MM-dd HH:mm:ss)') }}
+				        	{{ else }}
+				        		-
+				        	{{ fi }}
+				        	</td>
+				        </tr>
+				    {{ else }}
+				        <tr>
+				        	<td class="col-xs-5 active">@(退款通知日期)</td>
+				        	<td>
+			        		{{ if notify_time }}
+				        		{{ notify_time | format('@(yyyy-MM-dd HH:mm:ss)') }}
+				        	{{ else }}
+				        		-
+				        	{{ fi }}
+				        	</td>
+				        </tr>
+				        <tr>
+				        	<td class="col-xs-5 active">@(异步通知信息)</td>
+				        	<td>
+				        		{{ if notifyInfo }}
+				        			{{ notifyInfo }}
+				        		{{ else }}
+			        				-
+			        			{{ fi }}
+				        	</td>
+				        </tr>
+				        <tr>
+				        	<td class="col-xs-5 active">@(异步通知id)</td>
+				        	<td>
+				        		{{ if notify_id }}
+				        			{{ notify_id }}
+				        		{{ else }}
+			        				-
+			        			{{ fi }}
+				        	</td>
+				        </tr>
+			        {{ fi }}
+				</tbody>
+			</table>
+			</script>
+		</div>
+		<div class="padding">
+			<div data-component="template" data-component-path="payrefunds" id="payrefund">
+				<script type="text/html">
+				{{ if form }}
+					<table class="table table-bordered" border="0">
+						<tbody>
+							<tr>
+								<td class="ui-center hidden-xs active">@(退款类型)</td>
+								<td class="ui-center hidden-xs active">@(支付ID)</td>
+								<td class="ui-center hidden-xs active">@(交易流水号)</td>
+								<td class="ui-center hidden-xs active">@(退款金额)</td>
+								<td class="ui-center col-xs-2 active">@(退款状态)</td>
+							</tr>
+							<tr>
+								<td class="ui-center hidden-xs">
+								{{ if form.payType }}
+									{{ if payType==1 }}
+										支付宝
+									{{ else }}
+										{{ if form.payType==2 }}
+											银联
+										{{ else }}
+											其他
+										{{ fi }}
+									{{ fi }}
+								{{ else }}
+									-
+								{{ fi }}
+								</td>
+								<td class="ui-center hidden-xs">{{ form.paymentId }}</td>
+								<td class="ui-center hidden-xs">{{ form.queryId }}</td>
+								<td class="ui-center hidden-xs">{{ form.price | price(2) }}</td>
+								<td class="ui-center col-xs-2">
+									<select data-name="status">
+									{{ foreach s in refundStatuses }}
+										<option value="{{ s.value }}" {{ if form.status == s.value }}selected{{ fi }}>{{ s.name }}
+										</option>
+									{{ end }}
+									</select>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				{{ fi }}
+				</script>
+			</div>
+			<div data-component="error" data-component-path="payrefunds.refundsubmitresponse"></div>
+			<div data-component="visible" class="ui-buttons" data-component-path="payrefunds.form" data-if="payrefunds.form">
+				<button name="submit" data-name="refundsubmit" data-warning="你确认提交退款状态的修改吗?">@(确认退款)</button>
+			</div>
+		</div>
+	</div>
+	<hr />
+	<div class="ui-form-buttons">
+		<button name="cancel">@(关闭)</button>
 	</div>
 </div>
 
@@ -356,9 +567,9 @@
 				</script>
 			</tbody>
 		</table>
-		<div data-component="template" data-component-path="payrefunds.order.form" class="paymentslist">
+		<div data-component="template" data-component-path="payrefunds.order" class="paymentslist">
 			<script type="text/html">
-			{{ if subOrders && subOrders.length > 0 }}
+			{{ if form.subOrders && form.subOrders.length > 0 }}
 				<br />
 				<div class="silver"><strong>@(子订单支付详情)</strong></div>
 				<br />
@@ -375,9 +586,9 @@
 							<td class="ui-center col-xs-1 active">@(是否关闭)</td>
 							<td class="ui-center col-xs-2 active">@(支付时间)</td>
 						</tr>
-						{{ foreach s in subOrders }}
+						{{ foreach s in form.subOrders }}
 							{{ foreach p in s.payments }}
-							<tr>
+							<tr {{if rowPaymentId == p.id}}class="red"{{fi}}>
 								<td class="ui-center">
 								{{ if s.type == 'deposit' }}
 									阶段一：定金
@@ -464,7 +675,9 @@
 	payrefunds.grid = [];
 	payrefunds.form = {};
 	payrefunds.info = {};
-	payrefunds.response;
+	payrefunds.order = {};
+	payrefunds.order.form = {};
+	payrefunds.refundsubmitresponse;
 
 	ON('#payrefunds.grid', function(component) {
 
@@ -488,7 +701,8 @@
 						}
 
 						SET('payrefunds.form', $.extend({}, response), true);
-						SET('payrefunds.response', null);
+						SET('payrefunds.refundStatuses',[{name:'待退款',value:0},{name:'已退款',value:1},{name:'退款失败',value:2}], true);
+						SET('payrefunds.refundsubmitresponse', null);
 						SET('common.form', 'payrefunds');
 					});
 					break;
@@ -506,6 +720,7 @@
 						}
 
 						SET('payrefunds.order.form', $.extend({}, response), true);
+						SET('payrefunds.order.rowPaymentId', row.paymentId);
 						SET('payrefunds.order.response', null);
 						SET('common.form', 'payrefunds_orders');
 					});
@@ -522,41 +737,68 @@
 	});
 
 	ON('#payrefunds.form', function(component) {
-
 		component.submit = function(hide, button) {
+			var datawarning = "你确认提交本次修改吗?";
 			var dataname = $(button).attr('data-name');
 			if (dataname) {
-				if (payrefunds.form[dataname]) {
-					var postdata = {};
-					var posturl = managerurl + '/api/payRefunds/' + dataname;
-					postdata['id'] = payrefunds.form._id;
-					postdata[dataname] = payrefunds.form[dataname];
-					$.components.PUT(posturl, postdata, function(response) {
-
-						var responsekey = 'payrefunds.form.' + dataname + '.response';
-
-						if (response && response.code && parseInt(response.code) !== 1000) {
-							if (response.error)
-								response = response.error;
-							else
-								response = [];
-						}
-						// Error handling
-						SET(responsekey, response);
-						if (response instanceof Array)
-							return;
-						hide();
-						payrefunds_refresh(true);
-						success();
-					});
-
+				var warning = $(button).attr('data-warning');
+				var postdata = {};
+				var posturl = managerurl + '/api/payRefunds/' + dataname;
+				postdata['id'] = payrefunds.form._id;
+				postdata['status'] = payrefunds.form.status;
+				if (warning) {
+					datawarning = warning;
 				}
+				if (!confirm(datawarning))
+					return;
+				$.components.PUT(posturl, postdata, function(response) {
+
+					var responsekey = 'payrefunds.' + dataname + 'response';
+
+					if (response && response.code && parseInt(response.code) !== 1000) {
+						if (response.error)
+							response = response.error;
+						else
+							response = [];
+					}
+					// Error handling
+					SET(responsekey, response);
+					if (response instanceof Array)
+						return;
+					hide();
+					payrefunds_refresh(true);
+					success();
+				});
 			}
 		};
 
-	});
+		$('#payrefund').on('change', 'select', function() {
+			var el = $(this);
+			var name = el.attr('data-name');
+			switch (name) {
+				case 'status':
+					var value = el.val();
+					payrefunds.form.status = parseInt(value);
+					component.changedisabled_botton('refundsubmit');
+					payrefunds_form_refresh('status');
+					break;
+			}
+		});
 
-	
+		component.changedisabled_botton = function (name) {
+			component.element.find('button').each(function() {
+				switch (this.name) {
+					case 'submit':
+						if ($(this).attr('data-name') === name) {
+							var el = $(this);
+							el.prop({ disabled: false });
+						}
+						break;
+				}
+			});
+		}
+
+	});
 
 	// Method refreshes grid
 	function payrefunds_refresh(reset) {

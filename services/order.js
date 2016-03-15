@@ -384,9 +384,9 @@ OrderService.prototype.updatePayments = function(options, callback) {
 							payment.payType = options.payments[payment.id].payType;
 						}
 						payment.dateSet = new Date();
-						if (options.user) {
-							payment.backendUser = options.user._id;
-							payment.backendUserAccount = options.user.account;
+						if (options.backendUser) {
+							payment.backendUser = options.backendUser._id;
+							payment.backendUserAccount = options.backendUser.account;
 						}
 					}
 				}

@@ -50,6 +50,15 @@ PayService.prototype.updatePaymentRefund = function(options, callback) {
 	try {
 		var query = {};
 		var setValues = {status: 1};
+
+        if (options.id) {
+            query._id = options.id;
+        }
+        if (options.backendUser) {
+            setValues.backendUser = options.backendUser._id;
+            setValues.backendUserAccount = options.backendUser.account;
+            setValues.dateSet = new Date();
+        }
 		
 		if (options.payType) {
 			query.payType = options.payType;
@@ -78,11 +87,6 @@ PayService.prototype.updatePaymentRefund = function(options, callback) {
 		if (options.notify_id) {
 			setValues.notify_id = options.notify_id;
 		}
-		if (options.dateNotify) {
-			setValues.dateNotify = options.dateNotify;
-		} else {
-            setValues.dateNotify = new Date();
-        }
 		if (options.notify_time) {
 			setValues.notify_time = options.notify_time;
 		}
@@ -96,15 +100,25 @@ PayService.prototype.updatePaymentRefund = function(options, callback) {
 		if (options.status) {
 			setValues.status = options.status;
 		}
+        if (options.dateNotify) {
+            setValues.dateNotify = options.dateNotify;
+        } else {
+            if (!options.status || options.status == 1) {
+                setValues.dateNotify = new Date();
+            }
+        }
 		OrderPaymentsRefund.update(query, {$set: setValues}, function(err) {
 			if (err) {
 				console.error('PayService updatePaymentRefund update err:', err);
 				console.error('PayService updatePaymentRefund update options:', options);
+                callback(err);
 			}
+            callback(null);
 		});
 	} catch (e) {
         console.error('PayService updatePaymentRefund update err:', e);
         console.error('PayService updatePaymentRefund update options:', options);
+        callback(err);
     }
 };
 

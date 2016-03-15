@@ -109,21 +109,24 @@ var orderPaidLogSchema = new mongoose.Schema({
 
 // refund Schema
 var orderPaymentRefundSchema = new mongoose.Schema({
-	'orderId': {type:String},						// 订单ID
-	'suborderId': {type:String},					// 子订单ID
-	'paymentId': {type:String, required:true},		// 支付ID
-	'payType': {type:Number, required:true},		// 支付类型
-	'batch_no': {type:String},						// 支付宝退款批次号
-	'price': {type: Number, required: true},		// 支付的金额（退款金额）
-	'queryId': {type:String},						// 银联或者支付宝的交易流水号
-	'refundReason': {type: Number},					// 退款原因 1:payment已经被支付（重复支付） 2:支付完payment超过了本阶段的总额 3:paymentId未找到订单
-	'dateCreated': {type: Date, default: Date.now},	// 创建日期
-	'dateNotify': {type: Date},						// 确认日期
-	'status': {type: Number, default: 0},			// 退款状态 0:生成退款记录 1:退款成功 2:退款失败
-	'notify_time': {type: Date},					// 异步通知发送日期
-	'notifyPrice': {type: Number},					// 退款金额
-	'notifyInfo': {type: String},					// 异步通知信息
-	'notify_id': {type: String}						// 异步通知id
+	'orderId': {type:String},											// 订单ID
+	'suborderId': {type:String},										// 子订单ID
+	'paymentId': {type:String, required:true},							// 支付ID
+	'payType': {type:Number, required:true},							// 支付类型
+	'batch_no': {type:String},											// 支付宝退款批次号
+	'price': {type: Number, required: true},							// 支付的金额（退款金额）
+	'queryId': {type:String},											// 银联或者支付宝的交易流水号
+	'refundReason': {type: Number},										// 退款原因 1:payment已经被支付（重复支付） 2:支付完payment超过了本阶段的总额 3:paymentId未找到订单
+	'dateCreated': {type: Date, default: Date.now},						// 创建日期
+	'dateNotify': {type: Date},											// 确认日期
+	'status': {type: Number, default: 0},								// 退款状态 0:生成退款记录 1:退款成功 2:退款失败
+	'notify_time': {type: Date},										// 异步通知发送日期
+	'notifyPrice': {type: Number},										// 退款金额
+	'notifyInfo': {type: String},										// 异步通知信息
+	'notify_id': {type: String},										// 异步通知id
+	'backendUser':{type: mongoose.Schema.ObjectId, ref:'backenduser'},	// 人工退款的后台用户
+	'backendUserAccount':{type: String},								// 人工退款的后台用户账户
+	'dateSet': Date														// 人为修改的日期
 });
             
 // Model
