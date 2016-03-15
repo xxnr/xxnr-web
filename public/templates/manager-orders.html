@@ -52,7 +52,11 @@
 	        			{{ if deliverStatus==3 }}
 	        				<span class="red">部分发货</span>
 	        			{{ else }}
-			        		<span class="mr5 red">其他</span>
+							{{ if deliverStatus==4 }}
+								<span class="red">已到服务站</span>
+							{{ else }}
+								<span class="mr5 red">其他</span>
+							{{ fi }}
 	        			{{ fi }}
 	        		{{ fi }}
 	        	{{ fi }}
@@ -162,7 +166,11 @@
 				        			{{ if deliverStatus==3 }}
 				        				<span class="red">部分发货</span>
 				        			{{ else }}
-						        		<span class="mr5 red">其他</span>
+										{{ if deliverStatus==4 }}
+											<span class="red">已到服务站</span>
+										{{ else }}
+						        			<span class="mr5 red">其他</span>
+										{{ fi }}
 				        			{{ fi }}
 				        		{{ fi }}
 				        	{{ fi }}
@@ -671,8 +679,8 @@
 
 						SET('orders.form', $.extend({}, response), true);
                         SET('orders.payStatuses',[{name:'未付款',value:1},{name:'已付款',value:2}], true);
-                        SET('orders.deliverStatuses',[{name:'未发货',value:1},{name:'已发货',value:2}], true);
-                        SET('orders.payTypes',[{name:'支付宝',value:1},{name:'银联',value:2},{name:'线下付款',value:3}], true);
+                        SET('orders.deliverStatuses',[{name:'未发货',value:1},{name:'已发货',value:2},{name:'已到服务站',value:4}], true);
+                        SET('orders.payTypes',[{name:'支付宝',value:1},{name:'银联',value:2},{name:'现金',value:3},{name:'线下POS机',value:4}], true);
 						SET('orders.response', null);
 						SET('common.form', 'orders');
 					});

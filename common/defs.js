@@ -2,9 +2,9 @@
 
 const UNPAID = 1, PAID = 2, PARTPAID = 3;
 const UNDELIVERED = 1, DELIVERED = 2, PARTDELIVERED = 3, RSCRECEIVED = 4;
-const ZHIFUBAO = 1, UNIONPAY = 2, OFFLINEPAY = 3;
+const ZHIFUBAO = 1, UNIONPAY = 2;
 const ZITI = 1, SONGHUO = 2;
-const OFFLINEPAYTYPE = {CASH:3.1, POS:3.2};
+const OFFLINEPAYTYPE = {CASH:3, POS:4};
 
 (function(exports){
     // your code goes here
@@ -25,7 +25,8 @@ const OFFLINEPAYTYPE = {CASH:3.1, POS:3.2};
     exports.PAYTYPE = Object.freeze({
         "ZHIFUBAO":ZHIFUBAO,
         "UNIONPAY":UNIONPAY,
-        "OFFLINEPAY":OFFLINEPAY
+        "CASH":OFFLINEPAYTYPE.CASH,
+        "POS":OFFLINEPAYTYPE.POS
     });
     exports.OFFLINEPAYTYPE = [
         {

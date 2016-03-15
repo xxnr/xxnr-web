@@ -1011,7 +1011,9 @@ function getMinPayPrice() {
 
 function offlinePay(){
     var self = this;
-    self.payType = PAYTYPE.OFFLINEPAY;
+
+    // default offline pay type
+    self.payType = PAYTYPE.CASH;
 
     payOrder.call(this, function(paymentId, totalPrice, ip, orderId, payment) {
         OrderService.changeToPendingApprove(orderId, function(err){

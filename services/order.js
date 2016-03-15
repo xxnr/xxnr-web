@@ -336,6 +336,9 @@ OrderService.prototype.updateSKUs = function(options, callback) {
 					if (sku.deliverStatus === DELIVERSTATUS.DELIVERED) {
 						sku.dateDelivered = new Date();
 					}
+					if(sku.deliverStatus === DELIVERSTATUS.RSCRECEIVED){
+						sku.dateRSCReceived = new Date();
+					}
 				}
 			});
 			// check order deliver status
@@ -1058,21 +1061,50 @@ OrderService.prototype.checkDeliverStatus = function(order) {
 				continue
 			}
 
-			if (parseInt(sku.deliverStatus) === DELIVERSTATUS.UNDELIVERED) {
-				if (order.deliverStatus && (parseInt(order.deliverStatus) === DELIVERSTATUS.DELIVERED || parseInt(order.deliverStatus) === DELIVERSTATUS.PARTDELIVERED))
+			switch(parseInt(order.deliverStatus)){
+				case DELIVERSTATUS.UNDELIVERED:
+					switch(parseInt(sku.deliverStatus)){
+						case DELIVERSTATUS.DELIVERED:
+							order.deliverStatus = DELIVERSTATUS.PARTDELIVERED;
+							break;
+						case DELIVERSTATUS.RSCRECEIVED:
+						case DELIVERSTATUS.UNDELIVERED:
+							order.deliverStatus = sku.deliverStatus;
+							break;
+					}
+					break;
+				case DELIVERSTATUS.RSCRECEIVED:
+					switch(parseInt(sku.deliverStatus)){
+						case DELIVERSTATUS.DELIVERED:
+							order.deliverStatus = DELIVERSTATUS.PARTDELIVERED;
+							break;
+						case DELIVERSTATUS.RSCRECEIVED:
+						case DELIVERSTATUS.UNDELIVERED:
+							order.deliverStatus = DELIVERSTATUS.RSCRECEIVED;
+							break;
+					}
+					break;
+				case DELIVERSTATUS.DELIVERED:
+					switch(parseInt(sku.deliverStatus)) {
+						case DELIVERSTATUS.DELIVERED:
+							order.deliverStatus = DELIVERSTATUS.DELIVERED;
+							break;
+						case DELIVERSTATUS.RSCRECEIVED:
+						case DELIVERSTATUS.UNDELIVERED:
+							order.deliverStatus = DELIVERSTATUS.PARTDELIVERED;
+							break;
+					}
+					break;
+				case DELIVERSTATUS.PARTDELIVERED:
 					order.deliverStatus = DELIVERSTATUS.PARTDELIVERED;
-				else
-					order.deliverStatus = DELIVERSTATUS.UNDELIVERED;
-			} else {
-				if (order.deliverStatus && (parseInt(order.deliverStatus) === DELIVERSTATUS.UNDELIVERED || parseInt(order.deliverStatus) === DELIVERSTATUS.PARTDELIVERED))
-					order.deliverStatus = DELIVERSTATUS.PARTDELIVERED;
-				else
-					order.deliverStatus = DELIVERSTATUS.DELIVERED;
+					break;
 			}
 		}
+
 		if (!order.deliverStatus) {
 			order.deliverStatus = DELIVERSTATUS.UNDELIVERED;
 		}
+
 		if (parseInt(order.deliverStatus) === DELIVERSTATUS.DELIVERED) {
 			order.dateDelivered = new Date();
 		}
