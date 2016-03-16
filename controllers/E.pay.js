@@ -23,8 +23,8 @@ exports.install = function() {
     F.route('/unionpay/refundnotify', unionpayRefundNotify, ['post','raw']);
     // pay success
     F.route('/alipay/success', aliPaySuccess);
-    // test alipay refund
-    F.route('/api/alipay/refund/', refundTest, ['get'], ['isLoggedIn']);
+    // // test alipay refund
+    // F.route('/api/alipay/refund/', refundTest, ['get'], ['isLoggedIn']);
 };
 
 var alipay = require('../configuration/alipay_config').alipay;
@@ -527,50 +527,50 @@ function unionpayRefundNotify() {
     });
 }
 
-var OrderPaidLog = require('../models').orderpaidlog;
-var OrderPaymentsRefund = require('../models').orderpaymentsrefund;
-function refundTest() {
-    var self = this;
-    //var paymentId = '9561ec5220';
-    //var paymentId = '4573828f46';
-    //var paymentId = 'e546c378ca';
-    var paymentId = '3b074a1876';
+// var OrderPaidLog = require('../models').orderpaidlog;
+// var OrderPaymentsRefund = require('../models').orderpaymentsrefund;
+// function refundTest() {
+//     var self = this;
+//     //var paymentId = '9561ec5220';
+//     //var paymentId = '4573828f46';
+//     //var paymentId = 'e546c378ca';
+//     var paymentId = '3b074a1876';
 
-    OrderPaymentsRefund.findOne({paymentId: paymentId, payType: 2}, function(err, orderPaymentRefund){
-        if (err) {
-            self.respond('not find refund');
-            return;
-        }
-        self.respond('refund success');
-        if (orderPaymentRefund && orderPaymentRefund.refundReason !== 3) {
-            // TODO refund
-            // console.log(orderPaymentRefund);
-            if (orderPaymentRefund.payType === PAYTYPE.ZHIFUBAO) {
-                console.log('zhifubao refund:', orderPaymentRefund);
-               //  var type = 'nopwd';
-               //  PayService.alipayRefund(type, orderPaymentRefund, function(err, result) {
-               //     if (err) {
-               //         console.error('payRefund PayService alipayRefundNopwd err:', err);
-               //         return;
-               //     }
-               //     console.log(result);
-               // });
-            } else if (orderPaymentRefund.payType === PAYTYPE.UNIONPAY) {
-               console.log('unionpay refund:', orderPaymentRefund);
-               // PayService.unionpayRefund(orderPaymentRefund, function(err, result) {
-               //      if (err) {
-               //          console.error('payRefund PayService unionpayRefund err:', err);
-               //          return;
-               //      }
-               //      if (result) {
-               //          console.log(result);
-               //      }
-               //      return;
-               // });
-            }
-        }
-    });
-}
+//     OrderPaymentsRefund.findOne({paymentId: paymentId, payType: 2}, function(err, orderPaymentRefund){
+//         if (err) {
+//             self.respond('not find refund');
+//             return;
+//         }
+//         self.respond('refund success');
+//         if (orderPaymentRefund && orderPaymentRefund.refundReason !== 3) {
+//             // TODO refund
+//             // console.log(orderPaymentRefund);
+//             if (orderPaymentRefund.payType === PAYTYPE.ZHIFUBAO) {
+//                 console.log('zhifubao refund:', orderPaymentRefund);
+//                //  var type = 'nopwd';
+//                //  PayService.alipayRefund(type, orderPaymentRefund, function(err, result) {
+//                //     if (err) {
+//                //         console.error('payRefund PayService alipayRefundNopwd err:', err);
+//                //         return;
+//                //     }
+//                //     console.log(result);
+//                // });
+//             } else if (orderPaymentRefund.payType === PAYTYPE.UNIONPAY) {
+//                console.log('unionpay refund:', orderPaymentRefund);
+//                // PayService.unionpayRefund(orderPaymentRefund, function(err, result) {
+//                //      if (err) {
+//                //          console.error('payRefund PayService unionpayRefund err:', err);
+//                //          return;
+//                //      }
+//                //      if (result) {
+//                //          console.log(result);
+//                //      }
+//                //      return;
+//                // });
+//             }
+//         }
+//     });
+// }
 
 // pay refund
 function payRefund(options) {
