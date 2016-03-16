@@ -20,7 +20,7 @@ exports.install = function() {
     F.route('/unionpay/nofity', unionpayNotify, ['post','raw']);
     // pay refund
     F.route('/dynamic/alipay/refund_fastpay_by_platform_nopwd_notify.asp', alipayRefundNotify, ['post','raw']);
-    F.route('/unionpay/refundnotify', unionRefundNotify, ['post','raw']);
+    F.route('/unionpay/refundnotify', unionpayRefundNotify, ['post','raw']);
     // pay success
     F.route('/alipay/success', aliPaySuccess);
     // test alipay refund
@@ -438,21 +438,31 @@ function alipayRefundNotify() {
             refundOptions.success_num = body.success_num;
             refundOptions.result_detail = result_details[0];
             // update payment refund
-            PayService.updatePaymentRefund(refundOptions);
+            PayService.updatePaymentRefund(refundOptions, function(err, result){
+                if (err) {
+                    console.error('alipayRefundNotify updatePaymentRefund err:', err);
+                    return;
+                }
+            });
         } else {
             for (var i = 0; i < result_details.length; i++) {
                 var refundOptions = options;
                 refundOptions.success_num = result_details.length;
                 refundOptions.result_detail = result_details[i];
                 // update payment refund
-                PayService.updatePaymentRefund(refundOptions);
+                PayService.updatePaymentRefund(refundOptions, function(err, result){
+                    if (err) {
+                        console.error('alipayRefundNotify updatePaymentRefund err:', err);
+                        return;
+                    }
+                });
             }
         }
     });
 }
 
 // unionpay refund notify
-function unionRefundNotify() {
+function unionpayRefundNotify() {
     var self = this;
 
     if (!self.body) {
@@ -500,7 +510,12 @@ function unionRefundNotify() {
                 refundOptions.result_detail = paymentInfo;
                 refundOptions.dateNotify = new Date();
                 // update payment refund
-                PayService.updatePaymentRefund(refundOptions);
+                PayService.updatePaymentRefund(refundOptions, function(err, result){
+                    if (err) {
+                        console.error('unionpayNotify updatePaymentRefund err:', err);
+                        return;
+                    }
+                });
             } else {
                 console.error('unionpayNotify error : respCode is ', body['respCode'], 'body:', body);
                 self.content('success'); // tell the notifier we successfully handled the notification
