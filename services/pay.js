@@ -21,11 +21,11 @@ var PayService = function(){};
 // save order payments refund
 PayService.prototype.savePaymentRefund = function(paymentOptions, callback) {
 	try {
-        if (paymentOptions.payType && paymentOptions.payType === PAYTYPE.ZHIFUBAO) {
-    		if (!paymentOptions.batch_no) {
-    			paymentOptions.batch_no = moment(paymentOptions.dateCreated).format("YYYYMMDD") + paymentOptions.paymentId;
-    		}
-        }
+      //   if (paymentOptions.payType && paymentOptions.payType === PAYTYPE.ZHIFUBAO) {
+    		// if (!paymentOptions.batch_no) {
+    		// 	paymentOptions.batch_no = moment(paymentOptions.dateCreated).format("YYYYMMDD") + paymentOptions.paymentId;
+    		// }
+      //   }
         if (paymentOptions.notify_time) {
             delete paymentOptions.notify_time;
         }
@@ -63,9 +63,10 @@ PayService.prototype.updatePaymentRefund = function(options, callback) {
 		if (options.payType) {
 			query.payType = options.payType;
 			if (options.payType === PAYTYPE.ZHIFUBAO) {
-				if (options.batch_no) {
-					query.batch_no = options.batch_no;
-				}
+                setValues.batch_no = options.batch_no;
+				// if (options.batch_no) {
+				// 	query.batch_no = options.batch_no;
+				// }
 				var result_detail_info = options.result_detail.split('^');
 				setValues.notifyInfo = options.result_detail;
 				if (result_detail_info && result_detail_info.length > 0) {
@@ -233,10 +234,10 @@ PayService.prototype.alipayRefund = function (refundType, options, callback) {
     	callback('request queryId');
     	return;
     }
-    if (!options.batch_no) {
-    	callback('request batch_no');
-    	return;
-    }
+    // if (!options.batch_no) {
+    // 	callback('request batch_no');
+    // 	return;
+    // }
     var refundReason = '协议退款';
     if (options.refundReason) {
     	if (options.refundReason == 1) {
@@ -252,7 +253,7 @@ PayService.prototype.alipayRefund = function (refundType, options, callback) {
         var param = {};
         param.anti_phishing_key = encrypt_key;
         param.refund_date = options.dateCreated ? moment(options.dateCreated).format("YYYY-MM-DD HH:mm:ss") : moment(new Date()).format("YYYY-MM-DD HH:mm:ss");
-		param.batch_no = options.batch_no;
+		param.batch_no = moment(new Date()).format("YYYYMMDD") + options.paymentId;
 		param.batch_num = 1;
 		param.detail_data = options.queryId + '^' + parseFloat(options.price).toFixed(2) + '^' + refundReason;
         if (refundType && refundType == 'nopwd') {
