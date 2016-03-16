@@ -7,6 +7,7 @@ var OrderService = services.order;
 var UseraddressService = services.useraddress;
 var ProductService = services.product;
 var CartService = services.cart;
+var DeliveryCodeService = services.deliveryCode;
 
 exports.install = function() {
 	F.route('/api/v2.0/order/getOderList',         getOders, ['post', 'get'], ['isLoggedIn']);
@@ -26,6 +27,7 @@ exports.install = function() {
 
     // v2.2
     F.route('/api/v2.2/order/confirmSKUReceived',   process_confirm_SKU_received, ['post'], ['isLoggedIn']);
+    F.route('/api/v2.2/order/getDeliveryCode',      json_get_delivery_code,     ['get'],    ['isLoggedIn']);
 };
 
 var converter = require('../common/converter');
@@ -929,13 +931,51 @@ function process_confirm_SKU_received(){
         return;
     }
 
-    OrderService.confirm(orderId, SKURefs, user.id, function(err){
-        if(err){
-            self.respond({code:1002, message:err});
+    OrderService.get({id:orderId}, function(err, order) {
+        if (err || !order) {
+            self.respond({code: 1002, message: '获取订单失败'});
             return;
         }
 
-        self.respond({code:1000, message:'success'});
+        if (order.buyerId != user.id) {
+            self.respond({code: 1002, message: '没有权利修改这个订单'});
+            return;
+        }
+
+        OrderService.confirm(orderId, SKURefs, function (err) {
+            if (err) {
+                self.respond({code: 1002, message: err});
+                return;
+            }
+
+            self.respond({code: 1000, message: 'success'});
+        })
+    })
+}
+
+function json_get_delivery_code(){
+    var self = this;
+    var user = self.user;
+    var orderId = self.data.orderId;
+    OrderService.get({id:orderId}, function(err, order){
+        if (err || !order) {
+            self.respond({code: 1002, message: '获取订单失败'});
+            return;
+        }
+
+        if (order.buyerId != user.id) {
+            self.respond({code: 1002, message: '没有权利修改这个订单'});
+            return;
+        }
+
+        DeliveryCodeService.getCodeByOrderId(orderId, function(err, code){
+            if(err){
+                self.respond({code:1002, message:err});
+                return;
+            }
+
+            self.respond({code:1000, message:'success', deliveryCode:code});
+        })
     })
 }
 

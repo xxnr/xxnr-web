@@ -9,6 +9,7 @@ var OrderService = services.order;
 var PAYMENTSTATUS = require('../common/defs').PAYMENTSTATUS;
 var DELIVERSTATUS = require('../common/defs').DELIVERSTATUS;
 var DELIVERYTYPE = require('../common/defs').DELIVERYTYPE;
+var DeliveryCodeService = services.deliveryCode;
 
 exports.install = function() {
     // RSC info related
@@ -21,9 +22,12 @@ exports.install = function() {
     F.route('/api/v2.2/RSC/address/county',             json_RSC_address_county_query,     ['get'],    ['isLoggedIn']);
     F.route('/api/v2.2/RSC/address/town',               json_RSC_address_town_query,     ['get'],    ['isLoggedIn']);
 
+    F.route('/api/v2.2/RSC',                            json_RSC_query,                 ['get'],     ['isLoggedIn']);
+
     // RSC order related
     F.route('/api/v2.2/RSC/orders',                         json_RSC_orders_get,        ['get'],    ['isLoggedIn', 'isRSC']);
     F.route('/api/v2.2/RSC/order/deliverStatus/delivering', process_RSC_order_deliverStatus_delivering, ['post'],    ['isLoggedIn', 'isRSC']);
+    F.route('/api/v2.2/RSC/order/selfDelivery',             process_self_delivery,        ['post'], ['isLoggedIn']);
 };
 
 /**
@@ -241,15 +245,13 @@ function json_RSC_address_province_query(){
         return;
     }
 
-    var page = U.parseInt(self.data.page, 1) - 1;
-    var max = U.parseInt(self.data.max, 20);
-    RSCService.getProvinceList(self.data.products.split(','), page, max, function(err, provinceList, RSCs, count, pageCount){
-        if(err || !provinceList || !RSCs){
+    RSCService.getProvinceList(self.data.products.split(','), function(err, provinceList){
+        if(err || !provinceList){
             self.respond({code:1002, message:'查询失败'});
             return;
         }
 
-        self.respond({code:1000, message:'success', provinceList: provinceList, RSCs: RSCs, count:count, pageCount:pageCount});
+        self.respond({code:1000, message:'success', provinceList: provinceList});
     })
 }
 
@@ -265,15 +267,13 @@ function json_RSC_address_city_query(){
         return;
     }
 
-    var page = U.parseInt(self.data.page, 1) - 1;
-    var max = U.parseInt(self.data.max, 20);
-    RSCService.getCityList(self.data.products.split(','), self.data.province, page, max, function(err, cityList, RSCs, count, pageCount){
-        if(err || !cityList || !RSCs){
+    RSCService.getCityList(self.data.products.split(','), self.data.province, function(err, cityList){
+        if(err || !cityList){
             self.respond({code:1002, message:'查询失败'});
             return;
         }
 
-        self.respond({code:1000, message:'success', cityList: cityList, RSCs: RSCs, count:count, pageCount:pageCount});
+        self.respond({code:1000, message:'success', cityList: cityList});
     })
 }
 
@@ -294,15 +294,13 @@ function json_RSC_address_county_query(){
         return;
     }
 
-    var page = U.parseInt(self.data.page, 1) - 1;
-    var max = U.parseInt(self.data.max, 20);
-    RSCService.getCountyList(self.data.products.split(','), self.data.province, self.data.city, page, max, function(err, countyList, RSCs, count, pageCount){
-        if(err || !countyList || !RSCs){
+    RSCService.getCountyList(self.data.products.split(','), self.data.province, self.data.city, function(err, countyList){
+        if(err || !countyList){
             self.respond({code:1002, message:'查询失败'});
             return;
         }
 
-        self.respond({code:1000, message:'success', countyList: countyList, RSCs: RSCs, count:count, pageCount:pageCount});
+        self.respond({code:1000, message:'success', countyList: countyList});
     })
 }
 
@@ -323,28 +321,44 @@ function json_RSC_address_town_query(){
         return;
     }
 
-    var page = U.parseInt(self.data.page, 1) - 1;
-    var max = U.parseInt(self.data.max, 20);
-    RSCService.getTownList(self.data.products.split(','), self.data.province, self.data.city, self.data.town, page, max, function(err, townList, RSCs, count, pageCount){
-        if(err || !townList || !RSCs){
+    RSCService.getTownList(self.data.products.split(','), self.data.province, self.data.city, self.data.county, function(err, townList){
+        if(err || !townList){
             self.respond({code:1002, message:'查询失败'});
             return;
         }
 
-        self.respond({code:1000, message:'success', townList: townList, RSCs: RSCs, count:count, pageCount:pageCount});
+        self.respond({code:1000, message:'success', townList: townList});
+    })
+}
+
+function json_RSC_query(){
+    var self = this;
+    if(!self.data.products){
+        self.respond({code:1001, message:'请先选择商品'});
+        return;
+    }
+    var page = U.parseInt(self.data.page, 1) - 1;
+    var max = U.parseInt(self.data.max, 20);
+    RSCService.getRSCList(self.data.products.split(','), self.data.province, self.data.city, self.data.county, self.data.town, page, max, function(err, RSCs, count, pageCount){
+        if(err || !RSCs){
+            self.respond({code:1002, message:'查询失败'});
+            return;
+        }
+
+        self.respond({code:1000, message:'success', RSCs: RSCs, count:count, pageCount:pageCount});
     })
 }
 
 function generate_RSC_order_type(orders){
     /**
      * Order types
-     * -1   :   已关闭
+     * 0    :   已关闭
      * 1    :   待付款
-     * 2    :   待审核
-     * 3    :   待发货
+     * 2    :   付款待审核
+     * 3    :   待厂家发货
      * 4    :   待配送(有一件商品为已到服务站，且配送方式为送货到家, 订单状态为已到服务站)
      * 5    :   待自提(有一件商品为已到服务站，且配送方式为自提, 订单状态为已到服务站)
-     * 6    :   待收货(有一件商品为已发货(配送中),订单状态为部分发货或者已发货)
+     * 6    :   配送中(有一件商品为已发货(配送中),订单状态为部分发货或者已发货)
      * 7    :   已完成(全部商品为确认收货)
      */
     orders.forEach(function(order) {
@@ -379,5 +393,55 @@ function generate_RSC_order_type(orders){
                 order.type = 1;
             }
         }
+    })
+}
+
+function process_self_delivery() {
+    var self = this;
+    var orderId = self.data.orderId;
+    var code = self.data.code;
+    var SKURefs = self.data.SKURefs;
+
+    if (!orderId) {
+        self.respond({code: 1001, message: 'orderId required'});
+        return;
+    }
+
+    if (!code) {
+        self.respond({code: 1001, message: 'code required'});
+        return;
+    }
+
+    if (!SKURefs) {
+        self.respond({code: 1001, message: 'SKURefs required'});
+        return;
+    }
+
+    DeliveryCodeService.checkDeliveryCode(orderId, code, function (err, pass) {
+        if (err || !pass) {
+            self.respond({code: 1002, message: '验证提货码失败'});
+            return;
+        }
+
+        var deliverStatusOptions = {id: orderId, SKUs: []};
+        SKURefs.forEach(function (SKURef) {
+            deliverStatusOptions.SKUs[SKURef] = {deliverStatus: DELIVERSTATUS.DELIVERED};
+        });
+
+        OrderService.updateSKUs(deliverStatusOptions, function (err) {
+            if (err) {
+                self.respond({code: 1002, message: '更新订单失败'});
+                return;
+            }
+
+            OrderService.confirm(orderId, SKURefs, function (err) {
+                if (err) {
+                    self.respond({code: 1002, message: err});
+                    return;
+                }
+
+                self.respond({code: 1000, message: 'success'});
+            })
+        })
     })
 }

@@ -15,6 +15,8 @@ var DELIVERYTYPE = require('../common/defs').DELIVERYTYPE;
 var converter = require('../common/converter');
 var api10 = converter.api10;
 var mongoose = require('mongoose');
+var DeliveryCodeModel = require('../models').deliveryCode;
+
 // Service
 var OrderService = function(){};
 
@@ -39,28 +41,104 @@ OrderService.prototype.orderType = function (order) {
     }
 };
 
-// order status
+// order status for user
 OrderService.prototype.orderStatus = function (order) {
-    if (order.payStatus == PAYMENTSTATUS.PAID) {
-        if (order.deliverStatus == DELIVERSTATUS.DELIVERED) {
-            if (order.confirmed) {
-                return {type:6, value:"已完成"};
-            }
-            return {type:5, value:"已发货"};
-        } else {
-        	if (order.deliverStatus == DELIVERSTATUS.PARTDELIVERED) {
-        		return {type:4, value:"部分发货"};
-        	}
-        	return {type:3, value:"待发货"};
-        }
-    } else if (order.payStatus == PAYMENTSTATUS.PARTPAID) {
-        return {type:2, value:"部分付款"};
-    } else {
-        if (order.isClosed) {
-            return {type:0, value:"交易关闭"};
-        }
-        return {type:1, value:"待付款"};
-    }
+	/**
+	 * User order types
+	 * 0	:	交易关闭
+	 * 1	:	待付款
+	 * 2	:	部分付款
+	 * 3	:	待发货
+	 * 4	:	配送中
+	 * 5	:	待自提
+	 * 6	:	已完成
+	 * 7	:	付款待审核
+	 */
+	if (order.payStatus === PAYMENTSTATUS.PARTPAID) {
+		if (order.pendingApprove) {
+			return {type:7, value:'付款待审核'};
+		} else {
+			return {type:2, value:'部分付款'};
+		}
+	} else if (order.payStatus === PAYMENTSTATUS.PAID) {
+		if (order.deliverStatus === DELIVERSTATUS.RSCRECEIVED) {
+			if (order.deliveryType === DELIVERYTYPE.ZITI.id) {
+				return {type:5, value:'待自提'};
+			} else if (order.deliveryType === DELIVERYTYPE.SONGHUO.id) {
+				return {type:3, value:'待发货'};
+			}
+		} else if (order.deliverStatus === DELIVERSTATUS.PARTDELIVERED || order.deliverStatus === DELIVERSTATUS.DELIVERED) {
+			if (order.confirmed) {
+				return {type:6, value:'已完成'};
+			} else {
+				if (order.deliveryType === DELIVERYTYPE.ZITI.id) {
+					return {type:5, value:'待自提'};
+				} else if (order.deliveryType === DELIVERYTYPE.SONGHUO.id) {
+					return {type:4, value:'配送中'};
+				}
+			}
+		} else {
+			return {type:3, value:'待发货'};
+		}
+	} else {
+		if (order.pendingApprove) {
+			return {type:7, value:'付款待审核'};
+		} else if (order.isClosed) {
+			return {type:0, value:'已关闭'};
+		} else {
+			return {type:1, value:'待付款'};
+		}
+	}
+};
+
+// order status for RSC
+OrderService.prototype.RSCOrderStatus = function(order){
+	/**
+	 * RSC order types
+	 * 0    :   已关闭
+	 * 1    :   待付款
+	 * 2    :   付款待审核
+	 * 3    :   待厂家发货
+	 * 4    :   待配送(有一件商品为已到服务站，且配送方式为送货到家, 订单状态为已到服务站)
+	 * 5    :   待自提(有一件商品为已到服务站，且配送方式为自提, 订单状态为已到服务站或部分发货或已发货)
+	 * 6    :   配送中(有一件商品为已发货(配送中),订单状态为部分发货或者已发货)
+	 * 7    :   已完成(全部商品为确认收货)
+	 */
+	if (order.payStatus === PAYMENTSTATUS.PARTPAID) {
+		if (order.pendingApprove) {
+			return {type:2, value:'付款待审核'};
+		} else {
+			return {type:1, value:'待付款'};
+		}
+	} else if (order.payStatus === PAYMENTSTATUS.PAID) {
+		if (order.deliverStatus === DELIVERSTATUS.RSCRECEIVED) {
+			if (order.deliveryType === DELIVERYTYPE.ZITI.id) {
+				return {type:5, value:'待自提'};
+			} else if (order.deliveryType === DELIVERYTYPE.SONGHUO.id) {
+				return {type:4, value:'待配送'};
+			}
+		} else if (order.deliverStatus === DELIVERSTATUS.PARTDELIVERED || order.deliverStatus === DELIVERSTATUS.DELIVERED) {
+			if (order.confirmed) {
+				return {type:7, value:'已完成'};
+			} else {
+				if (order.deliveryType === DELIVERYTYPE.ZITI.id) {
+					return {type:5, value:'待自提'};
+				} else if (order.deliveryType === DELIVERYTYPE.SONGHUO.id) {
+					return {type:6, value:'配送中'};
+				}
+			}
+		} else {
+			return {type:3, value:'待厂家发货'};
+		}
+	} else {
+		if (order.pendingApprove) {
+			return {type:2, value:'付款待审核'};
+		} else if (order.isClosed) {
+			return {type:0, value:'已关闭'};
+		} else {
+			return {type:1, value:'待付款'};
+		}
+	}
 };
 
 // Method
@@ -548,6 +626,8 @@ OrderService.prototype.updateSKUs = function(options, callback) {
 
 	// check order deliverStatus by all SKUs
 	var self = this;
+	var RSCReceived = false;
+	var newReceivedSKUs = [];
 	OrderModel.findOne({ id: options.id }, function (err, doc) {
 		if (err) {
 			callback(err);
@@ -563,6 +643,8 @@ OrderService.prototype.updateSKUs = function(options, callback) {
 					}
 					if(sku.deliverStatus === DELIVERSTATUS.RSCRECEIVED){
 						sku.dateRSCReceived = new Date();
+						RSCReceived = true;
+						newReceivedSKUs.push(sku);
 					}
 				}
 			});
@@ -576,11 +658,41 @@ OrderService.prototype.updateSKUs = function(options, callback) {
 
 				callback(null);
 			});
+
+			if(RSCReceived && doc.deliveryType == DELIVERYTYPE.ZITI.id && doc.payStatus == PAYMENTSTATUS.PAID){
+				self.generateDeliveryCode(doc.id, newReceivedSKUs);
+			}
 		} else {
 			callback('未查找到订单');
 		}
 	});
 };
+
+OrderService.prototype.generateDeliveryCode = function(orderId, newArrivedSKUs){
+	DeliveryCodeModel.findOne({orderId:orderId}, function(err, deliveryCode){
+		if(!err){
+			var newSKUReceivedProcessor = function(){
+				// TODO : notify app new SKU can be self delivered
+			};
+
+			if(!deliveryCode || !deliveryCode.code){
+				// generate code and insert
+				var code = U.GUID(6);
+				var newDeliveryCode = new DeliveryCodeModel({orderId:orderId, code: code});
+				newDeliveryCode.save(function(err){
+					if(err && 11000 != err.code){
+						// if error is dup key err, it means we already has one record, we don't need to insert
+						console.error(err);
+					}
+
+					newSKUReceivedProcessor();
+				})
+			} else{
+				newSKUReceivedProcessor();
+			}
+		}
+	})
+}
 
 // Updates specific order payments
 OrderService.prototype.updatePayments = function(options, callback) {
@@ -626,6 +738,7 @@ OrderService.prototype.updatePayments = function(options, callback) {
 					self.checkPayStatus({order:doc}, function(err, order, payment) {
 						if (err)
 							console.error('OrderService updatePayments checkPayStatus err: ' + err);
+
 					});
 				}
 			});
@@ -730,7 +843,7 @@ OrderService.prototype.paid = function(id, paymentId, options, callback) {
 
 
 // Sets order to confirmed 
-OrderService.prototype.confirm = function(orderId, SKURefs, userId, callback) {
+OrderService.prototype.confirm = function(orderId, SKURefs, callback) {
 	if(!orderId){
 		callback('orderId required');
 		return;
@@ -741,12 +854,7 @@ OrderService.prototype.confirm = function(orderId, SKURefs, userId, callback) {
 		return;
 	}
 
-	if(!userId){
-		callback('userId required');
-		return;
-	}
-
-	OrderModel.findOne({id:orderId, buyerId:userId}, function(err, order){
+	OrderModel.findOne({id:orderId}, function(err, order){
 		if(err){
 			console.error(err);
 			callback('查询订单失败');
@@ -1369,15 +1477,27 @@ OrderService.prototype.checkDeliverStatus = function(order) {
 
 // Check order pay status by all sub orders payments' pay status and get order payment
 OrderService.prototype.checkPayStatus = function(options, callback) {
-
 	var self = this;
+	var returnProcessor = function(order, payment){
+		callback(null, order, payment);
+		if(order.payStatus === PAYMENTSTATUS.PAID && order.deliveryType === DELIVERYTYPE.ZITI.id && order.deliverStatus === DELIVERSTATUS.RSCRECEIVED){
+			var newReceivedSKUs = [];
+			order.SKUs.forEach(function(SKU){
+				if(SKU.deliverStatus == DELIVERSTATUS.RSCRECEIVED){
+					newReceivedSKUs.push(SKU);
+				}
+			});
+			self.generateDeliveryCode(order.id, newReceivedSKUs);
+		}
+	};
+
 	if (options && options.order) {
 		self.checkPayStatusDetail(options.order, function(err, order, payment) {
 			if (err) {
 				callback(err, null, null);
 				return;
 			}
-			callback(null, order, payment);
+			returnProcessor(order, payment);
 			return;
 		});
 	} else {
@@ -1393,7 +1513,7 @@ OrderService.prototype.checkPayStatus = function(options, callback) {
 							callback(err, null, null);
 							return;
 						}
-						callback(null, order, payment);
+						returnProcessor(order, payment);
 						return;
 					});
 				} else {
@@ -1793,17 +1913,17 @@ OrderService.prototype.getByRSC = function(RSC, page, max, type, callback){
 			case 2:		//待审核
 				query.pendingApprove = true;
 				break;
-			case 4:		//待配送
+			case 3:		//待配送
 				query.payStatus = PAYMENTSTATUS.PAID;
 				query.deliverStatus = DELIVERSTATUS.RSCRECEIVED;
 				query.deliveryType = DELIVERYTYPE.SONGHUO.id;
 				break;
-			case 5:		//待自提
+			case 4:		//待自提
 				query.payStatus = PAYMENTSTATUS.PAID;
 				query.deliverStatus = DELIVERSTATUS.RSCRECEIVED;
 				query.deliveryType = DELIVERYTYPE.ZITI.id;
 				break;
-			case 7:		//已完成
+			case 5:		//已完成
 				query.payStatus = PAYMENTSTATUS.PAID;
 				query.deliverStatus = DELIVERSTATUS.DELIVERED;
 				query.confirmed = true;

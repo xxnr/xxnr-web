@@ -238,6 +238,11 @@ exports.getXXNRHost = function(url){
     }
 };
 
+exports.isOfflinePayType = function(type){
+    const offlinePayType = [3, 4];
+    return offlinePayType.indexOf(type) != -1;
+};
+
 exports.isArray = function(obj) {
     return obj instanceof Array;
 };

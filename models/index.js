@@ -74,6 +74,8 @@ exports.orderpaidlog = mongoose.model('order_paid_log');
 exports.auditlog = mongoose.model('auditlog');
 // frontend user access
 exports.frontendUserAccess = mongoose.model('frontendUserAccess');
+// delivery code
+exports.deliveryCode = mongoose.model('deliveryCode');
 
 exports.getModel = function (name, options) {
     options = options || {};

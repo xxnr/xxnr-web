@@ -521,7 +521,7 @@ function payOrder(payExecutor){
             return;
         }
 
-        if(order.pendingApprove){
+        if(order.pendingApprove && tools.isOfflinePayType(self.payType)){
             self.respond({code:1002, message:'线下付款正在审核中，请等待网点付款审核或者更改付款方式'});
             return;
         }

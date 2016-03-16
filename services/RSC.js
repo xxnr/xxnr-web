@@ -8,178 +8,147 @@ var tools = require('../common/tools');
 var RSCService = function(){};
 
 // Method
-RSCService.prototype.getProvinceList = function(products, page, max, callback) {
-    var query = {RSCInfo:{$exists:true}};
-    if(tools.isArray(products) && products.length>0){
+RSCService.prototype.getProvinceList = function(products, callback) {
+    var query = {RSCInfo: {$exists: true}};
+    if (tools.isArray(products) && products.length > 0) {
         query['RSCInfo.products'] = {$all: products};
     }
 
-    if(page<0 || !page){
-        page = 0;
-    }
+    UserModel.find(query)
+        .populate('RSCInfo.companyAddress.province')
+        .populate('RSCInfo.companyAddress.city')
+        .populate('RSCInfo.companyAddress.county')
+        .populate('RSCInfo.companyAddress.town')
+        .exec(function (err, RSCs) {
+            if (err) {
+                console.error(err);
+                callback('error query RSCs:', err);
+                return;
+            }
 
-    if(max<0 || !max){
-        max = 10;
-    }
-
-    if(max>50){
-        max = 50;
-    }
-
-    UserModel.count(query, function(err, count){
-        if(err){
-            console.error(err);
-            callback('error query RSCs:', err);
-            return;
-        }
-
-        UserModel.find(query)
-            .populate('RSCInfo.companyAddress.province')
-            .populate('RSCInfo.companyAddress.city')
-            .populate('RSCInfo.companyAddress.county')
-            .populate('RSCInfo.companyAddress.town')
-            .select('RSCInfo.name RSCInfo.phone RSCInfo.companyName RSCInfo.companyAddress')
-            .skip(page * max)
-            .limit(max)
-            .exec(function (err, RSCs) {
-                if (err) {
-                    console.error(err);
-                    callback('error query RSCs:', err);
-                    return;
+            var provinceList = [];
+            RSCs.forEach(function (RSC) {
+                if (RSC.RSCInfo.companyAddress && RSC.RSCInfo.companyAddress.province) {
+                    provinceList.push(RSC.RSCInfo.companyAddress.province);
                 }
+            });
 
-                var provinceList = [];
-                RSCs.forEach(function (RSC) {
-                    if(RSC.RSCInfo.companyAddress && RSC.RSCInfo.companyAddress.province) {
-                        provinceList.push(RSC.RSCInfo.companyAddress.province);
-                    }
-                });
-
-                var pageCount = Math.floor(count / max) + (count % max ? 1 : 0);
-                callback(null, provinceList, RSCs, count, pageCount);
-            })
-    })
+            callback(null, provinceList, RSCs);
+        })
 };
 
-RSCService.prototype.getCityList = function(products, province, page, max, callback){
-    var query = {RSCInfo:{$exists:true}};
-    if(tools.isArray(products) && products.length>0){
+RSCService.prototype.getCityList = function(products, province, callback) {
+    var query = {RSCInfo: {$exists: true}};
+    if (tools.isArray(products) && products.length > 0) {
         query['RSCInfo.products'] = {$all: products};
     }
 
-    if(province){
+    if (province) {
         query['RSCInfo.companyAddress.province'] = province;
     }
 
-    if(page<0 || !page){
-        page = 0;
-    }
+    UserModel.find(query)
+        .populate('RSCInfo.companyAddress.province')
+        .populate('RSCInfo.companyAddress.city')
+        .populate('RSCInfo.companyAddress.county')
+        .populate('RSCInfo.companyAddress.town')
+        .exec(function (err, RSCs) {
+            if (err) {
+                console.error(err);
+                callback('error query RSCs:', err);
+                return;
+            }
 
-    if(max<0 || !max){
-        max = 10;
-    }
-
-    if(max>50){
-        max = 50;
-    }
-
-    UserModel.count(query, function(err, count) {
-        if (err) {
-            console.error(err);
-            callback('error query RSCs:', err);
-            return;
-        }
-
-        UserModel.find(query)
-            .populate('RSCInfo.companyAddress.province')
-            .populate('RSCInfo.companyAddress.city')
-            .populate('RSCInfo.companyAddress.county')
-            .populate('RSCInfo.companyAddress.town')
-            .select('RSCInfo.name RSCInfo.phone RSCInfo.companyName RSCInfo.companyAddress')
-            .skip(page * max)
-            .limit(max)
-            .exec(function (err, RSCs) {
-                if (err) {
-                    console.error(err);
-                    callback('error query RSCs:', err);
-                    return;
+            var cityList = [];
+            RSCs.forEach(function (RSC) {
+                if (RSC.RSCInfo.companyAddress && RSC.RSCInfo.companyAddress.city) {
+                    cityList.push(RSC.RSCInfo.companyAddress.city);
                 }
+            });
 
-                var cityList = [];
-                RSCs.forEach(function (RSC) {
-                    if (RSC.RSCInfo.companyAddress && RSC.RSCInfo.companyAddress.city) {
-                        cityList.push(RSC.RSCInfo.companyAddress.city);
-                    }
-                });
-
-                var pageCount = Math.floor(count / max) + (count % max ? 1 : 0);
-                callback(null, cityList, RSCs, count, pageCount);
-            })
-    })
+            callback(null, cityList);
+        })
 };
 
-RSCService.prototype.getCountyList = function(products, province, city, page, max, callback){
-    var query = {RSCInfo:{$exists:true}};
-    if(tools.isArray(products) && products.length>0){
+RSCService.prototype.getCountyList = function(products, province, city, callback) {
+    var query = {RSCInfo: {$exists: true}};
+    if (tools.isArray(products) && products.length > 0) {
         query['RSCInfo.products'] = {$all: products};
     }
 
-    if(province){
+    if (province) {
         query['RSCInfo.companyAddress.province'] = province;
     }
 
-    if(city){
+    if (city) {
         query['RSCInfo.companyAddress.city'] = city;
     }
 
-    if(page<0 || !page){
-        page = 0;
-    }
+    UserModel.find(query)
+        .populate('RSCInfo.companyAddress.province')
+        .populate('RSCInfo.companyAddress.city')
+        .populate('RSCInfo.companyAddress.county')
+        .populate('RSCInfo.companyAddress.town')
+        .exec(function (err, RSCs) {
+            if (err) {
+                console.error(err);
+                callback('error query RSCs:', err);
+                return;
+            }
 
-    if(max<0 || !max){
-        max = 10;
-    }
-
-    if(max>50){
-        max = 50;
-    }
-
-    UserModel.count(query, function(err, count) {
-        if (err) {
-            console.error(err);
-            callback('error query RSCs:', err);
-            return;
-        }
-
-        UserModel.find(query)
-            .populate('RSCInfo.companyAddress.province')
-            .populate('RSCInfo.companyAddress.city')
-            .populate('RSCInfo.companyAddress.county')
-            .populate('RSCInfo.companyAddress.town')
-            .select('RSCInfo.name RSCInfo.phone RSCInfo.companyName RSCInfo.companyAddress')
-            .skip(page * max)
-            .limit(max)
-            .exec(function (err, RSCs) {
-                if (err) {
-                    console.error(err);
-                    callback('error query RSCs:', err);
-                    return;
+            var countyList = [];
+            RSCs.forEach(function (RSC) {
+                if (RSC.RSCInfo.companyAddress && RSC.RSCInfo.companyAddress.county) {
+                    countyList.push(RSC.RSCInfo.companyAddress.county);
                 }
+            });
 
-                var countyList = [];
-                RSCs.forEach(function (RSC) {
-                    if (RSC.RSCInfo.companyAddress && RSC.RSCInfo.companyAddress.county) {
-                        countyList.push(RSC.RSCInfo.companyAddress.county);
-                    }
-                });
-
-                var pageCount = Math.floor(count / max) + (count % max ? 1 : 0);
-                callback(null, countyList, RSCs, count, pageCount);
-            })
-    })
+            callback(null, countyList);
+        })
 };
 
-RSCService.prototype.getTownList = function(products, province, city, county, page, max, callback){
+RSCService.prototype.getTownList = function(products, province, city, county, callback) {
+    var query = {RSCInfo: {$exists: true}};
+    if (tools.isArray(products) && products.length > 0) {
+        query['RSCInfo.products'] = {$all: products};
+    }
+
+    if (province) {
+        query['RSCInfo.companyAddress.province'] = province;
+    }
+
+    if (city) {
+        query['RSCInfo.companyAddress.city'] = city;
+    }
+
+    if (county) {
+        query['RSCInfo.companyAddress.county'] = county;
+    }
+
+    UserModel.find(query)
+        .populate('RSCInfo.companyAddress.province')
+        .populate('RSCInfo.companyAddress.city')
+        .populate('RSCInfo.companyAddress.county')
+        .populate('RSCInfo.companyAddress.town')
+        .exec(function (err, RSCs) {
+            if (err) {
+                console.error(err);
+                callback('error query RSCs:', err);
+                return;
+            }
+
+            var townList = [];
+            RSCs.forEach(function (RSC) {
+                if (RSC.RSCInfo.companyAddress && RSC.RSCInfo.companyAddress.town) {
+                    townList.push(RSC.RSCInfo.companyAddress.town);
+                }
+            });
+
+            callback(null, townList);
+        })
+};
+
+RSCService.prototype.getRSCList = function(products, province, city, county, town, page, max, callback) {
     var query = {RSCInfo:{$exists:true}};
     if(tools.isArray(products) && products.length>0){
         query['RSCInfo.products'] = {$all: products};
@@ -197,6 +166,10 @@ RSCService.prototype.getTownList = function(products, province, city, county, pa
         query['RSCInfo.companyAddress.county'] = county;
     }
 
+    if(town){
+        query['RSCInfo.companyAddress.town'] = town;
+    }
+
     if(page<0 || !page){
         page = 0;
     }
@@ -231,15 +204,8 @@ RSCService.prototype.getTownList = function(products, province, city, county, pa
                     return;
                 }
 
-                var townList = [];
-                RSCs.forEach(function (RSC) {
-                    if (RSC.RSCInfo.companyAddress && RSC.RSCInfo.companyAddress.town) {
-                        townList.push(RSC.RSCInfo.companyAddress.town);
-                    }
-                });
-
                 var pageCount = Math.floor(count / max) + (count % max ? 1 : 0);
-                callback(null, townList, RSCs, count, pageCount);
+                callback(null, RSCs, count, pageCount);
             })
     })
 };

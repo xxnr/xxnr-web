@@ -1,6 +1,7 @@
 var mongoose = require('mongoose');
 var PAYMENTSTATUS = require('../common/defs').PAYMENTSTATUS;
 var DELIVERSTATUS = require('../common/defs').DELIVERSTATUS;
+var DELIVERYTYPE = require('../common/defs').DELIVERYTYPE;
 
 // Schema
 var schema = new mongoose.Schema({
@@ -89,7 +90,7 @@ var schema = new mongoose.Schema({
 	    'stageId': String,															// 分期付款类型ID
 	}],
 	'duePrice': {type:Number},														// 剩余金额
-	'deliveryType':{type:Number},													// 订单的配送方式
+	'deliveryType':{type:Number, default:DELIVERYTYPE.ZITI.id},					// 订单的配送方式
 	'RSCInfo':{																		// 订单选择的自提点信息
 		'RSC':{type:mongoose.Schema.ObjectId, ref:'user'},							// 自提点的reference
 		'companyName':{type:String},												// 自提点公司名
@@ -118,10 +119,17 @@ var orderPaidLogSchema = new mongoose.Schema({
 	'datePaid': {type: Date, default: Date.now},	// 交易日期
 	'queryId': {type:String}						// 银联或者支付宝的交易流水号
 });
-            
+
+var deliveryCodeSchema = new mongoose.Schema({
+	'orderId':{type:String, required:true, index:true, unique:true},			// 订单ID
+	'code':{type:String, required:true},			// 提货码
+	'dateCreated':{type:Date, default:Date.now}	// 创建时间
+});
+
 // Model
 mongoose.model('order', schema);
 mongoose.model('order_paid_log', orderPaidLogSchema);
+mongoose.model('deliveryCode', deliveryCodeSchema);
 // var orderModel = mongoose.model('order', schema);
 
 
