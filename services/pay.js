@@ -252,7 +252,7 @@ PayService.prototype.alipayRefund = function (refundType, options, callback) {
     alipay.alipaySubmitService.query_timestamp(function(encrypt_key) {
         var param = {};
         param.anti_phishing_key = encrypt_key;
-        param.refund_date = options.dateCreated ? moment(options.dateCreated).format("YYYY-MM-DD HH:mm:ss") : moment(new Date()).format("YYYY-MM-DD HH:mm:ss");
+        param.refund_date = moment(new Date()).format("YYYY-MM-DD HH:mm:ss");
 		param.batch_no = moment(new Date()).format("YYYYMMDD") + options.paymentId;
 		param.batch_num = 1;
 		param.detail_data = options.queryId + '^' + parseFloat(options.price).toFixed(2) + '^' + refundReason;
