@@ -119,7 +119,7 @@ PayService.prototype.updatePaymentRefund = function(options, callback) {
 	} catch (e) {
         console.error('PayService updatePaymentRefund update err:', e);
         console.error('PayService updatePaymentRefund update options:', options);
-        callback(err);
+        callback(e);
     }
 };
 

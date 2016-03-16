@@ -436,7 +436,7 @@ function alipayRefundNotify() {
         if (parseInt(body.success_num) === 1 && result_details && result_details.length === 1) {
             var refundOptions = options;
             refundOptions.success_num = body.success_num;
-            refundOptions.result_detail = result_details;
+            refundOptions.result_detail = result_details[0];
             // update payment refund
             PayService.updatePaymentRefund(refundOptions);
         } else {
