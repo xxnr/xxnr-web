@@ -1,0 +1,9 @@
+.sweet-alert h2 {
+    font-size: 16px;
+}
+.sweet-alert p{
+    font-size: 14px;
+}
+.sweet-alert button {
+    margin: 40px 20px 40px 20px;
+}
