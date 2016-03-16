@@ -84,10 +84,10 @@
 	        		-
 	        	{{ fi }}
 	        </td>
-	        <td style="width:40px" class="ui-right" data-title="查看退款">
+	        <td style="width:40px" class="ui-right" data-title="退款详情">
 				<button name="edit" title="@(查看退款)"><span class="fa fa-search"></span></button>
 			</td>
-			<td style="width:40px" class="ui-right" data-title="相关订单">
+			<td style="width:40px" class="ui-right" data-title="订单详情">
 				<button name="order" title="@(查看订单信息)"><span class="fa fa-search"></span></button>
 			</td>
 		</tr>
@@ -373,16 +373,6 @@
 				        </td>
 			        </tr>
 			        <tr>
-			        	<td class="col-xs-5 active">@(是否关闭)</td>
-				        <td>
-				        	{{ if isClosed }}
-				        		<span class="mr5 red">已关闭</span>
-				        	{{ else }}
-				        		<span class="mr5 green">未关闭</span>
-				        	{{ fi }}
-				        </td>
-				    </tr>
-			        <tr>
 			        	<td class="col-xs-5 active">@(订单状态类型)</td>
 					    <td>
 			        	{{ if order && order.orderStatus && order.orderStatus.value }}
@@ -395,32 +385,6 @@
 						{{ else }}
 							-		
 			        	{{ fi }}
-			        	</td>
-			        </tr>
-			        <tr>
-			        	<td class="col-xs-5 active">@(列表状态类型)</td>
-			        	<td>
-		        		{{ if orderType === 0 }}
-			        		<span class="red">已关闭</span>
-			        	{{ else }}
-				        	{{ if orderType === 1 }}
-			        			<span class="green">待付款</span>
-				        	{{ else }}
-				        		{{ if orderType === 2 }}
-			        				<span class="green">待发货</span>
-				        		{{ else }}
-				        			{{ if orderType === 3 }}
-			        					<span class="green">已发货</span>
-				        			{{ else }}
-				        				{{ if orderType === 4 }}
-			        						<span class="green">已完成</span>
-			        					{{ else }}
-					        				-
-					        			{{ fi }}
-				        			{{ fi }}
-				        		{{ fi }}
-				        	{{ fi }}
-				        {{ fi }}
 			        	</td>
 			        </tr>
 			        <tr>
@@ -457,8 +421,6 @@
 	                        <td class="ui-center col-xs-1 active">@(已支付金额)</td>
 							<td class="ui-center col-xs-1 active">@(未支付金额)</td>
 							<td class="ui-center col-xs-1 active">@(已支付次数)</td>
-							<td class="ui-center col-xs-1 active">@(总支付次数)</td>
-							<td class="ui-center col-xs-1 active">@(关闭支付次数)</td>
 							<td class="ui-center col-xs-2 active">@(最后一次支付时间)</td>
 						</tr>
 						{{ foreach s in subOrders }}
@@ -498,8 +460,6 @@
 	                        <td class="ui-center col-xs-1" title="{{ s.paidPrice | price(2) }}">{{ s.paidPrice | price(2) }}</td>
 	                        <td class="ui-center col-xs-1" title="{{ (s.price - s.paidPrice) | toFixed(2) }}">{{ (s.price - s.paidPrice) | toFixed(2) }}</td>
 							<td class="ui-center col-xs-1">{{ s.paidTimes }}</td>
-							<td class="ui-center col-xs-1">{{ s.payments.length }}</td>
-							<td class="ui-center col-xs-1">{{ s.closedTimes }}</td>
 							<td class="ui-center col-xs-2">
 								{{ if s.datePaid }}
 									{{ s.datePaid | format('@(yyyy-MM-dd HH:mm:ss)') }}
@@ -584,76 +544,70 @@
 	                        <td class="ui-center col-xs-1 active">@(支付金额)</td>
 	                        <td class="ui-center col-xs-1 active">@(支付方式)</td>
 							<td class="ui-center col-xs-1 active">@(支付状态)</td>
-							<td class="ui-center col-xs-1 active">@(是否关闭)</td>
 							<td class="ui-center col-xs-2 active">@(支付时间)</td>
 						</tr>
 						{{ foreach s in form.subOrders }}
 							{{ foreach p in s.payments }}
-							<tr {{if rowPaymentId == p.id}}class="red"{{fi}}>
-								<td class="ui-center">
-								{{ if s.type == 'deposit' }}
-									阶段一：定金
-								{{ else }}
-									{{ if s.type == 'balance' }}
-										阶段二：尾款
+								{{ if p.payStatus==2 || rowPaymentId == p.id}}
+								<tr {{if rowPaymentId == p.id}}class="red"{{fi}}>
+									<td class="ui-center">
+									{{ if s.type == 'deposit' }}
+										阶段一：定金
 									{{ else }}
-										{{ if s.type == 'full' }}
-											全款
+										{{ if s.type == 'balance' }}
+											阶段二：尾款
 										{{ else }}
-											其他
-										{{ fi }}
-									{{ fi }}
-								{{ fi }}
-								</td>
-								<td class="ui-center">{{ $index+1 }}</td>
-								<td class="ui-center col-xs-1">{{ p.id }}</td>
-								<td class="ui-center col-xs-1">第{{ p.slice }}笔</td>
-		                        <td class="ui-center col-xs-1">{{ p.price | price(2) }}</td>
-		                        <td class="ui-center col-xs-1">
-		                        {{ if p.payType }}
-									{{ if p.payType==1 }}
-										支付宝
-									{{ else }}
-										{{ if p.payType==2 }}
-											银联
-										{{ else }}
-											{{ if p.payType==3 }}
-												银联
+											{{ if s.type == 'full' }}
+												全款
 											{{ else }}
 												其他
 											{{ fi }}
 										{{ fi }}
 									{{ fi }}
-								{{ else }}
-									-
+									</td>
+									<td class="ui-center">{{ $index+1 }}</td>
+									<td class="ui-center col-xs-1">{{ p.id }}</td>
+									<td class="ui-center col-xs-1">第{{ p.slice }}笔</td>
+			                        <td class="ui-center col-xs-1">{{ p.price | price(2) }}</td>
+			                        <td class="ui-center col-xs-1">
+			                        {{ if p.payType }}
+										{{ if p.payType==1 }}
+											支付宝
+										{{ else }}
+											{{ if p.payType==2 }}
+												银联
+											{{ else }}
+												{{ if p.payType==3 }}
+													银联
+												{{ else }}
+													其他
+												{{ fi }}
+											{{ fi }}
+										{{ fi }}
+									{{ else }}
+										-
+									{{ fi }}
+			                        </td>
+									<td class="ui-center col-xs-1">
+									{{ if p.payStatus==1 }}
+						        		<span class="mr5 red">未付款</span>
+						        	{{ else }}
+						        		{{ if p.payStatus==2 }}
+						        			<span class="mr5 green">已付款</span>
+						        		{{ else }}
+						        			<span class="mr5 red">其他</span>
+						        		{{ fi }}
+						        	{{ fi }}
+									</td>
+									<td class="ui-center col-xs-2">
+									{{ if p.datePaid }}
+										{{ p.datePaid | format('@(yyyy-MM-dd HH:mm:ss)') }}
+									{{ else }}
+										-
+									{{ fi }}
+									</td>
+								</tr>
 								{{ fi }}
-		                        </td>
-								<td class="ui-center col-xs-1">
-								{{ if p.payStatus==1 }}
-					        		<span class="mr5 red">未付款</span>
-					        	{{ else }}
-					        		{{ if p.payStatus==2 }}
-					        			<span class="mr5 green">已付款</span>
-					        		{{ else }}
-					        			<span class="mr5 red">其他</span>
-					        		{{ fi }}
-					        	{{ fi }}
-								</td>
-								<td class="ui-center col-xs-1">
-								{{ if p.isClosed && p.payStatus == 1 }}
-					        		<span class="mr5 red">已关闭</span>
-					        	{{ else }}
-					        		<span class="mr5 green">未关闭</span>
-					        	{{ fi }}
-								</td>
-								<td class="ui-center col-xs-2">
-								{{ if p.datePaid }}
-									{{ p.datePaid | format('@(yyyy-MM-dd HH:mm:ss)') }}
-								{{ else }}
-									-
-								{{ fi }}
-								</td>
-							</tr>
 							{{ end }}
 						{{ end }}
 					</tbody>
@@ -741,15 +695,15 @@
 		component.submit = function(hide, button) {
 			var datawarning = "你确认提交本次修改吗?";
 			var dataname = $(button).attr('data-name');
+			var warning = $(button).attr('data-warning');
+			if (warning) {
+				datawarning = warning;
+			}
 			if (dataname) {
-				var warning = $(button).attr('data-warning');
 				var postdata = {};
 				var posturl = managerurl + '/api/payRefunds/' + dataname;
 				postdata['id'] = payrefunds.form._id;
 				postdata['status'] = payrefunds.form.status;
-				if (warning) {
-					datawarning = warning;
-				}
 				if (!confirm(datawarning))
 					return;
 				$.components.PUT(posturl, postdata, function(response) {
