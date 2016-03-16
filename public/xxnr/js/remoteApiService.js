@@ -470,5 +470,27 @@ app.service('remoteApiService', function(commonService){
         };
         return commonService.ajax(params);
     };
-
+    this.getNominatedInviter = function(){
+        var params = {
+            methodname:'api/v2.1/user/getNominatedInviter'
+        };
+        return commonService.ajax(params);
+    };
+    this.fillRSCinfo = function(name,IDNo,companyName,companyAddress,phone){
+        var data={
+            'methodname':'api/v2.2/RSC/info/fill',
+            'name':name,
+            'IDNo':IDNo,
+            'companyName':companyName,
+            'companyAddress':companyAddress,
+            'phone':phone
+        };
+        return commonService.sendPost(data);
+    };
+    this.getRSCinfo = function(){
+        var params = {
+            methodname:'api/v2.2/RSC/info/get',
+        };
+        return commonService.ajax(params);
+    };
 });
