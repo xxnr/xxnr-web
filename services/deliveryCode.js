@@ -20,7 +20,7 @@ DeliveryCodeService.prototype.getCodeByOrderId = function(orderId, callback){
         }
 
         if(!doc){
-            callback('该订单无提货码');
+            callback(null, null);
             return;
         }
 

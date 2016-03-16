@@ -668,11 +668,24 @@ OrderService.prototype.updateSKUs = function(options, callback) {
 	});
 };
 
-OrderService.prototype.generateDeliveryCode = function(orderId, newArrivedSKUs){
+OrderService.prototype.generateDeliveryCode = function(orderId, newArrivedSKUs, callback){
 	DeliveryCodeModel.findOne({orderId:orderId}, function(err, deliveryCode){
 		if(!err){
 			var newSKUReceivedProcessor = function(){
-				// TODO : notify app new SKU can be self delivered
+				if(callback){
+					DeliveryCodeModel.findOne({orderId:orderId}, function(err, deliveryCode){
+						if(err){
+							callback(err);
+							return;
+						}
+
+						callback(null, deliveryCode);
+					})
+				}
+
+				if(newArrivedSKUs){
+					// TODO : notify app new SKU can be self delivered
+				}
 			};
 
 			if(!deliveryCode || !deliveryCode.code){
@@ -692,7 +705,7 @@ OrderService.prototype.generateDeliveryCode = function(orderId, newArrivedSKUs){
 			}
 		}
 	})
-}
+};
 
 // Updates specific order payments
 OrderService.prototype.updatePayments = function(options, callback) {

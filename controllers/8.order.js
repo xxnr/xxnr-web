@@ -974,7 +974,24 @@ function json_get_delivery_code(){
                 return;
             }
 
-            self.respond({code:1000, message:'success', deliveryCode:code});
+            if(!code){
+                if(order.payStatus == PAYMENTSTATUS.PAID
+                    && order.deliveryType == DELIVERYTYPE.ZITI.id
+                    && (order.deliverStatus == DELIVERSTATUS.RSCRECEIVED || order.deliverStatus == DELIVERSTATUS.PARTDELIVERED)){
+                    OrderService.generateDeliveryCode(order.id, function(err, deliveryCode){
+                        if(err){
+                            self.respond({code:1002, message:'该订单无提货码，请联系客服人员'});
+                            return;
+                        }
+
+                        self.respond({code:1000, message:'success', deliveryCode:deliveryCode});
+                    });
+                } else{
+                    self.respond({code:1002, message:'该订单没有要自提的商品'});
+                }
+            } else {
+                self.respond({code: 1000, message: 'success', deliveryCode: code});
+            }
         })
     })
 }
