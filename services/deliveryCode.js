@@ -51,7 +51,7 @@ DeliveryCodeService.prototype.checkDeliveryCode = function(orderId, code, callba
             return;
         }
 
-        callback(null, doc.code != code);
+        callback(null, doc.code == code);
     })
 };
 

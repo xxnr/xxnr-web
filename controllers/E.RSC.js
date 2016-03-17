@@ -27,7 +27,7 @@ exports.install = function() {
     // RSC order related
     F.route('/api/v2.2/RSC/orders',                         json_RSC_orders_get,        ['get'],    ['isLoggedIn', 'isRSC']);
     F.route('/api/v2.2/RSC/order/deliverStatus/delivering', process_RSC_order_deliverStatus_delivering, ['post'],    ['isLoggedIn', 'isRSC']);
-    F.route('/api/v2.2/RSC/order/selfDelivery',             process_self_delivery,        ['post'], ['isLoggedIn']);
+    F.route('/api/v2.2/RSC/order/selfDelivery',             process_self_delivery,        ['post'], ['isLoggedIn', 'isRSC']);
 };
 
 /**
@@ -423,24 +423,42 @@ function process_self_delivery() {
             return;
         }
 
-        var deliverStatusOptions = {id: orderId, SKUs: []};
-        SKURefs.forEach(function (SKURef) {
-            deliverStatusOptions.SKUs[SKURef] = {deliverStatus: DELIVERSTATUS.DELIVERED};
-        });
-
-        OrderService.updateSKUs(deliverStatusOptions, function (err) {
-            if (err) {
-                self.respond({code: 1002, message: '更新订单失败'});
+        OrderService.get({id:orderId}, function(err, order){
+            if(err || !order){
+                self.respond({code:1002, message:'获取订单失败'});
                 return;
             }
 
-            OrderService.confirm(orderId, SKURefs, function (err) {
+            var deliverStatusOptions = {id: orderId, SKUs: []};
+            var needConfirmSKURefs = [];
+            SKURefs.forEach(function (SKURef) {
+                deliverStatusOptions.SKUs[SKURef] = {deliverStatus: DELIVERSTATUS.DELIVERED};
+            });
+
+            order.SKUs.forEach(function(SKU){
+                if(deliverStatusOptions.SKUs[SKU.ref]){
+                    if(SKU.deliverStatus != DELIVERSTATUS.RSCRECEIVED) {
+                        deliverStatusOptions.SKUs[SKU.ref] = null;
+                    } else{
+                        needConfirmSKURefs.push(SKU.ref.toString());
+                    }
+                }
+            });
+console.log(needConfirmSKURefs);
+            OrderService.updateSKUs(deliverStatusOptions, function (err) {
                 if (err) {
-                    self.respond({code: 1002, message: err});
+                    self.respond({code: 1002, message: '更新订单失败'});
                     return;
                 }
 
-                self.respond({code: 1000, message: 'success'});
+                OrderService.confirm(orderId, needConfirmSKURefs, function (err) {
+                    if (err) {
+                        self.respond({code: 1002, message: err});
+                        return;
+                    }
+
+                    self.respond({code: 1000, message: 'success'});
+                })
             })
         })
     })
