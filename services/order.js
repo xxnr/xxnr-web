@@ -1015,7 +1015,7 @@ OrderService.prototype.checkPayStatusDetail = function(order, callback) {
 					}
 				}
 
-				if (typeof(payment.isClosed) != 'undefined' && payment.isClosed === false && parseInt(payment.payStatus) === PAYMENTSTATUS.UNPAID)
+				if (payment.isClosed === false && parseInt(payment.payStatus) === PAYMENTSTATUS.UNPAID)
 					subOrdersInfo[payment.suborderId].payments.push(payment);
 	       	}
 	    }
@@ -1050,16 +1050,7 @@ OrderService.prototype.checkPayStatusDetail = function(order, callback) {
 						else
 							orderPayStatus = PAYMENTSTATUS.UNPAID;
 					}
-					// // get order paystatus
-					// if (subOrder.payStatus === PAYMENTSTATUS.PAID) {
-					// 	orderPayStatus = PAYMENTSTATUS.PARTPAID;
-					// 	paidCount += 1;
-					// } else {
-					// 	if (subOrder.payStatus === PAYMENTSTATUS.PARTPAID || orderPayStatus === PAYMENTSTATUS.PAID || orderPayStatus === PAYMENTSTATUS.PARTPAID)
-					// 		orderPayStatus = PAYMENTSTATUS.PARTPAID;
-					// 	else
-					// 		orderPayStatus = PAYMENTSTATUS.UNPAID;
-					// }
+					
 					// payment price must eq the subOrder dueprice
 					if (subOrderInfo.payments) {
 						for (var j = 0; j < subOrderInfo.payments.length; j++) {
@@ -1148,7 +1139,7 @@ OrderService.prototype.checkPayStatusDetail = function(order, callback) {
 		} else {
 			callback(null, order.toObject(), orderPayment);
 		}
-		// close the need closed payments
+		// close need closed payments
 		if (closePayments && closePayments.length > 0) {
 			for (var i = 0; i < closePayments.length; i++) {
 				var payment = closePayments[i];
