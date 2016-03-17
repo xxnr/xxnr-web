@@ -16,8 +16,7 @@ var categorySchema = new mongoose.Schema({
 	'datecreated': Date,
 	'deliveries':[{
 		'deliveryType':{type: Number},									// 商品分类的配送方式
-		'deliveryName':{type: String},									// 商品分类的配送方式Name
-		'deliveryWeight':{type: Number}									// 商品分类的配送方式排序
+		'deliveryName':{type: String}									// 商品分类的配送方式Name
 	}]
 });
 

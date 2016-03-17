@@ -3,6 +3,7 @@
  */
 var mongoose = require('mongoose');
 var CategoryModel = require('../models').category;
+var DELIVERYTYPESORT = require('../common/defs').DELIVERYTYPESORT;
 
 // Service
 var CategoryService = function(){};
@@ -35,11 +36,9 @@ CategoryService.prototype.getDeliveries = function(categoryIds, callback) {
             $group: {
                 _id: '$deliveries.deliveryType',
                 name: {$first: '$deliveries.deliveryName'},
-                weights: {$sum: '$deliveries.deliveryWeight'},
                 count: {$sum: 1}
             }
         }
-        , {$sort: {weights: -1}}
         , {$project: {_id: 0, id: '$_id', name: 1, count: 1}}
         )
     	.exec(function (err, docs) {
@@ -52,7 +51,7 @@ CategoryService.prototype.getDeliveries = function(categoryIds, callback) {
             var deliveries = [];
             docs.forEach(function (doc) {
             	if (doc.count === categoryIds.length) {
-            		deliveries.push({deliveryType: doc.id,deliveryName: doc.name});
+            		deliveries.push({deliveryType: doc.id,deliveryName: doc.name, sort:DELIVERYTYPESORT[doc.id]});
             	}
             });
         	callback(null, deliveries);

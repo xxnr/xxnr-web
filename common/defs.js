@@ -49,13 +49,16 @@ const OFFLINEPAYTYPE = {CASH:3, POS:4};
     exports.DELIVERYTYPE = Object.freeze({
         "ZITI":{
             "id":ZITI,
-            "name":"网点自提",
-            "weight":10
+            "name":"网点自提"
         },
         "SONGHUO":{
             "id":SONGHUO,
-            "name":"送货到家",
-            "weight":20
+            "name":"送货到家"
         }
-    })
+    });
+    var deliveryTypeSort = {};
+    deliveryTypeSort[SONGHUO]=10;
+    deliveryTypeSort[ZITI]=20;
+
+    exports.DELIVERYTYPESORT = Object.freeze(deliveryTypeSort);
 })(typeof exports === 'undefined'? this['defs']={}: exports);

@@ -6,6 +6,7 @@ var tools = require('../common/tools');
 var services = require('../services');
 var OrderService = services.order;
 var PayService = services.pay;
+var OFFLINEPAYTYPE = require('../common/defs').OFFLINEPAYTYPE;
 
 exports.install = function() {
     // pay
@@ -235,6 +236,8 @@ function offlinePay(){
     // default offline pay type
     self.payType = PAYTYPE.CASH;
 
+    // forbidden multi pay for offline pay, which means offline pay can only pay off
+    self.data.price = null;
     payOrder.call(this, function(paymentId, totalPrice, ip, orderId, payment) {
         OrderService.changeToPendingApprove(orderId, function(err){
             if(err){
@@ -438,16 +441,10 @@ function unionpayNotify() {
 function process_RSC_confirm_OfflinePay(){
     var self = this;
     var paymentId = self.data.paymentId;
-    var price = self.data.price;
     var offlinePayType = self.data.offlinePayType;
     var RSC = self.user;
     if(!paymentId){
         self.respond({code:1001, message:'paymentId required'});
-        return;
-    }
-
-    if(!price){
-        self.respond({code:1001, message:'price required'});
         return;
     }
 
@@ -472,7 +469,11 @@ function process_RSC_confirm_OfflinePay(){
             return;
         }
 
-        var options = {payType:offlinePayType, price:price};
+        var options = {payType:offlinePayType};
+        if(price){
+            options.price = price;
+        }
+
         payNotify.call(self, paymentId, options);
         self.respond({code:1000, message:'success'});
 

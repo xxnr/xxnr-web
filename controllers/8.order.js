@@ -957,6 +957,11 @@ function json_get_delivery_code(){
     var self = this;
     var user = self.user;
     var orderId = self.data.orderId;
+    if(!orderId){
+        self.respond({code:1001, message:'orderId required'});
+        return;
+    }
+
     OrderService.get({id:orderId}, function(err, order){
         if (err || !order) {
             self.respond({code: 1002, message: '获取订单失败'});
