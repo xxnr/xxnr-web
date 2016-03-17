@@ -506,15 +506,15 @@ UserService.prototype.saveUserConsignee = function(options, callback){
     }
 
     var query = {userId: options.userId, consigneeName: options.consigneeName, consigneePhone: options.consigneePhone};
-    UserConsigneeModel.findOne(query, function(err, user){
+    UserConsigneeModel.findOne(query, function(err, data){
         if(err){
             console.error('User Service saveUserConsignee findOne err:', err);
             callback('UserConsigneeModel find err');
             return;
         }
 
-        if(user){
-            callback('User consignee had in');
+        if(data){
+            callback('User consignee had in', data);
             return;
         }
 
@@ -525,7 +525,63 @@ UserService.prototype.saveUserConsignee = function(options, callback){
                 callback('UserConsigneeModel save err');
                 return;
             }
-            callback(null); 
+            callback(null, userConsignee); 
+        });
+    });
+};
+
+// query user consignee
+UserService.prototype.queryUserConsignee = function(options, callback){
+    // options.page {String or Number}
+    // options.max {String or Number}
+    // options.userId
+
+    options.page = U.parseInt(options.page) - 1;
+    options.max = U.parseInt(options.max, 20);
+
+    if (options.page < 0)
+        options.page = 0;
+
+    if (options.max > 50)
+        options.max = 50;
+
+
+    var take = U.parseInt(options.max);
+    var skip = U.parseInt(options.page * options.max);
+
+    var mongoOptions = {};
+    
+    // userId
+    if (options.userId) {
+        mongoOptions.userId = options.userId;
+    }
+
+    UserConsigneeModel.count(mongoOptions, function (err, count) {
+        if (err) {
+            callback(err);
+            return;
+        }
+        UserConsigneeModel.find(mongoOptions).sort({dateCreated:-1}).skip(skip).limit(take).lean().select('-_id -__v').exec(function(err, docs) {
+            if (err) {
+                callback(err);
+                return;
+            }
+            count = count || docs.length;
+            var data = {};
+
+            data.count = count;
+            data.items = docs;
+
+            // Gets page count
+            data.pages = Math.floor(count / options.max) + (count % options.max ? 1 : 0);
+
+            if (data.pages === 0)
+                data.pages = 1;
+
+            data.page = options.page + 1;
+
+            // Returns data
+            callback(null, data);
         });
     });
 };
@@ -539,15 +595,15 @@ UserService.prototype.saveUserRSC = function(options, callback){
     }
 
     var userRSCOptions = {userId: options.userId, RSC: options.RSCId};
-    UserRSCModel.findOne(userRSCOptions, function(err, user){
+    UserRSCModel.findOne(userRSCOptions, function(err, data){
         if(err){
             console.error('User Service saveUserRSC findOne err:', err);
             callback('UserRSCModel find err');
             return;
         }
 
-        if(user){
-            callback('User RSC had in');
+        if(data){
+            callback('User RSC had in', data);
             return;
         }
 
@@ -558,7 +614,7 @@ UserService.prototype.saveUserRSC = function(options, callback){
                 callback('UserRSCModel save err');
                 return;
             }
-            callback(null);
+            callback(null, userRSC);
         });
     });
 };

@@ -68,6 +68,10 @@ exports.install = function() {
 
     F.route('/api/v2.1/user/getNominatedInviter',       json_nominated_inviter_get, ['get'], ['isLoggedIn']);
 
+    // user consignees
+    F.route('/api/v2.2/user/queryConsignees',           json_userconsignees_query, ['get'], ['isLoggedIn']);
+    F.route('/api/v2.2/user/saveConsignees',            process_userconsignees_save, ['get', 'post'], ['isLoggedIn']);
+
 	// v1.0
 	// LOGIN
 	//fix api// F.route('/app/user/login/', 				        process_login, ['get', 'post']);
@@ -1718,4 +1722,74 @@ function json_nominated_inviter_get(){
 
         self.respond({code:1000, message:'success', nominated_inviter:{phone:customer.user.account, name:customer.user.name}});
     })
+}
+
+/**
+ * query user consignees for ZITI delivery
+ * @return {[object]{code:number message:string datas:object}}
+ */
+function json_userconsignees_query() {
+    var self = this;
+    var page = self.data['page'];
+    var max = self.data['max'];
+    var userId = self.data['userId'];
+
+    if (!userId) {
+        self.respond({code:1001,message:'缺少用户ID'});
+        return;
+    }
+
+    var options = {};
+    options.userId = userId;
+    options.page = page;
+    options.max = max;
+
+    UserService.queryUserConsignee(options, function(err, data) {
+        if (err || !data) {
+            if (err) console.error('User Service json_userconsignees_query queryUserConsignee err:', err);
+            self.respond({code:1002,message:'没有找到收货人列表'});
+            return;
+        }
+
+        self.respond({code:1000,message:'success',datas:{total:data.count,rows:data.items,page:data.page,pages:data.pages}});
+    });
+}
+
+/**
+ * save user consignees
+ * @return {[object]{code:number message:string}}
+ */
+function process_userconsignees_save() {
+    var self = this;
+    var consigneeName = self.data['consigneeName'];
+    var consigneePhone = self.data['consigneePhone'];
+    var userId = self.data['userId'];
+    if (!userId) {
+        self.respond({code:1001,message:'缺少用户ID'});
+        return;
+    }
+    if (!consigneeName) {
+        self.respond({code:1001,message:'请先填写收货人姓名'});
+        return;
+    }
+    if (!consigneePhone || !tools.isPhone(consigneePhone)) {
+        self.respond({"code":1001, "mesage":"请先填写正确的收货人手机号"});
+        return;
+    }
+
+    // save user input consignee
+    var userConsignee = {userId: userId, consigneeName: consigneeName, consigneePhone: consigneePhone};
+    UserService.saveUserConsignee(userConsignee, function(err, data) {
+        if (err) {
+            console.error('User Service process_userconsignees_save saveUserConsignee err:', err);
+            if (data) {
+                self.respond({code:1002,message:'收货人信息已经存在'});
+                return;
+            }
+            self.respond({code:1002,message:'收货人信息保存失败'});
+            return;
+        }
+        self.respond({code:1000,message:'success'});
+        return;
+    });
 }
