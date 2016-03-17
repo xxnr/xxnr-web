@@ -358,39 +358,42 @@ function addOrder(){
 
 function updateOrderPaytype() {
 	var self = this;
-    var buyer = self.data.userId || null;
-    var orderid = self.data.orderId || null;
-    var paytype = self.data.payType || PAYTYPE.ZHIFUBAO;
+    self.respond({code:'1000', message:'success'});
+    return;
 
-    OrderService.get({'buyer':buyer,'id':orderid}, function(err, data, payment) {
-        if (err || !data) {
-            if (err) console.error('Order updateOrderPaytype err:', err);
-            self.respond({'code':'1001','message':'未查询到订单'});
-            return;
-        }
-
-        var paymentid = null;
-        if (payment && payment.id) {
-            paymentid = payment.id;
-        } else {
-            if (!paymentid && data && data.paymentId) {
-                paymentid = data.paymentId;
-            } else {
-                console.error('Order updateOrderPaytype err: paymentid not find.');
-                self.respond({'code':'1001','message':'未查询到订单'});
-                return;
-            }
-        }
-        OrderService.updatepayType({'paytype':paytype,'orderid':orderid,'paymentid':paymentid}, function(err) {
-            if(err) {
-                console.error('Order updateOrderPaytype err:', err);
-                self.respond({'code':'1001','message':'修改支付方式出错'});
-                return;
-            }
-            self.respond({'code':'1000','message':'success'});
-            return;
-        });
-    });
+    //var buyer = self.data.userId || null;
+    //var orderid = self.data.orderId || null;
+    //var paytype = self.data.payType || PAYTYPE.ZHIFUBAO;
+    //
+    //OrderService.get({'buyer':buyer,'id':orderid}, function(err, data, payment) {
+    //    if (err || !data) {
+    //        if (err) console.error('Order updateOrderPaytype err:', err);
+    //        self.respond({'code':'1001','message':'未查询到订单'});
+    //        return;
+    //    }
+    //
+    //    var paymentid = null;
+    //    if (payment && payment.id) {
+    //        paymentid = payment.id;
+    //    } else {
+    //        if (!paymentid && data && data.paymentId) {
+    //            paymentid = data.paymentId;
+    //        } else {
+    //            console.error('Order updateOrderPaytype err: paymentid not find.');
+    //            self.respond({'code':'1001','message':'未查询到订单'});
+    //            return;
+    //        }
+    //    }
+    //    OrderService.updatepayType({'paytype':paytype,'orderid':orderid,'paymentid':paymentid}, function(err) {
+    //        if(err) {
+    //            console.error('Order updateOrderPaytype err:', err);
+    //            self.respond({'code':'1001','message':'修改支付方式出错'});
+    //            return;
+    //        }
+    //        self.respond({'code':'1000','message':'success'});
+    //        return;
+    //    });
+    //});
 }
 
 // user confirm order
