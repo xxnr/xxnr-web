@@ -1,5 +1,5 @@
 business_admin, orders, products
 news_editor, news
-super_admin, dashboard, orders, products, users, news, settings, auditlogs
+super_admin, dashboard, orders, products, users, news, settings, auditlogs, payrefunds
 customer_op, orders, users
 product_op, products
