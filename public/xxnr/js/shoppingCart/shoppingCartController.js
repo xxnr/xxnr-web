@@ -122,8 +122,6 @@ app.controller('shoppingCartController', function($scope, $timeout, remoteApiSer
                             // console.log(item);
                             shop.items.push(item);
                         }
-                        // set shoppingCartCount
-                        shoppingCartService.setSCart($scope.shoppingCartCount);
 
                         $scope.$broadcast('dataloaded');
 
@@ -137,6 +135,8 @@ app.controller('shoppingCartController', function($scope, $timeout, remoteApiSer
                         }
 
                     }
+                    // set shoppingCartCount
+                    shoppingCartService.setSCart($scope.shoppingCartCount);
                 });
         } else {
             var count = shoppingCartService.getSCart();

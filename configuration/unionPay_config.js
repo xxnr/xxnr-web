@@ -56,7 +56,8 @@ module.exports = Object.freeze({
 		host: 'http://www.xinxinnongren.com',
 		port:80,
 		front:"/my_xxnr.html",
-		back:"/unionpay/nofity"
+		back:"/unionpay/notify",
+		refundback:"/unionpay/refundnotify"
 	})
 });
 
