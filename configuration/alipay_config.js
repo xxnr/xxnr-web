@@ -1,5 +1,6 @@
 var config = {
-    partner:'2088911973097354' //合作身份者id，以2088开头的16位纯数字
+	alipay_api_host:'mapi.alipay.com'
+    ,partner:'2088911973097354' //合作身份者id，以2088开头的16位纯数字
     ,key:'o11oiidrjq70z8zfrvj6785b46xtpkkv'//MD5 key
     ,ali_pub_key:'-----BEGIN PUBLIC KEY-----' + '\r\n' +
         'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCnxj/9qwVfgoUh/y2W89L6BkRA' + '\r\n' +
@@ -16,8 +17,10 @@ var config = {
 	,cacert:'cacert.pem'//ca证书路径地址，用于curl中ssl校验 
 	,transport:'http' //访问模式,根据自己的服务器是否支持ssl访问，若支持请选择https；若不支持请选择http
 	,input_charset:'utf-8'//字符编码格式 目前支持 gbk 或 utf-8	
-	,create_direct_pay_by_user_return_url : '/alipay/success'
-	,create_direct_pay_by_user_notify_url: 'dynamic/alipay/nofity.asp'	
+	,create_direct_pay_by_user_return_url: '/alipay/success'
+	,create_direct_pay_by_user_notify_url: '/dynamic/alipay/notify.asp'
+	,refund_fastpay_by_platform_nopwd_notify_url: '/dynamic/alipay/refund_fastpay_by_platform_nopwd_notify.asp'
+	,refund_fastpay_by_platform_pwd_notify_url: '/dynamic/alipay/refund_fastpay_by_platform_pwd_notify.asp'
 	,input_charset:'UTF-8'//字符编码格式 目前支持 gbk 或 utf-8
 	,sign_type:"MD5"//签名方式 不需修改
 };

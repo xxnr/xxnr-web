@@ -23,6 +23,26 @@ module.exports = {
                 max_hits_per_user:10,
                 max_hits:1000
             }
+        },
+        '/alipay':{
+            'get':{
+                max_hits_per_user:10,
+                max_hits:10000
+            },
+            'post':{
+                max_hits_per_user:10,
+                max_hits:10000
+            }
+        },
+        '/unionpay':{
+            'get':{
+                max_hits_per_user:10,
+                max_hits:10000
+            },
+            'post':{
+                max_hits_per_user:10,
+                max_hits:10000
+            }
         }
     }
 };

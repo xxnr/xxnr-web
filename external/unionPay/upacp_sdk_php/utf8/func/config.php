@@ -16,6 +16,7 @@ $UNION_PAY_HOST = null;
 $UNION_PAY_FILE_QUERY_URL = null;
 $FRONT_NOTIFY_URL = null;
 $BACK_NOTIFY_URL = null;
+$REFUND_BACK_NOTIFY_URL = null;
 $MERID = null;
 $CERTIFICATE_TYPE = null;
 
@@ -34,6 +35,10 @@ for($i=0; $i<$argc; $i++){
 	
 	if(substr($arg, 0, 18) === '--back-notify-url='){
 		$BACK_NOTIFY_URL = substr($arg, 18);
+	}
+
+	if(substr($arg, 0, 25) === '--refund-back-notify-url='){
+		$REFUND_BACK_NOTIFY_URL = substr($arg, 25);
 	}
 }
 
@@ -95,6 +100,8 @@ $SDK_App_Request_Url = $UNION_PAY_HOST.'/gateway/api/appTransReq.do';
 $SDK_FRONT_NOTIFY_URL = $FRONT_NOTIFY_URL;// 'http://localhost:8085/upacp_sdk_php/demo/utf8/FrontReceive.php';
 // 后台通知地址 (商户自行配置通知地址)
 $SDK_BACK_NOTIFY_URL = $BACK_NOTIFY_URL;//'http://114.82.43.123/upacp_sdk_php/demo/utf8/BackReceive.php';
+// 退款的后台通知地址 (商户自行配置通知地址)
+$SDK_REFUND_BACK_NOTIFY_URL = $REFUND_BACK_NOTIFY_URL;
 
 //文件下载目录 
 $SDK_FILE_DOWN_PATH = __DIR__ . DIRECTORY_SEPARATOR . '../../../../download/unionPay';
