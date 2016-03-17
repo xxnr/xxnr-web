@@ -13,6 +13,7 @@ var BrandService = services.brand;
 var CategoryService = services.category;
 var PotentialCustomerService = services.potential_customer;
 var AuditlogService = services.auditservice;
+var PayService = services.pay;
 var PAYMENTSTATUS = require('../common/defs').PAYMENTSTATUS;
 var DELIVERSTATUS = require('../common/defs').DELIVERSTATUS;
 
@@ -152,6 +153,12 @@ exports.install = function() {
 
 	// RSC
 	F.route(CONFIG('manager-url') + '/api/v2.2/RSCInfo/{_id}',				json_RSC_info_get, ['get'], ['backend_auth']);
+
+	// pay refund
+	F.route(CONFIG('manager-url') + '/api/payrefunds/',            			json_payrefund_query, ['get'], ['backend_auth']);
+	F.route(CONFIG('manager-url') + '/api/payrefunds/{id}/',       			json_payrefund_read, ['get'], ['backend_auth']);
+	F.route(CONFIG('manager-url') + '/api/payrefunds/refundsubmit/',       	json_payrefund_update, ['put'], ['backend_auth', 'auditing']);
+
 };
 
 var files = DB('files', null, require('total.js/database/database').BUILT_IN_DB).binary;
@@ -554,7 +561,7 @@ function json_subOrders_payments_update() {
     }
     var options = {'id':orderid,'payments':updatepayments};
     if (self.user) {
-    	options.user = self.user;
+    	options.backendUser = self.user;
     }
     OrderService.updatePayments(options, function(err) {
 		if (err) {
@@ -1552,4 +1559,75 @@ function json_RSC_info_get(id){
 
 		self.respond({code:1000, message:'success', RSCInfo:user.RSCInfo});
 	})
+}
+
+// ==========================================================================
+// Pay Refund
+// ==========================================================================
+
+// Gets all pay refund
+function json_payrefund_query() {
+	var self = this;
+	PayService.queryPaymentRefund(self.query, function(err, datas){
+		if (err) {
+			console.error('manager json_payrefund_query err:', err);
+			self.respond({code: 1004, message: 'query pay refund err:' + err});
+			return;
+		}
+		self.respond({code:1000, message:'success', datas:datas});
+	});
+}
+
+// Reads a specific pay refund by ID
+function json_payrefund_read(id) {
+	var self = this;
+	var options = {};
+	options.id = id;
+    PayService.getPaymentRefund(options, function(err, datas){
+		if (err) {
+			console.error('manager json_payrefund_read err:', err);
+			self.respond({code: 1004, message: 'get pay refund err:' + err, error:[{'error':'没有找到退款信息'}]});
+			return;
+		}
+		self.respond({code:1000, message:'success', datas:datas});
+	});
+}
+
+// Update pay refund
+function json_payrefund_update() {
+	var self = this;
+	var refundid = self.body && self.body.id ? self.body.id: null;
+	var refundstatus = self.body && self.body.status ? self.body.status: null;
+	if(!refundid){
+		self.respond({code:1001, message:'请填写refund ID', error:[{'error':'请填写refund ID'}]});
+		return;
+	}
+	if(!refundstatus){
+		self.respond({code:1001, message:'请填写退款状态', error:[{'error':'请填写退款状态'}]});
+		return;
+	}
+	var options = {};
+	options.id = refundid;
+	options.status = refundstatus;
+	if (self.user) {
+    	options.backendUser = self.user;
+    }
+    PayService.getPaymentRefund({id: refundid}, function(err, refundData){
+    	if (err) {
+			console.error('manager json_payrefund_read err:', err);
+			self.respond({code: 1004, message: 'get pay refund err:' + err, error:[{'error':'没有找到退款信息'}]});
+			return;
+		}
+		if (options.status === 1) {
+			options.notifyPrice = refundData.price;
+		}
+	    PayService.updatePaymentRefund(options, function(err, datas){
+			if (err) {
+				console.error('manager json_payrefund_update err:', err);
+				self.respond({code: 1004, message: 'update pay refund err:' + err, error:[{'error':'系统错误，更新失败'}]});
+				return;
+			}
+			self.respond({code:1000, message:'success'});
+		});
+	});
 }

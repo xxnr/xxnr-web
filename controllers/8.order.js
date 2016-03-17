@@ -376,7 +376,7 @@ function updateOrderPaytype() {
             if (!paymentid && data && data.paymentId) {
                 paymentid = data.paymentId;
             } else {
-                console.error('Order updateOrderPaytype err:', err);
+                console.error('Order updateOrderPaytype err: paymentid not find.');
                 self.respond({'code':'1001','message':'未查询到订单'});
                 return;
             }

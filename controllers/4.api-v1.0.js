@@ -13,6 +13,7 @@ var ProductService = services.product;
 var CartService = services.cart;
 var BrandService = services.brand;
 var CategoryService = services.category;
+var PayService = services.pay;
 
 exports.install = function() {
 	//fix api// F.route('/api/v2.0/getProductDetails/', getProductDetails, ['post', 'get']);
@@ -30,11 +31,18 @@ exports.install = function() {
     // get product detail for web
     F.route('/api/v2.0/product/getProductDetails', getGoodsDetails, ['post', 'get']);
     F.route('/api/v2.0/getShoppingCartOffline', getShoppingCartOffline, ['get', 'post']);
-    F.route('/alipay', alipayOrder, ['post', 'get'], ['isInWhiteList']);
-    F.route('/dynamic/alipay/nofity.asp', alipayNotify, ['post','raw']);
-    F.route('/unionpay', unionPayOrder, ['post', 'get'], ['isInWhiteList']);
-    F.route('/unionpay/nofity', unionpayNotify, ['post','raw']);
-    F.route('/alipay/success', aliPaySuccess);
+    // // pay
+    // F.route('/alipay', alipayOrder, ['post', 'get'], ['isInWhiteList']);
+    // F.route('/dynamic/alipay/notify.asp', alipayNotify, ['post','raw']);
+    // F.route('/dynamic/alipay/nofity.asp', alipayNotify, ['post','raw']);
+    // F.route('/unionpay', unionPayOrder, ['post', 'get'], ['isInWhiteList']);
+    // F.route('/unionpay/notify', unionpayNotify, ['post','raw']);
+    // F.route('/unionpay/nofity', unionpayNotify, ['post','raw']);
+    // F.route('/alipay/success', aliPaySuccess);
+    // // pay refund
+    // F.route('/dynamic/alipay/refund_fastpay_by_platform_nopwd_notify.asp', alipayRefundNotify, ['post','raw']);
+    // F.route('/unionpay/refundnotify', unionRefundNotify, ['post','raw']);
+
     // F.route('/notify_alipay.asp', alipayNotify);
     //fix api// F.route('/unionPay', unionPayOrder, ['post', 'get']);
     //fix api// F.route('/unionpay', unionPayOrder, ['post', 'get']);
@@ -59,10 +67,10 @@ exports.install = function() {
 	F.route('/app/goods/getWebGoodsDetails', api10_getProductDetail, ['post', 'get', 'upload'], 8);
     F.route('/app/ad/getAdList', api10_getBanners, ['post', 'get', 'upload'], 8);
 
-    F.route('/api/v2.2/getOfflinePayType',              json_offline_pay_type, ['get']);
-    F.route('/offlinepay', offlinePay, ['get', 'isLoggedIn']);
-    // TODO: not tested and documented apis, add more conditions, need more tests
-    F.route('/api/v2.2/RSC/confirmOfflinePay',          process_RSC_confirm_OfflinePay, ['get'],    ['isLoggedIn', 'isRSC']);
+    // F.route('/api/v2.2/getOfflinePayType',              json_offline_pay_type, ['get']);
+    // F.route('/offlinepay', offlinePay, ['get', 'isLoggedIn']);
+    // // TODO: not tested and documented apis, add more conditions, need more tests
+    // F.route('/api/v2.2/RSC/confirmOfflinePay',          process_RSC_confirm_OfflinePay, ['get'],    ['isLoggedIn', 'isRSC']);
 };
 
 var converter = require('../common/converter');
@@ -75,6 +83,7 @@ var PAYMENTSTATUS = require('../common/defs').PAYMENTSTATUS;
 var PAYTYPE = require('../common/defs').PAYTYPE;
 var OFFLINEPAYTYPE = require('../common/defs').OFFLINEPAYTYPE;
 var dri = require('../common/dri');
+var moment = require('moment-timezone');
 // console.log('PAYMENTSTATUS=' + JSON.stringify(PAYMENTSTATUS));
 
 function getProducts() {
@@ -607,7 +616,171 @@ function aliPaySuccess(){
     this.view('alipaySuccess', null);
 }
 
+// alipay refund notify
+function alipayRefundNotify() {
+    var self = this;
+    var qs = require('querystring');
+    var body = qs.parse(self.body);
+    
+    console.log('alipayRefundNotify info:', body);
+    AlipayNotify.verifyNotify(body, function(isValid) {
+        if (!isValid) {
+            self.content('fail');
+            return;
+        }
+        var notify_type = body.notify_type;
+        var options = {};
+        options.payType = PAYTYPE.ZHIFUBAO;
+        options.notify_time = body.notify_time;
+        options.notify_id = body.notify_id;
+        options.batch_no = body.batch_no;
+        options.dateNotify = new Date();
+        // return success to alipay
+        self.content('success');
+        var result_details = body.result_details.split('#');
+        if (parseInt(body.success_num) === 1 && result_details && result_details.length === 1) {
+            var refundOptions = options;
+            refundOptions.success_num = body.success_num;
+            refundOptions.result_detail = result_details;
+            // update payment refund
+            PayService.updatePaymentRefund(refundOptions);
+        } else {
+            for (var i = 0; i < result_details.length; i++) {
+                var refundOptions = options;
+                refundOptions.success_num = result_details.length;
+                refundOptions.result_detail = result_details[i];
+                // update payment refund
+                PayService.updatePaymentRefund(refundOptions);
+            }
+        }
+    });
+}
+
+// unionpay refund notify
+function unionRefundNotify() {
+    var self = this;
+
+    if (!self.body) {
+        console.error('unionpayNotify cannot get unionpay notification body');
+        self.content('unionpayNotify cannot get unionpay notification body');
+        return;
+    }
+
+    var qs = require('querystring');
+    var body = qs.parse(self.body);
+
+    var php_processor = require("../common/php_processor");
+    var commandLine = '\"' + require('path').resolve(__filename + '/../../external/unionPay/upacp_sdk_php/demo/utf8/' + 'Verify.php') + '\"';
+
+    if(F.isDebug){
+        commandLine += ' --test';
+    }
+
+    commandLine += ` --data=${new Buffer(self.body).toString('base64')} --json=${new Buffer(JSON.stringify(body)).toString('base64')}`;
+
+    new php_processor(commandLine).execute(function(output, error) {
+        if (error) {
+            console.error('unionpayNotify verification failure:', error);
+            self.content('verification failure:' + error);
+            return;
+        }
+
+        var index = 0;
+        const BOM = 65279; // include_once utf-8 php will invole BOM
+
+        while(output.charCodeAt(index) == BOM) index++;
+
+        var result = output.substring(index);
+
+        // console.log('result = ' + result + ', and result.length = ' + result.length);
+
+        if (result.substring(0, 'success'.length) === 'success') {
+            if (body['respCode'] === 00 || body['respCode'] === '00') {
+                self.content('success');
+                var paymentInfo = JSON.parse(new Buffer(body.reqReserved, 'base64').toString());
+                var options = {paymentId: body.orderId || paymentInfo.paymentId, notifyPrice: (parseFloat(body.txnAmt)/100).toFixed(2), orderId:paymentInfo.orderId, payType:PAYTYPE.UNIONPAY};
+                options.notify_time = moment(body.txnTime,"YYYYMMDDHHmmss").format("YYYY-MM-DD HH:mm:ss");
+                options.queryId = body.origQryId || paymentInfo.queryId;
+                options.notify_id = body.queryId;
+                options.result_detail = paymentInfo;
+                options.dateNotify = new Date();
+                // update payment refund
+                PayService.updatePaymentRefund(refundOptions);
+            } else {
+                console.error('unionpayNotify error : respCode is ', body['respCode'], 'body:', body);
+                self.content('success'); // tell the notifier we successfully handled the notification
+            }
+        } else {
+            console.error('unionpayNotify verification failure:', result);
+            self.content('verification failure:' + result);
+        }
+    });
+}
+
+var OrderPaidLog = require('../models').orderpaidlog;
+function refundTest() {
+    var self = this;
+    var paymentId = '2c5170d47f';
+    OrderPaidLog.findOne({paymentId: paymentId}, function(err, doc){
+        if (doc) {
+            var paymentOptions = {paymentId: doc.paymentId, price: parseFloat(doc.price).toFixed(2), payType: doc.payType, datePaid: doc.datePaid};
+            if (doc.orderId) {
+                paymentOptions.orderId = doc.orderId;
+            }
+            if (doc.queryId) {
+                paymentOptions.queryId = doc.queryId;
+            }
+            paymentOptions.refundReason = 4;
+            payRefund.call(self, paymentOptions);
+            self.respond('refund success');
+        }
+    });
+}
+
+// pay refund
+function payRefund(options) {
+    var self = this;
+    if (options) {
+        PayService.savePaymentRefund(options, function(err, orderPaymentRefund) {
+            if (err) {
+                console.error('payRefund PayService save err:', err);
+                console.error(orderPaymentRefund);
+            } else {
+                console.log(orderPaymentRefund);
+            }
+            // if (orderPaymentRefund && orderPaymentRefund.refundReason !== 3) {
+            //     // TODO refund
+            //     // console.log(orderPaymentRefund);
+            //     if (orderPaymentRefund.payType === PAYTYPE.ZHIFUBAO) {
+            //         PayService.alipayRefundNopwd(orderPaymentRefund, function(err, result) {
+            //            if (err) {
+            //                console.error('payRefund PayService alipayRefundNopwd err:', err);
+            //                return;
+            //            }
+            //            console.log(reuslt);
+            //        });
+            //     } else if (orderPaymentRefund.payType === PAYTYPE.UNIONPAY) {
+            //        console.log(orderPaymentRefund);
+            //        PayService.unionpayRefund(orderPaymentRefund, function(err, result) {
+            //            if (err) {
+            //                console.error('payRefund PayService unionpayRefund err:', err);
+            //                return;
+            //            }
+            //            console.log(reuslt);
+            //        });
+            //     }
+            // }
+        });
+    }
+}
+
 function payNotify(paymentId, options){
+    var self = this;
+    // pay success log
+    var payLog = options;
+    payLog.paymnetId = paymentId;
+    OrderService.savePaidLog(payLog);
+    // order paid
     OrderService.get({"paymentId": paymentId}, function(err, order) {
         // TODO: log err
         if (err) {
@@ -616,16 +789,57 @@ function payNotify(paymentId, options){
         }
 
         if (order) {
-            if ((order.payStatus||PAYMENTSTATUS.UNPAID) == PAYMENTSTATUS.UNPAID || order.payStatus == PAYMENTSTATUS.PARTPAID) {
-                OrderService.paid(order.id, paymentId, options, function(err) {
-                    if(err){
-                        console.error('api-v1.0 payNotify OrderService paid err:', err);
-                        // if err happen
-                        // send sms to dri
-                        dri.sendDRI('[DRI] Fail to update order in order payNotify: ', 'orderId:'+order.id, err);
-                    }
-                }); // SchemaBuilderEntity.prototype.save = function(model, helper, callback, skip)
+            var payment = {paymentId: paymentId};
+            if (options && options.price) {
+                payment.price = parseFloat(parseFloat(options.price).toFixed(2));;
             }
+            var result = OrderService.judgePaymentRefund(order, payment);
+            if (result && result.refund) {
+                var paymentOptions = options;
+                paymentOptions.paymentId = paymentId;
+                if (!paymentOptions.orderId) {
+                    paymentOptions.orderId = order.id;
+                }
+                if (result.refundReason) {
+                    paymentOptions.refundReason = result.refundReason;
+                }
+                payRefund.call(self, paymentOptions);
+            } else {
+                if ((order.payStatus||PAYMENTSTATUS.UNPAID) == PAYMENTSTATUS.UNPAID || order.payStatus == PAYMENTSTATUS.PARTPAID) {
+                    OrderService.paid(order.id, paymentId, options, function(err, result) {
+                        if (err) {
+                            if (result && result.refund) {
+                                // *TODO refund
+                                var paymentOptions = options;
+                                paymentOptions.paymentId = paymentId;
+                                if (!paymentOptions.orderId) {
+                                    paymentOptions.orderId = order.id;
+                                }
+                                if (result.refundReason) {
+                                    paymentOptions.refundReason = result.refundReason;
+                                }
+                                payRefund.call(self, paymentOptions);
+                            } else {
+                                console.error('api-v1.0 payNotify OrderService paid err:', err);
+                                // if err happen
+                                // send sms to dri
+                                var idsStr = 'orderId:' + order.id + ' paymentId:' + paymentId;
+                                dri.sendDRI('[DRI] Fail to update order in order payNotify: ', idsStr, err);
+                            }
+                        }
+                    }); // SchemaBuilderEntity.prototype.save = function(model, helper, callback, skip)
+                }
+            }
+        } else {
+            // not find order by paymentId
+            // *TODO refund or other methods
+            var paymentOptions = options;
+            paymentOptions.paymentId = paymentId;
+            if (!paymentOptions.orderId) {
+                paymentOptions.orderId = order.id;
+            }
+            paymentOptions.refundReason = 3;
+            payRefund.call(self, paymentOptions);
         }
     });
 }
@@ -644,25 +858,28 @@ function alipayNotify() {
         var status = body.trade_status;
         var price = body.total_fee || null;
         if (status == 'TRADE_SUCCESS') {
-            var options = {};
-            options.payType = PAYTYPE.ZHIFUBAO;
+            var options = {payType:PAYTYPE.ZHIFUBAO, datePaid: new Date()};
             if (price) {
                 options.price = price;
             }
-            payNotify.call(self, paymentId, options);
-            self.content('success');
-            // alipay success log
-            var payLog = {paymentId:paymentId, payType:PAYTYPE.ZHIFUBAO, price:price, datePaid: new Date()};
             if (body.trade_no) {
-                payLog.queryId = body.trade_no;
+                options.queryId = body.trade_no;
             }
             if (body.extra_common_param && body.extra_common_param.length > 0) {
                 var extra_common_param = JSON.parse(body.extra_common_param);
                 if (extra_common_param && extra_common_param.orderId) {
-                    payLog.orderId = extra_common_param.orderId;
+                    options.orderId = extra_common_param.orderId;
                 }
             }
-            OrderService.savePaidLog(payLog);
+            if (body.notify_time) {
+                options.notify_time = body.notify_time;
+            }
+            payNotify.call(self, paymentId, options);
+            self.content('success');
+            // // alipay success log
+            // var payLog = options;
+            // payLog.paymentId = paymentId;
+            // OrderService.savePaidLog(payLog);
         } else {
             self.content('success');
         }
@@ -713,18 +930,22 @@ function unionpayNotify() {
         if (result.substring(0, 'success'.length) === 'success') {
             if (body['respCode'] === 00 || body['respCode'] === '00') {
                 var paymentInfo = JSON.parse(new Buffer(body.reqReserved, 'base64').toString());
-                var paymentId = paymentInfo.paymentId;
-                var options = {price: (parseFloat(paymentInfo.txnAmt)/100).toFixed(2), orderId:paymentInfo.orderId, payType:PAYTYPE.UNIONPAY};
+                var paymentId = body.orderId || paymentInfo.paymentId;
+                var options = {price: (parseFloat(body.txnAmt)/100).toFixed(2), orderId:paymentInfo.orderId, payType:PAYTYPE.UNIONPAY, datePaid: new Date()};
+                if (body.txnTime) {
+                    options.notify_time = moment(body.txnTime,"YYYYMMDDHHmmss").format("YYYY-MM-DD HH:mm:ss");
+                }
+                if (body.queryId) {
+                    options.queryId = body.queryId;
+                }
                 payNotify.call(self, paymentId, options);
                 self.content('success');
                 // update the third-party platform payment
                 OrderService.updateThirdpartyPayment(paymentId);
-                // unionpay success log
-                var payLog = {orderId:paymentInfo.orderId, paymentId:paymentId, payType:PAYTYPE.UNIONPAY, price:(parseFloat(paymentInfo.txnAmt)/100).toFixed(2), datePaid: new Date()};
-                if (body.queryId) {
-                    payLog.queryId = body.queryId;
-                }
-                OrderService.savePaidLog(payLog);
+                // // unionpay success log
+                // var payLog = options;
+                // payLog.paymnetId = paymentId;
+                // OrderService.savePaidLog(payLog);
             } else {
                 console.error('unionpayNotify error : respCode is ', body['respCode'], 'body:', body);
                 self.content('success'); // tell the notifier we successfully handled the notification

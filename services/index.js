@@ -49,3 +49,6 @@ exports.RSC = require('./RSC');
 
 // delivery code
 exports.deliveryCode = require('./deliveryCode');
+
+// pay
+exports.pay = require('./pay');

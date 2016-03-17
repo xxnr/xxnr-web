@@ -68,7 +68,7 @@
 	        		<span class="mr5 green">未关闭</span>
 	        	{{ fi }}
 	        </td>
-	        <td style="width:60px" data-title="订单状态类型">
+	        <td style="width:60px" data-title="订单状态">
 	        	{{ if order && order.orderStatus && order.orderStatus.value }}
 	        		{{ if order.orderStatus.type === 0 }}
 						<span class="red">
@@ -80,7 +80,7 @@
 					-		
 	        	{{ fi }}
 	        </td>
-	        <td style="width:60px" data-title="列表状态类型">
+	        <td style="width:60px" data-title="列表状态">
         		{{ if typeValue === 0 }}
 	        		<span class="red">已关闭</span>
 	        	{{ else }}
@@ -187,7 +187,7 @@
 				        </td>
 				    </tr>
 			        <tr>
-			        	<td class="col-xs-5 active">@(订单状态类型)</td>
+			        	<td class="col-xs-5 active">@(订单状态)</td>
 					    <td>
 			        	{{ if order && order.orderStatus && order.orderStatus.value }}
 			        		{{ if order.orderStatus.type === 0 }}
@@ -202,7 +202,7 @@
 			        	</td>
 			        </tr>
 			        <tr>
-			        	<td class="col-xs-5 active">@(列表状态类型)</td>
+			        	<td class="col-xs-5 active">@(列表状态)</td>
 			        	<td>
 		        		{{ if orderType === 0 }}
 			        		<span class="red">已关闭</span>
@@ -280,7 +280,7 @@
 		<div class="padding" style="padding-top: 0px;">
 			<div class="silver"><strong>@(支付信息)</strong></div>
 			<br />
-			<div class="silver"><strong>@(子订单信息)</strong></div>
+			<div class="silver"><strong>@(订单分阶段信息)</strong></div>
 			<br />
 			<table class="table table-bordered suborderslist" border="0">
 				<tbody data-component="template" data-component-path="orders.form">
@@ -484,7 +484,7 @@
 						        	{{ fi }}
 									</td>
 									<td class="ui-center col-xs-1">
-									{{ if p.isClosed && p.payStatus == 1 }}
+									{{ if p.isClosed }}
 						        		<span class="mr5 red">已关闭</span>
 						        	{{ else }}
 						        		<span class="mr5 green">未关闭</span>
@@ -517,10 +517,10 @@
 				{{ fi }}
 				</script>
 			</div>
+			<div data-component="error" data-component-path="orders.subOrdersresponse"></div>
 			<div data-component="visible" class="ui-buttons" data-component-path="orders.form.subOrders" data-if="orders.form.subOrders && orders.form.subOrders.length > 0">
-				<button name="submit" data-name="subOrders">@(提交修改)</button>
+				<button name="submit" data-name="subOrders" data-warning="你确认提交支付状态的修改吗?">@(提交修改)</button>
 			</div>
-			<div data-component="error" data-component-path="orders.form.subOrders.response"></div>
 		</div>
 		<hr />
 
@@ -567,14 +567,11 @@
 			</script>
 			</div>
 
-			<!-- <div class="ui-buttons">
-				<button name="submit" data-name="products">@(提交修改)</button>
-			</div>
-			<div data-component="error" data-component-path="orders.form.products.response"></div> -->
+			<div data-component="error" data-component-path="orders.productsresponse"></div>
 			<div data-component="visible" class="ui-buttons" data-component-path="orders.form.products" data-if="orders.form.products && orders.form.products.length > 0">
-				<button name="submit" data-name="products">@(提交修改)</button>
+				<button name="submit" data-name="products" data-warning="你确认提交商品发货状态的修改吗?">@(提交修改)</button>
 			</div>
-			<div data-component="error" data-component-path="orders.form.products.response"></div>
+			
 		</div>
 
 		<div class="padding" style="padding-top: 0px;">
@@ -628,10 +625,11 @@
 			</script>
 			</div>
 
+			<div data-component="error" data-component-path="orders.SKUsresponse"></div>
 			<div data-component="visible" class="ui-buttons" data-component-path="orders.form.SKUs" data-if="orders.form.SKUs && orders.form.SKUs.length > 0">
-				<button name="submit" data-name="SKUs">@(提交修改)</button>
+				<button name="submit" data-name="SKUs" data-warning="你确认提交SKU发货状态的修改吗?">@(提交修改)</button>
 			</div>
-			<div data-component="error" data-component-path="orders.form.SKUs.response"></div>
+			
 		</div>
 	</div>
 	<!-- <div data-component="error" data-component-path="orders.response"></div> -->
@@ -655,6 +653,9 @@
 	// orders.deliverStatuses = [{name:'未发货',value:1},{name:'已发货',value:2}];
 	// orders.form.payStatuses = [{name:'未支付',value:1},{name:'已支付',value:2}];
 	orders.response;
+	orders.subOrdersresponse;
+	orders.productsresponse;
+	orders.SKUsresponse;
 
 	ON('#orders.grid', function(component) {
 
@@ -682,6 +683,9 @@
                         SET('orders.deliverStatuses',[{name:'未发货',value:1},{name:'已发货',value:2},{name:'已到服务站',value:4}], true);
                         SET('orders.payTypes',[{name:'支付宝',value:1},{name:'银联',value:2},{name:'现金',value:3},{name:'线下POS机',value:4}], true);
 						SET('orders.response', null);
+						SET('orders.subOrdersresponse', null);
+						SET('orders.productsresponse', null);
+						SET('orders.SKUsresponse', null);
 						SET('common.form', 'orders');
 					});
 					break;
@@ -697,16 +701,23 @@
 	ON('#orders.form', function(component) {
 
 		component.submit = function(hide, button) {
+			var datawarning = "你确认提交本次修改吗?";
 			var dataname = $(button).attr('data-name');
+			var warning = $(button).attr('data-warning');
+			if (warning) {
+				datawarning = warning;
+			}
 			if (dataname) {
 				if (orders.form[dataname]) {
 					var postdata = {};
 					var posturl = managerurl + '/api/orders/' + dataname;
 					postdata['id'] = orders.form.id;
 					postdata[dataname] = orders.form[dataname];
+					if (!confirm(datawarning))
+						return;
 					$.components.PUT(posturl, postdata, function(response) {
 
-						var responsekey = 'orders.form.' + dataname + '.response';
+						var responsekey = 'orders.' + dataname + 'response';
 
 						if (response && response.code && parseInt(response.code) !== 1000) {
 							if (response.error)
