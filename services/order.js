@@ -1768,4 +1768,14 @@ OrderService.prototype.judgePaymentRefund = function(order, thePayment) {
 	return {refund: false};
 };
 
+OrderService.prototype.getPaymentInOrder = function (order, paymentId) {
+	for (var payment in order.payments) {
+		if (payment.id == paymentId) {
+			return payment;
+		}
+	}
+
+	return null;
+};
+
 module.exports = new OrderService();

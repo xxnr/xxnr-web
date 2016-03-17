@@ -255,10 +255,7 @@ function offlinePay(){
 // common pay notify function
 function payNotify(paymentId, options){
     var self = this;
-    // pay success log
-    var payLog = options;
-    payLog.paymentId = paymentId;
-    OrderService.savePaidLog(payLog);
+
     // order paid
     OrderService.get({"paymentId": paymentId}, function(err, order) {
         // TODO: log err
@@ -269,7 +266,7 @@ function payNotify(paymentId, options){
         if (order) {
             var payment = {paymentId: paymentId};
             if (options && options.price) {
-                payment.price = parseFloat(parseFloat(options.price).toFixed(2));;
+                payment.price = parseFloat(parseFloat(options.price).toFixed(2));
             }
             var result = OrderService.judgePaymentRefund(order, payment);
             if (result && result.refund) {
@@ -320,6 +317,11 @@ function payNotify(paymentId, options){
             payRefund.call(self, paymentOptions);
         }
     });
+
+    // pay success log
+    var payLog = options;
+    payLog.paymentId = paymentId;
+    OrderService.savePaidLog(payLog);
 }
 
 // alipay notify function
@@ -469,17 +471,16 @@ function process_RSC_confirm_OfflinePay(){
             return;
         }
 
-        var options = {payType:offlinePayType};
-        if(price){
-            options.price = price;
+        var payment = OrderService.getPaymentInOrder(order, paymentId);
+        if(!payment){
+            self.respond({code:1002, message:'确认付款失败'});
+            return;
         }
+
+        var options = {payType:offlinePayType, price:payment.payPrice ? payment.payPrice : payment.price};
 
         payNotify.call(self, paymentId, options);
         self.respond({code:1000, message:'success'});
-
-        // pay success log
-        var payLog = {paymentId:paymentId, payType:offlinePayType, price:price, datePaid: new Date()};
-        OrderService.savePaidLog(payLog);
     });
 }
 
