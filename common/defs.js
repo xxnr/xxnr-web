@@ -5,6 +5,23 @@ const UNDELIVERED = 1, DELIVERED = 2, PARTDELIVERED = 3, RSCRECEIVED = 4;
 const ZHIFUBAO = 1, UNIONPAY = 2;
 const ZITI = 1, SONGHUO = 2;
 const OFFLINEPAYTYPE = {CASH:3, POS:4};
+const DELIVERYTYPE = {
+    "ZITI":{
+        "id":ZITI,
+        "name":"网点自提"
+        },
+    "SONGHUO":{
+        "id":SONGHUO,
+        "name":"送货到家"
+        }
+    };
+var deliveryTypeSort = {};
+deliveryTypeSort[SONGHUO]=10;
+deliveryTypeSort[ZITI]=20;
+
+var deliveryTypeName = {};
+deliveryTypeName[SONGHUO]=DELIVERYTYPE.SONGHUO.name;
+deliveryTypeName[ZITI]=DELIVERYTYPE.ZITI.name;
 
 (function(exports){
     // your code goes here
@@ -46,19 +63,7 @@ const OFFLINEPAYTYPE = {CASH:3, POS:4};
     exports.SUBORDERTYPEKEYS = Object.freeze(
         ["DEPOSIT","BALANCE","FULL"]
     );
-    exports.DELIVERYTYPE = Object.freeze({
-        "ZITI":{
-            "id":ZITI,
-            "name":"网点自提"
-        },
-        "SONGHUO":{
-            "id":SONGHUO,
-            "name":"送货到家"
-        }
-    });
-    var deliveryTypeSort = {};
-    deliveryTypeSort[SONGHUO]=10;
-    deliveryTypeSort[ZITI]=20;
-
+    exports.DELIVERYTYPE = Object.freeze(DELIVERYTYPE);
     exports.DELIVERYTYPESORT = Object.freeze(deliveryTypeSort);
+    exports.DELIVERYTYPENAME = Object.freeze(deliveryTypeName);
 })(typeof exports === 'undefined'? this['defs']={}: exports);

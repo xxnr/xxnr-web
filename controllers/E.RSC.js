@@ -9,6 +9,7 @@ var OrderService = services.order;
 var PAYMENTSTATUS = require('../common/defs').PAYMENTSTATUS;
 var DELIVERSTATUS = require('../common/defs').DELIVERSTATUS;
 var DELIVERYTYPE = require('../common/defs').DELIVERYTYPE;
+var DELIVERYTYPENAME = require('../common/defs').DELIVERYTYPENAME;
 var DeliveryCodeService = services.deliveryCode;
 
 exports.install = function() {
@@ -25,6 +26,7 @@ exports.install = function() {
     F.route('/api/v2.2/RSC',                            json_RSC_query,                 ['get'],     ['isLoggedIn']);
 
     // RSC order related
+    F.route('/api/v2.2/RSC/orderDetail',                    json_RSC_order_detail,      ['get'],    ['isLoggedIn', 'isRSC']);
     F.route('/api/v2.2/RSC/orders',                         json_RSC_orders_get,        ['get'],    ['isLoggedIn', 'isRSC']);
     F.route('/api/v2.2/RSC/order/deliverStatus/delivering', process_RSC_order_deliverStatus_delivering, ['post'],    ['isLoggedIn', 'isRSC']);
     F.route('/api/v2.2/RSC/order/selfDelivery',             process_self_delivery,        ['post'], ['isLoggedIn', 'isRSC']);
@@ -350,49 +352,8 @@ function json_RSC_query(){
 }
 
 function generate_RSC_order_type(orders){
-    /**
-     * Order types
-     * 0    :   已关闭
-     * 1    :   待付款
-     * 2    :   付款待审核
-     * 3    :   待厂家发货
-     * 4    :   待配送(有一件商品为已到服务站，且配送方式为送货到家, 订单状态为已到服务站)
-     * 5    :   待自提(有一件商品为已到服务站，且配送方式为自提, 订单状态为已到服务站)
-     * 6    :   配送中(有一件商品为已发货(配送中),订单状态为部分发货或者已发货)
-     * 7    :   已完成(全部商品为确认收货)
-     */
     orders.forEach(function(order) {
-        if (order.payStatus === PAYMENTSTATUS.PARTPAID) {
-            if (order.pendingApprove) {
-                order.type = 2;
-            } else {
-                order.type = 1;
-            }
-        } else if (order.payStatus === PAYMENTSTATUS.PAID) {
-            if (order.deliverStatus === DELIVERSTATUS.RSCRECEIVED) {
-                if (order.deliveryType === DELIVERYTYPE.ZITI.id) {
-                    order.type = 5;
-                } else if (order.deliveryType === DELIVERYTYPE.SONGHUO.id) {
-                    order.type = 4;
-                }
-            } else if (order.deliverStatus === DELIVERSTATUS.PARTDELIVERED || order.deliverStatus === DELIVERSTATUS.DELIVERED) {
-                if (order.confirmed) {
-                    order.type = 7;
-                } else {
-                    order.type = 6;
-                }
-            } else {
-                order.type = 3;
-            }
-        } else {
-            if (order.pendingApprove) {
-                order.type = 2;
-            } else if (order.isClosed) {
-                order.type = -1;
-            } else {
-                order.type = 1;
-            }
-        }
+        order.type = OrderService.RSCOrderStatus(order);
     })
 }
 
@@ -467,5 +428,55 @@ function process_self_delivery() {
                 })
             })
         })
+    })
+}
+
+function json_RSC_order_detail(){
+    var self = this;
+    var orderId = self.data.orderId;
+    var RSC = self.user;
+
+    if(!orderId){
+        self.respond({code:1001, message:'orderId required'});
+        return;
+    }
+
+    if(!RSC){
+        self.respond({code:1001, message:'need login'});
+        return;
+    }
+
+    OrderService.get({id:orderId, 'RSCInfo.RSC':self.user}, function(err, order, returnPayment){
+        if(err || !order){
+            self.respond({code:1002, message:'获取订单详情失败'});
+            return;
+        }
+
+        var orderInfo = {
+            'id':order.id,
+            'totalPrice': order.price.toFixed(2),
+            'deposit': order.deposit.toFixed(2),
+            'dateCreated': order.dateCreated,
+            'deliveryType':{type:order.deliveryType, value:DELIVERYTYPENAME[order.deliveryType]},
+            'orderStatus': OrderService.RSCOrderStatus(order),
+            'consigneeName':order.consigneeName,
+            'consigneePhone':order.consigneePhone,
+            'consigneeAddress':order.consigneeAddress,
+            'SKUList': order.SKUs,
+            'subOrders': order.subOrders,
+            'payment':returnPayment
+        };
+
+        if (order.payStatus == PAYMENTSTATUS.PAID && order.datePaid) {
+            orderInfo.datePaid = order.datePaid;
+        }
+        if (order.payStatus == DELIVERSTATUS.DELIVERED && order.dateDelivered) {
+            orderInfo.dateDelivered = order.dateDelivered;
+        }
+        if (order.confirmed && order.dateCompleted) {
+            orderInfo.dateCompleted = order.dateCompleted;
+        }
+
+        self.respond({code:1000, message:'success', order:orderInfo});
     })
 }
