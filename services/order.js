@@ -890,7 +890,7 @@ OrderService.prototype.confirm = function(orderId, SKURefs, callback) {
 
 		var allConfirmed = true;
 		order.SKUs.forEach(function (sku) {
-			if (SKURefs.indexOf(sku.ref.toString()) != -1) {
+			if (SKURefs.indexOf(sku.ref.toString()) != -1 && !sku.confirmed) {
 				// we don't check if the deliver status is delivered right now to keep it's flexibility
 				// if we find strong reason to check, we can add the check here
 				sku.confirmed = true;

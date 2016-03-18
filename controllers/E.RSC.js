@@ -401,6 +401,7 @@ function process_self_delivery() {
     var orderId = self.data.orderId;
     var code = self.data.code;
     var SKURefs = self.data.SKURefs;
+    var RSC = self.user;
 
     if (!orderId) {
         self.respond({code: 1001, message: 'orderId required'});
@@ -426,6 +427,11 @@ function process_self_delivery() {
         OrderService.get({id:orderId}, function(err, order){
             if(err || !order){
                 self.respond({code:1002, message:'获取订单失败'});
+                return;
+            }
+
+            if(!order.RSCInfo || order.RSCInfo.RSC.toString() != RSC._id.toString()){
+                self.respond({code:1002, message:'该订单不属于此网点'});
                 return;
             }
 
