@@ -462,7 +462,6 @@ function json_RSC_order_detail(){
             'consigneeName':order.consigneeName,
             'consigneePhone':order.consigneePhone,
             'consigneeAddress':order.consigneeAddress,
-            'SKUList': order.SKUs,
             'subOrders': order.subOrders,
             'payment':returnPayment
         };
@@ -482,8 +481,8 @@ function json_RSC_order_detail(){
             order.SKUs.forEach(function(SKU){
                 orderInfo.SKUList.push({
                     productId:SKU.productId,
-                    price:SKU.price,
-                    deposit:SKU.deposit,
+                    price:SKU.price.toFixed(2),
+                    deposit:SKU.deposit.toFixed(2),
                     productName:SKU.productName,
                     name:SKU.name,
                     thumbnail:SKU.thumbnail,
@@ -498,6 +497,19 @@ function json_RSC_order_detail(){
                 })
             })
         }
+
+        if(tools.isArray(order.subOrders)){
+            orderInfo.subOrders = [];
+            order.subOrders.forEach(function(subOrder){
+                orderInfo.subOrders.push({
+                    id:subOrder.id,
+                    price:subOrder.price.toFixed(2),
+                    type:subOrder.type,
+                    payStatus:subOrder.payStatus
+                })
+            })
+        }
+
         self.respond({code:1000, message:'success', order:orderInfo});
     })
 }
