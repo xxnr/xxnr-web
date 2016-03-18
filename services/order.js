@@ -29,6 +29,10 @@ OrderService.prototype.orderType = function (order) {
                 return 4;
             }
             return 3;
+        } else {
+        	if (order.deliverStatus == DELIVERSTATUS.PARTDELIVERED) {
+        		return 3;
+        	}
         }
         return 2;
     } else if (order.payStatus == PAYMENTSTATUS.PARTPAID) {
