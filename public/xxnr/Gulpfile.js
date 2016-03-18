@@ -490,7 +490,8 @@ gulp.task('rev', function() {
         'fillProfile.html',
         'xxnr_bigdata.html',
         'xxnr_finance.html',
-        'xxnr_institute.html'])
+        'xxnr_institute.html',
+        'shareApp.html'])
        //- 读取 rev-manifest.json 文件以及需要进行css名替换的文件
         .pipe(htmlreplace({
             css: 'production_css/styleAllInOne.css',
