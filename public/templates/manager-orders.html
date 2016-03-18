@@ -8,7 +8,7 @@
 			</div>
 			<div class="col-md-3 col-sm-6 m">
 				<!--<div data-component="dropdown" data-component-path="orders.filter.type" data-options="@(全部订单)|0;@(Uncompleted)|1;@(Uncompleted and not paid)|2;@(Uncompleted and paid)|3;@(Completed)|4" data-component-type="number"></div>-->
-				<div data-component="dropdown" data-component-path="orders.filter.type" data-options="@(全部订单)|;@(待付款)|1;@(待发货)|2;@(已发货)|3;@(完成)|4;@(已关闭)|0" data-empty="true" data-empty-text="@(全部订单)">@(状态筛选)</div>
+				<div data-component="dropdown" data-component-path="orders.filter.type" data-options="@(全部订单)|;@(待付款)|1;@(待发货)|2;@(待收货)|3;@(完成)|4;@(已关闭)|0" data-empty="true" data-empty-text="@(全部订单)">@(状态筛选)</div>
 			</div>
 		</div>
 	</div>
@@ -91,7 +91,7 @@
 	        				<span class="green">待发货</span>
 		        		{{ else }}
 		        			{{ if typeValue === 3 }}
-	        					<span class="green">已发货</span>
+	        					<span class="green">待收货</span>
 		        			{{ else }}
 		        				{{ if typeValue === 4 }}
 	        						<span class="green">已完成</span>
@@ -214,7 +214,7 @@
 			        				<span class="green">待发货</span>
 				        		{{ else }}
 				        			{{ if orderType === 3 }}
-			        					<span class="green">已发货</span>
+			        					<span class="green">待收货</span>
 				        			{{ else }}
 				        				{{ if orderType === 4 }}
 			        						<span class="green">已完成</span>

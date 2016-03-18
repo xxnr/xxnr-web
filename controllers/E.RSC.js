@@ -477,6 +477,27 @@ function json_RSC_order_detail(){
             orderInfo.dateCompleted = order.dateCompleted;
         }
 
+        if(tools.isArray(order.SKUs)){
+            orderInfo.SKUList = [];
+            order.SKUs.forEach(function(SKU){
+                orderInfo.SKUList.push({
+                    productId:SKU.productId,
+                    price:SKU.price,
+                    deposit:SKU.deposit,
+                    productName:SKU.productName,
+                    name:SKU.name,
+                    thumbnail:SKU.thumbnail,
+                    count:SKU.count,
+                    category:SKU.category,
+                    dateRSCReceived:SKU.dateRSCReceived,
+                    dateDelivered:SKU.dateDelivered,
+                    dateConfirmed:SKU.dateConfirmed,
+                    additions:SKU.additions,
+                    attributes:SKU.attributes,
+                    deliverStatus:SKU.deliverStatus
+                })
+            })
+        }
         self.respond({code:1000, message:'success', order:orderInfo});
     })
 }

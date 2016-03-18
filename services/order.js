@@ -30,7 +30,7 @@ OrderService.prototype.orderType = function (order) {
             }
             return 3;
         } else {
-        	if (order.deliverStatus == DELIVERSTATUS.PARTDELIVERED) {
+        	if (order.deliverStatus == DELIVERSTATUS.PARTDELIVERED || order.deliverStatus == DELIVERSTATUS.RSCRECEIVED) {
         		return 3;
         	}
         }
@@ -644,7 +644,6 @@ OrderService.prototype.updateSKUs = function(options, callback) {
 			doc.SKUs.forEach(function (sku) {
 				if (options.SKUs[sku.ref] && sku.deliverStatus !== options.SKUs[sku.ref].deliverStatus) {
 					sku.deliverStatus = options.SKUs[sku.ref].deliverStatus;
-					sku.dateSet = new Date();
 					if (sku.deliverStatus === DELIVERSTATUS.DELIVERED) {
 						sku.dateDelivered = new Date();
 					}
@@ -652,6 +651,11 @@ OrderService.prototype.updateSKUs = function(options, callback) {
 						sku.dateRSCReceived = new Date();
 						RSCReceived = true;
 						newReceivedSKUs.push(sku);
+					}
+					if (options.backendUser) {
+						sku.dateSet = new Date();
+						sku.backendUser = options.backendUser._id;
+						sku.backendUserAccount = options.backendUser.account;
 					}
 				}
 			});
@@ -742,8 +746,9 @@ OrderService.prototype.updatePayments = function(options, callback) {
 						if (payment.payType !== options.payments[payment.id].payType) {
 							payment.payType = options.payments[payment.id].payType;
 						}
-						payment.dateSet = new Date();
+
 						if (options.backendUser) {
+							payment.dateSet = new Date();
 							payment.backendUser = options.backendUser._id;
 							payment.backendUserAccount = options.backendUser.account;
 						}

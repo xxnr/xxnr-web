@@ -53,7 +53,9 @@ var schema = new mongoose.Schema({
 		}],
 		'confirmed': {type:Boolean, default:false},								// 用户确认收货
 		'dateConfirmed':Date,														// 用户确认收货时间
-		'dateRSCReceived':Date														// 货物已到服务站的时间
+		'dateRSCReceived':Date,														// 货物已到服务站的时间
+		'backendUser':{type: mongoose.Schema.ObjectId, ref:'backenduser'},			// 设置本条信息的后台用户
+		'backendUserAccount':{type: String},										// 设置本条信息的后台用户账户
 	}],
 	'payStatus': {type:Number, required:true, default: PAYMENTSTATUS.UNPAID},		// 主订单付款状态，从子订单付款状态统计得来 分为未付款、部分付款、已付款三种，只用来做查询
 	'datePaid': Date,

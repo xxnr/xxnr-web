@@ -629,7 +629,11 @@ function json_orders_SKUs_update() {
 	    	}
        	}
     }
-    OrderService.updateSKUs({'id':orderid,'SKUs':updateSKUs}, function(err) {
+	var options = {'id':orderid,'SKUs':updateSKUs};
+	if (self.user) {
+		options.backendUser = self.user;
+	}
+    OrderService.updateSKUs(options, function(err) {
 		if (err) {
 			console.error('manager json_orders_SKUs_update err:', err);
 			self.respond({code:1004, message:'系统错误，更新失败', error:[{'error':'系统错误，更新失败'}]});
