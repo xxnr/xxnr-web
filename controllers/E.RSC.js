@@ -444,7 +444,7 @@ function process_self_delivery() {
                     }
                 }
             });
-console.log(needConfirmSKURefs);
+
             OrderService.updateSKUs(deliverStatusOptions, function (err) {
                 if (err) {
                     self.respond({code: 1002, message: '更新订单失败'});

@@ -27,9 +27,12 @@ RSCService.prototype.getProvinceList = function(products, callback) {
             }
 
             var provinceList = [];
+            var provinces = {};
             RSCs.forEach(function (RSC) {
-                if (RSC.RSCInfo.companyAddress && RSC.RSCInfo.companyAddress.province) {
-                    provinceList.push(RSC.RSCInfo.companyAddress.province);
+                var address = RSC.RSCInfo.companyAddress;
+                if (address && address.province && !provinces[address.province._id]) {
+                    provinces[address.province._id] = 1;
+                    provinceList.push(address.province);
                 }
             });
 
@@ -60,9 +63,12 @@ RSCService.prototype.getCityList = function(products, province, callback) {
             }
 
             var cityList = [];
+            var cities = {};
             RSCs.forEach(function (RSC) {
-                if (RSC.RSCInfo.companyAddress && RSC.RSCInfo.companyAddress.city) {
-                    cityList.push(RSC.RSCInfo.companyAddress.city);
+                var address = RSC.RSCInfo.companyAddress;
+                if (address && address.city && !cities[address.city._id]) {
+                    cities[address.city._id] = 1;
+                    cityList.push(address.city);
                 }
             });
 
@@ -97,9 +103,12 @@ RSCService.prototype.getCountyList = function(products, province, city, callback
             }
 
             var countyList = [];
+            var counties = {};
             RSCs.forEach(function (RSC) {
-                if (RSC.RSCInfo.companyAddress && RSC.RSCInfo.companyAddress.county) {
-                    countyList.push(RSC.RSCInfo.companyAddress.county);
+                var address = RSC.RSCInfo.companyAddress;
+                if (address && address.county && !counties[address.county._id]) {
+                    counties[address.county._id] = 1;
+                    countyList.push(address.county);
                 }
             });
 
@@ -138,9 +147,12 @@ RSCService.prototype.getTownList = function(products, province, city, county, ca
             }
 
             var townList = [];
+            var towns = {};
             RSCs.forEach(function (RSC) {
-                if (RSC.RSCInfo.companyAddress && RSC.RSCInfo.companyAddress.town) {
-                    townList.push(RSC.RSCInfo.companyAddress.town);
+                var address = RSC.RSCInfo.companyAddress;
+                if (address && address.town && !towns[address.town._id]) {
+                    towns[address.town._id] = 1;
+                    townList.push(address.town);
                 }
             });
 
