@@ -401,6 +401,7 @@ function process_self_delivery() {
     var orderId = self.data.orderId;
     var code = self.data.code;
     var SKURefs = self.data.SKURefs;
+    var RSC = self.user;
 
     if (!orderId) {
         self.respond({code: 1001, message: 'orderId required'});
@@ -429,6 +430,11 @@ function process_self_delivery() {
                 return;
             }
 
+            if(!order.RSCInfo || order.RSCInfo.RSC.toString() != RSC._id.toString()){
+                self.respond({code:1002, message:'该订单不属于此网点'});
+                return;
+            }
+
             var deliverStatusOptions = {id: orderId, SKUs: []};
             var needConfirmSKURefs = [];
             SKURefs.forEach(function (SKURef) {
@@ -444,7 +450,7 @@ function process_self_delivery() {
                     }
                 }
             });
-console.log(needConfirmSKURefs);
+
             OrderService.updateSKUs(deliverStatusOptions, function (err) {
                 if (err) {
                     self.respond({code: 1002, message: '更新订单失败'});

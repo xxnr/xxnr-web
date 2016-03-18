@@ -90,7 +90,7 @@ var schema = new mongoose.Schema({
 	    'stageId': String,															// 分期付款类型ID
 	}],
 	'duePrice': {type:Number},														// 剩余金额
-	'deliveryType':{type:Number, default:DELIVERYTYPE.ZITI.id},					// 订单的配送方式
+	'deliveryType':{type:Number, default:DELIVERYTYPE.SONGHUO.id},					// 订单的配送方式
 	'RSCInfo':{																		// 订单选择的自提点信息
 		'RSC':{type:mongoose.Schema.ObjectId, ref:'user'},							// 自提点的reference
 		'companyName':{type:String},												// 自提点公司名
