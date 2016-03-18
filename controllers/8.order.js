@@ -517,7 +517,7 @@ function api10_getOrderDetails() {
             // 配送方式
             if (data.deliveryType && data.deliveryType === DELIVERYTYPE['ZITI'].id) {
                 order.deliveryType  = data.deliveryType;
-                order.address       = data.RSCInfo.RSCAddress;
+                order.address       = data.RSCInfo && data.RSCInfo.RSCAddress ? data.RSCInfo.RSCAddress : '';
                 order.RSCInfo       = data.RSCInfo;
             } else {
                 order.deliveryType  = DELIVERYTYPE['SONGHUO'].id;

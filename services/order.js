@@ -1368,7 +1368,7 @@ OrderService.prototype.checkPayStatus = function(options, callback) {
 	};
 
 	if (options && options.order) {
-		self.checkPayStatusDetail(options.order, function(err, order, payment) {
+		self._checkPayStatus(options.order, function(err, order, payment) {
 			if (err) {
 				callback(err, null, null);
 				return;
@@ -1384,7 +1384,7 @@ OrderService.prototype.checkPayStatus = function(options, callback) {
 					return;
 				}
 				if (doc) {
-					self.checkPayStatusDetail(doc, function(err, order, payment) {
+					self._checkPayStatus(doc, function(err, order, payment) {
 						if (err) {
 							callback(err, null, null);
 							return;
@@ -1404,8 +1404,13 @@ OrderService.prototype.checkPayStatus = function(options, callback) {
 	}
 }
 
-// Check order pay status by all sub orders payments' pay status and get order payment
-OrderService.prototype.checkPayStatusDetail = function(order, callback) {
+/**
+ * Check order pay status by all sub orders payments' pay status and get order payment
+ * @param  {Object}   order    Order info in DB
+ * @param  {Function} callback callback function
+ * @return {null}     the end exec callback
+ */
+OrderService.prototype._checkPayStatus = function(order, callback) {
 	var self = this;
 	if (order) {
 		var setValues = {};							// order need set values
@@ -1537,6 +1542,10 @@ OrderService.prototype.checkPayStatusDetail = function(order, callback) {
 							}
 							orderPayment = payment;
 							break
+						}
+					} else {
+						if (!order.depositPaid && key === SUBORDERTYPE.DEPOSIT) {
+							setValues['depositPaid'] = true;
 						}
 					}
 				}
