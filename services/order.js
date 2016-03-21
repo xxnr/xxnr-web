@@ -363,8 +363,8 @@ OrderService.prototype.splitAndaddOrder = function(options, callback) {
         	if (options.RSC.RSCInfo.companyName) {
         		RSCInfo.companyName = options.RSC.RSCInfo.companyName;
         	}
-        	if (options.RSC.RSCInfo.RSCPhone) {
-        		RSCInfo.RSCPhone = options.RSC.RSCInfo.RSCPhone;
+        	if (options.RSC.RSCInfo.phone) {
+        		RSCInfo.RSCPhone = options.RSC.RSCInfo.phone;
         	}
         }
         if (!options.consigneeName) {
