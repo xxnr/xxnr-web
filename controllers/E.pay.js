@@ -22,7 +22,6 @@ exports.install = function() {
     F.route('/unionpay/notify', unionpayNotify, ['post','raw']);
     // offline pay notify
     F.route('/api/v2.2/getOfflinePayType',              json_offline_pay_type, ['get']);
-    // TODO: not tested and documented apis, add more conditions, need more tests
     F.route('/api/v2.2/RSC/confirmOfflinePay',          process_RSC_confirm_OfflinePay, ['get'],    ['isLoggedIn', 'isRSC']);
     // pay refund
     F.route('/dynamic/alipay/refund_fastpay_by_platform_nopwd_notify.asp', alipayRefundNotify, ['post','raw']);

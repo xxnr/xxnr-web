@@ -1673,12 +1673,12 @@ OrderService.prototype.getByRSC = function(RSC, page, max, type, callback){
 				break;
 			case 3:		//待配送
 				query.payStatus = PAYMENTSTATUS.PAID;
-				query.deliverStatus = DELIVERSTATUS.RSCRECEIVED;
+				query.deliverStatus = {$in:[DELIVERSTATUS.RSCRECEIVED, DELIVERSTATUS.PARTDELIVERED]};
 				query.deliveryType = DELIVERYTYPE.SONGHUO.id;
 				break;
 			case 4:		//待自提
 				query.payStatus = PAYMENTSTATUS.PAID;
-				query.deliverStatus = DELIVERSTATUS.RSCRECEIVED;
+				query.deliverStatus = {$in:[DELIVERSTATUS.RSCRECEIVED, DELIVERSTATUS.PARTDELIVERED]};
 				query.deliveryType = DELIVERYTYPE.ZITI.id;
 				break;
 			case 5:		//已完成
