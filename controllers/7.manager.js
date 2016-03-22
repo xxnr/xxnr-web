@@ -1640,7 +1640,9 @@ function json_payrefund_update() {
 
 function json_RSC_query(){
 	var self = this;
-	RSCService.getRSCList(null, null, null, null, null, self.data.page, self.data.max, function(err, RSCs, count, pageCount){
+	var page = U.parseInt(self.data.page, 1) - 1;
+	var max = U.parseInt(self.data.max, 20);
+	RSCService.getRSCList(null, null, null, null, null, page, max, function(err, RSCs, count, pageCount){
 		if(err){
 			self.respond({code:1002, message:err});
 			return;
