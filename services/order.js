@@ -1160,10 +1160,6 @@ OrderService.prototype.getPayOrderPaymentInfo = function(order, payment, payPric
 			    });
 			}
 	    });
-	} else {
-		console.error('OrderService getPayOrderPaymentInfo update payment not find setValues(type=2).');
-        callback('not find the setValues');
-        return;
 	}
 };
 
