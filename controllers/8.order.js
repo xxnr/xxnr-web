@@ -38,6 +38,7 @@ var DELIVERSTATUS = require('../common/defs').DELIVERSTATUS;
 var PAYTYPE = require('../common/defs').PAYTYPE;
 var tools = require('../common/tools');
 var DELIVERYTYPE = require('../common/defs').DELIVERYTYPE;
+var DELIVERYTYPENAME = require('../common/defs').DELIVERYTYPENAME;
 
 function getOdersList(callback) {
 	var self = this;
@@ -85,7 +86,11 @@ function getOders() {
                 if (!typeValue) {
                     item.typeValue = OrderService.orderType(item);
                 }
-                var orderInfo = {'totalPrice':item.price.toFixed(2), 'deposit':item.deposit.toFixed(2), 'dateCreated':item.dateCreated, 'orderStatus': OrderService.orderStatus(item)};
+                var orderInfo = {'totalPrice':item.price.toFixed(2)
+                    , 'deposit':item.deposit.toFixed(2)
+                    , 'dateCreated':item.dateCreated
+                    , 'orderStatus': OrderService.orderStatus(item)
+                    , 'deliveryType':{type:item.deliveryType, value:DELIVERYTYPENAME[item.deliveryType]}};
                 if (item.payStatus == PAYMENTSTATUS.PAID && item.datePaid) {
                     orderInfo.datePaid = item.datePaid;
                 }
@@ -128,7 +133,12 @@ function api10_getOders() {
                 if (!typeValue) {
                     typeValue = OrderService.orderType(item);
                 }
-                var orderInfo = {'totalPrice':item.price.toFixed(2), 'deposit':item.deposit.toFixed(2), 'dateCreated':item.dateCreated, 'orderStatus': OrderService.orderStatus(item)};
+
+                var orderInfo = {'totalPrice':item.price.toFixed(2)
+                    , 'deposit':item.deposit.toFixed(2)
+                    , 'dateCreated':item.dateCreated
+                    , 'orderStatus': OrderService.orderStatus(item)
+                    , 'deliveryType':{type:item.deliveryType, value:DELIVERYTYPENAME[item.deliveryType]}};
                 if (item.payStatus == PAYMENTSTATUS.PAID && item.datePaid) {
                     orderInfo.datePaid = item.datePaid;
                 }
