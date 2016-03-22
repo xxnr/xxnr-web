@@ -14,6 +14,7 @@ var CategoryService = services.category;
 var PotentialCustomerService = services.potential_customer;
 var AuditlogService = services.auditservice;
 var PayService = services.pay;
+var RSCService = services.RSC;
 var PAYMENTSTATUS = require('../common/defs').PAYMENTSTATUS;
 var DELIVERSTATUS = require('../common/defs').DELIVERSTATUS;
 
@@ -153,6 +154,7 @@ exports.install = function() {
 
 	// RSC
 	F.route(CONFIG('manager-url') + '/api/v2.2/RSCInfo/{_id}',				json_RSC_info_get, ['get'], ['backend_auth']);
+	F.route(CONFIG('manager-url') + '/api/v2.2/RSCs',						json_RSC_query, ['get'], ['backend_auth']);
 
 	// pay refund
 	F.route(CONFIG('manager-url') + '/api/payrefunds/',            			json_payrefund_query, ['get'], ['backend_auth']);
@@ -1634,4 +1636,16 @@ function json_payrefund_update() {
 			self.respond({code:1000, message:'success'});
 		});
 	});
+}
+
+function json_RSC_query(){
+	var self = this;
+	RSCService.getRSCList(null, null, null, null, null, self.data.page, self.data.max, function(err, RSCs, count, pageCount){
+		if(err){
+			self.respond({code:1002, message:err});
+			return;
+		}
+
+		self.respond({code:1000, message:'success', RSCs:RSCs, count:count, pageCount:pageCount});
+	}, self.data.search)
 }
