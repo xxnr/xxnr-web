@@ -526,11 +526,11 @@ function api10_getOrderDetails() {
             order.recipientPhone    = data.consigneePhone;
             // 配送方式
             if (data.deliveryType && data.deliveryType === DELIVERYTYPE['ZITI'].id) {
-                order.deliveryType  = data.deliveryType;
+                order.deliveryType  = {type:data.deliveryType, value:DELIVERYTYPENAME[data.deliveryType]};
                 order.address       = data.RSCInfo && data.RSCInfo.RSCAddress ? data.RSCInfo.RSCAddress : '';
                 order.RSCInfo       = data.RSCInfo;
             } else {
-                order.deliveryType  = DELIVERYTYPE['SONGHUO'].id;
+                order.deliveryType  = {type:DELIVERYTYPE['SONGHUO'].id, value:DELIVERYTYPENAME[DELIVERYTYPE['SONGHUO'].id]};
                 order.address       = data.consigneeAddress;
             }
             order.remarks           = '';
