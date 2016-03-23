@@ -16,10 +16,8 @@ var ProductService = function(){};
 ProductService.prototype.query = function(options, callback, oldSchema) {
 
     // page max num
-    var pagemax = 50;
-    var max = U.parseInt(options.max, 20);
     options.page = U.parseInt(options.page) - 1;
-    options.max = max > pagemax ? pagemax : max;
+    options.max =  U.parseInt(options.max, 20);
 
     if (options.id && typeof(options.id) === 'string')
         options.ids = options.id.split(',');

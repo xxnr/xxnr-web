@@ -106,6 +106,10 @@ function getProducts() {
 	if(max)
 		options.max = max;
 
+    var pagemax = 50;
+    max = U.parseInt(options.max, 20);
+    options.max = max > pagemax ? pagemax : max;
+
     ProductService.query(options, function(err, data) {
         if(err){
             self.respond({code:1001, message:'查询失败'});
@@ -141,6 +145,10 @@ function getGoodsListPage(transformer) {
 
 	if (max)
 		options.max = max;
+
+    var pagemax = 50;
+    max = U.parseInt(options.max, 20);
+    options.max = max > pagemax ? pagemax : max;
 
     if (brandName)
         options.brandName = decodeURI(brandName).split(',');

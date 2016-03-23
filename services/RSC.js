@@ -160,8 +160,8 @@ RSCService.prototype.getTownList = function(products, province, city, county, ca
         })
 };
 
-RSCService.prototype.getRSCList = function(products, province, city, county, town, page, max, callback) {
-    var query = {RSCInfo:{$exists:true}};
+RSCService.prototype.getRSCList = function(products, province, city, county, town, page, max, callback, search) {
+    var query = {RSCInfo:{$exists:true}, typeVerified:{$all:[5]}};
     if(tools.isArray(products) && products.length>0){
         query['RSCInfo.products'] = {$all: products};
     }
@@ -192,6 +192,12 @@ RSCService.prototype.getRSCList = function(products, province, city, county, tow
 
     if(max>50){
         max = 50;
+    }
+
+    if(search){
+        query.$or = [{'RSCInfo.name':new RegExp(search)}
+            , {'RSCInfo.phone':new RegExp(search)}
+            , {'RSCInfo.companyName':new RegExp(search)}];
     }
 
     UserModel.count(query, function(err, count) {
