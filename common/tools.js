@@ -63,13 +63,13 @@ function sendPhoneMessage(phonenumber, content) {
         res.setEncoding('utf8');
         res.on('data', function (chunk) {
             if ((chunk.indexOf('<returnstatus>Success</returnstatus>', 0) == -1) || (chunk.indexOf('<message>ok</message>', 0) == -1)) {
-                console.log(chunk);
+                console.error('sendPhoneMessage return err:', chunk);
             }
         });
     });
 
     req.on('error', function (e) {
-        console.log('problem with request: ' + e.message);
+        console.error('problem with request:', e.message);
     });
 
     // req.write(postData); we don't have body.
@@ -245,4 +245,45 @@ exports.isOfflinePayType = function(type){
 
 exports.isArray = function(obj) {
     return obj instanceof Array;
+};
+
+/**
+ * http request function
+ * @param  {object}   httpOptions http request options
+ * @param  {Function} callback    callback function
+ * @return {null}     only callback
+ */
+exports.httpRequest = function(options, callback) {
+    if (!options) {
+        callback('options is null');
+        return;
+    }
+    if (!options.httpOptions) {
+        callback('httpOptions is null');
+        return;
+    }
+
+    var req = http.request(options.httpOptions, function (res) {
+        res.setEncoding('utf8');
+        res.on('data', function (chunk) {
+            if (res.statusCode == 200) {
+                callback(null, chunk);
+            } else {
+                callback(res.statusCode, chunk);
+            }
+        });
+    });
+
+    if (options.postData) {
+        req.write(options.postData);
+    }
+
+    req.on('error', function (e) {
+        console.error('tools httpRequest error:', e);
+        callback(e);
+    });
+
+    
+
+    req.end();
 };
