@@ -16,6 +16,8 @@ var converter = require('../common/converter');
 var api10 = converter.api10;
 var mongoose = require('mongoose');
 var DeliveryCodeModel = require('../models').deliveryCode;
+var umengConfig = require('../configuration/umeng_config');
+var UMENG = MODULE('umeng');
 
 // Service
 var OrderService = function(){};
@@ -669,8 +671,12 @@ OrderService.prototype.updateSKUs = function(options, callback) {
 				callback(null);
 			});
 
-			if(RSCReceived && doc.deliveryType == DELIVERYTYPE.ZITI.id && doc.payStatus == PAYMENTSTATUS.PAID){
-				self.generateDeliveryCode(doc.id, newReceivedSKUs);
+			if (RSCReceived) {
+				if (doc.deliveryType == DELIVERYTYPE.ZITI.id && doc.payStatus == PAYMENTSTATUS.PAID){
+					self.generateDeliveryCodeandNotify(doc, newReceivedSKUs);
+				} else if (doc.payStatus !== PAYMENTSTATUS.PAID) {
+					UMENG.sendCustomizedcast(umengConfig.types.pay, order.buyerId, {orderId: order.id});
+				}
 			}
 		} else {
 			callback('未查找到订单');
@@ -678,12 +684,12 @@ OrderService.prototype.updateSKUs = function(options, callback) {
 	});
 };
 
-OrderService.prototype.generateDeliveryCode = function(orderId, newArrivedSKUs, callback){
-	DeliveryCodeModel.findOne({orderId:orderId}, function(err, deliveryCode){
+OrderService.prototype.generateDeliveryCodeandNotify = function(order, newArrivedSKUs, callback){
+	DeliveryCodeModel.findOne({orderId:order.id}, function(err, deliveryCode){
 		if(!err){
 			var newSKUReceivedProcessor = function(){
 				if(callback){
-					DeliveryCodeModel.findOne({orderId:orderId}, function(err, deliveryCode){
+					DeliveryCodeModel.findOne({orderId:order.id}, function(err, deliveryCode){
 						if(err){
 							callback(err);
 							return;
@@ -695,13 +701,15 @@ OrderService.prototype.generateDeliveryCode = function(orderId, newArrivedSKUs, 
 
 				if(newArrivedSKUs){
 					// TODO : notify app new SKU can be self delivered
+					// umeng send message to app
+					UMENG.sendCustomizedcast(umengConfig.types.ziti, order.buyerId, {orderId: order.id});
 				}
 			};
 
 			if(!deliveryCode || !deliveryCode.code){
 				// generate code and insert
 				var code = U.GUID(6);
-				var newDeliveryCode = new DeliveryCodeModel({orderId:orderId, code: code});
+				var newDeliveryCode = new DeliveryCodeModel({orderId:order.id, code: code});
 				newDeliveryCode.save(function(err){
 					if(err && 11000 != err.code){
 						// if error is dup key err, it means we already has one record, we don't need to insert
@@ -1372,16 +1380,16 @@ OrderService.prototype.checkDeliverStatus = function(order) {
 // Check order pay status by all sub orders payments' pay status and get order payment
 OrderService.prototype.checkPayStatus = function(options, callback) {
 	var self = this;
-	var returnProcessor = function(order, payment){
-		callback(null, order, payment);
-		if(order.payStatus === PAYMENTSTATUS.PAID && order.deliveryType === DELIVERYTYPE.ZITI.id && order.deliverStatus === DELIVERSTATUS.RSCRECEIVED){
+	var returnProcessor = function(oldOrder, newOrder, payment){
+		callback(null, newOrder, payment);
+		if(oldOrder.payStatus !== newOrder.payStatus && newOrder.payStatus === PAYMENTSTATUS.PAID && newOrder.deliveryType === DELIVERYTYPE.ZITI.id && newOrder.deliverStatus === DELIVERSTATUS.RSCRECEIVED){
 			var newReceivedSKUs = [];
-			order.SKUs.forEach(function(SKU){
+			newOrder.SKUs.forEach(function(SKU){
 				if(SKU.deliverStatus == DELIVERSTATUS.RSCRECEIVED){
 					newReceivedSKUs.push(SKU);
 				}
 			});
-			self.generateDeliveryCode(order.id, newReceivedSKUs);
+			self.generateDeliveryCodeandNotify(newOrder, newReceivedSKUs);
 		}
 	};
 
@@ -1391,7 +1399,7 @@ OrderService.prototype.checkPayStatus = function(options, callback) {
 				callback(err, null, null);
 				return;
 			}
-			returnProcessor(order, payment);
+			returnProcessor(options.order, order, payment);
 			return;
 		});
 	} else {
@@ -1407,7 +1415,7 @@ OrderService.prototype.checkPayStatus = function(options, callback) {
 							callback(err, null, null);
 							return;
 						}
-						returnProcessor(order, payment);
+						returnProcessor(doc, order, payment);
 						return;
 					});
 				} else {

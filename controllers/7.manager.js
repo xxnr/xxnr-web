@@ -14,6 +14,7 @@ var CategoryService = services.category;
 var PotentialCustomerService = services.potential_customer;
 var AuditlogService = services.auditservice;
 var PayService = services.pay;
+var AreaService = services.area;
 var RSCService = services.RSC;
 var PAYMENTSTATUS = require('../common/defs').PAYMENTSTATUS;
 var DELIVERSTATUS = require('../common/defs').DELIVERSTATUS;
@@ -26,6 +27,11 @@ exports.install = function() {
 	F.route(CONFIG('manager-url') + '/*', 									'~manager', ['get'], ['backend_auth']);
 	F.route(CONFIG('manager-url') + '/upload/',                  			upload, ['post', 'upload'], 3084, ['backend_auth']); // 3 MB
 	F.route(CONFIG('manager-url') + '/upload/base64/',           			upload_base64, ['post'], 2048, ['backend_auth']); // 2 MB
+	// AREA
+	F.route(CONFIG('manager-url') + '/api/area/getProvinceList/',			json_province_query, ['get', 'post'], ['backend_auth']);
+	F.route(CONFIG('manager-url') + '/api/area/getCityList/',				json_city_query, ['get', 'post'], ['backend_auth']);
+	F.route(CONFIG('manager-url') + '/api/area/getCountyList/',				json_county_query, ['get', 'post'], ['backend_auth']);
+	F.route(CONFIG('manager-url') + '/api/area/getTownList/',				json_town_query, ['get', 'post'], ['backend_auth']);
 
 	// Products UPLOAD IMAGE
 	F.route(CONFIG('manager-url') + '/products/uploadImage/',    			CKEditor_uploadImage, ['post', 'upload'], 20480, ['backend_auth']); // 20 MB
@@ -261,6 +267,94 @@ function upload_base64() {
 	}
 
 	self.json('/download/' + id);
+}
+
+// ==========================================================================
+// AREA
+// ==========================================================================
+// Province
+function json_province_query() {
+	var self = this;
+	var options = {};
+
+	AreaService.queryProvince(options, function(err, data){
+		if(!data || err){
+			if (err)
+				console.log('area json_province_query err:' + err);
+			self.respond({'code':'1001','message':'没有查询到省份'});
+			return;
+		} else{
+			self.respond({'code':'1000','message':'success','datas':{"total":data.count,"rows":data.items}});
+			return;
+		}
+	});
+	
+}
+
+// City
+function json_city_query() {
+	var self = this;
+	var options = {};
+	if (self.data.provinceId)
+		options.provinceid = self.data.provinceId;
+
+	AreaService.queryCity(options, function(err, data){
+		if(!data || err){
+			if (err)
+				console.log('area json_city_query err:' + err);
+			self.respond({'code':'1001','message':'没有查询到城市'});
+			return;
+		} else{
+			self.respond({'code':'1000','message':'success','datas':{"total":data.count,"rows":data.items}});
+			return;
+		}
+	});
+}
+
+// County
+function json_county_query() {
+	var self = this;
+	var options = {};
+	if (self.data.provinceId)
+		options.provinceid = self.data.provinceId;
+	if (self.data.cityId)
+		options.cityid = self.data.cityId;
+
+	AreaService.queryCounty(options, function(err, data){
+		if(!data || err) {
+			if (err)
+				console.log('area json_county_query err:' + err);
+			self.respond({'code':'1001','message':'没有查询到县区'});
+			return;
+		} else {
+			self.respond({'code':'1000','message':'success','datas':{"total":data.count,"rows":data.items}});
+			return;
+		}
+	});
+}
+
+// Town
+function json_town_query() {
+	var self = this;
+	var options = {};
+	if (self.data.provinceId)
+		options.provinceid = self.data.provinceId;
+	if (self.data.cityId)
+		options.cityid = self.data.cityId;
+	if (self.data.countyId)
+		options.countyid = self.data.countyId;
+
+	AreaService.queryTown(options, function(err, data){
+		if(!data || err) {
+			if (err)
+				console.log('area json_town_query err:' + err);
+			self.respond({'code':'1001','message':'没有查询到乡镇'});
+			return;
+		} else {
+			self.respond({'code':'1000','message':'success','datas':{"total":data.count,"rows":data.items}});
+			return;
+		}
+	});
 }
 
 // ==========================================================================
