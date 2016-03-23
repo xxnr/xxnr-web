@@ -587,7 +587,8 @@ function api10_getOrderDetails() {
                     'deliverStatus': SKU.deliverStatus,
                     'additions':SKU.additions,
                     'attributes':SKU.attributes,
-                    'productName':SKU.productName
+                    'productName':SKU.productName,
+                    'ref':SKU.ref
                 };
             }
 
