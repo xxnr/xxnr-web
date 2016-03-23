@@ -700,7 +700,6 @@ OrderService.prototype.generateDeliveryCodeandNotify = function(order, newArrive
 				}
 
 				if(newArrivedSKUs){
-					// TODO : notify app new SKU can be self delivered
 					// umeng send message to app
 					UMENG.sendCustomizedcast(umengConfig.types.ziti, order.buyerId, {orderId: order.id});
 				}
@@ -708,7 +707,7 @@ OrderService.prototype.generateDeliveryCodeandNotify = function(order, newArrive
 
 			if(!deliveryCode || !deliveryCode.code){
 				// generate code and insert
-				var code = U.GUID(6);
+				var code = tools.generateAuthCode();
 				var newDeliveryCode = new DeliveryCodeModel({orderId:order.id, code: code});
 				newDeliveryCode.save(function(err){
 					if(err && 11000 != err.code){
