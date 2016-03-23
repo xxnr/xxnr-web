@@ -1,7 +1,7 @@
 // "use strict";
 
 const UNPAID = 1, PAID = 2, PARTPAID = 3;
-const UNDELIVERED = 1, DELIVERED = 2, PARTDELIVERED = 3, RSCRECEIVED = 4;
+const UNDELIVERED = 1, DELIVERED = 2, PARTDELIVERED = 3, RSCRECEIVED = 4, RECEIVED = 5;
 const ZHIFUBAO = 1, UNIONPAY = 2;
 const ZITI = 1, SONGHUO = 2;
 const OFFLINEPAYTYPE = {CASH:3, POS:4};
@@ -12,7 +12,7 @@ const DELIVERYTYPE = {
         },
     "SONGHUO":{
         "id":SONGHUO,
-        "name":"送货到家"
+        "name":"配送到户"
         }
     };
 var deliveryTypeSort = {};
@@ -37,7 +37,8 @@ deliveryTypeName[ZITI]=DELIVERYTYPE.ZITI.name;
         "UNDELIVERED":UNDELIVERED,
         "DELIVERED":DELIVERED,
         "PARTDELIVERED":PARTDELIVERED,
-        "RSCRECEIVED":RSCRECEIVED
+        "RSCRECEIVED":RSCRECEIVED,
+        "RECEIVED":RECEIVED
     });
     exports.PAYTYPE = Object.freeze({
         "ZHIFUBAO":ZHIFUBAO,

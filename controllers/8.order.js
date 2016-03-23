@@ -94,10 +94,10 @@ function getOders() {
                 if (item.payStatus == PAYMENTSTATUS.PAID && item.datePaid) {
                     orderInfo.datePaid = item.datePaid;
                 }
-                if (item.payStatus == DELIVERSTATUS.DELIVERED && item.dateDelivered) {
+                if (item.deliverStatus == DELIVERSTATUS.DELIVERED && item.dateDelivered) {
                     orderInfo.dateDelivered = item.dateDelivered;
                 }
-                if (item.confirmed && item.dateCompleted) {
+                if (item.deliverStatus == DELIVERSTATUS.RECEIVED && item.dateCompleted) {
                     orderInfo.dateCompleted = item.dateCompleted;
                 }
                 item.order = orderInfo;
@@ -142,10 +142,10 @@ function api10_getOders() {
                 if (item.payStatus == PAYMENTSTATUS.PAID && item.datePaid) {
                     orderInfo.datePaid = item.datePaid;
                 }
-                if (item.payStatus == DELIVERSTATUS.DELIVERED && item.dateDelivered) {
+                if (item.deliverStatus == DELIVERSTATUS.DELIVERED && item.dateDelivered) {
                     orderInfo.dateDelivered = item.dateDelivered;
                 }
-                if (item.confirmed && item.dateCompleted) {
+                if (item.deliverStatus == DELIVERSTATUS.RECEIVED && item.dateCompleted) {
                     orderInfo.dateCompleted = item.dateCompleted;
                 }
                 arr[i] = {
@@ -512,10 +512,10 @@ function api10_getOrderDetails() {
             if (data.payStatus == PAYMENTSTATUS.PAID && data.datePaid) {
                 orderInfo.datePaid = data.datePaid;
             }
-            if (data.payStatus == DELIVERSTATUS.DELIVERED && data.dateDelivered) {
+            if (data.deliverStatus == DELIVERSTATUS.DELIVERED && data.dateDelivered) {
                 orderInfo.dateDelivered = data.dateDelivered;
             }
-            if (data.confirmed && data.dateCompleted) {
+            if (data.deliverStatus == DELIVERSTATUS.RECEIVED && data.dateCompleted) {
                 orderInfo.dateCompleted = data.dateCompleted;
             }
             order.id                = data.id;
@@ -541,7 +541,6 @@ function api10_getOrderDetails() {
             order.payStatus         = data.payStatus;
             order.deliverStatus     = data.deliverStatus;
             order.payType           = data.payType;
-            order.confirmed         = data.confirmed;
             order.isClosed          = data.isClosed;
             order.order             = orderInfo;
             order.subOrders         = data.subOrders;

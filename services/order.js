@@ -24,10 +24,9 @@ var OrderService = function(){};
 // order type
 OrderService.prototype.orderType = function (order) {
     if (order.payStatus == PAYMENTSTATUS.PAID) {
-        if (order.deliverStatus == DELIVERSTATUS.DELIVERED) {
-            if (order.confirmed) {
-                return 4;
-            }
+		if (order.deliverStatus == DELIVERSTATUS.RECEIVED){
+			return 4;
+		} else if (order.deliverStatus == DELIVERSTATUS.DELIVERED) {
             return 3;
         } else {
         	if (order.deliverStatus == DELIVERSTATUS.PARTDELIVERED || order.deliverStatus == DELIVERSTATUS.RSCRECEIVED) {
@@ -71,15 +70,13 @@ OrderService.prototype.orderStatus = function (order) {
 			} else if (order.deliveryType === DELIVERYTYPE.SONGHUO.id) {
 				return {type:3, value:'待发货'};
 			}
-		} else if (order.deliverStatus === DELIVERSTATUS.PARTDELIVERED || order.deliverStatus === DELIVERSTATUS.DELIVERED) {
-			if (order.confirmed) {
-				return {type:6, value:'已完成'};
-			} else {
-				if (order.deliveryType === DELIVERYTYPE.ZITI.id) {
-					return {type:5, value:'待自提'};
-				} else if (order.deliveryType === DELIVERYTYPE.SONGHUO.id) {
-					return {type:4, value:'配送中'};
-				}
+		} else if(order.deliverStatus === DELIVERSTATUS.RECEIVED){
+			return {type:6, value:'已完成'};
+		} else if(order.deliverStatus === DELIVERSTATUS.PARTDELIVERED || order.deliverStatus === DELIVERSTATUS.DELIVERED) {
+			if (order.deliveryType === DELIVERYTYPE.ZITI.id) {
+				return {type:5, value:'待自提'};
+			} else if (order.deliveryType === DELIVERYTYPE.SONGHUO.id) {
+				return {type:4, value:'配送中'};
 			}
 		} else {
 			return {type:3, value:'待发货'};
@@ -121,15 +118,13 @@ OrderService.prototype.RSCOrderStatus = function(order){
 			} else if (order.deliveryType === DELIVERYTYPE.SONGHUO.id) {
 				return {type:4, value:'待配送'};
 			}
+		} else if (order.deliverStatus === DELIVERSTATUS.RECEIVED){
+			return {type:7, value:'已完成'};
 		} else if (order.deliverStatus === DELIVERSTATUS.PARTDELIVERED || order.deliverStatus === DELIVERSTATUS.DELIVERED) {
-			if (order.confirmed) {
-				return {type:7, value:'已完成'};
-			} else {
-				if (order.deliveryType === DELIVERYTYPE.ZITI.id) {
-					return {type:5, value:'待自提'};
-				} else if (order.deliveryType === DELIVERYTYPE.SONGHUO.id) {
-					return {type:6, value:'配送中'};
-				}
+			if (order.deliveryType === DELIVERYTYPE.ZITI.id) {
+				return {type:5, value:'待自提'};
+			} else if (order.deliveryType === DELIVERYTYPE.SONGHUO.id) {
+				return {type:6, value:'配送中'};
 			}
 		} else {
 			return {type:3, value:'待厂家发货'};
@@ -193,15 +188,13 @@ OrderService.prototype.query = function(options, callback) {
 	}
 	// paid and delivered(including: part delivered)
 	if (type === 3) {
-		mongoOptions["confirmed"] = { $ne: true };
 		mongoOptions["payStatus"] = { $eq: PAYMENTSTATUS.PAID };
-		mongoOptions["deliverStatus"] = { $ne: DELIVERSTATUS.UNDELIVERED };
+		mongoOptions["deliverStatus"] = { $in: [DELIVERSTATUS.PARTDELIVERED, DELIVERSTATUS.DELIVERED, DELIVERSTATUS.RSCRECEIVED] };
 	} 
 	// Completed
 	if (type === 4) {
-		mongoOptions["confirmed"] = { $eq: true };
 		mongoOptions["payStatus"] = { $eq: PAYMENTSTATUS.PAID };
-		mongoOptions["deliverStatus"] = { $eq: DELIVERSTATUS.DELIVERED };
+		mongoOptions["deliverStatus"] = { $eq: DELIVERSTATUS.RECEIVED };
 	}
 
 	if (options.buyer) {
@@ -652,6 +645,9 @@ OrderService.prototype.updateSKUs = function(options, callback) {
 						RSCReceived = true;
 						newReceivedSKUs.push(sku);
 					}
+					if(sku.deliverStatus === DELIVERSTATUS.RECEIVED){
+						sku.dateConfirmed = new Date();
+					}
 					if (options.backendUser) {
 						sku.dateSet = new Date();
 						sku.backendUser = options.backendUser._id;
@@ -899,20 +895,18 @@ OrderService.prototype.confirm = function(orderId, SKURefs, callback) {
 
 		var allConfirmed = true;
 		order.SKUs.forEach(function (sku) {
-			if (SKURefs.indexOf(sku.ref.toString()) != -1 && !sku.confirmed) {
-				// we don't check if the deliver status is delivered right now to keep it's flexibility
-				// if we find strong reason to check, we can add the check here
-				sku.confirmed = true;
+			if (SKURefs.indexOf(sku.ref.toString()) != -1 && sku.deliverStatus == DELIVERSTATUS.DELIVERED) {
+				sku.deliverStatus = DELIVERSTATUS.RECEIVED;
 				sku.dateConfirmed = new Date();
 			}
 
-			if(!sku.confirmed){
+			if(sku.deliverStatus != DELIVERSTATUS.RECEIVED){
 				allConfirmed = false;
 			}
 		});
 
 		if(allConfirmed){
-			order.confirmed = true;
+			order.deliverStatus = DELIVERSTATUS.RECEIVED;
 			order.dateCompleted = new Date();
 		}
 
@@ -1285,6 +1279,7 @@ OrderService.prototype.createPayment = function(suborderPayment) {
 // Check order deliver status by all products or SKUs deliver status
 OrderService.prototype.checkDeliverStatus = function(order) {
 	var items = null;
+	var oldStatus = order.deliverStatus;
 	if (order && order.SKUs && order.SKUs.length > 0) {
 		items = order.SKUs;
 	} else {
@@ -1306,6 +1301,7 @@ OrderService.prototype.checkDeliverStatus = function(order) {
 				case DELIVERSTATUS.UNDELIVERED:
 					switch(parseInt(item.deliverStatus)){
 						case DELIVERSTATUS.DELIVERED:
+						case DELIVERSTATUS.RECEIVED:
 							order.deliverStatus = DELIVERSTATUS.PARTDELIVERED;
 							break;
 						case DELIVERSTATUS.RSCRECEIVED:
@@ -1317,6 +1313,7 @@ OrderService.prototype.checkDeliverStatus = function(order) {
 				case DELIVERSTATUS.RSCRECEIVED:
 					switch(parseInt(item.deliverStatus)){
 						case DELIVERSTATUS.DELIVERED:
+						case DELIVERSTATUS.RECEIVED:
 							order.deliverStatus = DELIVERSTATUS.PARTDELIVERED;
 							break;
 						case DELIVERSTATUS.RSCRECEIVED:
@@ -1328,6 +1325,7 @@ OrderService.prototype.checkDeliverStatus = function(order) {
 				case DELIVERSTATUS.DELIVERED:
 					switch(parseInt(item.deliverStatus)) {
 						case DELIVERSTATUS.DELIVERED:
+						case DELIVERSTATUS.RECEIVED:
 							order.deliverStatus = DELIVERSTATUS.DELIVERED;
 							break;
 						case DELIVERSTATUS.RSCRECEIVED:
@@ -1339,6 +1337,17 @@ OrderService.prototype.checkDeliverStatus = function(order) {
 				case DELIVERSTATUS.PARTDELIVERED:
 					order.deliverStatus = DELIVERSTATUS.PARTDELIVERED;
 					break;
+				case DELIVERSTATUS.RECEIVED:
+					switch(parseInt(item.deliverStatus)) {
+						case DELIVERSTATUS.DELIVERED:
+						case DELIVERSTATUS.RSCRECEIVED:
+						case DELIVERSTATUS.UNDELIVERED:
+							order.deliverStatus = DELIVERSTATUS.PARTDELIVERED;
+							break;
+						case DELIVERSTATUS.RECEIVED:
+							order.deliverStatus = DELIVERSTATUS.RECEIVED;
+							break;
+					}
 			}
 		}
 
@@ -1346,8 +1355,12 @@ OrderService.prototype.checkDeliverStatus = function(order) {
 			order.deliverStatus = DELIVERSTATUS.UNDELIVERED;
 		}
 
-		if (parseInt(order.deliverStatus) === DELIVERSTATUS.DELIVERED) {
+		if (parseInt(order.deliverStatus) === DELIVERSTATUS.DELIVERED && order.deliverStatus != oldStatus) {
 			order.dateDelivered = new Date();
+		}
+
+		if(parseInt(order.deliverStatus) === DELIVERSTATUS.RECEIVED  && order.deliverStatus != oldStatus){
+			order.dateCompleted = new Date();
 		}
 	}
 	if (!order.deliverStatus) {
@@ -1679,8 +1692,7 @@ OrderService.prototype.getByRSC = function(RSC, page, max, type, callback){
 				break;
 			case 5:		//已完成
 				query.payStatus = PAYMENTSTATUS.PAID;
-				query.deliverStatus = DELIVERSTATUS.DELIVERED;
-				query.confirmed = true;
+				query.deliverStatus = DELIVERSTATUS.RECEIVED;
 				break;
 			default:
 				break;
@@ -1695,7 +1707,7 @@ OrderService.prototype.getByRSC = function(RSC, page, max, type, callback){
 		}
 
 		OrderModel.find(query)
-			.select('dateCreated id consigneeName consigneePhone SKUs price subOrders payments deliveryType pendingApprove confirmed payStatus deliverStatus')
+			.select('dateCreated id consigneeName consigneePhone SKUs price subOrders payments deliveryType pendingApprove payStatus deliverStatus')
 			.sort({dateCreated:-1})
 			.skip(page * max)
 			.limit(max)

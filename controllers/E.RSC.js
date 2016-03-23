@@ -469,10 +469,10 @@ function json_RSC_order_detail(){
         if (order.payStatus == PAYMENTSTATUS.PAID && order.datePaid) {
             orderInfo.datePaid = order.datePaid;
         }
-        if (order.payStatus == DELIVERSTATUS.DELIVERED && order.dateDelivered) {
+        if (order.deliverStatus == DELIVERSTATUS.DELIVERED && order.dateDelivered) {
             orderInfo.dateDelivered = order.dateDelivered;
         }
-        if (order.confirmed && order.dateCompleted) {
+        if (order.deliverStatus == DELIVERSTATUS.RECEIVED && order.dateCompleted) {
             orderInfo.dateCompleted = order.dateCompleted;
         }
 

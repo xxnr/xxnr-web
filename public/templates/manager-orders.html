@@ -16,7 +16,7 @@
 <div class="container">
 	<div data-component="grid" data-component-path="orders.grid" data-max="auto" data-options-page="@(Page: #)" data-options-button="@(查看更多订单)" data-component-id="orders.grid">
 		<script type="text/html">
-		<tr{{ if confirmed }} class="order-completed"{{ fi }}>
+		<tr{{ if deliverStatus==5 }} class="order-completed"{{ fi }}>
 	        <td style="width:40px" class="silver hidden-xs" data-title="序号">$index</td>
 	        <td style="width:80px" class="silver hidden-xs" data-title="订单号">{{ id }}</td>
 	        <!--<td style="width:80px" class="silver hidden-xs" data-title="商品" title="{{ if products && products.length > 0 }}{{ products[0].name }}{{ fi }}">-->
@@ -55,7 +55,11 @@
 							{{ if deliverStatus==4 }}
 								<span class="red">已到服务站</span>
 							{{ else }}
-								<span class="mr5 red">其他</span>
+								{{ if deliverStatus==5 }}
+									<span class="green">已完成</span>
+								{{ else }}
+									<span class="mr5 red">其他</span>
+								{{ fi }}
 							{{ fi }}
 	        			{{ fi }}
 	        		{{ fi }}
@@ -169,7 +173,11 @@
 										{{ if deliverStatus==4 }}
 											<span class="red">已到服务站</span>
 										{{ else }}
-						        			<span class="mr5 red">其他</span>
+											{{ if deliverStatus==5 }}
+												<span class="green">已完成</span>
+											{{ else }}
+												<span class="mr5 red">其他</span>
+											{{ fi }}
 										{{ fi }}
 				        			{{ fi }}
 				        		{{ fi }}
@@ -680,7 +688,7 @@
 
 						SET('orders.form', $.extend({}, response), true);
                         SET('orders.payStatuses',[{name:'未付款',value:1},{name:'已付款',value:2}], true);
-                        SET('orders.deliverStatuses',[{name:'未发货',value:1},{name:'已发货',value:2},{name:'已到服务站',value:4}], true);
+                        SET('orders.deliverStatuses',[{name:'未发货',value:1},{name:'已发货',value:2},{name:'已到服务站',value:4},{name:'已收货',value:5}], true);
                         SET('orders.payTypes',[{name:'支付宝',value:1},{name:'银联',value:2},{name:'现金',value:3},{name:'线下POS机',value:4}], true);
 						SET('orders.response', null);
 						SET('orders.subOrdersresponse', null);

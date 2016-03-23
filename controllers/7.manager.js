@@ -521,10 +521,10 @@ function json_orders_query() {
                 if (item.payStatus == PAYMENTSTATUS.PAID && item.datePaid) {
                     orderInfo.datePaid = item.datePaid;
                 }
-                if (item.payStatus == DELIVERSTATUS.DELIVERED && item.dateDelivered) {
+                if (item.deliverStatus == DELIVERSTATUS.DELIVERED && item.dateDelivered) {
                     orderInfo.dateDelivered = item.dateDelivered;
                 }
-                if (item.confirmed && item.dateCompleted) {
+                if (item.deliverStatus == DELIVERSTATUS.RECEIVED && item.dateCompleted) {
                     orderInfo.dateCompleted = item.dateCompleted;
                 }
                 item.order = orderInfo;
@@ -726,10 +726,10 @@ var convertOrderToShow = function(order){
         if (order.payStatus == PAYMENTSTATUS.PAID && order.datePaid) {
             orderInfo.datePaid = order.datePaid;
         }
-        if (order.payStatus == DELIVERSTATUS.DELIVERED && order.dateDelivered) {
+        if (order.deliverStatus == DELIVERSTATUS.DELIVERED && order.dateDelivered) {
             orderInfo.dateDelivered = order.dateDelivered;
         }
-        if (order.confirmed && order.dateCompleted) {
+        if (order.deliverStatus == DELIVERSTATUS.RECEIVED && order.dateCompleted) {
             orderInfo.dateCompleted = order.dateCompleted;
         }
         order.order = orderInfo;
