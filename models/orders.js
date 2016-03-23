@@ -51,7 +51,6 @@ var schema = new mongoose.Schema({
 			'name':{type:String, required:true},
 			'price':{type:Number, required:true}
 		}],
-		'confirmed': {type:Boolean, default:false},								// 用户确认收货
 		'dateConfirmed':Date,														// 用户确认收货时间
 		'dateRSCReceived':Date,														// 货物已到服务站的时间
 		'backendUser':{type: mongoose.Schema.ObjectId, ref:'backenduser'},			// 设置本条信息的后台用户
@@ -61,7 +60,6 @@ var schema = new mongoose.Schema({
 	'datePaid': Date,
 	'deliverStatus': {type:Number, required:true}, 									// 主订单发货状态，从商品发货状态统计得来 分为无发货、部分发货、已发货三种，只用来做查询
 	'dateDelivered': Date,
-	'confirmed': {type:Boolean, default:false},									// 主订单确认完毕
 	'dateCompleted': Date,
 	'paymentId': {type:String, required:true},										// 最新一笔支付的ID
 	'payType': {type:Number, required:true},										// 最新一笔支付的支付方式
