@@ -370,7 +370,7 @@
 <input type="file" id="products_file_cvs" class="hidden" accept="text/csv" />
 
 <script>
-    const PRICE_REGEX = /^[0-9]*(\.[0-9]{1,2})?$/;
+    var PRICE_REGEX = /^[0-9]*(\.[0-9]{1,2})?$/;
     var productckeditors = ['product_body', 'product_standard', 'product_support', 'product_app_body', 'product_app_standard', 'product_app_support'];
     var productattributes = [{'key':'huafei','name':'化肥','arr':['brands'], id:'531680A5'}, {'key':'qiche','name':'汽车','arr':['brands'], id:'6C7D8F66'}];
     var products = {};
