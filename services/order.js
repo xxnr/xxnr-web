@@ -157,6 +157,8 @@ OrderService.prototype.query = function(options, callback) {
 
 	if (options.page < 0)
 		options.page = 0;
+	if(options.max > 50)
+        options.max = 50;
 
 	var take = U.parseInt(options.max);
 	var skip = U.parseInt(options.page * options.max);
