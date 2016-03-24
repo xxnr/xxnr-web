@@ -212,7 +212,7 @@ RSCService.prototype.getRSCList = function(products, province, city, county, tow
             .populate('RSCInfo.companyAddress.city')
             .populate('RSCInfo.companyAddress.county')
             .populate('RSCInfo.companyAddress.town')
-            .select('RSCInfo.name RSCInfo.phone RSCInfo.companyName RSCInfo.companyAddress')
+            .select('id RSCInfo.name RSCInfo.phone RSCInfo.companyName RSCInfo.companyAddress')
             .skip(page * max)
             .limit(max)
             .exec(function (err, RSCs) {
@@ -225,6 +225,45 @@ RSCService.prototype.getRSCList = function(products, province, city, county, tow
                 var pageCount = Math.floor(count / max) + (count % max ? 1 : 0);
                 callback(null, RSCs, count, pageCount);
             })
+    })
+};
+
+RSCService.prototype.modifyRSCInfo = function(id, setOptions, callback){
+    if(!id){
+        callback('id required');
+        return;
+    }
+
+    var setValues = {};
+    if(setOptions.companyName)
+        setValues['RSCInfo.companyName']= setOptions.companyName;
+    if(setOptions.name)
+        setValues['RSCInfo.name'] = setOptions.name;
+    if(setOptions.IDNo)
+        setValues['RSCInfo.IDNo'] = setOptions.IDNo;
+    if(setOptions.phone)
+        setValues['RSCInfo.phone'] = setOptions.phone;
+    if(setOptions.province)
+        setValues['RSCInfo.companyAddress.province'] = setOptions.province;
+    if(setOptions.city)
+        setValues['RSCInfo.companyAddress.city'] = setOptions.city;
+    if(setOptions.county)
+        setValues['RSCInfo.companyAddress.county'] = setOptions.county;
+    if(setOptions.town)
+        setValues['RSCInfo.companyAddress.town'] = setOptions.town;
+    if(setOptions.detailAddress)
+        setValues['RSCInfo.companyAddress.details'] = setOptions.detailAddress;
+    if(setOptions.products && tools.isArray(setOptions.products))
+        setValues['RSCInfo.products'] = setOptions.products;
+    
+    UserModel.update({id:id}, {$set:setValues}, function(err){
+        if(err){
+            console.error(err);
+            callback(err);
+            return;
+        }
+        
+        callback();
     })
 };
 

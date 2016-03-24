@@ -161,6 +161,7 @@ exports.install = function() {
 	// RSC
 	F.route(CONFIG('manager-url') + '/api/v2.2/RSCInfo/{_id}',				json_RSC_info_get, ['get'], ['backend_auth']);
 	F.route(CONFIG('manager-url') + '/api/v2.2/RSCs',						json_RSC_query, ['get'], ['backend_auth']);
+	F.route(CONFIG('manager-url') + '/api/v2.2/RSC/modify',					process_RSC_modify, ['put'], ['backend_auth']);
 
 	// pay refund
 	F.route(CONFIG('manager-url') + '/api/payrefunds/',            			json_payrefund_query, ['get'], ['backend_auth']);
@@ -1657,7 +1658,7 @@ function json_RSC_info_get(id){
 			return;
 		}
 
-		self.respond({code:1000, message:'success', RSCInfo:user.RSCInfo});
+		self.respond({code:1000, message:'success', RSCInfo:user.RSCInfo, id:user.id});
 	})
 }
 
@@ -1744,4 +1745,16 @@ function json_RSC_query(){
 
 		self.respond({code:1000, message:'success', RSCs:RSCs, count:count, pageCount:pageCount});
 	}, self.data.search)
+}
+
+function process_RSC_modify(){
+	var self = this;
+	RSCService.modifyRSCInfo(self.data.id, self.data, function(err){
+		if(err){
+			self.respond({code:1002, message:err});
+			return;
+		}
+
+		self.respond({code:1000, message:'success'});
+	})
 }
