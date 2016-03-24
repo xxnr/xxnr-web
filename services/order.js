@@ -1714,7 +1714,7 @@ OrderService.prototype.getByRSC = function(RSC, page, max, type, callback){
 		}
 
 		OrderModel.find(query)
-			.select('dateCreated id consigneeName consigneePhone SKUs price subOrders payments deliveryType pendingApprove payStatus deliverStatus')
+			.select('-_id -__v -products -buyerId -buyerPhone -buyerName -payments -paymentId -payType -SKUs.backendUser -SKUs.backendUserAccount -SKUs.dateSet -SKUs._id -subOrders._id')
 			.sort({dateCreated:-1})
 			.skip(page * max)
 			.limit(max)
