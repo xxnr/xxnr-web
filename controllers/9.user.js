@@ -842,19 +842,19 @@ function json_useraddress_create() {
     if (self.data.userId)
         options.userid = self.data.userId;
     else {
-        self.respond({'code': '1001', 'message': '请求参数错误，无效的userId参数'});
+        self.respond({code: 1001, message: '请求参数错误，无效的userId参数'});
         return;
     }
     if (self.data.address)
         options.address = self.data.address;
     else {
-        self.respond({'code': '1001', 'message': '请求参数错误，无效的address参数'});
+        self.respond({code: 1001, message: '请求参数错误，无效的address参数'});
         return;
     }
     if (self.data.areaId)
         options.provinceid = self.data.areaId;
     else {
-        self.respond({'code': '1001', 'message': '请求参数错误，无效的areaId参数'});
+        self.respond({code: 1001, message: '请求参数错误，无效的areaId参数'});
         return;
     }
     if (self.data.cityId)
@@ -865,19 +865,19 @@ function json_useraddress_create() {
         options.townid = self.data.townId;
     if (self.data.receiptPhone) {
         if (!tools.isPhone(self.data.receiptPhone.toString())) {
-            self.respond({'code': '1001', 'message': '请输入正确的11位手机号'});
+            self.respond({code: 1001, message: '请输入正确的11位手机号'});
             return;
         }
         options.receiptphone = self.data.receiptPhone;
     }
     else {
-        self.respond({'code': '1001', 'message': '请求参数错误，无效的receiptPhone参数'});
+        self.respond({code: 1001, message: '请求参数错误，无效的receiptPhone参数'});
         return;
     }
     if (self.data.receiptPeople)
         options.receiptpeople = self.data.receiptPeople;
     else {
-        self.respond({'code': '1001', 'message': '请求参数错误，无效的receiptPeople参数'});
+        self.respond({code: 1001, message: '请求参数错误，无效的receiptPeople参数'});
         return;
     }
     if (self.data.type && U.parseInt(self.data.type) === 1)
@@ -889,38 +889,34 @@ function json_useraddress_create() {
         options.zipcode = self.data.zipCode;
 
 
-    UseraddressService.create(options, function (err, data) {
+    UseraddressService.create(options, function (err, result) {
         // Error
         if (err) {
             console.error('user json_useraddress_create UseraddressService create err:', err);
-            if (data) {
-                self.respond(data);
+            if (result) {
+                self.respond(result);
                 return;
             } else {
-                self.respond({'code': '1001', 'message': '保存收货地址失败'});
+                self.respond({code: 1002, message: '保存收货地址失败'});
                 return;
             }
         } else {
             // Return results
-            self.respond({'code': '1000', 'message': 'success'});
+            self.respond({code: 1000, message: 'success', datas:{addressId: result.id}});
             if (U.parseInt(self.data.type) === 1) {
-                var newaddId = data.id;
                 var Qoptions = {'userid': self.data.userId, 'type': 1};
 
-               UseraddressService.query(Qoptions, function (err, data) {
+                UseraddressService.query(Qoptions, function (err, data) {
                     if (err) {
                         console.error('user json_useraddress_create UseraddressService query err:', err);
-                        self.respond({'code': '1001', 'message': '保存收货地址失败'});
                         return;
                     }
                     var items = data.items;
                     var count = data.count;
                     for (var i = 0; i < count; i++) {
                         var item = items[i];
-//                        var updateitem = {'userid': item.userid, 'type': 2, 'id': item.id};
-
-                        data.items[i].type = 2;
-                        if (newaddId !== item.id) {
+                        if (result.id !== item.id) {
+                            data.items[i].type = 2;
                             UseraddressService.update(data.items[i], function (err, data) {
                                 if (err) {
                                     var printerror = ['重置用户', item.userid.toString(), '默认收货地址出错'];
