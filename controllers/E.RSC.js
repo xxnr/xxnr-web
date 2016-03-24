@@ -354,6 +354,7 @@ function json_RSC_query(){
 function generate_RSC_order_type(orders){
     orders.forEach(function(order) {
         order.type = OrderService.RSCOrderStatus(order);
+        order.deliveryType = {type:order.deliveryType, value:DELIVERYTYPENAME[order.deliveryType]};
     })
 }
 
