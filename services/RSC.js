@@ -256,13 +256,17 @@ RSCService.prototype.modifyRSCInfo = function(id, setOptions, callback){
     if(setOptions.products && tools.isArray(setOptions.products))
         setValues['RSCInfo.products'] = setOptions.products;
     
-    UserModel.update({id:id}, {$set:setValues}, function(err){
+    UserModel.update({id:id}, {$set:setValues}, function(err, numUpdated){
         if(err){
             console.error(err);
             callback(err);
             return;
         }
-        
+
+        if(numUpdated.updated == 0){
+            callback('修改失败')
+        }
+
         callback();
     })
 };
