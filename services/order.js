@@ -553,6 +553,10 @@ OrderService.prototype.get = function(options, callback) {
 		nor.push({'payments.id':{$ne:options.paymentId}});
 	}
 
+	if(options.RSC){
+		nor.push({'RSCInfo.RSC':{$ne:options.RSC}});
+	}
+
 	var mongoOptions = {};
 
 	if (nor.length > 0) {
