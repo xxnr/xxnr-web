@@ -1804,9 +1804,12 @@ OrderService.prototype.judgePaymentRefund = function(order, thePayment) {
 };
 
 OrderService.prototype.getPaymentInOrder = function (order, paymentId) {
-	for (var payment in order.payments) {
-		if (payment.id == paymentId) {
-			return payment;
+	if(tools.isArray(order.payments)) {
+		for (var i = 0; i < order.payments.length; i++) {
+			var payment = order.payments[i];
+			if (payment.id == paymentId) {
+				return payment;
+			}
 		}
 	}
 
