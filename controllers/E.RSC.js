@@ -481,6 +481,7 @@ function json_RSC_order_detail(){
             orderInfo.SKUList = [];
             order.SKUs.forEach(function(SKU){
                 orderInfo.SKUList.push({
+                    ref:SKU.ref,
                     productId:SKU.productId,
                     price:SKU.price.toFixed(2),
                     deposit:SKU.deposit.toFixed(2),
