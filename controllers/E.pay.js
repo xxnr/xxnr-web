@@ -460,7 +460,7 @@ function process_RSC_confirm_OfflinePay(){
             return;
         }
 
-        if(!order.RSCInfo || order.RSCInfo.RSC.toString() == RSC._id.toString()){
+        if(!order.RSCInfo || order.RSCInfo.RSC.toString() != RSC._id.toString()){
             self.respond({code:1002, message:'该订单未分配到县级网点'});
             return;
         }
