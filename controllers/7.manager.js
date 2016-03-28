@@ -1722,8 +1722,9 @@ function json_RSCorders_query() {
                 var order = orders[i];
                 var orderInfo = {
                 	id: order.id,
-                	totalPrice: order.price.toFixed(2),
-                	deposit: order.deposit.toFixed(2),
+                	totalPrice: order.price,
+                	deposit: order.deposit,
+                	duePrice: order.duePrice,
                 	// 下单时间
                 	dateCreated: order.dateCreated,
                 	// 配送方式
