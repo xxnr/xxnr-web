@@ -528,10 +528,13 @@ function api10_getOrderDetails() {
             if (data.deliveryType && data.deliveryType === DELIVERYTYPE['ZITI'].id) {
                 order.deliveryType  = {type:data.deliveryType, value:DELIVERYTYPENAME[data.deliveryType]};
                 order.address       = data.RSCInfo && data.RSCInfo.RSCAddress ? data.RSCInfo.RSCAddress : '';
-                order.RSCInfo       = data.RSCInfo;
             } else {
                 order.deliveryType  = {type:DELIVERYTYPE['SONGHUO'].id, value:DELIVERYTYPENAME[DELIVERYTYPE['SONGHUO'].id]};
                 order.address       = data.consigneeAddress;
+            }
+            // RSC info
+            if (data.RSCInfo) {
+                order.RSCInfo       = data.RSCInfo;
             }
             order.remarks           = '';
             order.deliveryTime      = '';
