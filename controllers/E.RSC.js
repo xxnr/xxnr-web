@@ -381,9 +381,12 @@ function process_self_delivery() {
     }
 
     DeliveryCodeService.checkDeliveryCode(orderId, code, function (err, pass) {
-        if (err || !pass) {
+        if (err) {
             self.respond({code: 1002, message: '验证提货码失败'});
             return;
+        }
+        if (!pass) {
+            self.respond({code: 1001, message: '自提码错误，请重新输入'});
         }
 
         OrderService.get({id:orderId}, function(err, order){

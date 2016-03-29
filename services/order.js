@@ -28,10 +28,10 @@ OrderService.prototype.orderType = function (order) {
     if (order.payStatus == PAYMENTSTATUS.PAID) {
 		if (order.deliverStatus == DELIVERSTATUS.RECEIVED){
 			return 4;
-		} else if (order.deliverStatus == DELIVERSTATUS.DELIVERED) {
+		} else if (order.deliverStatus == DELIVERSTATUS.DELIVERED || order.deliverStatus == DELIVERSTATUS.PARTDELIVERED) {
             return 3;
         } else {
-        	if (order.deliverStatus == DELIVERSTATUS.PARTDELIVERED || order.deliverStatus == DELIVERSTATUS.RSCRECEIVED) {
+        	if (order.deliverStatus == DELIVERSTATUS.RSCRECEIVED && order.deliveryType === DELIVERYTYPE.ZITI.id) {
         		return 3;
         	}
         }
@@ -187,13 +187,21 @@ OrderService.prototype.query = function(options, callback) {
     }
 	// paid and not delivered
 	if (type === 2) {
-		mongoOptions["payStatus"] = { $eq: PAYMENTSTATUS.PAID };
-		mongoOptions["deliverStatus"] = { $eq: DELIVERSTATUS.UNDELIVERED };
+		// old
+		// mongoOptions["payStatus"] = { $eq: PAYMENTSTATUS.PAID };
+		// mongoOptions["deliverStatus"] = { $eq: DELIVERSTATUS.UNDELIVERED };
+		// new
+		mongoOptions["$or"] = [{payStatus: { $eq: PAYMENTSTATUS.PAID }, deliverStatus: { $eq: DELIVERSTATUS.UNDELIVERED }}, 
+								{payStatus: { $eq: PAYMENTSTATUS.PAID }, deliveryType: { $eq: DELIVERYTYPE.SONGHUO.id }, deliverStatus: { $eq: DELIVERSTATUS.RSCRECEIVED }}];
 	}
 	// paid and delivered(including: part delivered)
 	if (type === 3) {
-		mongoOptions["payStatus"] = { $eq: PAYMENTSTATUS.PAID };
-		mongoOptions["deliverStatus"] = { $in: [DELIVERSTATUS.PARTDELIVERED, DELIVERSTATUS.DELIVERED, DELIVERSTATUS.RSCRECEIVED] };
+		// old
+		// mongoOptions["payStatus"] = { $eq: PAYMENTSTATUS.PAID };
+		// mongoOptions["deliverStatus"] = { $in: [DELIVERSTATUS.PARTDELIVERED, DELIVERSTATUS.DELIVERED, DELIVERSTATUS.RSCRECEIVED] };
+		// new
+		mongoOptions["$or"] = [{payStatus: { $eq: PAYMENTSTATUS.PAID }, deliverStatus: { $in: [DELIVERSTATUS.PARTDELIVERED, DELIVERSTATUS.DELIVERED] }}, 
+								{payStatus: { $eq: PAYMENTSTATUS.PAID }, deliveryType: { $eq: DELIVERYTYPE.ZITI.id }, deliverStatus: { $eq: DELIVERSTATUS.RSCRECEIVED }}];
 	} 
 	// Completed
 	if (type === 4) {
