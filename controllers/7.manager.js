@@ -18,6 +18,7 @@ var AreaService = services.area;
 var RSCService = services.RSC;
 var PAYMENTSTATUS = require('../common/defs').PAYMENTSTATUS;
 var DELIVERSTATUS = require('../common/defs').DELIVERSTATUS;
+var DELIVERYTYPENAME = require('../common/defs').DELIVERYTYPENAME;
 
 exports.install = function() {
 	// Auto-localize static HTML templates
@@ -161,6 +162,9 @@ exports.install = function() {
 	// RSC
 	F.route(CONFIG('manager-url') + '/api/v2.2/RSCInfo/{_id}',				json_RSC_info_get, ['get'], ['backend_auth']);
 	F.route(CONFIG('manager-url') + '/api/v2.2/RSCs',						json_RSC_query, ['get'], ['backend_auth']);
+	F.route(CONFIG('manager-url') + '/api/v2.2/RSC/modify',					process_RSC_modify, ['put'], ['backend_auth']);
+	// RSC orders
+	F.route(CONFIG('manager-url') + '/api/v2.2/RSC/orders/',              	json_RSCorders_query, ['get'], ['backend_auth']);
 
 	// pay refund
 	F.route(CONFIG('manager-url') + '/api/payrefunds/',            			json_payrefund_query, ['get'], ['backend_auth']);
@@ -1649,6 +1653,10 @@ function json_agent_info_get(id){
 	})
 }
 
+// ==========================================================================
+// RSC
+// ==========================================================================
+
 function json_RSC_info_get(id){
 	var self = this;
 	UserService.getRSCInfoById(id, function(err, user){
@@ -1657,8 +1665,101 @@ function json_RSC_info_get(id){
 			return;
 		}
 
-		self.respond({code:1000, message:'success', RSCInfo:user.RSCInfo});
+		self.respond({code:1000, message:'success', RSCInfo:user.RSCInfo, id:user.id});
 	})
+}
+
+function json_RSC_query(){
+	var self = this;
+	var page = U.parseInt(self.data.page, 1) - 1;
+	var max = U.parseInt(self.data.max, 20);
+	RSCService.getRSCList(null, null, null, null, null, page, max, function(err, RSCs, count, pageCount){
+		if(err){
+			self.respond({code:1002, message:err});
+			return;
+		}
+
+		self.respond({code:1000, message:'success', RSCs:RSCs, count:count, pageCount:pageCount});
+	}, self.data.search)
+}
+
+function process_RSC_modify(){
+	var self = this;
+	RSCService.modifyRSCInfo(self.data.id, self.data, function(err){
+		if(err){
+			self.respond({code:1002, message:err});
+			return;
+		}
+
+		self.respond({code:1000, message:'success'});
+	})
+}
+
+function json_RSCorders_query() {
+    var self = this;
+    if (!self.data.RSCId) {
+    	self.respond({code:1001, message:'获取订单失败，需要RSCId'});
+    	return;
+    }
+    var RSC = self.data.RSCId;
+    var page = U.parseInt(self.data.page, 1) - 1;
+    var max = U.parseInt(self.data.max, 20);
+    var type = U.parseInt(self.data.type);
+    if (page < 0)
+		page = 0;
+	if(max > 50)
+        max = 50;
+    OrderService.getByRSC(RSC, page, max, type, function (err, orders, count, pageCount) {
+        if (err) {
+            self.respond({code:1002, message:'获取订单失败'});
+            return;
+        }
+        
+        if (orders) {
+        	var results = [];
+	        var length = orders.length;
+	        for (var i = 0; i < length; i++) {
+                var order = orders[i];
+                var orderInfo = {
+                	id: order.id,
+                	totalPrice: order.price,
+                	deposit: order.deposit,
+                	duePrice: order.duePrice,
+                	// 下单时间
+                	dateCreated: order.dateCreated,
+                	// 配送方式
+                	delivery: {type:order.deliveryType, value:DELIVERYTYPENAME[order.deliveryType]},
+                	SKUs: order.SKUs,
+                	consigneeName: order.consigneeName,
+					consigneePhone: order.consigneePhone,
+					consigneeAddress: order.consigneeAddress,
+					RSCInfo: order.RSCInfo
+                };
+                // 订单状态
+            	orderInfo.orderStatus = OrderService.orderStatus(order);
+                // 订单合成状态
+                orderInfo.typeValue = OrderService.orderType(order);
+                // 订单RSC的合成状态
+                orderInfo.RSCtypeValue = OrderService.RSCOrderStatus(order);
+                // 支付时间
+                if (order.payStatus == PAYMENTSTATUS.PAID && order.datePaid) {
+                    orderInfo.datePaid = order.datePaid;
+                }
+               	// 发货时间
+                if (order.deliverStatus == DELIVERSTATUS.DELIVERED && order.dateDelivered) {
+                    orderInfo.dateDelivered = order.dateDelivered;
+                }
+                // 收货时间 完成时间
+                if (order.deliverStatus == DELIVERSTATUS.RECEIVED && order.dateCompleted) {
+                    orderInfo.dateCompleted = order.dateCompleted;
+                }
+                results.push(orderInfo);
+            }
+            self.respond({code:1000, message:'success', orders:results, count:count, pageCount:pageCount, page:page+1});
+        } else {
+        	self.respond({code:1000, message:'success', orders:[], count:0, pageCount:1, page:page+1});
+        }
+    });
 }
 
 // ==========================================================================
@@ -1730,18 +1831,4 @@ function json_payrefund_update() {
 			self.respond({code:1000, message:'success'});
 		});
 	});
-}
-
-function json_RSC_query(){
-	var self = this;
-	var page = U.parseInt(self.data.page, 1) - 1;
-	var max = U.parseInt(self.data.max, 20);
-	RSCService.getRSCList(null, null, null, null, null, page, max, function(err, RSCs, count, pageCount){
-		if(err){
-			self.respond({code:1002, message:err});
-			return;
-		}
-
-		self.respond({code:1000, message:'success', RSCs:RSCs, count:count, pageCount:pageCount});
-	}, self.data.search)
 }

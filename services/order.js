@@ -157,6 +157,8 @@ OrderService.prototype.query = function(options, callback) {
 
 	if (options.page < 0)
 		options.page = 0;
+	if(options.max > 50)
+        options.max = 50;
 
 	var take = U.parseInt(options.max);
 	var skip = U.parseInt(options.page * options.max);
@@ -549,6 +551,10 @@ OrderService.prototype.get = function(options, callback) {
 
 	if (options.paymentId) {
 		nor.push({'payments.id':{$ne:options.paymentId}});
+	}
+
+	if(options.RSC){
+		nor.push({'RSCInfo.RSC':{$ne:options.RSC}});
 	}
 
 	var mongoOptions = {};
@@ -1714,7 +1720,7 @@ OrderService.prototype.getByRSC = function(RSC, page, max, type, callback){
 		}
 
 		OrderModel.find(query)
-			.select('dateCreated id consigneeName consigneePhone SKUs price subOrders payments deliveryType pendingApprove payStatus deliverStatus')
+			.select('-_id -__v -products -buyerId -buyerPhone -buyerName -payments -paymentId -payType -SKUs.backendUser -SKUs.backendUserAccount -SKUs.dateSet -SKUs._id -subOrders._id')
 			.sort({dateCreated:-1})
 			.skip(page * max)
 			.limit(max)
@@ -1802,9 +1808,12 @@ OrderService.prototype.judgePaymentRefund = function(order, thePayment) {
 };
 
 OrderService.prototype.getPaymentInOrder = function (order, paymentId) {
-	for (var payment in order.payments) {
-		if (payment.id == paymentId) {
-			return payment;
+	if(tools.isArray(order.payments)) {
+		for (var i = 0; i < order.payments.length; i++) {
+			var payment = order.payments[i];
+			if (payment.id == paymentId) {
+				return payment;
+			}
 		}
 	}
 

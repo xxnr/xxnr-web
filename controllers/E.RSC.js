@@ -354,6 +354,7 @@ function json_RSC_query(){
 function generate_RSC_order_type(orders){
     orders.forEach(function(order) {
         order.type = OrderService.RSCOrderStatus(order);
+        order.deliveryType = {type:order.deliveryType, value:DELIVERYTYPENAME[order.deliveryType]};
     })
 }
 
@@ -446,7 +447,7 @@ function json_RSC_order_detail(){
         return;
     }
 
-    OrderService.get({id:orderId, 'RSCInfo.RSC':self.user}, function(err, order, returnPayment){
+    OrderService.get({id:orderId, 'RSC':self.user}, function(err, order, returnPayment){
         if(err || !order){
             self.respond({code:1002, message:'获取订单详情失败'});
             return;
@@ -480,6 +481,7 @@ function json_RSC_order_detail(){
             orderInfo.SKUList = [];
             order.SKUs.forEach(function(SKU){
                 orderInfo.SKUList.push({
+                    ref:SKU.ref,
                     productId:SKU.productId,
                     price:SKU.price.toFixed(2),
                     deposit:SKU.deposit.toFixed(2),

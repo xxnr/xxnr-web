@@ -430,7 +430,7 @@ UserService.prototype.getRSCInfoById = function(_id, callback){
         .populate({path: 'RSCInfo.companyAddress.county', select: ' -__v'})
         .populate({path: 'RSCInfo.companyAddress.town', select: ' -__v'})
         .populate({path:'RSCInfo.products', select:' _id category brand name'})
-        .select('-_id RSCInfo')
+        .select('-_id id RSCInfo')
         .exec(function(err, user){
             if(err){
                 console.error('User Service getRSCInfoById findById err:', err);

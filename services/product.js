@@ -159,6 +159,8 @@ ProductService.prototype.save = function(model, callback) {
     delete model.SKUAdditions;
     delete model.defaultSKU;
     delete model.price;
+    delete model.referencePrice;
+    delete model.SKUMarketPrice;
 
     if (!model.id)
         model.id = U.GUID(10);
