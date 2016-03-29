@@ -361,11 +361,11 @@
                                                             </a>
                                                         </div>
                                                         <div class="p-name">
-                                                            <a ng-href={{item.detailPageUrl}} ng-cloak>{{item.name}}</a>
+                                                            <a ng-href={{item.detailPageUrl}} class="ng-cloak" ng-cloak>{{item.name}}</a>
                                                         </div>
                                                         <div class="p-skus">
                                                             <ul>
-                                                                <li ng-repeat="attribute in item.attributes">
+                                                                <li class="ng-cloak" ng-repeat="attribute in item.attributes">
                                                                     {{attribute.name}}: {{attribute.value}} ;&nbsp;
                                                                 </li>
                                                             </ul>
@@ -373,9 +373,9 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="cell p-props-price" ng-cloak>￥{{item.nowPrice}}
+                                            <div class="cell p-props-price ng-cloak" ng-cloak>￥{{item.nowPrice}}
                                             </div>
-                                            <div class="cell p-buy-count" ng-cloak>{{item.buyCount}}</div>
+                                            <div class="cell p-buy-count ng-cloak" ng-cloak>{{item.buyCount}}</div>
                                             <div class="cell p-sum">
                                                 <!--<div ng-cloak>{{item.totalDeposit}}<span ng-show="{{item.deposit}}">（订金）</span></div>-->
                                                 <div class="ng-cloak" ng-class="{'hasDeposit':item.hasDeposit}">¥
@@ -391,10 +391,10 @@
                                             </div>
                                             <div class="p-additions-contents">
                                                 <p ng-repeat="addition in item.additions" class="p-additions-content">
-                                                    <span class="addition-name">{{addition.name}}</span>
-                                                    <span class="addition-price">￥ {{addition.price.toFixed(2)}}</span>
-                                                    <span class="addition-count">{{item.buyCount}}</span>
-                                                    <span class="addition-totalPrice">￥ {{(item.buyCount*addition.price).toFixed(2)}}</span>
+                                                    <span class="addition-name ng-cloak">{{addition.name}}</span>
+                                                    <span class="addition-price ng-cloak">￥ {{addition.price.toFixed(2)}}</span>
+                                                    <span class="addition-count ng-cloak">{{item.buyCount}}</span>
+                                                    <span class="addition-totalPrice ng-cloak">￥ {{(item.buyCount*addition.price).toFixed(2)}}</span>
                                                 </p>
                                             </div>
                                         </div>
@@ -423,8 +423,8 @@
                                              ng-click="buy(deliveryMethod,selectedCompanyId,consigneePhone,consigneeName)">提交订单</a>
             </div>
             <div class="right price-total">
-                <p><label>商品数量：</label><span ng-cloak>{{totalCount}}</span></p>
-                <p><label>合计：</label><span class="total" ng-cloak>￥{{totalPrice}}</span></p>
+                <p><label>商品数量：</label><span class="ng-cloak" ng-cloak>{{totalCount}}</span></p>
+                <p><label>合计：</label><span class="total ng-cloak"  ng-cloak>￥{{totalPrice}}</span></p>
                 <!--<p><label>已节省：</label><span ng-cloak>{{totalSaving}}元</span></p>-->
             </div>
         </div>
