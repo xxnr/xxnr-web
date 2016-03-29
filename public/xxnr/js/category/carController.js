@@ -3,8 +3,8 @@
  */
 var app = angular.module('product_category');
 app.controller('carController', function($scope, remoteApiService, sideService) {
-    $scope.categoryId = '6C7D8F66';
-    $scope.brandsStr = '';
+    $scope.categoryId = '6C7D8F66';    //汽车ID
+    $scope.brandsStr = '';             //所选品牌的字符串
     var brands = [];
     var attributes = [];
 
@@ -16,7 +16,7 @@ app.controller('carController', function($scope, remoteApiService, sideService) 
             }
         });
 
-    var price_ranges = [{
+    var price_ranges = [{           //写死的价格区间
         name: '0~50000元',
         isSelected: false
     }, {
@@ -29,7 +29,7 @@ app.controller('carController', function($scope, remoteApiService, sideService) 
         name: '70000元以上',
         isSelected: false
     }];
-    $scope.search_categories = [
+    $scope.search_categories = [           //筛选项
         {
             name: '品牌',
             index: 'brand',

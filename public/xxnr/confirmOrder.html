@@ -1,13 +1,16 @@
 <!doctype html>
 <html ng-app="jiesuan" ng-controller="needLoginController">
 <head>
-<meta charset="utf-8">
-<meta name="renderer" content="webkit">
-<meta name="force-rendering" content="webkit">
-<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
-<title>订单结算 - 新新农人</title>
-    <!--[if lte IE 7]><script>alert('为了更好的购物体验，请升级您的浏览器版本');window.location.href='http://cdn.dmeng.net/upgrade-your-browser.html?referrer='+location.href;</script><![endif]-->
-    <link rel='icon' href='images/title_logo.png' type='image/png' />
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit">
+    <meta name="force-rendering" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+    <title>订单结算 - 新新农人</title>
+    <!--[if lte IE 7]>
+    <script>alert('为了更好的购物体验，请升级您的浏览器版本');
+    window.location.href = 'http://cdn.dmeng.net/upgrade-your-browser.html?referrer=' + location.href;</script>
+    <![endif]-->
+    <link rel='icon' href='images/title_logo.png' type='image/png'/>
     <meta http-equiv="pragma" content="no-cache">
     <meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
     <meta http-equiv="expires" content="Wed, 26 Feb 1997 08:21:57 GMT">
@@ -33,101 +36,300 @@
     <script src="js/sweetalert.min.js"></script>
     <script src="js/sideService.js"></script>
     <!-- endbuild -->
-<script type="text/javascript">
-    var products = function(){
-        function getQueryStringByName(name){
-            var result = location.search.match(new RegExp("[\?\&]" + name+ "=([^\&]+)","i"));
-            if(result == null || result.length < 1){
-                return "";
+    <script type="text/javascript">
+        var products = function () {
+            function getQueryStringByName(name) {
+                var result = location.search.match(new RegExp("[\?\&]" + name + "=([^\&]+)", "i"));
+                if (result == null || result.length < 1) {
+                    return "";
+                }
+                return result[1];
             }
-            return result[1];
-        }
 
-        try{
-            var queryProducts = getQueryStringByName('products');
-            queryProducts = decodeURI(decodeURI(queryProducts));
-            queryProducts = JSON.parse(queryProducts);
-            var returnProducts = [];
-            for(var i in queryProducts){
-                returnProducts[queryProducts[i].id] = queryProducts[i].count;
+            try {
+                var queryProducts = getQueryStringByName('products');
+                queryProducts = decodeURI(decodeURI(queryProducts));
+                queryProducts = JSON.parse(queryProducts);
+                var returnProducts = [];
+                for (var i in queryProducts) {
+                    returnProducts[queryProducts[i].id] = queryProducts[i].count;
+                }
+                return returnProducts;
             }
-            return returnProducts;
-        }
-        catch(err){
-            return null;
-        }
-    }();
-    var productFilter = products ? function(product){
-        var productId = product._id;
-        if(products[productId] != undefined){
-            product.goodsCount = products[productId];
-            return [true,product];
-        }else{
-            return [false,product];
-        }
-    } : null;
-</script>
+            catch (err) {
+                return null;
+            }
+        }();
+        var productFilter = products ? function (product) {
+            var productId = product._id;
+            if (products[productId] != undefined) {
+                product.goodsCount = products[productId];
+                return [true, product];
+            } else {
+                return [false, product];
+            }
+        } : null;
+    </script>
 </head>
 <body ng-controller="jiesuanController" class="confirm-order">
 <header ng-controller="headerController"></header>
 <div class="wrap nav">
     <h1 class="left logo"><a href="/">新新农人</a></h1>
     <ul class="right shopping_procedure">
-        <li><img src="images/green1.png" alt=""/><p>我的购物车</p></li>
+        <li><img src="images/green1.png" alt=""/>
+            <p>我的购物车</p></li>
         <li class="procedure_line"><img src="images/green_line.png" alt=""/></li>
-        <li><img src="images/green2.png" alt=""/><p>填写核对订单信息</p></li>
+        <li><img src="images/green2.png" alt=""/>
+            <p>填写核对订单信息</p></li>
         <li class="procedure_line"><img src="images/gray_line.png" alt=""/></li>
-        <li><img src="images/gray0k.png" alt=""/><p>成功提交订单</p></li>
+        <li><img src="images/gray0k.png" alt=""/>
+            <p>成功提交订单</p></li>
     </ul>
 </div>
 
 <div class="clear channel3 cart_box">
-    <div class="wrap checkout-steps">
-        <p class="confirm-tit">
-            <span class="left">确认收货信息</span>
+    <div class="wrap checkout-steps ng-cloak">
+        <p class="confirm-tit ng-clock">
+            <span class="left">配送方式</span>
         </p>
-        <div class="consignee-cont">
-            <div ng-hide="undefinedAddressMsg" class="consignee-cont-title">
-                发货至
+        <div class="deliveryInfo ng-clock">
+            <div class="deliveryMethod ng-clock">
+                <ul>
+                    <li ng-repeat="delivery in deliveries">
+                        <a href="" ng-click="deliveryMethodClick($index)"
+                           ng-class="{true:'current'}[deliveries[$index].deliveryType == deliveryMethod]">{{deliveries[$index].deliveryName}}</a>
+                    </li>
+                </ul>
             </div>
-            <ul>
-                <li ng-repeat="contact in contacts" class="clearfix">
-                    <div class="left name" ng-cloak>
-                        <input type="radio" ng-checked='contact.selected' ng-click="selectAddress($index)"> {{contact.name}}
+            <div class="companyPickup ng-clock" ng-show="deliveryMethod==1 && hasCompany">
+                <p class="selectCompanyTag" ng-show="!companySelected"><span class="p_title">自提网点</span><span
+                        ng-click="showSelectCompany()" class="span_edit">订单中商品将配送至服务站，请选择自提网点 ></span></p>
+                <p class="selectedCompanyInfo" ng-show="companySelected">
+                    <span class="p_title">自提网点</span>
+                    <span class="company_address">{{selectedCompanyInfo.companyAddress.province.name}} {{selectedCompanyInfo.companyAddress.city.name}} {{selectedCompanyInfo.companyAddress.county.name}} {{selectedCompanyInfo.companyAddress.town.name}} {{selectedCompanyInfo.companyAddress.details}}</span><span
+                        class="span_edit" ng-click="showSelectCompany()">修改</span>
+                </p>
+                <form name="newConsigneeForm" class="consigneeForm newConsigneeForm" novalidate ng-submit=""
+                      ng-show="!newConsigneeCommit && !hasOldConsignees">
+                    <div class="form-group">
+                        <label>收货人</label>
+                        <input type="text" name="name" ng-model="newConsigneeName" placeholder="请填写真实姓名"
+                               ng-focus="focusShowValidate(1)" ng-blur="blurShowValidate()" under12 required/>
+                        <span class="focus_info ng-cloak"
+                              ng-show="focusFormGroupNum == 1 && !newConsigneeForm.name.$error.under12">
+                        <div class="arrow-left"></div>
+                        请填写收货人的真实姓名
+                        </span>
+                        <div class="validate_error ng-cloak"
+                             ng-show="newConsigneeForm.name.$error.under12">
+                            <span ng-show="newConsigneeForm.name.$error.under12">
+                            <div class="arrow-left"></div>
+                            <img src="../xxnr/images/error.png" alt=""/>
+                            姓名限6个汉字或12个英文字符
+                            </span>
+                        </div>
                     </div>
-                    <div class="left address" ng-cloak>
-                        {{contact.address}}
+                    <div class="form-group">
+                        <label>联系电话</label>
+                        <input name="phoneNum" type="tel" phoneverfied ng-model="newConsigneePhone"
+                               ng-readonly="hasAppliedCounty" ng-class="{true:'inputReadonly'}[hasAppliedCounty]"
+                               placeholder="请填写常用手机号" ng-focus="focusShowValidate(2)" ng-blur="blurShowValidate()"
+                               required>
+                    <span class="focus_info ng-cloak"
+                          ng-show="focusFormGroupNum == 2 && (!newConsigneeForm.phoneNum.$error.phoneverfied || newConsigneeForm.phoneNum.$viewValue =='' )">
+                        <div class="arrow-left"></div>
+                        请填写常用手机号
+                    </span>
+                        <div class="validate_error ng-cloak"
+                             ng-show="newConsigneeForm.phoneNum.$error.phoneverfied && !newConsigneeForm.phoneNum.$viewValue ==''">
+                        <span>
+                            <div class="arrow-left"></div>
+                            <img src="../xxnr/images/error.png" alt=""/>
+                            请填写正确的手机号
+                        </span>
+                        </div>
                     </div>
-                    <div class="left tel" ng-cloak>
-                        {{contact.phone}}
+                    <button type="submit" ng-disabled="newConsigneeForm.$invalid"
+                            ng-class="{false:'valid'}[newConsigneeForm.$invalid]" ng-click="saveConsignee()">
+                        保存
+                    </button>
+                </form>
+                <div class="consigneeResult ng-cloak" ng-show="newConsigneeCommit || hasOldConsignees">
+                    <p><span class="p_title">收货人</span><span class="consigneeName">{{consigneeName}}</span><span
+                            class="consigneePhone">{{consigneePhone}}</span><span
+                            ng-click="showEditConsigneePop()" class="span_edit">修改</span></p>
+                </div>
+            </div>
+            <div class="noAvailableCompany" ng-if="deliveryMethod==1 && !hasCompany">
+                <p class="ng-clock"><img src="./images/error.png" alt="">您选择的商品不能在同一个网点自提，请返回购物车重新选择</p>
+            </div>
+            <div class="expressToHome" ng-show="deliveryMethod == 2">
+                <div class="hasConsigneeAddress-cont" ng-show="hasConsigneeAddress">
+
+                    <div class="onlyDefaultContact clearfix" ng-show="!moreContactDisplay">
+                        <ul>
+                            <li ng-repeat="contact in contacts" ng-if="$index<3" class="clearfix">
+                                <div class="onlyThreeContact clearfix" ng-class="{true:'selected'}[contact.selected]"
+                                     ng-click="selectAddress($index)" ng-mouseenter="enterAddress($index)"
+                                     ng-mouseleave="leaveAddress()">
+                                    <div ng-show="contact.selected" class="consignee-cont-title">
+                                        <span>发货至</span>
+                                    </div>
+                                    <div class="left name" ng-cloak>
+                                        <!--<input type="radio" ng-checked='contacts[0].selected' ng-click="selectAddress(0)">-->
+                                        {{contact.name}}
+                                    </div>
+                                    <div class="left address" ng-cloak>
+                                        {{contact.address}}
+                                    </div>
+                                    <div class="left tel" ng-cloak>
+                                        {{contact.phone}}
+                                    </div>
+                                    <div ng-show="contact.isDefault" class="left defaultIcon" ng-cloak>
+                                        默认地址
+                                    </div>
+                                    <div class="right opt" ng-show="contact.selected || $index == hoveredAddressNumber">
+                                        <a href="" ng-click="editAddress($index);$event.stopPropagation()">编辑</a>
+                                        <a href="" ng-click="deleteAddress($index);$event.stopPropagation()">删除</a>
+                                    </div>
+                                    <!--<div class="chooseIcon" ng-show="contact.selected">-->
+                                    <!--<img src="./images/choose.png" alt="">-->
+                                    <!--</div>-->
+                                </div>
+                            </li>
+                        </ul>
                     </div>
-                    <div class="right opt">
-                        <a href="" ng-click="editAddress($index)">编辑</a>
-                        <a href="" ng-click="deleteAddress($index)">删除</a>
+                    <div class="fullContactList" ng-show="moreContactDisplay">
+                        <ul>
+                            <li ng-repeat="contact in contacts" class="clearfix">
+                                <div class="singleContact clearfix" ng-class="{true:'selected'}[contact.selected]"
+                                     ng-click="selectAddress($index)" ng-mouseenter="enterAddress($index)"
+                                     ng-mouseleave="leaveAddress()">
+                                    <div ng-show="contact.selected" class="consignee-cont-title">
+                                        <span>发货至</span>
+                                    </div>
+                                    <div class="left name" ng-cloak>
+                                        <!--<input type="radio" ng-checked='' >-->
+                                        {{contact.name}}
+                                    </div>
+                                    <div class="left address" ng-cloak>
+                                        {{contact.address}}
+                                    </div>
+                                    <div class="left tel" ng-cloak>
+                                        {{contact.phone}}
+                                    </div>
+                                    <div ng-show="contact.isDefault" class="left defaultIcon" ng-cloak>
+                                        默认地址
+                                    </div>
+                                    <div class="right opt" ng-show="contact.selected || $index == hoveredAddressNumber">
+                                        <a href="" ng-click="editAddress($index);$event.stopPropagation()">编辑</a>
+                                        <a href="" ng-click="deleteAddress($index);$event.stopPropagation()">删除</a>
+                                    </div>
+                                    <!--<div ng-show="contact.selected" class="chooseIcon">-->
+                                    <!--<img src="./images/choose.png" alt="">-->
+                                    <!--</div>-->
+                                </div>
+                            </li>
+                        </ul>
                     </div>
-                </li>
-            </ul>
-            <p ng-cloak class="undefinedAddressMsg">{{undefinedAddressMsg}}</p>
-        </div>
-        <div class="addNewAddBtn clearfix">
-            <a href="" ng-click="addNewAddress()" class="left xxnr_btn">添加新地址</a>
+
+
+                </div>
+                <div class="addressToggle"
+                     ng-show="hasConsigneeAddress && contacts.length>3 && !everClickOneOfMoreContacts">
+                    <div class="clickabeZone" ng-click="moreContactDisplay = !moreContactDisplay">
+                        {{moreContactDisplay?"收起地址":"更多地址"}}
+                        <img ng-show="!moreContactDisplay" src="./images/arrow_down.png" alt="">
+                        <img ng-show="moreContactDisplay" src="./images/arrow_up.png" alt="">
+                    </div>
+                </div>
+                <div ng-show="hasConsigneeAddress" class="addNewAddressBtn clearfix">
+                    <img src="./images/add.png" alt=""><a href="" ng-click="addNewAddress()">添加新地址</a>
+                </div>
+                <div ng-cloak class="noConsigneeAddress-cont addressFormTable" ng-show="!hasConsigneeAddress">
+                    <table>
+                        <tr>
+                            <td class="first-td" style="vertical-align:top;"><img src="./images/prompt.png" alt="">所在地区
+                            </td>
+                            <td class="second-td">
+                                <select name="" id="provin" ng-model="modifyAddress.province"
+                                        ng-options="province as province.name for province in provinces"
+                                        ng-change="getCityList()">
+                                </select>
+                                <select name="" id="city" ng-model="modifyAddress.city"
+                                        ng-options="city as city.name for city in cities" ng-change="getCountyList()">
+                                </select>
+                                <select name="" ng-show="modifyAddress.county" id="county"
+                                        ng-model="modifyAddress.county"
+                                        ng-options="county as county.name for county in counties"
+                                        ng-change="getTownList()">
+                                </select>
+                                <select name="" id="town" ng-model="modifyAddress.town"
+                                        ng-options="town as town.name for town in towns">
+                                </select>
+                                <span style="color: #999999" id="address_detail"></span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="first-td" style="vertical-align:top;">
+                                <img src="./images/prompt.png" alt="">详细地址
+                            </td>
+                            <td class="second-td">
+                                <textarea name="" class="dizhi" ng-model="modifyAddress.detailAddress"></textarea>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="first-td postcode">邮政编码</td>
+                            <td class="second-td"><input type="text" value="" class="youbian"
+                                                         ng-model="modifyAddress.zipCode"></td>
+                        </tr>
+                        <tr>
+                            <td class="first-td"><img src="./images/prompt.png" alt="">收货人</td>
+                            <td class="second-td"><input type="text" class="shouhuoren" value=""
+                                                         ng-model="modifyAddress.receiptName"></td>
+                        </tr>
+                        <tr>
+                            <td class="first-td"><img src="./images/prompt.png" alt="">联系电话</td>
+                            <td class="second-td">
+                                <!--<select name="" id="select1">-->
+                                <!--<option value="">中国大陆 +86</option>-->
+                                <!--</select>-->
+                                <input type="text" class="mobile-num" value="" ng-model="modifyAddress.phone">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="first-td">&nbsp;</td>
+                            <td class="second-td">
+                                <input type="checkbox" name="" id="checkbox1" ng-checked="modifyAddress.isDefault"
+                                       ng-model="modifyAddress.isDefault">
+                                <label for="checkbox1">设为默认地址</label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="first-td">&nbsp;</td>
+                            <td class="second-td"><input type="submit" value="提交" class="tijiao"
+                                                         ng-click="submitAddressAdd()"></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
     <!--<div class="wrap clear checkout-steps">-->
-        <!--<p class="confirm-tit">-->
-            <!--<span class="left">选择支付方式</span>-->
-        <!--</p>-->
-        <!--<ul class="pay-style">-->
-            <!--&lt;!&ndash;            <li><a href="#" ng-click="itemClicked($index)" ng-class="{ 'selected-class-name': $index == selectedIndex }"><img src="images/pay1.png" alt=""></a></li>-->
-                        <!--<li><a href="#" ng-click="itemClicked($index)" ng-class="{ 'selected-class-name': $index == selectedIndex }"><img src="images/pay2.png" alt=""></a></li>-->
-                        <!--<li><a href="#"><img src="images/pay3.png" alt=""></a></li>-->
-                        <!--<li><a href="#"><img src="images/pay4.png" alt=""></a></li> &ndash;&gt;-->
+    <!--<p class="confirm-tit">-->
+    <!--<span class="left">选择支付方式</span>-->
+    <!--</p>-->
+    <!--<ul class="pay-style">-->
+    <!--&lt;!&ndash;            <li><a href="#" ng-click="itemClicked($index)" ng-class="{ 'selected-class-name': $index == selectedIndex }"><img src="images/pay1.png" alt=""></a></li>-->
+    <!--<li><a href="#" ng-click="itemClicked($index)" ng-class="{ 'selected-class-name': $index == selectedIndex }"><img src="images/pay2.png" alt=""></a></li>-->
+    <!--<li><a href="#"><img src="images/pay3.png" alt=""></a></li>-->
+    <!--<li><a href="#"><img src="images/pay4.png" alt=""></a></li> &ndash;&gt;-->
 
-            <!--<li ng-repeat="payMethod in payMethods"><a href=""  ng-class="{ 'current': $index == selectedPayMethodIndex }" ng-click="itemClicked($index)"><img ng-src="{{payMethod.imgUrl}}" alt=""></a></li>-->
-        <!--</ul>-->
+    <!--<li ng-repeat="payMethod in payMethods"><a href=""  ng-class="{ 'current': $index == selectedPayMethodIndex }" ng-click="itemClicked($index)"><img ng-src="{{payMethod.imgUrl}}" alt=""></a></li>-->
+    <!--</ul>-->
     <!--</div>-->
     <div ng-controller="shoppingCartController" class="jiesuan">
-        <div class="wrap">
+        <div class="wrap ng-clock">
             <div class="cart">
                 <div class="cart-main">
                     <p class="confirm-tit">
@@ -144,7 +346,7 @@
                             <div class="cart-tbody" ng-repeat="shop in shops">
                                 <div class="shop">
                                     <span class="shop-txt">
-                                            <a class="shop-name" href="" target="_blank"  ng-cloak>{{shop.name}}</a>
+                                            <a class="shop-name" href="" target="_blank" ng-cloak>{{shop.name}}</a>
                                     </span>
                                 </div>
                                 <div class="item-list">
@@ -176,11 +378,13 @@
                                             <div class="cell p-buy-count" ng-cloak>{{item.buyCount}}</div>
                                             <div class="cell p-sum">
                                                 <!--<div ng-cloak>{{item.totalDeposit}}<span ng-show="{{item.deposit}}">（订金）</span></div>-->
-                                                <div class="ng-cloak" ng-class="{'hasDeposit':item.hasDeposit}">¥ {{item.totalPrice.toFixed(2)}}</div>
+                                                <div class="ng-cloak" ng-class="{'hasDeposit':item.hasDeposit}">¥
+                                                    {{item.totalPrice.toFixed(2)}}
+                                                </div>
 
                                             </div>
                                         </div>
-                                        <div class="p-additions" ng-if="item.additions" >
+                                        <div class="p-additions" ng-if="item.additions">
                                             <!-- <ul ng-if="product.addition"> -->
                                             <div class="p-additions-title">
                                                 附加项目:
@@ -195,8 +399,12 @@
                                             </div>
                                         </div>
                                         <div class="pay-step" ng-show="{{item.hasDeposit}}">
-                                            <div class="ng-cloak pay-step-1"><span class="text-info">阶段一：订金</span><span class="order-price ng-cloak">¥ {{item.totalDeposit.toFixed(2)}}</span></div>
-                                            <div class="ng-cloak pay-step-2"><span class="text-info">阶段二：尾款</span><span class="balance ng-cloak">¥ {{(item.totalPrice + item.buyCount*item.additionsTotalPrice - item.totalDeposit).toFixed(2)}}</span></div>
+                                            <div class="ng-cloak pay-step-1"><span class="text-info">阶段一：订金</span><span
+                                                    class="order-price ng-cloak">¥ {{item.totalDeposit.toFixed(2)}}</span>
+                                            </div>
+                                            <div class="ng-cloak pay-step-2"><span class="text-info">阶段二：尾款</span><span
+                                                    class="balance ng-cloak">¥ {{(item.totalPrice + item.buyCount*item.additionsTotalPrice - item.totalDeposit).toFixed(2)}}</span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -207,9 +415,13 @@
             </div>
         </div>
         <div class="wrap options-box">
-            <div class="changeCart left"><a href="cart.html"><返回修改购物车</a></div>
+            <div class="changeCart left"><a href="cart.html">
+                < 返回修改购物车
+            </a></div>
 
-            <div class="right submit-btn"><a href="" ng-click="buy()">提交订单</a></div>
+            <div class="right submit-btn"><a href=""
+                                             ng-click="buy(deliveryMethod,selectedCompanyId,consigneePhone,consigneeName)">提交订单</a>
+            </div>
             <div class="right price-total">
                 <p><label>商品数量：</label><span ng-cloak>{{totalCount}}</span></p>
                 <p><label>合计：</label><span class="total" ng-cloak>￥{{totalPrice}}</span></p>
@@ -222,113 +434,123 @@
 
 <div class="modify-address" ng-cloak>
     <div id="D-overlar" ng-show="showPop"></div>
-    <div id="D3" ng-show="showModifyPop">
-        <a ng-href="" ng-click='hideModifyPop()' id="close2" class="close"><img src="images/close.png" alt=""></a>
+    <div id="modifyAddress" class="addressFormTable" ng-show="showModifyPop">
+        <a ng-href="" ng-click='hideModifyPop()' id="close2" class="close"><img src="images/close.gif" alt=""></a>
         <h1>修改地址</h1>
         <table>
             <tr>
-                <td class="first-td" style="vertical-align:top;">请选择省<span>*</span></td>
+                <td class="first-td" style="vertical-align:top;"><img src="./images/prompt.png" alt="">所在地区</td>
                 <td class="second-td">
-                    <select name="" id="provin" ng-model="modifyAddress.province" ng-options="province as province.name for province in provinces" ng-change="getCityList()">
+                    <select class="ng-cloak" name="" id="provin" ng-model="modifyAddress.province"
+                            ng-options="province as province.name for province in provinces" ng-change="getCityList()">
                     </select>
-                    <select name="" id="city" ng-model="modifyAddress.city" ng-options="city as city.name for city in cities" ng-change="getCountyList()">
+                    <select class="ng-cloak name="" id="city" ng-model="modifyAddress.city"
+                    ng-options="city as city.name for city in cities" ng-change="getCountyList()">
                     </select>
-                    <select ng-show="modifyAddress.county" name="" id="county" ng-model="modifyAddress.county" ng-options="county as county.name for county in counties" ng-change="getTownList()">
+                    <select class="ng-cloak ng-show=" modifyAddress.county" name="" id="county"
+                    ng-model="modifyAddress.county"
+                    ng-options="county as county.name for county in counties" ng-change="getTownList()">
                     </select>
-                    <select name="" id="town" ng-model="modifyAddress.town" ng-options="town as town.name for town in towns">
+                    <select class="ng-cloak name="" id="town" ng-model="modifyAddress.town"
+                    ng-options="town as town.name for town in towns">
                     </select>
                     <span style="color: #999999" id="address_detail"></span>
                 </td>
             </tr>
             <tr>
-            <tr>
                 <td class="first-td" style="vertical-align:top;">
-                    地址详情信息<span>*</span>
-                    <div class="s">(请填写详细的)</div>
+                    <img src="./images/prompt.png" alt="">详细地址
                 </td>
                 <td class="second-td">
-                    <textarea name=""  class="dizhi" ng-model="modifyAddress.detailAddress"></textarea>
+                    <textarea name="" class="dizhi" ng-model="modifyAddress.detailAddress"></textarea>
                 </td>
             </tr>
             <tr>
-                <td class="first-td">邮政编码</td>
+                <td class="first-td postcode">邮政编码</td>
                 <td class="second-td"><input type="text" value="" class="youbian" ng-model="modifyAddress.zipCode"></td>
             </tr>
             <tr>
-                <td class="first-td">收货人姓名<span>*</span></td>
-                <td class="second-td"><input type="text" class="shouhuoren" value="" ng-model="modifyAddress.receiptName"></td>
+                <td class="first-td"><img src="./images/prompt.png" alt="">收货人</td>
+                <td class="second-td"><input type="text" class="shouhuoren" value=""
+                                             ng-model="modifyAddress.receiptName"></td>
             </tr>
             <tr>
-                <td class="first-td">手机号码<span>*</span></td>
+                <td class="first-td"><img src="./images/prompt.png" alt="">联系电话</td>
                 <td class="second-td">
-                    <select name="" id="select1">
-                        <option value="">中国大陆 +86</option>
-                    </select>
+                    <!--<select name="" id="select1">-->
+                    <!--<option value="">中国大陆 +86</option>-->
+                    <!--</select>-->
                     <input type="text" class="mobile-num" value="" ng-model="modifyAddress.phone">
                 </td>
             </tr>
             <tr>
                 <td class="first-td">&nbsp;</td>
                 <td class="second-td">
-                    <input type="checkbox" name="" id="checkbox1" ng-checked="modifyAddress.isDefault" ng-model="modifyAddress.isDefault">
+                    <input type="checkbox" name="" id="checkbox1" ng-checked="modifyAddress.isDefault"
+                           ng-model="modifyAddress.isDefault">
                     <label for="checkbox1">设为默认地址</label>
                 </td>
             </tr>
             <tr>
                 <td class="first-td">&nbsp;</td>
-                <td class="second-td"><input type="submit" value="提交" class="tijiao" ng-click="submitAddressEdit()"></td>
+                <td class="second-td"><input type="submit" value="提交" class="tijiao" ng-click="submitAddressEdit()">
+                </td>
             </tr>
         </table>
     </div>
-    <div id="D4" ng-show="showAddPop">  <!-- 添加地址弹框结构 -->
-        <a href="" ng-click='hideAddPop()' id="close3" class="close"><img src="images/close.png" alt=""></a>
-        <h1>添加地址</h1>
+    <div class="addressFormTable" id="D4" ng-show="showAddPop">  <!-- 添加地址弹框结构 -->
+        <a href="" ng-click='hideAddPop()' id="close3" class="close"><img src="images/close.gif" alt=""></a>
+        <h1>添加收货地址</h1>
         <table>
             <tr>
-                <td class="first-td" style="vertical-align:top;">请选择省<span>*</span></td>
+                <td class="first-td" style="vertical-align:top;">
+                    <img src="./images/prompt.png" alt="">所在地区
+                </td>
                 <td class="second-td">
-                    <select name="" id="provin" ng-model="modifyAddress.province" ng-options="province as province.name for province in provinces" ng-change="getCityList()">
+                    <select class="ng-cloak" name="" id="provin" ng-model="modifyAddress.province"
+                            ng-options="province as province.name for province in provinces" ng-change="getCityList()">
                     </select>
-                    <select name="" id="city" ng-model="modifyAddress.city" ng-options="city as city.name for city in cities" ng-change="getCountyList()">
+                    <select class="ng-cloak" name="" id="city" ng-model="modifyAddress.city"
+                            ng-options="city as city.name for city in cities" ng-change="getCountyList()">
                     </select>
-                    <select name="" ng-show="modifyAddress.county" id="county" ng-model="modifyAddress.county" ng-options="county as county.name for county in counties" ng-change="getTownList()">
+                    <select class="ng-cloak" name="" ng-show="modifyAddress.county" id="county"
+                            ng-model="modifyAddress.county"
+                            ng-options="county as county.name for county in counties" ng-change="getTownList()">
                     </select>
-                    <select name="" id="town" ng-model="modifyAddress.town" ng-options="town as town.name for town in towns">
+                    <select class="ng-cloak" name="" id="town" ng-model="modifyAddress.town"
+                            ng-options="town as town.name for town in towns">
                     </select>
                     <span style="color: #999999" id="address_detail"></span>
                 </td>
             </tr>
             <tr>
-            <tr>
                 <td class="first-td" style="vertical-align:top;">
-                    地址详情信息<span>*</span>
-                    <div class="s">(请填写详细的)</div>
+                    <img src="./images/prompt.png" alt="">详细地址
                 </td>
                 <td class="second-td">
-                    <textarea name=""  class="dizhi" ng-model="modifyAddress.detailAddress"></textarea>
+                    <textarea name="" class="dizhi" ng-model="modifyAddress.detailAddress"></textarea>
                 </td>
             </tr>
             <tr>
-                <td class="first-td">邮政编码</td>
+                <td class="first-td postcode">邮政编码</td>
                 <td class="second-td"><input type="text" value="" class="youbian" ng-model="modifyAddress.zipCode"></td>
             </tr>
             <tr>
-                <td class="first-td">收货人姓名<span>*</span></td>
-                <td class="second-td"><input type="text" class="shouhuoren" value="" ng-model="modifyAddress.receiptName"></td>
+                <td class="first-td"><img src="./images/prompt.png" alt="">收货人</td>
+                <td class="second-td"><input type="text" class="shouhuoren" value=""
+                                             ng-model="modifyAddress.receiptName"></td>
             </tr>
             <tr>
-                <td class="first-td">手机号码<span>*</span></td>
+                <td class="first-td"><img src="./images/prompt.png" alt="">联系电话</td>
                 <td class="second-td">
-                    <select name="" id="select1">
-                        <option value="">中国大陆 +86</option>
-                    </select>
                     <input type="text" class="mobile-num" value="" ng-model="modifyAddress.phone">
                 </td>
             </tr>
             <tr>
                 <td class="first-td">&nbsp;</td>
                 <td class="second-td">
-                    <input type="checkbox" name="" id="checkbox1" ng-checked="modifyAddress.isDefault" ng-model="modifyAddress.isDefault">
+                    <input type="checkbox" name="" id="checkbox1" ng-checked="modifyAddress.isDefault"
+                           ng-model="modifyAddress.isDefault">
                     <label for="checkbox1">设为默认地址</label>
                 </td>
             </tr>
@@ -337,6 +559,117 @@
                 <td class="second-td"><input type="submit" value="提交" class="tijiao" ng-click="submitAddressAdd()"></td>
             </tr>
         </table>
+    </div>
+    <div class="selectCompany" ng-show="showSelectCompanyPop">
+        <p class="popTitle">选择自提网点 <img ng-click="showPop = false;showSelectCompanyPop=false;selectedCompanyId=-1"
+                                        src="./images/close.gif"
+                                        alt=""></p>
+        <p class="infoText">1.选择自提网点下单并支付完成 <span>></span> 2.收到自提通知 <span>></span> 3.通过自提码到网点提货</p>
+        <div class="select-group region">
+            <select class="profileInput" ng-class="{'changed':profileProvince.id!=0}"
+                    ng-model="selectOfProvinceCompanies"
+                    ng-options="province as province.name for province in provinceListCompanies"
+                    ng-change="getCityCompaniesList()">
+            </select>
+            <select class="profileInput" ng-class="{'changed':profileCity.id!=0}"
+                    ng-model="selectOfCityCompanies" ng-options="city as city.name for city in cityListCompanies"
+                    ng-change="getCountyCompaniesList()">
+            </select>
+            <select class="profileInput"
+                    ng-class="{'grayed':selectOfCityCompanies.id==0 && selectOfCountyCompanies.id==0}"
+                    ng-model="selectOfCountyCompanies"
+                    ng-options="county as county.name for county in countyListCompanies"
+                    ng-change="getRSCwithAllAddress()">
+            </select>
+        </div>
+        <div class="shopList">
+            <div class="singleShop" ng-repeat="rsc in RSCs">
+                <div class="shopTitle" ng-click="selectCompany($index)"
+                     ng-class="{true:'selected'}[rsc._id == selectingCompanyId]">
+                    <a href="">{{rsc.RSCInfo.companyName}}</a>
+                </div>
+                <div class="shopAddress">
+                    <p>地址：{{rsc.RSCInfo.companyAddress.province.name}} {{rsc.RSCInfo.companyAddress.city.name}}
+                        {{rsc.RSCInfo.companyAddress.county.name}} {{rsc.RSCInfo.companyAddress.town.name}}
+                        {{rsc.RSCInfo.companyAddress.details}}</p>
+                    <p>电话：{{rsc.RSCInfo.phone}}</p>
+                </div>
+            </div>
+        </div>
+        <div class="buttons">
+            <button ng-disabled="selectingCompanyId==-1"
+                    ng-class="{true:'companySelcted',false:'companyUnselcted'}[selectingCompanyId!=-1]"
+                    ng-click="checkedCompany()">确定
+            </button>
+            <button ng-click="showPop = false;showSelectCompanyPop=false;selectedCompanyId=-1;selectingCompanyId=-1">
+                取消
+            </button>
+        </div>
+    </div>
+    <div class="pickupConsignee" ng-show="showConsigneePop">
+        <p class="pickupConsigneeTitle">选择收货人 <img ng-click="showPop = false; showConsigneePop=false"
+                                                   src="./images/close.gif" alt=""></p>
+        <p class="infoText">填写到网点自提的收货人信息</p>
+        <div class="consignees_list">
+            <a href="" ng-repeat="oldConsignee in oldConsignees" ng-click="selectConsignee($index)"
+               ng-class="{true:'selected'}[selectedConsigneeNum == $index]"><span class="consignee_name">{{oldConsignee.consigneeName}}</span><span
+                    class="consignee_phone">{{oldConsignee.consigneePhone}}</span></a>
+        </div>
+        <div class="addConsignee">
+            <p class="addConsignee_title">添加收货人</p>
+
+            <form name="popNewConsigneeForm" class="consigneeForm popNewConsigneeForm" novalidate ng-submit="">
+                <div class="form-group">
+                    <img src="./images/prompt.png" alt="">
+                    <label>收货人</label>
+                    <input type="text" name="name" ng-model="popConsigneeName" placeholder="请填写真实姓名"
+                           ng-focus="focusShowValidate(3)" ng-blur="blurShowValidate()" under12 required/>
+                    <div class="validate_error ng-cloak"
+                         ng-show="popNewConsigneeForm.name.$dirty && popNewConsigneeForm.name.$error.under12 && !popNewConsigneeForm.name.$error.required">
+                            <span ng-show="popNewConsigneeForm.name.$error.under12">
+                            <img src="../xxnr/images/error.png" alt=""/>
+                            限6个汉字或12个英文字符
+                            </span>
+                    </div>
+                    <div class="validate_error ng-cloak"
+                         ng-show="popNewConsigneeForm.name.$dirty && popNewConsigneeForm.name.$error.required">
+                            <span ng-show="popNewConsigneeForm.name.$error.required">
+                            <img src="../xxnr/images/error.png" alt=""/>
+                                请填写您的真实姓名
+                            </span>
+                    </div>
+
+                </div>
+                <div class="or_image">
+                    <img src="./images/or.png" alt="">
+                </div>
+                <div class="form-group">
+                    <img src="./images/prompt.png" alt="">
+                    <label>联系电话</label>
+                    <input name="phoneNum" type="tel" phoneverfied ng-model="popConsigneePhone"
+                           ng-readonly="hasAppliedCounty" ng-class="{true:'inputReadonly'}[hasAppliedCounty]"
+                           placeholder="请填写常用手机号" ng-focus="focusShowValidate(4)" ng-blur="blurShowValidate()" required>
+                    <div class="validate_error ng-cloak"
+                         ng-show="popNewConsigneeForm.phoneNum.$dirty && (popNewConsigneeForm.phoneNum.$error.phoneverfied || popNewConsigneeForm.phoneNum.$error.required)">
+                        <span ng-show="popNewConsigneeForm.phoneNum.$error.phoneverfied || !popNewConsigneeForm.phoneNum.$error.required">
+                            <img src="../xxnr/images/error.png" alt=""/>
+                            请填写正确的手机号
+                        </span>
+                    </div>
+                </div>
+
+                <button class="submitConsignee" type="submit" ng-disabled="popNewConsigneeForm.$invalid"
+                        ng-class="{false:'valid'}[popNewConsigneeForm.$invalid]" ng-click="popSaveConsignee()">
+                    确定
+                </button>
+            </form>
+        </div>
+        <div class="buttons">
+            <button class="consigneeSubmit"
+                    ng-class="{true:'consigneeSelcted',false:'consigneeUnselcted'}[selectedConsigneeNum!=-1]"
+                    ng-disabled="selectedConsigneeNum==-1" ng-click="consigneeSelected()">确定
+            </button>
+        </div>
     </div>
 </div>
 
