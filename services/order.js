@@ -941,11 +941,14 @@ OrderService.prototype.confirm = function(orderId, SKURefs, callback) {
 			return;
 		}
 
+		// 是否有商品收货
+		var isConfirmed = false;
 		var allConfirmed = true;
 		order.SKUs.forEach(function (sku) {
 			if (SKURefs.indexOf(sku.ref.toString()) != -1 && sku.deliverStatus == DELIVERSTATUS.DELIVERED) {
 				sku.deliverStatus = DELIVERSTATUS.RECEIVED;
 				sku.dateConfirmed = new Date();
+				isConfirmed = true;
 			}
 
 			if(sku.deliverStatus != DELIVERSTATUS.RECEIVED){
@@ -967,6 +970,11 @@ OrderService.prototype.confirm = function(orderId, SKURefs, callback) {
 
 			callback(null);
 		});
+		if (isConfirmed) {
+			if (order.deliveryType == DELIVERYTYPE.ZITI.id) {
+				UMENG.sendCustomizedcast(umengConfig.types.zitiDone, order.buyerId, {orderId: order.id});
+			}
+		}
 	});
 };
 
