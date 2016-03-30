@@ -43,6 +43,11 @@ module.exports = {
                 max_hits_per_user:10,
                 max_hits:10000
             }
+        },
+        '/api/v2.2/RSC/order/selfDelivery':{
+            'post':{
+                max_hits_per_user:3
+            }
         }
     }
 };

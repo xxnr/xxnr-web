@@ -721,7 +721,7 @@ OrderService.prototype.generateDeliveryCodeandNotify = function(order, newArrive
 
 			if(!deliveryCode || !deliveryCode.code){
 				// generate code and insert
-				var code = tools.generateAuthCode();
+				var code = tools.generateAuthCode(7);
 				var newDeliveryCode = new DeliveryCodeModel({orderId:order.id, code: code});
 				newDeliveryCode.save(function(err){
 					if(err && 11000 != err.code){
