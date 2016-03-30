@@ -7,6 +7,7 @@ var DELIVERSTATUS = require('../common/defs').DELIVERSTATUS;
 var PAYTYPE = require('../common/defs').PAYTYPE;
 var SUBORDERTYPE = require('../common/defs').SUBORDERTYPE;
 var SUBORDERTYPEKEYS = require('../common/defs').SUBORDERTYPEKEYS;
+var DELIVERYTYPENAME = require('../common/defs').DELIVERYTYPENAME;
 var OrderModel = require('../models').order;
 var UseOrdersNumberModel = require('../models').userordersnumber;
 var OrderPaidLog = require('../models').orderpaidlog;
@@ -21,6 +22,38 @@ var UMENG = MODULE('umeng');
 
 // Service
 var OrderService = function(){};
+
+// get orderInfo object of order
+OrderService.prototype.get_orderInfo = function(order) {
+	var self = this;
+    if (!order) {
+        return null;
+    }
+    var orderInfo = {
+        'totalPrice':order.price.toFixed(2)                                                     // 总价
+        , 'deposit':order.deposit.toFixed(2)                                                    // 定金
+        , 'dateCreated':order.dateCreated                                                       // 订单创建时间
+        , 'orderStatus': self.orderStatus(order)                                         		// 订单状态
+        , 'deliveryType':{type:order.deliveryType, value:DELIVERYTYPENAME[order.deliveryType]}  // 配送方式
+    };
+    // 支付时间
+    if (order.payStatus == PAYMENTSTATUS.PAID && order.datePaid) {
+        orderInfo.datePaid = order.datePaid;
+    }
+    // 待收货时间
+    if (order.datePendingDeliver) {
+        orderInfo.datePendingDeliver = order.datePendingDeliver;
+    }
+    // 全部发货时间
+    if (order.deliverStatus == DELIVERSTATUS.DELIVERED && order.dateDelivered) {
+        orderInfo.dateDelivered = order.dateDelivered;
+    }
+    // 完成时间
+    if (order.deliverStatus == DELIVERSTATUS.RECEIVED && order.dateCompleted) {
+        orderInfo.dateCompleted = order.dateCompleted;
+    }
+    return orderInfo;
+}
 
 // Method
 // order type
@@ -620,9 +653,6 @@ OrderService.prototype.updateProducts = function(options, callback) {
 			});
 			// check order deliver status
 			var order = self.checkDeliverStatus(doc);
-			if (parseInt(order.deliverStatus) === DELIVERSTATUS.DELIVERED) {
-				order.dateDelivered = new Date();
-			}
 			order.save(function(err) {
 				if (err) {
 					callback(err);
@@ -656,12 +686,12 @@ OrderService.prototype.updateSKUs = function(options, callback) {
 					if (sku.deliverStatus === DELIVERSTATUS.DELIVERED) {
 						sku.dateDelivered = new Date();
 					}
-					if(sku.deliverStatus === DELIVERSTATUS.RSCRECEIVED){
+					if (sku.deliverStatus === DELIVERSTATUS.RSCRECEIVED) {
 						sku.dateRSCReceived = new Date();
 						RSCReceived = true;
 						newReceivedSKUs.push(sku);
 					}
-					if(sku.deliverStatus === DELIVERSTATUS.RECEIVED){
+					if (sku.deliverStatus === DELIVERSTATUS.RECEIVED) {
 						sku.dateConfirmed = new Date();
 					}
 					if (options.backendUser) {
@@ -673,9 +703,6 @@ OrderService.prototype.updateSKUs = function(options, callback) {
 			});
 			// check order deliver status
 			var order = self.checkDeliverStatus(doc);
-			if (parseInt(order.deliverStatus) === DELIVERSTATUS.DELIVERED) {
-				order.dateDelivered = new Date();
-			}
 			order.save(function(err) {
 				if (err) {
 					callback(err);
@@ -686,7 +713,7 @@ OrderService.prototype.updateSKUs = function(options, callback) {
 			});
 
 			if (RSCReceived) {
-				if (doc.deliveryType == DELIVERYTYPE.ZITI.id && doc.payStatus == PAYMENTSTATUS.PAID){
+				if (doc.deliveryType == DELIVERYTYPE.ZITI.id && doc.payStatus == PAYMENTSTATUS.PAID) {
 					self.generateDeliveryCodeandNotify(doc, newReceivedSKUs);
 				} else if (doc.payStatus !== PAYMENTSTATUS.PAID) {
 					UMENG.sendCustomizedcast(umengConfig.types.pay, order.buyerId, {orderId: order.id});
@@ -1376,6 +1403,17 @@ OrderService.prototype.checkDeliverStatus = function(order) {
 			order.deliverStatus = DELIVERSTATUS.UNDELIVERED;
 		}
 
+		// 待收货时间
+		// 自提订单的待收货时间
+		if (order.deliveryType === DELIVERYTYPE.ZITI.id && parseInt(order.payStatus) === PAYMENTSTATUS.PAID && parseInt(order.deliverStatus) === DELIVERSTATUS.RSCRECEIVED && order.deliverStatus != oldStatus) {
+			order.datePendingDeliver = new Date();
+		} else {
+			// 送货到户订单的待收货时间
+			if (order.deliveryType === DELIVERYTYPE.SONGHUO.id && parseInt(oldStatus) !== DELIVERSTATUS.PARTDELIVERED && parseInt(oldStatus) !== DELIVERSTATUS.DELIVERED && (parseInt(order.deliverStatus) === DELIVERSTATUS.PARTDELIVERED || parseInt(order.deliverStatus) === DELIVERSTATUS.DELIVERED)) {
+				order.datePendingDeliver = new Date();
+			}
+		}
+
 		if (parseInt(order.deliverStatus) === DELIVERSTATUS.DELIVERED && order.deliverStatus != oldStatus) {
 			order.dateDelivered = new Date();
 		}
@@ -1593,6 +1631,11 @@ OrderService.prototype._checkPayStatus = function(order, callback) {
 				setValues['payStatus'] = orderPayStatus;
 				if (orderPayStatus === PAYMENTSTATUS.PAID) {
 					setValues['datePaid'] = new Date();
+					// 待收货时间
+					// 自提订单的待收货时间
+					if (order.deliveryType === DELIVERYTYPE.ZITI.id && parseInt(order.deliverStatus) === DELIVERSTATUS.RSCRECEIVED) {
+						setValues['datePendingDeliver'] = new Date();
+					}
 				}
 			}
 			if (orderPayStatus === PAYMENTSTATUS.PAID) {

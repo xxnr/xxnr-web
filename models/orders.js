@@ -25,7 +25,7 @@ var schema = new mongoose.Schema({
 			'count': {type:Number, required: true},
             'category' : {type:String, required: false},
             'dateDelivered': Date,
-            'dateSet': Date,														// 人为设置的日期
+            'dateSet': Date,														// 后台用户设置的日期
             'deliverStatus': {type:Number, required:true, default: DELIVERSTATUS.UNDELIVERED}
 		}]},
 	'SKUs':[{
@@ -38,8 +38,8 @@ var schema = new mongoose.Schema({
 		'thumbnail':String,
 		'count':{type:Number, required:true},
 		'category':{type:String, required:false},
-		'dateDelivered':Date,
-		'dateSet': Date,
+		'dateDelivered':Date,														// 自提时间，配送时间
+		'dateSet': Date,															// 后台用户设置的日期
 		'deliverStatus':{type:Number, required:true, default:DELIVERSTATUS.UNDELIVERED},
 		'attributes':[{
 			'ref':{type:mongoose.Schema.ObjectId, ref:'SKUAttributes', required:true},
@@ -58,9 +58,10 @@ var schema = new mongoose.Schema({
 	}],
 	'payStatus': {type:Number, required:true, default: PAYMENTSTATUS.UNPAID},		// 主订单付款状态，从子订单付款状态统计得来 分为未付款、部分付款、已付款三种，只用来做查询
 	'datePaid': Date,
-	'deliverStatus': {type:Number, required:true}, 									// 主订单发货状态，从商品发货状态统计得来 分为无发货、部分发货、已发货三种，只用来做查询
-	'dateDelivered': Date,
-	'dateCompleted': Date,
+	'deliverStatus': {type:Number, required:true}, 									// 主订单发货状态，从商品发货状态统计得来 分为未发货、部分发货、离开服务站、已到服务站、已收货五种，只用来做查询
+	'datePendingDeliver': Date,														// 订单待收货时间，配送订单中RSC配送第一个商品的时间或者已付款的自提订单中第一个商品到RSC的时间
+	'dateDelivered': Date,															// 订单发货时间，订单中商品全部离开RSC的时间
+	'dateCompleted': Date,															// 订单完成时间
 	'paymentId': {type:String, required:true},										// 最新一笔支付的ID
 	'payType': {type:Number, required:true},										// 最新一笔支付的支付方式
     'isClosed': {type:Boolean, required:true, default:false},						// 本订单是否关闭
@@ -74,7 +75,7 @@ var schema = new mongoose.Schema({
         'suborderId': {type: String, index: true, required: true},					// 所属子订单ID
         'dateCreated': {type: Date, default: Date.now},								// 生成日期
 		'datePaid': Date,															// 支付日期
-		'dateSet': Date,															// 人为设置的日期
+		'dateSet': Date,															// 后台用户设置的日期
 		'payStatus': {type:Number, required:true, default: PAYMENTSTATUS.UNPAID},	// 支付状态
 		'payType': {type:Number, required:true},									// 支付类型
 		'isClosed': {type:Boolean, required:true, default:false},					// 本支付是否关闭

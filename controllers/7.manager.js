@@ -616,15 +616,22 @@ function json_orders_query() {
                 // 订单合成状态
                 item.typeValue = OrderService.orderType(item);
                 var orderInfo = {'totalPrice':item.price.toFixed(2), 'deposit':item.deposit.toFixed(2), 'dateCreated':item.dateCreated, 'orderStatus': OrderService.orderStatus(item)};
-                if (item.payStatus == PAYMENTSTATUS.PAID && item.datePaid) {
-                    orderInfo.datePaid = item.datePaid;
-                }
-                if (item.deliverStatus == DELIVERSTATUS.DELIVERED && item.dateDelivered) {
-                    orderInfo.dateDelivered = item.dateDelivered;
-                }
-                if (item.deliverStatus == DELIVERSTATUS.RECEIVED && item.dateCompleted) {
-                    orderInfo.dateCompleted = item.dateCompleted;
-                }
+                // 支付时间
+			    if (item.payStatus == PAYMENTSTATUS.PAID && item.datePaid) {
+			        orderInfo.datePaid = item.datePaid;
+			    }
+			    // 待收货时间
+			    if (item.datePendingDeliver) {
+			        orderInfo.datePendingDeliver = item.datePendingDeliver;
+			    }
+			    // 全部发货时间
+			    if (item.deliverStatus == DELIVERSTATUS.DELIVERED && item.dateDelivered) {
+			        orderInfo.dateDelivered = item.dateDelivered;
+			    }
+			    // 完成时间
+			    if (item.deliverStatus == DELIVERSTATUS.RECEIVED && item.dateCompleted) {
+			        orderInfo.dateCompleted = item.dateCompleted;
+			    }
                 item.order = orderInfo;
             }
         }
@@ -799,11 +806,17 @@ var convertOrderToShow = function(order){
 				}
 				payment.price = parseFloat(payment.price.toFixed(2));
 			}
+			// 本阶段要付金额
 			subOrder.price = parseFloat(subOrder.price.toFixed(2));
+			// 本阶段已付金额
 			subOrder.paidPrice = parseFloat(paidPrice.toFixed(2));
+			// 本阶段已支付次数
 			subOrder.paidTimes = paidTimes;
+			// 本阶段支付已关闭次数
 			subOrder.closedTimes = closedTimes;
+			// 本阶段的所有支付信息列表
 			subOrder.payments = payments;
+			// 本阶段支付时间
 			subOrder.datePaid = datePaid;
 			subOrders.push(subOrder);
 		}
@@ -813,23 +826,33 @@ var convertOrderToShow = function(order){
 
 	// order status and type
 	if (order) {
+		// 总价
 		order.price = parseFloat(order.price.toFixed(2));
+		// 定金
 		if (order.deposit)
 			order.deposit = parseFloat(order.deposit.toFixed(2));
+		// 待付金额
 		if (order.duePrice)
 			order.duePrice = parseFloat(order.duePrice.toFixed(2));
 		// 订单合成状态
         order.orderType = OrderService.orderType(order);
 		var orderInfo = {'totalPrice':parseFloat(order.price.toFixed(2)),'deposit':parseFloat(order.deposit.toFixed(2)),'dateCreated':order.dateCreated, 'orderStatus': OrderService.orderStatus(order)};
-        if (order.payStatus == PAYMENTSTATUS.PAID && order.datePaid) {
-            orderInfo.datePaid = order.datePaid;
-        }
-        if (order.deliverStatus == DELIVERSTATUS.DELIVERED && order.dateDelivered) {
-            orderInfo.dateDelivered = order.dateDelivered;
-        }
-        if (order.deliverStatus == DELIVERSTATUS.RECEIVED && order.dateCompleted) {
-            orderInfo.dateCompleted = order.dateCompleted;
-        }
+        // 支付时间
+	    if (order.payStatus == PAYMENTSTATUS.PAID && order.datePaid) {
+	        orderInfo.datePaid = order.datePaid;
+	    }
+	    // 待收货时间
+	    if (order.datePendingDeliver) {
+	        orderInfo.datePendingDeliver = order.datePendingDeliver;
+	    }
+	    // 全部发货时间
+	    if (order.deliverStatus == DELIVERSTATUS.DELIVERED && order.dateDelivered) {
+	        orderInfo.dateDelivered = order.dateDelivered;
+	    }
+	    // 完成时间
+	    if (order.deliverStatus == DELIVERSTATUS.RECEIVED && order.dateCompleted) {
+	        orderInfo.dateCompleted = order.dateCompleted;
+	    }
         order.order = orderInfo;
 	}
 
@@ -1745,7 +1768,11 @@ function json_RSCorders_query() {
                 if (order.payStatus == PAYMENTSTATUS.PAID && order.datePaid) {
                     orderInfo.datePaid = order.datePaid;
                 }
-               	// 发货时间
+                // 待收货时间
+			    if (order.datePendingDeliver) {
+			        orderInfo.datePendingDeliver = order.datePendingDeliver;
+			    }
+               	// 全部发货时间
                 if (order.deliverStatus == DELIVERSTATUS.DELIVERED && order.dateDelivered) {
                     orderInfo.dateDelivered = order.dateDelivered;
                 }
