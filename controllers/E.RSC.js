@@ -153,6 +153,7 @@ function json_RSC_orders_get(){
     var page = U.parseInt(self.data.page, 1) - 1;
     var max = U.parseInt(self.data.max, 20);
     var type = U.parseInt(self.data.type);
+    var search = self.data.search;
     OrderService.getByRSC(RSC, page, max, type, function(err, orders, count, pageCount){
         if(err){
             self.respond({code:1002, message:'获取订单失败'});
@@ -161,7 +162,7 @@ function json_RSC_orders_get(){
 
         generate_RSC_order_type(orders);
         self.respond({code:1000, message:'success', orders:orders, count:count, pageCount:pageCount});
-    })
+    }, search)
 }
 
 function process_RSC_order_deliverStatus_delivering(){

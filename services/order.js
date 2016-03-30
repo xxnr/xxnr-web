@@ -748,7 +748,7 @@ OrderService.prototype.generateDeliveryCodeandNotify = function(order, newArrive
 
 			if(!deliveryCode || !deliveryCode.code){
 				// generate code and insert
-				var code = tools.generateAuthCode();
+				var code = tools.generateAuthCode(7);
 				var newDeliveryCode = new DeliveryCodeModel({orderId:order.id, code: code});
 				newDeliveryCode.save(function(err){
 					if(err && 11000 != err.code){
@@ -1714,7 +1714,7 @@ OrderService.prototype.savePaidLog = function(paidLog, callback) {
     }
 };
 
-OrderService.prototype.getByRSC = function(RSC, page, max, type, callback){
+OrderService.prototype.getByRSC = function(RSC, page, max, type, callback, search){
 	if(!RSC){
 		callback('RSC needed');
 		return;
@@ -1761,6 +1761,12 @@ OrderService.prototype.getByRSC = function(RSC, page, max, type, callback){
 			default:
 				break;
 		}
+	}
+
+	if (search) {
+		query.$or = [{buyerPhone: new RegExp('^'+search)},
+			{consigneePhone: new RegExp('^'+search)},
+			{id: new RegExp('^'+search)}];
 	}
 
 	OrderModel.count(query, function(err, count){

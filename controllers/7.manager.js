@@ -1688,7 +1688,7 @@ function json_RSC_info_get(id){
 			return;
 		}
 
-		self.respond({code:1000, message:'success', RSCInfo:user.RSCInfo, id:user.id});
+		self.respond({code:1000, message:'success', RSCInfo:user.RSCInfo, id:user.id, account:user.account});
 	})
 }
 
