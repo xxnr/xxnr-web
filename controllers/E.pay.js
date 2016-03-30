@@ -12,7 +12,7 @@ exports.install = function() {
     // pay
     F.route('/alipay', alipayOrder, ['post', 'get'], ['isInWhiteList', 'throttle']);
     F.route('/unionpay', unionPayOrder, ['post', 'get'], ['isInWhiteList', 'throttle']);
-    F.route('/offlinepay', offlinePay, ['get', 'isLoggedIn']);
+    F.route('/offlinepay', offlinePay, ['get'], ['isLoggedIn']);
     // pay notify
     // old url
     F.route('/dynamic/alipay/nofity.asp', alipayNotify, ['post','raw']);
