@@ -36,9 +36,24 @@ exports.isPrice = function(str) {
     return regexpPrice.test(str.toString());
 };
 
-exports.generateAuthCode = function () {
+exports.parseInt = function(obj, def){
+    if (obj === undefined || obj === null)
+        return def || 0;
+
+    var type = typeof(obj);
+
+    if (type === 'number')
+        return obj;
+
+    var str = type !== 'string' ? obj.toString() : obj;
+    return str.parseInt(def, 10);
+};
+
+exports.generateAuthCode = function (length) {
+    var self = this;
+    length = self.parseInt(length, 6);
     var authCode = '';
-    for (var i = 0; i < 6; i++) {
+    for (var i = 0; i < length; i++) {
         authCode += Math.floor(Math.random() * 10);
     }
 
