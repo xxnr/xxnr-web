@@ -7,6 +7,7 @@ var SKUModel = require('../models').SKU;
 var ProductAttributeModel = require('../models').productAttribute;
 var sortOptions = {"price-desc":{price:-1},"price-asc":{price:1}};
 var BrandModel = require('../models').brand;
+var tools = require('../common/tools');
 
 // Service
 var ProductService = function(){};
@@ -582,6 +583,23 @@ ProductService.prototype.updateStatus = function(_id, online, callback){
     };
 
     onlineProduct(_id, online, updator, callback);
+};
+
+ProductService.prototype.queryProductsById = function(productIds, callback){
+    if(!tools.isArray(productIds)){
+        callback('array input of productIds required');
+        return;
+    }
+
+    ProductModel.find({id:{$in:productIds}}, function(err, products){
+        if(err){
+            console.error(err);
+            callback(err);
+            return;
+        }
+
+        callback(null, products || []);
+    })
 };
 
 function onlineProduct(_id, online, updator, callback){

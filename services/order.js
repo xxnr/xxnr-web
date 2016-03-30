@@ -1885,4 +1885,31 @@ OrderService.prototype.getPaymentInOrder = function (order, paymentId) {
 	return null;
 };
 
+OrderService.prototype.updateRSCInfo = function(orderId, RSCInfo, callback){
+	if(!orderId){
+		callback('orderId required');
+		return;
+	}
+
+	if(!RSCInfo){
+		callback('RSCInfo required');
+		return;
+	}
+
+	OrderModel.update({id:orderId}, {$set:{RSCInfo:RSCInfo}}, function(err, numUpdated){
+		if(err){
+			console.error(err);
+			callback(err);
+			return;
+		}
+
+		if(!numUpdated || numUpdated.updated == 0){
+			callback('not updated');
+			return;
+		}
+
+		callback();
+	})
+};
+
 module.exports = new OrderService();

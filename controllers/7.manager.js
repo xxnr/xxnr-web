@@ -55,6 +55,7 @@ exports.install = function() {
 	F.route(CONFIG('manager-url') + '/api/orders/subOrders/',              	json_subOrders_payments_update, ['put'], ['backend_auth', 'auditing']);
 	F.route(CONFIG('manager-url') + '/api/orders/products/',              	json_orders_products_update, ['put'], ['backend_auth', 'auditing']);
 	F.route(CONFIG('manager-url') + '/api/orders/SKUs/',              		json_orders_SKUs_update, ['put'], ['backend_auth', 'auditing']);
+	F.route(CONFIG('manager-url') + '/api/orders/RSCInfo/',					process_orders_RSCInfo_update, ['put'], ['backend_auth', 'auditing']);
 	// F.route(CONFIG('manager-url') + '/api/orders/',              			json_orders_save, ['put'], ['backend_auth']);
 	// F.route(CONFIG('manager-url') + '/api/orders/',              			json_orders_remove, ['delete']);
 	// F.route(CONFIG('manager-url') + '/api/orders/clear/',        			json_orders_clear);
@@ -163,6 +164,7 @@ exports.install = function() {
 	F.route(CONFIG('manager-url') + '/api/v2.2/RSCInfo/{_id}',				json_RSC_info_get, ['get'], ['backend_auth']);
 	F.route(CONFIG('manager-url') + '/api/v2.2/RSCs',						json_RSC_query, ['get'], ['backend_auth']);
 	F.route(CONFIG('manager-url') + '/api/v2.2/RSC/modify',					process_RSC_modify, ['put'], ['backend_auth']);
+	F.route(CONFIG('manager-url') + '/api/v2.2/RSC/queryByProducts',		json_RSC_query_by_products,['get'],['backend_auth']);
 	// RSC orders
 	F.route(CONFIG('manager-url') + '/api/v2.2/RSC/orders/',              	json_RSCorders_query, ['get'], ['backend_auth']);
 
@@ -1789,6 +1791,32 @@ function json_RSCorders_query() {
     });
 }
 
+function json_RSC_query_by_products(){
+	var self = this;
+	var productIds = self.data.productIds.split(',');
+
+	ProductService.queryProductsById(productIds, function(err, products){
+		if(err){
+			self.respond({code: 1002, message: '查询失败' + err});
+			return;
+		}
+
+		var product_ids = [];
+		products.forEach(function(product){
+			product_ids.push(product._id.toString());
+		});
+
+		RSCService.getRSCList(product_ids, null, null, null, null, null, null, function(err, RSCs, count, pageCount){
+			if(err){
+				self.respond({code: 1002, message: '查询失败' + err});
+				return;
+			}
+
+			self.respond({code:1000, message:'success', RSCs:RSCs});
+		});
+	})
+}
+
 // ==========================================================================
 // Pay Refund
 // ==========================================================================
@@ -1858,4 +1886,18 @@ function json_payrefund_update() {
 			self.respond({code:1000, message:'success'});
 		});
 	});
+}
+
+function process_orders_RSCInfo_update(){
+	var self = this;
+	var orderId = self.data.id;
+	var RSCInfo = self.data.RSCInfo;
+	OrderService.updateRSCInfo(orderId, RSCInfo, function(err){
+		if(err){
+			self.respond({code:1002, message:err});
+			return;
+		}
+
+		self.respond({code:1000, message:'success'});
+	})
 }
