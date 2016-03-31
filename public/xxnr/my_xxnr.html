@@ -102,11 +102,17 @@
                 </div>
                 <div class="userProfile ng-hide" ng-hide="!user.isUserInfoFullFilled">
                     <p class="name">姓名：{{user.name}}
-                        <span ng-class="{true:'female',false:'male'}[user.sex]">{{user.sex}}</span>
+                        <span class="sex" ng-class="{true:'female',false:'male'}[user.sex]">{{user.sex}}</span>
                     </p>
                     <p>地区：{{user.address}}</p>
                     <p class="type">类型：{{user.type}}
-                        <img class="huizhang" ng-if="user.isVerified" src="images/huiyuan.png" alt="" /><a href="fillProfile.html" class="modifyInfo">修改资料</a></p>
+                        <a href="applyCountyVerified.html">
+                            <img class="huizhang" ng-if="user.isVerified" src="images/huiyuan.png" alt="" />
+                            <img class="huizhang" ng-if="!user.isVerified && user.RSCInfoVerifing" src="images/badge_gray.png" alt="" />
+                        </a>
+                        <a href="fillProfile.html" class="modifyInfo">修改资料</a>
+                        <a href="applyCountyVerified.html" class="applyVerified" ng-if="!user.isRSC && !user.RSCInfoVerifing && user.typeNum == 5">申请认证</a>
+                    </p>
                 </div>
                 <div class="needToFillProfile ng-hide" ng-hide="user.isUserInfoFullFilled">
                     <a href="fillProfile.html">去完善资料领积分</a>

@@ -9,6 +9,7 @@ var JWT = require('jsonwebtoken');
 
 var regexpPhone = new RegExp('^(13[0-9]|15[012356789]|17[678]|18[0-9]|14[57])[0-9]{8}$');
 var regexpPrice = new RegExp('^[0-9]*(\.[0-9]{1,2})?$');
+var regexIdentityNo = /^(\d{15}$|^\d{18}$|^\d{17}(\d|X|x))$/;
 var regexpXXNRHost = new RegExp('(.*\.|^)xinxinnongren\.com.*');
 
 /*
@@ -35,9 +36,24 @@ exports.isPrice = function(str) {
     return regexpPrice.test(str.toString());
 };
 
-exports.generateAuthCode = function () {
+exports.parseInt = function(obj, def){
+    if (obj === undefined || obj === null)
+        return def || 0;
+
+    var type = typeof(obj);
+
+    if (type === 'number')
+        return obj;
+
+    var str = type !== 'string' ? obj.toString() : obj;
+    return str.parseInt(def, 10);
+};
+
+exports.generateAuthCode = function (length) {
+    var self = this;
+    length = self.parseInt(length, 6);
     var authCode = '';
-    for (var i = 0; i < 6; i++) {
+    for (var i = 0; i < length; i++) {
         authCode += Math.floor(Math.random() * 10);
     }
 
@@ -62,13 +78,13 @@ function sendPhoneMessage(phonenumber, content) {
         res.setEncoding('utf8');
         res.on('data', function (chunk) {
             if ((chunk.indexOf('<returnstatus>Success</returnstatus>', 0) == -1) || (chunk.indexOf('<message>ok</message>', 0) == -1)) {
-                console.log(chunk);
+                console.error('sendPhoneMessage return err:', chunk);
             }
         });
     });
 
     req.on('error', function (e) {
-        console.log('problem with request: ' + e.message);
+        console.error('problem with request:', e.message);
     });
 
     // req.write(postData); we don't have body.
@@ -210,6 +226,21 @@ exports.isXXNRAgent = function(verifiedTypes){
     return verifiedTypes && verifiedTypes.indexOf(XXNRAgentId) != -1;
 };
 
+exports.isRSC = function(verifiedTypes){
+    const RSCId = '5';
+    return verifiedTypes && verifiedTypes.indexOf(RSCId) != -1;
+};
+
+exports.isValidIdentityNo = function(identityNo){
+    return regexIdentityNo.test(identityNo);
+};
+
+exports.regexIdentityNo = regexIdentityNo;
+
+exports.isEmptyObject = function isEmptyObject(obj) {
+    return !Object.keys(obj).length;
+};
+
 // get xxnr host
 exports.getXXNRHost = function(url){
     if (!url)
@@ -220,4 +251,54 @@ exports.getXXNRHost = function(url){
     } else {
         return url;
     }
+};
+
+exports.isOfflinePayType = function(type){
+    const offlinePayType = [3, 4];
+    return offlinePayType.indexOf(type) != -1;
+};
+
+exports.isArray = function(obj) {
+    return obj instanceof Array;
+};
+
+/**
+ * http request function
+ * @param  {object}   httpOptions http request options
+ * @param  {Function} callback    callback function
+ * @return {null}     only callback
+ */
+exports.httpRequest = function(options, callback) {
+    if (!options) {
+        callback('options is null');
+        return;
+    }
+    if (!options.httpOptions) {
+        callback('httpOptions is null');
+        return;
+    }
+
+    var req = http.request(options.httpOptions, function (res) {
+        res.setEncoding('utf8');
+        res.on('data', function (chunk) {
+            if (res.statusCode == 200) {
+                callback(null, chunk);
+            } else {
+                callback(res.statusCode, chunk);
+            }
+        });
+    });
+
+    if (options.postData) {
+        req.write(options.postData);
+    }
+
+    req.on('error', function (e) {
+        console.error('tools httpRequest error:', e);
+        callback(e);
+    });
+
+    
+
+    req.end();
 };

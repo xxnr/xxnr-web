@@ -46,6 +46,29 @@ String.prototype.endsWith = function(text, ignoreCase) {
 
 };
 
+/**
+ * Checks if is object empty
+ * @param  {Object}  obj
+ * @return {Boolean}
+ */
+objIsEmpty = function(obj) {
+
+	if (obj === null)
+		return true;
+
+	if (obj.length)
+		return false;
+
+	if (obj.length === 0)
+		return true;
+
+	for (var key in obj) {
+		if (hasOwnProperty.call(obj, key))
+		return false;
+	}
+	return true;
+};
+
 COMPONENT('click', function() {
 	var self = this;
 

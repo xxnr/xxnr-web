@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html ng-app="applyCountyVeri">
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="renderer" content="webkit">
+    <meta name="force-rendering" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+    <title>服务站认证</title>
+    <!--[if lte IE 7]><script>alert('为了更好的购物体验，请升级您的浏览器版本');window.location.href='http://cdn.dmeng.net/upgrade-your-browser.html?referrer='+location.href;</script><![endif]-->
+    <link rel='icon' href='images/title_logo.png' type='image/png' />
+    <meta http-equiv="pragma" content="no-cache">
+    <meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
+    <meta http-equiv="expires" content="Wed, 26 Feb 1997 08:21:57 GMT">
+    <!-- build:css -->
+    <link type="text/css" rel="stylesheet" href="css/style.css">
+    <link type="text/css" rel="stylesheet" href="css/sweetalert.css">
+    <!-- endbuild -->
+    <!-- build:js -->
+    <script src="js/jquery.min.js"></script>
+    <script src="js/angular.min.js"></script>
+    <script src="js/angular-cookies.min.js"></script>
+    <script src="js/common.js"></script>
+    <script src="js/login/loginService.js"></script>
+    <script src="js/remoteApiService.js"></script>
+    <script src="js/login/loginController.js"></script>
+    <script src="js/headerFooterDirective.js"></script>
+    <script src="js/headerController.js"></script>
+    <script src="js/sweetalert.min.js"></script>
+    <script src="js/myPlaceholderDirective.js"></script>
+    <script src="js/fillProfile/applyCountyVeriController.js"></script>
+    <script src="js/sideService.js"></script>
+    <script src="js/shoppingCart/shoppingCartService.js"></script>
+    <script src="js/shoppingCart/shoppingCartController.js"></script>
+    <!-- endbuild -->
+</head>
+<body>
+<header ng-controller="headerController"></header>
+<div class="wrap nav" ng-controller="shoppingCartController">
+    <h1 class="left logo"><a href="/">新新农人</a></h1>
+    <div class="ng-cloak">
+        <ul class="left">
+            <li><a href="/">首页</a></li>
+            <li><a href="huafei_list.html">化肥专场</a></li>
+            <li><a href="car_list.html">汽车专场</a></li>
+            <li><a href="news_list.html">新农资讯</a></li>
+            <!-- <li><a href="#">新农论坛</a></li> -->
+            <li><a href="about.html">公司介绍</a></li>
+        </ul>
+        <div class="right buy">
+            <a href="" ng-click="accessShoppingCart()">
+                <em>&nbsp;</em>
+                购物车
+            </a>
+        </div>
+        <span class="shopping_cart_badge ng-cloak" ng-bind="shoppingCartCount"></span>
+    </div>
+</div>
+<div class="clear applyVerified_section" ng-controller="applyCountyController">
+    <p class="guide">
+        <a href="/">首页</a> ／ <a href="my_xxnr.html">我的新农人</a> ／ <a href="">服务站认证</a>
+    </p>
+    <div class="wrap">
+        <div class="container">
+            <div class="formTitle">
+                <span class="formTitle__title">服务站认证</span><span class="formTitle__titleText"><img src="../xxnr/images/prompt.png" alt="" />资料提交后不可修改，认证成功后“我的新农人”页面的徽章将被点亮</span>
+            </div>
+            <form name="applyCountyForm" class="applyCountyForm" novalidate ng-submit="" >
+                <div class="form-group">
+                    <label>姓名</label>
+                    <input type="text" name="name" ng-model="name" ng-readonly="hasAppliedCounty" ng-class="{true:'inputReadonly'}[hasAppliedCounty]" placeholder="请填写真实姓名" ng-focus="focusShowValidate(1)" ng-blur="blurShowValidate()" under12 />
+                    <span class="focus_info ng-cloak" ng-show="fouceFormGroupNum == 1 && !applyCountyForm.name.$error.under12 && !hasAppliedCounty">
+                        <div class="arrow-left"></div>
+                        请填写真实姓名
+                    </span>
+                    <div class="validate_error ng-cloak" ng-show="applyCountyForm.name.$dirty && applyCountyForm.name.$error.under12">
+                        <span ng-show="applyCountyForm.name.$error.under12">
+                            <div class="arrow-left"></div>
+                            <img src="../xxnr/images/error.png" alt="" />
+                            姓名限6个汉字或12个英文字符
+                        </span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>身份证号</label>
+                    <input name="ID_Num" ng-model="ID_Num" ng-readonly="hasAppliedCounty" ng-class="{true:'inputReadonly'}[hasAppliedCounty]" placeholder="请填写身份证号，用于验证身份" ng-focus="focusShowValidate(2)" ng-blur="blurShowValidate()" idverfied/>
+                    <span class="focus_info ng-cloak" ng-show="fouceFormGroupNum == 2 && !applyCountyForm.ID_Num.$error.idverfied && !hasAppliedCounty">
+                        <div class="arrow-left"></div>
+                        请填写身份证号，用于验证身份
+                    </span>
+                    <div class="validate_error ng-cloak" ng-show="applyCountyForm.ID_Num.$dirty && applyCountyForm.ID_Num.$error.idverfied">
+                        <span ng-show="applyCountyForm.ID_Num.$error.idverfied">
+                            <div class="arrow-left"></div>
+                            <img src="../xxnr/images/error.png" alt="" />
+                            请填写正确的身份证号
+                        </span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>门店名称</label>
+                    <input name="companyName" maxlength="20" type="text" required ng-model="companyName" ng-readonly="hasAppliedCounty" ng-class="{true:'inputReadonly'}[hasAppliedCounty]" placeholder="请填写门店名称" ng-focus="focusShowValidate(3)" ng-blur="blurShowValidate()">
+                    <span class="focus_info ng-cloak" ng-show="fouceFormGroupNum == 3 && !applyCountyForm.companyName.$error.required && !hasAppliedCounty">
+                        <div class="arrow-left"></div>
+                        请填写门店名称（门店名称限20个汉字）
+                    </span>
+                    <div class="validate_error ng-cloak" ng-show="applyCountyForm.shopName.$dirty && applyCountyForm.shopName.$error.required">
+                        <span ng-show="applyCountyForm.shopName.$error.required">
+                            <div class="arrow-left"></div>
+                            <img src="../xxnr/images/error.png" alt="" />
+                            填写门店名称（门店名称限20个汉字）
+                        </span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>联系电话</label>
+                    <input name="phoneNum" type="tel" phoneverfied ng-model="phoneNum" ng-readonly="hasAppliedCounty" ng-class="{true:'inputReadonly'}[hasAppliedCounty]" placeholder="请填写常用手机号" ng-focus="focusShowValidate(4)" ng-blur="blurShowValidate()">
+                    <span class="focus_info ng-cloak" ng-show="fouceFormGroupNum == 4 && !applyCountyForm.phoneNum.$error.phoneverfied && !hasAppliedCounty">
+                        <div class="arrow-left"></div>
+                        请填写常用手机号
+                    </span>
+                    <div class="validate_error ng-cloak" ng-show="applyCountyForm.phoneNum.$dirty && applyCountyForm.phoneNum.$error.phoneverfied">
+                        <span ng-show="applyCountyForm.phoneNum.$error.phoneverfied">
+                            <div class="arrow-left"></div>
+                            <img src="../xxnr/images/error.png" alt="" />
+                            请填写正确的手机号
+                        </span>
+                    </div>
+                </div>
+                <div class="form-group region">
+                    <label>所在地区</label>
+                    <select class="profileInput" ng-disabled="hasAppliedCounty" ng-class="{'changed':profileProvince.id!=0,'selectReadonly':hasAppliedCounty}" name="" id="provin" ng-model="profileProvince" ng-options="province as province.name for province in provinces" ng-change="getCityList()">
+                    </select>
+                    <select class="profileInput" ng-disabled="hasAppliedCounty" ng-class="{'changed':profileCity.id!=0,'selectReadonly' :hasAppliedCounty}" name="" id="city" ng-model="profileCity" ng-options="city as city.name for city in cities" ng-change="getCountyList()">
+                    </select>
+                    <select class="profileInput" ng-disabled="hasAppliedCounty" ng-class="{'changed':profileCounty.id!=0,'selectReadonly' :hasAppliedCounty}" name="" ng-model="profileCounty" ng-show="profileCounty" id="county" ng-options="county as county.name for county in counties" ng-change="getTownList()">
+                    </select>
+                    <select class="profileInput" ng-disabled="hasAppliedCounty" ng-class="{'changed':profileTown.id!=0,'selectReadonly' :hasAppliedCounty}" name="" id="town" ng-model="profileTown" ng-options="town as town.name for town in towns" >
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>详细地址</label>
+                    <input name="detailAddress" type="text" maxlength="30" required ng-model="detailAddress" ng-readonly="hasAppliedCounty" ng-class="{true:'inputReadonly'}[hasAppliedCounty]" placeholder="请填写门店详细地址" ng-focus="focusShowValidate(5)" ng-blur="blurShowValidate()">
+                    <span class="focus_info ng-cloak" ng-show="fouceFormGroupNum == 5 && !applyCountyForm.detailAddress.$error.required && !hasAppliedCounty">
+                        <div class="arrow-left"></div>
+                        请填写门店详细地址（限30个汉字）
+                    </span>
+                    <div class="validate_error ng-cloak" ng-show="applyCountyForm.shopAddress.$dirty && applyCountyForm.shopAddress.$error.required">
+                        <span ng-show="applyCountyForm.shopAddress.$error.required">
+                            <div class="arrow-left"></div>
+                            <img src="../xxnr/images/error.png" alt="" />
+                            填写门店详细地址（限30个汉字）
+                        </span>
+                    </div>
+                </div>
+                <button type="submit" ng-click="submitApplyForm()" ng-disabled="applyCountyForm.$invalid || profileProvince.id==0 || profileCity.id==0 || hasAppliedCounty" ng-class="{true:'invalid'}[applyCountyForm.$invalid || profileProvince.id==0 || profileCity.id==0 || hasAppliedCounty]">完成</button>
+            </form>
+        </div>
+    </div>
+</div>
+<footer></footer>
+</body>
+</html>

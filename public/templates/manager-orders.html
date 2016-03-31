@@ -8,7 +8,7 @@
 			</div>
 			<div class="col-md-3 col-sm-6 m">
 				<!--<div data-component="dropdown" data-component-path="orders.filter.type" data-options="@(全部订单)|0;@(Uncompleted)|1;@(Uncompleted and not paid)|2;@(Uncompleted and paid)|3;@(Completed)|4" data-component-type="number"></div>-->
-				<div data-component="dropdown" data-component-path="orders.filter.type" data-options="@(全部订单)|;@(待付款)|1;@(待发货)|2;@(已发货)|3;@(完成)|4;@(已关闭)|0" data-empty="true" data-empty-text="@(全部订单)">@(状态筛选)</div>
+				<div data-component="dropdown" data-component-path="orders.filter.type" data-options="@(全部订单)|;@(待付款)|1;@(待发货)|2;@(待收货)|3;@(完成)|4;@(已关闭)|0" data-empty="true" data-empty-text="@(全部订单)">@(状态筛选)</div>
 			</div>
 		</div>
 	</div>
@@ -16,9 +16,9 @@
 <div class="container">
 	<div data-component="grid" data-component-path="orders.grid" data-max="auto" data-options-page="@(Page: #)" data-options-button="@(查看更多订单)" data-component-id="orders.grid">
 		<script type="text/html">
-		<tr{{ if confirmed }} class="order-completed"{{ fi }}>
+		<tr{{ if deliverStatus==5 }} class="order-completed"{{ fi }}>
 	        <td style="width:40px" class="silver hidden-xs" data-title="序号">$index</td>
-	        <td style="width:80px" class="silver hidden-xs" data-title="订单号">{{ id }}</td>
+	        <td style="width:60px" class="silver hidden-xs" data-title="订单号">{{ id }}</td>
 	        <!--<td style="width:80px" class="silver hidden-xs" data-title="商品" title="{{ if products && products.length > 0 }}{{ products[0].name }}{{ fi }}">-->
 	        	<!--{{ if products && products.length > 0 }}-->
 		        	<!--{{ products[0].name }}-->
@@ -27,8 +27,15 @@
             <td style="width:80px" class="silver hidden-xs ui-center" data-title="收货人">{{ consigneeName }}</br>{{ consigneePhone }}</td>
 	        <td style="width:110px" class="silver hidden-xs ui-right" data-title="下单时间" title="{{ dateCreated | format('@(yyyy-MM-dd HH:mm:ss)') }}">{{ dateCreated | format('@(yyyy-MM-dd HH:mm:ss)') }}</td>
 			<td style="width:80px" class="silver hidden-xs ui-center" data-title="下单用户">{{ buyerName }}</br>{{ buyerPhone }}</td>
-	        <td style="width:80px" class="ui-right active" data-title="总金额" title="{{price | price(2)}}">{{ price | price(2) }} </td>
-	        <td style="width:80px" class="ui-right active" data-title="定金" title="{{deposit | price(2)}}">{{ deposit | price(2) }} </td>
+	        <td style="width:70px" class="ui-right active" data-title="总金额" title="{{price | price(2)}}">{{ price | price(2) }} </td>
+			<td style="width:60px" class="ui-right active" data-title="定金" title="{{deposit | price(2)}}">{{ deposit | price(2) }} </td>
+			<td style="width:50px" class="ui-right active" data-title="配送方式">
+				{{ if deliveryType==1 }}
+					自提
+				{{ else }}
+					配送到户
+				{{ fi }}
+			</td>
 	        <td style="width:90px" data-title="状态">
 	        	{{ if payStatus==1 }}
 	        		<span class="mr5 red">未付款</span>
@@ -52,7 +59,15 @@
 	        			{{ if deliverStatus==3 }}
 	        				<span class="red">部分发货</span>
 	        			{{ else }}
-			        		<span class="mr5 red">其他</span>
+							{{ if deliverStatus==4 }}
+								<span class="red">已到服务站</span>
+							{{ else }}
+								{{ if deliverStatus==5 }}
+									<span class="green">已完成</span>
+								{{ else }}
+									<span class="mr5 red">其他</span>
+								{{ fi }}
+							{{ fi }}
 	        			{{ fi }}
 	        		{{ fi }}
 	        	{{ fi }}
@@ -87,7 +102,7 @@
 	        				<span class="green">待发货</span>
 		        		{{ else }}
 		        			{{ if typeValue === 3 }}
-	        					<span class="green">已发货</span>
+	        					<span class="green">待收货</span>
 		        			{{ else }}
 		        				{{ if typeValue === 4 }}
 	        						<span class="green">已完成</span>
@@ -162,7 +177,15 @@
 				        			{{ if deliverStatus==3 }}
 				        				<span class="red">部分发货</span>
 				        			{{ else }}
-						        		<span class="mr5 red">其他</span>
+										{{ if deliverStatus==4 }}
+											<span class="red">已到服务站</span>
+										{{ else }}
+											{{ if deliverStatus==5 }}
+												<span class="green">已完成</span>
+											{{ else }}
+												<span class="mr5 red">其他</span>
+											{{ fi }}
+										{{ fi }}
 				        			{{ fi }}
 				        		{{ fi }}
 				        	{{ fi }}
@@ -206,7 +229,7 @@
 			        				<span class="green">待发货</span>
 				        		{{ else }}
 				        			{{ if orderType === 3 }}
-			        					<span class="green">已发货</span>
+			        					<span class="green">待收货</span>
 				        			{{ else }}
 				        				{{ if orderType === 4 }}
 			        						<span class="green">已完成</span>
@@ -243,8 +266,8 @@
 			<br />
 			<div data-component="template" data-component-path="orders.form">
 				<script type="text/html">
-				<table class="table table-bordered" border="0">
-					<tbody>
+					<table class="table table-bordered" border="0">
+						<tbody>
 						<tr>
 							<td class="col-xs-5 active">@(收货人)</td>
 							<td>{{ consigneeName }}</td>
@@ -263,9 +286,67 @@
 						<tr>
 							<td class="col-xs-5 active">@(用户备注)</td>
 						</tr> -->
-					</tbody>
-				</table>
+						</tbody>
+					</table>
 				</script>
+			</div>
+			<div class="silver"><strong>@(配送信息)</strong></div>
+			<br />
+			<div data-component="template" data-component-path="orders">
+				<script type="text/html">
+					<table class="table table-bordered" border="0">
+						<tbody>
+						<tr>
+							<td class="col-xs-5 active">@(配送方式)</td>
+							<td>
+								{{ if form.deliveryType==1 }}
+									自提
+								{{ else }}
+									配送到户
+								{{ fi }}
+							</td>
+						</tr>
+						<tr>
+							<td class="col-xs-5 active">@(服务站信息)</td>
+							<td>
+								<p id="RSCList">服务站:
+									<select data-name="RSCSelector">
+										<option selected disabled hidden value=''>@(请选择服务站)</option>
+										{{ foreach RSC in RSCList }}
+											<option RSC="{{ RSC._id }}" companyName="{{RSC.RSCInfo.companyName}}" name="{{RSC.RSCInfo.name}}" phone="{{ RSC.RSCInfo.phone}}"
+													{{if RSC.RSCInfo.companyAddress}}
+														{{ if RSC.RSCInfo.companyAddress.province}}
+															province="{{RSC.RSCInfo.companyAddress.province.name}}"
+														{{ fi }}
+														{{ if RSC.RSCInfo.companyAddress.city}}
+															city="{{RSC.RSCInfo.companyAddress.city.name}}"
+														{{ fi }}
+														{{ if RSC.RSCInfo.companyAddress.county}}
+															county="{{RSC.RSCInfo.companyAddress.county.name}}"
+														{{ fi }}
+														{{ if RSC.RSCInfo.companyAddress.town}}
+															town="{{RSC.RSCInfo.companyAddress.town.name}}"
+														{{ fi }}
+														details="{{RSC.RSCInfo.companyAddress.details}}"
+													{{ fi }}
+													{{  if form.RSCInfo && RSC._id == form.RSCInfo.RSC }}selected{{ fi }}>
+												{{ RSC.RSCInfo.companyName }}
+											</option>
+										{{ end }}
+									</select>
+								</p>
+								{{ if form.RSCInfo }}
+									<p>服务站地址:{{ form.RSCInfo.RSCAddress}}</p>
+									<p>联系电话:{{ form.RSCInfo.RSCPhone }}</p>
+								{{ fi }}
+							</td>
+						</tr>
+						</tbody>
+					</table>
+				</script>
+			</div>
+			<div data-component="visible" class="ui-buttons" data-component-path="orders.form.RSCInfo" data-if="orders.form">
+				<button id="RSCInfoModifyButton" name="submit" data-name="RSCInfo" data-warning="你确认提交服务站信息的修改吗?">@(提交修改)</button>
 			</div>
 		</div>
 		<hr />
@@ -642,6 +723,8 @@
 	orders.grid = [];
 	orders.form = {};
 	orders.info = {};
+
+	orders.RSCList = {};
 	// orders.deliverStatuses = [{name:'未发货',value:1},{name:'已发货',value:2}];
 	// orders.form.payStatuses = [{name:'未支付',value:1},{name:'已支付',value:2}];
 	orders.response;
@@ -672,13 +755,27 @@
 
 						SET('orders.form', $.extend({}, response), true);
                         SET('orders.payStatuses',[{name:'未付款',value:1},{name:'已付款',value:2}], true);
-                        SET('orders.deliverStatuses',[{name:'未发货',value:1},{name:'已发货',value:2}], true);
-                        SET('orders.payTypes',[{name:'支付宝',value:1},{name:'银联',value:2},{name:'线下付款',value:3}], true);
+                        SET('orders.deliverStatuses',[{name:'未发货',value:1},{name:'已发货',value:2},{name:'已到服务站',value:4},{name:'已收货',value:5}], true);
+                        SET('orders.payTypes',[{name:'支付宝',value:1},{name:'银联',value:2},{name:'现金',value:3},{name:'线下POS机',value:4}], true);
 						SET('orders.response', null);
 						SET('orders.subOrdersresponse', null);
 						SET('orders.productsresponse', null);
 						SET('orders.SKUsresponse', null);
-						SET('common.form', 'orders');
+
+						var productIds = "";
+						orders.form.SKUs.forEach(function(SKU){
+							productIds += SKU.productId+',';
+						});
+
+						$.components.GET(managerurl + '/api/v2.2/RSC/queryByProducts', {productIds:productIds}, function(RSCresponse){
+							if(RSCresponse.code != 1000){
+								alert(RSCresponse.message);
+							} else{
+								SET('orders.RSCList', RSCresponse.RSCs);
+								onRSCListRefreshed();
+								SET('common.form', 'orders');
+							}
+						})
 					});
 					break;
 			}
@@ -689,6 +786,31 @@
 			orders_refresh();
 		};
 	});
+
+	function onRSCListRefreshed(){
+		$('#RSCList').on('change', 'select', function () {
+			var el = $(this);
+			var data_name = el.attr('data-name');
+			var RSC = el.find('option:selected').attr('RSC');
+			var companyName = el.find('option:selected').attr('companyName');
+			var name = el.find('option:selected').attr('name');
+			var phone = el.find('option:selected').attr('phone');
+			var province = el.find('option:selected').attr('province');
+			var city = el.find('option:selected').attr('city');
+			var county = el.find('option:selected').attr('county');
+			var town = el.find('option:selected').attr('town');
+			var details = el.find('option:selected').attr('details');
+
+			switch (data_name) {
+				case 'RSCSelector':
+					var RSCInfo = {RSC: RSC, companyName: companyName, RSCPhone:phone, RSCAddress:province+city+county+town+details};
+					orders.form.RSCInfo = RSCInfo;
+					$('#RSCInfoModifyButton').prop({ disabled: false });
+					orders_form_refresh();
+					onRSCListRefreshed();
+			}
+		});
+	}
 
 	ON('#orders.form', function(component) {
 
@@ -786,6 +908,7 @@
 					break;
 			}
 		});
+
 
 		component.changedisabled_botton = function (name) {
 			component.element.find('button').each(function() {

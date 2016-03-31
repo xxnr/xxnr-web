@@ -3,13 +3,15 @@
  */
 var app = angular.module('commit_pay', ['xxnr_common', 'shop_cart']);
 app.controller('commitPayController', function($scope, remoteApiService, payService, commonService, loginService){
+    $scope.has_offlinePay_company = false; //用来表示线下支付点的参数
+    $scope.offlineSubmitted = false;   // 已提交线下订单
     // if not login
     if(!loginService.isLogin) {
         window.location.href = "logon.html";
     }
     var sweetalert = commonService.sweetalert;
     $scope.isInWhiteList = false;
-    $scope.wholePageShow = false;
+    $scope.wholePageShow = false;  //用来解决angular ng-show 闪动的变量
     $scope.orderSelectedNum = 0;
     $scope.payMethods =
     [
@@ -29,8 +31,8 @@ app.controller('commitPayController', function($scope, remoteApiService, payServ
     // $scope.id = commonService.getParam('id');
 
 
-    $scope.itemClicked = function ($index) {
-        $scope.selectedPayMethodIndex = $index;
+    $scope.itemClicked = function (index) {
+        $scope.selectedPayMethodIndex = index;
     };
     $scope.orderClicked = function ($index) {
         $scope.orderSelectedNum = $index;
@@ -156,6 +158,10 @@ app.controller('commitPayController', function($scope, remoteApiService, payServ
                         }else if($scope.orders[index].paySubOrderType == 'full'){
                             $scope.orders[index].orderType = '订单总额';
                         }
+                        if(data.datas.rows.RSCInfo){
+                            $scope.has_offlinePay_company = true;
+                            $scope.orders[index].RSCInfo = data.datas.rows.RSCInfo;
+                        }
 
                         $scope.orders[index].duePrice = data.datas.rows.duePrice;
                         $scope.orders[index].totalPrice = data.datas.rows.totalPrice;
@@ -202,14 +208,16 @@ app.controller('commitPayController', function($scope, remoteApiService, payServ
                         $scope.payUrl = payService.unionPayUrl($scope.orders[$scope.orderSelectedNum].id,$scope.pay_price);
                     }
                 }
+            }else if($scope.selectedPayMethodIndex==2){
+                $scope.payType = '线下支付';
             }
-            if($scope.selectedPayMethodIndex!==null){
-                if($scope.orders[$scope.orderSelectedNum]){
-                    remoteApiService.updateOrderPaytype($scope.orders[$scope.orderSelectedNum].id,$scope.selectedPayMethodIndex+1)
-                        .then(function(data) {
-                        });
-                }
-            }
+            //if($scope.selectedPayMethodIndex!==null){
+            //    if($scope.orders[$scope.orderSelectedNum]){
+            //        remoteApiService.updateOrderPaytype($scope.orders[$scope.orderSelectedNum].id,$scope.selectedPayMethodIndex+1)
+            //            .then(function(data) {
+            //            });
+            //    }
+            //}
         }
 
     });
@@ -218,9 +226,24 @@ app.controller('commitPayController', function($scope, remoteApiService, payServ
         remoteApiService.isAlive()
             .then(function(data){
                 if(data.code == 1000){
-                    $scope.showPayPop = true;
-                    $scope.isOverflow = true;
-                    window.open($scope.payUrl);
+                    if($scope.selectedPayMethodIndex == 2){
+                        remoteApiService.offlinepay($scope.orders[$scope.orderSelectedNum].id,$scope.orders[$scope.orderSelectedNum].duePrice)
+                            .then(function(data) {
+                                if(data.code==1000){
+                                    window.scrollTo(0,0);
+                                    $scope.offlineSubmitted = true;
+
+                                }else{
+                                    sweetalert('线下支付申请失败,请重试');
+                                }
+                            });
+                        //$scope.offlineSubmitted = true;
+                    }else {
+                        window.open($scope.payUrl);
+                        $scope.showPayPop = true;
+                        $scope.isOverflow = true;
+                    }
+
                 }
             });
     };

@@ -2,29 +2,8 @@
  * Created by pepelu on 9/14/2015.
  */
 var app = angular.module('shop_cart', ['xxnr_common']);
-// app.config(function ($stateProvider, $urlRouterProvider, $locationProvider) {
-//     $locationProvider.html5Mode(false);
-//     // $urlRouterProvider.otherwise(function ($injector, $location) {
-//     //   templateUrl : 'test.html'
-//     // });
-//     $stateProvider.state('test', {
-//         url: '',
-//         templateUrl: 'test.html'
-//     });
-// });
 app.controller('shoppingCartController', function($scope, $timeout, remoteApiService, commonService, loginService, sideService, shoppingCartService) {
-    // $scope.$watch('$viewContentLoaded', function(event) {
-    //     console.log("loaded");
-    //     $footer = $(".options-box");
-    //     // var originalTop = $footer.offset().top;
-    //     // var originalLeft = $footer.offset().left;
-    //     // console.log(originalTop);
-    //     // console.log(originalLeft);
-    //     console.log($footer);
-    // });
-    // $scope.$on('$viewContentLoaded',function(event) {
-    //         console.log("loaded");
-    // });
+
     var sweetalert = commonService.sweetalert;
     /////////////////////////////////////
 
@@ -34,7 +13,8 @@ app.controller('shoppingCartController', function($scope, $timeout, remoteApiSer
     $scope.totalPrice = 0;
     $scope.totalSaving = 0;
     $scope.shoppingCartCount = " ";
-
+    $scope.$parent.SKUs = [];
+    $scope.$parent.products_Ids = [];
     $scope.$on('shoppingCartController', function(e, d) {
         //console.log(data);         //子级能得到值
         $scope.shoppingCartCount += d;
@@ -68,21 +48,21 @@ app.controller('shoppingCartController', function($scope, $timeout, remoteApiSer
                         for (var itemIndex in shopData.SKUList) {
                             var itemData = shopData.SKUList[itemIndex];
                             $scope.shoppingCartCount += itemData.count;
-                            // console.log(productFilter);
+
                             if (typeof productFilter === 'function') {
                                 var result = productFilter(itemData);
-                                // console.log(result);
+
                                 if (result[0]) {
                                     itemData = result[1];
                                 } else {
                                     continue;
                                 }
                             }
-                            // console.log(itemData);
+
                             var item = {};
                             item.selected = true;
                             item.SKU_id = itemData._id;
-
+                            item.product_id = itemData.product_id;
                             item.detailPageUrl = "productDetail.html?goodsId=" + itemData.goodsId + '&type=' + shop.name;
                             item.thumbnailUrl = commonService.baseUrl + itemData.imgUrl;
                             item.onSale = (itemData.unitPrice == null || itemData.unitPrice == '') ? false : itemData.unitPrice != itemData.originalPrice;
@@ -90,9 +70,7 @@ app.controller('shoppingCartController', function($scope, $timeout, remoteApiSer
                             if (!item.online) {
                                 item.selected = undefined;
                             }
-                            // console.log(item.online);
                             item.name = itemData.productName.length > 40 ? (itemData.productName.substr(0, 40) + '...') : itemData.productName;
-                            // console.log(itemData.name);
                             item.additions = itemData.additions;
                             item.additionsTotalPrice = 0;
                             for (var i in item.additions) {
@@ -134,9 +112,36 @@ app.controller('shoppingCartController', function($scope, $timeout, remoteApiSer
                             calculateTotal();
                         }
 
+
+                    }
+                    for (var shopIndex = 0; shopIndex < $scope.shops.length; shopIndex++) {
+                        for (var itemIndex = 0; itemIndex < $scope.shops[shopIndex].items.length; itemIndex++) {
+                            if ($scope.shops[shopIndex].items[itemIndex].selected) {
+                                var SKU = {};
+                                SKU._id = $scope.shops[shopIndex].items[itemIndex].SKU_id;
+                                SKU.count = $scope.shops[shopIndex].items[itemIndex].buyCount;
+                                var product_id = $scope.shops[shopIndex].items[itemIndex].product_id;
+                                $scope.$parent.products_Ids.push(product_id);
+                                $scope.$parent.SKUs.push(SKU);
+                            }
+                        }
+                    }
+                    if(window.location.href.indexOf("confirmOrder") != -1){
+                        $scope.$parent.checkHasAvailableCompany();
                     }
                     // set shoppingCartCount
                     shoppingCartService.setSCart($scope.shoppingCartCount);
+                    remoteApiService.getDeliveries($scope.$parent.SKUs)
+                        .then(function(data){
+                            if(data.code == 1000){
+                                data.datas.items.sort(function(a, b) {
+                                    return b.sort - a.sort;
+                                });
+
+                                $scope.$parent.deliveries = data.datas.items;
+                                $scope.$parent.deliveryMethod = $scope.$parent.deliveries[0].deliveryType;
+                            }
+                        });
                 });
         } else {
             var count = shoppingCartService.getSCart();
@@ -296,25 +301,38 @@ app.controller('shoppingCartController', function($scope, $timeout, remoteApiSer
     $scope.accessShoppingCart = function() {
         commonService.accessShoppingCart();
     };
-    $scope.buy = function() {
+    $scope.buy = function(deliveryType,RSCId,consigneePhone,consigneeName) {
+        //var SKUs = []
+        //for (var shopIndex = 0; shopIndex < $scope.shops.length; shopIndex++) {
+        //    for (var itemIndex = 0; itemIndex < $scope.shops[shopIndex].items.length; itemIndex++) {
+        //        if ($scope.shops[shopIndex].items[itemIndex].selected) {
+        //            var SKU = {};
+        //            SKU._id = $scope.shops[shopIndex].items[itemIndex].SKU_id;
+        //            SKU.count = $scope.shops[shopIndex].items[itemIndex].buyCount;
+        //            SKUs.push(SKU);
+        //        }
+        //    }
+        //}
 
-        var SKUs = [];
-
-        for (var shopIndex = 0; shopIndex < $scope.shops.length; shopIndex++) {
-            for (var itemIndex = 0; itemIndex < $scope.shops[shopIndex].items.length; itemIndex++) {
-                if ($scope.shops[shopIndex].items[itemIndex].selected) {
-                    var SKU = {};
-                    SKU._id = $scope.shops[shopIndex].items[itemIndex].SKU_id;
-                    SKU.count = $scope.shops[shopIndex].items[itemIndex].buyCount;
-                    SKUs.push(SKU);
-                }
-            }
-        }
-        if (!$scope.$parent.selectedAddressId || $scope.$parent.selectedAddressId == '') {
+        if (deliveryType == 2 && (!$scope.$parent.selectedAddressId || $scope.$parent.selectedAddressId == '')) {
             sweetalert("请填写您的收货地址");
             return;
         }
-        remoteApiService.addOrder($scope.shoppingCartId, $scope.$parent.selectedAddressId, SKUs, 1)
+        if (deliveryType == 1) {
+            if(!$scope.$parent.hasCompany){
+                sweetalert("您选择的商品不能在同一个网点自提，请返回购物车重新选择");
+                return;
+            }else if(RSCId==-1 && $scope.$parent.hasCompany){
+                sweetalert("请选择自提网点");
+                return;
+            }
+            if(!consigneePhone || !consigneeName){
+                sweetalert("请填写收货人信息");
+                return;
+            }
+        }
+        var payType = 1;
+            remoteApiService.addOrder($scope.shoppingCartId, $scope.$parent.selectedAddressId, $scope.$parent.SKUs, payType , deliveryType, RSCId,consigneePhone, consigneeName)
             .then(function(datas) {
                 $scope.data = datas;
                 if (datas.code == 1000) {
