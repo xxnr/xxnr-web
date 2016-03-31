@@ -788,6 +788,7 @@ OrderService.prototype.updatePayments = function(options, callback) {
 							}
 						}
 						if (payment.payType !== options.payments[payment.id].payType) {
+							needCheck = true;
 							payment.payType = options.payments[payment.id].payType;
 						}
 
@@ -1653,6 +1654,8 @@ OrderService.prototype._checkPayStatus = function(order, callback) {
 				orderPayment = null;
 				pushValues = {};
 			}
+
+			setValues['pendingApprove'] = U.parseBoolean(orderPayment && tools.isOfflinePayType(orderPayment.payType), false);
 		}
 		// update and return order info
 		var values = {};
