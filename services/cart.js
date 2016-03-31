@@ -110,7 +110,7 @@ CartService.prototype.updateItems = function(cartId, product_id, count, update_b
             if(count < 0){
                 // if count<0, it means we are removing items
                 // we first update those who's count is greater than -count, using $inc
-                CartModel.update({cartId:cartId, 'items.product':product_id, 'items.count':{$gt:-count}}, {$inc:{'items.$.count':count}}, function(err, numAffected){
+                CartModel.update({cartId:cartId, items:{$elemMatch:{product:product_id, count:{$gt:-count}}}}, {$inc:{'items.$.count':count}}, function(err, numAffected){
                     if(err){
                         console.error(err);
                         callback(err);
@@ -252,8 +252,7 @@ CartService.prototype.updateSKUItems = function(cartId, SKU_id, count, update_by
                     }
                     CartModel.update({
                         cartId: cartId,
-                        'SKU_items.SKU': SKU_id,
-                        'SKU_items.count': {$gt: -count}
+                        SKU_items:{$elemMatch:{SKU:SKU_id, count:{$gt:-count}}}
                     }, options, function (err, numAffected) {
                         if (err) {
                             console.error(err);
