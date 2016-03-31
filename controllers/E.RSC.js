@@ -29,7 +29,7 @@ exports.install = function() {
     F.route('/api/v2.2/RSC/orderDetail',                    json_RSC_order_detail,      ['get'],    ['isLoggedIn', 'isRSC']);
     F.route('/api/v2.2/RSC/orders',                         json_RSC_orders_get,        ['get'],    ['isLoggedIn', 'isRSC']);
     F.route('/api/v2.2/RSC/order/deliverStatus/delivering', process_RSC_order_deliverStatus_delivering, ['post'],    ['isLoggedIn', 'isRSC']);
-    F.route('/api/v2.2/RSC/order/selfDelivery',             process_self_delivery,        ['post'], ['isLoggedIn', 'isRSC']);
+    F.route('/api/v2.2/RSC/order/selfDelivery',             process_self_delivery,        ['post'], ['isLoggedIn', 'isRSC', 'throttle']);
 };
 
 /**
