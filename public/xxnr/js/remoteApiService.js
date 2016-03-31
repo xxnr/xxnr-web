@@ -13,13 +13,17 @@ app.service('remoteApiService', function(commonService){
         return commonService.ajax(params);
     };
 
-    this.addOrder = function(shoppingCartId, addressId, SKUs, payType){
+    this.addOrder = function(shoppingCartId, addressId, SKUs, payType, deliveryType, RSCId, consigneePhone, consigneeName){
         var data = {
             'methodname':'api/v2.1/order/addOrder',
             'shopCartId':shoppingCartId,
             'addressId':addressId,
             'SKUs':SKUs,
-            'payType':payType
+            'payType':payType,
+            'deliveryType':deliveryType,
+            'RSCId':RSCId,
+            'consigneePhone':consigneePhone,
+            'consigneeName':consigneeName
         };
 
         return commonService.sendPost(data);
@@ -470,5 +474,97 @@ app.service('remoteApiService', function(commonService){
         };
         return commonService.ajax(params);
     };
+    this.getNominatedInviter = function(){
+        var params = {
+            methodname:'api/v2.1/user/getNominatedInviter'
+        };
+        return commonService.ajax(params);
+    };
+    this.fillRSCinfo = function(name,IDNo,companyName,companyAddress,phone){
+        var data={
+            'methodname':'api/v2.2/RSC/info/fill',
+            'name':name,
+            'IDNo':IDNo,
+            'companyName':companyName,
+            'companyAddress':companyAddress,
+            'phone':phone
+        };
+        return commonService.sendPost(data);
+    };
+    this.getRSCinfo = function(){
+        var params = {
+            methodname:'api/v2.2/RSC/info/get',
+        };
+        return commonService.ajax(params);
+    };
+    this.getDeliveries = function(SKUs){
+        var data={
+            'methodname':'api/v2.2/cart/getDeliveries',
+            'userId':user.userid,
+            'SKUs':SKUs
+        };
+        return commonService.sendPost(data);
+    };
+    this.RSCAddressProvince = function(products){
+        var params = {
+            'methodname':'api/v2.2/RSC/address/province',
+            'products':products
+        };
+        return commonService.ajax(params);
+    };
+    this.RSCAddressCity = function(products,provinceId){
+        var params = {
+            'methodname':'api/v2.2/RSC/address/city',
+            'products':products,
+            'province':provinceId
+        };
+        return commonService.ajax(params);
+    };
 
+    this.RSCAddressCounty = function(products,provinceId,cityId){
+        var params = {
+            'methodname':'api/v2.2/RSC/address/county',
+            'products':products,
+            'province':provinceId,
+            'city':cityId
+        };
+        return commonService.ajax(params);
+    };
+    this.getRSC = function(products,province,city,county,town,page,max){
+        var params = {
+            'methodname':'api/v2.2/RSC',
+            'products':products,
+            'province':province,
+            'city':city,
+            'county':county,
+            'town':town,
+            'page':page,
+            'max':max
+        };
+        return commonService.ajax(params);
+    };
+    this.saveConsignees = function(consigneeName,consigneePhone){
+        var data={
+            'methodname':'api/v2.2/user/saveConsignees',
+            'userId':user.userid,
+            'consigneeName':consigneeName,
+            'consigneePhone':consigneePhone
+        };
+        return commonService.sendPost(data);
+    };
+    this.queryConsignees = function(){
+        var params = {
+            'methodname':'api/v2.2/user/queryConsignees',
+            'userId':user.userid
+        };
+        return commonService.ajax(params);
+    };
+    this.offlinepay = function(orderId,price){
+        var params = {
+            'methodname':'offlinepay',
+            'orderId':orderId,
+            'price':price
+        };
+        return commonService.ajax(params);
+    };
 });

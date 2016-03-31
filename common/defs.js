@@ -1,8 +1,27 @@
 // "use strict";
 
 const UNPAID = 1, PAID = 2, PARTPAID = 3;
-const UNDELIVERED = 1, DELIVERED = 2, PARTDELIVERED = 3;
+const UNDELIVERED = 1, DELIVERED = 2, PARTDELIVERED = 3, RSCRECEIVED = 4, RECEIVED = 5;
 const ZHIFUBAO = 1, UNIONPAY = 2;
+const ZITI = 1, SONGHUO = 2;
+const OFFLINEPAYTYPE = {CASH:3, POS:4};
+const DELIVERYTYPE = {
+    "ZITI":{
+        "id":ZITI,
+        "name":"网点自提"
+        },
+    "SONGHUO":{
+        "id":SONGHUO,
+        "name":"配送到户"
+        }
+    };
+var deliveryTypeSort = {};
+deliveryTypeSort[SONGHUO]=10;
+deliveryTypeSort[ZITI]=20;
+
+var deliveryTypeName = {};
+deliveryTypeName[SONGHUO]=DELIVERYTYPE.SONGHUO.name;
+deliveryTypeName[ZITI]=DELIVERYTYPE.ZITI.name;
 
 (function(exports){
     // your code goes here
@@ -17,12 +36,26 @@ const ZHIFUBAO = 1, UNIONPAY = 2;
     exports.DELIVERSTATUS = Object.freeze({
         "UNDELIVERED":UNDELIVERED,
         "DELIVERED":DELIVERED,
-        "PARTDELIVERED":PARTDELIVERED
+        "PARTDELIVERED":PARTDELIVERED,
+        "RSCRECEIVED":RSCRECEIVED,
+        "RECEIVED":RECEIVED
     });
     exports.PAYTYPE = Object.freeze({
         "ZHIFUBAO":ZHIFUBAO,
-        "UNIONPAY":UNIONPAY
+        "UNIONPAY":UNIONPAY,
+        "CASH":OFFLINEPAYTYPE.CASH,
+        "POS":OFFLINEPAYTYPE.POS
     });
+    exports.OFFLINEPAYTYPE = [
+        {
+            "type":OFFLINEPAYTYPE.CASH,
+            "name":"现金"
+        },
+        {
+            "type":OFFLINEPAYTYPE.POS,
+            "name":"线下POS机"
+        }
+    ];
     exports.SUBORDERTYPE = Object.freeze({
         "DEPOSIT":"deposit",
         "BALANCE":"balance",
@@ -31,4 +64,7 @@ const ZHIFUBAO = 1, UNIONPAY = 2;
     exports.SUBORDERTYPEKEYS = Object.freeze(
         ["DEPOSIT","BALANCE","FULL"]
     );
+    exports.DELIVERYTYPE = Object.freeze(DELIVERYTYPE);
+    exports.DELIVERYTYPESORT = Object.freeze(deliveryTypeSort);
+    exports.DELIVERYTYPENAME = Object.freeze(deliveryTypeName);
 })(typeof exports === 'undefined'? this['defs']={}: exports);

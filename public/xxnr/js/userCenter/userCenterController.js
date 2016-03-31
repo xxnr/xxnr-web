@@ -128,6 +128,8 @@ app.controller('userCenterController', function($scope, $rootScope,$timeout ,rem
             $scope.user.sex = data.datas.sex;
             $scope.user.typeNum = data.datas.userType;
             $scope.user.isVerified = data.datas.isVerified;
+            $scope.user.isRSC = data.datas.isRSC;
+            $scope.user.RSCInfoVerifing = data.datas.RSCInfoVerifing;
             $scope.user.points = data.datas.pointLaterTrade;
             // switch (data.datas.userType) {
             //     case '2':

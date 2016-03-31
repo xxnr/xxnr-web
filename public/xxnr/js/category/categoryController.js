@@ -27,10 +27,7 @@ app.controller('categoryController', function($scope, remoteApiService, commonSe
             }
         }else{
             $scope.$parent.search_categories[categoryIndex].choices[choiceIndex].isSelected = !$scope.$parent.search_categories[categoryIndex].choices[choiceIndex].isSelected;
-            // $scope.$parent.search_categories[categoryIndex].current_query.push($scope.$parent.search_categories[categoryIndex].choices[choiceIndex].name);
             if(categoryIndex === 0){
-                // var brandsStr = $scope.$parent.getSelectedBrands($scope.$parent.search_categories[categoryIndex].choices,false);
-                // brandsStr = $scope.$parent.stringifyBrands(brandsStr,false).slice(0,-1);
                 $scope.$parent.getAttributes(false,true);
             }
         }

@@ -6,18 +6,23 @@ var tools = require('../common/tools');
 var services = require('../services');
 var OrderService = services.order;
 var PayService = services.pay;
+var OFFLINEPAYTYPE = require('../common/defs').OFFLINEPAYTYPE;
 
 exports.install = function() {
     // pay
     F.route('/alipay', alipayOrder, ['post', 'get'], ['isInWhiteList', 'throttle']);
     F.route('/unionpay', unionPayOrder, ['post', 'get'], ['isInWhiteList', 'throttle']);
+    F.route('/offlinepay', offlinePay, ['get'], ['isLoggedIn']);
     // pay notify
-    F.route('/dynamic/alipay/notify.asp', alipayNotify, ['post','raw']);
     // old url
     F.route('/dynamic/alipay/nofity.asp', alipayNotify, ['post','raw']);
-    F.route('/unionpay/notify', unionpayNotify, ['post','raw']);
+    F.route('/dynamic/alipay/notify.asp', alipayNotify, ['post','raw']);
     // old url
     F.route('/unionpay/nofity', unionpayNotify, ['post','raw']);
+    F.route('/unionpay/notify', unionpayNotify, ['post','raw']);
+    // offline pay notify
+    F.route('/api/v2.2/getOfflinePayType',              json_offline_pay_type, ['get']);
+    F.route('/api/v2.2/RSC/confirmOfflinePay',          process_RSC_confirm_OfflinePay, ['get'],    ['isLoggedIn', 'isRSC']);
     // pay refund
     F.route('/dynamic/alipay/refund_fastpay_by_platform_nopwd_notify.asp', alipayRefundNotify, ['post','raw']);
     F.route('/unionpay/refundnotify', unionpayRefundNotify, ['post','raw']);
@@ -25,6 +30,7 @@ exports.install = function() {
     F.route('/alipay/success', aliPaySuccess);
     // // test alipay refund
     // F.route('/api/alipay/refund/', refundTest, ['get'], ['isLoggedIn']);
+  
 };
 
 var alipay = require('../configuration/alipay_config').alipay;
@@ -35,7 +41,8 @@ var PAYTYPE = require('../common/defs').PAYTYPE;
 var dri = require('../common/dri');
 var moment = require('moment-timezone');
 
-// pay
+// pay order
+
 // common pay function
 function payOrder(payExecutor){
     var self = this;
@@ -222,15 +229,32 @@ function unionPayOrder() {
     return;
 }
 
+function offlinePay(){
+    var self = this;
+
+    // default offline pay type
+    self.payType = PAYTYPE.CASH;
+
+    // forbidden multi pay for offline pay, which means offline pay can only pay off
+    self.data.price = null;
+    payOrder.call(this, function(paymentId, totalPrice, ip, orderId, payment) {
+        OrderService.changeToPendingApprove(orderId, function(err){
+            if(err){
+                self.respond({code:1002, message:'更改订单状态失败'});
+                return;
+            }
+
+            self.respond({code:1000, message:'success', "paymentId":paymentId, "price":totalPrice});
+        });
+    });
+}
+
 // pay notify
 
 // common pay notify function
 function payNotify(paymentId, options){
     var self = this;
-    // pay success log
-    var payLog = options;
-    payLog.paymentId = paymentId;
-    OrderService.savePaidLog(payLog);
+
     // order paid
     OrderService.get({"paymentId": paymentId}, function(err, order) {
         // TODO: log err
@@ -241,7 +265,7 @@ function payNotify(paymentId, options){
         if (order) {
             var payment = {paymentId: paymentId};
             if (options && options.price) {
-                payment.price = parseFloat(parseFloat(options.price).toFixed(2));;
+                payment.price = parseFloat(parseFloat(options.price).toFixed(2));
             }
             var result = OrderService.judgePaymentRefund(order, payment);
             if (result && result.refund) {
@@ -292,6 +316,11 @@ function payNotify(paymentId, options){
             payRefund.call(self, paymentOptions);
         }
     });
+
+    // pay success log
+    var payLog = options;
+    payLog.paymentId = paymentId;
+    OrderService.savePaidLog(payLog);
 }
 
 // alipay notify function
@@ -409,7 +438,57 @@ function unionpayNotify() {
     });
 }
 
-// pay refund no
+// RSC offline pay notify function
+function process_RSC_confirm_OfflinePay(){
+    var self = this;
+    var paymentId = self.data.paymentId;
+    var offlinePayType = self.data.offlinePayType;
+    var RSC = self.user;
+    if(!paymentId){
+        self.respond({code:1001, message:'paymentId required'});
+        return;
+    }
+
+    if(!offlinePayType){
+        self.respond({code:1001, message:'offlinePayType required'});
+        return;
+    }
+
+    OrderService.get({"paymentId": paymentId}, function(err, order) {
+        if (err) {
+            self.respond({code:1002, message:'获取订单失败'});
+            return;
+        }
+
+        if(!order.RSCInfo || order.RSCInfo.RSC.toString() != RSC._id.toString()){
+            self.respond({code:1002, message:'该订单未分配到县级网点'});
+            return;
+        }
+
+        if(!order.pendingApprove){
+            self.respond({code:1002, message:'该订单没有待审核的线下支付'});
+            return;
+        }
+
+        var payment = OrderService.getPaymentInOrder(order, paymentId);
+        if(!payment){
+            self.respond({code:1002, message:'确认付款失败'});
+            return;
+        }
+
+        var options = {payType:offlinePayType, price:payment.payPrice ? payment.payPrice : payment.price};
+
+        payNotify.call(self, paymentId, options);
+        self.respond({code:1000, message:'success'});
+    });
+}
+
+function json_offline_pay_type(){
+    var self = this;
+    self.respond({code:1000, message:'success', offlinePayType:OFFLINEPAYTYPE});
+}
+
+// pay refund notify
 
 // alipay refund notify
 function alipayRefundNotify() {

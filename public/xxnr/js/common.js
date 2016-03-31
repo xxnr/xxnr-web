@@ -154,6 +154,18 @@ app.directive('focusMe', function($timeout) {
     };
 });
 
+String.prototype.gblen = function() {
+    var len = 0;
+    for (var i=0; i<this.length; i++) {
+        if (this.charCodeAt(i)>127 || this.charCodeAt(i)==94) {
+            len += 2;
+        } else {
+            len ++;
+        }
+    }
+    return len;
+};
+
 /*************************************************************************************************
  **                                    common controller                                        **
  *************************************************************************************************/
@@ -369,26 +381,28 @@ app.service('hostnameService', function() {
 /*************************************************************************************************
  **                              fix checkout btn at bottom when page is too long               **
  *************************************************************************************************/
-$('.options-box').ready(function() {
-    $(window).scroll(function() {
-        var dh = dh || $( document ).height();
-        var bh = $(window).height();
-        var st = st || $(window).scrollTop();
-        var el = $('.options-box');
-        var eh = el.height();
-        if (dh - st >= bh + 350 ) {
-            el.css({
-                position: 'fixed',
-                left: el.offset().left,
-                border: '1px solid #e0e0e0',
-                bottom: 0
-            });
-            $(".cart_box").css({
-                'padding-bottom': 90
-            });
-        } else {
-            el.removeAttr("style");
-            $(".cart_box").removeAttr("style");
-        }
+ if((window.location.href.indexOf("cart.html") != -1) || (window.location.href.indexOf("cart.html") != -1) || (window.location.href.indexOf("confirmOrder.html") != -1)){
+    $('.options-box').ready(function() {
+        $(window).scroll(function() {
+            var dh = dh || $( document ).height();
+            var bh = $(window).height();
+            var st = st || $(window).scrollTop();
+            var el = $('.options-box');
+            var eh = el.height();
+            if (dh - st >= bh + 350 ) {
+                el.css({
+                    position: 'fixed',
+                    left: el.offset().left,
+                    border: '1px solid #e0e0e0',
+                    bottom: 0
+                });
+                $(".cart_box").css({
+                    'padding-bottom': 90
+                });
+            } else {
+                el.removeAttr("style");
+                $(".cart_box").removeAttr("style");
+            }
+        });
     });
-});
+}
