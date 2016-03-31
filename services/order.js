@@ -10,6 +10,7 @@ var SUBORDERTYPEKEYS = require('../common/defs').SUBORDERTYPEKEYS;
 var DELIVERYTYPENAME = require('../common/defs').DELIVERYTYPENAME;
 var OrderModel = require('../models').order;
 var UseOrdersNumberModel = require('../models').userordersnumber;
+var UserModel = require('../models').user;
 var OrderPaidLog = require('../models').orderpaidlog;
 var moment = require('moment-timezone');
 var DELIVERYTYPE = require('../common/defs').DELIVERYTYPE;
@@ -716,7 +717,13 @@ OrderService.prototype.updateSKUs = function(options, callback) {
 				if (doc.deliveryType == DELIVERYTYPE.ZITI.id && doc.payStatus == PAYMENTSTATUS.PAID) {
 					self.generateDeliveryCodeandNotify(doc, newReceivedSKUs);
 				} else if (doc.payStatus !== PAYMENTSTATUS.PAID) {
-					UMENG.sendCustomizedcast(umengConfig.types.pay, order.buyerId, {orderId: order.id});
+					// 有商品到服务站，通知用户付款
+					self.umengSendCustomizedcast(umengConfig.types.pay, order.buyerId, 'user', {orderId: order.id});
+				} else {
+					// 已付款的配送到户订单有商品到服务站，通知RSC配送
+					if (doc.deliveryType == DELIVERYTYPE.SONGHUO.id && doc.payStatus == PAYMENTSTATUS.PAID && order.RSCInfo) {
+						self.umengSendCustomizedcast(umengConfig.types.delivery, order.RSCInfo.RSC, 'RSC', {orderId: order.id});
+					}
 				}
 			}
 		} else {
@@ -726,6 +733,7 @@ OrderService.prototype.updateSKUs = function(options, callback) {
 };
 
 OrderService.prototype.generateDeliveryCodeandNotify = function(order, newArrivedSKUs, callback){
+	var self = this;
 	DeliveryCodeModel.findOne({orderId:order.id}, function(err, deliveryCode){
 		if(!err){
 			var newSKUReceivedProcessor = function(){
@@ -742,7 +750,12 @@ OrderService.prototype.generateDeliveryCodeandNotify = function(order, newArrive
 
 				if(newArrivedSKUs){
 					// umeng send message to app
-					UMENG.sendCustomizedcast(umengConfig.types.ziti, order.buyerId, {orderId: order.id});
+					// 付款完成自提订单有商品到服务站，通知用户自提
+					self.umengSendCustomizedcast(umengConfig.types.ziti, order.buyerId, 'user', {orderId: order.id});
+					// 付款完成自提订单有商品到服务站，通知RSC提前准备自提商品
+					if (order.RSCInfo) {
+						self.umengSendCustomizedcast(umengConfig.types.ziti, order.RSCInfo.RSC, 'RSC', {orderId: order.id});
+					}
 				}
 			};
 
@@ -920,6 +933,7 @@ OrderService.prototype.paid = function(id, paymentId, options, callback) {
 
 // Sets order to confirmed 
 OrderService.prototype.confirm = function(orderId, SKURefs, callback) {
+	var self = this;
 	if(!orderId){
 		callback('orderId required');
 		return;
@@ -972,8 +986,9 @@ OrderService.prototype.confirm = function(orderId, SKURefs, callback) {
 			callback(null);
 		});
 		if (isConfirmed) {
+			// 自提订单有商品被自提，通知用户
 			if (order.deliveryType == DELIVERYTYPE.ZITI.id) {
-				UMENG.sendCustomizedcast(umengConfig.types.zitiDone, order.buyerId, {orderId: order.id});
+				self.umengSendCustomizedcast(umengConfig.types.zitiDone, order.buyerId, 'user', {orderId: order.id});
 			}
 		}
 	});
@@ -1691,6 +1706,13 @@ OrderService.prototype._checkPayStatus = function(order, callback) {
 			    });
 			}
 		}
+
+		// 已付款的配送到户订单有商品到服务站，通知RSC配送
+		if (orderPayStatus !== order.payStatus && orderPayStatus === PAYMENTSTATUS.PAID) {
+			if (order.deliveryType === DELIVERYTYPE.SONGHUO.id && parseInt(order.deliverStatus) === DELIVERSTATUS.RSCRECEIVED && order.RSCInfo) {
+				self.umengSendCustomizedcast(umengConfig.types.delivery, order.RSCInfo.RSC, 'RSC', {orderId: order.id});
+			}
+		}
 	} else {
 		callback(null, order, null);
 	    return;
@@ -1888,7 +1910,7 @@ OrderService.prototype.getPaymentInOrder = function (order, paymentId) {
 	return null;
 };
 
-OrderService.prototype.updateRSCInfo = function(orderId, RSCInfo, callback){
+OrderService.prototype.updateRSCInfo = function(orderId, RSCInfo, callback) {
 	if(!orderId){
 		callback('orderId required');
 		return;
@@ -1899,7 +1921,7 @@ OrderService.prototype.updateRSCInfo = function(orderId, RSCInfo, callback){
 		return;
 	}
 
-	OrderModel.update({id:orderId}, {$set:{RSCInfo:RSCInfo}}, function(err, numUpdated){
+	OrderModel.update({id:orderId}, {$set:{RSCInfo:RSCInfo}}, function(err, numUpdated) {
 		if(err){
 			console.error(err);
 			callback(err);
@@ -1913,6 +1935,27 @@ OrderService.prototype.updateRSCInfo = function(orderId, RSCInfo, callback){
 
 		callback();
 	})
+};
+
+// umeng 自定义推送
+OrderService.prototype.umengSendCustomizedcast = function(type, userId, userType, options) {
+	if (userType == 'user') {
+		UMENG.sendCustomizedcast(type, userId, userType, options);
+	} else if (userType == 'RSC') {
+		UserModel.findById(userId, function(err, user){
+	        if(err){
+	            console.error('OrderService umengSendCustomizedcast findById err:', err);
+	            return;
+	        }
+
+	        if(!user) {
+	            console.error('OrderService umengSendCustomizedcast findById not find user...');
+	            return;
+	        }
+
+	        UMENG.sendCustomizedcast(type, user.id, userType, options);
+	    });
+	}
 };
 
 module.exports = new OrderService();
