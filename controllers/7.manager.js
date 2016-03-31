@@ -1690,7 +1690,18 @@ function json_RSC_info_get(id){
 			return;
 		}
 
-		self.respond({code:1000, message:'success', RSCInfo:user.RSCInfo, id:user.id, account:user.account});
+		var RSCInfo = user.RSCInfo ? user.RSCInfo.toObject() : user.RSCInfo;
+		if (U.isEmpty(RSCInfo)) {
+			RSCInfo = null;
+		} else {
+			if (U.isEmpty(RSCInfo.companyAddress)) {
+				delete RSCInfo.companyAddress;
+			}
+			if (U.isEmpty(RSCInfo.products)) {
+				delete RSCInfo.products;
+			}
+		}
+		self.respond({code:1000, message:'success', RSCInfo:RSCInfo, id:user.id, account:user.account});
 	})
 }
 
