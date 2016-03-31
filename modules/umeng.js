@@ -63,10 +63,14 @@ Umeng.prototype.umengSend = function(params, appMasterSecret, callback) {
  * @param  {Function} callback callback function
  * @return {null}              only callback
  */
-Umeng.prototype.sendAndroidCustomizedcast = function(type, alias, options, callback) {
+Umeng.prototype.sendAndroidCustomizedcast = function(type, alias, aliasType, options, callback) {
 	var self = this;
 	if (!type || !umengConfig.body[type]) {
 		callback('need message type');
+		return;
+	}
+	if (!aliasType || !umengConfig.body[type][aliasType]) {
+		callback('need message aliasType');
 		return;
 	}
 	if (!alias) {
@@ -88,11 +92,11 @@ Umeng.prototype.sendAndroidCustomizedcast = function(type, alias, options, callb
     	body: {
     		// 通知用户订单状态变化，打开订单详情，自提或付款
 			// 点击"通知"的后续行为，默认为打开app。
-			after_open: umengConfig.body[type].after_open, // 必填 值可以为:"go_app": 打开应用 "go_url": 跳转到URL "go_activity": 打开特定的activity "go_custom": 用户自定义内容。
-			activity: umengConfig.body[type].activity, // 可选 当"after_open"为"go_activity"时，必填。通知栏点击后打开的Activity
-			ticker: umengConfig.body[type].ticker, // 必填 通知栏提示文字
-	    	title: umengConfig.body[type].title, // 必填 通知标题
-	    	text:  umengConfig.body[type].text // 必填 通知文字描述
+			after_open: umengConfig.body[type][aliasType].after_open, // 必填 值可以为:"go_app": 打开应用 "go_url": 跳转到URL "go_activity": 打开特定的activity "go_custom": 用户自定义内容。
+			activity: umengConfig.body[type][aliasType].activity, // 可选 当"after_open"为"go_activity"时，必填。通知栏点击后打开的Activity
+			ticker: umengConfig.body[type][aliasType].ticker, // 必填 通知栏提示文字
+	    	title: umengConfig.body[type][aliasType].title, // 必填 通知标题
+	    	text:  umengConfig.body[type][aliasType].text // 必填 通知文字描述
     	}
     };
     
@@ -134,10 +138,14 @@ Umeng.prototype.sendAndroidCustomizedcast = function(type, alias, options, callb
  * @param  {Function} callback callback function
  * @return {null}              only callback
  */
-Umeng.prototype.sendIOSCustomizedcast = function(type, alias, options, callback) {
+Umeng.prototype.sendIOSCustomizedcast = function(type, alias, aliasType, options, callback) {
 	var self = this;
 	if (!type || !umengConfig.body[type]) {
 		callback('need message type');
+		return;
+	}
+	if (!aliasType || !umengConfig.body[type][aliasType]) {
+		callback('need message aliasType');
 		return;
 	}
 	if (!alias) {
@@ -156,7 +164,7 @@ Umeng.prototype.sendIOSCustomizedcast = function(type, alias, options, callback)
 	customizedcast.payload = {
 		// 必填 严格按照APNs定义来填写
 		aps: {
-	        alert: umengConfig.body[type].text          // 必填
+	        alert: umengConfig.body[type][aliasType].text          // 必填
 	    }
     };
     // "badge": xx,           // 可选        
@@ -188,14 +196,13 @@ Umeng.prototype.sendIOSCustomizedcast = function(type, alias, options, callback)
  * @param  {Function} callback callback function
  * @return {null}              only callback
  */
-Umeng.prototype.sendCustomizedcast = function(type, alias, options, times, callback) {
-	return;
+Umeng.prototype.sendCustomizedcast = function(type, alias, aliasType, options, times, callback) {
 	var self = this;
 	if (!times) {
 		times = 1;
 	}
 	// send Android Customized cast
-    self.sendAndroidCustomizedcast(type, alias, options, function(err, result) {
+    self.sendAndroidCustomizedcast(type, alias, aliasType, options, function(err, result) {
     	if (err) {
 			console.error('Umeng sendCustomizedcast sendAndroidCustomizedcast err:', err, result ? result : '');
 			if (err == 500 && result) {
@@ -207,7 +214,7 @@ Umeng.prototype.sendCustomizedcast = function(type, alias, options, times, callb
 						if (data["data"]["error_code"]==code) {
 							if (times && times < 2) {
 								setTimeout(function() {
-									self.sendCustomizedcast(type, alias, options, times+1)
+									self.sendCustomizedcast(type, alias, aliasType, options, times+1)
 									}, 10000);
 							} else {
 								console.error('Umeng sendCustomizedcast sendAndroidCustomizedcast send the max times...');
