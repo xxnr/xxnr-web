@@ -30,12 +30,13 @@ OrderService.prototype.get_orderInfo = function(order) {
     if (!order) {
         return null;
     }
+	var deliveryType = order.deliveryType ? order.deliveryType : DELIVERYTYPE.SONGHUO.id;
     var orderInfo = {
         'totalPrice':order.price.toFixed(2)                                                     // 总价
         , 'deposit':order.deposit.toFixed(2)                                                    // 定金
         , 'dateCreated':order.dateCreated                                                       // 订单创建时间
         , 'orderStatus': self.orderStatus(order)                                         		// 订单状态
-        , 'deliveryType':{type:order.deliveryType, value:DELIVERYTYPENAME[order.deliveryType]}  // 配送方式
+        , 'deliveryType':{type:deliveryType, value:DELIVERYTYPENAME[deliveryType]}  // 配送方式
     };
     // 支付时间
     if (order.payStatus == PAYMENTSTATUS.PAID && order.datePaid) {
@@ -103,7 +104,7 @@ OrderService.prototype.orderStatus = function (order) {
 		if (order.deliverStatus === DELIVERSTATUS.RSCRECEIVED) {
 			if (order.deliveryType === DELIVERYTYPE.ZITI.id) {
 				return {type:5, value:'待自提'};
-			} else if (order.deliveryType === DELIVERYTYPE.SONGHUO.id) {
+			} else {
 				return {type:3, value:'待发货'};
 			}
 		} else if(order.deliverStatus === DELIVERSTATUS.RECEIVED){
@@ -111,7 +112,7 @@ OrderService.prototype.orderStatus = function (order) {
 		} else if(order.deliverStatus === DELIVERSTATUS.PARTDELIVERED || order.deliverStatus === DELIVERSTATUS.DELIVERED) {
 			if (order.deliveryType === DELIVERYTYPE.ZITI.id) {
 				return {type:5, value:'待自提'};
-			} else if (order.deliveryType === DELIVERYTYPE.SONGHUO.id) {
+			} else {
 				return {type:4, value:'配送中'};
 			}
 		} else {
@@ -151,7 +152,7 @@ OrderService.prototype.RSCOrderStatus = function(order){
 		if (order.deliverStatus === DELIVERSTATUS.RSCRECEIVED) {
 			if (order.deliveryType === DELIVERYTYPE.ZITI.id) {
 				return {type:5, value:'待自提'};
-			} else if (order.deliveryType === DELIVERYTYPE.SONGHUO.id) {
+			} else {
 				return {type:4, value:'待配送'};
 			}
 		} else if (order.deliverStatus === DELIVERSTATUS.RECEIVED){
@@ -159,7 +160,7 @@ OrderService.prototype.RSCOrderStatus = function(order){
 		} else if (order.deliverStatus === DELIVERSTATUS.PARTDELIVERED || order.deliverStatus === DELIVERSTATUS.DELIVERED) {
 			if (order.deliveryType === DELIVERYTYPE.ZITI.id) {
 				return {type:5, value:'待自提'};
-			} else if (order.deliveryType === DELIVERYTYPE.SONGHUO.id) {
+			} else {
 				return {type:6, value:'配送中'};
 			}
 		} else {
@@ -1571,7 +1572,7 @@ OrderService.prototype._checkPayStatus = function(order, callback) {
 					var subOrderPayStatus = subOrder.payStatus;
 					// var payments = subOrdersPayments[subOrder.id] || [];
 					var subOrderInfo = subOrdersInfo[subOrder.id] || {};
-					var paidPrice = subOrderInfo.paidPrice || 0;
+					var paidPrice = parseFloat((subOrderInfo.paidPrice || 0).toFixed(2));
 					var paidTimes = subOrderInfo.paidTimes || 0;
 					var payPrice = parseFloat((subOrder.price-paidPrice).toFixed(2));
 					var suborderPayment = null;
