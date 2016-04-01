@@ -30,12 +30,13 @@ OrderService.prototype.get_orderInfo = function(order) {
     if (!order) {
         return null;
     }
+	var deliveryType = order.deliveryType ? order.deliveryType : DELIVERYTYPE.SONGHUO.id;
     var orderInfo = {
         'totalPrice':order.price.toFixed(2)                                                     // 总价
         , 'deposit':order.deposit.toFixed(2)                                                    // 定金
         , 'dateCreated':order.dateCreated                                                       // 订单创建时间
         , 'orderStatus': self.orderStatus(order)                                         		// 订单状态
-        , 'deliveryType':{type:order.deliveryType, value:DELIVERYTYPENAME[order.deliveryType]}  // 配送方式
+        , 'deliveryType':{type:deliveryType, value:DELIVERYTYPENAME[deliveryType]}  // 配送方式
     };
     // 支付时间
     if (order.payStatus == PAYMENTSTATUS.PAID && order.datePaid) {
