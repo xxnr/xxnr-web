@@ -1721,6 +1721,16 @@ function json_RSC_query(){
 
 function process_RSC_modify(){
 	var self = this;
+	if(self.data.IDNo && !tools.isValidIdentityNo(self.data.IDNo)){
+		self.respond({code:1001, message:'请填写正确的身份证号'});
+		return;
+	}
+
+	if(self.data.phone && !tools.isPhone(self.data.phone)){
+		self.respond({code:1001, message:'请填写正确的手机号'});
+		return;
+	}
+
 	RSCService.modifyRSCInfo(self.data.id, self.data, function(err){
 		if(err){
 			self.respond({code:1002, message:err});
