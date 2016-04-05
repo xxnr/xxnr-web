@@ -53,23 +53,25 @@ app.controller('indexController', function($scope, remoteApiService, commonServi
                     }
 
                     for (var i in data.products) {
-                        var product = data.products[i];
-                        var item = {};
-                        item.discount = product.discount || 1.0;
-                        item.name = product.defaultSKU.name;
-                        item.id = product.defaultSKU.ref;
-                        item.shortName = item.name.length > 36 ? (item.name.substr(0, 33) + '...') : item.name;
-                        item.detailUrl = 'productDetail.html?id=' + product.id;
-                        item.imgUrl = commonService.baseUrl + product.thumbnail;
-                        item.price = product.price;
-                        item.discountPrice = product.defaultSKU.price?product.defaultSKU.price.platform_price:product.discountPrice;
-                        item.hasDiscount = (0 < product.discount && product.discount < 1.0);
-                        item.presale = product.presale;
-                        if ($scope.classes[categoryIndex].products === undefined) {
-                            $scope.classes[categoryIndex].products = [];
-                        }
+                        if(data.products.hasOwnProperty(i)){
+                            var product = data.products[i];
+                            var item = {};
+                            item.discount = product.discount || 1.0;
+                            item.name = product.defaultSKU.name;
+                            item.id = product.defaultSKU.ref;
+                            item.shortName = item.name.length > 36 ? (item.name.substr(0, 33) + '...') : item.name;
+                            item.detailUrl = 'productDetail.html?id=' + product.id;
+                            item.imgUrl = commonService.baseUrl + product.thumbnail;
+                            item.price = product.price;
+                            item.discountPrice = product.defaultSKU.price?product.defaultSKU.price.platform_price:product.discountPrice;
+                            item.hasDiscount = (0 < product.discount && product.discount < 1.0);
+                            item.presale = product.presale;
+                            if ($scope.classes[categoryIndex].products === undefined) {
+                                $scope.classes[categoryIndex].products = [];
+                            }
 
-                        $scope.classes[categoryIndex].products.push(item);
+                            $scope.classes[categoryIndex].products.push(item);
+                        }
                     }
 
                 });

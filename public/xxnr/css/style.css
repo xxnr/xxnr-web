@@ -2380,7 +2380,7 @@ body {
     height: 100%;
     background: #ddd;
     opacity: 0.6;
-    position: absolute;
+    position: fixed;
     left: 0;
     top: 0;
     -ms-filter: alpha(opacity=50);
@@ -2542,6 +2542,234 @@ body {
     margin: 30px auto;
     width: 260px;
     margin-bottom: 15px;
+}
+.pop_ConfirmSKUReceived {
+    z-index: 101;
+    position: fixed;
+    width: 680px;
+    height: 470px;
+    left: 50%;
+    top: 50%;
+    margin-left: -390px;
+    margin-top: -235px;
+    background: #fff;
+    border-radius: 5px;
+    border: 1px solid #bdbdbd;
+    box-shadow: 0 0 3px #bdbdbd;
+}
+.pop_ConfirmSKUReceived .pop_title{
+    display: inline-block;
+    margin-left: 20px;
+    width: 640px;
+    font-size: 16px;
+    color: #323232;
+    height: 56px;
+    line-height: 56px;
+    border-bottom: 1px solid #c7c7c7;
+}
+.pop_ConfirmSKUReceived .pop_title img{
+    margin-top: 20px;
+    float: right;
+}
+
+.pop_ConfirmSKUReceived .SKUs{
+    width: 640px;
+    margin-left: 20px;
+    height: 344px;
+    padding-top: 16px;
+    overflow-y: auto;
+}
+.pop_ConfirmSKUReceived .SKUs .SKU{
+    width: 600px;
+    margin-bottom: 10px;
+    border: 1px solid #c7c7c7;
+    cursor: pointer;
+}
+.pop_ConfirmSKUReceived .SKUs .selected{
+    border: 1px solid #FE9B00;
+}
+.pop_ConfirmSKUReceived .SKUs .SKU img{
+    width: 80px;
+    height: 80px;
+    border: 0;
+    /*float: left;*/
+}
+.pop_ConfirmSKUReceived .SKUs .SKU .SKU_info .SKU_title{
+    padding-top: 10px;
+    display: inline-block;
+    color: #333333;
+}
+.pop_ConfirmSKUReceived .SKUs .SKU .SKU_info{
+    display: inline-block;
+    border-left: 1px solid #C7C7C7;
+    height: 80px;
+    /*float: left;*/
+    margin-left: -5px;
+    width: 490px;
+    padding-left: 14px;
+    color: #646464;
+}
+.pop_ConfirmSKUReceived .SKUs .SKU .SKU_info .SKU_count{
+    padding-top: 10px;
+    display: inline-block;
+    float: right;
+    color: #323232;
+    font-size: 16px;
+}
+.pop_ConfirmSKUReceived .buttons{
+    margin-left: 20px;
+}
+.pop_ConfirmSKUReceived .buttons .button{
+    height: 40px;
+    line-height: 40px;
+    font-size: 16px;
+    background: #C7C7C7;
+    color: #FFF;
+    display: inline-block;
+    border-radius: 5px;
+    text-align: center;
+    box-sizing: border-box;
+}
+.pop_ConfirmSKUReceived .buttons .confirm_btn{
+    width: 160px;
+    margin-right: 40px;
+    margin-left: 170px;
+    cursor: not-allowed;
+}
+.pop_ConfirmSKUReceived .buttons .SKUchecked{
+    background: #FE9B00;
+    cursor: pointer;
+}
+.pop_ConfirmSKUReceived .buttons .cancel_bth{
+    width: 120px;
+}
+.pop_ConfirmSKUReceived .close{
+    cursor: pointer;
+}
+.pop_Pickup{
+    z-index: 101;
+    position: fixed;
+    width: 680px;
+    height: 460px;
+    left: 50%;
+    top: 50%;
+    margin-left: -390px;
+    margin-top: -230px;
+    background: #fff;
+    border-radius: 5px;
+    border: 1px solid #bdbdbd;
+    box-shadow: 0 0 3px #bdbdbd;
+}
+.pop_Pickup .close{
+    cursor: pointer;
+}
+.pop_Pickup .pop_title{
+    display: inline-block;
+    margin-left: 20px;
+    width: 640px;
+    font-size: 16px;
+    color: #323232;
+    height: 56px;
+    line-height: 56px;
+    border-bottom: 1px solid #c7c7c7;
+}
+.pop_Pickup .pop_title img{
+    margin-top: 20px;
+    float: right;
+}
+.pop_Pickup .pickupContents{
+    height: 345px;
+    width: 640px;
+    overflow-y: auto;
+    margin-left: 20px;
+}
+.pop_Pickup .pickupContents .pickup{
+    display: inline-block;
+    margin-left: 20px;
+}
+.pop_Pickup .pickupContents .pickup .pickupCode{
+    color: #FE9B00;
+}
+.pop_Pickup .pickupContents .pickupGuide{
+    height: 35px;
+    line-height: 35px;
+}
+.pop_Pickup .pickupContents .pickupCompany p{
+    height: 20px;
+    line-height: 20px;
+}
+.pop_Pickup .pickupContents .pickupCompany .pickupTitle{
+    color: #646464;
+    font-size: 16px;
+    margin-bottom: 10px;
+    margin-top: 8px;
+}
+.pop_Pickup .pickupContents .pickupSKUs{
+    margin-top: 20px;
+}
+.pop_Pickup .pickupContents .pickupSKUs .pickupSKUsTitle{
+    font-size: 16px;
+    color: #646464;
+    margin-bottom: 3px;
+}
+.pop_Pickup .SKU{
+    width: 600px;
+    margin-bottom: 10px;
+    border: 1px solid #c7c7c7;
+    cursor: default;
+}
+.pop_Pickup .selected{
+    border: 1px solid #FE9B00;
+}
+.pop_Pickup .SKU img{
+    width: 80px;
+    height: 80px;
+    border: 0;
+    /*float: left;*/
+}
+.pop_Pickup .SKU .SKU_info .SKU_title{
+    padding-top: 6px;
+    display: inline-block;
+    color: #333333;
+    font-size:16px;
+    width: 460px;
+    overflow: hidden;
+    height: 20px;
+}
+.pop_Pickup .SKU .SKU_info{
+    display: inline-block;
+    border-left: 1px solid #C7C7C7;
+    height: 80px;
+    /*float: left;*/
+    margin-left: -5px;
+    width: 460px;
+    padding-left: 14px;
+    color: #646464;
+    position: relative;
+}
+.pop_Pickup .SKU .SKU_info p{
+    max-width: 460px;
+}
+.pop_Pickup .SKU .SKU_info .SKU_count{
+    color: #323232;
+    font-size: 16px;
+    position: absolute;
+    padding-top: 6px;
+    padding-left: 5px;
+}
+.pop_Pickup .cancel_bth{
+    height: 40px;
+    width: 160px;
+    line-height: 40px;
+    font-size: 16px;
+    background: #FE9B00;
+    color: #FFF;
+    display: block;
+    border-radius: 5px;
+    text-align: center;
+    box-sizing: border-box;
+    margin: 0 auto;
+    cursor: pointer;
 }
 .swf_upload_btn {
     position: absolute;
@@ -3362,7 +3590,7 @@ body {
 .deliveryInfo .deliveryMethod a.current {
     border: 2px solid #FE9B00;
     background: url('../images/choose.png') no-repeat;
-    background-position: 90px 14px;
+    background-position: 92px 13px;
 }
 .deliveryInfo .selectCompanyTag{
     display: inline-block;
@@ -3722,12 +3950,17 @@ body {
     background: #fdfdfd;
     font-size: 14px;
     line-height: 50px;
-    padding-left: 30px;
+    padding-left: 15px;
     border: 1px solid #e0e0e0;
     background: #e5e5e5;
 }
+.wrap_user_info .orders .orders-main .order-list .order-info .order-time{
+    width: 190px;
+    display: inline-block;
+}
 .wrap_user_info .orders .orders-main .order-list .order-info .order-number {
-    padding-left: 30px;
+    width: 255px;
+    display: inline-block;
 }
 .wrap_user_info .orders .orders-main .row {
     position: relative;
@@ -3801,6 +4034,7 @@ body {
     font-size: 14px;
     margin-left: 30px;
     color: #323232;
+    margin-top: 2px;
 }
 .wrap_user_info .orders .orders-main .product .p-info .additions .addition-options {
     width: 270px;
@@ -3956,16 +4190,30 @@ body {
     padding-top: 20px;
 }
 .wrap_user_info .orders .orders-main .single-order .pay-section .pay-action a.order-actionName {
-    width: 80px;
+    max-width: 140px;
     height: 30px;
     background: #fe9b00;
     border: 1px solid #fe9b00;
     color: #fff;
-    display: block;
+    display: inline-block;
     line-height: 30px;
     margin: 0 auto;
-    border-radius: 3px;
+    border-radius: 5px;
     margin-bottom: 8px;
+    padding: 0 15px;
+}
+.wrap_user_info .orders .orders-main .single-order .pay-section .pay-action a.modify-paymethod-actionName {
+    max-width: 140px;
+    height: 30px;
+    background: #FFF;
+    border: 1px solid #FE9B00;
+    color: #FE9B00;
+    display: inline-block;
+    line-height: 30px;
+    margin: 0 auto;
+    border-radius: 5px;
+    margin-bottom: 8px;
+    padding: 0 15px;
 }
 .wrap_user_info .orders .orders-main .single-order .pay-section .pay-action .order-detail {}
 .wrap_user_info .orders .orders-main .single-order .row {
@@ -4702,7 +4950,7 @@ body {
 .myClients_forms .clients_info .clients_form .form_title ul li {
     float: left;
     text-align: center;
-    border-left: 1px solid #e2e2e2;
+    border-left: 1px solid #e5e5e5;
     height: 50px;
 }
 .myClients_forms .clients_info .clients_form .form_title ul li:first-child {
@@ -5165,6 +5413,10 @@ body {
 }
 .order-detail-section .order .order-info .order-statusName span {
     padding-left: 10px;
+    color: #FE9B00;
+}
+.order-detail-section .order .order-info .pickupCode{
+    color: #FE9B00;
 }
 .order-detail-section .order .order-info-text {
     color: #909090;
@@ -5177,12 +5429,37 @@ body {
 .order-detail-section .order .order-body {
     margin: 30px 30px;
 }
+.order-detail-section .order .order-body .confirmSKU_btn{
+    float: right;
+    width: 100px;
+    height: 30px;
+    line-height: 30px;
+    text-align: center;
+    display: inline-block;
+    background: #FE9B00;
+    color: #FFF;
+    border-radius: 5px;
+    font-weight: normal;
+}
 .order-detail-section .order .order-body .title {
     line-height: 30px;
     height: 30px;
     padding-top: 0;
     font-weight: bold;
 }
+.order-detail-section .order .order-body .title .deliveryType{
+    font-weight: normal;
+    display: inline-block;
+    margin-left: 30px;
+    padding-left: 34px;
+}
+.order-detail-section .order .order-body .title .pickup{
+    background: url('../images/pickup_icon.png') no-repeat left;
+}
+.order-detail-section .order .order-body .title .express{
+    background: url('../images/express_icon.png') no-repeat left;
+}
+
 .order-detail-section .order .order-body .address {
     margin-top: 10px;
     margin-bottom: 22px;
@@ -5219,13 +5496,25 @@ body {
     text-align: center;
     border-top: 1px solid #c7c7c7;
 }
-.order-detail-section .order .order-body .pay_table_content .xxnr_btn {
-    width: 100px;
-    height: 40px;
+.order-detail-section .order .order-body .pay_table_content .action_btn {
+    display: inline-block;
+    text-align: center;
+    height: 30px;
     border-radius: 7px;
     background: #fea121;
-    line-height: 40px;
+    line-height: 30px;
     margin-top: 13px;
+    padding: 0 15px;
+    font-size: 16px;
+    color: #FFFFFF;
+}
+.order-detail-section .order .order-body .pay_table_content .modify-paymethod-actionName{
+    margin-top: 0px;
+    margin-bottom: 10px;
+    background: #FFFFFF;
+    color: #FE9B00;
+    border: 1px solid #FE9B00;
+    box-sizing: border-box;
 }
 .order-detail-section .order .order-body .pay_table_content .payments_detail {
     height: 22px;
@@ -5259,6 +5548,7 @@ body {
 }
 .order-detail-section .order .order-body .pay_table_content li:nth-child(6) {
     width: 190px;
+    line-height: 40px;
 }
 .order-detail-section .order .order-body .address p {
     line-height: 25px;

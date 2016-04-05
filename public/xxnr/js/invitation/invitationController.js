@@ -57,9 +57,10 @@ app.controller('invitationController', function($scope, remoteApiService, common
         .then(function (data) {
             $scope.invitees = data.invitee;
             for(var index in $scope.invitees){
-                var d = Date.fromISO($scope.invitees[index].dateinvited);
-                $scope.invitees[index].dateinvited = d.getFullYear().toString()+'-'+ (d.getMonth()+1).toString() +'-'+d.getDate().toString();
-
+                if($scope.invitees.hasOwnProperty(index)){
+                    var d = Date.fromISO($scope.invitees[index].dateinvited);
+                    $scope.invitees[index].dateinvited = d.getFullYear().toString()+'-'+ (d.getMonth()+1).toString() +'-'+d.getDate().toString();
+                }
             }
         });
 

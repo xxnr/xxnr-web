@@ -259,6 +259,12 @@ app.filter('deliverStatusToChineseWording', function() {
             case 2:
                 output = "已发货";
                 break;
+            case 4:
+                output = "已到服务站";
+                break;
+            case 5:
+                output = "已收货";
+                break;
             default:
                 output = "其他";
         }
@@ -276,6 +282,12 @@ app.filter('payTypeToChineseWording', function() {
             case 2:
                 output = "银联支付";
                 break;
+            case 3:
+                output = "现金";
+                break;
+            case 4:
+                output = "线下POS机";
+                break;
             default:
                 output = "";
         }
@@ -288,25 +300,28 @@ app.filter('payStatusToChineseText', function() {
         var output = "";
         switch (input) {
             case 1:
-                output = "尊敬的客户，我们还未收到该订单的款项，请您尽快完成付款。";
+                output = "尊敬的客户，我们还未收到该订单的款项，请您尽快完成付款";
                 break;
             case 2:
-                output = "尊敬的客户，您的订单还未支付完成，请您尽快完成剩余款项。";
+                output = "尊敬的客户，您的订单还未支付完成，请您尽快完成剩余款项";
                 break;
             case 3:
-                output = "尊敬的客户，您的订单已支付完成，请耐心等待卖家发货，如有问题可拨打客服电话联系我们。";
+                output = "尊敬的客户，您的订单已支付完成，请耐心等待卖家发货，如有问题可拨打客服电话联系我们";
                 break;
             case 4:
-                output = "尊敬的客户，您的订单商品已部分发货，请您做好收货准备，其他商品请耐心等待发货。";
+                output = "尊敬的客户，您的订单商品正由网点配送中，请做好收货准备";
                 break;
             case 5:
-                output = "尊敬的客户，您的订单商品已发货，请您做好收货准备。";
+                output = "尊敬的客户，您的订单商品已到服务站，请前往网点完成自提";
                 break;
             case 6:
-                output = "尊敬的客户，您的订单商品已完成收货，如有问题可拨打客服电话联系我们。";
+                output = "尊敬的客户，您的订单商品已完成收货，如有问题可拨打客服电话联系我们";
+                break;
+            case 7:
+                output = "尊敬的客户，您已选择线下支付订单，请尽快到相应网点完成付款";
                 break;
             case 0:
-                output = "尊敬的客户，您的订单商品已关闭，如有问题可拨打客服电话联系我们。";
+                output = "尊敬的客户，您的订单商品已关闭，如有问题可拨打客服电话联系我们";
                 break;
             default:
                 output = "";
@@ -406,3 +421,32 @@ app.service('hostnameService', function() {
         });
     });
 }
+/*************************************************************************************************
+ **                              Array prototype method                                         **
+ *************************************************************************************************/
+
+// check if an element exists in array using a comparer function
+// comparer : function(currentElement)
+Array.prototype.inArray = function(comparer) {
+    for(var i=0; i < this.length; i++) {
+        if(comparer(this[i])) return true;
+    }
+    return false;
+};
+
+// adds an element to the array if it does not already exist using a comparer
+// function
+Array.prototype.pushIfNotExist = function(element, comparer) {
+    if (!this.inArray(comparer)) {
+        this.push(element);
+    }
+};
+
+// adds an element to the array if it does not already exist using a comparer
+// function
+Array.prototype.pushIfNotExist = function(element, comparer) {
+    if (!this.inArray(comparer)) {
+        this.push(element);
+    }
+};
+

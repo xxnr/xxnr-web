@@ -117,20 +117,22 @@ app.controller('categoryController', function($scope, remoteApiService, commonSe
                 all_products = [];
                 $scope.pages_count = data.datas.pages;
                 for(var i in data.datas.rows){
-                    var good = data.datas.rows[i];
-                    var item = {};
+                    if(data.datas.rows.hasOwnProperty(i)){
+                        var good = data.datas.rows[i];
+                        var item = {};
+                        item.onSale = (good.unitPrice == null || good.unitPrice == '')? false:good.unitPrice!=good.originalPrice;
+                        item.name = good.goodsName;
+                        item.shortName = item.name.length>28?(item.name.substr(0, 20) + '...') : item.name;
+                        item.detailUrl = 'productDetail.html?goodsId='+good.goodsId;
+                        item.imgUrl = commonService.baseUrl + good.thumbnail;
+                        item.nowPrice = item.onSale?good.unitPrice:good.originalPrice;
+                        item.oldPrice = good.originalPrice;
+                        item.brand = good.brandName;
+                        item.model = good.model;
+                        item.presale = good.presale;
+                        all_products.push(item);
+                    }
 
-                    item.onSale = (good.unitPrice == null || good.unitPrice == '')? false:good.unitPrice!=good.originalPrice;
-                    item.name = good.goodsName;
-                    item.shortName = item.name.length>28?(item.name.substr(0, 20) + '...') : item.name;
-                    item.detailUrl = 'productDetail.html?goodsId='+good.goodsId;
-                    item.imgUrl = commonService.baseUrl + good.thumbnail;
-                    item.nowPrice = item.onSale?good.unitPrice:good.originalPrice;
-                    item.oldPrice = good.originalPrice;
-                    item.brand = good.brandName;
-                    item.model = good.model;
-                    item.presale = good.presale;
-                    all_products.push(item);
 
                 }
 

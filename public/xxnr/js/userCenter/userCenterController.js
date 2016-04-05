@@ -13,6 +13,13 @@ app.controller('userCenterController', function($scope, $rootScope,$timeout ,rem
     $scope.avatarChange = false;
     $scope.uploaded = false;
 
+    $scope.showConfirmSKUReceivedPop = false; //确认收货的弹窗变量
+    $scope.ConfirmingSKUs = [];  //要确认的收货物品列表
+    $scope.ConfirmingSKUIds = [];  //要确认的收货物品id列表
+    $scope.ConfirmingOrderIds;  //要确认的收货物品列表
+
+    $scope.showPickupPop = false; //去自提的弹窗变量
+
 
     $scope.showModifyPwd = function() {
         window.scrollTo(0, 0);
@@ -23,6 +30,9 @@ app.controller('userCenterController', function($scope, $rootScope,$timeout ,rem
         $scope.isOverflow = false;
         $scope.showPop = false;
         $scope.showAvatarPop = false;
+        $scope.showConfirmSKUReceivedPop = false;
+        $scope.showPickupPop = false;
+        $scope.ConfirmingOrderIds = null;
     };
     $scope.closeAvatarPop = function() {
         $scope.isOverflow = false;
@@ -102,7 +112,11 @@ app.controller('userCenterController', function($scope, $rootScope,$timeout ,rem
         isSelected: false
     }, {
         id: 3,
-        name: '已发货',
+        name: '待收货',
+        isSelected: false
+    }, {
+        id: 4,
+        name: '已完成',
         isSelected: false
     }];
 
@@ -329,7 +343,6 @@ app.controller('userCenterController', function($scope, $rootScope,$timeout ,rem
                     }
                     for(var k in order.products){
                         order.products[k].totalAdditionsPrice = $scope.calculateTotalAdditionsPrice(order.products[k].additions);
-                        // console.log(typeof order.products[k].totalAdditionsPrice);
                     }
 
 
@@ -353,6 +366,7 @@ app.controller('userCenterController', function($scope, $rootScope,$timeout ,rem
                     order.deliveryTime = orders[i].dateDelivered;
                     order.createTime = orders[i].dateCreated;
                     order.order = orders[i].order;
+                    order.orderDeliveryType = orders[i].deliveryType;
                     var d = new Date(commonService.parseDate(orders[i].dateCreated));
                     order.createTime_local = d.toLocaleString();
 
@@ -371,69 +385,84 @@ app.controller('userCenterController', function($scope, $rootScope,$timeout ,rem
                     }else if(order.order.orderStatus.type == 3){
                         order.actionName = '联系客服';
                         order.showAction = false;
-                    }else if(order.order.orderStatus.type == 4){
-                        order.actionName = '联系客服';
-                        order.showAction = false;
-                    }else if(order.order.orderStatus.type == 5){
+                    }else if(order.order.orderStatus.type == 4){ //配送中的订单 用户可以确认收货
                         order.actionName = '确认收货';
-                        order.showAction = false;
-                        order.action = function(order) {
-                            if (confirm('确认收货')) {
-                                //remoteApiService.confirmReceipt(order.id)
-                                //    .then(function (data) {
-                                //        alert("确认订单成功");
-                                //        window.location.reload();
-                                //    })
+
+                        var hadSKU_deliverying = false; //判断是否有可自提SKU
+                        order.SKUs.forEach(function(SKU){
+                            if(SKU.deliverStatus == 2){
+                                hadSKU_deliverying = true;
                             }
+                        });
+                        order.showAction = hadSKU_deliverying;
+                        order.action = function(order) {
+                            $scope.ConfirmingOrderIds = order.id;
+                            $scope.ConfirmingSKUs = [];
+                            $scope.ConfirmingSKUIndex = -1;
+                            $scope.showConfirmSKUReceivedPop = true;
+                            //window.scrollTo(0, 0);
+                            $scope.ConfirmingSKUIds = [];
+                            $scope.isOverflow = true;
+                            if(order.SKUs){
+                                for(var i in order.SKUs){
+                                    if(order.SKUs[i].deliverStatus == 2){
+                                        $scope.ConfirmingSKUs.push(order.SKUs[i]);
+                                    }
+                                }
+                            }
+                            $scope.ConfirmingSKUs.forEach(function(ConfirmingSKU){
+                                ConfirmingSKU.shortName = ConfirmingSKU.productName.length > 30 ? (ConfirmingSKU.productName.substr(0, 27) + '...') : ConfirmingSKU.productName;
+                            });
+                        }
+                    }else if(order.order.orderStatus.type == 5){
+                        order.actionName = '去自提';
+
+                        var hadDeliveriedCompany = false; //判断是否已到服务站
+                        order.SKUs.forEach(function(SKU){
+                            if(SKU.deliverStatus == 4){
+                                hadDeliveriedCompany = true;
+                            }
+                        });
+                        order.showAction = hadDeliveriedCompany;
+                        $scope.pickupRSCInfo = null;
+                        order.action = function(order) {
+                            $scope.showPickupPop = true;
+                            $scope.pickupOrderIds = order.id;
+                            $scope.pickupOrderSKUs = [];
+                            order.SKUs.forEach(function(SKU){
+                                if(SKU.deliverStatus == 4){
+                                    $scope.pickupOrderSKUs.push(SKU);
+                                }
+                            });
+                            $scope.pickupOrderSKUs.forEach(function(pickupOrderSKU){
+                                pickupOrderSKU.shortName = pickupOrderSKU.productName.length > 30 ? (pickupOrderSKU.productName.substr(0, 27) + '...') : pickupOrderSKU.productName;
+                            });
+                            $scope.isOverflow = true;
+                            $scope.pickupRSCInfo = order.RSCInfo;
+                            remoteApiService.getDeliveryCode($scope.pickupOrderIds)
+                                .then(function(data) {
+                                    if(data.code == 1000){
+                                        //$scope.pickupOrderDeliveryCode = data.
+                                        $scope.pickupDeliveryCode = data.deliveryCode;
+                                    }else{
+                                        sweetalert('获取提货码失败','my_xxnr.html');
+                                    }
+                                })
                         }
                     }else if(order.order.orderStatus.type == 6){
                         order.showAction = false;
                         order.actionName = '联系客服';
                     } else if(order.order.orderStatus.type == 7){
-                        order.showAction = false;
-                        order.actionName = '联系客服';
+                        order.showAction = true;
+                        order.showModifyAction = true;
+                        order.actionName = '查看付款信息';
+                        order.action = function(order) {
+                            window.location.href = "commitPay.html?id=" + order.id+"&offlinePay=1";
+                        };
+                        order.modifyPay = function(order){
+                            window.location.href = "commitPay.html?id=" + order.id;
+                        }
                     }
-
-                    // if (orders[i].payStatus == 1 && !orders[i].isClosed) {
-                    //     order.statusName = '待付款';
-                    //     order.actionName = '去付款';
-                    //     order.showAction = true;
-                    //     order.action = function(order) {
-                    //         window.location.href = "commitPay.html?id=" + order.id;
-                    //     }
-                    // } else if (orders[i].payStatus == 2 && orders[i].deliverStatus == 1) {
-                    //     order.statusName = '待发货';
-                    //     order.actionName = '联系客服';
-                    //     order.showAction = false;
-                    // } else if (orders[i].payStatus == 2 && orders[i].deliverStatus == 2 && !orders[i].confirmed) {
-                    //     order.statusName = '已发货';
-                    //     order.actionName = '确认收货';
-                    //     order.showAction = false;
-                    //     order.action = function(order) {
-                    //         if (confirm('确认收货')) {
-                    //             //remoteApiService.confirmReceipt(order.id)
-                    //             //    .then(function (data) {
-                    //             //        alert("确认订单成功");
-                    //             //        window.location.reload();
-                    //             //    })
-                    //         }
-                    //     }
-                    // } else if(orders[i].payStatus == 3){
-                    //     order.statusName = '部分付款';
-                    //     order.actionName = '去付款';
-                    //     order.showAction = true;
-                    //     order.action = function(order){
-                    //         window.location.href = "commitPay.html?id=" + order.id;
-                    //     }
-                    // } else if (orders[i].confirmed) {
-                    //     order.showAction = false;
-                    //     order.statusName = '已完成';
-                    //     order.actionName = '联系客服';
-                    // } else {
-                    //     order.showAction = false;
-                    //     order.statusName = '已关闭';
-                    //     order.actionName = '联系客服';
-                    // }
 
                     $scope.searchIndex[order.id] = $scope.orderList.push(order) - 1;
                 }
@@ -454,9 +483,48 @@ app.controller('userCenterController', function($scope, $rootScope,$timeout ,rem
     $scope.calculateTotalAdditionsPrice = function(additions){
         var totalAdditionsPrice = 0;
         for(var i in additions){
-            totalAdditionsPrice = totalAdditionsPrice + Number(additions[i].price);
+            if(additions.hasOwnProperty(i)){
+                totalAdditionsPrice = totalAdditionsPrice + Number(additions[i].price?additions[i].price:0);
+            }
         }
         return Number(totalAdditionsPrice.toFixed(2));
-    }
+    };
+    $scope.addToConfirmingSKU_List = function(index){
+        if($scope.ConfirmingSKUIds.length == 0){
+            $scope.ConfirmingSKUIds.push($scope.ConfirmingSKUs[index]._id);
+        }else{
+            var hasExsited = false;
+            for(var i in $scope.ConfirmingSKUIds){              //如果已在$scope.ConfirmingSKUs就剔除
+                if($scope.ConfirmingSKUs[index]._id == $scope.ConfirmingSKUIds[i]){
+                    $scope.ConfirmingSKUIds.splice(i, 1);
+                    hasExsited = true;
+                }
+            }
+            if(!hasExsited){
+                $scope.ConfirmingSKUIds.push($scope.ConfirmingSKUs[index]._id); //不在时就加入$scope.ConfirmingSKUs
+            }
+        }
+    };
+    $scope.checkConfirmingSKU_List = function(index){
+        if($scope.ConfirmingSKUs.hasOwnProperty(index)){
+            if($scope.ConfirmingSKUIds.indexOf($scope.ConfirmingSKUs[index]._id )!=-1){
+                return true;
+            }else{
+                return false;
+            }
+        }
+    };
+    $scope.confirmSKU = function(){
+        remoteApiService.confirmSKU($scope.ConfirmingOrderIds,$scope.ConfirmingSKUIds.join())
+            .then(function(data) {
+                $scope.ConfirmingOrderIds = null;
+                if(data.code == 1000){
+                    sweetalert('该商品确认收货成功','my_xxnr.html');
+                }else{
+                    sweetalert('确认收货失败','my_xxnr.html');
+                }
+            })
+        //$scope.ConfirmingOrderIds = null;
+    };
 
 });
