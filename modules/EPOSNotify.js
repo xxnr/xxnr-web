@@ -2,6 +2,7 @@
  * Created by pepelu on 2016/3/25.
  */
 var EPOSConfig = require('../configuration/EPOS_config').EPOSConfig;
+crypto = require('crypto');
 
 var EPOSNotify = function(){};
 
