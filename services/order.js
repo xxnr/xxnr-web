@@ -1027,6 +1027,7 @@ OrderService.prototype.updatepayType = function(options, callback) {
 OrderService.prototype.closeOrders = function(callback) {
     OrderModel.find({isClosed:false}, function(err, orders) {
         var count = 0;
+		var closedPaymentCount = 0;
         var promises = orders.map(function(order) {
             return new Promise(function(resolve, reject) {
                 if(order.payments && order.payments.length > 0) {
@@ -1046,6 +1047,7 @@ OrderService.prototype.closeOrders = function(callback) {
                                         return;
                                     }
 
+									closedPaymentCount++;
                                     resolve();
                                 })
                             } else {
@@ -1065,6 +1067,7 @@ OrderService.prototype.closeOrders = function(callback) {
                                         return;
                                     }
 
+									count++;
                                     resolve();
                                 })
                             } else {
@@ -1081,13 +1084,13 @@ OrderService.prototype.closeOrders = function(callback) {
                     var dayDiff = UTCNow.diff(dateCreated, 'days');
 
                     if (dayDiff >= 3) {
-                        count++;
                         OrderModel.update({_id: order._id}, {$set: {isClosed: true}}, function (err, numAffected) {
                             if (err) {
                                 reject(err);
                                 return;
                             }
 
+							count++;
                             resolve();
                         })
                     } else {
@@ -1099,7 +1102,7 @@ OrderService.prototype.closeOrders = function(callback) {
 
         Promise.all(promises)
             .then(function() {
-                callback(null, count);
+                callback(null, count, closedPaymentCount);
             })
             .catch(function() {
                 callback(err)
