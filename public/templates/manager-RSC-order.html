@@ -17,8 +17,9 @@
     </div>
     <div class="rsc-tab">
         <div class="rsc-tab-ul">
-            <a href="#1">全部</a>
-            <a href="#2">待付款</a>
+            <a href="#0">全部</a>
+            <a href="#1">待付款</a>
+            <a href="#2">待审核</a>
             <a href="#3">待配送</a>
             <a href="#4">待自提</a>
             <a href="#5">已完成</a>
@@ -35,11 +36,11 @@
                         {{sku.name}}{{if SKUs && SKUs.length != 1 && $index != 0}},{{fi}}
                     {{end}}
                 </td>
-                <td style="width:120px" class=" silver hidden-xs1" data-title="收货人信息">{{consigneeName}} {{consigneePhone}}</td>
-                <td style="width:120px" class=" silver hidden-xs1" data-title="配送方式">{{delivery.value}}</td>
-                <td style="width:120px" class=" silver hidden-xs1" data-title="应付总额">{{totalPrice}}</td>
-                <td style="width:120px" class=" silver hidden-xs1" data-title="订金金额">{{deposit}}</td>
-                <td style="width:120px" class=" silver hidden-xs1 ui-center" data-title="订单状态">{{orderStatus ? orderStatus.value : ''}}</td>
+                <td style="width:160px" class=" silver hidden-xs1" data-title="收货人信息">{{consigneeName}} {{consigneePhone}}</td>
+                <td style="width:80px" class=" silver hidden-xs1" data-title="配送方式">{{delivery.value}}</td>
+                <td style="width:120px" class=" silver hidden-xs1" data-title="应付总额">{{totalPrice | price(2)}}</td>
+                <td style="width:120px" class=" silver hidden-xs1" data-title="订金金额">{{deposit | price(2)}}</td>
+                <td style="width:120px" class=" silver hidden-xs1 ui-center" data-title="订单状态">{{RSCtypeValue ? RSCtypeValue.value : ''}}</td>
                 <td style="width:40px" class=" silver hidden-xs1 ui-center" data-title="操作"><button name="edit" class="fa fa-search"></button></td>
             </tr>
         </script>
@@ -54,13 +55,15 @@
                     订单信息
                 </div>
                 <div class="rsc-order-info-con">
-                    <div>订单状态：{{ if orderStatus }}{{orderStatus.value}}{{ fi }}{{ if RSCtypeValue }}{{RSCtypeValue.value}}{{ fi }}</div>
+                    <div>订单状态：
+                        {{ if payStatuses }}{{payStatuses[payStatus]}}{{ fi }}&nbsp;&nbsp;{{ if deliverStatuses }}{{deliverStatuses[deliverStatus]}}{{ fi }}
+                    </div>
                     <div>订单号：{{ id }}</div>
                     <div>下单时间：{{dateCreated | format('@(yyyy-MM-dd HH:mm:ss)')}}</div>
                     <div>总价：{{totalPrice | price(2)}}</div>
                     <div>订金：{{deposit | price(2)}}</div>
                     <div>尾款：{{(totalPrice - deposit) | price(2)}}</div>
-                    <div>待付金额：</div>
+                    <div>待付金额：{{duePrice| price(2)}}</div>
                     <div>配送方式：
                         {{if delivery}}
                             {{delivery.value}}
@@ -96,8 +99,8 @@
                         <tr>
                             <td class="ui-center hidden-xs active">@(序号)</td>
                             <td class="ui-center hidden-xs active">@(商品ID)</td>
-                            <td class="ui-center col-xs-4 hidden-xs active">@(商品名称)</td>
-                            <td class="ui-center col-xs-1 active">@(单价)</td>
+                            <td class="ui-center col-xs-3 hidden-xs active">@(商品名称)</td>
+                            <td class="ui-center col-xs-2 active">@(单价)</td>
                             <td class="ui-center col-xs-1 active">@(订金)</td>
                             <td class="ui-center col-xs-1 active">@(数量)</td>
                             <td class="ui-center col-xs-2 active">@(合计)</td>
@@ -107,13 +110,13 @@
                         <tr>
                             <td class="ui-center hidden-xs active">{{$index + 1}}</td>
                             <td class="ui-center hidden-xs">{{ s.productId }}</td>
-                            <td class="ui-center col-xs-4 hidden-xs" title="{{ s.name }}">{{ s.name }}</td>
-                            <td class="ui-center col-xs-1">{{ s.price | price(2) }}</td>
+                            <td class="ui-center col-xs-3 hidden-xs" title="{{ s.name }}">{{ s.name }}</td>
+                            <td class="ui-center col-xs-2">{{ s.price | price(2) }}</td>
                             <td class="ui-center col-xs-1">{{ s.deposit | price(2) }}</td>
                             <td class="ui-center col-xs-1">{{ s.count }}</td>
                             <td class="ui-center col-xs-2 active">{{(s.count * s.price) | price(2)}}</td>
                             <td class="ui-center col-xs-2 deliver-status-hover" style="position: relative;">
-                                {{ foreach d in deliverStatuses }}
+                                {{ foreach d in deliverStatusesArray }}
                                 {{ if s.deliverStatus == d.value }}{{ d.name }}{{ fi }}
                                 {{ end }}
                                 <div class="deliver-status-detail" >
@@ -175,7 +178,7 @@
             var href = url.split('#')[1];
             $(".rsc-tab-ul a[href=#" + href + "]").addClass("checked");
         } else {
-            href = '1';
+            href = '0';
             $(".rsc-tab-ul a").removeClass("checked");
             $(".rsc-tab-ul a").eq(0).addClass("checked");
         }
@@ -187,16 +190,25 @@
         component.click = function(index, row, button){
             switch ($(button).attr('name')){
                 case 'edit':
-                    SET('rscOrder.deliverStatuses',[{name:'未发货',value:1},{name:'已发货',value:2},{name:'已到服务站',value:4},{name:'已收货',value:5}], true);
+                    SET('rscOrder.deliverStatusesArray',[{name:'未发货',value:1},{name:'已发货',value:2},{name:'部分发货',value:3},{name:'已到服务站',value:4},{name:'已收货',value:5}], true);
                     SET('rscOrder.form', $.extend({}, row), true);
                     SET('common.form', 'rscOrder');
+                    SET('rscOrder.form.deliverStatuses',{1:'未发货', 2: '已发货', 3: '部分发货', 4: '已到服务站',5: '已收货'}, true);
+                    SET('rscOrder.form.payStatuses',{1:'未付款',2:'已付款',3: '部分付款'}, true);
                     break;
             }
         };
 
         component.next = function(page) {
             rscOrder.filter.page = page;
-            rsc_order_refresh(false, getUrlParam('id'));
+            var url = window.location.href;
+            var reg = /#.+/;
+            if (reg.test(url)) {
+                rsc_order_refresh(false, getUrlParam('id'),url.split('#')[1]);
+            } else {
+                rsc_order_refresh(false, getUrlParam('id'));
+            }
+
         };
     });
 
@@ -249,8 +261,9 @@
     function rsc_order_refresh_by_href(id){
         var rscId = getUrlParam('id');
         switch (id) {
-            case '#1':rsc_order_refresh(true, rscId);break;
-            case '#2':rsc_order_refresh(true, rscId, 1);break;
+            case '#0':rsc_order_refresh(true, rscId);break;
+            case '#1':rsc_order_refresh(true, rscId, 1);break;
+            case '#2':rsc_order_refresh(true, rscId, 2);break;
             case '#3':rsc_order_refresh(true, rscId, 3);break;
             case '#4':rsc_order_refresh(true, rscId, 4);break;
             case '#5':rsc_order_refresh(true, rscId, 5);break;

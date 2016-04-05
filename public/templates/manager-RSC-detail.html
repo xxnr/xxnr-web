@@ -8,6 +8,7 @@
         <ul class="rsc-sidebar-ul">
             <li class="checked">网点管理</li>
             <li id="rsc-order-link">网点订单</a></li>
+            <li class="clear"></li>
         </ul>
     </div>
     <div class="rsc-tab">
@@ -28,19 +29,19 @@
                     </tr>
                     <tr>
                         <td class="col-xs-4 active">@(网点名称)</td>
-                        <td class="rsc-base-td"><input type="text" value="{{base.companyName}}"  class="border-none" attrName="companyName" readonly><div class="edit-btn"><span class="fa fa-pencil"></span></div><div class="confirm-btn">确定</div></td>
+                        <td class="rsc-base-td"><input type="text" value="{{base.companyName}}"  class="border-none" attrName="companyName" attrTitle = "网点名称" readonly><div class="edit-btn"><span class="fa fa-pencil"></span></div><div class="confirm-btn">确定</div></td>
                     </tr>
                     <tr>
                         <td class="col-xs-4 active">@(负责人姓名)</td>
-                        <td class="rsc-base-td"><input type="text" value="{{base.name}}"  class="border-none" attrName="name" readonly><div class="edit-btn"><span class="fa fa-pencil"></span></div><div class="confirm-btn">确定</div></td>
+                        <td class="rsc-base-td"><input type="text" value="{{base.name}}"  class="border-none" attrName="name" attrTitle="负责人姓名" readonly><div class="edit-btn"><span class="fa fa-pencil"></span></div><div class="confirm-btn">确定</div></td>
                     </tr>
                     <tr>
                         <td class="col-xs-4 active">@(身份证号码)</td>
-                        <td class="rsc-base-td"><input type="text" value="{{base.IDNo}}" class="border-none" attrName="IDNo" readonly><div class="edit-btn"><span class="fa fa-pencil"></span></div><div class="confirm-btn">确定</div></td>
+                        <td class="rsc-base-td"><input type="text" value="{{base.IDNo}}" class="border-none" attrName="IDNo" attrTitle="身份证号码" readonly><div class="edit-btn"><span class="fa fa-pencil"></span></div><div class="confirm-btn">确定</div></td>
                     </tr>
                     <tr>
                         <td class="col-xs-4 active">@(负责人手机)</td>
-                        <td class="rsc-base-td"><input type="text" value="{{base.phone}}"  class="border-none" attrName="phone" readonly><div class="edit-btn"><span class="fa fa-pencil"></span></div><div class="confirm-btn">确定</div></td>
+                        <td class="rsc-base-td"><input type="text" value="{{base.phone}}"  class="border-none" attrName="phone" attrTitle="负责人手机" readonly><div class="edit-btn"><span class="fa fa-pencil"></span></div><div class="confirm-btn">确定</div></td>
                     </tr>
                     <tr>
                         <td class="col-xs-4 active">@(所属地区)</td>
@@ -84,7 +85,7 @@
                         <td class="col-xs-4 active">@(详细地址)</td>
                         <td class="rsc-base-td">
                             {{if base.companyAddress}}
-                            <input type="text" value="{{base.companyAddress ? base.companyAddress.details : ''}}"  class="border-none" attrName="detailAddress" readonly><div class="edit-btn">
+                            <input type="text" value="{{base.companyAddress ? base.companyAddress.details : ''}}"  class="border-none" attrName="detailAddress" attrTitle="详细地址" readonly><div class="edit-btn">
                             {{fi}}
                             <span class="fa fa-pencil"></span></div><div class="confirm-btn">确定</div>
                         </td>
@@ -93,10 +94,10 @@
                         <td class="col-xs-4 active">@(用户名)</td>
                         <td>{{base.account}}</td>
                     </tr>
-                    <tr>
-                        <td class="col-xs-4 active">@(认证时间)</td>
-                        <td></td>
-                    </tr>
+                    <!--<tr>-->
+                        <!--<td class="col-xs-4 active">@(认证时间)</td>-->
+                        <!--<td></td>-->
+                    <!--</tr>-->
                 </table>
                 {{fi}}
             </div>
@@ -128,7 +129,7 @@
                     {{if products && products['化肥']}}
                         {{foreach brand in products['化肥']}}
                         <tr>
-                            <td class="ui-left col-xs-1">{{products['汽车'].length + $index + 1}}</td>
+                            <td class="ui-left col-xs-1">{{if products['汽车']}}{{products['汽车'].length + $index + 1}}{{else}}{{$index + 1}}{{fi}}</td>
                             <td class="ui-left col-xs-1">{{brand.name}}</td>
                             <td class="ui-left col-xs-4">
                                 {{if brand.products}}
@@ -355,9 +356,16 @@
                 $(".confirm-btn").off('click').on('click', function () {
                     var b_value = $(this).prev().val();
                     var attrName = $(this).prev().attr('attrName');
+                    var attrTitle = $(this).prev().attr('attrTitle');
                     var putData = {};
                     putData.id = $("#recInfoId").text().trim();
                     putData[attrName]= b_value;
+
+                    if(b_value.trim() == '') {
+                        alert(attrTitle + '不能为空');
+                        return;
+                    }
+
                     if(attrName == 'IDNo' && !regexIdentityNo.test(b_value)) {
                         alert("请输入正确的身份证号");
                         return;
@@ -419,8 +427,16 @@
                 }
                 brandProductsList.name = brandProductsItems[0].brand.name;
                 brandProductsList.brandId = brandProductsItems[0].brand._id;
+                console.log(brandProductsItems[0]);
+                console.log(brandProductsItems[0].category);
+                console.log(rscProductList);
                 brandProductsList.category = brandProductsItems[0].category;
-                var m = rscProductList[brandProductsList.category];
+                var m;
+                if(rscProductList[brandProductsList.category]) {
+                    m = rscProductList[brandProductsList.category];
+                } else {
+                    m = [];
+                }
                 for(var i = 0; i < m.length; i++ ) {
                     if( m[i].brand_id == brandProductsList.brandId) {
                         brandProductExisted.products = m[i].products.slice(0);
@@ -446,6 +462,7 @@
                 SET('rscBrandInfo.brandProducts',brandProductsList);
                 SET('rscBrandInfo.brandProductExisted',brandProductExisted);
                 SET('rscBrandInfo.brandProductRest',brandProductRest);
+                $("#rsc-mask").hide();
                 $("#add-brand-box").hide();
                 $("#products-edit-box").show();
                 $("#rsc-mask").show();
@@ -607,7 +624,6 @@
             $("#add-brand-box").show();
             $("#rsc-mask").show();
             $(".brands-bit").off('click').on('click',function(){
-                $("#rsc-mask").hide();
                 brands_load($(this).attr('brand_id'));
             });
 
@@ -644,9 +660,15 @@
         $(".confirm-btn").off('click').on('click', function () {
             var b_value = $(this).prev().val();
             var attrName = $(this).prev().attr('attrName');
+            var attrTitle = $(this).prev().attr('attrTitle');
             var putData = {};
             putData.id = $("#recInfoId").text().trim();
             putData[attrName]= b_value;
+
+            if(b_value.trim() == '') {
+                alert(attrTitle + '不能为空');
+                return;
+            }
             if(attrName == 'IDNo' && !regexIdentityNo.test(b_value)) {
                 alert("请输入正确的身份证号");
                 return;

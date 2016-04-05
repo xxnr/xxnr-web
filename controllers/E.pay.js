@@ -716,9 +716,10 @@ function process_EPOSNotify(){
     var params = self.data.params;
     var signature = self.data.signature;
     console.log(params, signature);
-    var decryptedParams = EPOSNotify.decryptParams(params);
-    console.log('decrypted params',decryptedParams);
-    if(EPOSNotify.verifySignature(decryptedParams, signature)){
+    var decryptedParamsBuf = EPOSNotify.decryptParams(params);
+    if(EPOSNotify.verifySignature(decryptedParamsBuf, signature)){
+        var decryptedParams = decryptedParamsBuf.toJSON();
+        console.log('decrypted params',decryptedParams);
         var paymentId = decryptedParams.merchantOrderId;
         var status = decryptedParams.dealStatus;
         var price = decryptedParams.amount || null;
