@@ -13,7 +13,7 @@ EPOSNotify.prototype.decryptParams = function(params){
 
 EPOSNotify.prototype.verifySignature = function(params, signature){
     var verify = crypto.createVerify('RSA-SHA1');
-    return verify.update(decrypted_params).verify(EPOSConfig.RSAPublicKey, signature);
+    return verify.update(params).verify(EPOSConfig.RSAPublicKey, signature);
 };
 
 module.exports = new EPOSNotify();
