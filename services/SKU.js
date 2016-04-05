@@ -758,10 +758,12 @@ SKUService.prototype.querySKUAttributesAndPrice = function(productId, attributes
                         }
 
                         var pricemin = 0, pricemax = 0, marketpricemin = 0, marketpricemax = 0;
-                        pricemin = priceResult[0].pricemin;
-                        pricemax = priceResult[0].pricemax;
-                        marketpricemin = priceResult[0].marketpricemin;
-                        marketpricemax = priceResult[0].marketpricemax;
+                        if (priceResult && priceResult[0]) {
+                            pricemin = priceResult[0].pricemin;
+                            pricemax = priceResult[0].pricemax;
+                            marketpricemin = priceResult[0].marketpricemin;
+                            marketpricemax = priceResult[0].marketpricemax;
+                        }
 
                         SKUModel.aggregate({$match: matchOptions}
                             , {$unwind: '$additions'}
