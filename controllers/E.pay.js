@@ -733,5 +733,7 @@ function process_EPOSNotify(){
         }
 
         self.respond({orderId:orderId, merchantMsgProcessId:0, merchantMsgProcessTime:currentTime, merchantRecMsgProcessState:1});
+    } else{
+        console.info('EPOS notify verification fail');
     }
 }
