@@ -561,7 +561,7 @@
         </table>
     </div>
     <div class="selectCompany" ng-show="showSelectCompanyPop">
-        <p class="popTitle">选择自提网点 <img ng-click="showPop = false;showSelectCompanyPop=false;selectedCompanyId=-1"
+        <p class="popTitle">选择自提网点 <img ng-click="showPop = false;showSelectCompanyPop=false;selectingCompanyId = -1"
                                         src="./images/close.gif"
                                         alt=""></p>
         <p class="infoText">1.选择自提网点下单并支付完成 <span>></span> 2.收到自提通知 <span>></span> 3.通过自提码到网点提货</p>
@@ -597,11 +597,11 @@
             </div>
         </div>
         <div class="buttons">
-            <button ng-disabled="selectingCompanyId==-1"
-                    ng-class="{true:'companySelcted',false:'companyUnselcted'}[selectingCompanyId!=-1]"
+            <button ng-disabled="!checkSelectingCompanyInPopRSCList()"
+                    ng-class="{true:'companySelcted',false:'companyUnselcted'}[checkSelectingCompanyInPopRSCList()]"
                     ng-click="checkedCompany()">确定
             </button>
-            <button ng-click="showPop = false;showSelectCompanyPop=false;selectedCompanyId=-1;selectingCompanyId=-1">
+            <button ng-click="showPop = false;showSelectCompanyPop=false;selectingCompanyId=-1">
                 取消
             </button>
         </div>

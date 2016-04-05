@@ -1782,26 +1782,30 @@ function json_RSCorders_query() {
 					RSCInfo: order.RSCInfo
                 };
                 // 订单状态
-            	orderInfo.orderStatus = OrderService.orderStatus(order);
+            	orderInfo.orderStatus 				= OrderService.orderStatus(order);
                 // 订单合成状态
-                orderInfo.typeValue = OrderService.orderType(order);
+                orderInfo.typeValue 				= OrderService.orderType(order);
                 // 订单RSC的合成状态
-                orderInfo.RSCtypeValue = OrderService.RSCOrderStatus(order);
+                orderInfo.RSCtypeValue 				= OrderService.RSCOrderStatus(order);
+                // 支付状态
+	            orderInfo.payStatus         		= order.payStatus;
+	            // 发货状态
+	            orderInfo.deliverStatus     		= order.deliverStatus;
                 // 支付时间
                 if (order.payStatus == PAYMENTSTATUS.PAID && order.datePaid) {
-                    orderInfo.datePaid = order.datePaid;
+                    orderInfo.datePaid 				= order.datePaid;
                 }
                 // 待收货时间
 			    if (order.datePendingDeliver) {
-			        orderInfo.datePendingDeliver = order.datePendingDeliver;
+			        orderInfo.datePendingDeliver 	= order.datePendingDeliver;
 			    }
                	// 全部发货时间
                 if (order.deliverStatus == DELIVERSTATUS.DELIVERED && order.dateDelivered) {
-                    orderInfo.dateDelivered = order.dateDelivered;
+                    orderInfo.dateDelivered 		= order.dateDelivered;
                 }
                 // 收货时间 完成时间
                 if (order.deliverStatus == DELIVERSTATUS.RECEIVED && order.dateCompleted) {
-                    orderInfo.dateCompleted = order.dateCompleted;
+                    orderInfo.dateCompleted 		= order.dateCompleted;
                 }
                 results.push(orderInfo);
             }

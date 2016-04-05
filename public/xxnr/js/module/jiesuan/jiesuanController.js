@@ -15,23 +15,25 @@ app.controller('jiesuanController', function($scope, remoteApiService){
             var addressList = data.datas.rows;
             $scope.addressId = addressList.length ? addressList[0].addressId : null;
             for( var i in addressList){
-                var contact = {};
-                contact.name = addressList[i].receiptPeople;
-                contact.addressId = addressList[i].addressId;
-                contact.detailAddress = addressList[i].address;
-                contact.address = addressList[i].areaName + addressList[i].cityName + addressList[i].countyName + addressList[i].address;
-                contact.phone = addressList[i].receiptPhone;
-                contact.province = addressList[i].areaName;
-                contact.selected = addressList[i].type == 1;
-                contact.areaId = addressList[i].areaId;
-                contact.cityId = addressList[i].cityId;
-                contact.countyId = addressList[i].countyId;
+                if(addressList.hasOwnProperty(i)){
+                    var contact = {};
+                    contact.name = addressList[i].receiptPeople;
+                    contact.addressId = addressList[i].addressId;
+                    contact.detailAddress = addressList[i].address;
+                    contact.address = addressList[i].areaName + addressList[i].cityName + addressList[i].countyName + addressList[i].address;
+                    contact.phone = addressList[i].receiptPhone;
+                    contact.province = addressList[i].areaName;
+                    contact.selected = addressList[i].type == 1;
+                    contact.areaId = addressList[i].areaId;
+                    contact.cityId = addressList[i].cityId;
+                    contact.countyId = addressList[i].countyId;
 
-                if(contact.selected == true){
-                    $scope.selectedAddressId = contact.addressId;
+                    if(contact.selected == true){
+                        $scope.selectedAddressId = contact.addressId;
+                    }
+
+                    $scope.contacts.push(contact);
                 }
-
-                $scope.contacts.push(contact);
             }
             if(!$scope.selectedAddressId){
                 $scope.selectedAddressId = $scope.contacts[0].addressId;

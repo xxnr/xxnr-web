@@ -3,8 +3,17 @@
  */
 var app = angular.module('commit_pay', ['xxnr_common', 'shop_cart']);
 app.controller('commitPayController', function($scope, remoteApiService, payService, commonService, loginService){
+    function getQueryStringByName(name) {
+        var result = location.search.match(new RegExp("[\?\&]" + name + "=([^\&]+)", "i"));
+        if (result == null || result.length < 1) {
+            return "";
+        }
+        return result[1];
+    }
+
     $scope.has_offlinePay_company = false; //用来表示线下支付点的参数
-    $scope.offlineSubmitted = false;   // 已提交线下订单
+    $scope.offlineSubmitted = getQueryStringByName('offlinePay') | false;   // 已提交线下订单
+    console.log($scope.offlineSubmitted);
     // if not login
     if(!loginService.isLogin) {
         window.location.href = "logon.html";
@@ -230,7 +239,7 @@ app.controller('commitPayController', function($scope, remoteApiService, payServ
                         remoteApiService.offlinepay($scope.orders[$scope.orderSelectedNum].id,$scope.orders[$scope.orderSelectedNum].duePrice)
                             .then(function(data) {
                                 if(data.code==1000){
-                                    window.scrollTo(0,0);
+                                    window.scrollTo(0);
                                     $scope.offlineSubmitted = true;
 
                                 }else{

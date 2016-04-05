@@ -7,12 +7,14 @@ var services = require('../services');
 var OrderService = services.order;
 var PayService = services.pay;
 var OFFLINEPAYTYPE = require('../common/defs').OFFLINEPAYTYPE;
+var EPOSNotify = MODULE('EPOSNotify');
 
 exports.install = function() {
     // pay
     F.route('/alipay', alipayOrder, ['post', 'get'], ['isInWhiteList', 'throttle']);
     F.route('/unionpay', unionPayOrder, ['post', 'get'], ['isInWhiteList', 'throttle']);
     F.route('/offlinepay', offlinePay, ['get'], ['isLoggedIn']);
+    F.route('/EPOSpay', EPOSPay, ['get']);
     // pay notify
     // old url
     F.route('/dynamic/alipay/nofity.asp', alipayNotify, ['post','raw']);
@@ -20,6 +22,7 @@ exports.install = function() {
     // old url
     F.route('/unionpay/nofity', unionpayNotify, ['post','raw']);
     F.route('/unionpay/notify', unionpayNotify, ['post','raw']);
+    F.route('/EPOS/notify', process_EPOSNotify, ['post','raw']);
     // offline pay notify
     F.route('/api/v2.2/getOfflinePayType',              json_offline_pay_type, ['get']);
     F.route('/api/v2.2/RSC/confirmOfflinePay',          process_RSC_confirm_OfflinePay, ['get'],    ['isLoggedIn', 'isRSC']);
@@ -476,7 +479,7 @@ function process_RSC_confirm_OfflinePay(){
             return;
         }
 
-        var options = {payType:offlinePayType, price:payment.payPrice ? payment.payPrice : payment.price};
+        var options = {payType:offlinePayType, price:payment.payPrice ? payment.payPrice : payment.price, datePaid:new Date()};
 
         payNotify.call(self, paymentId, options);
         self.respond({code:1000, message:'success'});
@@ -698,4 +701,37 @@ function payRefund(options) {
 // alipay success front page view
 function aliPaySuccess(){
     this.view('alipaySuccess', null);
+}
+
+function EPOSPay(){
+    var self = this;
+    self.payType = PAYTYPE.EPOS;
+    payOrder.call(this, function(paymentId, totalPrice, ip, orderId, payment) {
+        self.respond({code:1000, message:'success', "paymentId":paymentId, "price":totalPrice});
+    });
+}
+
+function process_EPOSNotify(){
+    var self = this;
+    var params = self.data.params;
+    var signature = self.data.signature;
+    console.log(params, signature);
+    var decryptedParams = EPOSNotify.decryptParams(params);
+    console.log('decrypted params',decryptedParams);
+    if(EPOSNotify.verifySignature(decryptedParams, signature)){
+        var paymentId = decryptedParams.merchantOrderId;
+        var status = decryptedParams.dealStatus;
+        var price = decryptedParams.amount || null;
+        var orderId = decryptedParams.orderId;
+        var datePaid = new Date(decryptedParams.dealDate + ' ' + decryptedParams.dealTime);
+        var currentTime = new Date();
+
+        if(status == 1) {
+            // paid successfully
+            var options = {payType: PAYTYPE.EPOS, price: price, datePaid: datePaid, queryId: orderId, notify_time:currentTime};
+            payNotify.call(self, paymentId, options);
+        }
+
+        self.respond({orderId:orderId, merchantMsgProcessId:0, merchantMsgProcessTime:currentTime, merchantRecMsgProcessState:1});
+    }
 }
