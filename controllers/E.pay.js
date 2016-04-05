@@ -22,7 +22,7 @@ exports.install = function() {
     // old url
     F.route('/unionpay/nofity', unionpayNotify, ['post','raw']);
     F.route('/unionpay/notify', unionpayNotify, ['post','raw']);
-    F.route('/EPOS/notify', process_EPOSNotify, ['post','raw']);
+    F.route('/EPOS/notify', process_EPOSNotify, ['post']);
     // offline pay notify
     F.route('/api/v2.2/getOfflinePayType',              json_offline_pay_type, ['get']);
     F.route('/api/v2.2/RSC/confirmOfflinePay',          process_RSC_confirm_OfflinePay, ['get'],    ['isLoggedIn', 'isRSC']);
