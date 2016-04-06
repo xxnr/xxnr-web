@@ -295,7 +295,7 @@
         </div>
         <div class="SKUs">
             <div class="SKU" ng-repeat="SKU in ConfirmingSKUs" ng-click="addToConfirmingSKU_List($index)" ng-class="{true:'selected'}[checkConfirmingSKU_List($index)]">
-                <img ng-src="{{SKU.thumbnail}}" alt="">
+                <img ng-src="{{SKU.imgs}}" alt="">
                 <div class="SKU_info">
                     <p><span class="SKU_title">{{SKU.shortName}}</span><span class="SKU_count">×{{SKU.count}}</span></p>
                     <p>
