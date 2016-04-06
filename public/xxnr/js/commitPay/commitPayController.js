@@ -51,6 +51,20 @@ app.controller('commitPayController', function($scope, remoteApiService, payServ
         $scope.more_text = "更多支付方式";
         $scope.more_imgUrl = "pay_times_more_down.png";
         $scope.pay_price = $scope.orders[$scope.orderSelectedNum].duePrice;
+        if($scope.selectedPayMethodIndex==0){
+            $scope.payType = '支付宝支付';
+            if($scope.orders[$scope.orderSelectedNum]){
+                $scope.payUrl = payService.aliPayUrl($scope.orders[$scope.orderSelectedNum].id);
+            }
+
+        }else if($scope.selectedPayMethodIndex==1){
+            $scope.payType = '银联支付';
+            if($scope.orders[$scope.orderSelectedNum]){
+                $scope.payUrl = payService.unionPayUrl($scope.orders[$scope.orderSelectedNum].id);
+            }
+        }else if($scope.selectedPayMethodIndex==2){
+            $scope.payType = '线下支付';
+        }
         // $scope.multi_pay_text_editing = false;
     };
     $scope.changePayTimes = function (index) {
