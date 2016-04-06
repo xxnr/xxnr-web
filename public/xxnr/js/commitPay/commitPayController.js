@@ -246,7 +246,7 @@ app.controller('commitPayController', function($scope, remoteApiService, payServ
                                     sweetalert('线下支付申请失败,请重试');
                                 }
                             });
-                        //$scope.offlineSubmitted = true;
+                        $scope.offlineSubmitted = true;
                     }else {
                         window.open($scope.payUrl);
                         $scope.showPayPop = true;

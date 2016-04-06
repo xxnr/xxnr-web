@@ -83,9 +83,9 @@
             </div>
             <div class="order clearfix">
                 <div class="order-info">
-                    <span class="order-number ng-cloak" ng-cloak>订单号:{{order.id}}</span>
+                    <span class="order-number ng-cloak" ng-cloak>订单号：{{order.id}}</span>
                     <!--<span class="order-time" ng-cloak>{{order.createTime_local}}</span>-->
-                    <span class="order-statusName ng-cloak" ng-cloak>订单状态:
+                    <span class="order-statusName ng-cloak" ng-cloak>订单状态：
                         <span ng-class="{true:'payOrange'}[order.payStatus!=2]">{{order.orderStatus.value}}</span>
                     </span>
                     <span class="pickup" ng-show="pickupDeliveryCode">自提码：
@@ -98,7 +98,7 @@
                             <ul>
                                 <li ng-show="order.dateCreated">下单时间：{{order.dateCreated}}</li>
                                 <li ng-show="order.datePaid">付款时间：{{order.datePaid}}</li>
-                                <li ng-show="order.dateDelivered">发货时间：{{order.dateDelivered}}</li>
+                                <li ng-show="order.datePendingDeliver">发货时间：{{order.datePendingDeliver}}</li>
                                 <li ng-show="order.dateCompleted">完成时间：{{order.dateCompleted}}</li>
                             </ul>
                         </div>
@@ -310,7 +310,7 @@
             </div>
         </div>
         <div class="buttons">
-            <a href="" class="button confirm_btn" ng-class="{true:'SKUchecked'}[ConfirmingSKUIds.length > 0]" ng-disable="ConfirmingSKUIds.length==0" ng-click="confirmSKU()">确定（{{ConfirmingSKUIds.length}}）</a>
+            <a href="" class="button confirm_btn" ng-class="{true:'SKUchecked'}[ConfirmingSKU_refs.length > 0]" ng-click="confirmSKU()">确定（{{ConfirmingSKU_number()}}）</a>
             <a href="" class="button cancel_bth" ng-click="closePop()">取消</a>
         </div>
     </div>
