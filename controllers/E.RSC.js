@@ -219,7 +219,6 @@ function process_RSC_order_deliverStatus_delivering(){
                 if(SKU.deliverStatus == DELIVERSTATUS.RSCRECEIVED){
                     needUpdate = true;
                     options.SKUs[SKU.ref] = {deliverStatus:DELIVERSTATUS.DELIVERED};
-                    break;
                 }
             }
         }
