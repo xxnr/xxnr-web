@@ -96,6 +96,8 @@ function getOders() {
                     'SKUs':order.SKUs || [],
                     'duePrice':typeof(order.duePrice) != 'undefined' ? parseFloat(order.duePrice.toFixed(2)) : null,
                     'deliveryType':order.deliveryType,
+                    'payStatus':order.payStatus,
+                    'deliverStatus':order.deliverStatus,
                     'RSCInfo':order.RSCInfo
                 };
                 // 订单合成状态
@@ -158,11 +160,12 @@ function api10_getOders() {
                     'orderId':item.id,
                     'orderNo':item.paymentId,
                     'totalPrice':item.price.toFixed(2),
-                    'goodsCount':item.products ? item.products.length: 0,
+                    'goodsCount':item.products ? item.products.length : 0,
                     'address':item.consigneeAddress,
                     'recipientName':item.consigneeName,
                     'recipientPhone':item.consigneePhone,
                     'typeLable':'',
+                    // for old app pay price
                     'deposit': typeof(item.duePrice) != 'undefined' ? item.duePrice.toFixed(2) : item.deposit.toFixed(2),
                     'payType':item.payType,
                     'order': orderInfo,
@@ -170,6 +173,7 @@ function api10_getOders() {
                     'SKUs':item.SKUs || [],
                     'subOrders': item.subOrders || [],
                     'duePrice': typeof(data.duePrice) != 'undefined' ? item.duePrice.toFixed(2) : null,
+                    'RSCInfo': item.RSCInfo
                 };
 
                 if(arr[i].SKUs && arr[i].SKUs.length > 0){
@@ -177,7 +181,8 @@ function api10_getOders() {
                     arr[i].SKUs.forEach(function(SKU){
                         var product = {id:SKU.productId, price:SKU.price.toFixed(2), deposit:SKU.deposit.toFixed(2), name:SKU.productName, thumbnail:SKU.thumbnail, count:SKU.count, category:SKU.category, dateDelivered:SKU.dateDelivered, dateSet:SKU.dateSet, deliverStatus:SKU.deliverStatus};
                         arr[i].products.push(product);
-                    })
+                    });
+                    arr[i].goodsCount = arr[i].products ? arr[i].products.length : 0;
                 }
                 
             }
