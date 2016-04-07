@@ -59,7 +59,7 @@ exports.install = function() {
     F.route('/api/v2.0/getMinPayPrice/',       getMinPayPrice, ['post', 'get'], ['isLoggedIn']);
 
     // ISO upgrade message
-    F.route('/api/v2.1/ISOupgrade/',       ISOUpgrade, ['post', 'get']);
+    F.route('/api/v2.1/ISOupgrade/',       ISOUpgrade, ['post']);
 
 	// v1.0
     //fix api// F.route('/app/shopCart/getShopCartList', getShoppingCart, ['post', 'get']);
