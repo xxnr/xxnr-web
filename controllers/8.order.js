@@ -80,44 +80,53 @@ function getOders() {
             var length = items.length;
             var arr = new Array(length);
             for (var i = 0; i < length; i++) {
-                var item = items[i];
+                var order = items[i];
+                // var item = items[i];
                 var typeValue = type;
+                var item = {
+                    'id':order.id,
+                    'paymentId':order.paymentId,
+                    'price':order.price,
+                    'deposit':order.deposit,
+                    'consigneeAddress':order.consigneeAddress,
+                    'consigneeName':order.consigneeName,
+                    'consigneePhone':order.consigneePhone,
+                    'payType':order.payType,
+                    'products':order.products || [],
+                    'SKUs':order.SKUs || [],
+                    'duePrice':typeof(order.duePrice) != 'undefined' ? parseFloat(order.duePrice.toFixed(2)) : null,
+                    'deliveryType':order.deliveryType,
+                    'RSCInfo':order.RSCInfo
+                };
                 // 订单合成状态
                 if (!typeValue) {
-                    item.typeValue = OrderService.orderType(item);
-                }
-                // var orderInfo = {
-                //     'totalPrice':item.price.toFixed(2)                                                      // 总价
-                //     , 'deposit':item.deposit.toFixed(2)                                                     // 定金
-                //     , 'dateCreated':item.dateCreated                                                        // 订单创建时间
-                //     , 'orderStatus': OrderService.orderStatus(item)                                         // 订单状态
-                //     , 'deliveryType':{type:item.deliveryType, value:DELIVERYTYPENAME[item.deliveryType]}    // 配送方式
-                // };
-                // // 支付时间
-                // if (item.payStatus == PAYMENTSTATUS.PAID && item.datePaid) {
-                //     orderInfo.datePaid = item.datePaid;
-                // }
-                // // 待收货时间
-                // if (item.datePendingDeliver) {
-                //     orderInfo.datePendingDeliver = item.datePendingDeliver;
-                // }
-                // // 全部发货时间
-                // if (item.deliverStatus == DELIVERSTATUS.DELIVERED && item.dateDelivered) {
-                //     orderInfo.dateDelivered = item.dateDelivered;
-                // }
-                // // 完成时间
-                // if (item.deliverStatus == DELIVERSTATUS.RECEIVED && item.dateCompleted) {
-                //     orderInfo.dateCompleted = item.dateCompleted;
-                // }
-                var orderInfo = OrderService.get_orderInfo(item);
-                item.order = orderInfo;
-                // for old web page
-                if (item.payStatus == PAYMENTSTATUS.PAID) {
-                    item.deposit = typeof(item.price) != 'undefined' ? parseFloat(item.price.toFixed(2)) : parseFloat(item.deposit.toFixed(2));
+                    item.typeValue = OrderService.orderType(order);
                 } else {
-                    item.deposit = typeof(item.duePrice) != 'undefined' ? parseFloat(item.duePrice.toFixed(2)) : parseFloat(item.deposit.toFixed(2));
+                    item.typeValue = typeValue;
                 }
+                var orderInfo = OrderService.get_orderInfo(order);
+                item.order = orderInfo;
+                // 创建时间
+                item.dateCreated = order.dateCreated;
+                // 支付时间
+                if (order.payStatus == PAYMENTSTATUS.PAID && order.datePaid) {
+                    item.datePaid = order.datePaid;
+                }
+                // 待收货时间
+                if (order.payStatus == PAYMENTSTATUS.PAID && order.deliverStatus !== DELIVERSTATUS.UNDELIVERED && order.datePendingDeliver) {
+                    item.datePendingDeliver = order.datePendingDeliver;
+                }
+                // 全部发货时间
+                if (order.deliverStatus == DELIVERSTATUS.DELIVERED && order.dateDelivered) {
+                    item.dateDelivered = order.dateDelivered;
+                }
+                // 完成时间
+                if (order.deliverStatus == DELIVERSTATUS.RECEIVED && order.dateCompleted) {
+                    item.dateCompleted = order.dateCompleted;
+                }
+                arr[i] = item;
             }
+            data.items = arr;
             self.respond(data);
         } else {
             self.respond({'code':'1001','message':'没有找到订单'});
@@ -143,21 +152,6 @@ function api10_getOders() {
                 if (!typeValue) {
                     typeValue = OrderService.orderType(item);
                 }
-
-                // var orderInfo = {'totalPrice':item.price.toFixed(2)
-                //     , 'deposit':item.deposit.toFixed(2)
-                //     , 'dateCreated':item.dateCreated
-                //     , 'orderStatus': OrderService.orderStatus(item)
-                //     , 'deliveryType':{type:item.deliveryType, value:DELIVERYTYPENAME[item.deliveryType]}};
-                // if (item.payStatus == PAYMENTSTATUS.PAID && item.datePaid) {
-                //     orderInfo.datePaid = item.datePaid;
-                // }
-                // if (item.deliverStatus == DELIVERSTATUS.DELIVERED && item.dateDelivered) {
-                //     orderInfo.dateDelivered = item.dateDelivered;
-                // }
-                // if (item.deliverStatus == DELIVERSTATUS.RECEIVED && item.dateCompleted) {
-                //     orderInfo.dateCompleted = item.dateCompleted;
-                // }
                 var orderInfo = OrderService.get_orderInfo(item);
                 arr[i] = {
                     'typeValue':typeValue,

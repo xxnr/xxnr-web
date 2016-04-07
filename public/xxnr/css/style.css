@@ -2587,6 +2587,7 @@ body {
 }
 .pop_ConfirmSKUReceived .SKUs .selected{
     border: 1px solid #FE9B00;
+    background: url('../images/text_box.png') no-repeat bottom right;
 }
 .pop_ConfirmSKUReceived .SKUs .SKU img{
     width: 80px;
@@ -2598,6 +2599,7 @@ body {
     padding-top: 10px;
     display: inline-block;
     color: #333333;
+    font-family: "Microsoft YaHei";
 }
 .pop_ConfirmSKUReceived .SKUs .SKU .SKU_info{
     display: inline-block;
@@ -2689,6 +2691,7 @@ body {
 }
 .pop_Pickup .pickupContents .pickup .pickupCode{
     color: #FE9B00;
+    font-weight: bold;
 }
 .pop_Pickup .pickupContents .pickupGuide{
     height: 35px;
@@ -3797,6 +3800,7 @@ body {
     border: 1px solid #FFF;
     box-sizing: border-box;
     border-radius: 5px;
+    display: inline-block;
 }
 .jifen_box .jifen .subSections .subSection:hover{
     background: #FAFAFA;
@@ -3807,15 +3811,18 @@ body {
 .jifen_box .jifen .subSections p{
     text-align: center;
 }
-
-.jifen_box .jifen .invitation_btn{
-    display: inline-block;
-}
 .jifen_box .jifen .invitation_btn img{
     margin: 14px auto;
     display: block;
 }
 .jifen_box .jifen .invitation_btn p{
+    margin-top: 2px;
+}
+.jifen_box .jifen .RSC_btn img{
+    margin: 12px auto;
+    display: block;
+}
+.jifen_box .jifen .RSC_btn p{
     margin-top: 2px;
 }
 .wrap_user_info .cart-item-list {
@@ -5410,6 +5417,7 @@ body {
 }
 .order-detail-section .order .order-info p {
     color: #909090;
+    margin-top: -10px;
 }
 .order-detail-section .order .order-info .order-statusName span {
     padding-left: 10px;
@@ -5417,6 +5425,7 @@ body {
 }
 .order-detail-section .order .order-info .pickupCode{
     color: #FE9B00;
+    font-weight: bold;
 }
 .order-detail-section .order .order-info-text {
     color: #909090;
@@ -5492,7 +5501,7 @@ body {
     width: 190px;
 }
 .order-detail-section .order .order-body .pay_table_content {
-    line-height: 66px;
+    line-height: 65px;
     text-align: center;
     border-top: 1px solid #c7c7c7;
 }
@@ -5503,13 +5512,14 @@ body {
     border-radius: 7px;
     background: #fea121;
     line-height: 30px;
-    margin-top: 13px;
+    margin-top: 16.5px;
     padding: 0 15px;
-    font-size: 16px;
     color: #FFFFFF;
+    min-width: 100px;
+    box-sizing: border-box;
 }
 .order-detail-section .order .order-body .pay_table_content .modify-paymethod-actionName{
-    margin-top: 0px;
+    margin-top: 10px;
     margin-bottom: 10px;
     background: #FFFFFF;
     color: #FE9B00;
@@ -5548,7 +5558,8 @@ body {
 }
 .order-detail-section .order .order-body .pay_table_content li:nth-child(6) {
     width: 190px;
-    line-height: 40px;
+    line-height: 30px;
+    max-height: 100px;
 }
 .order-detail-section .order .order-body .address p {
     line-height: 25px;

@@ -15,7 +15,7 @@ app.controller('userCenterController', function($scope, $rootScope,$timeout ,rem
 
     $scope.showConfirmSKUReceivedPop = false; //确认收货的弹窗变量
     $scope.ConfirmingSKUs = [];  //要确认的收货物品列表
-    $scope.ConfirmingSKUIds = [];  //要确认的收货物品id列表
+    $scope.ConfirmingSKU_refs = [];  //要确认的收货物品id列表
     $scope.ConfirmingOrderIds;  //要确认的收货物品列表
 
     $scope.showPickupPop = false; //去自提的弹窗变量
@@ -401,7 +401,7 @@ app.controller('userCenterController', function($scope, $rootScope,$timeout ,rem
                             $scope.ConfirmingSKUIndex = -1;
                             $scope.showConfirmSKUReceivedPop = true;
                             //window.scrollTo(0, 0);
-                            $scope.ConfirmingSKUIds = [];
+                            $scope.ConfirmingSKU_refs = [];
                             $scope.isOverflow = true;
                             if(order.SKUs){
                                 for(var i in order.SKUs){
@@ -490,24 +490,24 @@ app.controller('userCenterController', function($scope, $rootScope,$timeout ,rem
         return Number(totalAdditionsPrice.toFixed(2));
     };
     $scope.addToConfirmingSKU_List = function(index){
-        if($scope.ConfirmingSKUIds.length == 0){
-            $scope.ConfirmingSKUIds.push($scope.ConfirmingSKUs[index]._id);
+        if($scope.ConfirmingSKU_refs.length == 0){
+            $scope.ConfirmingSKU_refs.push($scope.ConfirmingSKUs[index].ref);
         }else{
             var hasExsited = false;
-            for(var i in $scope.ConfirmingSKUIds){              //如果已在$scope.ConfirmingSKUs就剔除
-                if($scope.ConfirmingSKUs[index]._id == $scope.ConfirmingSKUIds[i]){
-                    $scope.ConfirmingSKUIds.splice(i, 1);
+            for(var i in $scope.ConfirmingSKU_refs){              //如果已在$scope.ConfirmingSKUs就剔除
+                if($scope.ConfirmingSKUs[index].ref == $scope.ConfirmingSKU_refs[i]){
+                    $scope.ConfirmingSKU_refs.splice(i, 1);
                     hasExsited = true;
                 }
             }
             if(!hasExsited){
-                $scope.ConfirmingSKUIds.push($scope.ConfirmingSKUs[index]._id); //不在时就加入$scope.ConfirmingSKUs
+                $scope.ConfirmingSKU_refs.push($scope.ConfirmingSKUs[index].ref); //不在时就加入$scope.ConfirmingSKUs
             }
         }
     };
     $scope.checkConfirmingSKU_List = function(index){
         if($scope.ConfirmingSKUs.hasOwnProperty(index)){
-            if($scope.ConfirmingSKUIds.indexOf($scope.ConfirmingSKUs[index]._id )!=-1){
+            if($scope.ConfirmingSKU_refs.indexOf($scope.ConfirmingSKUs[index].ref )!=-1){
                 return true;
             }else{
                 return false;
@@ -515,16 +515,34 @@ app.controller('userCenterController', function($scope, $rootScope,$timeout ,rem
         }
     };
     $scope.confirmSKU = function(){
-        remoteApiService.confirmSKU($scope.ConfirmingOrderIds,$scope.ConfirmingSKUIds.join())
-            .then(function(data) {
-                $scope.ConfirmingOrderIds = null;
-                if(data.code == 1000){
-                    sweetalert('该商品确认收货成功','my_xxnr.html');
-                }else{
-                    sweetalert('确认收货失败','my_xxnr.html');
+        if($scope.ConfirmingSKU_refs.length>0){
+            remoteApiService.confirmSKU($scope.ConfirmingOrderIds,$scope.ConfirmingSKU_refs)
+                .then(function(data) {
+                    $scope.ConfirmingOrderIds = null;
+                    if(data.code == 1000){
+                        sweetalert('该商品确认收货成功','my_xxnr.html');
+                    }else{
+                        sweetalert('确认收货失败','my_xxnr.html');
+                    }
+                });
+            //$scope.ConfirmingOrderIds = null;
+        }
+    };
+    $scope.ConfirmingSKU_number = function(){   //计算被算中的确认收货的SKU的数量
+        var resultNum = 0;
+        $scope.ConfirmingSKU_refs.forEach(function(SKU_ref){
+            if($scope.ConfirmingSKUs){
+                for(var i in $scope.ConfirmingSKUs){
+
+                    if($scope.ConfirmingSKUs.hasOwnProperty(i)){
+                        if(SKU_ref == $scope.ConfirmingSKUs[i].ref){
+                            resultNum = resultNum + $scope.ConfirmingSKUs[i].count;
+                        }
+                    }
                 }
-            })
-        //$scope.ConfirmingOrderIds = null;
+            }
+        });
+        return resultNum;
     };
 
 });
