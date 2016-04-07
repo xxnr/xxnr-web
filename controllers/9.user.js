@@ -1613,7 +1613,7 @@ function json_potential_customer(){
                     message: 'success',
                     count: totalCount,
                     potentialCustomers: potentialCustomers,
-                    countLeftToday: count,
+                    countLeftToday: count && count > 0 ? count : 0,
                     totalPageNo: pageCount,
                     currentPageNo: page + 1
                 });
