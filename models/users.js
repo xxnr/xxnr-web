@@ -58,24 +58,26 @@ var UserSchema = new mongoose.Schema({
 });
 
 var PotentialCustomerSchema = new mongoose.Schema({
-    "user":{type:mongoose.Schema.ObjectId, ref:"user"},  // 用户 reference
-    "name":{type:String, required:true},                // 姓名
-    "phone":{type:String, required:true},              // 手机号码
-    "sex":{type:Boolean, default:false},              // 性别 0：男 1：女
-    "address":{                                         // 用户所在地
+    "user":{type:mongoose.Schema.ObjectId, ref:"user"},     // 用户 reference
+    "name":{type:String, required:true},                    // 姓名
+    "namePinyin":{type:String},                             // 姓名汉语拼音
+    "nameInitial":{type:String},                            // 姓名汉语拼音首字母
+    "phone":{type:String, required:true},                   // 手机号码
+    "sex":{type:Boolean, default:false},                    // 性别 0：男 1：女
+    "address":{                                             // 用户所在地
         province:{type:mongoose.Schema.ObjectId, ref:"province"},
         city:{type:mongoose.Schema.ObjectId, ref:"city"},
         county:{type:mongoose.Schema.ObjectId, ref:"county"},
         town:{type:mongoose.Schema.ObjectId, ref:"town"}
     },
-    "buyIntentions":[{type:mongoose.Schema.ObjectId, ref:"intention_product"}],                           // 购买意向商品
-    "remarks":{type:String},                             // 备注
-    "dateTimeAdded":{type:Date, default:Date.now},      // 添加时间
-    "dateAdded":{type:String},                            // 添加日期(北京时间)
-    "isRegistered":{type:Boolean, default:false},         // 是否注册
+    "buyIntentions":[{type:mongoose.Schema.ObjectId, ref:"intention_product"}],     // 购买意向商品
+    "remarks":{type:String},                                // 备注
+    "dateTimeAdded":{type:Date, default:Date.now},          // 添加时间
+    "dateAdded":{type:String},                              // 添加日期(北京时间)
+    "isRegistered":{type:Boolean, default:false},           // 是否注册
     "dateTimeRegistered":{type:Date},                       // 注册时间
-    "isBinded":{type:Boolean, default:false},           // 是否绑定该经纪人
-    "dateTimeBinded":{type:Date}                           // 绑定该经纪人时间
+    "isBinded":{type:Boolean, default:false},               // 是否绑定该经纪人
+    "dateTimeBinded":{type:Date}                            // 绑定该经纪人时间
 });
 
 var IntentionProductSchema = new mongoose.Schema({
