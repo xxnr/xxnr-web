@@ -121,10 +121,10 @@ OrderService.prototype.orderStatus = function (order) {
 			return {type:3, value:'待发货'};
 		}
 	} else {
-		if (order.pendingApprove) {
-			return {type:7, value:'付款待审核'};
-		} else if (order.isClosed) {
+		if (order.isClosed) {
 			return {type:0, value:'已关闭'};
+		} else if (order.pendingApprove) {
+			return {type:7, value:'付款待审核'};
 		} else {
 			return {type:1, value:'待付款'};
 		}
@@ -169,10 +169,10 @@ OrderService.prototype.RSCOrderStatus = function(order){
 			return {type:3, value:'待厂家发货'};
 		}
 	} else {
-		if (order.pendingApprove) {
-			return {type:2, value:'付款待审核'};
-		} else if (order.isClosed) {
+		if (order.isClosed) {
 			return {type:0, value:'已关闭'};
+		} else if (order.pendingApprove) {
+			return {type:2, value:'付款待审核'};
 		} else {
 			return {type:1, value:'待付款'};
 		}
