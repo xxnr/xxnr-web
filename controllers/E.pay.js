@@ -719,15 +719,17 @@ function process_EPOSNotify(){
     console.log(decryptedParams);
     if(EPOSNotify.verifySignature(params, signature)){
         console.log('verification success');
-        if(!decryptedParams.memo || !decryptedParams.memo.orderId || !decryptedParams.memo.paymentId){
+        var memo = EPOSNotify.buildMemo(decryptedParams.memo);
+        console.log('memo:', memo);
+        if(!memo || !memo.orderId || !memo.paymentId){
             self.content('bad notify');
             return;
         }
 
-        var paymentId = decryptedParams.memo.paymentId;
+        var paymentId = memo.paymentId;
         var status = decryptedParams.dealStatus;
         var price = (decryptedParams.amount/100) || 0;
-        var orderId = decryptedParams.memo.orderId;
+        var orderId = memo.orderId;
         var datePaid = new Date(decryptedParams.dealDate + ' ' + decryptedParams.dealTime);
         var currentTime = new Date();
 

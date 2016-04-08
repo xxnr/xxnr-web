@@ -24,4 +24,20 @@ EPOSNotify.prototype.verifySignature = function(params, signature){
     return verify.update(params).verify(EPOSConfig.RSAPublicKey, signature, 'hex');
 };
 
+EPOSNotify.prototype.buildMemo = function(memo){
+    if(!memo || typeof memo != 'string'){
+        return null;
+    }
+
+    var memoJson = {};
+    memo.split('&').forEach(function(keyValuePair){
+        if(typeof keyValuePair == 'string' && keyValuePair.indexOf('=') != -1) {
+            var keyValue = keyValuePair.split('=');
+            memoJson[keyValue[0]] = memoJson[keyValue[1]];
+        }
+    });
+
+    return memoJson;
+};
+
 module.exports = new EPOSNotify();
