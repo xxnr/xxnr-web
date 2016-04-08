@@ -33,7 +33,7 @@ EPOSNotify.prototype.buildMemo = function(memo){
     memo.split('&').forEach(function(keyValuePair){
         if(typeof keyValuePair == 'string' && keyValuePair.indexOf('=') != -1) {
             var keyValue = keyValuePair.split('=');
-            memoJson[keyValue[0]] = memoJson[keyValue[1]];
+            memoJson[keyValue[0]] = keyValue[1];
         }
     });
 
