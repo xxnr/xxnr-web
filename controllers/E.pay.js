@@ -716,11 +716,8 @@ function process_EPOSNotify(){
     var params = self.data.params;
     var signature = self.data.signature;
     var decryptedParams = JSON.parse(EPOSNotify.decryptParams(params));
-    console.log(decryptedParams);
     if(EPOSNotify.verifySignature(params, signature)){
-        console.log('verification success');
         var memo = EPOSNotify.buildMemo(decryptedParams.memo);
-        console.log('memo:', memo);
         if(!memo || !memo['商户订单号'] || !memo['商户支付号']){
             self.content('bad notify');
             return;
@@ -733,12 +730,9 @@ function process_EPOSNotify(){
         var datePaid = new Date(decryptedParams.dealDate + ' ' + decryptedParams.dealTime);
         var currentTime = new Date();
 
-        console.log(status, price, datePaid, orderId, currentTime);
-
         if(status == 1) {
             // paid successfully
             var options = {payType: PAYTYPE.EPOS, price: price, datePaid: datePaid, queryId: orderId, notify_time:currentTime};
-            console.log(options);
             payNotify.call(self, paymentId, options);
         }
 
