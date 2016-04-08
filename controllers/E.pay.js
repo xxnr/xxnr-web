@@ -721,15 +721,15 @@ function process_EPOSNotify(){
         console.log('verification success');
         var memo = EPOSNotify.buildMemo(decryptedParams.memo);
         console.log('memo:', memo);
-        if(!memo || !memo.orderId || !memo.paymentId){
+        if(!memo || !memo['商户订单号'] || !memo['商户支付号']){
             self.content('bad notify');
             return;
         }
 
-        var paymentId = memo.paymentId;
+        var paymentId = memo['商户支付号'];
         var status = decryptedParams.dealStatus;
         var price = (decryptedParams.amount/100) || 0;
-        var orderId = memo.orderId;
+        var orderId = memo['商户订单号'];
         var datePaid = new Date(decryptedParams.dealDate + ' ' + decryptedParams.dealTime);
         var currentTime = new Date();
 
