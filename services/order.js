@@ -1009,8 +1009,9 @@ OrderService.prototype.paid = function(id, paymentId, options, callback) {
 		values['payments.$.backendUser'] = options.backendUser._id;
 		values['payments.$.backendUserAccount'] = options.backendUser.account;
 	}
-	if (options.RSC) {
-		values['payments.$.RSC'] = options.RSC;
+	if (options.RSC && options.RSC._id) {
+		values['payments.$.RSC'] = options.RSC._id;
+		values['payments.$.RSCCompanyName'] = options.RSC.companyName;
 	}
 	// find and update the payment not PAID
 	var query = { id: id, payments: { $elemMatch: { id: paymentId, payStatus: { $ne: PAYMENTSTATUS.PAID } } } };

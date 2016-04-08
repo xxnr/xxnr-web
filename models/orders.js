@@ -83,7 +83,7 @@ var schema = new mongoose.Schema({
 		'backendUser':{type: mongoose.Schema.ObjectId, ref:'backenduser'},			// 设置本条信息的后台用户
 		'backendUserAccount':{type: String},										// 设置本条信息的后台用户账户
 		'RSC':{type:mongoose.Schema.ObjectId, ref:'user'},							// 支付时的相关RSC
-		'RSCCompanyName':{type: String}														// 支付时的相关RSC
+		'RSCCompanyName':{type: String}												// 支付时的相关RSC公司名
 	}],
 	'subOrders': [{
 	    'id': {type: String, index: true, unique: true, required: true},			// 子订单ID
