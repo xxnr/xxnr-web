@@ -344,4 +344,46 @@ PayService.prototype.unionpayRefund = function (options, callback) {
     }, false);
 };
 
+// pay refund
+PayService.prototype.payRefund = function(options) {
+    var self = this;
+    if (options) {
+        self.savePaymentRefund(options, function(err, orderPaymentRefund) {
+            if (err) {
+                console.error('payRefund PayService save err:', err);
+                console.error(orderPaymentRefund);
+            } else {
+                console.log(orderPaymentRefund);
+            }
+            // if (orderPaymentRefund && orderPaymentRefund.refundReason !== 3) {
+            //     // TODO refund
+            //     // console.log(orderPaymentRefund);
+            //     if (orderPaymentRefund.payType === PAYTYPE.ZHIFUBAO) {
+            //         console.log('zhifubao refund:', orderPaymentRefund);
+            //         var type = 'nopwd';
+            //         self.alipayRefund(type, orderPaymentRefund, function(err, result) {
+            //            if (err) {
+            //                console.error('payRefund PayService alipayRefundNopwd err:', err);
+            //                return;
+            //            }
+            //            console.log(result);
+            //        });
+            //     } else if (orderPaymentRefund.payType === PAYTYPE.UNIONPAY) {
+            //        // console.log(orderPaymentRefund);
+            //        self.unionpayRefund(orderPaymentRefund, function(err, result) {
+            //             if (err) {
+            //                 console.error('payRefund PayService unionpayRefund err:', err);
+            //                 return;
+            //             }
+            //             if (result) {
+            //                 console.log(result);
+            //             }
+            //             return;
+            //        });
+            //     }
+            // }
+        });
+    }
+}
+
 module.exports = new PayService();

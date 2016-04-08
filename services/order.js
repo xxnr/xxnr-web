@@ -20,6 +20,8 @@ var mongoose = require('mongoose');
 var DeliveryCodeModel = require('../models').deliveryCode;
 var umengConfig = require('../configuration/umeng_config');
 var UMENG = MODULE('umeng');
+var PayService = require('../services').order;
+var dri = require('../common/dri');
 
 // Service
 var OrderService = function(){};
@@ -1944,6 +1946,7 @@ OrderService.prototype.changeToPendingApprove = function(orderId, callback){
 // judge whether the order payment need refund
 // params: order: the order of the payment; thePayment: {paymentId:String, price:Number}
 // return: refund Object {refund:Bool, refundReason:Number}
+// refundReason 1:payment已经被支付（重复支付） 2:支付完payment超过了本阶段的总额 3:paymentId未找到订单
 OrderService.prototype.judgePaymentRefund = function(order, thePayment) {
 	var self = this;
 	if (order) {
@@ -1986,6 +1989,79 @@ OrderService.prototype.judgePaymentRefund = function(order, thePayment) {
 		}
 	}
 	return {refund: false};
+};
+
+// pay notify
+// common pay notify function
+OrderService.prototype.payNotify = function(paymentId, options){
+    var self = this;
+
+    // order paid
+    self.get({"paymentId": paymentId}, function(err, order) {
+        // TODO: log err
+        if (err) {
+            console.error('api-v1.0 payNotify OrderService get err:', err);
+            dri.sendDRI('[DRI] Fail to get order in order payNotify: ', 'paymentId:'+paymentId, err);
+        }
+        if (order) {
+            var payment = {paymentId: paymentId};
+            if (options && options.price) {
+                payment.price = parseFloat(parseFloat(options.price).toFixed(2));
+            }
+            var result = self.judgePaymentRefund(order, payment);
+            if (result && result.refund) {
+                var paymentOptions = options;
+                paymentOptions.paymentId = paymentId;
+                if (!paymentOptions.orderId) {
+                    paymentOptions.orderId = order.id;
+                }
+                if (result.refundReason) {
+                    paymentOptions.refundReason = result.refundReason;
+                }
+                PayService.payRefund(paymentOptions);
+            } else {
+                if ((order.payStatus||PAYMENTSTATUS.UNPAID) == PAYMENTSTATUS.UNPAID || order.payStatus == PAYMENTSTATUS.PARTPAID) {
+                    self.paid(order.id, paymentId, options, function(err, result) {
+                        if (err) {
+                            if (result && result.refund) {
+                                // *TODO refund
+                                var paymentOptions = options;
+                                paymentOptions.paymentId = paymentId;
+                                if (!paymentOptions.orderId) {
+                                    paymentOptions.orderId = order.id;
+                                }
+                                if (result.refundReason) {
+                                    paymentOptions.refundReason = result.refundReason;
+                                }
+                                PayService.payRefund(paymentOptions);
+                            } else {
+                                console.error('api-v1.0 payNotify OrderService paid err:', err);
+                                // if err happen
+                                // send sms to dri
+                                var idsStr = 'orderId:' + order.id + ' paymentId:' + paymentId;
+                                dri.sendDRI('[DRI] Fail to update order in order payNotify: ', idsStr, err);
+                            }
+                        }
+                    }); // SchemaBuilderEntity.prototype.save = function(model, helper, callback, skip)
+                }
+            }
+        } else {
+            // not find order by paymentId
+            // *TODO refund or other methods
+            var paymentOptions = options;
+            paymentOptions.paymentId = paymentId;
+            if (!paymentOptions.orderId) {
+                paymentOptions.orderId = order.id;
+            }
+            paymentOptions.refundReason = 3;
+            PayService.payRefund(paymentOptions);
+        }
+    });
+
+    // pay success log
+    var payLog = options;
+    payLog.paymentId = paymentId;
+    self.savePaidLog(payLog);
 };
 
 OrderService.prototype.getPaymentInOrder = function (order, paymentId) {
