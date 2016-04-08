@@ -641,65 +641,65 @@ function json_user_modify() {
             var address = self.data.address;
             options.address = {};
             AreaService.getProvince({id: address.provinceId}, function (err, province) {
-                if (err) {
-                    console.error('get province err:', err);
-                    self.respond({code: 1001, message: err});
+                if (err || !province) {
+                    if (err) console.error('get province err:', err);
+                    self.respond({code: 1001, message: '没有查到要修改的省'});
                     return;
                 }
 
                 options.address.province = province;
                 AreaService.getCity({id: address.cityId}, function (err, city) {
-                    if (err) {
-                        console.error('get city err:', err);
-                        self.respond({code: 1001, message: err});
+                    if (err || !city) {
+                        if (err) console.error('get city err:', err);
+                        self.respond({code: 1001, message: '没有查到要修改的市'});
                         return;
                     }
 
                     options.address.city = city;
                     if (self.data.address.countyId) {
                         AreaService.getCounty({id: address.countyId}, function (err, county) {
-                            if (err) {
-                                console.error('get county err:', err);
-                                self.respond({code: 1001, message: err});
+                            if (err || !county) {
+                                if (err) console.error('get county err:', err);
+                                self.respond({code: 1001, message: '没有查到要修改的县'});
                                 return;
                             }
 
                             options.address.county = county;
                             if (address.townId) {
                                 AreaService.getTown({id: address.townId}, function (err, town) {
-                                    if (err) {
-                                        console.error('get town err:', err);
-                                        self.respond({code: 1001, message: err});
+                                    if (err || !town) {
+                                        if (err) console.error('get town err:', err);
+                                        self.respond({code: 1001, message: '没有查到要修改的乡镇'});
                                         return;
                                     }
 
                                     options.address.town = town;
                                     UserService.update(options, callback);
-                                })
+                                });
                             } else {
                                 UserService.update(options, callback);
                             }
                         })
                     } else if (address.townId) {
                         AreaService.getTown({id: address.townId}, function (err, town) {
-                            if (err) {
-                                console.error('get town err:', err);
-                                self.respond({code: 1001, message: err});
+                            if (err || !town) {
+                                if (err) console.error('get town err:', err);
+                                self.respond({code: 1001, message: '没有查到要修改的乡镇'});
                                 return;
                             }
 
                             options.address.town = town;
                             UserService.update(options, callback);
-                        })
+                        });
                     } else {
                         UserService.update(options, callback);
                     }
-                })
-            })
+                });
+            });
         } else{
             UserService.update(options, callback);
         }
-    })
+    });
 }
 
 // Find Account in users
