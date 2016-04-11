@@ -64,6 +64,10 @@ exports.install = function() {
     F.route('/api/v2.1/potentialCustomer/isAvailable',  json_potential_customer_available, ['get'], ['isLoggedIn', 'isXXNRAgent']);
     F.route('/api/v2.1/potentialCustomer/add',          process_add_potential_customer, ['post'], ['isLoggedIn', 'isXXNRAgent']);
     F.route('/api/v2.1/potentialCustomer/query',        json_potential_customer, ['get'], ['isLoggedIn', 'isXXNRAgent']);
+    // order by name pinyin
+    F.route('/api/v2.1/potentialCustomer/queryAllOrderbyName',     json_potential_customer_orderby_namePinyin, ['get'], ['isLoggedIn', 'isXXNRAgent']);
+    // Whether order by name pinyin is latest
+    F.route('/api/v2.1/potentialCustomer/isLatest',     json_potential_customer_islatest, ['get'], ['isLoggedIn', 'isXXNRAgent']);
     F.route('/api/v2.1/potentialCustomer/get',          json_potential_customer_get, ['get'], ['isLoggedIn', 'isXXNRAgent']);
 
     F.route('/api/v2.1/user/getNominatedInviter',       json_nominated_inviter_get, ['get'], ['isLoggedIn']);
@@ -1587,7 +1591,7 @@ function process_add_potential_customer(){
         }
 
         self.respond({code:1000, message:'success'});
-    })
+    });
 }
 
 function json_potential_customer(){
@@ -1617,9 +1621,52 @@ function json_potential_customer(){
                     totalPageNo: pageCount,
                     currentPageNo: page + 1
                 });
-            })
-        })
+            });
+        });
     }
+}
+
+function json_potential_customer_orderby_namePinyin(){
+    var self = this;
+    PotentialCustomerService.queryOrderbynamePinyin(self.user, function (err, potentialCustomers) {
+        if (err) {
+            self.respond({code: 1001, message: '获取潜在客户列表失败'});
+            return;
+        }
+
+        self.respond({
+            code: 1000,
+            message: 'success',
+            count: potentialCustomers ? potentialCustomers.length : 0,
+            potentialCustomers: potentialCustomers ? potentialCustomers : []
+        });
+    });
+}
+
+function json_potential_customer_islatest(){
+    var self = this;
+    var count = self.data.count || 0;
+    PotentialCustomerService.queryOrderbynamePinyin(self.user, function (err, potentialCustomers) {
+        if (err) {
+            self.respond({code: 1001, message: '获取潜在客户列表失败'});
+            return;
+        }
+
+        PotentialCustomerService.countLeftToday(self.user, function (err, countLeftToday) {
+            if (err) {
+                self.respond({code: 1001, message: '查询客户列表失败'});
+                return;
+            }
+
+            self.respond({
+                code: 1000,
+                message: 'success',
+                count: potentialCustomers ? potentialCustomers.length : 0,
+                countLeftToday: countLeftToday && countLeftToday > 0 ? countLeftToday : 0,
+                needUpdate: potentialCustomers && parseInt(count) !== potentialCustomers.length ? 1 : 0
+            });
+        });
+    });
 }
 
 function json_intention_products(){
