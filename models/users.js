@@ -62,6 +62,7 @@ var PotentialCustomerSchema = new mongoose.Schema({
     "name":{type:String, required:true},                    // 姓名
     "namePinyin":{type:String},                             // 姓名汉语拼音
     "nameInitial":{type:String},                            // 姓名汉语拼音首字母
+    "nameInitialType":{type:Number},                        // 姓名汉语拼音首字母类型 1:字母 2:其他符号
     "phone":{type:String, required:true},                   // 手机号码
     "sex":{type:Boolean, default:false},                    // 性别 0：男 1：女
     "address":{                                             // 用户所在地
@@ -92,10 +93,10 @@ UserSchema.index({name:1});
 UserSchema.index({'RSCInfo.products':1});
 
 PotentialCustomerSchema.index({"phone":1, unique:true});
-PotentialCustomerSchema.index({"user":1, "dateAdded":1, "nameInitial":1, "namePinyin":1, "dateTimeAdded":1});
+PotentialCustomerSchema.index({"user":1, "dateAdded":1, "nameInitialType":1, "namePinyin":1, "dateTimeAdded":1});
 PotentialCustomerSchema.index({"user":1, "isRegistered":1, "isBinded":1});
 PotentialCustomerSchema.index({"dateTimeAdded":1});
-PotentialCustomerSchema.index({"nameInitial":1, "namePinyin":1});
+PotentialCustomerSchema.index({"nameInitialType":1, "namePinyin":1});
 
 IntentionProductSchema.index({"name":1, unique:true});
 
