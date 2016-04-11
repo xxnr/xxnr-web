@@ -81,7 +81,7 @@ PotentialCustomerService.prototype.add = function(user, name, phone, sex, addres
         if(regs.test(char)) {
             nameInitial = char.toUpperCase();
         } else {
-            namePinyin = nameInitial + namePinyin;
+            namePinyin = nameInitial + namePinyin.toLowerCase();
         }
     } catch (e) {
         console.error('PotentialCustomerService pinyin err:', e, name);

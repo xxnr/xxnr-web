@@ -27,7 +27,7 @@ PotentialCustomerModel.find({}).sort({dateTimeAdded:-1}).exec(function (err, cus
 		        if(regs.test(char)) {
 		            nameInitial = char.toUpperCase();
 		        } else {
-		            namePinyin = nameInitial + namePinyin;
+		            namePinyin = nameInitial + namePinyin.toLowerCase();
 		        }
 		        setvalues.nameInitial = nameInitial;
 		        setvalues.namePinyin = namePinyin;
