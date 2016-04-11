@@ -21,13 +21,13 @@ PotentialCustomerModel.find({}).sort({dateTimeAdded:-1}).exec(function (err, cus
 		    var nameInitial = '#';
 		    try {
 		        var namePinyinList = pinyin(name, {style: pinyin.STYLE_NORMAL});
-		        namePinyin = namePinyinList.join("");
+		        namePinyin = namePinyinList.join("").toLowerCase();
 		        var char = namePinyin[0];
 		        var regs=/^[A-Z-a-z]$/;
 		        if(regs.test(char)) {
 		            nameInitial = char.toUpperCase();
 		        } else {
-		            namePinyin = nameInitial + namePinyin.toLowerCase();
+		            namePinyin = nameInitial + namePinyin;
 		        }
 		        setvalues.nameInitial = nameInitial;
 		        setvalues.namePinyin = namePinyin;
