@@ -1004,6 +1004,15 @@ OrderService.prototype.paid = function(id, paymentId, options, callback) {
 	if (options && options.payType) {
 		values['payments.$.payType'] = options.payType;
 	}
+	if (options.backendUser) {
+		values['payments.$.dateSet'] = new Date();
+		values['payments.$.backendUser'] = options.backendUser._id;
+		values['payments.$.backendUserAccount'] = options.backendUser.account;
+	}
+	if (options.RSC && options.RSC._id && options.RSC.RSCInfo) {
+		values['payments.$.RSC'] = options.RSC._id;
+		values['payments.$.RSCCompanyName'] = options.RSC.RSCInfo.companyName;
+	}
 	// find and update the payment not PAID
 	var query = { id: id, payments: { $elemMatch: { id: paymentId, payStatus: { $ne: PAYMENTSTATUS.PAID } } } };
 	OrderModel.update(query, {$set:values}, function(err, count) {

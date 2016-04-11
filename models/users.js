@@ -92,9 +92,10 @@ UserSchema.index({name:1});
 UserSchema.index({'RSCInfo.products':1});
 
 PotentialCustomerSchema.index({"phone":1, unique:true});
-PotentialCustomerSchema.index({"user":1, "dateAdded":1, "dateTimeAdded":1});
+PotentialCustomerSchema.index({"user":1, "dateAdded":1, "nameInitial":1, "namePinyin":1, "dateTimeAdded":1});
 PotentialCustomerSchema.index({"user":1, "isRegistered":1, "isBinded":1});
 PotentialCustomerSchema.index({"dateTimeAdded":1});
+PotentialCustomerSchema.index({"nameInitial":1, "namePinyin":1});
 
 IntentionProductSchema.index({"name":1, unique:true});
 
