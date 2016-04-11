@@ -3,7 +3,7 @@ var AreaService = services.area;
 
 exports.install = function() {
 	// area
-	F.route('/api/v2.0/area/getAreaList/', 							json_province_query, ['get', 'post']);
+	//F.route('/api/v2.0/area/getAreaList/', 							json_province_query, ['get', 'post']);
 	F.route('/api/v2.0/area/getAreaCity/', 							json_city_query, ['get', 'post']);
 	F.route('/api/v2.0/area/getAreaCounty/', 						json_county_query, ['get', 'post']);
 	F.route('/api/v2.0/area/getAreaTown/', 							json_town_query, ['get', 'post']);
@@ -18,16 +18,15 @@ exports.install = function() {
 // ==========================================================================
 
 // Province
-function json_province_query() {
+exports.json_province_query = function(req, res, next) {
 	var self = this;
-	var callbackName = self.data['callback'] || 'callback';
 	var options = {};
 
 	AreaService.queryProvince(options, function(err, data){
 		if(!data || err){
 			if (err)
 				console.log('area json_province_query err:' + err);
-			self.respond({'code':'1001','message':'没有查询到省份'});
+			res.success({'code':'1001','message':'没有查询到省份'});
 			return;
 		} else{
 			var items = data.items;
@@ -43,8 +42,7 @@ function json_province_query() {
 			return;
 		}
 	});
-	
-}
+};
 
 // City
 function json_city_query() {

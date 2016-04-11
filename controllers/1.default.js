@@ -4,9 +4,9 @@ var middleware = require('../common/middleware');
 
 exports.install = function() {
 	// F.route('/', function(){this.raw(`<html><meta http-equiv="refresh" content="0;url=xxnr/index.html"></html>`);}); // same method to jump from baidu.com to www.baidu.com, which should be stable and good enough 
-	F.route('/', function(){this.raw(F.config['home-page']);});
-    F.route('/header',function(){this.view('/../public/xxnr/header')});
-    F.route('/footer',function(){this.view('/../public/xxnr/footer')});
+	//F.route('/', function(){this.raw(F.config['home-page']);});
+    //F.route('/header',function(){this.view('/../public/xxnr/header')});
+    //F.route('/footer',function(){this.view('/../public/xxnr/footer')});
 
     // COMMON
 	// F.route('/', view_homepage);

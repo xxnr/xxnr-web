@@ -19,7 +19,7 @@ var api10 = converter.api10;
 var mongoose = require('mongoose');
 var DeliveryCodeModel = require('../models').deliveryCode;
 var umengConfig = require('../configuration/umeng_config');
-var UMENG = MODULE('umeng');
+var UMENG = require('../modules/umeng');
 
 // Service
 var OrderService = function(){};
@@ -312,7 +312,7 @@ OrderService.prototype.create = function(options, callback) {
 		self.addUserOrderNumber({userId:order.buyerId});
 
 		// Writes stats
-		MODULE('webcounter').increment('orders');
+		require('../modules/webcounter').increment('orders');
 	});
 };
 
@@ -348,7 +348,7 @@ OrderService.prototype.add = function(options, callback) {
 		self.addUserOrderNumber({userId:order.buyerId});
 
 		// Writes stats
-		MODULE('webcounter').increment('orders');
+		require('../modules/webcounter').increment('orders');
 	});
 
 };
