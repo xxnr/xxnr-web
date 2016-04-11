@@ -19,6 +19,7 @@ PotentialCustomerModel.find({}).sort({dateTimeAdded:-1}).exec(function (err, cus
         	var name = customer.name;
         	var namePinyin = '#';
 		    var nameInitial = '#';
+            var nameInitialType = 2;
 		    try {
 		        var namePinyinList = pinyin(name, {style: pinyin.STYLE_NORMAL});
 		        namePinyin = namePinyinList.join("").toLowerCase();
@@ -26,11 +27,14 @@ PotentialCustomerModel.find({}).sort({dateTimeAdded:-1}).exec(function (err, cus
 		        var regs=/^[A-Z-a-z]$/;
 		        if(regs.test(char)) {
 		            nameInitial = char.toUpperCase();
+                    nameInitialType = 1;
 		        } else {
+                    nameInitialType = 2;
 		            namePinyin = nameInitial + namePinyin;
 		        }
 		        setvalues.nameInitial = nameInitial;
 		        setvalues.namePinyin = namePinyin;
+                setvalues.nameInitialType = nameInitialType;
 		    } catch (e) {
 		        var err = 'PotentialCustomerService pinyin err:' + e + ' name:' + name;
 		        reject(err);

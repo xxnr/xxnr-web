@@ -73,6 +73,7 @@ PotentialCustomerService.prototype.add = function(user, name, phone, sex, addres
 
     var namePinyin = '#';
     var nameInitial = '#';
+    var nameInitialType = 2;
     try {
         var namePinyinList = pinyin(name, {style: pinyin.STYLE_NORMAL});
         namePinyin = namePinyinList.join("").toLowerCase();
@@ -80,14 +81,17 @@ PotentialCustomerService.prototype.add = function(user, name, phone, sex, addres
         var regs=/^[A-Z-a-z]$/;
         if(regs.test(char)) {
             nameInitial = char.toUpperCase();
+            nameInitialType = 1;
         } else {
             namePinyin = nameInitial + namePinyin;
+            nameInitialType = 2;
         }
     } catch (e) {
         console.error('PotentialCustomerService pinyin err:', e, name);
     }
     potential_customer.namePinyin = namePinyin;
     potential_customer.nameInitial = nameInitial;
+    potential_customer.nameInitialType = nameInitialType;
 
     Promise.all(promises)
         .then(function () {
@@ -180,7 +184,7 @@ PotentialCustomerService.prototype.queryOrderbynamePinyin = function(user, callb
             query = query.select('name phone remarks isRegistered sex namePinyin nameInitial');
         }
 
-        query.sort({nameInitial:1, namePinyin:1})
+        query.sort({nameInitialType:1, namePinyin:1})
             .exec(function (err, customers) {
                 if (err) {
                     console.error(err);
