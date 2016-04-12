@@ -308,7 +308,7 @@ app.controller('userCenterController', function($scope, $rootScope,$timeout ,rem
 
 
     $scope.show = function(showTypeId, index, reset) {
-        if (reset > 0) {
+        if (reset == true) {
             $scope.current_page = 1;
         };
         remoteApiService.getOrderList($scope.current_page, showTypeId)
@@ -319,7 +319,9 @@ app.controller('userCenterController', function($scope, $rootScope,$timeout ,rem
                 var orders = data.items;
                 $scope.searchIndex = [];
                 for (var showType in $scope.showTypes) {
-                    $scope.showTypes[showType].isSelected = false;
+                    if($scope.showTypes.hasOwnProperty(showType)){
+                        $scope.showTypes[showType].isSelected = false;
+                    }
                 }
                 $scope.showTypes[index].isSelected = true;
 
@@ -367,8 +369,9 @@ app.controller('userCenterController', function($scope, $rootScope,$timeout ,rem
                     order.createTime = orders[i].dateCreated;
                     order.order = orders[i].order;
                     order.orderDeliveryType = orders[i].deliveryType;
-                    var d = new Date(commonService.parseDate(orders[i].dateCreated));
-                    order.createTime_local = d.toLocaleString();
+                    //var d = new Date(commonService.parseDate(orders[i].dateCreated));
+                    //order.createTime_local = d.toLocaleString();
+                    order.createTime_local = commonService.convertDateIncludeHMM(orders[i].dateCreated);
 
                     if(order.order.orderStatus.type == 1){
                         order.actionName = '去付款';
@@ -404,9 +407,9 @@ app.controller('userCenterController', function($scope, $rootScope,$timeout ,rem
                             $scope.ConfirmingSKU_refs = [];
                             $scope.isOverflow = true;
                             if(order.SKUs){
-                                for(var i in order.SKUs){
-                                    if(order.SKUs[i].deliverStatus == 2){
-                                        $scope.ConfirmingSKUs.push(order.SKUs[i]);
+                                for(var x in order.SKUs){
+                                    if(order.SKUs[x].deliverStatus == 2){
+                                        $scope.ConfirmingSKUs.push(order.SKUs[x]);
                                     }
                                 }
                             }

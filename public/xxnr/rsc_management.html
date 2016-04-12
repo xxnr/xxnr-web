@@ -1,0 +1,290 @@
+<!doctype html>
+<html ng-app="rsc_management" ng-controller="needLoginController">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit">
+    <meta name="force-rendering" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <title>县级服务站</title>
+    <!--[if lte IE 7]><script>alert('为了更好的购物体验，请升级您的浏览器版本');window.location.href='http://cdn.dmeng.net/upgrade-your-browser.html?referrer='+location.href;</script><![endif]-->
+    <link rel='icon' href='images/title_logo.png' type='image/png' />
+    <meta http-equiv="pragma" content="no-cache">
+    <meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
+    <meta http-equiv="expires" content="Wed, 26 Feb 1997 08:21:57 GMT">
+    <!-- build:css -->
+    <link rel="stylesheet" type="text/css" href="css/uploadify.css" />
+    <link type="text/css" rel="stylesheet" href="css/style.css">
+    <link type="text/css" rel="stylesheet" href="css/sweetalert.css">
+    <!-- endbuild -->
+    <!-- build:js -->
+    <script src="js/jquery.min.js"></script>
+    <script src="js/angular.min.js"></script>
+    <script src="js/angular-cookies.min.js"></script>
+    <script src="js/common.js"></script>
+    <script src="js/login/loginService.js"></script>
+    <script src="js/remoteApiService.js"></script>
+    <script src="js/payService.js"></script>
+    <script src="js/shoppingCart/shoppingCartService.js"></script>
+    <script src="js/shoppingCart/shoppingCartController.js"></script>
+    <script src="js/rscManagement/rscMgmtController.js"></script>
+    <script src="js/login/loginController.js"></script>
+    <script src="js/headerFooterDirective.js"></script>
+    <script src="js/headerController.js"></script>
+    <script src="js/sweetalert.min.js"></script>
+    <script src="js/uploadService.js"></script>
+    <script src="js/sideService.js"></script>
+    <script src="js/myPlaceholderDirective.js"></script>
+    <!-- endbuild -->
+</head>
+
+<body ng-controller="rscManagementController" ng-class="{true:'overflow_body', false:'not_overflow_body'}[isOverflow]">
+<header ng-controller="headerController"></header>
+
+<div class="wrap nav" ng-controller="shoppingCartController">
+    <h1 class="left logo"><a href="/">新新农人</a></h1>
+    <ul class="left">
+        <li><a href="/">首页</a></li>
+        <li><a href="huafei_list.html">化肥专场</a></li>
+        <li><a href="car_list.html">汽车专场</a></li>
+        <li><a href="news_list.html">新农资讯</a></li>
+        <!-- <li><a href="#">新农论坛</a></li> -->
+        <li><a href="about.html">公司介绍</a></li>
+    </ul>
+    <div class="right buy">
+        <a href="" ng-click="accessShoppingCart()">
+            <em>&nbsp;</em>
+            购物车
+        </a>
+    </div>
+    <span class="shopping_cart_badge ng-cloak" ng-bind="shoppingCartCount"></span>
+    <a href="#" id="side_shoping_cart" ng-click="accessShoppingCart()" title="side shopping cart">
+        <img src="images/shopping-right.png" alt="" />
+        <span class="side_shopping_cart_badge ng-cloak" ng-show="shoppingCartCount>0">{{shoppingCartCount>99?'99+':shoppingCartCount}}</span>
+    </a>
+</div>
+
+<a href="#" id="back-to-top" title="Back to top">
+    <img src="images/backToTop.png" alt="" />
+</a>
+<div class="clear rsc_mgmt">
+    <p class="guide">
+        <a href="/">首页</a> ／ <a href="my_xxnr.html">我的新农人</a> ／ <a> 县级服务站 </a>
+    </p>
+    <div class="rsc_mgmt_body wrap">
+        <ul class="details_tab">
+            <li ng-repeat="showType in showTypes" ng-class="{true:'current', false:''}[showType.isSelected]"><a href="" ng-click='show(showType.id, $index, 1, true, orderSearchInput)' ng-cloak>{{showType.name}}</a></li>
+        </ul>
+        <div class="order--search" ng-show="showTypes[0].isSelected">
+            <input type="text" class="search--input" my-placeholder="收货人手机号/下单人手机号/订单号" placeholder="收货人手机号/下单人手机号/订单号" ng-model="orderSearchInput">
+            <a href="" class="search--btn" ng-click='show(showType.id, 0, 1, true, orderSearchInput)' >搜索</a>
+        </div>
+        <ul class="orderslist--titles">
+            <li>商品详情</li>
+            <li>数量</li>
+            <li>发货状态</li>
+            <li>合计（元）</li>
+            <li>状态</li>
+            <li>操作</li>
+        </ul>
+        <div class="orders--list" class="ng-cloak" ng-show="orderList.length>0">
+            <div class="single--order clearfix" ng-repeat="order in orderList | orderBy:'+createTime':true">
+                <div class="singleOrder--titleInfo">
+                    <span class="order--time" ng-cloak>{{order.createTime_local}}</span>
+                    <span class="order--number ng-cloak">订单号：{{order.id}}</span>
+                    <span class="order--deliveryMethod ng-cloak">{{order.deliveryType.value}}</span>
+                </div>
+                <div class="delivery--Info">
+                    <p ng-show="order.deliveryType.type==2" class="address ng-cloak">
+                        <img src="./images/express-position-icon.png" alt="">
+                        <span>{{order.consigneeAddress}}</span>
+                        <span>{{order.consigneeName}}，{{order.consigneePhone}}</span>
+                    </p>
+                    <p ng-show="order.deliveryType.type==1" class="address ng-cloak">
+                        <img src="./images/pickup-contact-icon.png" alt="">
+                        <span>{{order.consigneeName}}&nbsp;&nbsp;&nbsp;&nbsp;{{order.consigneePhone}}</span>
+                    </p>
+                </div>
+                <div class="singleOrder--body clearfix row">
+                    <div class="products--section row">
+                        <div class="left-section">
+                            <div class="order--secition row">
+                                <div class="products">
+                                    <ul>
+                                        <li class="product clearfix" ng-repeat="product in order.products">
+                                            <div class="p-info ng-cloak clearfix">
+                                                <div class="product-row">
+                                                    <div class="product--info">
+                                                        <div class="p-img">
+                                                            <a ng-if="!product.attributes" ng-href="productDetail.html?goodsId={{product.id}}" target="_blank">
+                                                                <img class="ng-cloak" ng-src={{product.thumbnail}}>
+                                                            </a>
+                                                            <a ng-if="product.attributes" ng-href="productDetail.html?goodsId={{product.productId}}" target="_blank">
+                                                                <img class="ng-cloak" ng-src={{product.thumbnail}}>
+                                                            </a>
+                                                        </div>
+                                                        <div class="p-name">
+                                                            <a ng-hide="product.productName" class="ng-cloak" ng-href="productDetail.html?goodsId={{product.id}}" ng-cloak target="_blank">{{product.name}}</a>
+                                                            <a ng-show="product.productName" class="ng-cloak" ng-href="productDetail.html?goodsId={{product.productId}}" ng-cloak target="_blank">{{product.productName}}</a>
+                                                            <div class="p-skus clearfix" ng-if="product.attributes">
+                                                                <ul>
+                                                                    <li ng-repeat="attribute in product.attributes">
+                                                                        {{attribute.name}}：{{attribute.value}};&nbsp;
+                                                                    </li>
+
+                                                                </ul>
+                                                            </div>
+                                                        </div>
+                                                        <div class="p-quantity ng-cloak">
+                                                            {{product.count}}
+                                                        </div>
+
+                                                        <div class="p-deliveryStatus">
+                                                            <p class="ng-cloak">{{product.deliverStatus | RSCdeliverStatusToChineseWording}}</p>
+                                                        </div>
+                                                        <div class="additions" ng-if="product.additions">
+                                                            <div class="">
+                                                                附加项目 ：
+                                                            </div>
+                                                            <div class="addition-options">
+                                                                    <span ng-repeat="addition in product.additions">
+                                                                        {{addition.name}}&nbsp;;
+                                                                    </span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div ng-show="$index==0" class="pay-info">
+                                                        <p class="now" ng-cloak>￥{{order.totalPrice}}</p>
+                                                        <!-- <p ng-cloak>{{order.payType}}</p> -->
+                                                    </div>
+                                                    <div ng-show="$index==0" class="pay-status">
+                                                        <p class="order-statusName" ng-cloak>{{order.type.value}}</p>
+                                                        <!-- <p class="duePrice" ng-show="order.duePrice">待付金额：￥{{order.duePrice.toFixed(2)}}</p> -->
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="pay-step" ng-show="order.subOrders.length>1">
+                                <div class="pay-step-1"><span class="text-info">阶段一：订金</span><span class="pay-step-1-price">¥ {{order.subOrders[0].price.toFixed(2)}}</span><span class="pay_status">{{order.subOrders[0].payStatus | payStatusToChineseWording}}</span></div>
+                                <div class="pay-step-2"><span class="text-info">阶段二：尾款</span><span class="pay-step-2-price">¥ {{ order.subOrders[1].price.toFixed(2)}}</span><span class="pay_status">{{order.subOrders[1].payStatus | payStatusToChineseWording}}</span></div>
+                            </div>
+                        </div>
+                        <div class="right-section pay-action">
+                            <p ng-show="{{order.showAction}}" ng-cloak><a href='' ng-click='order.action(order)' class="order-actionName">{{order.actionName}}</a></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="rscMgmt--noOrders" ng-show="orderList.length==0">
+            <img src="./images/noOrder_icon.png" alt="">
+            <p>未找到符合条件的订单</p>
+        </div>
+    </div>
+    <div class="xxnr--pager">
+        <div id="page_buttons">
+            <ul class="row">
+                <li ng-hide="current_page==1" class="pre_btn"><a href="" ng-click="pre_page()"><em class="ban ban_8_0">&nbsp;</em></a></li>
+                <li ng-repeat="page in pages"><a href="" ng-click="show_page(page.id)" ng-class="{true:'current', false:''}[page.isSelected]">{{page.id}}</a></li>
+                <li ng-hide="current_page==pageCount || orderList.length==0" class="next_btn"><a href="" ng-click="next_page()"><em class="ban ban_9_0">&nbsp;</em></a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="pop--mask ng-hide" ng-show="showRSC_ConfirmPayment" ng-cloak></div>
+    <div class="action--pop RSC-ConfirmPayment--pop ng-hide" ng-show="showRSC_ConfirmPayment">
+        <div class="pop--title">
+            <span>审核付款</span>
+            <img class="pop--close" ng-click="closePop()" src="./images/close.gif" alt="">
+        </div>
+        <div class="pop--body">
+            <p class="pop--subTitle">用户选择线下支付方式，请核对线下支付信息</p>
+            <p class="consigneeName"><span>收货人姓名</span> {{RSC_ConfirmPayment_consignee}}</p>
+            <p class="confirmPaymentAmount"><span>待审金额</span> ￥{{RSC_ConfirmPayment_duePrice}}</p>
+            <div class="payMethod"><span>付款方式</span><div class="pop--selectTagRound" ng-click="RSC_ConfirmPayment_payMethod = 3" ng-class="{true:'pop--selectTagRound--selected'}[RSC_ConfirmPayment_payMethod == 3]">现金</div><div ng-class="{true:'pop--selectTagRound--selected'}[RSC_ConfirmPayment_payMethod == 4]" ng-click="RSC_ConfirmPayment_payMethod = 4" class="pop--selectTagRound">POS机刷卡</div></div>
+        </div>
+        <div class="pop--buttons">
+            <a href="" class="pop--button pop--confirm_btn" ng-class="{true:'pop--confirm_btn--active'}[RSC_ConfirmPayment_payMethod >= 0]" ng-click="RSC_ConfirmPayment()">确定</a>
+            <!--<a href="" class="pop&#45;&#45;button pop&#45;&#45;cancel_bth" ng-click="closePop()">取消</a>-->
+        </div>
+    </div>
+
+    <div class="pop--mask ng-hide" ng-show="showRSC_Shipping" ng-cloak></div>
+    <div class="action--pop RSC_Shipping--pop ng-hide" ng-show="showRSC_Shipping">
+        <div class="pop--title">
+            <span>开始配送</span>
+            <img class="pop--close" ng-click="closePop()" src="./images/close.gif" alt="">
+        </div>
+        <div class="pop--body">
+            <div class="SKUs shippingSKUs">
+                <div class="SKU" ng-repeat="SKU in shippingSKUs" ng-click="addToSKU_List($index,shippingSKUs,shippingSKU_refs)" ng-class="{true:'selected'}[check_SKU_List($index,shippingSKUs,shippingSKU_refs)]">
+                    <img ng-src="{{SKU.thumbnail}}" alt="">
+                    <div class="SKU_info">
+                        <p><span class="SKU_title">{{SKU.shortName}}</span><span class="SKU_count">×{{SKU.count}}</span></p>
+                        <p>
+                        <span class="SKU_attribute" ng-repeat="attribute in SKU.attributes">
+                            {{attribute.name}}：{{attribute.value}};&nbsp;
+                        </span>
+                        </p>
+                        <p ng-show="SKU.additions">
+                            <span class="SKU_addition" ng-repeat="addition in SKU.additions">附加项目：{{addition.name}}&nbsp;</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="pop--buttons">
+            <a href="" class="pop--button pop--confirm_btn" ng-class="{true:'pop--confirm_btn--active'}[shippingSKU_refs.length > 0]"  ng-click="RSC_shipping()">确定（{{SKU_number(shippingSKUs,shippingSKU_refs)}}）</a>
+        </div>
+    </div>
+
+    <div class="pop--mask ng-hide" ng-show="showRSC_Pickup" ng-cloak></div>
+    <div class="action--pop RSC_Pickup--pop ng-hide" ng-show="showRSC_Pickup">
+        <div class="pop--title">
+            <span ng-show="pickingUp_step == 1">客户自提-选择商品</span>
+            <span ng-show="pickingUp_step == 2">客户自提-自提码</span>
+            <img class="pop--close" ng-click="closePop()" src="./images/close.gif" alt="">
+        </div>
+        <div class="pop--body">
+            <div class="SKUs pickingUpSKUs" ng-show="pickingUp_step == 1">
+                <div class="SKU" ng-repeat="SKU in pickingUpSKUs" ng-click="addToSKU_List($index,pickingUpSKUs,pickingUpSKU_refs)" ng-class="{true:'selected'}[check_SKU_List($index,pickingUpSKUs,pickingUpSKU_refs)]">
+                    <img ng-src="{{SKU.thumbnail}}" alt="">
+                    <div class="SKU_info">
+                        <p><span class="SKU_title">{{SKU.shortName}}</span><span class="SKU_count">×{{SKU.count}}</span></p>
+                        <p>
+                        <span class="SKU_attribute" ng-repeat="attribute in SKU.attributes">
+                            {{attribute.name}}：{{attribute.value}};&nbsp;
+                        </span>
+                        </p>
+                        <p ng-show="SKU.additions">
+                            <span class="SKU_addition" ng-repeat="addition in SKU.additions">附加项目：{{addition.name}}&nbsp;</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="pickUpCode" ng-show="pickingUp_step == 2">
+                <div class="inputPickUpCode">
+                    <span>请输入自提码</span>
+                    <input class="code" type="text" ng-model="pickUpCode" maxlength="7">
+                </div>
+
+            </div>
+        </div>
+        <div class="pop--buttons">
+            <a href="" ng-show="pickingUp_step == 1" class="pop--button pop--confirm_btn" ng-class="{true:'pop--confirm_btn--active'}[pickingUpSKU_refs.length > 0]"  ng-click="RSC_pickingUp_nextStep()">下一步 <span ng-show="pickingUpSKU_refs.length>0">（{{SKU_number(pickingUpSKUs,pickingUpSKU_refs)}}）</span></a>
+            <a href="" ng-show="pickingUp_step == 2" class="pop--button pop--pickupCode_confirm_btn" ng-class="{true:'pop--confirm_btn--active'}[pickUpCode.length == 7]"  ng-click="RSC_pickingUp_checkCode()">确定</a>
+            <!--<a href="" class="pop&#45;&#45;button pop&#45;&#45;cancel_bth" ng-click="closePop()">取消</a>-->
+        </div>
+    </div>
+</div>
+
+
+
+<footer></footer>
+</body>
+
+</html>
