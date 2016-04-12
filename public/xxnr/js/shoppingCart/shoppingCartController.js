@@ -360,15 +360,17 @@ app.controller('shoppingCartController', function($scope, $timeout, remoteApiSer
                 if (datas.code == 1000) {
                     var commitUrl = "commitPay.html?";
                     for (var orderIndex in datas.orders) {
-                        commitUrl = commitUrl + "id" + '=' + datas.orders[orderIndex].id + '&';
-                        // set shoppingCartCount
-                        if (datas.orders[orderIndex] && datas.orders[orderIndex].SKUs) {
-                            for (var SKUIndex in datas.orders[orderIndex].SKUs) {
-                                var sku = datas.orders[orderIndex].SKUs[SKUIndex];
-                                $scope.shoppingCartCount -= sku.count;
+                        if(datas.orders.hasOwnProperty(orderIndex)){
+                            commitUrl = commitUrl + "id" + '=' + datas.orders[orderIndex].id + '&';
+                            // set shoppingCartCount
+                            if (datas.orders[orderIndex] && datas.orders[orderIndex].SKUs) {
+                                for (var SKUIndex in datas.orders[orderIndex].SKUs) {
+                                    var sku = datas.orders[orderIndex].SKUs[SKUIndex];
+                                    $scope.shoppingCartCount -= sku.count;
+                                }
                             }
+                            shoppingCartService.setSCart($scope.shoppingCartCount);
                         }
-                        shoppingCartService.setSCart($scope.shoppingCartCount);
                     };
                     // console.log(commitUrl);
                     window.location.href = commitUrl;

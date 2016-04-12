@@ -139,11 +139,11 @@
                             </p>
                         </a>
                     </div>
-                    <div class="subSection RSC_btn">
+                    <div ng-if="user.isVerified && user.isRSC" class="subSection RSC_btn">
                         <a href="rsc_management.html" class="clearfix">
                             <img src="images/RSC-icon.png" alt="" />
                             <p>
-                                县级经销商
+                                我的网点
                             </p>
                         </a>
                     </div>
@@ -224,8 +224,8 @@
                                                     </div>
                                                 </div>
                                                 <div class="pay-step" ng-show="{{product.deposit>0}}">
-                                                    <div class="pay-step-1"><span class="text-info">阶段一：订金</span><span class="pay-step-1-price">¥ {{product.deposit | fixedTwo}}</span><span class="right">{{product.count}}</span></div>
-                                                    <div class="pay-step-2"><span class="text-info">阶段二：尾款</span><span class="pay-step-2-price">¥ {{ product.price - product.deposit + product.totalAdditionsPrice | fixedTwo}}</span><span class="right">{{product.count}}</span></div>
+                                                    <div class="pay-step-1"><span class="text-info">阶段一：订金</span><span class="pay-step-1-price">¥ {{product.deposit | fixedTwo}}</span><span class="count">{{product.count}}</span></div>
+                                                    <div class="pay-step-2"><span class="text-info">阶段二：尾款</span><span class="pay-step-2-price">¥ {{ product.price - product.deposit + product.totalAdditionsPrice | fixedTwo}}</span><span class="count">{{product.count}}</span></div>
                                                 </div>
                                             </div>
                                         </li>
