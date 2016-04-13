@@ -16,4 +16,8 @@ router.get('/footer', function(req, res){res.sendFile(path.join(__dirname, './pu
 router.get('/api/v2.0/area/getAreaList', controllers.Area.json_province_query);
 router.post('/api/v2.0/area/getAreaList', controllers.Area.json_province_query);
 
+// user
+router.get('/api/v2.0/user/login', controllers.User.process_login);
+router.post('/api/v2.0/user/login', controllers.User.process_login);
+router.get('/api/v2.0/user/getpubkey', controllers.User.json_public_key);
 module.exports = router;

@@ -14,10 +14,12 @@ var OrderService = services.order;
 var IntentionProductService = services.intention_product;
 var PotentialCustomerService = services.potential_customer;
 var REG_MOBILE = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|Tablet|IOS/i;
+var config = require('../config');
+var Global = require('../global.js');
 
 exports.install = function() {
 	// LOGIN
-	F.route('/api/v2.0/user/login/', 				    process_login, ['get', 'post']);
+	//F.route('/api/v2.0/user/login/', 				    process_login, ['get', 'post']);
 	//F.route('/logout/', 						        process_logout);
 
 	// REGISTER
@@ -42,7 +44,7 @@ exports.install = function() {
 	F.route('/api/v2.0/user/deleteUserAddress/',		json_useraddress_remove, ['get', 'post'],['isLoggedIn']);
 
     // RSA public key
-    F.route('/api/v2.0/user/getpubkey/',                json_public_key, ['get', 'post']);
+    //F.route('/api/v2.0/user/getpubkey/',                json_public_key, ['get', 'post']);
 
     // Use sign
     F.route('/api/v2.0/user/sign/',                     process_user_sign, ['get','post'], ['isLoggedIn']);
@@ -98,9 +100,9 @@ exports.install = function() {
 
     //fix api// F.route('/app/user/uploadHeadPortrait',             uploadPhoto, ['post', 'upload'], 1024*20, ['isLoggedIn']);
 };
-if(!F.global.key){
+if(!Global.key){
     var key = null;
-    if(F.isDebug){
+    if(config.isDebug){
         // in debug mode we use key in memory
         key = new NodeRSA({b:512});
         key.generateKeyPair();
@@ -115,11 +117,11 @@ if(!F.global.key){
         key = new NodeRSA(private_key_string);
     }
 
-    F.global.key = key;
+    Global.key = key;
 }
 
-F.global.usertypes = JSON.parse(F.config.user_types);
-F.global.default_user_type = JSON.parse(F.config.default_user_type);
+Global.usertypes = config.user_types;
+Global.default_user_type = config.default_user_type;
 
 // ==========================================================================
 // LOGIN
@@ -128,33 +130,32 @@ F.global.default_user_type = JSON.parse(F.config.default_user_type);
 var files = DB('files', null, require('total.js/database/database').BUILT_IN_DB).binary;
 
 // Login
-function process_login() {
+exports.process_login = function(req, res, next) {
     var self = this;
     var options = {};
-    if (!self.data.account){
+    if (!req.data.account){
         self.respond({code:1001,message:'请输入账号'});
         return;
     }
 
-    if (!self.data.password){
+    if (!req.data.password){
         self.respond({code:1001,message:'请输入密码'});
         return;
     }
 
-    options.account = self.data.account;
-    if (self.data.password) {
-        options.password = tools.decrypt_password(decodeURI(self.data.password));
+    options.account = req.data.account;
+    if (req.data.password) {
+        options.password = tools.decrypt_password(decodeURI(req.data.password));
     }
 
-    var keepLogin = !(self.data.keepLogin === 'false');
-    options.useragent = self.data["user-agent"] || 'web';
-    options.ip = self.req.ip;
-
+    var keepLogin = !(req.data.keepLogin === 'false');
+    options.useragent = req.data["user-agent"] || 'web';
+    options.ip = req.ip;
     UserService.login(options, function (err, data) {
         // Error
         if (err) {
             console.error('user process_login fail:', err);
-            self.respond({code:1001, message:err});
+            res.respond({code:1001, message:err});
             return;
         }
 
@@ -172,23 +173,21 @@ function process_login() {
         convert_user_type_info(user, data);
         CartService.getOrAdd(user.userid, function(err, cart){
             if(err){
-                self.respond({code:1001, message:'获取购物车id失败'});
+                res.respond({code:1001, message:'获取购物车id失败'});
                 return;
             }
 
             user.cartId = cart.cartId;
-            setCookieAndResponse.call(self, user, keepLogin);
+            setCookieAndResponse(req, res, user, keepLogin);
         }, false);
     });
-}
+};
 
-var setCookieAndResponse = function(user, keepLogin){
-    var self = this;
-
+var setCookieAndResponse = function(req, res, user, keepLogin){
     // Set cookie
-    // self.res.cookie(F.config.usercookie, F.encrypt({ userid: user.userid, ip: self.req.ip }, 'user'), new Date().add('5 minutes'));
+    // self.res.cookie(config.usercookie, F.encrypt({ userid: user.userid, ip: self.req.ip }, 'user'), new Date().add('5 minutes'));
     var options = {userid:user.userid};
-    var userAgent = self.data['user-agent'];
+    var userAgent = req.data['user-agent'];
     if(REG_MOBILE.test(userAgent)){
         // is app
         options.appLoginId = U.GUID(10);
@@ -201,7 +200,7 @@ var setCookieAndResponse = function(user, keepLogin){
     UserService.update(options, function(err){
         if(err){
             console.error('setCookieAndResponse err:', err);
-            self.respond({code:1001, message:'登录失败'});
+            res.respond({code:1001, message:'登录失败'});
             return;
         }
 
@@ -210,20 +209,20 @@ var setCookieAndResponse = function(user, keepLogin){
             cookieUserInfo.nickName = encodeURIComponent(user.nickname);
         }
         if(keepLogin){
-            if(F.isDebug){
-                self.res.cookie(F.config.usercookie, JSON.stringify(cookieUserInfo), new Date().add(F.config.usercookie_expires_in));
-                self.res.cookie(F.config.tokencookie, token, new Date().add(F.config.token_cookie_expires_in));
+            if(config.isDebug){
+                res.cookie(config.usercookie, JSON.stringify(cookieUserInfo), {expires: new Date().add(config.usercookie_expires_in)});
+                res.cookie(config.tokencookie, token, {expires: new Date().add(config.token_cookie_expires_in)});
             }else {
-                self.res.cookie(F.config.usercookie, JSON.stringify(cookieUserInfo), new Date().add(F.config.usercookie_expires_in), {domain: F.config.domain});
-                self.res.cookie(F.config.tokencookie, token, new Date().add(F.config.token_cookie_expires_in), {domain: F.config.domain});
+                res.cookie(config.usercookie, JSON.stringify(cookieUserInfo), {expires:new Date().add(config.usercookie_expires_in), domain: config.domain});
+                res.cookie(config.tokencookie, token, {expires:new Date().add(config.token_cookie_expires_in), domain: config.domain});
             }
         }else{
-            if(F.isDebug){
-                self.res.cookie(F.config.usercookie, JSON.stringify(cookieUserInfo));
-                self.res.cookie(F.config.tokencookie, token);
+            if(config.isDebug){
+                res.cookie(config.usercookie, JSON.stringify(cookieUserInfo));
+                res.cookie(config.tokencookie, token);
             }else {
-                self.res.cookie(F.config.usercookie, JSON.stringify(cookieUserInfo), null, {domain: F.config.domain});
-                self.res.cookie(F.config.tokencookie, token, null, {domain: F.config.domain});
+                res.cookie(config.usercookie, JSON.stringify(cookieUserInfo), {domain: config.domain});
+                res.cookie(config.tokencookie, token, {domain: config.domain});
             }
         }
 
@@ -243,15 +242,15 @@ var setCookieAndResponse = function(user, keepLogin){
                 }
             }
 
-            if (F.isDebug) {
-                self.res.cookie(F.config.shopingCartcookie, shoppingCart_count);
+            if (config.isDebug) {
+                res.cookie(config.shopingCartcookie, shoppingCart_count);
             } else {
-                self.res.cookie(F.config.shopingCartcookie, shoppingCart_count, null, {domain: F.config.domain});
+                res.cookie(config.shopingCartcookie, shoppingCart_count, {domain: config.domain});
             }
 
             // Return results
             var result = {'code': '1000', 'message': 'success', 'datas': user, token:token};
-            self.respond(result);
+            res.respond(result);
             return;
         }, true);
 
@@ -264,7 +263,7 @@ var setCookieAndResponse = function(user, keepLogin){
 // Logout
 /*function process_logout() {
 	var self = this;
-	self.res.cookie(F.config.usercookie, '', new Date().add('-1 year'));
+	self.res.cookie(config.usercookie, '', new Date().add('-1 year'));
 	self.redirect('/');
 }*/
 
@@ -330,7 +329,7 @@ function process_register() {
                         user.isVerified = false;
                         user.isUserInfoFullFilled = data.isUserInfoFullFilled;
 
-                        setCookieAndResponse.call(self, user, keepLogin);
+                        setCookieAndResponse(req, res, user, keepLogin);
                     }
                 }, true);
             } else {
@@ -599,7 +598,7 @@ function json_user_modify() {
         options.sex = self.data.sex;
     options.ip = self.req.ip;
 	if (self.data.type) {
-        if(!F.global.usertypes[self.data.type]){
+        if(!Global.usertypes[self.data.type]){
             self.respond({code:1001, message:'未查询到用户类型'});
             return;
         }
@@ -620,10 +619,10 @@ function json_user_modify() {
                 UserService.get({userid:self.data.userId}, function(err, new_user_info) {
                     if (new_user_info.name && new_user_info.address && new_user_info.address.province && new_user_info.type) {
                         UserService.update({userid:self.data.userId, isUserInfoFullFilled: true}, function (err, data) {
-                            UserService.increaseScore({userid: self.data.userId, score: F.config.user_info_full_filled_point_add}, function (err) {
+                            UserService.increaseScore({userid: self.data.userId, score: config.user_info_full_filled_point_add}, function (err) {
                                 var response = {'code': '1000', 'message': 'success'};
                                 if (!err) {
-                                    response.scoreAdded = F.config.user_info_full_filled_point_add;
+                                    response.scoreAdded = config.user_info_full_filled_point_add;
                                 }
 
                                 self.respond(response);
@@ -1051,11 +1050,10 @@ function json_useraddress_remove() {
     });
 }
 
-function json_public_key(){
-    var self = this;
-    var data = {'public_key': F.global.key.exportKey('pkcs8-public-pem'), 'code':1000};
-    self.respond(data);
-}
+exports.json_public_key = function(req, res, next){
+    var data = {'public_key': Global.key.exportKey('pkcs8-public-pem'), 'code':1000};
+    res.respond(data);
+};
 
 function getDefaultAddress(addresses){
     for(var i=0; i<addresses.length; i++){
@@ -1108,7 +1106,7 @@ function process_user_sign(){
                 }
             } else {
                 // if insert success, update user table to add points
-                UserService.increaseScore({userid:self.data.userId, score: F.config.user_sign_point_add}, function (err) {
+                UserService.increaseScore({userid:self.data.userId, score: config.user_sign_point_add}, function (err) {
                     if (err) {
                         // error happen,
                         // there are 2 cases of error: one is db operation error,
@@ -1124,7 +1122,7 @@ function process_user_sign(){
                             }
                         });
                     } else {
-                        self.respond({code: '1000', message: '签到成功', pointAdded:F.config.user_sign_point_add});
+                        self.respond({code: '1000', message: '签到成功', pointAdded:config.user_sign_point_add});
                     }
                 }, true)
             }
@@ -1546,7 +1544,7 @@ function isInWhiteList() {
 
 function json_usertypes_get() {
     var self = this;
-    self.respond({code: 1000, data: F.global.usertypes});
+    self.respond({code: 1000, data: Global.usertypes});
 }
 
 function process_add_potential_customer(){
@@ -1682,21 +1680,21 @@ function convert_user_type_info(user, data){
     user.RSCInfoVerifing = data.isRSC ? false : (data.RSCInfo ? (data.RSCInfo.name ? true : false) : false);
 
     // selected user type
-    if(!F.global.usertypes[data.type]){
+    if(!Global.usertypes[data.type]){
         user.isVerified = false;
-        data.type = F.global.default_user_type;
+        data.type = Global.default_user_type;
     }
 
     user.userType = data.type;
-    user.userTypeInName = F.global.usertypes[user.userType] || '其他';
+    user.userTypeInName = Global.usertypes[user.userType] || '其他';
 
     // verified user types
     user.verifiedTypes = data.typeVerified || [];
     if (user.verifiedTypes) {
         user.verifiedTypesInJson = [];
         user.verifiedTypes.forEach(function(type){
-            if(F.global.usertypes[type]){
-                user.verifiedTypesInJson.push({typeId:type, typeName: F.global.usertypes[type] || '其他'});
+            if(Global.usertypes[type]){
+                user.verifiedTypesInJson.push({typeId:type, typeName: Global.usertypes[type] || '其他'});
             }
         });
     }

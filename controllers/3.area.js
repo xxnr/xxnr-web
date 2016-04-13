@@ -19,10 +19,7 @@ exports.install = function() {
 
 // Province
 exports.json_province_query = function(req, res, next) {
-	var self = this;
-	var options = {};
-
-	AreaService.queryProvince(options, function(err, data){
+	AreaService.queryProvince({}, function(err, data){
 		if(!data || err){
 			if (err)
 				console.log('area json_province_query err:' + err);
@@ -38,7 +35,7 @@ exports.json_province_query = function(req, res, next) {
 				arr[i] = {"id":item.id,"name":item.name,"shortName":item.shortname,"_id":item._id};
 			}
 			// Return results
-			self.respond({'code':'1000','message':'success','datas':{"total":count,"rows":arr}});
+			res.respond({'code':'1000','message':'success','datas':{"total":count,"rows":arr}});
 			return;
 		}
 	});

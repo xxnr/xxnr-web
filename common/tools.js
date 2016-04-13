@@ -11,6 +11,8 @@ var regexpPhone = new RegExp('^(13[0-9]|15[012356789]|17[678]|18[0-9]|14[57])[0-
 var regexpPrice = new RegExp('^[0-9]*(\.[0-9]{1,2})?$');
 var regexIdentityNo = /^(\d{15}$|^\d{18}$|^\d{17}(\d|X|x))$/;
 var regexpXXNRHost = new RegExp('(.*\.|^)xinxinnongren\.com.*');
+var config = require('../config');
+var Global = require('../global.js');
 
 /*
     Phone in china validation
@@ -62,7 +64,7 @@ exports.generateAuthCode = function (length) {
 
 function sendPhoneMessage(phonenumber, content) {
 
-    var options = (F.config.phone_message_options).parseJSON();
+    var options = (config.phone_message_options).parseJSON();
     var httpOptions = options.http_request_options;
 
     httpOptions.path = options['url'] + querystring.stringify({
@@ -187,12 +189,12 @@ exports.generate_token = function(userId, appLoginId, webLoginId){
             appLoginId:appLoginId,
             webLoginId:webLoginId
         },
-        F.global.key.exportKey('pkcs8-private-pem'),    //private key
+        Global.key.exportKey('pkcs8-private-pem'),    //private key
         {                                               //options
-            algorithm: F.config.user_token_algorithm,
+            algorithm: config.user_token_algorithm,
             subject:userId,
-            expiresIn: F.config.user_token_expires_in,
-            issuer: F.config.user_token_issuer
+            expiresIn: config.user_token_expires_in,
+            issuer: config.user_token_issuer
         }
     );
     return token;
@@ -200,7 +202,7 @@ exports.generate_token = function(userId, appLoginId, webLoginId){
 
 exports.decrypt_password = function(encryptedPassword){
     try {
-        return F.global.key.decrypt(encryptedPassword, 'utf8');
+        return Global.key.decrypt(encryptedPassword, 'utf8');
     }catch(e){
         console.log(e);
         return null;
@@ -211,10 +213,10 @@ exports.decrypt_password = function(encryptedPassword){
 exports.verify_token = function(token){
     var payload = JWT.verify(
         token,
-        F.global.key.exportKey('pkcs8-public-pem'),
+        Global.key.exportKey('pkcs8-public-pem'),
         {
-            algorithm: F.config.user_token_algorithm,
-            issuer: F.config.user_token_issuer
+            algorithm: config.user_token_algorithm,
+            issuer: config.user_token_issuer
         }
     );
 

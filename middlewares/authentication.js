@@ -1,5 +1,5 @@
 /**
- * Created by pepelu on 2015/11/18.
+ * Created by pepelu on 2016/4/12.
  */
 var services = require('../services');
 var UserService = services.user;
@@ -38,9 +38,9 @@ exports.isLoggedIn_middleware = function(req, res, next, options, controller){
             }
 
             var valid = payload.appLoginId ?
-                payload.appLoginId == data.appLoginId :
+            payload.appLoginId == data.appLoginId :
                 payload.webLoginId ?
-                    payload.webLoginId == data.webLoginId :
+                payload.webLoginId == data.webLoginId :
                     false;
 
             if (!valid) {

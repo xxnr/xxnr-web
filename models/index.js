@@ -2,6 +2,10 @@
  * Created by pepelu on 2015/11/18.
  */
 var mongoose = require('mongoose');
+var config = require('../configuration/mongoose_config');
+
+mongoose.connect(config.db[config.environment],{user:'xxnr',pass:'xxnr001'});
+
 require('./users');
 require('./auth');
 require('./backendusers');

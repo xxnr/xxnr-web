@@ -93,21 +93,20 @@ AuditService.prototype.get = function(options, callback) {
 };
 
 // audit info
-AuditService.prototype.auditInfo = function (req, controller) {
+AuditService.prototype.generateAuditInfo = function (url, method, ip, user, data) {
 	if (controller) {
 	    var auditInfo = {};
-	    auditInfo.action = controller.url;
-	    auditInfo.actionMethod = req.method;
+	    auditInfo.action = url;
+	    auditInfo.actionMethod = method;
 	    if (controller.user) {
-	        auditInfo.actorName = controller.user.account;
-	        auditInfo.actorId = controller.user._id;
+	        auditInfo.actorName = user.account;
+	        auditInfo.actorId = user._id;
 	    } else {
 	        auditInfo.actorName = null;
 	        auditInfo.actorId = null;
 	    }
-	    auditInfo.actorIp = controller.ip;
+	    auditInfo.actorIp = ip;
 	    auditInfo.dateCreated = new Date();
-	    var data = req.method === 'GET' ? controller.query : controller.body;
 	    if (data) {
 	    	auditInfo.parameters = [];
 	    	var keys = Object.keys(data);
@@ -119,7 +118,7 @@ AuditService.prototype.auditInfo = function (req, controller) {
 	    		auditInfo.parameters.push({name:keys[i], value:value});
 	    	}
 	    }
-	    controller.auditInfo = auditInfo;
+	    return auditInfo;
 	}
 };
 

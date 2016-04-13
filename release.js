@@ -33,6 +33,13 @@ var bodyParser = require('body-parser');
 var https = require('https');
 var http = require('http');
 var path = require('path');
+//require('./common/extension_methods');
+require('./modules/database');
+global.U = require('./common/utils');
+global.F = {
+	config:require('./config'),
+	global:require('./global')
+};
 var app = express();
 
 // certificate
@@ -42,14 +49,22 @@ var options = {key:privateKey, cert:certificate};
 
 app.set('jsonp callback name', 'JSON_CALLBACK');
 
-// middleware
+/**
+ * middleware
+ */
+// bodyParser based on content type
 app.use(bodyParser.json({
 	'limit': '1mb'
 }));
 app.use(bodyParser.urlencoded({extended: false}));
+
+// website common middleware
 app.use(require('./middlewares/website'));
+
+// set static file path
 app.use(express.static(path.join(__dirname, 'public/xxnr')));
 
+// routes
 app.use('/', require('./routes'));
 
 http.createServer(app).listen(80);
