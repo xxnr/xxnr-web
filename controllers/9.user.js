@@ -1416,14 +1416,14 @@ function json_get_inviter() {
                             }
                         });
                     }
-                    self.respond({'code': '1000', 'message': 'success', 'datas': user});
+                    self.respond({code: '1000', message: 'success', datas: user});
                 } else {
-                    self.respond({'code': '1001', 'message': '没有找到新农代表信息'});
+                    self.respond({code: '1001', message: '没有找到新农代表信息'});
                     return; 
                 }
             });
         } else {
-            self.respond({'code': '1001', 'message': '没有找到新农代表信息'});
+            self.respond({code: '1000', message: '没有找到新农代表信息', datas:{}});
             return;
         }
     });
