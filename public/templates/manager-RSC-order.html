@@ -128,11 +128,10 @@
                                                 <li>发货到服务站</li>
                                                 <li>{{s.dateRSCReceived | format('@(yyyy-MM-dd HH:mm:ss)')}}</li>
                                             {{fi}}
-                                            {{if s.dateDelivered && form.delivery && form.delivery.type == 2}}
+                                            {{if s.dateDelivered && form.delivery && (form.delivery.type == 2 || form.delivery.type == 5)}}
                                                 <li>开始配送</li>
                                                 <li>{{s.dateDelivered | format('@(yyyy-MM-dd HH:mm:ss)')}}</li>
                                             {{fi}}
-                                            {{if s.dateConfirmed}}
                                                 {{if form.delivery && form.delivery.type == 1}}
                                                     <li>商品已自提</li>
                                                 {{else}}
@@ -140,6 +139,62 @@
                                                 {{fi}}
                                                 <li>{{s.dateConfirmed | format('@(yyyy-MM-dd HH:mm:ss)')}}</li>
                                             {{fi}}
+                                        {{fi}}
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                        {{ end }}
+                        </tbody>
+                    </table>
+                    {{ fi }}
+
+                    {{ if form.SKUs && form.SKUs.length > 0 }}
+                    <table class="table table-bordered" border="0" style="border-bottom: 0;margin-bottom: 0;">
+                        <tbody>
+                        <tr>
+                            <td class="ui-center hidden-xs active">@(序号)</td>
+                            <td class="ui-center hidden-xs active">@(商品ID)</td>
+                            <td class="ui-center col-xs-3 hidden-xs active">@(商品名称)</td>
+                            <td class="ui-center col-xs-2 active">@(单价)</td>
+                            <td class="ui-center col-xs-1 active">@(订金)</td>
+                            <td class="ui-center col-xs-1 active">@(数量)</td>
+                            <td class="ui-center col-xs-2 active">@(合计)</td>
+                            <td class="ui-center col-xs-2 active">@(发货状态)</td>
+                        </tr>
+                        {{ foreach p in form.products }}
+                        <tr>
+                            <td class="ui-center hidden-xs active">{{$index + 1}}</td>
+                            <td class="ui-center hidden-xs">{{ p.productId }}</td>
+                            <td class="ui-center col-xs-3 hidden-xs" title="{{ s.name }}">{{ s.name }}</td>
+                            <td class="ui-center col-xs-2">{{ p.price | price(2) }}</td>
+                            <td class="ui-center col-xs-1">{{ p.deposit | price(2) }}</td>
+                            <td class="ui-center col-xs-1">{{ p.count }}</td>
+                            <td class="ui-center col-xs-2 active">{{(p.count * p.price) | price(2)}}</td>
+                            <td class="ui-center col-xs-2 deliver-status-hover" style="position: relative;">
+                                {{ foreach d in deliverStatusesArray }}
+                                {{ if p.deliverStatus == d.value }}{{ d.name }}{{ fi }}
+                                {{ end }}
+                                <div class="deliver-status-detail" >
+                                    <ul>
+                                        {{if !p.dateRSCReceived && !p.dateDelivered && !p.dateConfirmed}}
+                                        <li>暂无物流信息</li>
+                                        {{else}}
+                                        {{if p.dateRSCReceived}}
+                                        <li>发货到服务站</li>
+                                        <li>{{p.dateRSCReceived | format('@(yyyy-MM-dd HH:mm:ss)')}}</li>
+                                        {{fi}}
+                                        {{if p.dateDelivered && form.delivery && (form.delivery.type == 2 || form.delivery.type == 5)}}
+                                        <li>开始配送</li>
+                                        <li>{{p.dateDelivered | format('@(yyyy-MM-dd HH:mm:ss)')}}</li>
+                                        {{fi}}
+                                        {{if form.delivery && form.delivery.type == 1}}
+                                        <li>商品已自提</li>
+                                        {{else}}
+                                        <li>配送完成</li>
+                                        {{fi}}
+                                        <li>{{p.dateConfirmed | format('@(yyyy-MM-dd HH:mm:ss)')}}</li>
+                                        {{fi}}
                                         {{fi}}
                                     </ul>
                                 </div>

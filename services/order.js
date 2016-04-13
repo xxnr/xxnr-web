@@ -2138,4 +2138,29 @@ OrderService.prototype.umengSendCustomizedcast = function(type, userId, userType
 	}
 };
 
+// Get orderInfo by id
+OrderService.prototype.getById = function(id, callback) {
+
+	if(!id) {
+		callback(null, null, null);
+		return;
+	}
+
+	var mongoOptions = {id: id};
+
+	OrderModel.findOne(mongoOptions, function(err, doc) {
+		if (err) {
+			callback(err);
+			return;
+		}
+
+		if (doc) {
+			callback(null, doc.toObject());
+			return;
+		} else {
+			callback(null, null);
+		}
+	});
+};
+
 module.exports = new OrderService();
