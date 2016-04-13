@@ -304,7 +304,12 @@ UserService.prototype.getOneInvitee = function(options, callback) {
         return;
     }
 
-    UserModel.findOne({inviter: options._id, id:options.inviteeId}, function(err, doc) {
+    UserModel.findOne({inviter: options._id, id:options.inviteeId})
+        .populate({path: 'address.province', select: ' -__v'})
+        .populate({path: 'address.city', select: ' -__v'})
+        .populate({path: 'address.county', select: ' -__v'})
+        .populate({path: 'address.town', select: ' -__v'})
+        .exec(function(err, doc) {
         if (err) {
             console.error('User Service getOneInvitee error:', err);
             callback('获取新农客户失败');

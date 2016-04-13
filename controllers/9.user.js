@@ -31,6 +31,7 @@ exports.install = function() {
 	F.route('/api/v2.0/point/findPointList/',		    json_userscore_get, ['get', 'post'], ['isLoggedIn']);
     F.route('/api/v2.0/user/findAccount/',              json_user_findaccount, ['get', 'post']);
     F.route('/api/v2.0/user/bindInviter',               process_bind_inviter, ['get','post'], ['isLoggedIn']);
+    F.route('/api/v2.0/user/getInviter',                json_get_inviter, ['get'], ['isLoggedIn'])
     F.route('/api/v2.0/user/getInvitee',                json_get_invitee, ['get', 'post'], ['isLoggedIn']);
     F.route('/api/v2.0/user/getInviteeOrders',          json_get_invitee_orders, ['get', 'post'], ['isLoggedIn']);
 	F.route('/api/v2.0/usertypes',                      json_usertypes_get, ['get']);
@@ -1373,6 +1374,61 @@ function process_bind_inviter(){
     });
 }
 
+// get user inviter info
+function json_get_inviter() {
+    var self = this;
+    var options = {};
+
+    if (self.data.userId)
+        options.userid = self.data.userId;
+
+    UserService.get(options, function (err, data) {
+        // Error
+        if (err) {
+            self.respond({'code': '1001', 'message': err});
+            return;
+        }
+        if (data && data.inviter && data.inviter.id) {
+            UserService.get({userid: data.inviter.id}, function (err, inviter) {
+                if (err) {
+                    self.respond({'code': '1001', 'message': err});
+                    return;
+                }
+                if (inviter) {
+                    var user = {};
+                    user.inviterId = inviter.id;
+                    user.inviterPhone = inviter.account;
+                    user.inviterPhoto = inviter.photo;
+                    user.inviterNickname = inviter.nickname;
+                    user.inviterName = inviter.name;
+                    user.inviterSex = inviter.sex;
+                    user.inviterAddress = inviter.address;
+                    user.inviterUserType = inviter.type;
+                    user.inviterUserTypeInName = F.global.usertypes[inviter.type] || '其他';
+
+                    // inviter verified user types
+                    user.inviterVerifiedTypes = inviter.typeVerified || [];
+                    if (user.inviterVerifiedTypes) {
+                        user.inviterVerifiedTypesInJson = [];
+                        user.inviterVerifiedTypes.forEach(function(type){
+                            if(F.global.usertypes[type]){
+                                user.inviterVerifiedTypesInJson.push({typeId:type, typeName: F.global.usertypes[type] || '其他'});
+                            }
+                        });
+                    }
+                    self.respond({'code': '1000', 'message': 'success', 'datas': user});
+                } else {
+                    self.respond({'code': '1001', 'message': '没有找到新农代表信息'});
+                    return; 
+                }
+            });
+        } else {
+            self.respond({'code': '1001', 'message': '没有找到新农代表信息'});
+            return;
+        }
+    });
+}
+
 function json_get_invitee() {
     var self = this;
     var options = {};
@@ -1403,6 +1459,7 @@ function json_get_invitee() {
                 invitee.name = user.name;
                 invitee.dateinvited = user.dateinvited;
                 invitee.photo = user.photo;
+                invitee.sex = user.sex;
                 invitee.newOrdersNumber = 0;
                 invitees.push(invitee);
                 inviteeIds.push(user.id);
@@ -1511,6 +1568,7 @@ function json_get_invitee_orders() {
                                 "account":user.account,
                                 "nickname":user.nickname,
                                 "name":user.name,
+                                "address":user.address,
                                 "total":data.count,
                                 "rows":arr,
                                 "page":data.page,
@@ -1523,6 +1581,7 @@ function json_get_invitee_orders() {
                                 "account":user.account,
                                 "nickname":user.nickname,
                                 "name":user.name,
+                                "address":user.address,
                                 "total":0,"rows":[],"page":0,"pages":0
                             }
                         };
@@ -1581,6 +1640,11 @@ function process_add_potential_customer(){
 
     if(!self.data.buyIntentions || !self.data.buyIntentions.length < 0){
         self.respond({code:1001, message:'请选择意向商品'});
+        return;
+    }
+
+    if(self.data.remarks && tools.getStringLen(self.data.remarks.toString())){
+        self.respond({code:1001, message:'备注字数过长，请输入少于30个字'});
         return;
     }
 
