@@ -3,4 +3,4 @@ databases-online
 .idea
 tmp
 *.pid
-private_key.pem
+*.pem
