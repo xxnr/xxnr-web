@@ -47,6 +47,7 @@ body {
     font-family: "Microsoft YaHei", "Lucida Sans Unicode", "Myriad Pro", "Hiragino Sans GB", "Heiti SC", Verdana, simsun;
     background: #fff;
     font-size: 14px;
+    width: 1200px;
 }
 .overflow_body {
     overflow: hidden;
