@@ -153,6 +153,28 @@ ProductService.prototype.query = function(options, callback, oldSchema) {
     })
 };
 
+function updateSKUName(product) {
+    SKUModel.find({product: product._id}, function (err, SKUs) {
+        if (err) {
+            console.error(err);
+        }
+
+        SKUs.forEach(function (SKU) {
+            SKU.name = product.name;
+            SKU.attributes.forEach(function (attribute) {
+                SKU.name += ' - ' + attribute.value;
+            });
+            SKU.save(function (err) {
+                if (err) {
+                    console.error(err);
+                }
+            })
+        })
+    });
+
+    require('./SKU').refresh_product_SKUAttributes(product._id, function(){});
+}
+
 // Saves the product into the database
 ProductService.prototype.save = function(model, callback) {
     delete model.SKUPrice;
@@ -206,12 +228,11 @@ ProductService.prototype.save = function(model, callback) {
                             }
 
                             callback(null, doc);
-                            //TODO:call add attributes before new product with new attribute
-                            //setTimeout(refresh, 1000);
                         });
                     })
                 });
             } else {
+                updateSKUName(model);
                 callback(null);
                 //setTimeout(refresh, 1000);
             }
