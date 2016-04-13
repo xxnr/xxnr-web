@@ -1416,6 +1416,7 @@ function json_get_inviter() {
                             }
                         });
                     }
+                    user.inviterIsVerified = inviter.isVerified;
                     self.respond({code: '1000', message: 'success', datas: user});
                 } else {
                     self.respond({code: '1001', message: '没有找到新农代表信息'});
