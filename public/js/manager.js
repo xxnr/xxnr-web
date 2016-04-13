@@ -44,6 +44,16 @@ jRouting.route(managerurl + '/orders/', function() {
     redirectToHomePage();
 });
 
+jRouting.route(managerurl + '/orders/detail', function() {
+
+	if (can('orders')) {
+		SET('common.page', 'order-detail');
+		return;
+	}
+
+	redirectToHomePage();
+});
+
 jRouting.route(managerurl + '/products/', function() {
 
     if (can('products')) {
