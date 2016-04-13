@@ -10,7 +10,7 @@ var config= {
 //Hiddensuperadminintheformusername:"password,",
 //manager-superadmin:"admin:admin,",
     "manager-superadmin": "xxnr:xxnr001",
-    
+
 //Imageconvertorforresizingofpictures
 //Defaultimageconverter:"im=ImageMagick,gm=GraphicsMagick",
     "default-image-converter": "gm",
