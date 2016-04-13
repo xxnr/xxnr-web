@@ -1103,7 +1103,8 @@ OrderService.prototype.confirm = function(orderId, SKURefs, callback) {
 
 // Update order payType
 OrderService.prototype.updatepayType = function(options, callback) {
-
+	var self = this;
+	
 	if (!options.paytype) {
 		callback('请提交支付方式');
 		return;
@@ -1127,6 +1128,9 @@ OrderService.prototype.updatepayType = function(options, callback) {
 			return;
 		}
 		callback(null, count.n);
+
+		// update order paystatus
+		self.checkPayStatus({id:options.orderid}, function(err, order, payment) {});
 	});
 };
 

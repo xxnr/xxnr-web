@@ -62,7 +62,7 @@ function payOrder(payExecutor){
     options.id = orderId;
     OrderService.get(options, function(err, order, payment) {
         if (err) {
-            console.error('api-v1.0 payOrder OrderService get err:', err);
+            console.error('pay payOrder OrderService get err:', err);
             self.respond({code:1001, message:'支付出错'});
             return;
         }
@@ -87,6 +87,7 @@ function payOrder(payExecutor){
         }
 
         try {
+            
             if (payPrice) {
                 // if user not in white list, the price of one time must more than config minPayPrice
                 if ((self.user && !self.user.inWhiteList) || !self.user) {
@@ -105,17 +106,38 @@ function payOrder(payExecutor){
             if (self.payType) {
                 reqOptions.payType = self.payType;
             }
-            OrderService.getPayOrderPaymentInfo(order, payment, payPrice, reqOptions, function (err, resultPayment, resultPayPrice) {
-                if (err) {
-                    console.error('api-v1.0 payOrder OrderService getPayOrderPaymentInfo err:', err);
-                    self.respond({code:1001, message:'获取支付信息出错'});
+            if (self.payType && self.payType !== payment.payType) {
+                OrderService.updatepayType({'paytype':self.payType,'orderid':order.id,'paymentid':payment.id}, function(err) {
+                    if(err) {
+                        console.error('pay payOrder OrderService updateOrderPaytype err:', err);
+                        self.respond({'code':'1001','message':'修改支付方式出错'});
+                        return;
+                    }
+                    payment.payType = self.payType;
+                    order.payType = self.payType;
+                    OrderService.getPayOrderPaymentInfo(order, payment, payPrice, reqOptions, function (err, resultPayment, resultPayPrice) {
+                        if (err) {
+                            console.error('pay payOrder OrderService getPayOrderPaymentInfo err:', err);
+                            self.respond({code:1001, message:'获取支付信息出错'});
+                            return;
+                        }
+                        payExecutor(resultPayment.id, parseFloat(resultPayPrice).toFixed(2), self.ip, order.id, resultPayment);
+                        return;
+                    });
+                });
+            } else {
+                OrderService.getPayOrderPaymentInfo(order, payment, payPrice, reqOptions, function (err, resultPayment, resultPayPrice) {
+                    if (err) {
+                        console.error('pay payOrder OrderService getPayOrderPaymentInfo err:', err);
+                        self.respond({code:1001, message:'获取支付信息出错'});
+                        return;
+                    }
+                    payExecutor(resultPayment.id, parseFloat(resultPayPrice).toFixed(2), self.ip, order.id, resultPayment);
                     return;
-                }
-                payExecutor(resultPayment.id, parseFloat(resultPayPrice).toFixed(2), self.ip, order.id, resultPayment);
-                return;
-            });
+                });
+            }
         } catch (e) {
-            console.error('api-v1.0 payOrder OrderService getPayOrderPaymentInfo err:', e);
+            console.error('pay payOrder OrderService getPayOrderPaymentInfo err:', e);
             self.respond({"code":1001, "mesage":"获取支付信息出错"});
             return;
         }
@@ -329,11 +351,13 @@ function payNotify(paymentId, options){
 // alipay notify function
 function alipayNotify() {
     var self = this;
+    console.log('alipayNotify body:', self.body);
     var qs = require('querystring');
     var body = qs.parse(self.body);
     
     AlipayNotify.verifyNotify(body, function(isValid) {
         if (!isValid) {
+            console.error('alipayNotify verification failure:', isValid, ' body:', body);
             return;
         }
 
@@ -379,6 +403,7 @@ function alipayNotify() {
 function unionpayNotify() {
     var self = this;
 
+    console.log('unionpayNotify body:', self.body);
     if (!self.body) {
         console.error('unionpayNotify cannot get unionpay notification body');
     }
