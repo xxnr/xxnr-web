@@ -1644,7 +1644,7 @@ function process_add_potential_customer(){
         return;
     }
 
-    if(self.data.remarks && tools.getStringLen(self.data.remarks.toString())){
+    if(self.data.remarks && tools.getStringLen(self.data.remarks.toString(), 30)){
         self.respond({code:1001, message:'备注字数过长，请输入少于30个字'});
         return;
     }
