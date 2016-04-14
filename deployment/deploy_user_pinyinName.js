@@ -3,43 +3,21 @@
  */
 
 require('total.js');
-var PotentialCustomerModel = require('../models').potential_customer;
+var UserModel = require('../models').user;
 var pinyin = require('pinyin');
 var tools = require('../common/tools');
 
-PotentialCustomerModel.find({}).sort({dateTimeAdded:-1}).exec(function (err, customers) {
+UserModel.find({}).sort({dateTimeAdded:-1}).exec(function (err, users) {
 	if (err) {
 		console.error('Finding PotentialCustomerModel err:', err);
 		return;
 	}
-	console.log('All customers num:', customers.length)
+	console.log('All users num:', users.length)
 	var count = 0;
-	var promises = customers.map(function(customer) {
+	var promises = users.map(function(user) {
         return new Promise(function(resolve, reject) {
         	var setvalues = {};
-        	var name = customer.name;
-      //   	var namePinyin = '#';
-		    // var nameInitial = '#';
-      //       var nameInitialType = 2;
-		    // try {
-		    //     var namePinyinList = pinyin(name, {style: pinyin.STYLE_NORMAL});
-		    //     namePinyin = namePinyinList.join("").toLowerCase();
-		    //     var char = namePinyin[0];
-		    //     var regs=/^[A-Z-a-z]$/;
-		    //     if(regs.test(char)) {
-		    //         nameInitial = char.toUpperCase();
-      //               nameInitialType = 1;
-		    //     } else {
-      //               nameInitialType = 2;
-		    //         namePinyin = nameInitial + namePinyin;
-		    //     }
-		    //     setvalues.nameInitial = nameInitial;
-		    //     setvalues.namePinyin = namePinyin;
-      //           setvalues.nameInitialType = nameInitialType;
-		    // } catch (e) {
-		    //     var err = 'PotentialCustomerService pinyin err:' + e + ' name:' + name;
-		    //     reject(err);
-		    // }
+        	var name = user.name;
             if (name) {
                 var result = tools.stringPinyin({'str':name});
                 if (result) {
@@ -60,7 +38,7 @@ PotentialCustomerModel.find({}).sort({dateTimeAdded:-1}).exec(function (err, cus
             }
 		    if(setvalues && !U.isEmpty(setvalues)) {
             	// console.log(setvalues);
-                PotentialCustomerModel.update({_id: customer._id}, {$set: setvalues}, function (err, numAffected) {
+                UserModel.update({_id: user._id}, {$set: setvalues}, function (err, numAffected) {
                 	if (err) {
                 		// console.log(err);
                 		reject(err);
@@ -76,12 +54,12 @@ PotentialCustomerModel.find({}).sort({dateTimeAdded:-1}).exec(function (err, cus
     });
     Promise.all(promises)
         .then(function() {
-            console.log('[', new Date(), ']', count, 'customers(s) fixed in total');
+            console.log('[', new Date(), ']', count, 'users(s) fixed in total');
     		process.exit(0);
         })
         .catch(function(err) {
-            console.log('[', new Date(), ']', count, 'customers(s) fixed in total');
-            console.log('[', new Date(), ']', 'customers(s) fixed err:', err);
+            console.log('[', new Date(), ']', count, 'users(s) fixed in total');
+            console.log('[', new Date(), ']', 'users(s) fixed err:', err);
     		process.exit(0);
         });
 });
