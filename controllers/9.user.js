@@ -32,6 +32,8 @@ exports.install = function() {
     F.route('/api/v2.0/user/findAccount/',              json_user_findaccount, ['get', 'post']);
     F.route('/api/v2.0/user/bindInviter',               process_bind_inviter, ['get','post'], ['isLoggedIn']);
     F.route('/api/v2.0/user/getInviter',                json_get_inviter, ['get'], ['isLoggedIn'])
+    // order by name pinyin
+    F.route('/api/v2.0/user/getInviteeOrderbyName',     json_get_inviteeOrderbynamePinyin, ['get'], ['isLoggedIn']);
     F.route('/api/v2.0/user/getInvitee',                json_get_invitee, ['get', 'post'], ['isLoggedIn']);
     F.route('/api/v2.0/user/getInviteeOrders',          json_get_invitee_orders, ['get', 'post'], ['isLoggedIn']);
 	F.route('/api/v2.0/usertypes',                      json_usertypes_get, ['get']);
@@ -1430,6 +1432,73 @@ function json_get_inviter() {
     });
 }
 
+// get user invitee order by namePinyin
+function json_get_inviteeOrderbynamePinyin() {
+    var self = this;
+    var options = {};
+    options._id = self.user._id;
+    UserService.getInviteeOrderbynamePinyin(options, function(err, result) {
+        if (err) {
+            console.error('user getInviteeOrderbynamePinyin err:', err);
+            self.respond({code:1001, message:'获取被邀请人列表失败'});
+            return;
+        }
+
+        var invitees = [];
+        var data = result.items;
+        if (data && data.length > 0) {
+            var inviteeIds = [];
+            for (var i=0; i<data.length; i++) {
+                var user = data[i];
+                var invitee = {};
+                invitee.userId = user.id;
+                invitee.account = user.account;
+                invitee.nickname = user.nickname;
+                invitee.name = user.name;
+                invitee.dateinvited = user.dateinvited;
+                invitee.photo = user.photo;
+                invitee.sex = user.sex;
+                invitee.newOrdersNumber = 0;
+                invitee.namePinyin = user.namePinyin;
+                invitee.nameInitial = user.nameInitial;
+                invitees.push(invitee);
+                inviteeIds.push(user.id);
+            }
+
+            // get invitee new orders number
+            if (inviteeIds && inviteeIds.length > 0) {
+                UserService.getInviteeOrderNumber(inviteeIds, function (err, inviteeOrderData) {
+                    if (err) {
+                        console.error('user json_get_invitee getInviteeOrderNumber err:', err);
+                        self.respond({code:1001, message:'获取被邀请人列表失败'});
+                        return;
+                    }
+
+                    if (inviteeOrderData) {
+                        var inviteeOrders = {};
+                        for (var i=0; i<inviteeOrderData.length; i++) {
+                            var inviteeOrder = inviteeOrderData[i];
+                            inviteeOrders[inviteeOrder.userId] = inviteeOrder;  
+                        }
+                        for (var i=0; i<invitees.length; i++) {
+                            var userId = invitees[i].userId;
+                            if (inviteeOrders && inviteeOrders[userId]) {
+                                invitees[i].newOrdersNumber = inviteeOrders[userId].numberForInviter;
+                            }
+                        }
+                    }
+                    self.respond({code:1000, message:'success', invitee:invitees, total:result.count});
+                });
+            } else {
+                self.respond({code:1000, message:'success', invitee:invitees, total:result.count});
+            }
+        } else {
+            self.respond({code:1000, message:'success', invitee:invitees, total:0});
+        }
+    });
+}
+
+// get user invitee list by page
 function json_get_invitee() {
     var self = this;
     var options = {};
