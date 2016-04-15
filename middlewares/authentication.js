@@ -258,22 +258,22 @@ exports.auditing_middleware = function(req, res, next) {
     }
 };
 
-exports.throttle = function(req, res, next, options, controller){
-    var user = controller.user;
-    var route = controller.route.name.trim();
+exports.throttle = function(req, res, next){
+    var user = req.user;
+    var route = req.route.path.trim();
     if (route.endsWith('/'))
         route = route.substring(0, route.length - 1);
     var method = req.method.trim().toLowerCase();
-    var ip = controller.ip.trim();
+    var ip = req.ip.trim();
     ThrottleService.requireAccess(route, method, ip, user?user._id:null, function(pass, reason){
         if(!pass){
             switch(reason){
                 case ThrottleService.THROTTLE_BY_HITS_PER_USER:
                 case ThrottleService.THROTTLE_BY_HITS_PER_IP:
-                    controller.respond({code:1429, message:'您操作的太频繁了，请稍后再试'});
+                    res.respond({code:1429, message:'您操作的太频繁了，请稍后再试'});
                     break;
                 default:
-                    controller.respond({code:1429, message:'系统繁忙，请稍后再试'});
+                    res.respond({code:1429, message:'系统繁忙，请稍后再试'});
             }
         } else{
             next();

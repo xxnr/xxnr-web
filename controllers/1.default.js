@@ -24,7 +24,7 @@ exports.install = function() {
     F.middleware('isInWhiteList', middleware.isInWhiteList_middleware);
 	F.middleware('isXXNRAgent', middleware.isXXNRAgent_middleware);
 	F.middleware('auditing', middleware.auditing_middleware);
-	F.middleware('throttle', middleware.throttle);
+	//F.middleware('throttle', middleware.throttle);
 	F.middleware('isRSC', middleware.isRSC_middleware);
 };
 

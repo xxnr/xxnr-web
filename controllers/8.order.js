@@ -11,23 +11,23 @@ var DeliveryCodeService = services.deliveryCode;
 
 exports.install = function() {
 	//F.route('/api/v2.0/order/getOderList',         getOrders, ['post', 'get'], ['isLoggedIn']);
-	F.route('/api/v2.0/order/getAppOrderList',     api10_getOders, ['post', 'get'], ['isLoggedIn']);
-	F.route('/api/v2.0/order/addOrder',            addOrder, ['post', 'get'], ['isLoggedIn', 'throttle']);
-    F.route('/api/v2.0/order/getOrderDetails',     api10_getOrderDetails, ['post', 'get'], ['isLoggedIn']);
-    F.route('/api/v2.0/order/updateOrderPaytype',  updateOrderPaytype, ['post', 'get'], ['isLoggedIn']);
-    F.route('/api/v2.0/order/confirmeOrder',       confirmOrder, ['post', 'get'], ['isLoggedIn']);
+	//F.route('/api/v2.0/order/getAppOrderList',     api10_getOrders, ['post', 'get'], ['isLoggedIn']);
+	//F.route('/api/v2.0/order/addOrder',            addOrder, ['post', 'get'], ['isLoggedIn', 'throttle']);
+    //F.route('/api/v2.0/order/getOrderDetails',     api10_getOrderDetails, ['post', 'get'], ['isLoggedIn']);
+    //F.route('/api/v2.0/order/updateOrderPaytype',  updateOrderPaytype, ['post', 'get'], ['isLoggedIn']);
+    //F.route('/api/v2.0/order/confirmeOrder',       confirmOrder, ['post', 'get'], ['isLoggedIn']);
 
 	// v1.0
-	F.route('/app/order/getOderList',              api10_getOders, ['post', 'get'], ['isLoggedIn']);
+	//F.route('/app/order/getOderList',              api10_getOrders, ['post', 'get'], ['isLoggedIn']);
 	//fix api// F.route('/app/order/addOrder',                 addOrder, ['post', 'get'], ['isLoggedIn']);
     //fix api// F.route('/app/order/confirmReceipt',           confirmOrder, ['post', 'get'], ['isLoggedIn']);
 
     // v2.1
-    F.route('/api/v2.1/order/addOrder',            addOrderBySKU, ['post'], ['isLoggedIn', 'throttle']);
+    //F.route('/api/v2.1/order/addOrder',            addOrderBySKU, ['post'], ['isLoggedIn', 'throttle']);
 
     // v2.2
-    F.route('/api/v2.2/order/confirmSKUReceived',   process_confirm_SKU_received, ['post'], ['isLoggedIn']);
-    F.route('/api/v2.2/order/getDeliveryCode',      json_get_delivery_code,     ['get'],    ['isLoggedIn']);
+    //F.route('/api/v2.2/order/confirmSKUReceived',   process_confirm_SKU_received, ['post'], ['isLoggedIn']);
+    //F.route('/api/v2.2/order/getDeliveryCode',      json_get_delivery_code,     ['get'],    ['isLoggedIn']);
 };
 
 var converter = require('../common/converter');
@@ -40,8 +40,7 @@ var tools = require('../common/tools');
 var DELIVERYTYPE = require('../common/defs').DELIVERYTYPE;
 var DELIVERYTYPENAME = require('../common/defs').DELIVERYTYPENAME;
 
-function getOdersList(callback) {
-	var self = this;
+function getOdersList(req, callback) {
 	var page = req.data['page'];
     var max = req.data['max'];
 	var type = req.data['type'] || req.data['typeValue'];//订单类型  所有的订单
@@ -73,7 +72,7 @@ function getOdersList(callback) {
 exports.getOrders = function(req, res, next) {
     var type = req.data['type'] || req.data['typeValue'] || null;
 
-    getOdersList.call(this, function(data, error) {
+    getOdersList(req, function(data, error) {
         if (data) {
             var items = data.items;
             var length = items.length;
@@ -99,13 +98,12 @@ exports.getOrders = function(req, res, next) {
             res.respond({'code':'1001','message':'没有找到订单'});
         }
     });
-}
+};
 
-function api10_getOders() {
-    var self = this;
+exports.api10_getOrders = function(req, res, next) {
     var type = req.data['type'] || req.data['typeValue'] || null;
 
-    getOdersList.call(this, function(data, error) {
+    getOdersList(req, function(data, error) {
         var result = {};
 
         if (data) {
@@ -120,20 +118,6 @@ function api10_getOders() {
                     typeValue = OrderService.orderType(item);
                 }
 
-                // var orderInfo = {'totalPrice':item.price.toFixed(2)
-                //     , 'deposit':item.deposit.toFixed(2)
-                //     , 'dateCreated':item.dateCreated
-                //     , 'orderStatus': OrderService.orderStatus(item)
-                //     , 'deliveryType':{type:item.deliveryType, value:DELIVERYTYPENAME[item.deliveryType]}};
-                // if (item.payStatus == PAYMENTSTATUS.PAID && item.datePaid) {
-                //     orderInfo.datePaid = item.datePaid;
-                // }
-                // if (item.deliverStatus == DELIVERSTATUS.DELIVERED && item.dateDelivered) {
-                //     orderInfo.dateDelivered = item.dateDelivered;
-                // }
-                // if (item.deliverStatus == DELIVERSTATUS.RECEIVED && item.dateCompleted) {
-                //     orderInfo.dateCompleted = item.dateCompleted;
-                // }
                 var orderInfo = OrderService.get_orderInfo(item);
                 arr[i] = {
                     'typeValue':typeValue,
@@ -169,11 +153,9 @@ function api10_getOders() {
         }
         res.respond(result);
     });
-}
+};
 
-function addOrder(){
-	var self = this;
-
+exports.addOrder = function(req, res, next){
 	var data = req.data;
 	var userId = data['userId'];
     var shopCartId = data.shopCartId;
@@ -351,57 +333,19 @@ function addOrder(){
 			});
 		});
 	});
-}
+};
 
-function updateOrderPaytype() {
-	var self = this;
+exports.updateOrderPaytype = function(req, res, next) {
     res.respond({code:'1000', message:'success'});
-    return;
-
-    //var buyer = req.data.userId || null;
-    //var orderid = req.data.orderId || null;
-    //var paytype = req.data.payType || PAYTYPE.ZHIFUBAO;
-    //
-    //OrderService.get({'buyer':buyer,'id':orderid}, function(err, data, payment) {
-    //    if (err || !data) {
-    //        if (err) console.error('Order updateOrderPaytype err:', err);
-    //        res.respond({'code':'1001','message':'未查询到订单'});
-    //        return;
-    //    }
-    //
-    //    var paymentid = null;
-    //    if (payment && payment.id) {
-    //        paymentid = payment.id;
-    //    } else {
-    //        if (!paymentid && data && data.paymentId) {
-    //            paymentid = data.paymentId;
-    //        } else {
-    //            console.error('Order updateOrderPaytype err: paymentid not find.');
-    //            res.respond({'code':'1001','message':'未查询到订单'});
-    //            return;
-    //        }
-    //    }
-    //    OrderService.updatepayType({'paytype':paytype,'orderid':orderid,'paymentid':paymentid}, function(err) {
-    //        if(err) {
-    //            console.error('Order updateOrderPaytype err:', err);
-    //            res.respond({'code':'1001','message':'修改支付方式出错'});
-    //            return;
-    //        }
-    //        res.respond({'code':'1000','message':'success'});
-    //        return;
-    //    });
-    //});
-}
+};
 
 // user confirm order
-function confirmOrder() {
-    var self = this;
+exports.confirmOrder = function(req, res, next) {
     res.respond({code:1009, message:'API retired'});
-}
+};
 
 // get order detail
-function getOrder(callback) {
-    var self = this;
+function getOrder(req, callback) {
     var buyer = req.data.userId || null;
     var orderid = req.data.orderId || null;
 
@@ -478,11 +422,10 @@ function getOrder(callback) {
     });
 }
 
-function api10_getOrderDetails() {
-    var self = this;
+exports.api10_getOrderDetails = function(req, res, next) {
     var locationUserId = req.data['locationUserId'];
 
-    getOrder.call(this, function(err, data, payment) {
+    getOrder(req, function(err, data, payment) {
         var result = {};
         if (err) {
             console.error('Order api10_getOrderDetails err:', err);
@@ -611,29 +554,6 @@ function api10_getOrderDetails() {
                 }
             }
 
-            // // 订单中SKU所属商品信息列表
-            // if( SKUsLength > 0 ) {
-            //     productArr = [];
-            //     // contains SKUs, need to convert into products to support old app
-            //     data.SKUs.forEach(function (SKU) {
-            //         var product = {
-            //             'goodsName': SKU.productName,
-            //             'goodsCount': SKU.count,
-            //             'unitPrice': SKU.price.toFixed(2),
-            //             'orderSubType': '',
-            //             'orderSubNo': '',
-            //             'originalPrice': SKU.price.toFixed(2),
-            //             'goodsId': SKU.productId,
-            //             'imgs': SKU.thumbnail,
-            //             'deposit': SKU.deposit.toFixed(2),
-            //             'category': SKU.category,
-            //             'deliverStatus': SKU.deliverStatus
-            //         };
-
-            //         productArr.push(product);
-            //     })
-            // }
-
             // 订单中SKU所属商品信息列表 contains SKUs, need to convert into products to support old app
             order.orderGoodsList  = productArr;
             // 订单中SKU信息列表
@@ -644,10 +564,9 @@ function api10_getOrderDetails() {
         }
         res.respond(result);
     });
-}
+};
 
-function addOrderBySKU(){
-    var self = this;
+exports.addOrderBySKU = function(req, res, next){
     var data = req.data;
     var userId = data['userId'];
     var shopCartId = data.shopCartId;
@@ -763,13 +682,12 @@ function addOrderBySKU(){
             }
         });
     });
-}
+};
 
-function process_confirm_SKU_received(){
-    var self = this;
+exports.process_confirm_SKU_received = function(req, res, next){
     var orderId = req.data.orderId;
     var SKURefs = req.data.SKURefs;
-    var user = self.user;
+    var user = req.user;
     if(!orderId){
         res.respond({code:1001, message:'orderId required'});
         return;
@@ -805,11 +723,10 @@ function process_confirm_SKU_received(){
             res.respond({code: 1000, message: 'success'});
         })
     })
-}
+};
 
-function json_get_delivery_code(){
-    var self = this;
-    var user = self.user;
+exports.json_get_delivery_code = function(req, res, next){
+    var user = req.user;
     var orderId = req.data.orderId;
     if(!orderId){
         res.respond({code:1001, message:'orderId required'});
@@ -853,6 +770,6 @@ function json_get_delivery_code(){
             }
         })
     })
-}
+};
 
 exports.getOders = getOdersList;

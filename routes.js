@@ -12,7 +12,7 @@ router.get('/', function(req, res){res.sendFile(path.join(__dirname, './public/x
 router.get('/header', function(req, res){res.sendFile(path.join(__dirname, './public/xxnr/header'));});
 router.get('/footer', function(req, res){res.sendFile(path.join(__dirname, './public/xxnr/footer'));});
 
-// area address
+// area address APIs
 router.get('/api/v2.0/area/getAreaList', controllers.Area.json_province_query);
 router.post('/api/v2.0/area/getAreaList', controllers.Area.json_province_query);
 router.get('/api/v2.0/area/getAreaCity', controllers.Area.json_city_query);
@@ -22,13 +22,13 @@ router.post('/api/v2.0/area/getAreaCounty', controllers.Area.json_county_query);
 router.get('/api/v2.0/area/getAreaTown', controllers.Area.json_town_query);
 router.post('/api/v2.0/area/getAreaTown', controllers.Area.json_town_query);
 
-// v1.0 api
+// v1.0 area APIs
 router.get('/api/v2.0/businessDistrict/getBusinessByAreaId', controllers.Area.json_city_query);
 router.post('/api/v2.0/businessDistrict/getBusinessByAreaId', controllers.Area.json_city_query);
 router.get('/api/v2.0/build/getBuildByBusiness', controllers.Area.json_county_query);
 router.post('/api/v2.0/build/getBuildByBusiness', controllers.Area.json_county_query);
 
-// old apis
+// old APIs
 router.get('/api/v2.0/products', controllers.Api_v1_0.getProducts);
 router.post('/api/v2.0/products', controllers.Api_v1_0.getProducts);
 router.get('/api/v2.0/products/categories', controllers.Api_v1_0.getCategories);
@@ -59,11 +59,33 @@ router.post('/api/v2.0/product/getAppProductDetails', controllers.Api_v1_0.getAp
 router.get('/api/v2.0/getMinPayPrice', middleware.isLoggedIn_middleware, controllers.Api_v1_0.getMinPayPrice);
 router.post('/api/v2.0/getMinPayPrice', middleware.isLoggedIn_middleware, controllers.Api_v1_0.getMinPayPrice);
 
-// order
+// order APIs
 router.get('/api/v2.0/order/getOderList', middleware.isLoggedIn_middleware, controllers.Order.getOrders);
 router.post('/api/v2.0/order/getOderList', middleware.isLoggedIn_middleware, controllers.Order.getOrders);
+router.get('/api/v2.0/order/getAppOrderList', middleware.isLoggedIn_middleware, controllers.Order.api10_getOrders);
+router.post('/api/v2.0/order/getAppOrderList', middleware.isLoggedIn_middleware, controllers.Order.api10_getOrders);
+router.get('/api/v2.0/order/addOrder', middleware.isLoggedIn_middleware, middleware.throttle, controllers.Order.addOrder);
+router.post('/api/v2.0/order/addOrder', middleware.isLoggedIn_middleware, middleware.throttle, controllers.Order.addOrder);
+router.get('/api/v2.0/order/getOrderDetails', middleware.isLoggedIn_middleware, controllers.Order.api10_getOrderDetails);
+router.post('/api/v2.0/order/getOrderDetails', middleware.isLoggedIn_middleware, controllers.Order.api10_getOrderDetails);
+router.get('/api/v2.0/order/updateOrderPaytype', middleware.isLoggedIn_middleware, controllers.Order.updateOrderPaytype);
+router.post('/api/v2.0/order/updateOrderPaytype', middleware.isLoggedIn_middleware, controllers.Order.updateOrderPaytype);
+router.get('/api/v2.0/order/confirmeOrder', middleware.isLoggedIn_middleware, controllers.Order.confirmOrder);
+router.post('/api/v2.0/order/confirmeOrder', middleware.isLoggedIn_middleware, controllers.Order.confirmOrder);
+router.post('/api/v2.1/order/addOrder', middleware.isLoggedIn_middleware, middleware.throttle, controllers.Order.addOrderBySKU);
+router.post('/api/v2.2/order/confirmSKUReceived', middleware.isLoggedIn_middleware, controllers.Order.process_confirm_SKU_received);
+router.get('/api/v2.2/order/getDeliveryCode', middleware.isLoggedIn_middleware, controllers.Order.json_get_delivery_code);
 
-// user
+// v1.0 order APIs
+router.get('/app/order/getOderList', middleware.isLoggedIn_middleware, controllers.Order.api10_getOrders);
+router.post('/app/order/getOderList', middleware.isLoggedIn_middleware, controllers.Order.api10_getOrders);
+
+// news APIs
+router.get('/api/v2.0/news', controllers.News.json_news_query);
+router.get('/api/v2.0/news/categories', controllers.News.json_news_categories);
+router.get('/api/v2.0/news/:id', controllers.News.json_news_read);
+
+// user APIs
 router.get('/api/v2.0/user/login', controllers.User.process_login);
 router.post('/api/v2.0/user/login', controllers.User.process_login);
 router.get('/api/v2.0/user/getpubkey', controllers.User.json_public_key);
