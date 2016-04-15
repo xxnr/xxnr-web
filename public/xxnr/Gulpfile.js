@@ -538,6 +538,7 @@ gulp.task('rev', function() {
         'xxnr_bigdata.html',
         'xxnr_finance.html',
         'xxnr_institute.html',
+        'applyCountyVerified.html',
         'shareApp.html',
         'rsc_management.html'
         ])
