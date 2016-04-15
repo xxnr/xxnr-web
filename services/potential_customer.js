@@ -1,6 +1,7 @@
 /**
  * Created by pepelu on 2016/1/20.
  */
+var tools = require('../common/tools');
 var IntentionProductModel = require('../models').intention_product;
 var PotentialCustomerModel = require('../models').potential_customer;
 var UserModel = require('../models').user;
