@@ -314,7 +314,7 @@ PotentialCustomerService.prototype.getById = function(id, callback){
         .populate({path:'address.county', select:'-_id -__v'})
         .populate({path:'address.town', select:'-_id -__v'})
         .populate({path:'user', select:'-_id name'})
-        .select('name phone sex address buyIntentions remarks user isRegistered dateTimeRegistered')
+        .select('name phone sex address buyIntentions remarks user isRegistered dateTimeRegistered namePinyin nameInitial')
         .lean()
         .exec(function(err, doc){
         if(err){
