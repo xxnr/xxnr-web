@@ -47,6 +47,11 @@ app.controller('orderDetailController', function ($scope, remoteApiService, comm
                         $scope.order.products = data.datas.rows.SKUList;
                     }
                 }
+                for(var k in $scope.order.products){
+                    if($scope.order.products.hasOwnProperty(k)){
+                        $scope.order.products[k].totalAdditionsPrice = $scope.calculateTotalAdditionsPrice($scope.order.products[k].additions);
+                    }
+                }
                 $scope.order.deliveryType = data.datas.rows.deliveryType;
                 $scope.order.deposit = data.datas.rows.deposit;
                 $scope.order.totalPrice = data.datas.rows.totalPrice;
@@ -161,6 +166,10 @@ app.controller('orderDetailController', function ($scope, remoteApiService, comm
                     if ($scope.order.paySubOrderType != $scope.subOrders[i].type && $scope.subOrders[i].payStatus != 2) {
                         $scope.subOrders[i].statusName = '未开始';
                     }
+                    if ($scope.order.orderType == 0) {
+                        $scope.subOrders[i].statusName = '已关闭';
+                    }
+
                 }
 
 
@@ -237,7 +246,7 @@ app.controller('orderDetailController', function ($scope, remoteApiService, comm
                 .then(function(data) {
                     $scope.ConfirmingOrderIds = null;
                     if(data.code == 1000){
-                        sweetalert('该商品确认收货成功',window.location.pathname+"?id="+$scope.id);
+                        sweetalert('收货成功',window.location.pathname+"?id="+$scope.id);
                     }else{
                         sweetalert('确认收货失败',window.location.pathname+"?id="+$scope.id);
                     }
@@ -260,4 +269,14 @@ app.controller('orderDetailController', function ($scope, remoteApiService, comm
         });
         return resultNum;
     };
+    $scope.calculateTotalAdditionsPrice = function(additions){
+        var totalAdditionsPrice = 0;
+        for(var i in additions){
+            if(additions.hasOwnProperty(i)){
+                totalAdditionsPrice = totalAdditionsPrice + Number(additions[i].price?additions[i].price:0);
+            }
+        }
+        return Number(totalAdditionsPrice.toFixed(2));
+    };
+
 });

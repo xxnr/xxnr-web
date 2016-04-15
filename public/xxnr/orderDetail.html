@@ -135,12 +135,12 @@
                                     <li class="ng-clock">{{subOrder.type | subOrderTypeToChineseWording}}</li>
                                     <li class="ng-clock">{{(subOrder.price) | toNumberFixedTwo}}</li>
                                     <li class="ng-clock">{{subOrder.paidPrice | toNumberFixedTwo}}</li>
-                                    <li class="ng-clock" ng-class="{true:'payOrange'}[subOrder.payStatus != 2]">
+                                    <li class="ng-clock" ng-class="{true:'payOrange'}[subOrder.payStatus != 2 && order.orderType != 0]">
                                         <span>{{subOrder.statusName}}</span>
                                     </li>
                                     <li class="ng-clock">{{subOrder.payType | payTypeToChineseWording}}</li>
                                     <li>
-                                        <div ng-show="subOrder.showAction && order.paySubOrderType == subOrder.type || subOrder.showAction && !order.paySubOrderType &&  order.orderStatus.type != 5 && order.orderStatus.type != 4 && order.orderStatus.type != 3 && order.orderStatus.type != 6" class="orderOptions">
+                                        <div ng-show="subOrder.showAction && order.paySubOrderType == subOrder.type || subOrder.showAction && !order.paySubOrderType && order.orderStatus.type == (1 || 2)" class="orderOptions">
                                             <a href="" ng-click='order.action()' class="action_btn ng-cloak">{{order.actionName}}</a>
                                             <a href='' ng-click='order.modifyPay()' ng-show="order.modifyPay" class="modify-paymethod-actionName action_btn">修改付款方式</a>
                                         </div>
@@ -220,7 +220,7 @@
                                                         </div>
                                                     </li>
                                                     <li class="p-delivery ng-cloak">
-                                                        {{product.deliverStatus | deliverStatusToChineseWording}}
+                                                        {{product.deliverStatus | RSCdeliverStatusToChineseWording}}
                                                     </li>
                                                     <li class="p-price ng-cloak">
                                                         <p ng-if="product.attributes" ng-cloak>￥ {{product.price}}</p>
@@ -252,7 +252,7 @@
                                                     <div ng-if="!product.attributes" class="pay-step-1"><span class="text-info">阶段一：订金</span><span class="pay-step-1-price">￥ {{(product.deposit*product.goodsCount).toFixed(2)}}</span></div>
                                                     <div ng-if="!product.attributes" class="pay-step-2"><span class="text-info">阶段二：尾款</span><span class="pay-step-2-price">￥ {{((product.unitPrice - product.deposit)*product.goodsCount).toFixed(2)}}</span></div>
                                                     <div ng-if="product.attributes" ng-class="{true:'hasAdditions'}[product.additions!='']" class="pay-step-1"><span class="text-info">阶段一：订金</span><span class="pay-step-1-price">￥ {{product.deposit*product.count | toNumberFixedTwo}}</span></div>
-                                                    <div ng-if="product.attributes" class="pay-step-2"><span class="text-info">阶段二：尾款</span><span class="pay-step-2-price">￥ {{(product.price-product.deposit)*product.count | toNumberFixedTwo}}</span></div>
+                                                    <div ng-if="product.attributes" class="pay-step-2"><span class="text-info">阶段二：尾款</span><span class="pay-step-2-price">￥ {{(product.price-product.deposit + product.totalAdditionsPrice)*product.count | toNumberFixedTwo}}</span></div>
                                                     <!-- <span class="product_count">{{product.count}}</span> -->
                                                 </div>
                                             </li>

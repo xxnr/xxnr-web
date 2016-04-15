@@ -178,7 +178,10 @@ app.controller('rscManagementController', function($scope, $rootScope,remoteApiS
         if (reset > 0) {
             $scope.current_page = 1;
         };
-
+        if(tabIndex != 0){   //当点击非 "所有订单"tab的时候隐藏 搜索输入框并且清空
+            $scope.orderSearchInput = '';
+            orderQueryStr = $scope.orderSearchInput;
+        }
         remoteApiService.rscGetOrders(showTypeId,page?page:$scope.current_page,null,orderQueryStr)
             .then(function(data) {
 
@@ -305,7 +308,7 @@ app.controller('rscManagementController', function($scope, $rootScope,remoteApiS
                                     }
                                 }
                                 $scope.pickingUpSKUs.forEach(function(pickingUpSKU){
-                                    pickingUpSKU.shortName = pickingUpSKU.productName.length > 33 ? (pickingUpSKU.productName.substr(0, 30) + '...') : pickingUpSKU.productName;
+                                    pickingUpSKU.shortName = pickingUpSKU.productName.length > 30 ? (pickingUpSKU.productName.substr(0, 27) + '...') : pickingUpSKU.productName;
                                 });
                             }
 
@@ -337,7 +340,7 @@ app.controller('rscManagementController', function($scope, $rootScope,remoteApiS
                                     }
                                 }
                                 $scope.shippingSKUs.forEach(function(shippingSKU){
-                                    shippingSKU.shortName = shippingSKU.productName.length > 33 ? (shippingSKU.productName.substr(0, 30) + '...') : shippingSKU.productName;
+                                    shippingSKU.shortName = shippingSKU.productName.length > 30 ? (shippingSKU.productName.substr(0, 27) + '...') : shippingSKU.productName;
                                 });
                             }
 

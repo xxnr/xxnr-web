@@ -12,6 +12,7 @@ input {
     _border: 0;
     outline: none;
     background: none;
+    font-family: "Microsoft YaHei";
 }
 em {
     font-style: normal;
@@ -48,11 +49,14 @@ body {
     background: #fff;
     font-size: 14px;
     min-width: 1250px;
+    width: 100%;
 }
 .overflow_body {
-    overflow: hidden;
+    position: fixed;
+    overflow-y: hidden;
 }
 .not_overflow_body {
+    position: relative;
     overflow: auto;
 }
 .wrap {
@@ -1761,6 +1765,7 @@ body {
     margin: 2px 6px;
     border-radius: 7px;
     position: relative;
+    overflow: hidden;
 }
 .product_detail .product_info .product_info_part1 .SKUAttributes .row li.SKUAttributes-title {
     width: 80px;
@@ -1921,6 +1926,7 @@ body {
     width: 200px;
     line-height: 60px;
     height: 60px;
+    padding: 0;
 }
 .product_detail .details_tab li:last-child a {
     width: 600px;
@@ -1938,6 +1944,7 @@ body {
     background: #f8f8f8;
     box-sizing: border-box;
     border-bottom: 1px solid #e2e2e2;
+    border-right: 0px;
 }
 
 /*.product_detail .details_tab li a div{background: #fff;}*/
@@ -2742,7 +2749,7 @@ body {
 }
 .pop_Pickup .SKU .SKU_info{
     display: inline-block;
-    border-left: 1px solid #C7C7C7;
+    /*border-left: 1px solid #C7C7C7;*/
     height: 80px;
     /*float: left;*/
     margin-left: -5px;
@@ -2936,7 +2943,7 @@ body {
     font-size: 14px;
 }
 .cart_box .cart-tbody .item-item .item-form {
-    height: 140px;
+    /*height: 140px;*/
 }
 .cart_box .cart-tbody .item-item .p-additions {
     display: block;
@@ -3019,18 +3026,18 @@ body {
 .cart_box .cart-tbody .item-item .goods-item .p-name {
     width: 250px;
     display: inline-block;
-    margin-top: -3px;
+    float: left;
 }
 .cart_box .cart-tbody .item-item .goods-item .p-skus {
     font-size: 14px;
     color: #646464;
-    width: 180px;
+    width: 170px;
     display: inline-block;
-    position: absolute;
+    /*position: absolute;*/
     top: 20px;
-    padding-left: 32px;
-    max-height: 120px;
-    overflow: hidden;
+    padding-left: 17px;
+    /*max-height: 120px;*/
+    /*overflow: hidden;*/
 }
 .cart_box .cart-tbody .item-item .p-props {
     width: 80px;
@@ -3583,13 +3590,14 @@ body {
     width: 110px;
     height: 30px;
     border: 2px solid #e0e0e0;
-    line-height: 30px;
+    /*line-height: 30px;*/
     display: inline-block;
     text-align: center;
     border-radius: 5px;
     color: #323232;
     margin-right: 20px;
     box-sizing: border-box;
+    padding-top: 3px;
 }
 .deliveryInfo .deliveryMethod a.current {
     border: 2px solid #FE9B00;
@@ -3613,7 +3621,7 @@ body {
     display: inline-block;
     width: 1140px;
     margin-left: 30px;
-    color: #646464;
+    color: #323232;
     border-bottom: 1px solid #c7c7c7;
     line-height: 30px;
 }
@@ -4609,6 +4617,7 @@ body {
     border-radius: 5px;
     color: #fff;
     cursor: pointer;
+    font-size: 16px;
 }
 .addressFormTable td{
     padding: 8px;
@@ -5564,7 +5573,7 @@ body {
 .order-detail-section .order .order-body .pay_table_content li:nth-child(6) {
     width: 190px;
     line-height: 30px;
-    max-height: 100px;
+    /*max-height: 100px;*/
 }
 .order-detail-section .order .order-body .address p {
     line-height: 25px;
@@ -5591,7 +5600,7 @@ body {
     width: 80px;
 }
 .order-detail-section .order .order-body .orders-main {
-    border: 1px solid #e2e2e2;
+    border: 1px solid #c7c7c7;
     margin-top: 5px;
     border-bottom: 0px;
 }
@@ -5623,7 +5632,7 @@ body {
     padding-right: 50px;
 }
 .order-detail-section .order .order-body .orders-main .order-list .products-section .product {
-    border-bottom: 1px solid #e2e2e2;
+    border-bottom: 1px solid #c7c7c7;
 }
 .order-detail-section .order .order-body .orders-main .order-list .products-section .p-info {
     line-height: 120px;
@@ -5658,6 +5667,7 @@ body {
     color: #909090;
     line-height: 18px;
     padding-top: 6px;
+    padding-bottom: 4px;
 }
 .order-detail-section .order .order-body .orders-main .order-list .products-section .p-info .p-additions {
     display: block;
@@ -5734,10 +5744,10 @@ body {
     line-height: 50px;
 }
 .order-detail-section .order .order-body .orders-main .order-list .products-section .product .pay-step .hasAdditions {
-    border-top: 1px solid #c7c7c7;
+    border-top: 1px solid #e2e2e2;
 }
 .order-detail-section .order .order-body .orders-main .order-list .products-section .product .pay-step .pay-step-2 {
-    border-top: 1px solid #c7c7c7;
+    border-top: 1px solid #e2e2e2;
 }
 .order-detail-section .order .order-body .orders-main .order-list .products-section .product .pay-step span.text-info {
     width: 725px;
@@ -6946,7 +6956,7 @@ body {
 .selectCompany .singleShop .shopAddress{
     display: inline-block;
     height: 40px;
-    width: 585px;
+    width: 560px;
     float: left;
     margin-left: 15px;
     color:#646464;
@@ -7330,6 +7340,7 @@ body {
 .singleOrder--body{
     position: relative;
     border: 1px solid #e0e0e0;
+    border-top: 0px;
 }
 .singleOrder--body .left-section{
     width: 1000px;
@@ -7343,6 +7354,7 @@ body {
     float: left;
     padding-top: 20px;
     text-align: center;
+    border-top:1px solid #E0E0E0;
 }
 /*.singleOrder--body .products--section{*/
     /*background: #fff;*/
@@ -7365,7 +7377,7 @@ body {
     width: 660px;
     border-right: 1px solid #E0E0E0;
     padding-bottom: 14px;
-    /*border-top: 1px solid #E0E0E0;*/
+    border-top: 1px solid #E0E0E0;
     float: left;
 }
 .products--section .product .p-info .p-img {
@@ -7388,7 +7400,7 @@ body {
     /*padding-right: 70px;*/
 }
 .products--section .product .p-info .p-name a {
-    width: 260px;
+    width: 316px;
     overflow: hidden;
     display: block;
 }
@@ -7507,7 +7519,7 @@ body {
     box-sizing: border-box;
     margin-left: 0px;
     width: 160px;
-    /*border-right: 1px solid #e0e0e0;*/
+    border-top: 1px solid #e0e0e0;
     text-align: center;
     padding-top: 20px;
     font-size: 16px;
@@ -7517,6 +7529,7 @@ body {
     box-sizing: border-box;
     width: 179px;
     border-left: 1px solid #e0e0e0;
+    border-top: 1px solid #e0e0e0;
     padding-top: 20px;
     text-align: center;
     float: left;
@@ -7671,8 +7684,8 @@ body {
     background: url('../images/choose.png') no-repeat bottom right;
 }
 .pop--body p{
-    min-height: 28px;
-    line-height: 28px;
+    /*min-height: 28px;*/
+    /*line-height: 28px;*/
 }
 .pop--body .consigneeName{
     font-size: 16px;
@@ -7786,12 +7799,23 @@ body {
     width: 490px;
     padding-left: 14px;
     color: #646464;
+    position: relative;
+}
+.pop--body .SKUs .SKU .SKU_info p{
+    width: 460px;
 }
 .pop--body .SKUs .SKU .SKU_info .SKU_title{
     padding-top: 4px;
     display: inline-block;
     color: #333333;
     font-family: "Microsoft YaHei";
+    padding-top: 6px;
+    display: inline-block;
+    color: #333333;
+    font-size: 16px;
+    width: 460px;
+    overflow: hidden;
+    height: 20px;
 }
 .pop--body .SKUs .SKU .SKU_info .SKU_count{
     padding-top: 4px;
@@ -7799,6 +7823,8 @@ body {
     float: right;
     color: #323232;
     font-size: 16px;
+    position: absolute;
+
 }
 /*RSC客户自提 弹窗样式*/
 .RSC_Pickup--pop{
