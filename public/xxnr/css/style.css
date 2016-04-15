@@ -2612,7 +2612,7 @@ body {
 }
 .pop_ConfirmSKUReceived .SKUs .SKU .SKU_info{
     display: inline-block;
-    border-left: 1px solid #C7C7C7;
+    /*border-left: 1px solid #C7C7C7;*/
     height: 80px;
     /*float: left;*/
     margin-left: -5px;
@@ -6276,12 +6276,13 @@ body {
 .fillProfile .container .profile_box ul .identity select {
     width: 260px;
     margin-top: 10px;
-    color: #c7c7c7;
+    /*color: #c7c7c7;*/
+    color: #323232;
     font-size: 18px;
     text-indent: 80px;
 }
 .fillProfile .container .profile_box ul .identity select.changed {
-    color: #323232;
+    /*color: #323232;*/
 }
 .fillProfile .container .profile_box ul .buttons {
     margin-top: 60px;
@@ -7190,7 +7191,7 @@ body {
 {
     width:100px;
     height:31px;
-    padding:5px 0;
+    /*padding:5px 0;*/
     margin-right: 6px;
     font-family: "Microsoft YaHei";
 }
@@ -7198,7 +7199,7 @@ body {
 {
     width:100px;
     height:31px;
-    padding:5px 0;
+    /*padding:5px 0;*/
     margin-right: 6px;
     font-family: "Microsoft YaHei";
 }
@@ -7206,14 +7207,14 @@ body {
 {
     width:100px;
     height:31px;
-    padding:5px 0;
+    /*padding:5px 0;*/
     margin-right: 6px;
     font-family: "Microsoft YaHei";
 }
 #town
 {
     height:31px;
-    padding:5px 0;
+    /*padding:5px 0;*/
     margin-right: 6px;
     font-family: "Microsoft YaHei";
 }
@@ -7794,7 +7795,7 @@ body {
 }
 .pop--body .SKUs .SKU .SKU_info {
     display: inline-block;
-    border-left: 1px solid #C7C7C7;
+    /*border-left: 1px solid #C7C7C7;*/
     height: 80px;
     /* float: left; */
     margin-left: -5px;
