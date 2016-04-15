@@ -1,11 +1,13 @@
 /**
  * Created by pepelu on 2016/1/20.
  */
+var tools = require('../common/tools');
 var IntentionProductModel = require('../models').intention_product;
 var PotentialCustomerModel = require('../models').potential_customer;
 var UserModel = require('../models').user;
 var mongoose = require("mongoose");
 var moment = require('moment-timezone');
+var pinyin = require("pinyin");
 const CountPerDay = 15;
 var PotentialCustomerService = function(){};
 
@@ -68,6 +70,20 @@ PotentialCustomerService.prototype.add = function(user, name, phone, sex, addres
 
     if (remarks) {
         potential_customer.remarks = remarks;
+    }
+
+    if (name) {
+        var nameResult = tools.stringPinyin({'str':name});
+        if (nameResult) {
+            if (nameResult.error)
+                console.error('PotentialCustomerService add stringPinyin error:', nameResult.error, name);
+            if (nameResult.strPinyin)
+                potential_customer.namePinyin = nameResult.strPinyin;
+            if (nameResult.initial)
+                potential_customer.nameInitial = nameResult.initial;
+            if (nameResult.initialType)
+                potential_customer.nameInitialType = nameResult.initialType;
+        }
     }
 
     Promise.all(promises)
@@ -139,6 +155,57 @@ PotentialCustomerService.prototype.add = function(user, name, phone, sex, addres
         .catch(function(err){
             callback(err);
         })
+};
+
+// query potential customers order by namePinyin
+PotentialCustomerService.prototype.queryOrderbynamePinyin = function(user, callback, search, BESchema){
+    var queryOptions = {};
+    if(user){
+        queryOptions.user = mongoose.Types.ObjectId(user._id);
+    }
+
+    var querier = function() {
+        var query = PotentialCustomerModel.find(queryOptions);
+        if(BESchema){
+            query = query.populate({path:'user', select:'-_id name typeVerified'})
+                .populate('address.province')
+                .populate('address.city')
+                .populate('address.county')
+                .populate('address.town')
+                .select('name phone remarks isRegistered sex address dateTimeAdded dateTimeRegistered user namePinyin nameInitial');
+        } else{
+            query = query.select('name phone remarks isRegistered sex namePinyin nameInitial');
+        }
+
+        query.sort({nameInitialType:1, namePinyin:1})
+            .exec(function (err, customers) {
+                if (err) {
+                    console.error(err);
+                    callback(err);
+                    return;
+                }
+                callback(null, customers);
+            });
+    };
+
+    if(search){
+        queryOptions['$or'] = [];
+        queryOptions['$or'].push({name:{$regex:new RegExp(search)}});
+        queryOptions['$or'].push({phone:{$regex:new RegExp(search)}});
+        UserModel.find({name:{$regex:new RegExp(search)}}, function(err, users){
+            if(users){
+                var userIds = [];
+                users.forEach(function(user){
+                    userIds.push(user._id);
+                });
+
+                queryOptions['$or'].push({user:{$in:userIds}});
+                querier();
+            }
+        });
+    } else{
+        querier();
+    }
 };
 
 // query potential customers

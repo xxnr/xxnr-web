@@ -118,6 +118,7 @@
 				<button name="edit" title="@(修改状态)"><span class="fa fa-pencil"></span></button>
 			</td> -->
 			<td style="width:20px" class="ui-right">
+
 				<button name="edit" title="@(编辑)"><span class="fa fa-pencil"></span></button>
 			</td>
 		</tr>
@@ -644,7 +645,6 @@
 			<div data-component="visible" class="ui-buttons" data-component-path="orders.form.products" data-if="orders.form.products && orders.form.products.length > 0">
 				<button name="submit" data-name="products" data-warning="你确认提交商品发货状态的修改吗?">@(提交修改)</button>
 			</div>
-			
 		</div>
 
 		<div class="padding" style="padding-top: 0px;">
@@ -741,42 +741,46 @@
 		component.click = function(index, row, button) {
 			switch ($(button).attr('name')) {
 				case 'edit':
-					$.components.GET(managerurl + '/api/orders/' + row.id, null, function(response, err) {
-						// Error prevention
-						if (response instanceof Array) {
-							response = {};
-						} else {
-							if (response && response.code && response.code==1000 && response.datas) {
-								response = response.datas;
-							} else {
+					if(su.role.name != 'customer_op') {
+						$.components.GET(managerurl + '/api/orders/' + row.id, null, function(response, err) {
+							// Error prevention
+							if (response instanceof Array) {
 								response = {};
+							} else {
+								if (response && response.code && response.code==1000 && response.datas) {
+									response = response.datas;
+								} else {
+									response = {};
+								}
 							}
-						}
 
-						SET('orders.form', $.extend({}, response), true);
-                        SET('orders.payStatuses',[{name:'未付款',value:1},{name:'已付款',value:2}], true);
-                        SET('orders.deliverStatuses',[{name:'未发货',value:1},{name:'已发货',value:2},{name:'已到服务站',value:4},{name:'已收货',value:5}], true);
-                        SET('orders.payTypes',[{name:'支付宝',value:1},{name:'银联',value:2},{name:'现金',value:3},{name:'线下POS机',value:4}], true);
-						SET('orders.response', null);
-						SET('orders.subOrdersresponse', null);
-						SET('orders.productsresponse', null);
-						SET('orders.SKUsresponse', null);
+							SET('orders.form', $.extend({}, response), true);
+							SET('orders.payStatuses',[{name:'未付款',value:1},{name:'已付款',value:2}], true);
+							SET('orders.deliverStatuses',[{name:'未发货',value:1},{name:'已发货',value:2},{name:'已到服务站',value:4},{name:'已收货',value:5}], true);
+							SET('orders.payTypes',[{name:'支付宝',value:1},{name:'银联',value:2},{name:'现金',value:3},{name:'线下POS机',value:4}], true);
+							SET('orders.response', null);
+							SET('orders.subOrdersresponse', null);
+							SET('orders.productsresponse', null);
+							SET('orders.SKUsresponse', null);
 
-						var productIds = "";
-						orders.form.SKUs.forEach(function(SKU){
-							productIds += SKU.productId+',';
+							var productIds = "";
+							orders.form.SKUs.forEach(function(SKU){
+								productIds += SKU.productId+',';
+							});
+
+							$.components.GET(managerurl + '/api/v2.2/RSC/queryByProducts', {productIds:productIds}, function(RSCresponse){
+								if(RSCresponse.code != 1000){
+									alert(RSCresponse.message);
+								} else{
+									SET('orders.RSCList', RSCresponse.RSCs);
+									onRSCListRefreshed();
+									SET('common.form', 'orders');
+								}
+							})
 						});
-
-						$.components.GET(managerurl + '/api/v2.2/RSC/queryByProducts', {productIds:productIds}, function(RSCresponse){
-							if(RSCresponse.code != 1000){
-								alert(RSCresponse.message);
-							} else{
-								SET('orders.RSCList', RSCresponse.RSCs);
-								onRSCListRefreshed();
-								SET('common.form', 'orders');
-							}
-						})
-					});
+					} else {
+						window.location.href = managerurl + '/orders/detail/?id=' + row.id;
+					}
 					break;
 			}
 		};

@@ -58,6 +58,9 @@ exports.install = function() {
     // F.route('/api/v2.0/getMinPayPrice/',       getMinPayPrice, ['get'], ['isLoggedIn']);
     //F.route('/api/v2.0/getMinPayPrice/',       getMinPayPrice, ['post', 'get'], ['isLoggedIn']);
 
+    // ISO upgrade message
+    //F.route('/api/v2.1/ISOupgrade/',       ISOUpgrade, ['post']);
+
 	// v1.0
     //fix api// F.route('/app/shopCart/getShopCartList', getShoppingCart, ['post', 'get']);
     //fix api// F.route('/app/shopCart/changeNum', updateShoppingCart, ['post', 'get'], ['isLoggedIn']);
@@ -1279,3 +1282,15 @@ function json_offline_pay_type(){
     var self = this;
     res.respond({code:1000, message:'success', offlinePayType:OFFLINEPAYTYPE});
 }
+
+exports.ISOUpgrade = function(req, res, next) {
+    var postVersion = req.data['version'] || '';
+    var nowVersion = '2.1.5';
+    if (!postVersion || (postVersion != nowVersion && postVersion < nowVersion)) {
+        res.respond({code:1000, message:'版本升级啦，快点去更新吧', version: nowVersion});
+        return;
+    } else {
+        res.respond({code:1200, message:'最新版本', version: nowVersion});
+        return;
+    }
+};

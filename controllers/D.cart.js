@@ -9,45 +9,44 @@ var converter = require('../common/converter');
 var api10 = converter.api10;
 
 exports.install = function() {
-    F.route('/api/v2.1/cart/getShoppingCart', getShoppingCart, ['get'], ['isLoggedIn']);
-    F.route('/api/v2.1/cart/addToCart', updateShoppingCart, ['post'], ['isLoggedIn']);
-    F.route('/api/v2.1/cart/changeNum', updateShoppingCart, ['post'], ['isLoggedIn']);
-    F.route('/api/v2.1/cart/getShoppingCartOffline', getShoppingCartOffline, ['post']);
+    //F.route('/api/v2.1/cart/getShoppingCart', getShoppingCart, ['get'], ['isLoggedIn']);
+    //F.route('/api/v2.1/cart/addToCart', updateShoppingCart, ['post'], ['isLoggedIn']);
+    //F.route('/api/v2.1/cart/changeNum', updateShoppingCart, ['post'], ['isLoggedIn']);
+    //F.route('/api/v2.1/cart/getShoppingCartOffline', getShoppingCartOffline, ['post']);
 
     // jiesuan
-    F.route('/api/v2.2/cart/getDeliveries', getSKUDeliveries, ['post'], ['isLoggedIn']);
+    //F.route('/api/v2.2/cart/getDeliveries', getSKUDeliveries, ['post'], ['isLoggedIn']);
 };
 
-function updateShoppingCart() {
-    var self = this;
-    var userId = self.data['userId'];
-    var SKUId = self.data['SKUId'];
-    var count = self.data['quantity'];
-    var update_by_add = self.data['update_by_add'];
-    var additions = self.data.additions;
+exports.updateShoppingCart = function(req, res, next) {
+    var userId = req.data['userId'];
+    var SKUId = req.data['SKUId'];
+    var count = req.data['quantity'];
+    var update_by_add = req.data['update_by_add'];
+    var additions = req.data.additions;
     if (!userId) {
         var response = {code: 1001, message: "param userId required"};
-        self.respond(response);
+        res.respond(response);
         return;
     }
 
     if (!SKUId) {
         var response = {code: 1001, message: "param goodsId required"};
-        self.respond(response);
+        res.respond(response);
         return;
     }
 
     if (typeof count == 'undefined') {
-        count = self.data['count'];//This is to support addToCart api
+        count = req.data['count'];//This is to support addToCart api
         if (typeof count == 'undefined') {
             var response = {code: 1001, message: "param quantity/count required"};
-            self.respond(response);
+            res.respond(response);
             return;
         }
     }
 
     if (parseInt(count) > 9999) {
-        self.respond({code: 1001, message: "商品个数不能大于9999"});
+        res.respond({code: 1001, message: "商品个数不能大于9999"});
         return;
     }
 
@@ -61,29 +60,29 @@ function updateShoppingCart() {
 
     CartService.getOrAdd(userId, function (err, cart) {
         if (err) {
-            self.respond({code: 1001, message: "获取购物车失败"});
+            res.respond({code: 1001, message: "获取购物车失败"});
             return;
         }
 
         SKUService.getSKU({_id: SKUId}, function (err, SKU) {
             if (err || !SKU) {
-                self.respond({code: 1001, message: "无法查找到商品"});
+                res.respond({code: 1001, message: "无法查找到商品"});
                 return;
             }
 
             if(count != 0) {
                 if (SKU && SKU.product.presale) {
-                    self.respond({code: 1001, message: "无法添加或修改预售商品"});
+                    res.respond({code: 1001, message: "无法添加或修改预售商品"});
                     return;
                 }
 
                 if (SKU && !SKU.product.online) {
-                    self.respond({code: 1001, message: "无法添加或修改下架商品"});
+                    res.respond({code: 1001, message: "无法添加或修改下架商品"});
                     return
                 }
 
                 if (!SKU.online) {
-                    self.respond({code: 1001, message: "无法添加或修改下架SKU"});
+                    res.respond({code: 1001, message: "无法添加或修改下架SKU"});
                     return
                 }
             }
@@ -91,50 +90,48 @@ function updateShoppingCart() {
             CartService.updateSKUItems(cart.cartId, SKU._id, count, update_by_add, additions, function (err) {
                 if (err) {
                     console.log(err);
-                    self.respond({code: 1001, message: "更新购物车失败"});
+                    res.respond({code: 1001, message: "更新购物车失败"});
                     return;
                 }
 
-                self.respond({code: 1000, message: "success"});
+                res.respond({code: 1000, message: "success"});
             })
         }, false);
     });
-}
+};
 
-function getShoppingCart(){
-    var self = this;
-    var userId = self.data.userId;
+exports.getShoppingCart = function(req, res, next){
+    var userId = req.data.userId;
     if(!userId){
-        self.respond({code:1001, message:'param userId required'});
+        res.respond({code:1001, message:'param userId required'});
         return;
     }
 
     CartService.getOrAdd(userId, function(err, cart){
         if(err){
-            self.respond({code:1001, message:'查询购物车失败'});
+            res.respond({code:1001, message:'查询购物车失败'});
             return;
         }
 
-        self.respond(convertToShoppingCartFormatV_1_0(cart.SKU_items || [], cart.cartId, cart.userId));
+        res.respond(convertToShoppingCartFormatV_1_0(cart.SKU_items || [], cart.cartId, cart.userId));
     }, true)
-}
+};
 
-function getShoppingCartOffline(){
-    var self = this;
-    var SKUs = self.data.SKUs;
+exports.getShoppingCartOffline = function(req, res, next){
+    var SKUs = req.data.SKUs;
     if(!SKUs || !Array.isArray(SKUs) || !(SKUs.length > 0)){
-        self.respond({code:1001, message:'请提供正确的参数'});
+        res.respond({code:1001, message:'请提供正确的参数'});
         return;
     }
 
     SKUService.idJoinWithCount({SKUs: SKUs}, function(err, SKUs){
         if(err){
-            self.respond({code:1001,message:err});
+            res.respond({code:1001,message:err});
         }else {
-            self.respond(convertToShoppingCartFormatV_1_0(SKUs || [], null, null));
+            res.respond(convertToShoppingCartFormatV_1_0(SKUs || [], null, null));
         }
     });
-}
+};
 
 function convertToShoppingCartFormatV_1_0(SKUs, cartId, userId){
     var goodDetails = {"code":1000,"message":"success",
@@ -196,33 +193,32 @@ function convertToShoppingCartFormatV_1_0(SKUs, cartId, userId){
 }
 
 // get the deliveries of post SKUs in shopping cart
-function getSKUDeliveries() {
-    var self = this;
-    var userId = self.data.userId;
-    var checkoutSKUs = self.data.SKUs;
+exports.getSKUDeliveries = function(req, res, next) {
+    var userId = req.data.userId;
+    var checkoutSKUs = req.data.SKUs;
     if (!userId) {
-        self.respond({code:1001, message:'请提供正确的参数'});
+        res.respond({code:1001, message:'请提供正确的参数'});
         return;
     }
     if(!checkoutSKUs || !Array.isArray(checkoutSKUs) || !(checkoutSKUs.length > 0)){
-        self.respond({code:1001, message:'请提供正确的参数'});
+        res.respond({code:1001, message:'请提供正确的参数'});
         return;
     }
     
     CartService.getSKUCategoriesInCart(userId, checkoutSKUs, function(err, categories) {
         if (err || !categories) {
             if (err) console.error('Cart getSKUDeliveries getSKUCategoriesInCart err:', err);
-            self.respond({code:1001, message:'查询SKU分类失败'});
+            res.respond({code:1001, message:'查询SKU分类失败'});
             return;
         }
         CategoryService.getDeliveries(categories, function(err, results) {
             if (err || !results) {
                 if (err) console.error('Cart getSKUDeliveries getDeliveries err:', err);
-                self.respond({code:1001, message:'查询SKU配送方式失败'});
+                res.respond({code:1001, message:'查询SKU配送方式失败'});
                 return;
             }
-            self.respond({code:1000, message:'success', datas:{count:results.length, items:results}});
+            res.respond({code:1000, message:'success', datas:{count:results.length, items:results}});
             return;
         });
     });
-}
+};

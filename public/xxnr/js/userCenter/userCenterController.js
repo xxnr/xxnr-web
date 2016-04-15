@@ -15,7 +15,7 @@ app.controller('userCenterController', function($scope, $rootScope,$timeout ,rem
 
     $scope.showConfirmSKUReceivedPop = false; //确认收货的弹窗变量
     $scope.ConfirmingSKUs = [];  //要确认的收货物品列表
-    $scope.ConfirmingSKUIds = [];  //要确认的收货物品id列表
+    $scope.ConfirmingSKU_refs = [];  //要确认的收货物品id列表
     $scope.ConfirmingOrderIds;  //要确认的收货物品列表
 
     $scope.showPickupPop = false; //去自提的弹窗变量
@@ -130,6 +130,8 @@ app.controller('userCenterController', function($scope, $rootScope,$timeout ,rem
             $scope.user.phoneNumber = data.datas.phone;
             $scope.user.imgUrl = data.datas.photo;
             $scope.user.name = data.datas.name;
+            $scope.user.verifiedTypes = data.datas.verifiedTypes;
+            $scope.user.isVerifiedRSC = ($scope.user.verifiedTypes.indexOf('5')!=-1);
             $scope.user.isUserInfoFullFilled = data.datas.isUserInfoFullFilled;
             if (!$scope.user.imgUrl) {
                 $scope.user.imgUrl = "images/default_avatar.png"
@@ -274,6 +276,23 @@ app.controller('userCenterController', function($scope, $rootScope,$timeout ,rem
                 $scope.pages[pageIndex].isSelected = false;
             }
         }
+        if($scope.pages.length<=7){                                                     // e.g.: 1 2 3 4 5 6 7
+            $scope.pages = $scope.pages;
+        }else if($scope.pages.length>7 && $scope.current_page<5){                              // e.g.: 1 2 3 4 5 ... 20
+            $scope.pages = $scope.pages.slice(0,6).concat($scope.pages[$scope.pages.length-1]);
+            $scope.pages[5].id = '...';
+        }else if($scope.pages.length>7 && $scope.current_page <= $scope.pages_count && $scope.current_page> $scope.pages_count - 4 ) {    // e.g.: 1 ... 16 17 18 19 20
+            $scope.pages = $scope.pages.slice(0,1).concat($scope.pages.slice($scope.pages.length-6,$scope.pages.length));
+            $scope.pages[1].id = '...';
+        }else{                                                                          // e.g.: 1 .. 8 9 10 ... 20
+            var tempFirst = $scope.pages[0];
+            var tempLast = $scope.pages[$scope.pages.length-1];
+            $scope.pages = $scope.pages.slice($scope.current_page-3,$scope.current_page+2);
+            $scope.pages[0].id = '...';
+            $scope.pages[$scope.pages.length-1].id = '...';
+            $scope.pages.push(tempLast);
+            $scope.pages.unshift(tempFirst);
+        }
     };
     $scope.show_page = function(pageId) {
         $scope.current_page = pageId;
@@ -308,7 +327,7 @@ app.controller('userCenterController', function($scope, $rootScope,$timeout ,rem
 
 
     $scope.show = function(showTypeId, index, reset) {
-        if (reset > 0) {
+        if (reset == true) {
             $scope.current_page = 1;
         };
         remoteApiService.getOrderList($scope.current_page, showTypeId)
@@ -319,7 +338,9 @@ app.controller('userCenterController', function($scope, $rootScope,$timeout ,rem
                 var orders = data.items;
                 $scope.searchIndex = [];
                 for (var showType in $scope.showTypes) {
-                    $scope.showTypes[showType].isSelected = false;
+                    if($scope.showTypes.hasOwnProperty(showType)){
+                        $scope.showTypes[showType].isSelected = false;
+                    }
                 }
                 $scope.showTypes[index].isSelected = true;
 
@@ -367,8 +388,9 @@ app.controller('userCenterController', function($scope, $rootScope,$timeout ,rem
                     order.createTime = orders[i].dateCreated;
                     order.order = orders[i].order;
                     order.orderDeliveryType = orders[i].deliveryType;
-                    var d = new Date(commonService.parseDate(orders[i].dateCreated));
-                    order.createTime_local = d.toLocaleString();
+                    //var d = new Date(commonService.parseDate(orders[i].dateCreated));
+                    //order.createTime_local = d.toLocaleString();
+                    order.createTime_local = commonService.convertDateIncludeHMM(orders[i].dateCreated);
 
                     if(order.order.orderStatus.type == 1){
                         order.actionName = '去付款';
@@ -401,12 +423,12 @@ app.controller('userCenterController', function($scope, $rootScope,$timeout ,rem
                             $scope.ConfirmingSKUIndex = -1;
                             $scope.showConfirmSKUReceivedPop = true;
                             //window.scrollTo(0, 0);
-                            $scope.ConfirmingSKUIds = [];
+                            $scope.ConfirmingSKU_refs = [];
                             $scope.isOverflow = true;
                             if(order.SKUs){
-                                for(var i in order.SKUs){
-                                    if(order.SKUs[i].deliverStatus == 2){
-                                        $scope.ConfirmingSKUs.push(order.SKUs[i]);
+                                for(var x in order.SKUs){
+                                    if(order.SKUs[x].deliverStatus == 2){
+                                        $scope.ConfirmingSKUs.push(order.SKUs[x]);
                                     }
                                 }
                             }
@@ -490,24 +512,24 @@ app.controller('userCenterController', function($scope, $rootScope,$timeout ,rem
         return Number(totalAdditionsPrice.toFixed(2));
     };
     $scope.addToConfirmingSKU_List = function(index){
-        if($scope.ConfirmingSKUIds.length == 0){
-            $scope.ConfirmingSKUIds.push($scope.ConfirmingSKUs[index]._id);
+        if($scope.ConfirmingSKU_refs.length == 0){
+            $scope.ConfirmingSKU_refs.push($scope.ConfirmingSKUs[index].ref);
         }else{
             var hasExsited = false;
-            for(var i in $scope.ConfirmingSKUIds){              //如果已在$scope.ConfirmingSKUs就剔除
-                if($scope.ConfirmingSKUs[index]._id == $scope.ConfirmingSKUIds[i]){
-                    $scope.ConfirmingSKUIds.splice(i, 1);
+            for(var i in $scope.ConfirmingSKU_refs){              //如果已在$scope.ConfirmingSKUs就剔除
+                if($scope.ConfirmingSKUs[index].ref == $scope.ConfirmingSKU_refs[i]){
+                    $scope.ConfirmingSKU_refs.splice(i, 1);
                     hasExsited = true;
                 }
             }
             if(!hasExsited){
-                $scope.ConfirmingSKUIds.push($scope.ConfirmingSKUs[index]._id); //不在时就加入$scope.ConfirmingSKUs
+                $scope.ConfirmingSKU_refs.push($scope.ConfirmingSKUs[index].ref); //不在时就加入$scope.ConfirmingSKUs
             }
         }
     };
     $scope.checkConfirmingSKU_List = function(index){
         if($scope.ConfirmingSKUs.hasOwnProperty(index)){
-            if($scope.ConfirmingSKUIds.indexOf($scope.ConfirmingSKUs[index]._id )!=-1){
+            if($scope.ConfirmingSKU_refs.indexOf($scope.ConfirmingSKUs[index].ref )!=-1){
                 return true;
             }else{
                 return false;
@@ -515,16 +537,34 @@ app.controller('userCenterController', function($scope, $rootScope,$timeout ,rem
         }
     };
     $scope.confirmSKU = function(){
-        remoteApiService.confirmSKU($scope.ConfirmingOrderIds,$scope.ConfirmingSKUIds.join())
-            .then(function(data) {
-                $scope.ConfirmingOrderIds = null;
-                if(data.code == 1000){
-                    sweetalert('该商品确认收货成功','my_xxnr.html');
-                }else{
-                    sweetalert('确认收货失败','my_xxnr.html');
+        if($scope.ConfirmingSKU_refs.length>0){
+            remoteApiService.confirmSKU($scope.ConfirmingOrderIds,$scope.ConfirmingSKU_refs)
+                .then(function(data) {
+                    $scope.ConfirmingOrderIds = null;
+                    if(data.code == 1000){
+                        sweetalert('收货成功','my_xxnr.html');
+                    }else{
+                        sweetalert('确认收货失败','my_xxnr.html');
+                    }
+                });
+            //$scope.ConfirmingOrderIds = null;
+        }
+    };
+    $scope.ConfirmingSKU_number = function(){   //计算被算中的确认收货的SKU的数量
+        var resultNum = 0;
+        $scope.ConfirmingSKU_refs.forEach(function(SKU_ref){
+            if($scope.ConfirmingSKUs){
+                for(var i in $scope.ConfirmingSKUs){
+
+                    if($scope.ConfirmingSKUs.hasOwnProperty(i)){
+                        if(SKU_ref == $scope.ConfirmingSKUs[i].ref){
+                            resultNum = resultNum + $scope.ConfirmingSKUs[i].count;
+                        }
+                    }
                 }
-            })
-        //$scope.ConfirmingOrderIds = null;
+            }
+        });
+        return resultNum;
     };
 
 });

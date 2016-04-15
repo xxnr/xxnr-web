@@ -78,21 +78,57 @@ exports.getOrders = function(req, res, next) {
             var length = items.length;
             var arr = new Array(length);
             for (var i = 0; i < length; i++) {
-                var item = items[i];
+                var order = items[i];
+                // var item = items[i];
                 var typeValue = type;
+                var item = {
+                    'id':order.id,
+                    'paymentId':order.paymentId,
+                    'price':order.price,
+                    'deposit':order.deposit,
+                    'consigneeAddress':order.consigneeAddress,
+                    'consigneeName':order.consigneeName,
+                    'consigneePhone':order.consigneePhone,
+                    'payType':order.payType,
+                    'products':order.products || [],
+                    'SKUs':order.SKUs || [],
+                    'duePrice':typeof(order.duePrice) != 'undefined' ? parseFloat(order.duePrice.toFixed(2)) : null,
+                    'deliveryType':order.deliveryType,
+                    'payStatus':order.payStatus,
+                    'deliverStatus':order.deliverStatus,
+                    'RSCInfo':order.RSCInfo
+                };
                 // 订单合成状态
                 if (!typeValue) {
-                    item.typeValue = OrderService.orderType(item);
-                }
-                var orderInfo = OrderService.get_orderInfo(item);
-                item.order = orderInfo;
-                // for old web page
-                if (item.payStatus == PAYMENTSTATUS.PAID) {
-                    item.deposit = typeof(item.price) != 'undefined' ? parseFloat(item.price.toFixed(2)) : parseFloat(item.deposit.toFixed(2));
+                    item.typeValue = OrderService.orderType(order);
                 } else {
-                    item.deposit = typeof(item.duePrice) != 'undefined' ? parseFloat(item.duePrice.toFixed(2)) : parseFloat(item.deposit.toFixed(2));
+                    item.typeValue = typeValue;
                 }
+
+                var orderInfo = OrderService.get_orderInfo(order);
+                item.order = orderInfo;
+                // 创建时间
+                item.dateCreated = order.dateCreated;
+                // 支付时间
+                if (order.payStatus == PAYMENTSTATUS.PAID && order.datePaid) {
+                    item.datePaid = order.datePaid;
+                }
+                // 待收货时间
+                if (order.payStatus == PAYMENTSTATUS.PAID && order.deliverStatus !== DELIVERSTATUS.UNDELIVERED && order.datePendingDeliver) {
+                    item.datePendingDeliver = order.datePendingDeliver;
+                }
+                // 全部发货时间
+                if (order.deliverStatus == DELIVERSTATUS.DELIVERED && order.dateDelivered) {
+                    item.dateDelivered = order.dateDelivered;
+                }
+                // 完成时间
+                if (order.deliverStatus == DELIVERSTATUS.RECEIVED && order.dateCompleted) {
+                    item.dateCompleted = order.dateCompleted;
+                }
+                arr[i] = item;
             }
+
+            data.items = arr;
             res.respond(data);
         } else {
             res.respond({'code':'1001','message':'没有找到订单'});
@@ -124,11 +160,12 @@ exports.api10_getOrders = function(req, res, next) {
                     'orderId':item.id,
                     'orderNo':item.paymentId,
                     'totalPrice':item.price.toFixed(2),
-                    'goodsCount':item.products ? item.products.length: 0,
+                    'goodsCount':item.products ? item.products.length : 0,
                     'address':item.consigneeAddress,
                     'recipientName':item.consigneeName,
                     'recipientPhone':item.consigneePhone,
                     'typeLable':'',
+                    // for old app pay price
                     'deposit': typeof(item.duePrice) != 'undefined' ? item.duePrice.toFixed(2) : item.deposit.toFixed(2),
                     'payType':item.payType,
                     'order': orderInfo,
@@ -136,6 +173,7 @@ exports.api10_getOrders = function(req, res, next) {
                     'SKUs':item.SKUs || [],
                     'subOrders': item.subOrders || [],
                     'duePrice': typeof(data.duePrice) != 'undefined' ? item.duePrice.toFixed(2) : null,
+                    'RSCInfo': item.RSCInfo
                 };
 
                 if(arr[i].SKUs && arr[i].SKUs.length > 0){
@@ -143,7 +181,8 @@ exports.api10_getOrders = function(req, res, next) {
                     arr[i].SKUs.forEach(function(SKU){
                         var product = {id:SKU.productId, price:SKU.price.toFixed(2), deposit:SKU.deposit.toFixed(2), name:SKU.productName, thumbnail:SKU.thumbnail, count:SKU.count, category:SKU.category, dateDelivered:SKU.dateDelivered, dateSet:SKU.dateSet, deliverStatus:SKU.deliverStatus};
                         arr[i].products.push(product);
-                    })
+                    });
+                    arr[i].goodsCount = arr[i].products ? arr[i].products.length : 0;
                 }
                 
             }
@@ -633,7 +672,13 @@ exports.addOrderBySKU = function(req, res, next){
                     addOrderOptions.user = user;
                     addOrderOptions.SKU_items = cart.SKU_items;
                     addOrderOptions.deliveryType = deliveryType;
-                    addOrderOptions.address = address;
+                    // addOrderOptions.address = address;
+
+                    addOrderOptions.addressInfo = {
+                        "consigneeName": address.receiptpeople,
+                        "consigneePhone": address.receiptphone,
+                        "consigneeAddress": address.provincename + address.cityname + (address.countyname || '') + (address.townname || '') + address.address
+                    };
                     OrderService.splitAndaddOrder(addOrderOptions, function(err, response, orderSKUs) {
                         if(err || !response){
                             res.respond({code:1001, message:err});
@@ -651,14 +696,36 @@ exports.addOrderBySKU = function(req, res, next){
                         res.respond({code:1001, message:'自提点不存在'});
                         return;
                     }
+                    if (!RSC.RSCInfo || !RSC.RSCInfo.companyAddress || !RSC.RSCInfo.companyAddress.province.name || !RSC.RSCInfo.companyAddress.city.name) {
+                        callback("自提点地址不完整");
+                        return;
+                    }
                     var addOrderOptions = {};
                     addOrderOptions.user = user;
                     addOrderOptions.SKU_items = cart.SKU_items;
                     addOrderOptions.deliveryType = deliveryType;
                     addOrderOptions.RSCId = RSCId;
-                    addOrderOptions.RSC = RSC;
+                    // addOrderOptions.RSC = RSC;
                     addOrderOptions.consigneeName = consigneeName;
                     addOrderOptions.consigneePhone = consigneePhone;
+
+                    addOrderOptions.RSCInfo = {RSC: RSCId};
+                    addOrderOptions.RSCInfo.RSCAddress = RSC.RSCInfo.companyAddress.province.name + RSC.RSCInfo.companyAddress.city.name;
+                    if (RSC.RSCInfo.companyAddress.county && RSC.RSCInfo.companyAddress.county.name) {
+                        addOrderOptions.RSCInfo.RSCAddress += RSC.RSCInfo.companyAddress.county.name;
+                    }
+                    if (RSC.RSCInfo.companyAddress.town && RSC.RSCInfo.companyAddress.town.name) {
+                        addOrderOptions.RSCInfo.RSCAddress += RSC.RSCInfo.companyAddress.town.name;
+                    }
+                    if (RSC.RSCInfo.companyAddress.details) {
+                        addOrderOptions.RSCInfo.RSCAddress += RSC.RSCInfo.companyAddress.details;
+                    }
+                    if (RSC.RSCInfo.companyName) {
+                        addOrderOptions.RSCInfo.companyName = RSC.RSCInfo.companyName;
+                    }
+                    if (RSC.RSCInfo.phone) {
+                        addOrderOptions.RSCInfo.RSCPhone = RSC.RSCInfo.phone;
+                    }
                     OrderService.splitAndaddOrder(addOrderOptions, function(err, response, orderSKUs) {
                         if(err || !response){
                             res.respond({code:1001, message:err});

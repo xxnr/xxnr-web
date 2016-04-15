@@ -16,7 +16,7 @@ app.controller('orderDetailController', function ($scope, remoteApiService, comm
 
     $scope.showConfirmSKUReceivedPop = false; //确认收货的弹窗变量
     $scope.ConfirmingSKUs = [];  //要确认的收货物品列表
-    $scope.ConfirmingSKUIds = [];  //要确认的收货物品id列表
+    $scope.ConfirmingSKU_refs = [];  //要确认的收货物品id列表
     $scope.ConfirmingOrderIds;  //要确认的收货物品列表
 
     $scope.closePop = function() {
@@ -35,7 +35,7 @@ app.controller('orderDetailController', function ($scope, remoteApiService, comm
                 $scope.order.id = data.datas.rows.id;
                 $scope.order.dateCreated = data.datas.rows.order.dateCreated ? convertDateIncludeHMM(data.datas.rows.order.dateCreated) : "";
                 $scope.order.datePaid = data.datas.rows.order.datePaid ? convertDateIncludeHMM(data.datas.rows.order.datePaid) : "";
-                $scope.order.dateDelivered = data.datas.rows.order.dateDelivered ? convertDateIncludeHMM(data.datas.rows.order.dateDelivered) : "";
+                $scope.order.datePendingDeliver = data.datas.rows.order.datePendingDeliver ? convertDateIncludeHMM(data.datas.rows.order.datePendingDeliver) : "";
                 $scope.order.dateCompleted = data.datas.rows.order.dateCompleted ? convertDateIncludeHMM(data.datas.rows.order.dateCompleted) : "";
                 $scope.order.orderStatus = data.datas.rows.order.orderStatus;
                 $scope.order.receiver = data.datas.rows.recipientName;
@@ -45,6 +45,11 @@ app.controller('orderDetailController', function ($scope, remoteApiService, comm
                 if (data.datas.rows.SKUList) {
                     if (data.datas.rows.SKUList.length > 0) {
                         $scope.order.products = data.datas.rows.SKUList;
+                    }
+                }
+                for(var k in $scope.order.products){
+                    if($scope.order.products.hasOwnProperty(k)){
+                        $scope.order.products[k].totalAdditionsPrice = $scope.calculateTotalAdditionsPrice($scope.order.products[k].additions);
                     }
                 }
                 $scope.order.deliveryType = data.datas.rows.deliveryType;
@@ -100,7 +105,7 @@ app.controller('orderDetailController', function ($scope, remoteApiService, comm
                         $scope.ConfirmingSKUs = [];
                         $scope.ConfirmingSKUIndex = -1;
                         $scope.showConfirmSKUReceivedPop = true;
-                        $scope.ConfirmingSKUIds = [];
+                        $scope.ConfirmingSKU_refs = [];
                         $scope.isOverflow = true;
                         if ($scope.order.products) {
                             for (var i in $scope.order.products) {
@@ -160,8 +165,11 @@ app.controller('orderDetailController', function ($scope, remoteApiService, comm
                     }
                     if ($scope.order.paySubOrderType != $scope.subOrders[i].type && $scope.subOrders[i].payStatus != 2) {
                         $scope.subOrders[i].statusName = '未开始';
-                        $scope.subOrders[i].showAction = false;
                     }
+                    if ($scope.order.orderType == 0) {
+                        $scope.subOrders[i].statusName = '已关闭';
+                    }
+
                 }
 
 
@@ -210,39 +218,65 @@ app.controller('orderDetailController', function ($scope, remoteApiService, comm
         return output;
     };
     $scope.addToConfirmingSKU_List = function(index){
-        if($scope.ConfirmingSKUIds.length == 0){
-            $scope.ConfirmingSKUIds.push($scope.ConfirmingSKUs[index]._id);
+        if($scope.ConfirmingSKU_refs.length == 0){
+            $scope.ConfirmingSKU_refs.push($scope.ConfirmingSKUs[index].ref);
         }else{
             var hasExsited = false;
-            for(var i in $scope.ConfirmingSKUIds){              //如果已在$scope.ConfirmingSKUs就剔除
-                if($scope.ConfirmingSKUs[index]._id == $scope.ConfirmingSKUIds[i]){
-                    $scope.ConfirmingSKUIds.splice(i, 1);
+            for(var i in $scope.ConfirmingSKU_refs){              //如果已在$scope.ConfirmingSKUs就剔除
+                if($scope.ConfirmingSKUs[index].ref == $scope.ConfirmingSKU_refs[i]){
+                    $scope.ConfirmingSKU_refs.splice(i, 1);
                     hasExsited = true;
                 }
             }
             if(!hasExsited){
-                $scope.ConfirmingSKUIds.push($scope.ConfirmingSKUs[index]._id); //不在时就加入$scope.ConfirmingSKUs
+                $scope.ConfirmingSKU_refs.push($scope.ConfirmingSKUs[index].ref); //不在时就加入$scope.ConfirmingSKUs
             }
         }
     };
     $scope.checkConfirmingSKU_List = function(index){
-        if($scope.ConfirmingSKUIds.indexOf($scope.ConfirmingSKUs[index]._id )!=-1){
+        if($scope.ConfirmingSKU_refs.indexOf($scope.ConfirmingSKUs[index].ref )!=-1){
             return true;
         }else{
             return false;
         }
     };
     $scope.confirmSKU = function(){
-        //remoteApiService.confirmSKU($scope.ConfirmingOrderIds,$scope.ConfirmingSKUIds.join())
-        //    .then(function(data) {
-        //        $scope.ConfirmingOrderIds = null;
-        //        if(data.code == 1000){
-        //            sweetalert('该商品确认收货成功',window.location.pathname);
-        //        }else{
-        //            sweetalert('确认收货失败',window.location.pathname);
-        //        }
-        //    });
-        sweetalert('该商品确认收货成功',window.location.pathname+"?id="+$scope.order.id);
-        //$scope.ConfirmingOrderIds = null;
+        if($scope.ConfirmingSKU_refs.length>0){
+            remoteApiService.confirmSKU($scope.id,$scope.ConfirmingSKU_refs)
+                .then(function(data) {
+                    $scope.ConfirmingOrderIds = null;
+                    if(data.code == 1000){
+                        sweetalert('收货成功',window.location.pathname+"?id="+$scope.id);
+                    }else{
+                        sweetalert('确认收货失败',window.location.pathname+"?id="+$scope.id);
+                    }
+                });
+        }
     };
+    $scope.ConfirmingSKU_number = function(){   //计算被算中的确认收货的SKU的数量
+        var resultNum = 0;
+        $scope.ConfirmingSKU_refs.forEach(function(SKU_ref){
+            if($scope.ConfirmingSKUs){
+                for(var i in $scope.ConfirmingSKUs){
+
+                    if($scope.ConfirmingSKUs.hasOwnProperty(i)){
+                        if(SKU_ref == $scope.ConfirmingSKUs[i].ref){
+                            resultNum = resultNum + $scope.ConfirmingSKUs[i].count;
+                        }
+                    }
+                }
+            }
+        });
+        return resultNum;
+    };
+    $scope.calculateTotalAdditionsPrice = function(additions){
+        var totalAdditionsPrice = 0;
+        for(var i in additions){
+            if(additions.hasOwnProperty(i)){
+                totalAdditionsPrice = totalAdditionsPrice + Number(additions[i].price?additions[i].price:0);
+            }
+        }
+        return Number(totalAdditionsPrice.toFixed(2));
+    };
+
 });

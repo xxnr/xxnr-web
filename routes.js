@@ -58,6 +58,7 @@ router.get('/api/v2.0/product/getAppProductDetails', controllers.Api_v1_0.getApp
 router.post('/api/v2.0/product/getAppProductDetails', controllers.Api_v1_0.getAppProductDetails);
 router.get('/api/v2.0/getMinPayPrice', middleware.isLoggedIn_middleware, controllers.Api_v1_0.getMinPayPrice);
 router.post('/api/v2.0/getMinPayPrice', middleware.isLoggedIn_middleware, controllers.Api_v1_0.getMinPayPrice);
+router.post('/api/v2.1/ISOupgrade', controllers.Api_v1_0.ISOUpgrade);
 
 // order APIs
 router.get('/api/v2.0/order/getOderList', middleware.isLoggedIn_middleware, controllers.Order.getOrders);
@@ -84,6 +85,22 @@ router.post('/app/order/getOderList', middleware.isLoggedIn_middleware, controll
 router.get('/api/v2.0/news', controllers.News.json_news_query);
 router.get('/api/v2.0/news/categories', controllers.News.json_news_categories);
 router.get('/api/v2.0/news/:id', controllers.News.json_news_read);
+
+// product APIs
+router.get('/api/v2.1/brands', controllers.Product.getBrands);
+router.get('/api/v2.1/products', controllers.Product.json_products_get);
+router.get('/api/v2.1/product/getProductsListPage', controllers.Product.getProductsListPage);
+router.post('/api/v2.1/product/getProductsListPage', controllers.Product.getProductsListPage);
+router.get('/api/v2.1/products/attributes', controllers.Product.json_products_attributes);
+router.post('/api/v2.1/SKU/attributes_and_price/query', controllers.Product.json_SKU_Attributes_query);
+router.get('/api/v2.1/SKU/get', controllers.Product.json_SKU_get);
+
+// cart APIs
+router.get('/api/v2.1/cart/getShoppingCart', middleware.isLoggedIn_middleware, controllers.Cart.getShoppingCart);
+router.post('/api/v2.1/cart/addToCart', middleware.isLoggedIn_middleware, controllers.Cart.updateShoppingCart);
+router.post('/api/v2.1/cart/changeNum', middleware.isLoggedIn_middleware, controllers.Cart.updateShoppingCart);
+router.post('/api/v2.1/cart/getShoppingCartOffline', controllers.Cart.getShoppingCartOffline);
+router.post('/api/v2.2/cart/getDeliveries', middleware.isLoggedIn_middleware, controllers.Cart.getSKUDeliveries);
 
 // user APIs
 router.get('/api/v2.0/user/login', controllers.User.process_login);

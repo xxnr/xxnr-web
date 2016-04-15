@@ -9,14 +9,17 @@ var UserSchema = new mongoose.Schema({
     "datecreated": {type: Date, default: Date.now},                         // 注册时间
     "nickname": String,                                                     // 用户昵称
     "name": String,                                                         // 用户名称
+    "namePinyin":{type:String, default: '#'},                               // 姓名汉语拼音
+    "nameInitial":{type:String, default: '#'},                              // 姓名汉语拼音首字母
+    "nameInitialType":{type:Number, default: 2},                            // 姓名汉语拼音首字母类型 1:字母(a-z-A-Z) 2:其他符号
     "type": {type: String, default:"1"},                                    // 用户类型 1：其他 2：种植大户 3：村级经销商 4：乡镇经销商 5：县级经销商 it"s configured in config file right now
-    "typeVerified": [{type: String}],                                         // 认证类型
+    "typeVerified": [{type: String}],                                       // 认证类型
     "sex": {type: Boolean, default:false},                                  // 性别 0：男 1：女
     "photo": String,                                                        // 用户头像
     "regmethod": Boolean,                                                   // 注册方式 0：手机 1：web
     "score": Number,                                                        // 用户积分
     "inviterId": String,                                                    // 邀请人id
-    inviter:{type:mongoose.Schema.ObjectId, ref:"user"},                    // 邀请人
+    "inviter":{type:mongoose.Schema.ObjectId, ref:"user"},                  // 邀请人
     "dateinvited" : Date,                                                   //邀请时间
     "webLoginId" : String,                                                  // web login id
     "appLoginId" : String,                                                  // app login id
@@ -58,24 +61,27 @@ var UserSchema = new mongoose.Schema({
 });
 
 var PotentialCustomerSchema = new mongoose.Schema({
-    "user":{type:mongoose.Schema.ObjectId, ref:"user"},  // 用户 reference
-    "name":{type:String, required:true},                // 姓名
-    "phone":{type:String, required:true},              // 手机号码
-    "sex":{type:Boolean, default:false},              // 性别 0：男 1：女
-    "address":{                                         // 用户所在地
+    "user":{type:mongoose.Schema.ObjectId, ref:"user"},     // 用户 reference
+    "name":{type:String, required:true},                    // 姓名
+    "namePinyin":{type:String, default: '#'},               // 姓名汉语拼音
+    "nameInitial":{type:String, default: '#'},              // 姓名汉语拼音首字母
+    "nameInitialType":{type:Number, default: 2},            // 姓名汉语拼音首字母类型 1:字母(a-z-A-Z) 2:其他符号
+    "phone":{type:String, required:true},                   // 手机号码
+    "sex":{type:Boolean, default:false},                    // 性别 0：男 1：女
+    "address":{                                             // 用户所在地
         province:{type:mongoose.Schema.ObjectId, ref:"province"},
         city:{type:mongoose.Schema.ObjectId, ref:"city"},
         county:{type:mongoose.Schema.ObjectId, ref:"county"},
         town:{type:mongoose.Schema.ObjectId, ref:"town"}
     },
-    "buyIntentions":[{type:mongoose.Schema.ObjectId, ref:"intention_product"}],                           // 购买意向商品
-    "remarks":{type:String},                             // 备注
-    "dateTimeAdded":{type:Date, default:Date.now},      // 添加时间
-    "dateAdded":{type:String},                            // 添加日期(北京时间)
-    "isRegistered":{type:Boolean, default:false},         // 是否注册
+    "buyIntentions":[{type:mongoose.Schema.ObjectId, ref:"intention_product"}],     // 购买意向商品
+    "remarks":{type:String},                                // 备注
+    "dateTimeAdded":{type:Date, default:Date.now},          // 添加时间
+    "dateAdded":{type:String},                              // 添加日期(北京时间)
+    "isRegistered":{type:Boolean, default:false},           // 是否注册
     "dateTimeRegistered":{type:Date},                       // 注册时间
-    "isBinded":{type:Boolean, default:false},           // 是否绑定该经纪人
-    "dateTimeBinded":{type:Date}                           // 绑定该经纪人时间
+    "isBinded":{type:Boolean, default:false},               // 是否绑定该经纪人
+    "dateTimeBinded":{type:Date}                            // 绑定该经纪人时间
 });
 
 var IntentionProductSchema = new mongoose.Schema({
@@ -87,12 +93,14 @@ var IntentionProductSchema = new mongoose.Schema({
 UserSchema.index({account:"text", nickname:"text", name:"text"});
 UserSchema.index({type:1});
 UserSchema.index({name:1});
+UserSchema.index({inviter:1, nameInitialType:1, namePinyin:1, dateinvited:-1});
 UserSchema.index({'RSCInfo.products':1});
 
 PotentialCustomerSchema.index({"phone":1, unique:true});
-PotentialCustomerSchema.index({"user":1, "dateAdded":1, "dateTimeAdded":1});
+PotentialCustomerSchema.index({"user":1, "dateAdded":1, "nameInitialType":1, "namePinyin":1, "dateTimeAdded":-1});
 PotentialCustomerSchema.index({"user":1, "isRegistered":1, "isBinded":1});
-PotentialCustomerSchema.index({"dateTimeAdded":1});
+PotentialCustomerSchema.index({"dateTimeAdded":-1});
+PotentialCustomerSchema.index({"nameInitialType":1, "namePinyin":1});
 
 IntentionProductSchema.index({"name":1, unique:true});
 

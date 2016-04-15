@@ -83,9 +83,9 @@
             </div>
             <div class="order clearfix">
                 <div class="order-info">
-                    <span class="order-number ng-cloak" ng-cloak>订单号:{{order.id}}</span>
+                    <span class="order-number ng-cloak" ng-cloak>订单号：{{order.id}}</span>
                     <!--<span class="order-time" ng-cloak>{{order.createTime_local}}</span>-->
-                    <span class="order-statusName ng-cloak" ng-cloak>订单状态:
+                    <span class="order-statusName ng-cloak" ng-cloak>订单状态：
                         <span ng-class="{true:'payOrange'}[order.payStatus!=2]">{{order.orderStatus.value}}</span>
                     </span>
                     <span class="pickup" ng-show="pickupDeliveryCode">自提码：
@@ -98,7 +98,7 @@
                             <ul>
                                 <li ng-show="order.dateCreated">下单时间：{{order.dateCreated}}</li>
                                 <li ng-show="order.datePaid">付款时间：{{order.datePaid}}</li>
-                                <li ng-show="order.dateDelivered">发货时间：{{order.dateDelivered}}</li>
+                                <li ng-show="order.datePendingDeliver">发货时间：{{order.datePendingDeliver}}</li>
                                 <li ng-show="order.dateCompleted">完成时间：{{order.dateCompleted}}</li>
                             </ul>
                         </div>
@@ -135,12 +135,12 @@
                                     <li class="ng-clock">{{subOrder.type | subOrderTypeToChineseWording}}</li>
                                     <li class="ng-clock">{{(subOrder.price) | toNumberFixedTwo}}</li>
                                     <li class="ng-clock">{{subOrder.paidPrice | toNumberFixedTwo}}</li>
-                                    <li class="ng-clock" ng-class="{true:'payOrange'}[subOrder.payStatus != 2]">
+                                    <li class="ng-clock" ng-class="{true:'payOrange'}[subOrder.payStatus != 2 && order.orderType != 0]">
                                         <span>{{subOrder.statusName}}</span>
                                     </li>
                                     <li class="ng-clock">{{subOrder.payType | payTypeToChineseWording}}</li>
                                     <li>
-                                        <div ng-show="subOrder.showAction && order.paySubOrderType == subOrder.type || subOrder.showAction && !order.paySubOrderType &&  order.orderStatus.type != 5 && order.orderStatus.type != 4 && order.orderStatus.type != 3 && order.orderStatus.type != 6" class="orderOptions">
+                                        <div ng-show="subOrder.showAction && order.paySubOrderType == subOrder.type || subOrder.showAction && !order.paySubOrderType && order.orderStatus.type == (1 || 2)" class="orderOptions">
                                             <a href="" ng-click='order.action()' class="action_btn ng-cloak">{{order.actionName}}</a>
                                             <a href='' ng-click='order.modifyPay()' ng-show="order.modifyPay" class="modify-paymethod-actionName action_btn">修改付款方式</a>
                                         </div>
@@ -220,7 +220,7 @@
                                                         </div>
                                                     </li>
                                                     <li class="p-delivery ng-cloak">
-                                                        {{product.deliverStatus | deliverStatusToChineseWording}}
+                                                        {{product.deliverStatus | RSCdeliverStatusToChineseWording}}
                                                     </li>
                                                     <li class="p-price ng-cloak">
                                                         <p ng-if="product.attributes" ng-cloak>￥ {{product.price}}</p>
@@ -252,7 +252,7 @@
                                                     <div ng-if="!product.attributes" class="pay-step-1"><span class="text-info">阶段一：订金</span><span class="pay-step-1-price">￥ {{(product.deposit*product.goodsCount).toFixed(2)}}</span></div>
                                                     <div ng-if="!product.attributes" class="pay-step-2"><span class="text-info">阶段二：尾款</span><span class="pay-step-2-price">￥ {{((product.unitPrice - product.deposit)*product.goodsCount).toFixed(2)}}</span></div>
                                                     <div ng-if="product.attributes" ng-class="{true:'hasAdditions'}[product.additions!='']" class="pay-step-1"><span class="text-info">阶段一：订金</span><span class="pay-step-1-price">￥ {{product.deposit*product.count | toNumberFixedTwo}}</span></div>
-                                                    <div ng-if="product.attributes" class="pay-step-2"><span class="text-info">阶段二：尾款</span><span class="pay-step-2-price">￥ {{(product.price-product.deposit)*product.count | toNumberFixedTwo}}</span></div>
+                                                    <div ng-if="product.attributes" class="pay-step-2"><span class="text-info">阶段二：尾款</span><span class="pay-step-2-price">￥ {{(product.price-product.deposit + product.totalAdditionsPrice)*product.count | toNumberFixedTwo}}</span></div>
                                                     <!-- <span class="product_count">{{product.count}}</span> -->
                                                 </div>
                                             </li>
@@ -295,7 +295,7 @@
         </div>
         <div class="SKUs">
             <div class="SKU" ng-repeat="SKU in ConfirmingSKUs" ng-click="addToConfirmingSKU_List($index)" ng-class="{true:'selected'}[checkConfirmingSKU_List($index)]">
-                <img ng-src="{{SKU.thumbnail}}" alt="">
+                <img ng-src="{{SKU.imgs}}" alt="">
                 <div class="SKU_info">
                     <p><span class="SKU_title">{{SKU.shortName}}</span><span class="SKU_count">×{{SKU.count}}</span></p>
                     <p>
@@ -310,7 +310,7 @@
             </div>
         </div>
         <div class="buttons">
-            <a href="" class="button confirm_btn" ng-class="{true:'SKUchecked'}[ConfirmingSKUIds.length > 0]" ng-disable="ConfirmingSKUIds.length==0" ng-click="confirmSKU()">确定（{{ConfirmingSKUIds.length}}）</a>
+            <a href="" class="button confirm_btn" ng-class="{true:'SKUchecked'}[ConfirmingSKU_refs.length > 0]" ng-click="confirmSKU()">确定（{{ConfirmingSKU_number()}}）</a>
             <a href="" class="button cancel_bth" ng-click="closePop()">取消</a>
         </div>
     </div>

@@ -50,8 +50,20 @@ UserService.prototype.update = function(options, callback) {
     var setValue = {};
     if (options.password)
         setValue.password = bcrypt.hashSync(options.password);
-    if (options.name)
+    if (options.name) {
         setValue.name = options.name;
+        var nameResult = tools.stringPinyin({'str':options.name});
+        if (nameResult) {
+            if (nameResult.error)
+                console.error('UserService update name stringPinyin error:', nameResult.error, options.name);
+            if (nameResult.strPinyin)
+                setValue.namePinyin = nameResult.strPinyin;
+            if (nameResult.initial)
+                setValue.nameInitial = nameResult.initial;
+            if (nameResult.initialType)
+                setValue.nameInitialType = nameResult.initialType;
+        }
+    }
     if (options.regMethod)
         setValue.regmethod = options.regMethod;
     if (options.nickname)
@@ -249,6 +261,28 @@ UserService.prototype.increaseScore = function(options, callback){
     })
 };
 
+UserService.prototype.getInviteeOrderbynamePinyin = function(options, callback) {
+    if (!options._id) {
+        callback('_id required');
+        return;
+    }
+
+    UserModel.find({inviter: options._id})
+        .sort({nameInitialType:1, namePinyin:1, dateinvited:-1})
+        .lean()
+        .exec(function(err, docs) {
+            if (err) {
+                console.error('User Service getInviteeOrderbynamePinyin error:', err);
+                callback('获取新农客户失败');
+            }
+
+            var data = {};
+            data.count = docs?docs.length:docs;
+            data.items = docs;
+            callback(null, data);
+        });
+};
+
 UserService.prototype.getInvitee = function(options, callback) {
     if (!options._id) {
         callback('_id required');
@@ -304,7 +338,12 @@ UserService.prototype.getOneInvitee = function(options, callback) {
         return;
     }
 
-    UserModel.findOne({inviter: options._id, id:options.inviteeId}, function(err, doc) {
+    UserModel.findOne({inviter: options._id, id:options.inviteeId})
+        .populate({path: 'address.province', select: ' -__v'})
+        .populate({path: 'address.city', select: ' -__v'})
+        .populate({path: 'address.county', select: ' -__v'})
+        .populate({path: 'address.town', select: ' -__v'})
+        .exec(function(err, doc) {
         if (err) {
             console.error('User Service getOneInvitee error:', err);
             callback('获取新农客户失败');

@@ -69,8 +69,8 @@ module.exports = function(req, res, next){
         var callbackName = req.data.callback;
         callbackName ? res.jsonp(data, callbackName) : res.json(data);
 
-        if (this.auditInfo) {
-            AuditService.saveLog(this.auditInfo, arguments);
+        if (req.auditInfo) {
+            AuditService.saveLog(req.auditInfo, arguments);
         }
     };
 

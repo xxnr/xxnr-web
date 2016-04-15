@@ -54,7 +54,7 @@ var schema = new mongoose.Schema({
 		'dateConfirmed':Date,														// 用户确认收货时间
 		'dateRSCReceived':Date,														// 货物已到服务站的时间
 		'backendUser':{type: mongoose.Schema.ObjectId, ref:'backenduser'},			// 设置本条信息的后台用户
-		'backendUserAccount':{type: String},										// 设置本条信息的后台用户账户
+		'backendUserAccount':{type: String}											// 设置本条信息的后台用户账户
 	}],
 	'payStatus': {type:Number, required:true, default: PAYMENTSTATUS.UNPAID},		// 主订单付款状态，从子订单付款状态统计得来 分为未付款、部分付款、已付款三种，只用来做查询
 	'datePaid': Date,
@@ -82,6 +82,8 @@ var schema = new mongoose.Schema({
 		'thirdPartyRecorded': {type:Boolean, default:false},						// 本支付是否在第三方支付平台生成
 		'backendUser':{type: mongoose.Schema.ObjectId, ref:'backenduser'},			// 设置本条信息的后台用户
 		'backendUserAccount':{type: String},										// 设置本条信息的后台用户账户
+		'RSC':{type:mongoose.Schema.ObjectId, ref:'user'},							// 支付时的相关RSC
+		'RSCCompanyName':{type: String}												// 支付时的相关RSC公司名
 	}],
 	'subOrders': [{
 	    'id': {type: String, index: true, unique: true, required: true},			// 子订单ID

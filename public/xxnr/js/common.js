@@ -129,10 +129,28 @@ app.service('commonService', function($q, $http, BaseUrl, loginService) {
 
     this.sweetalert = sweetalert;
 
+
+    /*************************************************************************************************
+     **                              time convert method                                            **
+     *************************************************************************************************/
+
     this.parseDate = function(str) {
         return Date.parse(
             str.replace(/-/g, "/").replace('T', ' ').substr(0, str.indexOf('.')) +
             ((str[str.length - 1] >= '0' && str[str.length - 1] <= '9') ? '' : str[str.length - 1]));
+    };
+    this.convertDateIncludeHMM = function (dataStr) {
+        var d = Date.fromISO(dataStr);
+        // console.log(d);
+        var output = d.getFullYear().toString() + '-' + this.timeStringExtendZero((d.getMonth() + 1).toString()) + '-' + this.timeStringExtendZero(d.getDate().toString()) + ' ' + d.getHours().toString() + ':' + this.timeStringExtendZero(d.getMinutes().toString()) + ':' + this.timeStringExtendZero(d.getSeconds().toString());
+        return output;
+    };
+    this.timeStringExtendZero = function (timeString) {
+        if (timeString.length < 2) {
+            return '0' + timeString;
+        } else {
+            return timeString;
+        }
     };
 
 });
@@ -271,6 +289,28 @@ app.filter('deliverStatusToChineseWording', function() {
         return input = output;
     };
 });
+app.filter('RSCdeliverStatusToChineseWording', function() {
+    return function(input) {
+        var output = "";
+        switch (input) {
+            case 1:
+                output = "未发货";
+                break;
+            case 2:
+                output = "配送中";
+                break;
+            case 4:
+                output = "已到服务站";
+                break;
+            case 5:
+                output = "已收货";
+                break;
+            default:
+                output = "其他";
+        }
+        return input = output;
+    };
+});
 
 app.filter('payTypeToChineseWording', function() {
     return function(input) {
@@ -331,8 +371,18 @@ app.filter('payStatusToChineseText', function() {
 });
 app.filter('toNumberFixedTwo', function() {
     return function(input) {
-        var output = Number(input).toFixed(2);
-        return output;
+        if(input){
+            var output = Number(input).toFixed(2);
+            return output;
+        }
+    };
+});
+app.filter('appendDotToLongName36', function() {
+    return function(input) {
+        if(input){
+            var output = input.length > 36 ? (input.substr(0, 33) + '...') : input;
+            return output;
+        }
     };
 });
 
@@ -425,28 +475,19 @@ app.service('hostnameService', function() {
  **                              Array prototype method                                         **
  *************************************************************************************************/
 
-// check if an element exists in array using a comparer function
-// comparer : function(currentElement)
-Array.prototype.inArray = function(comparer) {
-    for(var i=0; i < this.length; i++) {
-        if(comparer(this[i])) return true;
-    }
-    return false;
-};
-
-// adds an element to the array if it does not already exist using a comparer
-// function
-Array.prototype.pushIfNotExist = function(element, comparer) {
-    if (!this.inArray(comparer)) {
-        this.push(element);
-    }
-};
-
-// adds an element to the array if it does not already exist using a comparer
-// function
-Array.prototype.pushIfNotExist = function(element, comparer) {
-    if (!this.inArray(comparer)) {
-        this.push(element);
-    }
-};
-
+//// check if an element exists in array using a comparer function
+//// comparer : function(currentElement)
+//Array.prototype.inArray = function(comparer) {
+//    for(var i=0; i < this.length; i++) {
+//        if(comparer(this[i])) return true;
+//    }
+//    return false;
+//};
+//
+//// adds an element to the array if it does not already exist using a comparer
+//// function
+//Array.prototype.pushIfNotExist = function(element, comparer) {
+//    if (!this.inArray(comparer)) {
+//        this.push(element);
+//    }
+//};

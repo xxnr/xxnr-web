@@ -160,16 +160,16 @@ exports.backend_auth = function(req, res, next, options, controller){
  * @param options
  * @param controller
  */
-exports.isInWhiteList_middleware = function(req, res, next, options, controller) {
+exports.isInWhiteList_middleware = function(req, res, next) {
     var token = null;
     // check if token is valid
-    var data = req.method === 'GET' ? controller.query : controller.body;
+    var data = req.data;
     if (data.token) {
         // if data contains token
         // it means the request is from app
         token = data.token;
-    } else if (controller.req.cookie(F.config.tokencookie)) {
-        token = controller.req.cookie(F.config.tokencookie);
+    } else if (req.cookies[F.config.tokencookie]) {
+        token = req.cookies[F.config.tokencookie];
     }
 
     if (!token) {
@@ -201,7 +201,7 @@ exports.isInWhiteList_middleware = function(req, res, next, options, controller)
 
                         if (data) {
                             user.inWhiteList = true;
-                            controller.user = user;
+                            req.user = user;
                         }
                         next();
                     });
@@ -221,17 +221,17 @@ exports.isInWhiteList_middleware = function(req, res, next, options, controller)
     }
 };
 
-exports.isXXNRAgent_middleware = function(req, res, next, options, controller){
-    var user = controller.user;
+exports.isXXNRAgent_middleware = function(req, res, next){
+    var user = req.user;
     if(!user){
         console.error('need login first');
-        controller.respond({code:1401, message:'请先登录'});
+        res.respond({code:1401, message:'请先登录'});
         return;
     }
 
     UserService.isXXNRAgent(user, function(err, isXXNRAgent){
         if(err || !isXXNRAgent){
-            controller.respond({code:1403, message:'您没有权限这样操作'});
+            res.respond({code:1403, message:'您没有权限这样操作'});
             return;
         }
 
@@ -249,7 +249,7 @@ exports.isXXNRAgent_middleware = function(req, res, next, options, controller){
  */
 exports.auditing_middleware = function(req, res, next) {
     try {
-        AuditService.generateAuditInfo(req.url, req.method, req.ip, req.user, req.body);
+        req.auditInfo = AuditService.generateAuditInfo(req.url, req.method, req.ip, req.user, req.data);
         next();
     } catch(e) {
         // auditing fail
@@ -281,17 +281,17 @@ exports.throttle = function(req, res, next){
     })
 };
 
-exports.isRSC_middleware = function(req, res, next, options, controller){
-    var user = controller.user;
+exports.isRSC_middleware = function(req, res, next){
+    var user = req.user;
     if(!user){
         console.error('need login first');
-        controller.respond({code:1401, message:'请先登录'});
+        res.respond({code:1401, message:'请先登录'});
         return;
     }
 
     UserService.isRSC(user, function(err, isRSC){
         if(err || !isRSC){
-            controller.respond({code:1403, message:'您没有权限这样操作'});
+            res.respond({code:1403, message:'您没有权限这样操作'});
             return;
         }
 

@@ -106,10 +106,14 @@
                     </p>
                     <p>地区：{{user.address}}</p>
                     <p class="type">类型：{{user.type}}
-                        <a href="applyCountyVerified.html">
-                            <img class="huizhang" ng-if="user.isVerified" src="images/huiyuan.png" alt="" />
-                            <img class="huizhang" ng-if="!user.isVerified && user.RSCInfoVerifing" src="images/badge_gray.png" alt="" />
+                        <a href="applyCountyVerified.html" ng-if="user.isVerified && user.typeNum == 5">
+                            <img class="huizhang"  src="images/huiyuan.png" alt="" />
                         </a>
+                        <a href="applyCountyVerified.html" ng-if="!user.isVerified && user.RSCInfoVerifing && user.typeNum == 5">
+                            <img class="huizhang" src="images/badge_gray.png" alt="" />
+                        </a>
+                        <img class="huizhang" ng-if="user.isVerified && user.typeNum == 6"  src="images/huiyuan.png" alt="" />
+
                         <a href="fillProfile.html" class="modifyInfo">修改资料</a>
                         <a href="applyCountyVerified.html" class="applyVerified" ng-if="!user.isRSC && !user.RSCInfoVerifing && user.typeNum == 5">申请认证</a>
                     </p>
@@ -121,7 +125,7 @@
             </div>
             <div class="jifen">
                 <p>
-                    <span class="total">积分 :&nbsp;</span><span class="num" ng-cloak>{{user.points}}</span>
+                    <span class="total">积分 ：</span><span class="num" ng-cloak>{{user.points}}</span>
                 </p>
 
                 <!--<div class="jifen_input">-->
@@ -132,10 +136,18 @@
                 <!--</div>-->
                 <div class="subSections">
                     <div class="subSection invitation_btn">
-                        <a href="invitationCenter.html">
+                        <a href="invitationCenter.html" class="clearfix">
                             <img src="images/farmer_behalf.png" alt="" />
                             <p>
                                 新农代表
+                            </p>
+                        </a>
+                    </div>
+                    <div ng-if="user.isVerifiedRSC" class="subSection RSC_btn">
+                        <a href="rsc_management.html" class="clearfix">
+                            <img src="images/RSC-icon.png" alt="" />
+                            <p>
+                                我的网点
                             </p>
                         </a>
                     </div>
@@ -160,7 +172,7 @@
                         <div class="single-order clearfix" ng-repeat="order in orderList | orderBy:'+createTime':true">
                             <div class="order-info">
                                 <span class="order-time" ng-cloak>{{order.createTime_local}}</span>
-                                <span class="order-number ng-cloak">订单号:{{order.id}}</span>
+                                <span class="order-number ng-cloak">订单号：{{order.id}}</span>
                                 <span class="order-delivery-method ng-cloak">{{order.order.deliveryType.value}}</span>
                             </div>
                             <div class="row clearfix">
@@ -183,7 +195,7 @@
                                                         <div class="p-skus clearfix" ng-if="product.attributes">
                                                             <ul>
                                                                 <li ng-repeat="attribute in product.attributes">
-                                                                    {{attribute.name}}: {{attribute.value}};&nbsp;
+                                                                    {{attribute.name}}：{{attribute.value}};&nbsp;
                                                                 </li>
 
                                                             </ul>
@@ -216,8 +228,8 @@
                                                     </div>
                                                 </div>
                                                 <div class="pay-step" ng-show="{{product.deposit>0}}">
-                                                    <div class="pay-step-1"><span class="text-info">阶段一：订金</span><span class="pay-step-1-price">¥ {{product.deposit | fixedTwo}}</span><span class="right">{{product.count}}</span></div>
-                                                    <div class="pay-step-2"><span class="text-info">阶段二：尾款</span><span class="pay-step-2-price">¥ {{ product.price - product.deposit + product.totalAdditionsPrice | fixedTwo}}</span><span class="right">{{product.count}}</span></div>
+                                                    <div class="pay-step-1"><span class="text-info">阶段一：订金</span><span class="pay-step-1-price">¥ {{product.deposit | fixedTwo}}</span><span class="count">{{product.count}}</span></div>
+                                                    <div class="pay-step-2"><span class="text-info">阶段二：尾款</span><span class="pay-step-2-price">¥ {{ product.price - product.deposit + product.totalAdditionsPrice | fixedTwo}}</span><span class="count">{{product.count}}</span></div>
                                                 </div>
                                             </div>
                                         </li>
@@ -368,17 +380,17 @@
                     <p><span class="SKU_title">{{SKU.shortName}}</span><span class="SKU_count">×{{SKU.count}}</span></p>
                     <p>
                         <span class="SKU_attribute" ng-repeat="attribute in SKU.attributes">
-                            {{attribute.name}}: {{attribute.value}};&nbsp;
+                            {{attribute.name}}：{{attribute.value}};&nbsp;
                         </span>
                     </p>
-                    <p ng-show="SKU.addition">
-                        <span class="SKU_addition" ng-repeat="attribute in SKU.attributes">附加项目：{{SKU.addition.name}}&nbsp;</span>
+                    <p ng-show="SKU.additions">
+                        <span class="SKU_addition" ng-repeat="addition in SKU.additions">附加项目：{{addition.name}}&nbsp;</span>
                     </p>
                 </div>
             </div>
         </div>
         <div class="buttons">
-            <a href="" class="button confirm_btn" ng-class="{true:'SKUchecked'}[ConfirmingSKUIds.length > 0]" ng-disable="ConfirmingSKUIds.length==0" ng-click="confirmSKU()">确定（{{ConfirmingSKUIds.length}}）</a>
+            <a href="" class="button confirm_btn" ng-class="{true:'SKUchecked'}[ConfirmingSKU_refs.length > 0]" ng-click="confirmSKU()">确定（{{ConfirmingSKU_number()}}）</a>
             <a href="" class="button cancel_bth" ng-click="closePop()">取消</a>
         </div>
     </div>
@@ -405,7 +417,7 @@
                         <p><span class="SKU_title">{{SKU.shortName}}</span><span class="SKU_count">×{{SKU.count}}</span></p>
                         <p>
                         <span class="SKU_attribute" ng-repeat="attribute in SKU.attributes">
-                            {{attribute.name}}: {{attribute.value}};&nbsp;
+                            {{attribute.name}}：{{attribute.value}};&nbsp;
                         </span>
                         </p>
                         <p ng-show="SKU.additions">

@@ -6,3 +6,5 @@ exports.Api_v1_0 = require('./4.api-v1.0.js');
 exports.Order = require('./8.order.js');
 exports.News = require('./9.new.js');
 exports.User = require('./9.user.js');
+exports.Product = require('./C.product.js');
+exports.Cart = require('./D.cart.js');

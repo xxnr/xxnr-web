@@ -1,0 +1,710 @@
+<div class="filter">
+    <div class="container">
+        <div class="caption"><span class="fa fa-truck mr5"></span> @(订单详情)</div>
+        <div class="row">
+            <div class="col-md-3 col-sm-6 m">
+                <!--<div data-component="textbox" data-component-path="rsc.filter.search" data-placeholder="" data-control-icon="fa-search">@(网点名称/负责人/电话)</div>-->
+                <!--<div class="help" data-component="template" data-component-path="rsc.info"><script type="text/html">{{ count | pluralize(@('items','item','items','items')) }} / {{pages | pluralize(@('pages', 'page', 'pages', 'pages')) }}</script></div>-->
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container">
+    <div data-component="template" data-component-path="orderInfo" data-component-id="orderInfo">
+        <script type="text/html">
+            <div class="order-detail-title">@(订单信息)</div>
+            <div class="order-detail-con">
+                <div>订单状态： {{payStatus}} {{deliverStatus}}</div>
+                <div>订单号：{{id}}</div>
+                <div>下单时间：{{dateCreated | format('@(yyyy-MM-dd HH:mm:ss)')}}</div>
+                <div>总价：{{totalPrice | price(2)}}</div>
+                {{if isPhased}}
+                <div>订金：{{deposit | price(2)}}</div>
+                <div>尾款：{{totalPrice - deposit | price(2)}}</div>
+                {{fi}}
+                <div>待付金额：{{duePrice | price(2)}}</div>
+                <div>收货人：{{consigneeName}}</div>
+                <div>电话：{{consigneePhone}}</div>
+                {{if consigneeAddress}}
+                <div>地址：{{consigneeAddress}}</div>
+                {{fi}}
+            </div>
+        </script>
+    </div>
+    <div data-component="template" data-component-path="deliveryInfo" data-component-id="deliveryInfo">
+        <script type="text/html">
+            <div class="order-detail-title">@(配送信息)</div>
+            <div class="order-detail-con">
+                <div>配送方式：{{deliveryType}}</div>
+                {{if RSCInfo && RSCInfo.companyName}}
+                <div class="rsc-list-box">
+                    <div>服务站名称：{{RSCInfo.companyName}}</div>
+                    <div>服务站地址：{{RSCInfo.RSCAddress}}</div>
+                    <div>联系电话：{{RSCInfo.RSCPhone}}</div>
+                    <div id="order-rsc-edit">修改</div>
+                </div>
+                {{else}}
+                <button id="order-add-rsc">添加服务站</button>
+                {{fi}}
+            </div>
+        </script>
+    </div>
+    <div data-component="template" data-component-path="order">
+        <script type="text/html">
+            <div class="order-detail-title">@(支付信息)</div>
+        {{if subOrders}}
+        {{ if subOrders && subOrders.length > 0 }}
+        <div class="order-detail-con">
+            <table class="table table-bordered" border="0">
+                <tbody>
+                <tr>
+                    <td class="ui-center active">@(序号)</td>
+                    <td class="ui-center col-xs-2 active">@(支付内容)</td>
+                    <td class="ui-center col-xs-1 active">@(支付状态)</td>
+                    <td class="ui-center col-xs-1 active">@(应支付金额)</td>
+                    <td class="ui-center col-xs-1 active">@(已支付金额)</td>
+                    <td class="ui-center col-xs-1 active">@(未支付金额)</td>
+                    <td class="ui-center col-xs-1 active">@(已支付次数)</td>
+                    <td class="ui-center col-xs-1 active">@(总支付次数)</td>
+                    <td class="ui-center col-xs-1 active">@(关闭支付次数)</td>
+                    <td class="ui-center col-xs-2 active">@(最后一次支付时间)</td>
+                </tr>
+                {{ foreach s in subOrders }}
+                <tr>
+                    <td class="ui-center">{{ $index+1 }}</td>
+                    <td class="ui-center col-xs-2">
+                        {{ if s.type == 'deposit' }}
+                        阶段一：定金
+                        {{ else }}
+                        {{ if s.type == 'balance' }}
+                        阶段二：尾款
+                        {{ else }}
+                        {{ if s.type == 'full' }}
+                        订单金额
+                        {{ else }}
+                        其他
+                        {{ fi }}
+                        {{ fi }}
+                        {{ fi }}
+                    </td>
+                    <td class="ui-center col-xs-1">
+                        {{ if s.payStatus==1 }}
+                        <span class="mr5 red">未付款</span>
+                        {{ else }}
+                        {{ if s.payStatus==2 }}
+                        <span class="mr5 green">已付款</span>
+                        {{ else }}
+                        {{ if s.payStatus==3 }}
+                        <span class="mr5 red">部分付款</span>
+                        {{ else }}
+                        <span class="mr5 red">其他</span>
+                        {{ fi }}
+                        {{ fi }}
+                        {{ fi }}
+                    </td>
+                    <td class="ui-center col-xs-1" title="{{ s.price | price(2) }}">{{ s.price | price(2) }}</td>
+                    <td class="ui-center col-xs-1" title="{{ s.paidPrice | price(2) }}">{{ s.paidPrice | price(2) }}</td>
+                    <td class="ui-center col-xs-1" title="{{ (s.price - s.paidPrice) | toFixed(2) }}">{{ (s.price - s.paidPrice) | toFixed(2) }}</td>
+                    <td class="ui-center col-xs-1">{{ s.paidTimes }}</td>
+                    <td class="ui-center col-xs-1">{{ s.payments.length }}</td>
+                    <td class="ui-center col-xs-1">{{ s.closedTimes }}</td>
+                    <td class="ui-center col-xs-2">
+                        {{ if s.datePaid }}
+                        {{ s.datePaid | format('@(yyyy-MM-dd HH:mm:ss)') }}
+                        {{ else }}
+                        -
+                        {{ fi }}
+                    </td>
+                </tr>
+                {{ end }}
+                {{ else }}
+                <tr>
+                    <td class="ui-center col-xs-1 active">@(订单ID)</td>
+                    <td class="ui-center col-xs-1 active">@(支付ID)</td>
+                    <td class="ui-center col-xs-1 active">@(支付方式)</td>
+                    <td class="ui-center col-xs-1 active">@(支付状态)</td>
+                    <td class="ui-center col-xs-1 active">@(应支付金额)</td>
+                    <td class="ui-center col-xs-1 active">@(定金)</td>
+                    <td class="ui-center col-xs-1 active">@(尾款)</td>
+                    <td class="ui-center col-xs-1 active">@(支付完成时间)</td>
+                </tr>
+                <tr>
+                    <td class="ui-center col-xs-1">{{ id }}</td>
+                    <td class="ui-center col-xs-1">{{ paymentId }}</td>
+                    <td class="ui-center col-xs-1">
+                        {{ if payType }}
+                            {{ if payType==1 }}
+                            支付宝
+                            {{ else }}
+                                {{ if payType==2 }}
+                                银联
+                                {{ else }}
+                                其他
+                                {{ fi }}
+                            {{ fi }}
+                        {{ else }}
+                        -
+                        {{ fi }}
+                    </td>
+                    <td class="ui-center col-xs-1">
+                        {{ if payStatus==1 }}
+                        <span class="mr5 red">未付款</span>
+                        {{ else }}
+                        {{ if payStatus==2 }}
+                        <span class="mr5 green">已付款</span>
+                        {{ else }}
+                        {{ if payStatus==3 }}
+                        <span class="mr5 red">部分付款</span>
+                        {{ else }}
+                        <span class="mr5 red">其他</span>
+                        {{ fi }}
+                        {{ fi }}
+                        {{ fi }}
+                    </td>
+                    <td class="ui-center col-xs-1">{{ price | price(2) }}</td>
+                    <td class="ui-center col-xs-1">{{ deposit | price(2) }}</td>
+                    <td class="ui-center col-xs-1">{{ (price - deposit) | toFixed(2) }}</td>
+                    <td class="ui-center col-xs-1">
+                        {{ if datePaid }}
+                        {{ datePaid | format('@(yyyy-MM-dd HH:mm:ss)') }}
+                        {{ else }}
+                        -
+                        {{ fi }}
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        {{ fi }}
+        {{fi}}
+        </script>
+    </div>
+    <div data-component="template" data-component-path="order">
+        <script type="text/html">
+            {{ if subOrders && subOrders.length > 0 }}
+            <div class="order-detail-title">@(订单支付详情)</div>
+            <div class="order-detail-con" style="padding-bottom: 30px;position: relative;">
+                <table class="table table-bordered" border="0">
+                    <tbody>
+                    <tr>
+                        <td class="ui-center active">@(序号)</td>
+                        <td class="ui-center col-xs-1 active">@(支付内容)</td>
+                        <td class="ui-center col-xs-1 active">@(支付ID)</td>
+                        <td class="ui-center col-xs-1 active">@(笔数)</td>
+                        <td class="ui-center col-xs-1 active">@(支付金额)</td>
+                        <td class="ui-center col-xs-1 active">@(支付方式)</td>
+                        <td class="ui-center col-xs-1 active">@(支付状态)</td>
+                        <td class="ui-center col-xs-2 active">@(支付时间)</td>
+                        <td class="ui-center col-xs-2 active">@(支付网点)</td>
+                        <td class="ui-center col-xs-2 active">@(操作人)</td>
+                    </tr>
+                    {{ foreach p in paymentsList }}
+                    {{if p.payStatus == 2 || (order.payment && order.payment.id == p.id)}}
+                    <tr>
+                        <td class="ui-center">{{ $index+1 }}</td>
+                        <td class="ui-center col-xs-1">
+                            {{ if p.suborderType == 'deposit' }}
+                            阶段一：定金
+                            {{ else }}
+                                {{ if p.suborderType == 'balance' }}
+                                阶段二：尾款
+                                {{ else }}
+                                    {{ if p.suborderType == 'full' }}
+                                    全款
+                                    {{ else }}
+                                    其他
+                                    {{ fi }}
+                                {{ fi }}
+                            {{ fi }}
+                        </td>
+                        <td class="ui-center col-xs-1">{{ p.id }}</td>
+                        <td class="ui-center col-xs-1">第{{ p.slice }}笔</td>
+                        <td class="ui-center col-xs-1">{{ p.price | price(2) }}</td>
+                        <td class="ui-center col-xs-1">
+                            {{if p.payType && payTypes}}
+                            {{payTypes[p.payType]}}
+                            {{else}}
+                            -
+                            {{fi}}
+                        </td>
+                        <td class="ui-center col-xs-1">
+                            {{ if p.payStatus==1}}
+                                {{if order.payment && order.payment.id == p.id && ( p.payType == 3 || p.payType == 4) && order.orderStatus.type == 7}}
+                                    <span class="mr5 red">付款待审核</span>
+                                    <button id="confirm-offline-pay" payType="{{p.payType}}" paymentId="{{order.payment.id}}">审核付款</button>
+                                    <div id="confirm-offline-pay-box">
+                                        <div>请核对线下支付信息</div>
+                                        <div>
+                                            <div>收货人：{{consigneeName}}</div>
+                                            <div>付款金额：{{p.price}}</div>
+                                            <div>付款网点：
+                                                <select id="confirm-rsc-list">
+                                                    <option selected disabled hidden value=''>@(请选择服务站)</option>
+                                                    {{ foreach RSC in RSCs }}
+                                                    <option RSC="{{ RSC._id }}" value="{{RSC._id}}" companyName="{{RSC.RSCInfo.companyName}}" name="{{RSC.RSCInfo.name}}" phone="{{ RSC.RSCInfo.phone}}"
+                                                            {{if RSC.RSCInfo.companyAddress}}
+                                                            {{ if RSC.RSCInfo.companyAddress.province}}
+                                                            province="{{RSC.RSCInfo.companyAddress.province.name}}"
+                                                            {{ fi }}
+                                                            {{ if RSC.RSCInfo.companyAddress.city}}
+                                                            city="{{RSC.RSCInfo.companyAddress.city.name}}"
+                                                            {{ fi }}
+                                                            {{ if RSC.RSCInfo.companyAddress.county}}
+                                                            county="{{RSC.RSCInfo.companyAddress.county.name}}"
+                                                            {{ fi }}
+                                                            {{ if RSC.RSCInfo.companyAddress.town}}
+                                                            town="{{RSC.RSCInfo.companyAddress.town.name}}"
+                                                            {{ fi }}
+                                                            details="{{RSC.RSCInfo.companyAddress.details}}"
+                                                            {{ fi }}
+                                                            {{  if RSCInfo && RSC._id == RSCInfo.RSC }}selected{{ fi }}>
+                                                        {{ RSC.RSCInfo.companyName }}
+                                                    </option>
+                                                    {{ end }}
+                                                </select>
+                                            </div>
+                                            <div id="confirm-offline-pay-type">付款方式：
+                                                {{if offlinePayType}}
+                                                    {{foreach o in offlinePayType}}
+                                                        <span><label><input type="radio" {{if o.type == p.payType}}checked{{fi}} name="payType" value="{{o.type}}">{{o.name}}</label></span>
+                                                    {{end}}
+                                                {{fi}}
+                                            </div>
+                                            <div class="rsc-list-btn-box" style="margin-top: 20px;">
+                                                <button id="pay-confirm-btn" class="rsc-list-btn-l">确定</button>
+                                                <button id="pay-cancel-btn" class="rsc-list-btn-r">取消</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {{else}}
+                                    <span class="mr5 red">未付款</span>
+                                {{fi}}
+                            {{ else }}
+                                {{ if p.payStatus==2 }}
+                                    <span class="mr5 green">已付款</span>
+                                {{ else }}
+                                    <span class="mr5 red">其他</span>
+                                {{ fi }}
+                            {{ fi }}
+                        </td>
+                        <td class="ui-center col-xs-2">
+                            {{ if p.datePaid }}
+                            {{ p.datePaid | format('@(yyyy-MM-dd HH:mm:ss)') }}
+                            {{ else }}
+                            -
+                            {{ fi }}
+                        </td>
+                        <td class="ui-center col-xs-2">
+                            {{p.RSCCompanyName}}
+                        </td>
+                        <td class="ui-center col-xs-2">
+                            {{p.backendUserAccount}}
+                        </td>
+                    </tr>
+                    {{fi}}
+                    {{ end }}
+                    </tbody>
+                </table>
+            </div>
+            {{ fi }}
+        </script>
+    </div>
+    <div data-component="template" data-component-path="order">
+        <script type="text/html">
+            {{ if products && products.length > 0 }}
+            <div class="order-detail-title">@(商品信息)</div>
+            <div class="order-detail-con">
+                <div>
+                    <table class="table table-bordered" border="0">
+                        <tbody>
+                        <tr>
+                            <td class="ui-center hidden-xs active">@(序号)</td>
+                            <td class="ui-center col-xs-1 hidden-xs active">@(商品ID)</td>
+                            <td class="ui-center col-xs-3 hidden-xs active">@(商品名称)</td>
+                            <td class="ui-center col-xs-2 active">@(单价)</td>
+                            <td class="ui-center col-xs-2 active">@(订金)</td>
+                            <td class="ui-center col-xs-1 active">@(数量)</td>
+                            <td class="ui-center col-xs-2 active">@(发货状态)</td>
+                        </tr>
+                        {{ foreach p in products }}
+                        <tr>
+                            <td class="ui-center hidden-xs">{{ $index+1 }}</td>
+                            <td class="ui-center col-xs-1 hidden-xs">{{ p.id }}</td>
+                            <td class="ui-center col-xs-3 hidden-xs" title="{{ p.name }}">{{ p.name }}</td>
+                            <td class="ui-center col-xs-2">{{if p.price}}{{ p.price | price(2) }}{{fi}}</td>
+                            <td class="ui-center col-xs-2">{{if p.deposit}}{{ p.deposit | price(2) }}{{fi}}</td>
+                            <td class="ui-center col-xs-1">{{ p.count }}x</td>
+                            <td class="ui-center col-xs-2">
+                                {{if deliveryStatuses}}
+                                {{deliveryStatuses[p.deliverStatus]}}
+                                {{fi}}
+                            </td>
+                        </tr>
+                        {{ end }}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {{ fi }}
+        </script>
+    </div>
+    <div data-component="template" data-component-path="order">
+        <script type="text/html">
+            {{ if SKUs && SKUs.length > 0 }}
+            <div class="order-detail-title">@(商品SKU信息)</div>
+            <div class="order-detail-con">
+                <table class="table table-bordered" border="0">
+                    <tbody>
+                    <tr>
+                        <td class="ui-center hidden-xs active">@(序号)</td>
+                        <td class="ui-center col-xs-1 active">@(商品ID)</td>
+                        <td class="ui-center col-xs-3  active">@(商品名称)</td>
+                        <td class="ui-center col-xs-1 active">@(单价)</td>
+                        <td class="ui-center col-xs-1 active">@(订金)</td>
+                        <td class="ui-center col-xs-1 active">@(数量)</td>
+                        <td class="ui-center col-xs-1 active">@(合计)</td>
+                        <td class="ui-center col-xs-2 active">@(发货状态)</td>
+                        <td class="ui-center col-xs-2 active">@(操作)</td>
+                    </tr>
+                    {{ foreach s in SKUs }}
+                    <tr>
+                        <td class="ui-center hidden-xs">{{ $index + 1}}</td>
+                        <td class="ui-center col-xs-1">{{ s.productId }}</td>
+                        <td class="ui-center col-xs-3" title="{{ s.name }}">{{ s.name }}</td>
+                        <td class="ui-center col-xs-1">{{ s.price | price(2) }}</td>
+                        <td class="ui-center col-xs-1">{{ s.deposit | price(2) }}</td>
+                        <td class="ui-center col-xs-1">{{ s.count }}x</td>
+                        <td class="ui-center col-xs-1">{{ s.price * s.count}}</td>
+                        <td class="ui-center col-xs-2  deliver-status-hover"  style="position: relative;">
+                           {{if deliveryStatuses}}
+                                {{deliveryStatuses[s.deliverStatus]}}
+                           {{fi}}
+                            <div class="deliver-status-detail">
+                                <ul>
+                                    {{if !s.dateRSCReceived && !s.dateDelivered && !s.dateConfirmed}}
+                                        <li>暂无物流信息</li>
+                                    {{else}}
+                                        {{if s.dateRSCReceived}}
+                                            <li>发货到服务站</li>
+                                            <li>{{s.dateRSCReceived | format('@(yyyy-MM-dd HH:mm:ss)')}}</li>
+                                        {{fi}}
+                                        {{if s.dateDelivered && deliveryType == 2 && (s.deliverStatus == 2 || s.deliverStatus == 5)}}
+                                            <li>开始配送</li>
+                                            <li>{{s.dateDelivered | format('@(yyyy-MM-dd HH:mm:ss)')}}</li>
+                                        {{fi}}
+                                        {{if s.dateConfirmed && s.deliverStatus == 5}}
+                                            {{if order.deliveryType == 1}}
+                                            <li>商品已自提</li>
+                                            {{else}}
+                                            <li>配送完成</li>
+                                            {{fi}}
+                                            <li>{{s.dateConfirmed | format('@(yyyy-MM-dd HH:mm:ss)')}}</li>
+                                        {{fi}}
+                                    {{fi}}
+                                </ul>
+                            </div>
+                        </td>
+                        <td class="ui-center col-xs-2">
+                            {{if s.deliverStatus == 1}}
+                                <button SKURef="{{s.ref}}" deliveryType=4 class="change-status-btn">发货到服务站</button>
+                            {{else}}
+                                {{if s.deliverStatus == 4 && deliveryType == 2}}
+                                    <button SKURef="{{s.ref}}" deliveryType=2 class="change-status-btn">开始配送</button>
+                                {{fi}}
+                            {{fi}}
+                        </td>
+                    </tr>
+                    {{ end }}
+                    </tbody>
+                </table>
+            </div>
+            {{ fi }}
+        </script>
+    </div>
+    <div data-component="template" data-component-path="order" id="rsc-list">
+        <script type="text/html">
+            <div class="rsc-list-title">请选择需要匹配的配送站：</div>
+            <select id="RSCList">
+                <option selected disabled hidden value=''>@(请选择服务站)</option>
+                {{ foreach RSC in RSCList }}
+                <option RSC="{{ RSC._id }}" companyName="{{RSC.RSCInfo.companyName}}" name="{{RSC.RSCInfo.name}}" phone="{{ RSC.RSCInfo.phone}}"
+                        {{if RSC.RSCInfo.companyAddress}}
+                        {{ if RSC.RSCInfo.companyAddress.province}}
+                        province="{{RSC.RSCInfo.companyAddress.province.name}}"
+                        {{ fi }}
+                        {{ if RSC.RSCInfo.companyAddress.city}}
+                        city="{{RSC.RSCInfo.companyAddress.city.name}}"
+                        {{ fi }}
+                        {{ if RSC.RSCInfo.companyAddress.county}}
+                        county="{{RSC.RSCInfo.companyAddress.county.name}}"
+                        {{ fi }}
+                        {{ if RSC.RSCInfo.companyAddress.town}}
+                        town="{{RSC.RSCInfo.companyAddress.town.name}}"
+                        {{ fi }}
+                        details="{{RSC.RSCInfo.companyAddress.details}}"
+                        {{ fi }}
+                        {{  if RSCInfo && RSC._id == RSCInfo.RSC }}selected{{ fi }}>
+                    {{ RSC.RSCInfo.companyName }}
+                </option>
+                {{ end }}
+            </select>
+            <div class="rsc-list-btn-box">
+                <button id="rsc-list-confirm" class="rsc-list-btn-l">确定</button>
+                <button id="rsc-list-cancel" class="rsc-list-btn-r">取消</button>
+            </div>
+        </script>
+    </div>
+
+</div>
+<div id="order-mask"></div>
+<script>
+    var orderInfo = {};
+    var deliveryInfo = {};
+    var productsInfo = {};
+    var order = {};
+    order.paymentsList = [];
+
+    var payStatus = {1:'未付款',2:'已付款',3: '部分付款'};
+    var deliverStatus = {1:'未发货', 2: '已发货', 3: '部分发货', 4: '已到服务站',5: '已收货'};
+
+    ON('#orderInfo', function (component) {
+        orderDetailLoad();
+    });
+
+    function orderDetailLoad() {
+        $.components.GET(managerurl + '/api/orders/' + getUrlParam('id'), null, function(response) {
+            console.log(response);
+            var data = response.datas;
+            SET('orderInfo', {
+                deliverStatus : deliverStatus[data.deliverStatus],
+                payStatus : payStatus[data.payStatus],
+                id : data.id,
+                dateCreated : data.dateCreated,
+                deposit : data.deposit,
+                totalPrice : data.order.totalPrice,
+                duePrice : data.order.duePrice,
+                consigneeName : data.consigneeName,
+                consigneeAddress : data.deliveryType == 2 ? data.consigneeAddress : '',
+                consigneePhone : data.consigneePhone,
+                isPhased: data.subOrders.length > 1 ? true : false
+            });
+
+            SET('deliveryInfo', {
+                deliveryType: data.deliveryType == 2 ? '配送到户' : '自提',
+                RSCInfo : data.RSCInfo ? data.RSCInfo : {}
+            });
+
+            SET('order', data);
+            var paymentsList = [];
+            for(var i = 0; i < order.subOrders.length; i++) {
+                for(var j = 0; j < order.subOrders[i].payments.length; j++) {
+                    if ( order.subOrders[i].payments[j].payStatus == 2 || order.paymentId == order.subOrders[i].payments[j].id) {
+                        order.subOrders[i].payments[j].suborderType = order.subOrders[i].type;
+                        paymentsList.push(order.subOrders[i].payments[j]);
+//                        order.subOrders[i].payments.splice(j,1);
+//                        j--;
+                    }
+                }
+            }
+
+            SET('order.paymentsList', paymentsList)
+            console.log(order.paymentsList);
+            UPDATE('order.subOrders');
+            SET('order.payStatuses', {1:'未付款',2:'已付款',3: '部分付款'}, true);
+            SET('order.deliveryStatuses', {1:'未发货', 2: '配送中', 3: '部分发货', 4: '已到服务站',5: '已收货'}, true);
+            SET('order.payTypes', {1:'支付宝', 2: '银联', 3: '现金', 4: '线下POS机', 5: 'EPOS'}, true);
+            SET('order.deliverStatusesArray', [{name:'未发货',value:1},{name:'已发货',value:2},{name:'已到服务站',value:4},{name:'已收货',value:5}]);
+            var productIds = "";
+            order.SKUs.forEach(function(SKU){
+                productIds += SKU.productId+',';
+            });
+
+            $.components.GET(managerurl + '/api/v2.2/RSC/queryByProducts', {productIds:productIds}, function(RSCresponse){
+                if(RSCresponse.code != 1000){
+                    alert(RSCresponse.message);
+                    return;
+                }
+
+                SET('order.RSCList', RSCresponse.RSCs);
+                getOfflinePayType();
+
+            });
+
+        });
+    }
+
+
+    function orderInfoChangedRefresh() {
+        $("#RSCList").off('change').on('change', function() {
+            var el = $(this);
+            var RSC = el.find('option:selected').attr('RSC');
+            var companyName = el.find('option:selected').attr('companyName');
+            var name = el.find('option:selected').attr('name');
+            var phone = el.find('option:selected').attr('phone');
+            var province = el.find('option:selected').attr('province');
+            var city = el.find('option:selected').attr('city');
+            var county = el.find('option:selected').attr('county');
+            var town = el.find('option:selected').attr('town');
+            var details = el.find('option:selected').attr('details');
+
+            var RSCInfo = {RSC: RSC, companyName: companyName, RSCPhone:phone, RSCAddress:province+city+county+town+details};
+            deliveryInfo.RSCInfo = RSCInfo;
+            UPDATE('deliveryInfo.RSCInfo');
+            orderInfoChangedRefresh();
+        });
+
+        $(".change-status-btn").off('click').on('click', function() {
+            if(confirm('确认' + $(this).text() + '?')) {
+                var el = $(this);
+                changeSKUDeliveryStatus(el.attr('SKURef'), el.attr('deliveryType'));
+            } else {
+                return;
+            }
+
+        });
+
+        $("#rsc-list-confirm").off('click').on('click', function() {
+            changeRSCList();
+        });
+
+        $("#rsc-list-cancel").off('click').on('click', function() {
+            $("#order-mask").hide();
+            $("#rsc-list").hide();
+        });
+
+        $("#order-add-rsc").off('click').on('click', function() {
+            $("#rsc-list").show();
+            $("#order-mask").show();
+        });
+
+        $("#order-rsc-edit").off('click').on('click', function() {
+            $("#rsc-list").show();
+            $("#order-mask").show();
+        });
+
+        $("#confirm-offline-pay").off('click').on('click', function(){
+            $("#confirm-offline-pay-box").show();
+            $("#order-mask").show();
+        });
+
+        $("#pay-cancel-btn").off('click').on('click', function() {
+            $("#confirm-offline-pay-box").hide();
+            $("#order-mask").hide();
+        });
+
+        $("#pay-confirm-btn").off('click').on('click', function() {
+            var paymentId = order.paymentId;
+            var offlinePayType = $("#confirm-offline-pay-type input[type=radio]:checked").val();
+            var RSCId = $("#confirm-rsc-list option:selected").val()
+            confirmOfflinePay(paymentId, offlinePayType, RSCId);
+        });
+    }
+
+    function changeRSCList() {
+        if(isEmptyObject(deliveryInfo.RSCInfo)) {
+            alert('请选择服务站');
+            return;
+        }
+        var putData = {id: orderInfo.id, RSCInfo: deliveryInfo.RSCInfo};
+        $.components.PUT(managerurl + '/api/orders/RSCInfo/', putData, function(response){
+            if(response.code != '1000') {
+                alert(response.message);
+                return ;
+            }
+
+            alert('修改成功');
+            $("#rsc-list").hide();
+            $("#order-mask").hide();
+            UPDATE('deliveryInfo.RSCInfo');
+            orderInfoChangedRefresh();
+        });
+    }
+
+    function isEmptyObject(obj) {
+        for (o in obj) {
+            return false;
+        }
+        return true;
+    }
+
+    function changeSKUDeliveryStatus(id, type) {
+        for(var i = 0; i < order.SKUs.length; i++) {
+            if(order.SKUs[i].ref == id) {
+                order.SKUs[i].deliverStatus = parseInt(type);
+                break;
+            }
+        }
+        var putData = {id: orderInfo.id, SKUs: order.SKUs.slice(0)};
+
+        $.components.PUT(managerurl + '/api/orders/SKUsDelivery/', putData, function(response){
+            if(response.code != '1000') {
+                alert(response.message);
+                return ;
+            }
+            UPDATE('order.SKUs');
+            //orderInfoChangedRefresh();
+        });
+
+
+    }
+
+    function getOfflinePayType() {
+        $.components.GET(managerurl + '/api/order/getOfflinePayType', null, function(typeResponse) {
+            if(typeResponse.code != '1000') {
+                alert(typeResponse.message);
+                return;
+            }
+            SET('order.offlinePayType', typeResponse.offlinePayType);
+            getRSCList();
+        });
+    }
+
+    function getRSCList() {
+        var getData ={page: '1', max: '50'}
+        $.components.GET(managerurl + '/api/v2.2/RSCs', getData, function(response) {
+            if(response.code != '1000') {
+                alert(response.message);
+                return;
+            }
+
+            SET('order.RSCs', response.RSCs);
+            orderInfoChangedRefresh();
+        });
+    }
+
+    $(function(){
+        $("#skus-deliver-status").off('change').on('change',function(){
+            var el = $(this);
+            var id = el.attr('data-id');
+            var name = el.attr('data-name');
+            switch (name) {
+                case 'deliverStatus':
+                    break;
+            }
+        });
+
+    });
+
+    function confirmOfflinePay(paymentId, offlinePayType, RSCId) {
+        if($("#confirm-offline-pay-type input[type=radio]:checked").length == 0) {
+            alert('请选择付款方式');
+            return;
+        }
+
+        var getData = {paymentId: paymentId, offlinePayType: offlinePayType, RSCId: RSCId};
+
+        $.components.GET(managerurl + '/api/orders/confirmOfflinePay', getData, function(response) {
+            if(response.code != '1000') {
+                alert(response.message);
+                return;
+            }
+
+            alert('审核成功');
+            $("#confirm-offline-pay-box").hide();
+            $("#order-mask").hide();
+
+            window.location.reload();
+
+        });
+    }
+</script>

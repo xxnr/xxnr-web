@@ -32,6 +32,7 @@ app.controller('jiesuanController', function ($scope, remoteApiService, payServi
 
     $scope.selectedAddressIndex = 0;
     $scope.everClickOneOfMoreContacts = false;
+    $scope.isOverflow = false;
     $scope.cityListCompanies = [{
         name: "全部地区",
         id: 0
@@ -88,14 +89,18 @@ app.controller('jiesuanController', function ($scope, remoteApiService, payServi
     $scope.hideModifyPop = function () {
         $scope.showPop = false;
         $scope.showModifyPop = false;
+        $scope.isOverflow = false;
+
     };
     $scope.hideAddPop = function () {
         $scope.showPop = false;
         $scope.showAddPop = false;
+        $scope.isOverflow = false;
     };
     $scope.editAddress = function (index) {
         $scope.showPop = true;
         $scope.showModifyPop = true;
+        $scope.isOverflow = true;
         $scope.getProvinceList($scope.contacts[index].areaId, $scope.contacts[index].cityId, $scope.contacts[index].countyId, $scope.contacts[index].townId);
         $scope.modifyAddress.detailAddress = $scope.contacts[index].detailAddress;
         $scope.modifyAddress.receiptName = $scope.contacts[index].name;
@@ -112,6 +117,8 @@ app.controller('jiesuanController', function ($scope, remoteApiService, payServi
         $scope.modifyAddress.phone = undefined;
         $scope.showPop = true;
         $scope.showAddPop = true;
+        $scope.isOverflow = true;
+
         //$scope.getProvinceList();
     };
 
@@ -340,29 +347,75 @@ app.controller('jiesuanController', function ($scope, remoteApiService, payServi
     };
 
     $scope.deleteAddress = function (index) {
-        remoteApiService.deleteUserAddress($scope.contacts[index].addressId)
-            .then(function (data) {
-                if (data.code == "1000") {
-                    sweetalert("删除成功");
-                    if($scope.contacts.length === 1 ){
-                        $scope.hasConsigneeAddress = false;
-                        $scope.selectedAddressId = null;
-                        $scope.selectedAddressIndex = null;
-                        $scope.contacts.splice(index, 1);
-                    }else{
-                        if($scope.contacts[index].selected){
-                            $scope.contacts.splice(index, 1);
-                            $scope.selectedAddressIndex = 0;
-                            $scope.contacts[0].selected = true;
-                            $scope.selectedAddressId = $scope.contacts[0].addressId;
+        if (navigator.appName == "Microsoft Internet Explorer" && navigator.appVersion.match(/8./i) == "8.") {
+            var r = confirm("是否删除该地址？");
+            if (r == true) {
+                remoteApiService.deleteUserAddress($scope.contacts[index].addressId)
+                    .then(function (data) {
+                        if (data.code == "1000") {
+                            sweetalert("删除成功");
+                            if($scope.contacts.length === 1 ){
+                                $scope.hasConsigneeAddress = false;
+                                $scope.selectedAddressId = null;
+                                $scope.selectedAddressIndex = null;
+                                $scope.contacts.splice(index, 1);
+                            }else{
+                                if($scope.contacts[index].selected){
+                                    $scope.contacts.splice(index, 1);
+                                    $scope.selectedAddressIndex = 0;
+                                    $scope.contacts[0].selected = true;
+                                    $scope.selectedAddressId = $scope.contacts[0].addressId;
+                                }else{
+                                    $scope.contacts.splice(index, 1);
+                                }
+                            }
                         }else{
-                            $scope.contacts.splice(index, 1);
+                            sweetalert(data.message);
                         }
+                    });
+            } else {
+                return false;
+            }
+        } else {
+            swal({
+                    title: "是否删除该地址？",
+                    //text: nominated_inviter.name + "   " + nominated_inviter.phone,
+                    //type: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: '#00913a',
+                    confirmButtonText: '确定',
+                    cancelButtonText: "取消",
+                    closeOnConfirm: false
+                },
+                function (isConfirm) {
+                    if (isConfirm) {
+                        remoteApiService.deleteUserAddress($scope.contacts[index].addressId)
+                            .then(function (data) {
+                                if (data.code == "1000") {
+                                    sweetalert("删除成功");
+                                    if($scope.contacts.length === 1 ){
+                                        $scope.hasConsigneeAddress = false;
+                                        $scope.selectedAddressId = null;
+                                        $scope.selectedAddressIndex = null;
+                                        $scope.contacts.splice(index, 1);
+                                    }else{
+                                        if($scope.contacts[index].selected){
+                                            $scope.contacts.splice(index, 1);
+                                            $scope.selectedAddressIndex = 0;
+                                            $scope.contacts[0].selected = true;
+                                            $scope.selectedAddressId = $scope.contacts[0].addressId;
+                                        }else{
+                                            $scope.contacts.splice(index, 1);
+                                        }
+                                    }
+                                }else{
+                                    sweetalert(data.message);
+                                }
+                            });
                     }
-                }else{
-                    sweetalert(data.message);
-                }
-            });
+                });
+        }
+
     };
     $scope.selectCompany = function(index){
         //if(!$scope.selectedCompanyId){
@@ -376,6 +429,7 @@ app.controller('jiesuanController', function ($scope, remoteApiService, payServi
         $scope.companySelected = true;
         $scope.showPop = false;
         $scope.showSelectCompanyPop = false;
+        $scope.isOverflow = false;
         $scope.selectedCompanyId = $scope.selectingCompanyId;
         for(var i in $scope.RSCs){
             if($scope.RSCs.hasOwnProperty(i)){
@@ -392,6 +446,8 @@ app.controller('jiesuanController', function ($scope, remoteApiService, payServi
     };
     $scope.showSelectCompany = function () {
         $scope.showSelectCompanyPop = true;
+        $scope.isOverflow = true;
+
         $scope.showPop = true;
         productsQuery = combineProductsQuery();
         //$scope.selectedCompanyId = -1;
@@ -611,6 +667,8 @@ app.controller('jiesuanController', function ($scope, remoteApiService, payServi
         $scope.selectedConsigneeNum = -1;
         $scope.showConsigneePop = true;
         $scope.showPop = true;
+        $scope.isOverflow = true;
+
         $scope.popConsigneeName = "";
         $scope.popConsigneePhone = "";
         remoteApiService.queryConsignees()
@@ -667,6 +725,8 @@ app.controller('jiesuanController', function ($scope, remoteApiService, payServi
     $scope.consigneeSelected = function(){
         $scope.showPop = false;
         $scope.showConsigneePop=false;
+        $scope.isOverflow = false;
+
         if($scope.selectedConsigneeNum!=-1){
             $scope.consigneeName = $scope.oldConsignees[$scope.selectedConsigneeNum].consigneeName;
             $scope.consigneePhone = $scope.oldConsignees[$scope.selectedConsigneeNum].consigneePhone;
@@ -686,6 +746,7 @@ app.controller('jiesuanController', function ($scope, remoteApiService, payServi
             $scope.consigneePhone = newConsignee.consigneePhone;
             $scope.showPop = false;
             $scope.showConsigneePop=false;
+            $scope.isOverflow = false;
             //console.log('保存收货人成功');
             $scope.popNewConsigneeForm.name.$dirty = false;
         }else{
@@ -697,6 +758,7 @@ app.controller('jiesuanController', function ($scope, remoteApiService, payServi
                         $scope.consigneePhone = $scope.oldConsignees[0].consigneePhone;
                         $scope.showPop = false;
                         $scope.showConsigneePop=false;
+                        $scope.isOverflow = false;
                         $scope.popNewConsigneeForm.name.$dirty = false;
                         //console.log('保存收货人成功');
                     }else{

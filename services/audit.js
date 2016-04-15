@@ -94,32 +94,30 @@ AuditService.prototype.get = function(options, callback) {
 
 // audit info
 AuditService.prototype.generateAuditInfo = function (url, method, ip, user, data) {
-	if (controller) {
-	    var auditInfo = {};
-	    auditInfo.action = url;
-	    auditInfo.actionMethod = method;
-	    if (controller.user) {
-	        auditInfo.actorName = user.account;
-	        auditInfo.actorId = user._id;
-	    } else {
-	        auditInfo.actorName = null;
-	        auditInfo.actorId = null;
-	    }
-	    auditInfo.actorIp = ip;
-	    auditInfo.dateCreated = new Date();
-	    if (data) {
-	    	auditInfo.parameters = [];
-	    	var keys = Object.keys(data);
-	    	for (var i = 0; i < keys.length; i++) {
-	    		var value = data[keys[i]];
-	    		if (value instanceof Object) {
-	    			value = JSON.stringify(value);
-	    		}
-	    		auditInfo.parameters.push({name:keys[i], value:value});
-	    	}
-	    }
-	    return auditInfo;
+	var auditInfo = {};
+	auditInfo.action = url;
+	auditInfo.actionMethod = method;
+	if (user) {
+		auditInfo.actorName = user.account;
+		auditInfo.actorId = user._id;
+	} else {
+		auditInfo.actorName = null;
+		auditInfo.actorId = null;
 	}
+	auditInfo.actorIp = ip;
+	auditInfo.dateCreated = new Date();
+	if (data) {
+		auditInfo.parameters = [];
+		var keys = Object.keys(data);
+		for (var i = 0; i < keys.length; i++) {
+			var value = data[keys[i]];
+			if (value instanceof Object) {
+				value = JSON.stringify(value);
+			}
+			auditInfo.parameters.push({name:keys[i], value:value});
+		}
+	}
+	return auditInfo;
 };
 
 // save audit log
