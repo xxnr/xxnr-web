@@ -1103,7 +1103,8 @@ OrderService.prototype.confirm = function(orderId, SKURefs, callback) {
 
 // Update order payType
 OrderService.prototype.updatepayType = function(options, callback) {
-
+	var self = this;
+	
 	if (!options.paytype) {
 		callback('请提交支付方式');
 		return;
@@ -1127,6 +1128,9 @@ OrderService.prototype.updatepayType = function(options, callback) {
 			return;
 		}
 		callback(null, count.n);
+
+		// update order paystatus
+		self.checkPayStatus({id:options.orderid}, function(err, order, payment) {});
 	});
 };
 
@@ -2132,6 +2136,31 @@ OrderService.prototype.umengSendCustomizedcast = function(type, userId, userType
 	        UMENG.sendCustomizedcast(type, user.id, userType, options);
 	    });
 	}
+};
+
+// Get orderInfo by id
+OrderService.prototype.getById = function(id, callback) {
+
+	if(!id) {
+		callback(null, null, null);
+		return;
+	}
+
+	var mongoOptions = {id: id};
+
+	OrderModel.findOne(mongoOptions, function(err, doc) {
+		if (err) {
+			callback(err);
+			return;
+		}
+
+		if (doc) {
+			callback(null, doc.toObject());
+			return;
+		} else {
+			callback(null, null);
+		}
+	});
 };
 
 module.exports = new OrderService();

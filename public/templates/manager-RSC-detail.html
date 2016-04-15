@@ -281,7 +281,7 @@
                 }
                 SET('rscInfo.addressSelected', rscInfo.addressSelected);
 
-                rscProduct = response.RSCInfo.products;
+                rscProduct = response.RSCInfo.products ? response.RSCInfo.products: [];
                 rscProductData = rscProduct.slice(0);
                 for(var i = 0; i < rscProduct.length; i++) {
                     var rscEle = {_id: rscProduct[i]._id, name:rscProduct[i].name};
