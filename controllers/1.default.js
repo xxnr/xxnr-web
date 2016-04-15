@@ -19,7 +19,7 @@ exports.install = function() {
 	F.file('Images (small, large, original, thumbnail) (category)', file_image);
 	F.file('Files', file_read);
 
-    F.middleware('isLoggedIn', middleware.isLoggedIn_middleware);
+    //F.middleware('isLoggedIn', middleware.isLoggedIn_middleware);
     F.middleware('backend_auth', middleware.backend_auth);
     F.middleware('isInWhiteList', middleware.isInWhiteList_middleware);
 	F.middleware('isXXNRAgent', middleware.isXXNRAgent_middleware);

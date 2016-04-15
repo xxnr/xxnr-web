@@ -17,20 +17,20 @@ var PayService = services.pay;
 
 exports.install = function() {
 	//fix api// F.route('/api/v2.0/getProductDetails/', getProductDetails, ['post', 'get']);
-	F.route('/api/v2.0/products/', getProducts, ['post', 'get']);
-	F.route('/api/v2.0/products/categories/', getCategories, ['post', 'get']);
-	F.route('/api/v2.0/getShoppingCart', getShoppingCart, ['post', 'get'], ['isLoggedIn']);
-    F.route('/api/v2.0/updateShoppingCart', updateShoppingCart, ['post', 'get'], ['isLoggedIn']);
+	//F.route('/api/v2.0/products/', getProducts, ['post', 'get']);
+	//F.route('/api/v2.0/products/categories/', getCategories, ['post', 'get']);
+	//F.route('/api/v2.0/getShoppingCart', getShoppingCart, ['post', 'get'], ['isLoggedIn']);
+    //F.route('/api/v2.0/updateShoppingCart', updateShoppingCart, ['post', 'get'], ['isLoggedIn']);
     //fix api// F.route('/api/v2.0/addToCart', updateShoppingCart, ['post', 'get'], ['isLoggedIn']);
-    F.route('/api/v2.0/shopCart/getShopCartList', getShoppingCart, ['post', 'get'], ['isLoggedIn']);
-    F.route('/api/v2.0/shopCart/changeNum', updateShoppingCart, ['post', 'get'], ['isLoggedIn']);
-    F.route('/api/v2.0/shopCart/addToCart', updateShoppingCart, ['post', 'get'], ['isLoggedIn']);
+    //F.route('/api/v2.0/shopCart/getShopCartList', getShoppingCart, ['post', 'get'], ['isLoggedIn']);
+    //F.route('/api/v2.0/shopCart/changeNum', updateShoppingCart, ['post', 'get'], ['isLoggedIn']);
+    //F.route('/api/v2.0/shopCart/addToCart', updateShoppingCart, ['post', 'get'], ['isLoggedIn']);
 //    F.route('/api/v2.0/product/getGoodsListPage', getGoodsListPage, ['post', 'get']);
-    F.route('/api/v2.0/product/getProductsListPage', getGoodsListPage, ['post', 'get']);
+//    F.route('/api/v2.0/product/getProductsListPage', getGoodsListPage, ['post', 'get']);
 //    F.route('/api/v2.0/product/getGoodsDetails', getGoodsDetails, ['post', 'get']);
     // get product detail for web
-    F.route('/api/v2.0/product/getProductDetails', getGoodsDetails, ['post', 'get']);
-    F.route('/api/v2.0/getShoppingCartOffline', getShoppingCartOffline, ['get', 'post']);
+    //F.route('/api/v2.0/product/getProductDetails', getGoodsDetails, ['post', 'get']);
+    //F.route('/api/v2.0/getShoppingCartOffline', getShoppingCartOffline, ['get', 'post']);
     // // pay
     // F.route('/alipay', alipayOrder, ['post', 'get'], ['isInWhiteList']);
     // F.route('/dynamic/alipay/notify.asp', alipayNotify, ['post','raw']);
@@ -47,16 +47,16 @@ exports.install = function() {
     //fix api// F.route('/unionPay', unionPayOrder, ['post', 'get']);
     //fix api// F.route('/unionpay', unionPayOrder, ['post', 'get']);
     // Brands Models Engines etc. attributes
-    F.route('/api/v2.0/products/{attributeName}/', getAttributes, ['get']);
+    //F.route('/api/v2.0/products/{attributeName}/', getAttributes, ['get']);
     // home page banners
-    F.route('/api/v2.0/ad/getAdList', api10_getBanners, ['post', 'get', 'upload'], 8);
+    //F.route('/api/v2.0/ad/getAdList', api10_getBanners, ['post', 'get', 'upload'], 8);
     // get product detail for app
-    F.route('/api/v2.0/product/getAppProductDetails/', getAppProductDetails, ['post', 'get']);
+    //F.route('/api/v2.0/product/getAppProductDetails/', getAppProductDetails, ['post', 'get']);
     // product app info page (app_body app_standard app_support)
     F.route('/product/{productInfo}/{productId}/', view_product_info);
     // get min pay price
     // F.route('/api/v2.0/getMinPayPrice/',       getMinPayPrice, ['get'], ['isLoggedIn']);
-    F.route('/api/v2.0/getMinPayPrice/',       getMinPayPrice, ['post', 'get'], ['isLoggedIn']);
+    //F.route('/api/v2.0/getMinPayPrice/',       getMinPayPrice, ['post', 'get'], ['isLoggedIn']);
 
 	// v1.0
     //fix api// F.route('/app/shopCart/getShopCartList', getShoppingCart, ['post', 'get']);
@@ -64,8 +64,8 @@ exports.install = function() {
     //fix api// F.route('/app/shopCart/addToCart', updateShoppingCart, ['post', 'get'], ['isLoggedIn']);
 //	F.route('/app/goods/getGoodsListPage', api10_getProducts, ['post', 'get', 'upload'], 8);
 	//fix api// F.route('/app/goods/getGoodsDetails', getGoodsDetails, ['post', 'get']);
-	F.route('/app/goods/getWebGoodsDetails', api10_getProductDetail, ['post', 'get', 'upload'], 8);
-    F.route('/app/ad/getAdList', api10_getBanners, ['post', 'get', 'upload'], 8);
+	//F.route('/app/goods/getWebGoodsDetails', api10_getProductDetail, ['post', 'get', 'upload'], 8);
+    //F.route('/app/ad/getAdList', api10_getBanners, ['post', 'get', 'upload'], 8);
 
     // F.route('/api/v2.2/getOfflinePayType',              json_offline_pay_type, ['get']);
     // F.route('/offlinepay', offlinePay, ['get', 'isLoggedIn']);
@@ -86,19 +86,17 @@ var dri = require('../common/dri');
 var moment = require('moment-timezone');
 // console.log('PAYMENTSTATUS=' + JSON.stringify(PAYMENTSTATUS));
 
-function getProducts() {
-	var self = this;
-	var options = {};
-	var category = this.query['category'];
-	var userId = this.query.userId;
-	var max = this.query['max'];
+exports.getProducts = function(req, res, next) {
+	var category = req.data.category;
+	var userId = req.data.userId;
+	var max = req.data.max;
 
     var options = {online:{$exists:false}};
 
 	if (category)
 		options.category = category;
 
-	var page = this.query.page;
+	var page = req.data.page;
 
 	if (page)
 		options.page = page;
@@ -112,28 +110,26 @@ function getProducts() {
 
     ProductService.query(options, function(err, data) {
         if(err){
-            self.respond({code:1001, message:'查询失败'});
+            res.respond({code:1001, message:'查询失败'});
             return;
         }
 
-        self.respond({'code':"1000", "message":"success",
+        res.respond({'code':"1000", "message":"success",
             "products":api10.convertProducts(data.items),
             "userId": userId,
             "category":category
         });
     });
-}
+};
 
-function getGoodsListPage(transformer) {
-    var self = this;
-	var userId = self.data["locationUserId"];
-    var page = self.data["page"];
-    var max = self.data["rowCount"] || self.data["max"];
-    var category = self.data["classId"];
-    var brandName = self.data["brandName"];
-    var reservePrice = self.data["reservePrice"];
-    var modelName = self.data["modelName"];
-    var sort = self.data["sort"];
+exports.getGoodsListPage = function(req, res, next) {
+    var page = req.data["page"];
+    var max = req.data["rowCount"] || req.data["max"];
+    var category = req.data["classId"];
+    var brandName = req.data["brandName"];
+    var reservePrice = req.data["reservePrice"];
+    var modelName = req.data["modelName"];
+    var sort = req.data["sort"];
 
     var options = {online:{$exists:false}};
 
@@ -195,28 +191,26 @@ function getGoodsListPage(transformer) {
 
             var goodsListPage = {"code":"1000","message":"success","datas":{total:count, "rows":products,"pages":pages,"page":page}};
 
-            if(transformer) transformer(goodsListPage);
-
-            self.respond(goodsListPage);
+            res.respond(goodsListPage);
 		});
-}
+};
 
 function api10_getProducts(){
     var self = this;
-	var categary = self.data["classId"];
+    var categary = self.data["classId"];
 
-	if(categary){
-		self.data["classId"] = function(categary){
-			switch(categary){
-				case "49921c468feb4cc6bd69e5de0e1b9e15":
-					return "531680A5";
-				case "085c3dde0b5e413ab70e5f0a8dfd3c4c":
+    if(categary){
+        self.data["classId"] = function(categary){
+            switch(categary){
+                case "49921c468feb4cc6bd69e5de0e1b9e15":
+                    return "531680A5";
+                case "085c3dde0b5e413ab70e5f0a8dfd3c4c":
                     return "6C7D8F66";
-				default:
-				    return categary;
-			}
-		}(categary);
-	}
+                default:
+                    return categary;
+            }
+        }(categary);
+    }
 
     getGoodsListPage.call(this, function(data){
         data["datas"]['locationUserId'] = self.data['locationUserId'];
@@ -232,12 +226,12 @@ function getProductDetails() {
 
 	ProductService.get(options, function(err, data) {
         if(err){
-            self.respond({code:1001, message:'查询失败'});
+            res.respond({code:1001, message:'查询失败'});
             return;
         }
 
         var response = api10.convertProduct(data);
-        self.respond(response);
+        res.respond(response);
 	});
 }
 
@@ -262,23 +256,20 @@ function api10_getProductDetail(){
     });
 }
 
-function getGoodsDetails(transformer){
-	var self = this;
-	var callbackName = this.query['callback'];
-
+exports.getGoodsDetails = function(req, res, next){
 	var options = {};
-	options.id = this.data['goodsId'];
+	options.id = req.data['goodsId'];
 
 	ProductService.get(options, function(err, data) {
         if(err){
-            self.respond({code:1001, message:'查询失败'});
+            res.respond({code:1001, message:'查询失败'});
             return;
         }
 
 		var product = api10.convertProduct(data);
 		var goodDetails = {"code":"1000","message":"success",
 		"datas":{"total":1,"rows":[
-		]},"locationUserId":self.data["locationUserId"]};
+		]},"locationUserId":req.data["locationUserId"]};
 
 		var goodDetail = {"goodsId": product.id,"goodsHabitatName":null,
     		"recommendedStar":product.stars,
@@ -317,26 +308,23 @@ function getGoodsDetails(transformer){
 		goodDetails.datas.rows.push(goodDetail);
         var response = goodDetail;
 
-        if(transformer) transformer(response);
-
-		callbackName ? self.jsonp(callbackName, response) : self.json(response);
+		res.respond(response);
 	});
-}
+};
 
-function getAppProductDetails() {
-    var self = this;
-    if (!self.data['productId']) {
-        self.respond({"code":"1001","message":"缺少商品ID"});
+exports.getAppProductDetails = function(req, res, next) {
+    if (!req.data['productId']) {
+        res.respond({"code":"1001","message":"缺少商品ID"});
         return;
     }
-    var host = self.req.uri.host;
+    var host = req.hostname;
     var prevurl = 'http://' + host + '/product/';
     var options = {};
-    options.id = self.data['productId'];
+    options.id = req.data['productId'];
 
     ProductService.get(options, function(err, data) {
         if (err || !data) {
-            self.respond({"code":"1001","message":"无法查找到商品"});
+            res.respond({"code":"1001","message":"无法查找到商品"});
             return;
         }
         delete data.body;
@@ -361,9 +349,9 @@ function getAppProductDetails() {
         delete data.app_support;
         var product = api10.convertProduct(data);
 
-        self.respond({"code":"1000","message":"success","datas":product});
+        res.respond({"code":"1000","message":"success","datas":product});
     });
-}
+};
 
 // get product info page
 function view_product_info(productInfo, productId) {
@@ -394,38 +382,27 @@ function view_product_info(productInfo, productId) {
     });
 }
 
-function getCategories(){
-	var self = this;
-	var callbackName = this.query['callback'];
-
+exports.getCategories = function(req, res, next){
     CategoryService.all(function(err, categories){
         if(err){
-            self.respond({code:1001, message:'fail to query category'});
+            res.respond({code:1001, message:'fail to query category'});
             return;
         }
 
-        self.respond({code:1000, message:'success', categories:categories});
+        res.respond({code:1000, message:'success', categories:categories});
     });
-    //
-	//if (!F.global.categories)
-	//	F.global.categories = [];
-    //
-    //var response = api10.convertCategories(F.global.categories, F.global.mapCategories);
-	//callbackName ? self.jsonp(callbackName, response) : self.json(response);
-}
+};
 
-function getShoppingCart(){
-	var self = this;
-	var callbackName = this.query['callback'];
-	var userId = self.data.userId;
+exports.getShoppingCart = function(req, res, next){
+	var userId = req.data.userId;
     if(!userId){
-        self.jsonp(callbackName, {code:1001, message:'param userId required'});
+        res.respond({code:1001, message:'param userId required'});
         return;
     }
 
     CartService.getOrAdd(userId, function(err, cart){
         if(err){
-            self.respond({code:1001, message:'查询购物车失败'});
+            res.respond({code:1001, message:'查询购物车失败'});
             return;
         }
 
@@ -440,38 +417,36 @@ function getShoppingCart(){
             });
         }
 
-        self.respond(convertToShoppingCartFormatV_1_0(products, cart.cartId, cart.userId));
+        res.respond(convertToShoppingCartFormatV_1_0(products, cart.cartId, cart.userId));
     })
-}
+};
 
-function updateShoppingCart() {
-    var self = this;
-    var callbackName = this.query['callback'];
-    var userId = self.data['userId'];
-    var goodsId = self.data['goodsId'];
-    var count = self.data['quantity'];
-    var update_by_add = self.data['update_by_add'];
+exports.updateShoppingCart = function(req, res, next) {
+    var userId = req.data['userId'];
+    var goodsId = req.data['goodsId'];
+    var count = req.data['quantity'];
+    var update_by_add = req.data['update_by_add'];
     if (!userId) {
         var response = {code: 1001, message: 'param userId required'};
-        callbackName ? self.jsonp(callbackName, response) : self.json(response);
+        res.respond(response);
         return;
     }
     if (!goodsId) {
         var response = ( {code: 1001, message: 'param goodsId required'});
-        callbackName ? self.jsonp(callbackName, response) : self.json(response);
+        res.respond(response);
         return;
     }
     if (!count) {
-        count = self.data['count'];//This is to support addToCart api
+        count = req.data['count'];//This is to support addToCart api
         if (!count) {
             var response = {code: 1001, message: 'param quantity/count required'};
-            callbackName ? self.jsonp(callbackName, response) : self.json(response);
+            res.respond(response);
             return;
         }
     }
 
     if (parseInt(count) > 9999) {
-        self.respond({code: 1001, message: '商品个数不能大于9999'});
+        res.respond({code: 1001, message: '商品个数不能大于9999'});
         return;
     }
 
@@ -481,41 +456,41 @@ function updateShoppingCart() {
 
     CartService.getOrAdd(userId, function (err, cart) {
         if (err) {
-            self.respond({code: 1001, message: '获取购物车失败'});
+            res.respond({code: 1001, message: '获取购物车失败'});
             return;
         }
 
         ProductService.get({id: goodsId}, function (err, data) {
             if (err || !data) {
-                self.respond({"code": "1001", "message": "无法查找到商品"});
+                res.respond({"code": "1001", "message": "无法查找到商品"});
                 return;
             }
 
             if (data && data.presale) {
-                self.respond({"code": "1001", "message": "无法添加预售商品"});
+                res.respond({"code": "1001", "message": "无法添加预售商品"});
                 return;
             }
 
             CartService.updateItems(cart.cartId, data._id, count, update_by_add, function (err) {
                 if (err) {
-                    self.respond({code: 1001, message: '更新购物车失败'});
+                    res.respond({code: 1001, message: '更新购物车失败'});
                     return;
                 }
 
-                self.respond({code: 1000, message: 'success'});
+                res.respond({code: 1000, message: 'success'});
             })
         }, false);
     });
-}
+};
 
 function payOrder(payExecutor){
     var self = this;
     var callbackName = self.query['callback'];
-    var orderId = self.data['orderId'];
-    var payPrice = self.data['price'];
+    var orderId = req.data['orderId'];
+    var payPrice = req.data['price'];
 
     if (!orderId) {
-        self.respond({code:1001, message:'请提供订单ID'});
+        res.respond({code:1001, message:'请提供订单ID'});
         return;
     }
 
@@ -524,31 +499,31 @@ function payOrder(payExecutor){
     OrderService.get(options, function(err, order, payment) {
         if (err) {
             console.error('api-v1.0 payOrder OrderService get err:', err);
-            self.respond({code:1001, message:'支付出错'});
+            res.respond({code:1001, message:'支付出错'});
             return;
         }
 
         if (!order) {
-            self.respond({code:1001, message:'未找到订单信息'});
+            res.respond({code:1001, message:'未找到订单信息'});
             return;
         }
 
         if (order.isClosed && order.payStatus === PAYMENTSTATUS.UNPAID) {
-            self.respond({code:1001, message:'订单已关闭'});
+            res.respond({code:1001, message:'订单已关闭'});
             return;
         }
 
         if(order.pendingApprove && tools.isOfflinePayType(self.payType)){
-            self.respond({code:1002, message:'线下付款正在审核中，请等待网点付款审核或者更改付款方式'});
+            res.respond({code:1002, message:'线下付款正在审核中，请等待网点付款审核或者更改付款方式'});
             return;
         }
 
         if (!payment || typeof(payment.id) === 'undefined' || typeof(payment.price) === 'undefined') {
             if (order.payStatus === PAYMENTSTATUS.PAID) {
-                self.respond({code:1001, message:'订单已支付'});
+                res.respond({code:1001, message:'订单已支付'});
                 return;
             }
-            self.respond({code:1001, message:'未找到支付信息'});
+            res.respond({code:1001, message:'未找到支付信息'});
             return;
         }
 
@@ -574,7 +549,7 @@ function payOrder(payExecutor){
             OrderService.getPayOrderPaymentInfo(order, payment, payPrice, reqOptions, function (err, resultPayment, resultPayPrice) {
                 if (err) {
                     console.error('api-v1.0 payOrder OrderService getPayOrderPaymentInfo err:', err);
-                    self.respond({code:1001, message:'获取支付信息出错'});
+                    res.respond({code:1001, message:'获取支付信息出错'});
                     return;
                 }
                 payExecutor(resultPayment.id, parseFloat(resultPayPrice).toFixed(2), self.ip, order.id, resultPayment);
@@ -582,7 +557,7 @@ function payOrder(payExecutor){
             });
         } catch (e) {
             console.error('api-v1.0 payOrder OrderService getPayOrderPaymentInfo err:', e);
-            self.respond({"code":1001, "mesage":"获取支付信息出错"});
+            res.respond({"code":1001, "mesage":"获取支付信息出错"});
             return;
         }
     });
@@ -590,14 +565,14 @@ function payOrder(payExecutor){
 
 function alipayOrder(){
     var self = this;
-    var consumer = self.data['consumer']||'website';
+    var consumer = req.data['consumer']||'website';
     self.payType = PAYTYPE.ZHIFUBAO;
 
     payOrder.call(this, function(paymentId, totalPrice, ip, orderId, payment) {
         switch(consumer) {
             case 'app':
                 var response = {"code":1000, "paymentId":paymentId, "price":totalPrice};
-                self.respond(response);
+                res.respond(response);
                 break;
             case 'website':
                 alipay.alipaySubmitService.query_timestamp(function(encrypt_key) {
@@ -740,7 +715,7 @@ function refundTest() {
             }
             paymentOptions.refundReason = 4;
             payRefund.call(self, paymentOptions);
-            self.respond('refund success');
+            res.respond('refund success');
         }
     });
 }
@@ -971,7 +946,7 @@ function unionPayOrder() {
     var self = this;
     self.payType = PAYTYPE.UNIONPAY;
     payOrder.call(this, function(paymentId, totalPrice, ip, orderId, payment) {
-        var consumer = self.data['consumer']||'website';
+        var consumer = req.data['consumer']||'website';
         var phpPage = null;
 
         switch(consumer) {
@@ -1026,12 +1001,12 @@ function unionPayOrder() {
                         }
                     }
 
-                    if (self.data['option'] === 'raw-tn') {
+                    if (req.data['option'] === 'raw-tn') {
                         self.raw(response.tn);
                         break;
                     }
 
-                    self.respond(response);
+                    res.respond(response);
                     break;
                 case 'website':
                     self.raw(output.substring(index));
@@ -1099,10 +1074,9 @@ function unionPayOrder() {
 }
 
 
-function getBanners(callback){
-    var self = this;
+function getBanners(req, callback){
     var fs = require('fs');
-    var bannerType = self.data['bannerType'] || 'app';
+    var bannerType = req.data['bannerType'] || 'app';
     var bannerFolder = `${XXNR_DIR}/images/banners/` + bannerType;
 
     var root = require('path').resolve(__filename + `/../../public/` + bannerFolder);
@@ -1115,33 +1089,32 @@ function getBanners(callback){
                 }
             });
 
-        callback.call(self, data, null);
+        callback(data, null);
     });
 }
 
-function api10_getBanners(){
-    getBanners.call(this, function(data, err){
+exports.api10_getBanners = function(req, res, next){
+    getBanners(req, function(data, err){
         data = {"code":"1000","message":"success","datas":{"total":data.length,"rows":data,"locationUserId":""}};
-        this.json(data);
+        res.respond(data);
     });
-}
+};
 
-function getShoppingCartOffline(){
-    var self = this;
-    var products = JSON.parse(decodeURI(self.data.products));
+exports.getShoppingCartOffline = function(req, res, next){
+    var products = JSON.parse(decodeURI(req.data.products));
     if(!products || !Array.isArray(products) || !(products.length > 0)){
-        self.respond({code:1001,message:'请提供正确的参数'});
+        res.respond({code:1001,message:'请提供正确的参数'});
         return;
     }
 
     ProductService.idJoinWithCount({products: products}, function(err, products){
         if(err){
-            self.respond({code:1001,message:err});
+            res.respond({code:1001,message:err});
         }else {
-            self.respond(convertToShoppingCartFormatV_1_0(products, null, null));
+            res.respond(convertToShoppingCartFormatV_1_0(products, null, null));
         }
     });
-}
+};
 
 // return the format that FE need for shopping cart for v1.0
 // productDetails: the products Product.idJoinWithCount returns
@@ -1185,9 +1158,9 @@ function convertToShoppingCartFormatV_1_0(productDetails, cartId, userId){
 }
 
 // Get Brands Models Engines etc. attributes
-function getAttributes(attributeName) {
-    var self = this;
-    var category = self.data.category;
+exports.getAttributes = function(req, res, next) {
+    var attributeName = req.params.attributeName;
+    var category = req.data.category;
 
     // support old app
     if(category == '化肥'){
@@ -1197,18 +1170,18 @@ function getAttributes(attributeName) {
         category = '6C7D8F66';
     }
 
-    var brand = self.data.brand;
+    var brand = req.data.brand;
     if(attributeName == 'brands'){
         // brands is treated as an attribute before
         // we need to check here
         BrandService.query(category, function(err, brands){
             if(err){
                 console.error('query brands error', err);
-                self.respond({code:1001, message:'获取品牌列表失败', error:err});
+                res.respond({code:1001, message:'获取品牌列表失败', error:err});
                 return;
             }
 
-            self.respond({'code': '1000', 'message': 'success', 'datas': brands});
+            res.respond({'code': '1000', 'message': 'success', 'datas': brands});
         })
     } else {
         if(attributeName == 'models') attributeName = '车系';
@@ -1218,23 +1191,22 @@ function getAttributes(attributeName) {
         ProductService.getAttributes(category, brand, attributeName, function (err, attributes) {
             if (err) {
                 console.error('query attributes error', err);
-                self.respond({code: 1001, message: '获取商品属性列表失败', error: err});
+                res.respond({code: 1001, message: '获取商品属性列表失败', error: err});
                 return;
             }
 
-            self.respond({'code': '1000', 'message': 'success', 'datas': attributes.length > 0 ? attributes[0].values || [] : []});
+            res.respond({'code': '1000', 'message': 'success', 'datas': attributes.length > 0 ? attributes[0].values || [] : []});
         })
     }
-}
+};
 
 // Get min pay price
-function getMinPayPrice() {
-    var self = this;
+exports.getMinPayPrice = function(req, res, next) {
     var minPayPrice = F.config.minPayPrice;
     if (minPayPrice) {
-        self.respond({'code': '1000', 'message': 'success', 'payprice': minPayPrice});
+        res.respond({'code': '1000', 'message': 'success', 'payprice': minPayPrice});
     } else {
-        self.respond({'code': '1002', 'message': '未查询到数据'});
+        res.respond({'code': '1002', 'message': '未查询到数据'});
     }
 }
 
@@ -1247,55 +1219,55 @@ function offlinePay(){
     payOrder.call(this, function(paymentId, totalPrice, ip, orderId, payment) {
         OrderService.changeToPendingApprove(orderId, function(err){
             if(err){
-                self.respond({code:1002, message:'更改订单状态失败'});
+                res.respond({code:1002, message:'更改订单状态失败'});
                 return;
             }
 
-            self.respond({code:1000, message:'success', "paymentId":paymentId, "price":totalPrice});
+            res.respond({code:1000, message:'success', "paymentId":paymentId, "price":totalPrice});
         });
     });
 }
 
 function process_RSC_confirm_OfflinePay(){
     var self = this;
-    var paymentId = self.data.paymentId;
-    var price = self.data.price;
-    var offlinePayType = self.data.offlinePayType;
+    var paymentId = req.data.paymentId;
+    var price = req.data.price;
+    var offlinePayType = req.data.offlinePayType;
     var RSC = self.user;
     if(!paymentId){
-        self.respond({code:1001, message:'paymentId required'});
+        res.respond({code:1001, message:'paymentId required'});
         return;
     }
 
     if(!price){
-        self.respond({code:1001, message:'price required'});
+        res.respond({code:1001, message:'price required'});
         return;
     }
 
     if(!offlinePayType){
-        self.respond({code:1001, message:'offlinePayType required'});
+        res.respond({code:1001, message:'offlinePayType required'});
         return;
     }
 
     OrderService.get({"paymentId": paymentId}, function(err, order) {
         if (err) {
-            self.respond({code:1002, message:'获取订单失败'});
+            res.respond({code:1002, message:'获取订单失败'});
             return;
         }
 
         if(!order.RSCInfo || order.RSCInfo.RSC.toString() == RSC._id.toString()){
-            self.respond({code:1002, message:'该订单未分配到县级网点'});
+            res.respond({code:1002, message:'该订单未分配到县级网点'});
             return;
         }
 
         if(!order.pendingApprove){
-            self.respond({code:1002, message:'该订单没有待审核的线下支付'});
+            res.respond({code:1002, message:'该订单没有待审核的线下支付'});
             return;
         }
 
         var options = {payType:offlinePayType, price:price};
         payNotify.call(self, paymentId, options);
-        self.respond({code:1000, message:'success'});
+        res.respond({code:1000, message:'success'});
 
         // pay success log
         var payLog = {paymentId:paymentId, payType:offlinePayType, price:price, datePaid: new Date()};
@@ -1305,5 +1277,5 @@ function process_RSC_confirm_OfflinePay(){
 
 function json_offline_pay_type(){
     var self = this;
-    self.respond({code:1000, message:'success', offlinePayType:OFFLINEPAYTYPE});
+    res.respond({code:1000, message:'success', offlinePayType:OFFLINEPAYTYPE});
 }

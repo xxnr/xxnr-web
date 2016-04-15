@@ -30,6 +30,7 @@
 var fs = require("fs");
 var express = require('express');
 var bodyParser = require('body-parser');
+var cookieParser = require('cookie-parser')
 var https = require('https');
 var http = require('http');
 var path = require('path');
@@ -57,6 +58,9 @@ app.use(bodyParser.json({
 	'limit': '1mb'
 }));
 app.use(bodyParser.urlencoded({extended: false}));
+
+// cookieParser;
+app.use(cookieParser());
 
 // website common middleware
 app.use(require('./middlewares/website'));

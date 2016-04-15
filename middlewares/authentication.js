@@ -7,22 +7,22 @@ var AuthService = services.auth;
 var BackEndUserService = services.backenduser;
 var AuditService = services.auditservice;
 var ThrottleService = services.throttle;
-var tools = require('./tools');
+var tools = require('../common/tools');
 
-exports.isLoggedIn_middleware = function(req, res, next, options, controller){
+exports.isLoggedIn_middleware = function(req, res, next){
     var token = null;
     // check if token is valid
-    var data = req.method === 'GET' ? controller.query : controller.body;
+    var data = req.data;
     if(data.token){
         // if data contains token
         // it means the request is from app
         token = data.token;
-    }else if (controller.req.cookie(F.config.tokencookie)){
-        token = controller.req.cookie(F.config.tokencookie);
+    }else if (req.cookies[F.config.tokencookie]){
+        token = req.cookies[F.config.tokencookie];
     }
 
     if(!token){
-        controller.respond({code:1401, message:'请先登录'});
+        res.respond({code:1401, message:'请先登录'});
         return;
     }
 
@@ -33,7 +33,7 @@ exports.isLoggedIn_middleware = function(req, res, next, options, controller){
             if (err) {
                 // perhaps no user find
                 console.error('isLogin_middleware user not found:', err);
-                controller.respond({code: 1401, message: '用户不存在'});
+                res.respond({code: 1401, message: '用户不存在'});
                 return;
             }
 
@@ -44,23 +44,19 @@ exports.isLoggedIn_middleware = function(req, res, next, options, controller){
                     false;
 
             if (!valid) {
-                controller.respond({code: 1401, message: '您已在其他地方登录'});
+                res.respond({code: 1401, message: '您已在其他地方登录'});
                 return;
             }
 
-            if (req.method == 'GET') {
-                controller.query['userId'] = payload.userId;
-            } else {
-                controller.body.userId = payload.userId;
-            }
+            req.data.userId = payload.userId;
 
-            controller.user = data;
+            req.user = data;
             next();
         })
     }catch(e){
         // authentication fail
         console.error('Token verification fail:', e);
-        controller.respond({code: 1401, message: '用户信息验证错误，请重新登录'});
+        res.respond({code: 1401, message: '用户信息验证错误，请重新登录'});
     }
 };
 
