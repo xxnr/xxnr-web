@@ -737,7 +737,13 @@ function addOrderBySKU(){
                     addOrderOptions.user = user;
                     addOrderOptions.SKU_items = cart.SKU_items;
                     addOrderOptions.deliveryType = deliveryType;
-                    addOrderOptions.address = address;
+                    // addOrderOptions.address = address;
+
+                    addOrderOptions.addressInfo = {
+                        "consigneeName": address.receiptpeople,
+                        "consigneePhone": address.receiptphone,
+                        "consigneeAddress": address.provincename + address.cityname + (address.countyname || '') + (address.townname || '') + address.address
+                    };
                     OrderService.splitAndaddOrder(addOrderOptions, function(err, response, orderSKUs) {
                         if(err || !response){
                             self.respond({code:1001, message:err});
@@ -755,14 +761,36 @@ function addOrderBySKU(){
                         self.respond({code:1001, message:'自提点不存在'});
                         return;
                     }
+                    if (!RSC.RSCInfo || !RSC.RSCInfo.companyAddress || !RSC.RSCInfo.companyAddress.province.name || !RSC.RSCInfo.companyAddress.city.name) {
+                        callback("自提点地址不完整");
+                        return;
+                    }
                     var addOrderOptions = {};
                     addOrderOptions.user = user;
                     addOrderOptions.SKU_items = cart.SKU_items;
                     addOrderOptions.deliveryType = deliveryType;
                     addOrderOptions.RSCId = RSCId;
-                    addOrderOptions.RSC = RSC;
+                    // addOrderOptions.RSC = RSC;
                     addOrderOptions.consigneeName = consigneeName;
                     addOrderOptions.consigneePhone = consigneePhone;
+
+                    addOrderOptions.RSCInfo = {RSC: RSCId};
+                    addOrderOptions.RSCInfo.RSCAddress = RSC.RSCInfo.companyAddress.province.name + RSC.RSCInfo.companyAddress.city.name;
+                    if (RSC.RSCInfo.companyAddress.county && RSC.RSCInfo.companyAddress.county.name) {
+                        addOrderOptions.RSCInfo.RSCAddress += RSC.RSCInfo.companyAddress.county.name;
+                    }
+                    if (RSC.RSCInfo.companyAddress.town && RSC.RSCInfo.companyAddress.town.name) {
+                        addOrderOptions.RSCInfo.RSCAddress += RSC.RSCInfo.companyAddress.town.name;
+                    }
+                    if (RSC.RSCInfo.companyAddress.details) {
+                        addOrderOptions.RSCInfo.RSCAddress += RSC.RSCInfo.companyAddress.details;
+                    }
+                    if (RSC.RSCInfo.companyName) {
+                        addOrderOptions.RSCInfo.companyName = RSC.RSCInfo.companyName;
+                    }
+                    if (RSC.RSCInfo.phone) {
+                        addOrderOptions.RSCInfo.RSCPhone = RSC.RSCInfo.phone;
+                    }
                     OrderService.splitAndaddOrder(addOrderOptions, function(err, response, orderSKUs) {
                         if(err || !response){
                             self.respond({code:1001, message:err});
