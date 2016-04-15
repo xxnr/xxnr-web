@@ -52,11 +52,11 @@ body {
     width: 100%;
 }
 .overflow_body {
-    position: fixed;
-    overflow-y: hidden;
+    /*position: fixed;*/
+    overflow: hidden;
 }
 .not_overflow_body {
-    position: relative;
+    /*position: relative;*/
     overflow: auto;
 }
 .wrap {
@@ -1920,6 +1920,7 @@ body {
     line-height: 78px;
     overflow: hidden;
     background: #f8f8f8;
+    border-bottom: 0px;
 }
 .product_detail .details_tab li {
     float: left;
@@ -5830,6 +5831,7 @@ body {
     width: auto;
     border-top: 1px solid #c7c7c7;
     position: relative;
+    line-height: inherit;
 }
 .order-detail-section .order .order-body .pay_table_content .payment_detail #triangle {
     position: absolute;
