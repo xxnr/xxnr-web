@@ -112,7 +112,10 @@
                                     <ul class="row">
                                         <li class="SKUAttributes-title">{{SKUAttribute.name}}</li>
                                         <div class="SKUAttributes-options">
-                                            <li class="SKUAttributes-option" ng-repeat="value in SKUAttribute.values" ng-click="selectSKU($parent.$index,$index)" ng-class="{'selected':SKUAttribute.isSelected[$index]==true,'selectable':SKUAttribute.selectable[$index]==true,'unselectable':SKUAttribute.selectable[$index]==false}"><img ng-show="SKUAttribute.isSelected[$index]" src="images/choose.png" alt="">{{value}}</li>
+                                            <li class="SKUAttributes-option" ng-repeat="value in SKUAttribute.values" ng-click="selectSKU($parent.$index,$index)" ng-class="{'selected':SKUAttribute.isSelected[$index]==true,'selectable':SKUAttribute.selectable[$index]==true,'unselectable':SKUAttribute.selectable[$index]==false}">
+                                                <img ng-show="SKUAttribute.isSelected[$index]" src="images/choose.png" alt="">
+                                                {{ value | appendDotToLongName36 }}
+                                            </li>
                                         </div>
 
                                     </ul>
