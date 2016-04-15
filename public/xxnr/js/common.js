@@ -377,6 +377,14 @@ app.filter('toNumberFixedTwo', function() {
         }
     };
 });
+app.filter('appendDotToLongName36', function() {
+    return function(input) {
+        if(input){
+            var output = input.length > 36 ? (input.substr(0, 33) + '...') : input;
+            return output;
+        }
+    };
+});
 
 
 

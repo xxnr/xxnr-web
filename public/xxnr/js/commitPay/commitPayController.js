@@ -79,10 +79,14 @@ app.controller('commitPayController', function($scope, remoteApiService, payServ
             }
         }else if (index==1) {
             $scope.pay_price = Number($scope.multi_pay_amount).toFixed(2);
+
             if($scope.selectedPayMethodIndex==0){
                 $scope.payUrl = payService.aliPayUrl($scope.orders[$scope.orderSelectedNum].id,$scope.pay_price);
             }else if($scope.selectedPayMethodIndex==1){
                 $scope.payUrl = payService.unionPayUrl($scope.orders[$scope.orderSelectedNum].id,$scope.pay_price);
+            }else if($scope.selectedPayMethodIndex==2){
+                $scope.selectedPayMethodIndex=0;
+                $scope.payUrl = payService.aliPayUrl($scope.orders[$scope.orderSelectedNum].id,$scope.pay_price);
             }
         }
 

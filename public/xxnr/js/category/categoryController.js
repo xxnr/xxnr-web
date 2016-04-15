@@ -13,19 +13,20 @@ app.controller('categoryController', function($scope, remoteApiService, commonSe
     var hasAttributes = false;
 
     $scope.$parent.select = function(categoryIndex, choiceIndex){
-        $scope.$parent.brandsStr = null;
-        if(categoryIndex== ($scope.$parent.search_categories.length - 1)){
-            if($scope.$parent.search_categories[categoryIndex].choices[choiceIndex].isSelected == true){
+        $scope.$parent.brandsStr = null;                //用来QUERY的品牌的字符串
+
+        if(categoryIndex== ($scope.$parent.search_categories.length - 1)){     //选中价格那一行的属性
+            if($scope.$parent.search_categories[categoryIndex].choices[choiceIndex].isSelected == true){ //原来是选中状态时
                 $scope.$parent.search_categories[categoryIndex].choices[choiceIndex].isSelected = false;
                 $scope.$parent.search_categories.slice(-1)[0].current_query = "";
-            }else{
+            }else{   //原来是非选中状态时
                 for(var i in $scope.$parent.search_categories[categoryIndex].choices){
                     $scope.$parent.search_categories[categoryIndex].choices[i].isSelected = false;
                 }
                 $scope.$parent.search_categories[categoryIndex].choices[choiceIndex].isSelected = true;
                 $scope.$parent.search_categories[categoryIndex].current_query = $scope.$parent.search_categories[categoryIndex].choices[choiceIndex].name;
             }
-        }else{
+        }else{     //选中其他行时
             $scope.$parent.search_categories[categoryIndex].choices[choiceIndex].isSelected = !$scope.$parent.search_categories[categoryIndex].choices[choiceIndex].isSelected;
             if(categoryIndex === 0){
                 $scope.$parent.getAttributes(false,true);
@@ -38,35 +39,38 @@ app.controller('categoryController', function($scope, remoteApiService, commonSe
         }
         current_page = 1;
         $scope.$parent.current_items = [];
-
         queryAttributes = [];
         hasAttributes = false;
+        if(categoryIndex === 0){
+            queryAttributes = null;
+        }else{
+            for(var j = 1;j<$scope.$parent.search_categories.length-1;j++){
+                var a = {
+                    name:"",
+                    value:
+                    {
+                        '$in':[]
+                    }
+                };
+                for(var k in $scope.$parent.search_categories[j].choices){
+                    if($scope.$parent.search_categories[j].choices[k].isSelected === true){
+                        a.name = $scope.$parent.search_categories[j].name;
+                        // console.log($scope.$parent.search_categories[j].choices[k].name);
+                        // console.log(a.value);
+                        a.value['$in'].push($scope.$parent.search_categories[j].choices[k].name);
+                        hasAttributes = true;
+                    }
 
-        for(var j = 1;j<$scope.$parent.search_categories.length-1;j++){
-            var a = {
-                name:"",
-                value:
-                {
-                    '$in':[]
                 }
-            };
-            for(var k in $scope.$parent.search_categories[j].choices){
-                if($scope.$parent.search_categories[j].choices[k].isSelected === true){
-                    a.name = $scope.$parent.search_categories[j].name;
-                    // console.log($scope.$parent.search_categories[j].choices[k].name);
-                    // console.log(a.value);
-                    a.value['$in'].push($scope.$parent.search_categories[j].choices[k].name);
-                    hasAttributes = true;
+                if(a.name){
+                    queryAttributes.push(a);
                 }
 
             }
-            if(a.name){
-                queryAttributes.push(a);
-            }
-
         }
 
-        // console.log(queryAttributes);
+
+
         if(!hasAttributes){
             queryAttributes = null;
         }
@@ -80,8 +84,6 @@ app.controller('categoryController', function($scope, remoteApiService, commonSe
         }else{
             price = null;
         }
-        // console.log(queryAttributes);
-        // console.log(price);
         getPagedGoods(current_page,product_count_per_page,$scope.$parent.categoryId,$scope.$parent.brandsStr, queryAttributes, price);
         generate_page();
     };
