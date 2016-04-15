@@ -109,10 +109,11 @@
                         <a href="applyCountyVerified.html" ng-if="user.isVerified && user.typeNum == 5">
                             <img class="huizhang"  src="images/huiyuan.png" alt="" />
                         </a>
-                        <img class="huizhang" ng-if="user.isVerified && user.typeNum == 6"  src="images/huiyuan.png" alt="" />
-                        <a href="applyCountyVerified.html" ng-if="!user.isVerified && user.RSCInfoVerifing">
+                        <a href="applyCountyVerified.html" ng-if="!user.isVerified && user.RSCInfoVerifing && user.typeNum == 5">
                             <img class="huizhang" src="images/badge_gray.png" alt="" />
                         </a>
+                        <img class="huizhang" ng-if="user.isVerified && user.typeNum == 6"  src="images/huiyuan.png" alt="" />
+
                         <a href="fillProfile.html" class="modifyInfo">修改资料</a>
                         <a href="applyCountyVerified.html" class="applyVerified" ng-if="!user.isRSC && !user.RSCInfoVerifing && user.typeNum == 5">申请认证</a>
                     </p>
@@ -142,7 +143,7 @@
                             </p>
                         </a>
                     </div>
-                    <div ng-if="user.isVerified && user.isRSC" class="subSection RSC_btn">
+                    <div ng-if="user.isVerifiedRSC" class="subSection RSC_btn">
                         <a href="rsc_management.html" class="clearfix">
                             <img src="images/RSC-icon.png" alt="" />
                             <p>
