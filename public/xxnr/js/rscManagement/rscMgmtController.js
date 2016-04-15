@@ -98,6 +98,23 @@ app.controller('rscManagementController', function($scope, $rootScope,remoteApiS
                 $scope.pages[pageIndex].isSelected = false;
             }
         }
+        if($scope.pages.length<=7){                                                     // e.g.: 1 2 3 4 5 6 7
+            $scope.pages = $scope.pages;
+        }else if($scope.pages.length>7 && $scope.current_page<5){                              // e.g.: 1 2 3 4 5 ... 20
+            $scope.pages = $scope.pages.slice(0,6).concat($scope.pages[$scope.pages.length-1]);
+            $scope.pages[5].id = '...';
+        }else if($scope.pages.length>7 && $scope.current_page <= $scope.pages_count && $scope.current_page> $scope.pages_count - 4 ) {    // e.g.: 1 ... 16 17 18 19 20
+            $scope.pages = $scope.pages.slice(0,1).concat($scope.pages.slice($scope.pages.length-6,$scope.pages.length));
+            $scope.pages[1].id = '...';
+        }else{                                                                          // e.g.: 1 .. 8 9 10 ... 20
+            var tempFirst = $scope.pages[0];
+            var tempLast = $scope.pages[$scope.pages.length-1];
+            $scope.pages = $scope.pages.slice($scope.current_page-3,$scope.current_page+2);
+            $scope.pages[0].id = '...';
+            $scope.pages[$scope.pages.length-1].id = '...';
+            $scope.pages.push(tempLast);
+            $scope.pages.unshift(tempFirst);
+        }
     };
     $scope.show_page = function(pageId) {
         $scope.current_page = pageId;

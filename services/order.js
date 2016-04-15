@@ -379,45 +379,12 @@ OrderService.prototype.splitAndaddOrder = function(options, callback) {
     }
     // different deliveryType different address
     if (options.deliveryType && options.deliveryType === DELIVERYTYPE['SONGHUO'].id) {
-        if (!options.address) {
+    	if (!options.addressInfo) {
             callback("请先填写收货地址");
             return;
-        } else {
-        	addressInfo = {
-        		"consigneeName": options.address.receiptpeople,
-        		"consigneePhone": options.address.receiptphone,
-        		"consigneeAddress": options.address.provincename + options.address.cityname + (options.address.countyname || '') + (options.address.townname || '') + options.address.address
-        	};
         }
-        options.addressInfo = addressInfo;
     } else if (options.deliveryType && options.deliveryType === DELIVERYTYPE['ZITI'].id) {
-        if (!options.RSC || !options.RSCId) {
-            callback("请先选择自提点");
-            return;
-        } else {
-        	RSCInfo = {RSC: options.RSCId};
-        	if (!options.RSC.RSCInfo || !options.RSC.RSCInfo.companyAddress || !options.RSC.RSCInfo.companyAddress.province.name || !options.RSC.RSCInfo.companyAddress.city.name) {
-        		callback("自提点地址不完整");
-            	return;
-            }
-        	RSCInfo.RSCAddress = options.RSC.RSCInfo.companyAddress.province.name + options.RSC.RSCInfo.companyAddress.city.name;
-        	if (options.RSC.RSCInfo.companyAddress.county && options.RSC.RSCInfo.companyAddress.county.name) {
-        		RSCInfo.RSCAddress += options.RSC.RSCInfo.companyAddress.county.name;
-        	}
-        	if (options.RSC.RSCInfo.companyAddress.town && options.RSC.RSCInfo.companyAddress.town.name) {
-        		RSCInfo.RSCAddress += options.RSC.RSCInfo.companyAddress.town.name;
-        	}
-        	if (options.RSC.RSCInfo.companyAddress.details) {
-        		RSCInfo.RSCAddress += options.RSC.RSCInfo.companyAddress.details;
-        	}
-        	if (options.RSC.RSCInfo.companyName) {
-        		RSCInfo.companyName = options.RSC.RSCInfo.companyName;
-        	}
-        	if (options.RSC.RSCInfo.phone) {
-        		RSCInfo.RSCPhone = options.RSC.RSCInfo.phone;
-        	}
-        }
-        if (!options.consigneeName) {
+    	if (!options.consigneeName) {
             callback("请先填写收货人姓名");
             return;
         }
@@ -425,7 +392,10 @@ OrderService.prototype.splitAndaddOrder = function(options, callback) {
             callback("请先填写收货人手机号");
             return;
         }
-        options.RSCInfo = RSCInfo;
+        if (!options.RSCInfo || !options.RSCId) {
+            callback("请先选择自提点");
+            return;
+        }
     } else {
         callback("请先选择正确的配送方式");
         return;
@@ -444,69 +414,6 @@ OrderService.prototype.splitAndaddOrder = function(options, callback) {
         	callback('无法添加下架SKU');
             return;
         }
-
-        // var additions = options.SKU_items[i].additions;
-        // var additionPrice = 0;
-        // additions.forEach(function(addition) {
-        //     additionPrice += addition.price;
-        //     if (!addition.ref) {
-        //         addition.ref = addition._id;
-        //     }
-            
-        //     delete addition._id;
-        // });
-        // product = api10.convertProduct(product);
-        // var SKU_to_add = {
-        // 	ref: SKU._id,
-        // 	productId: product.id,
-	       //  price: SKU.price.platform_price,
-	       //  deposit: product.deposit,
-	       //  productName: product.name,
-	       //  name: SKU.name,
-	       //  thumbnail: product.thumbnail,
-	       //  count: options.SKU_items[i].count,
-	       //  category: product.category,
-	       //  attributes: SKU.attributes
-        // };
-        // if (additions && additions.length > 0) {
-        //     SKU_to_add.additions = additions;
-        // }
-
-        // var orderKey = "full";
-        // if (SKU_to_add.deposit) {
-        // 	orderKey = "deposit";
-        // }
-        // if (!orders[orderKey]) {
-        //     orders[orderKey] = {
-        //         "buyerName":options.user.name,
-        //         "buyerPhone":options.user.account,
-        //         "buyerId":options.user.id,
-        //         "price":0,
-        //         "deposit":0,
-        //         "SKUs":[],
-        //         "payType":options.payType || PAYTYPE.ZHIFUBAO,
-        //         "payStatus":PAYMENTSTATUS.UNPAID,
-        //         "deliverStatus":DELIVERSTATUS.UNDELIVERED
-        //     };
-        //     orders[orderKey].id = U.GUID(10);
-        //     orders[orderKey].paymentId = U.GUID(10);
-        //     if (options.deliveryType === DELIVERYTYPE['ZITI'].id) {
-        //     	orders[orderKey].RSCInfo = RSCInfo;
-        //     	orders[orderKey].consigneeName = options.consigneeName;
-        //         orders[orderKey].consigneePhone = options.consigneePhone;
-        //         orders[orderKey].deliveryType = DELIVERYTYPE['ZITI'].id;
-        //     } else {
-        //     	orders[orderKey].consigneeName = addressInfo.consigneeName;
-        //         orders[orderKey].consigneePhone = addressInfo.consigneePhone;
-        //         orders[orderKey].consigneeAddress = addressInfo.consigneeAddress;
-        //         orders[orderKey].deliveryType = DELIVERYTYPE['SONGHUO'].id;
-        //     }
-        // }
-        // orders[orderKey].price +=  SKU_to_add.count * (SKU_to_add.price+additionPrice);
-        // if (SKU_to_add.deposit) {
-        // 	orders[orderKey].deposit += SKU_to_add.count * SKU_to_add.deposit;
-        // }
-        // orders[orderKey].SKUs.push(SKU_to_add);
     	
     	var result = self.pushSKUtoOrders(orders, options.SKU_items[i], options);
     	if (result && result.length >= 2) {
@@ -2060,7 +1967,7 @@ OrderService.prototype.payNotify = function(paymentId, options){
             }
         } else {
             // not find order by paymentId
-            // *TODO refund or other methods
+            // refund or other methods
             var paymentOptions = options;
             paymentOptions.paymentId = paymentId;
             if (!paymentOptions.orderId) {
