@@ -415,7 +415,7 @@ gulp.task('apply_county_js_minify', function() {
         './js/sweetalert.min.js',
         './js/myPlaceholderDirective.js',
         './js/fillProfile/applyCountyVeriController.js'])
-        .pipe(concat('applyCounty_js.js'))
+        .pipe(concat('applyCountyVerified_js.js'))
         .pipe(ngmin())
         .pipe(uglify({mangle: false}))
         .pipe(gulp.dest('./dev/js'))
