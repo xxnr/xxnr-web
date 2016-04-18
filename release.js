@@ -50,6 +50,11 @@ var options = {key:privateKey, cert:certificate};
 
 app.set('jsonp callback name', 'JSON_CALLBACK');
 
+//view template setting
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'html');
+app.engine('html', require('ejs-mate'));
+
 /**
  * middleware
  */

@@ -6,8 +6,8 @@ app.directive('header', function(){
            return attrs.templateUrl || 'header';
         },
         controller: function ($scope) {
-            $(function(){
-                if(window.location.href.indexOf("resources") != -1){
+            $(function () {
+                if (window.location.href.indexOf("resources") != -1) {
                     var login = document.getElementById('header_login');
                     login.href = "../../logon.html";
                     var register = document.getElementById('header_register');
@@ -18,15 +18,13 @@ app.directive('header', function(){
                     androidLink.href = "../../newFarmer.apk";
                 }
             });
-        },
-        replace:true
+        }
     }
 }).directive('footer', function(){
   return{
         restrict: 'AE',
     templateUrl: function(element, attrs) {
-           return attrs.templateUrl || 'footer';
-        },
-    replace:true
+        return attrs.templateUrl || 'footer';
+    }
   }
 });

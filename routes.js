@@ -9,8 +9,8 @@ var middleware = require('./middlewares/authentication');
 
 // front end page
 router.get('/', function(req, res){res.sendFile(path.join(__dirname, './public/xxnr/index.html'));});
-router.get('/header', function(req, res){res.sendFile(path.join(__dirname, './public/xxnr/header'));});
-router.get('/footer', function(req, res){res.sendFile(path.join(__dirname, './public/xxnr/footer'));});
+router.get('/header', function(req, res){res.sendFile(path.join(__dirname, './public/xxnr/header.html'));});
+router.get('/footer', function(req, res){res.sendFile(path.join(__dirname, './public/xxnr/footer.html'));});
 
 // area address APIs
 router.get('/api/v2.0/area/getAreaList', controllers.Area.json_province_query);
