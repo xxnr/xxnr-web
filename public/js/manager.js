@@ -44,6 +44,16 @@ jRouting.route(managerurl + '/orders/', function() {
     redirectToHomePage();
 });
 
+jRouting.route(managerurl + '/orders/detail', function() {
+
+	if (can('orders')) {
+		SET('common.page', 'order-detail');
+		return;
+	}
+
+	redirectToHomePage();
+});
+
 jRouting.route(managerurl + '/products/', function() {
 
     if (can('products')) {
@@ -133,6 +143,33 @@ jRouting.route(managerurl + '/system/', function() {
     }
 
     redirectToHomePage();
+});
+
+jRouting.route(managerurl + '/rsc/', function(){
+	if(can('rsc')) {
+		SET('common.page', 'rsc');
+		return;
+	}
+
+	redirectToHomePage();
+});
+
+jRouting.route(managerurl + '/rsc/rsc-detail', function(){
+	if(can('rsc')) {
+		SET('common.page', 'rsc-detail');
+		return;
+	}
+
+	redirectToHomePage();
+});
+
+jRouting.route(managerurl + '/rsc/rsc-order', function(){
+	if(can('rsc')) {
+		SET('common.page', 'rsc-order');
+		return;
+	}
+
+	redirectToHomePage();
 });
 
 jRouting.on('location', function(url) {
@@ -238,6 +275,31 @@ Delay_Search_WATCH = function(field, callback, latency_in_millisecond){
 			callback(path, value);
 		}
 	})
+};
+
+hasElementArray = function(checkArray, judge) {
+	// TODO : use js closure
+	if(checkArray instanceof Array) {
+		if(typeof judge == 'function') {
+			for(var i = 0; i < checkArray.length; i++) {
+				var rscObj = checkArray[i];
+				if(judge(rscObj)) {
+					return i;
+				}
+			}
+			return -1;
+		}
+	}else if(typeof(checkArray) == "string") {
+		return checkArray.indexOf(judge);
+	}
+};
+
+getUrlParam = function(name) {
+	var result = location.search.match(new RegExp("[\?\&]" + name + "=([^\&]+)", "i"));
+	if (result == null || result.length < 1) {
+		return "";
+	}
+	return result[1];
 };
 
 var app = angular.module('xxnr.manager',['ngCookies'])

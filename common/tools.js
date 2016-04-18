@@ -6,6 +6,7 @@ var http = require('http');
 var https = require('https');
 var querystring = require('querystring');
 var JWT = require('jsonwebtoken');
+var pinyin = require("pinyin");
 
 var regexpPhone = new RegExp('^(13[0-9]|15[012356789]|17[678]|18[0-9]|14[57])[0-9]{8}$');
 var regexpPrice = new RegExp('^[0-9]*(\.[0-9]{1,2})?$');
@@ -301,4 +302,36 @@ exports.httpRequest = function(options, callback) {
     
 
     req.end();
+};
+
+/**
+ * get string's Pinyin
+ * @param  {object}   options  input string
+ * @return {object}   the yinpin result {'error':error info, 'strPinyin':string pinyin result, 'initial':the initial of pinyin, 'initialType':the initialType of pinyin 1(a-z-A-Z) 2(others)}
+ */
+exports.stringPinyin = function(options) {
+    var strPinyin = '#';
+    var initial = '#';
+    var initialType = 2;
+    if (options.str) {
+        try {
+            var pinyinList = pinyin(options.str, {style: pinyin.STYLE_NORMAL});
+            strPinyin = pinyinList.join("").toLowerCase();
+            var char = strPinyin[0];
+            var regs=/^[A-Z-a-z]$/;
+            if(regs.test(char)) {
+                initial = char.toUpperCase();
+                initialType = 1;
+            } else {
+                strPinyin = initial + strPinyin;
+                initialType = 2;
+            }
+            return {'strPinyin':strPinyin, 'initial':initial, 'initialType':initialType};
+        } catch (e) {
+            console.error('tools stringPinyin err:', e, options.str);
+            return {'error':e, 'strPinyin':strPinyin, 'initial':initial, 'initialType':initialType};
+        }
+    } else {
+        return {'error':'no string', 'strPinyin':strPinyin, 'initial':initial, 'initialType':initialType};
+    }
 };

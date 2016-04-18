@@ -71,7 +71,7 @@
         } : null;
     </script>
 </head>
-<body ng-controller="jiesuanController" class="confirm-order">
+<body ng-controller="jiesuanController" class="confirm-order" ng-class="{true:'overflow_body', false:'not_overflow_body'}[isOverflow]">
 <header ng-controller="headerController"></header>
 <div class="wrap nav">
     <h1 class="left logo"><a href="/">新新农人</a></h1>
@@ -307,7 +307,7 @@
                         </tr>
                         <tr>
                             <td class="first-td">&nbsp;</td>
-                            <td class="second-td"><input type="submit" value="提交" class="tijiao"
+                            <td class="second-td"><input type="submit" value="保存" class="tijiao"
                                                          ng-click="submitAddressAdd()"></td>
                         </tr>
                     </table>
@@ -351,7 +351,7 @@
                                 </div>
                                 <div class="item-list">
                                     <div class="item-single item-item" ng-repeat="item in shop.items">
-                                        <div class="item-form">
+                                        <div class="item-form clearfix">
                                             <div class="cell p-goods p-goods2">
                                                 <div class="goods-item">
                                                     <div class="item-msg clearfix">
@@ -556,12 +556,12 @@
             </tr>
             <tr>
                 <td class="first-td">&nbsp;</td>
-                <td class="second-td"><input type="submit" value="提交" class="tijiao" ng-click="submitAddressAdd()"></td>
+                <td class="second-td"><input type="submit" value="保存" class="tijiao" ng-click="submitAddressAdd()"></td>
             </tr>
         </table>
     </div>
     <div class="selectCompany" ng-show="showSelectCompanyPop">
-        <p class="popTitle">选择自提网点 <img ng-click="showPop = false;showSelectCompanyPop=false;selectedCompanyId=-1"
+        <p class="popTitle">选择自提网点 <img ng-click="showPop = false;showSelectCompanyPop=false;selectingCompanyId = -1;isOverflow=false"
                                         src="./images/close.gif"
                                         alt=""></p>
         <p class="infoText">1.选择自提网点下单并支付完成 <span>></span> 2.收到自提通知 <span>></span> 3.通过自提码到网点提货</p>
@@ -597,17 +597,17 @@
             </div>
         </div>
         <div class="buttons">
-            <button ng-disabled="selectingCompanyId==-1"
-                    ng-class="{true:'companySelcted',false:'companyUnselcted'}[selectingCompanyId!=-1]"
+            <button ng-disabled="!checkSelectingCompanyInPopRSCList()"
+                    ng-class="{true:'companySelcted',false:'companyUnselcted'}[checkSelectingCompanyInPopRSCList()]"
                     ng-click="checkedCompany()">确定
             </button>
-            <button ng-click="showPop = false;showSelectCompanyPop=false;selectedCompanyId=-1;selectingCompanyId=-1">
+            <button ng-click="showPop = false;showSelectCompanyPop=false;selectingCompanyId=-1">
                 取消
             </button>
         </div>
     </div>
     <div class="pickupConsignee" ng-show="showConsigneePop">
-        <p class="pickupConsigneeTitle">选择收货人 <img ng-click="showPop = false; showConsigneePop=false"
+        <p class="pickupConsigneeTitle">选择收货人 <img ng-click="showPop = false; showConsigneePop=false;isOverflow=false"
                                                    src="./images/close.gif" alt=""></p>
         <p class="infoText">填写到网点自提的收货人信息</p>
         <div class="consignees_list">

@@ -19,6 +19,7 @@ var RSCService = services.RSC;
 var PAYMENTSTATUS = require('../common/defs').PAYMENTSTATUS;
 var DELIVERSTATUS = require('../common/defs').DELIVERSTATUS;
 var DELIVERYTYPENAME = require('../common/defs').DELIVERYTYPENAME;
+var OFFLINEPAYTYPE = require('../common/defs').OFFLINEPAYTYPE;
 
 exports.install = function() {
 	// Auto-localize static HTML templates
@@ -55,7 +56,11 @@ exports.install = function() {
 	F.route(CONFIG('manager-url') + '/api/orders/subOrders/',              	json_subOrders_payments_update, ['put'], ['backend_auth', 'auditing']);
 	F.route(CONFIG('manager-url') + '/api/orders/products/',              	json_orders_products_update, ['put'], ['backend_auth', 'auditing']);
 	F.route(CONFIG('manager-url') + '/api/orders/SKUs/',              		json_orders_SKUs_update, ['put'], ['backend_auth', 'auditing']);
+	F.route(CONFIG('manager-url') + '/api/orders/SKUsDelivery/',            json_orders_SKUs_delivery, ['put'], ['backend_auth', 'auditing']);
 	F.route(CONFIG('manager-url') + '/api/orders/RSCInfo/',					process_orders_RSCInfo_update, ['put'], ['backend_auth', 'auditing']);
+	F.route(CONFIG('manager-url') + '/api/orders/confirmOfflinePay',    	process_order_confirm_OfflinePay, ['get'], ['backend_auth', 'auditing']);
+	F.route(CONFIG('manager-url') + '/api/order/getOfflinePayType',          json_offline_pay_type, ['get'], ['backend_auth']);
+
 	// F.route(CONFIG('manager-url') + '/api/orders/',              			json_orders_save, ['put'], ['backend_auth']);
 	// F.route(CONFIG('manager-url') + '/api/orders/',              			json_orders_remove, ['delete']);
 	// F.route(CONFIG('manager-url') + '/api/orders/clear/',        			json_orders_clear);
@@ -613,29 +618,55 @@ function json_orders_query() {
         if (orders) {
 	        var items = orders.items;
 	        var length = items.length;
+	        var arr = [];
 	        for (var i = 0; i < length; i++) {
-                var item = items[i];
+                // var item = items[i];
+                var order = items[i];
+                var item = {
+                    'id':order.id,
+                    'paymentId':order.paymentId,
+                    'price':order.price,
+                    'deposit':order.deposit,
+                    'consigneeAddress':order.consigneeAddress,
+                    'consigneeName':order.consigneeName,
+                    'consigneePhone':order.consigneePhone,
+                    'buyerName':order.buyerName,
+                    'buyerPhone':order.buyerPhone,
+                    'payType':order.payType,
+                    'products':order.products || [],
+                    'SKUs':order.SKUs || [],
+                    'duePrice':typeof(order.duePrice) != 'undefined' ? parseFloat(order.duePrice.toFixed(2)) : null,
+                    'deliveryType':order.deliveryType,
+                    'payStatus':order.payStatus,
+                    'deliverStatus':order.deliverStatus,
+                    'RSCInfo':order.RSCInfo,
+                    'isClosed':order.isClosed
+                };
                 // 订单合成状态
-                item.typeValue = OrderService.orderType(item);
-                var orderInfo = {'totalPrice':item.price.toFixed(2), 'deposit':item.deposit.toFixed(2), 'dateCreated':item.dateCreated, 'orderStatus': OrderService.orderStatus(item)};
+                item.typeValue = OrderService.orderType(order);
+                // 创建时间
+                item.dateCreated = order.dateCreated;
                 // 支付时间
-			    if (item.payStatus == PAYMENTSTATUS.PAID && item.datePaid) {
-			        orderInfo.datePaid = item.datePaid;
-			    }
-			    // 待收货时间
-			    if (item.datePendingDeliver) {
-			        orderInfo.datePendingDeliver = item.datePendingDeliver;
-			    }
-			    // 全部发货时间
-			    if (item.deliverStatus == DELIVERSTATUS.DELIVERED && item.dateDelivered) {
-			        orderInfo.dateDelivered = item.dateDelivered;
-			    }
-			    // 完成时间
-			    if (item.deliverStatus == DELIVERSTATUS.RECEIVED && item.dateCompleted) {
-			        orderInfo.dateCompleted = item.dateCompleted;
-			    }
+                if (order.payStatus == PAYMENTSTATUS.PAID && order.datePaid) {
+                    item.datePaid = order.datePaid;
+                }
+                // 待收货时间
+                if (order.payStatus == PAYMENTSTATUS.PAID && order.deliverStatus !== DELIVERSTATUS.UNDELIVERED && order.datePendingDeliver) {
+                    item.datePendingDeliver = order.datePendingDeliver;
+                }
+                // 全部发货时间
+                if (order.deliverStatus == DELIVERSTATUS.DELIVERED && order.dateDelivered) {
+                    item.dateDelivered = order.dateDelivered;
+                }
+                // 完成时间
+                if (order.deliverStatus == DELIVERSTATUS.RECEIVED && order.dateCompleted) {
+                    item.dateCompleted = order.dateCompleted;
+                }
+                var orderInfo = {'totalPrice':order.price.toFixed(2), 'deposit':order.deposit.toFixed(2), 'dateCreated':order.dateCreated, 'orderStatus': OrderService.orderStatus(order)};
                 item.order = orderInfo;
+                arr[i] = item;
             }
+            orders.items = arr;
         }
         self.respond({code:1000, message:'success', datas:orders});
     });
@@ -752,23 +783,171 @@ function json_orders_SKUs_update() {
 	});
 }
 
+//  SKUs deliver
+function json_orders_SKUs_delivery() {
+	var self = this;
+	var orderid = self.body && self.body.id ? self.body.id: null;
+	var SKUs = self.body && self.body.SKUs ? self.body.SKUs: null;
+	if (!orderid) {
+		self.respond({code:1001, message:'请求参数错误', error:[{'error':'更新失败，缺少订单ID'}]});
+		return;
+	}
+	if (!SKUs) {
+		self.respond({code:1001, message:'请求参数错误', error:[{'error':'更新失败，缺少商品列表'}]});
+		return;
+	}
+
+	OrderService.getById(orderid, function(err, order) {
+		if (err) {
+			console.error('manager json_orders_read error:', err);
+			self.respond({code:1004, message:'系统错误，没有找到订单信息', error:[{'error':'系统错误，没有找到订单信息'}]});
+			return;
+		}
+
+		var postSKUs = {};
+		if (SKUs && SKUs.length > 0) {
+			for (var i = 0; i < SKUs.length; i++) {
+				var sku = SKUs[i];
+
+				if (!postSKUs.hasOwnProperty(sku.ref)) {
+					postSKUs[sku.ref] = sku;
+				}
+			}
+		}
+
+		var updateSKUs = {};
+		if (order.SKUs && order.SKUs.length > 0) {
+			for(var i = 0; i < order.SKUs.length; i++) {
+				var deliverStatus = order.SKUs[i].deliverStatus;
+				var sku_ref = order.SKUs[i].ref;
+				if(postSKUs[sku_ref] && deliverStatus != postSKUs[sku_ref].deliverStatus) {
+					if(!((deliverStatus == DELIVERSTATUS.UNDELIVERED && postSKUs[sku_ref].deliverStatus == DELIVERSTATUS.RSCRECEIVED)
+						|| (deliverStatus == DELIVERSTATUS.RSCRECEIVED && postSKUs[sku_ref].deliverStatus == DELIVERSTATUS.DELIVERED && order.deliveryType == DELIVERYTYPE.SONGHUO.id))) {
+						self.respond({code:1001, message:'状态不符合', error:[{'error':'状态不符合'}]});
+						return;
+					}
+					updateSKUs[sku_ref] = postSKUs[sku_ref];
+				}
+			}
+
+
+			if (!U.isEmpty(updateSKUs)) {
+				var options = {'id':orderid,'SKUs':updateSKUs};
+				if (self.user) {
+					options.backendUser = self.user;
+				}
+				OrderService.updateSKUs(options, function(err) {
+					if (err) {
+						console.error('manager json_orders_SKUs_update err:', err);
+						self.respond({code:1004, message:'系统错误，更新失败', error:[{'error':'系统错误，更新失败'}]});
+						return;
+					}
+					self.respond({code:1000, message:'success', success: true});
+				});
+			} else {
+				self.respond({code:1001, message:'没有需要修改的SKU', error:[{'error':'没有需要修改的SKUs'}]});
+				return;
+			}
+		} else {
+			self.respond({code:1001, message:'没有查找到SKUs', error:[{'error':'没有查找到SKUs'}]});
+			return;
+		}
+	});
+}
+
+// order offline pay notify function
+function process_order_confirm_OfflinePay(){
+	var self = this;
+	var paymentId = self.data.paymentId;
+	var offlinePayType = self.data.offlinePayType;
+	var RSCId = self.data.RSCId;
+	//var RSC = self.user;
+	if(!paymentId){
+		self.respond({code:1001, message:'paymentId required'});
+		return;
+	}
+
+	if(!offlinePayType){
+		self.respond({code:1001, message:'offlinePayType required'});
+		return;
+	}
+
+	if(!RSCId){
+		self.respond({code:1001, message:'RSCId required'});
+		return;
+	}
+
+	OrderService.get({"paymentId": paymentId}, function(err, order) {
+		if (err) {
+			self.respond({code:1002, message:'获取订单失败'});
+			return;
+		}
+
+		//if(!order.RSCInfo || order.RSCInfo.RSC.toString() != RSC._id.toString()){
+		//	self.respond({code:1002, message:'该订单未分配到县级网点'});
+		//	return;
+		//}
+
+		if(!order.pendingApprove){
+			self.respond({code:1002, message:'该订单没有待审核的线下支付'});
+			return;
+		}
+
+		var payment = OrderService.getPaymentInOrder(order, paymentId);
+		if(!payment){
+			self.respond({code:1002, message:'确认付款失败'});
+			return;
+		}
+
+		UserService.getRSCInfoById(RSCId, function(err, RSC) {
+
+			if(err || !RSC) {
+				if(err) console.error('manager process_order_confirm_OfflinePay UserService getRSCInfoById err:', err);
+				self.respond({code:1002, message:'未查找到RSC'});
+				return;
+			}
+
+			var options = {
+				payType: offlinePayType,
+				price: payment.payPrice ? payment.payPrice : payment.price,
+				datePaid: new Date()
+			};
+
+			if (self.user) {
+				options.backendUser = self.user;
+			}
+
+			RSC._id = RSCId;
+			options.RSC = RSC;
+
+			OrderService.payNotify(paymentId, options);
+			self.respond({code: 1000, message: 'success'});
+		});
+	});
+}
+
+function json_offline_pay_type(){
+	var self = this;
+	self.respond({code:1000, message:'success', offlinePayType:OFFLINEPAYTYPE});
+}
+
 // Reads a specific order by ID
 function json_orders_read(id) {
 	var self = this;
 	var options = {};
 	options.id = id;
 	
-	OrderService.get(options, function(err, order) {
+	OrderService.get(options, function(err, order, payment) {
 		if (err) {
 			console.error('manager json_orders_read error:', err);
 			self.respond({code:1004, message:'系统错误，没有找到订单信息', error:[{'error':'系统错误，没有找到订单信息'}]});
 			return;
 		}
-        self.respond({code:1000, message:'success', datas: convertOrderToShow(order)});
+        self.respond({code:1000, message:'success', datas: convertOrderToShow(order, payment)});
     });
 }
 
-var convertOrderToShow = function(order){
+var convertOrderToShow = function(order, payment){
     var subOrdersPayments = {};					// suborder all payments
 
 	if (order && order.payments) {
@@ -855,6 +1034,7 @@ var convertOrderToShow = function(order){
 	    if (order.deliverStatus == DELIVERSTATUS.RECEIVED && order.dateCompleted) {
 	        orderInfo.dateCompleted = order.dateCompleted;
 	    }
+		orderInfo.payment = payment;
         order.order = orderInfo;
 	}
 
@@ -1721,6 +1901,16 @@ function json_RSC_query(){
 
 function process_RSC_modify(){
 	var self = this;
+	if(self.data.IDNo && !tools.isValidIdentityNo(self.data.IDNo)){
+		self.respond({code:1001, message:'请填写正确的身份证号'});
+		return;
+	}
+
+	if(self.data.phone && !tools.isPhone(self.data.phone)){
+		self.respond({code:1001, message:'请填写正确的手机号'});
+		return;
+	}
+
 	RSCService.modifyRSCInfo(self.data.id, self.data, function(err){
 		if(err){
 			self.respond({code:1002, message:err});
@@ -1772,26 +1962,30 @@ function json_RSCorders_query() {
 					RSCInfo: order.RSCInfo
                 };
                 // 订单状态
-            	orderInfo.orderStatus = OrderService.orderStatus(order);
+            	orderInfo.orderStatus 				= OrderService.orderStatus(order);
                 // 订单合成状态
-                orderInfo.typeValue = OrderService.orderType(order);
+                orderInfo.typeValue 				= OrderService.orderType(order);
                 // 订单RSC的合成状态
-                orderInfo.RSCtypeValue = OrderService.RSCOrderStatus(order);
+                orderInfo.RSCtypeValue 				= OrderService.RSCOrderStatus(order);
+                // 支付状态
+	            orderInfo.payStatus         		= order.payStatus;
+	            // 发货状态
+	            orderInfo.deliverStatus     		= order.deliverStatus;
                 // 支付时间
                 if (order.payStatus == PAYMENTSTATUS.PAID && order.datePaid) {
-                    orderInfo.datePaid = order.datePaid;
+                    orderInfo.datePaid 				= order.datePaid;
                 }
                 // 待收货时间
 			    if (order.datePendingDeliver) {
-			        orderInfo.datePendingDeliver = order.datePendingDeliver;
+			        orderInfo.datePendingDeliver 	= order.datePendingDeliver;
 			    }
                	// 全部发货时间
                 if (order.deliverStatus == DELIVERSTATUS.DELIVERED && order.dateDelivered) {
-                    orderInfo.dateDelivered = order.dateDelivered;
+                    orderInfo.dateDelivered 		= order.dateDelivered;
                 }
                 // 收货时间 完成时间
                 if (order.deliverStatus == DELIVERSTATUS.RECEIVED && order.dateCompleted) {
-                    orderInfo.dateCompleted = order.dateCompleted;
+                    orderInfo.dateCompleted 		= order.dateCompleted;
                 }
                 results.push(orderInfo);
             }

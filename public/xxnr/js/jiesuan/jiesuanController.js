@@ -32,6 +32,7 @@ app.controller('jiesuanController', function ($scope, remoteApiService, payServi
 
     $scope.selectedAddressIndex = 0;
     $scope.everClickOneOfMoreContacts = false;
+    $scope.isOverflow = false;
     $scope.cityListCompanies = [{
         name: "全部地区",
         id: 0
@@ -48,26 +49,29 @@ app.controller('jiesuanController', function ($scope, remoteApiService, payServi
             var addressList = data.datas.rows;
             $scope.addressId = addressList.length ? addressList[0].addressId : null;
             for (var i in addressList) {
-                var contact = {};
-                contact.name = addressList[i].receiptPeople;
-                contact.addressId = addressList[i].addressId;
-                contact.detailAddress = addressList[i].address;
-                contact.address = addressList[i].areaName + ' ' + addressList[i].cityName + ' ' + (addressList[i].countyName || '') + ' ' + (addressList[i].townName || '') + ' ' + addressList[i].address;
-                contact.phone = addressList[i].receiptPhone;
-                contact.province = addressList[i].areaName;
-                contact.selected = addressList[i].type == 1;
-                contact.areaId = addressList[i].areaId;
-                contact.cityId = addressList[i].cityId;
-                contact.countyId = addressList[i].countyId;
-                contact.townId = addressList[i].townId;
-                contact.isDefault = addressList[i].type == 1;
-                contact.zipCode = addressList[i].zipCode;
+                if(addressList.hasOwnProperty(i)){
+                    var contact = {};
+                    contact.name = addressList[i].receiptPeople;
+                    contact.addressId = addressList[i].addressId;
+                    contact.detailAddress = addressList[i].address;
+                    contact.address = addressList[i].areaName + ' ' + addressList[i].cityName + ' ' + (addressList[i].countyName || '') + ' ' + (addressList[i].townName || '') + ' ' + addressList[i].address;
+                    contact.phone = addressList[i].receiptPhone;
+                    contact.province = addressList[i].areaName;
+                    contact.selected = addressList[i].type == 1;
+                    contact.areaId = addressList[i].areaId;
+                    contact.cityId = addressList[i].cityId;
+                    contact.countyId = addressList[i].countyId;
+                    contact.townId = addressList[i].townId;
+                    contact.isDefault = addressList[i].type == 1;
+                    contact.zipCode = addressList[i].zipCode;
 
-                if (contact.selected == true) {
-                    $scope.selectedAddressId = contact.addressId;
+                    if (contact.selected == true) {
+                        $scope.selectedAddressId = contact.addressId;
+                    }
+
+                    $scope.contacts.push(contact);
                 }
 
-                $scope.contacts.push(contact);
             }
 
             if ($scope.contacts.length == 0) {
@@ -85,14 +89,18 @@ app.controller('jiesuanController', function ($scope, remoteApiService, payServi
     $scope.hideModifyPop = function () {
         $scope.showPop = false;
         $scope.showModifyPop = false;
+        $scope.isOverflow = false;
+
     };
     $scope.hideAddPop = function () {
         $scope.showPop = false;
         $scope.showAddPop = false;
+        $scope.isOverflow = false;
     };
     $scope.editAddress = function (index) {
         $scope.showPop = true;
         $scope.showModifyPop = true;
+        $scope.isOverflow = true;
         $scope.getProvinceList($scope.contacts[index].areaId, $scope.contacts[index].cityId, $scope.contacts[index].countyId, $scope.contacts[index].townId);
         $scope.modifyAddress.detailAddress = $scope.contacts[index].detailAddress;
         $scope.modifyAddress.receiptName = $scope.contacts[index].name;
@@ -109,6 +117,8 @@ app.controller('jiesuanController', function ($scope, remoteApiService, payServi
         $scope.modifyAddress.phone = undefined;
         $scope.showPop = true;
         $scope.showAddPop = true;
+        $scope.isOverflow = true;
+
         //$scope.getProvinceList();
     };
 
@@ -118,20 +128,22 @@ app.controller('jiesuanController', function ($scope, remoteApiService, payServi
             .then(function (data) {
                 $scope.provinces = [];
                 for (var index in data.datas.rows) {
-                    var province = {};
-                    province.name = data.datas.rows[index].name;
-                    province.id = data.datas.rows[index].id;
+                    if(data.datas.rows.hasOwnProperty(index)){
+                        var province = {};
+                        province.name = data.datas.rows[index].name;
+                        province.id = data.datas.rows[index].id;
 
-                    if (areaId) {
-                        if (province.id == areaId) {
-                            $scope.modifyAddress.province = province;
+                        if (areaId) {
+                            if (province.id == areaId) {
+                                $scope.modifyAddress.province = province;
+                            }
+                        } else {
+                            if (province.name == '河南') {
+                                $scope.modifyAddress.province = province;
+                            }
                         }
-                    } else {
-                        if (province.name == '河南') {
-                            $scope.modifyAddress.province = province;
-                        }
+                        $scope.provinces.push(province);
                     }
-                    $scope.provinces.push(province);
                 }
                 $scope.getCityList(cityId, countyId, townId);
             })
@@ -142,19 +154,22 @@ app.controller('jiesuanController', function ($scope, remoteApiService, payServi
             .then(function (data) {
                 $scope.cities.length = 0;
                 for (var index in data.datas.rows) {
-                    var city = {};
-                    city = angular.copy(data.datas.rows[index]);
-                    $scope.cities.push(city);
+                    if(data.datas.rows.hasOwnProperty(index)){
+                        var city = {};
+                        city = angular.copy(data.datas.rows[index]);
+                        $scope.cities.push(city);
 
-                    if (cityId) {
-                        if (city.id == cityId) {
-                            $scope.modifyAddress.city = city;
-                        }
-                    } else {
-                        if (index == 0) {
-                            $scope.modifyAddress.city = city;
+                        if (cityId) {
+                            if (city.id == cityId) {
+                                $scope.modifyAddress.city = city;
+                            }
+                        } else {
+                            if (index == 0) {
+                                $scope.modifyAddress.city = city;
+                            }
                         }
                     }
+
                 }
                 $scope.getCountyList(countyId, townId);
             })
@@ -163,20 +178,24 @@ app.controller('jiesuanController', function ($scope, remoteApiService, payServi
         $scope.modifyAddress.county = null;
         remoteApiService.getCountyList($scope.modifyAddress.city.id)
             .then(function (data) {
+
                 $scope.counties = [];
                 for (var index in data.datas.rows) {
-                    var county = {};
-                    county = angular.copy(data.datas.rows[index]);
-                    $scope.counties.push(county);
-                    if (countyId && $scope.counties.length > 0) {
-                        if (county.id == countyId) {
-                            $scope.modifyAddress.county = county;
-                        }
-                    } else {
-                        if (index == 0) {
-                            $scope.modifyAddress.county = county;
+                    if(data.datas.rows.hasOwnProperty(index)){
+                        var county = {};
+                        county = angular.copy(data.datas.rows[index]);
+                        $scope.counties.push(county);
+                        if (countyId && $scope.counties.length > 0) {
+                            if (county.id == countyId) {
+                                $scope.modifyAddress.county = county;
+                            }
+                        } else {
+                            if (index == 0) {
+                                $scope.modifyAddress.county = county;
+                            }
                         }
                     }
+
                 }
                 $scope.getTownList(townId);
 
@@ -188,16 +207,18 @@ app.controller('jiesuanController', function ($scope, remoteApiService, payServi
             .then(function (data) {
                 $scope.towns = [];
                 for (var index in data.datas.rows) {
-                    var town = {};
-                    town = angular.copy(data.datas.rows[index]);
-                    $scope.towns.push(town);
-                    if (townId) {
-                        if (town.id == townId) {
-                            $scope.modifyAddress.town = town;
-                        }
-                    } else {
-                        if (index == 0) {
-                            $scope.modifyAddress.town = town;
+                    if(data.datas.rows.hasOwnProperty(index)){
+                        var town = {};
+                        town = angular.copy(data.datas.rows[index]);
+                        $scope.towns.push(town);
+                        if (townId) {
+                            if (town.id == townId) {
+                                $scope.modifyAddress.town = town;
+                            }
+                        } else {
+                            if (index == 0) {
+                                $scope.modifyAddress.town = town;
+                            }
                         }
                     }
                 }
@@ -326,29 +347,75 @@ app.controller('jiesuanController', function ($scope, remoteApiService, payServi
     };
 
     $scope.deleteAddress = function (index) {
-        remoteApiService.deleteUserAddress($scope.contacts[index].addressId)
-            .then(function (data) {
-                if (data.code == "1000") {
-                    sweetalert("删除成功");
-                    if($scope.contacts.length === 1 ){
-                        $scope.hasConsigneeAddress = false;
-                        $scope.selectedAddressId = null;
-                        $scope.selectedAddressIndex = null;
-                        $scope.contacts.splice(index, 1);
-                    }else{
-                        if($scope.contacts[index].selected){
-                            $scope.contacts.splice(index, 1);
-                            $scope.selectedAddressIndex = 0;
-                            $scope.contacts[0].selected = true;
-                            $scope.selectedAddressId = $scope.contacts[0].addressId;
+        if (navigator.appName == "Microsoft Internet Explorer" && navigator.appVersion.match(/8./i) == "8.") {
+            var r = confirm("是否删除该地址？");
+            if (r == true) {
+                remoteApiService.deleteUserAddress($scope.contacts[index].addressId)
+                    .then(function (data) {
+                        if (data.code == "1000") {
+                            sweetalert("删除成功");
+                            if($scope.contacts.length === 1 ){
+                                $scope.hasConsigneeAddress = false;
+                                $scope.selectedAddressId = null;
+                                $scope.selectedAddressIndex = null;
+                                $scope.contacts.splice(index, 1);
+                            }else{
+                                if($scope.contacts[index].selected){
+                                    $scope.contacts.splice(index, 1);
+                                    $scope.selectedAddressIndex = 0;
+                                    $scope.contacts[0].selected = true;
+                                    $scope.selectedAddressId = $scope.contacts[0].addressId;
+                                }else{
+                                    $scope.contacts.splice(index, 1);
+                                }
+                            }
                         }else{
-                            $scope.contacts.splice(index, 1);
+                            sweetalert(data.message);
                         }
+                    });
+            } else {
+                return false;
+            }
+        } else {
+            swal({
+                    title: "是否删除该地址？",
+                    //text: nominated_inviter.name + "   " + nominated_inviter.phone,
+                    //type: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: '#00913a',
+                    confirmButtonText: '确定',
+                    cancelButtonText: "取消",
+                    closeOnConfirm: false
+                },
+                function (isConfirm) {
+                    if (isConfirm) {
+                        remoteApiService.deleteUserAddress($scope.contacts[index].addressId)
+                            .then(function (data) {
+                                if (data.code == "1000") {
+                                    sweetalert("删除成功");
+                                    if($scope.contacts.length === 1 ){
+                                        $scope.hasConsigneeAddress = false;
+                                        $scope.selectedAddressId = null;
+                                        $scope.selectedAddressIndex = null;
+                                        $scope.contacts.splice(index, 1);
+                                    }else{
+                                        if($scope.contacts[index].selected){
+                                            $scope.contacts.splice(index, 1);
+                                            $scope.selectedAddressIndex = 0;
+                                            $scope.contacts[0].selected = true;
+                                            $scope.selectedAddressId = $scope.contacts[0].addressId;
+                                        }else{
+                                            $scope.contacts.splice(index, 1);
+                                        }
+                                    }
+                                }else{
+                                    sweetalert(data.message);
+                                }
+                            });
                     }
-                }else{
-                    sweetalert(data.message);
-                }
-            });
+                });
+        }
+
     };
     $scope.selectCompany = function(index){
         //if(!$scope.selectedCompanyId){
@@ -362,10 +429,13 @@ app.controller('jiesuanController', function ($scope, remoteApiService, payServi
         $scope.companySelected = true;
         $scope.showPop = false;
         $scope.showSelectCompanyPop = false;
+        $scope.isOverflow = false;
         $scope.selectedCompanyId = $scope.selectingCompanyId;
         for(var i in $scope.RSCs){
-            if($scope.RSCs[i]._id==$scope.selectedCompanyId){
-                $scope.selectedCompanyInfo = $scope.RSCs[i].RSCInfo;
+            if($scope.RSCs.hasOwnProperty(i)){
+                if($scope.RSCs[i]._id==$scope.selectedCompanyId){
+                    $scope.selectedCompanyInfo = $scope.RSCs[i].RSCInfo;
+                }
             }
         }
         $scope.selectingCompanyId = -1;
@@ -376,6 +446,8 @@ app.controller('jiesuanController', function ($scope, remoteApiService, payServi
     };
     $scope.showSelectCompany = function () {
         $scope.showSelectCompanyPop = true;
+        $scope.isOverflow = true;
+
         $scope.showPop = true;
         productsQuery = combineProductsQuery();
         //$scope.selectedCompanyId = -1;
@@ -425,7 +497,10 @@ app.controller('jiesuanController', function ($scope, remoteApiService, payServi
         var resultProductsQuery = "";
         //combine array elements to a query string
         for (var product_id in $scope.products_Ids) {
-            resultProductsQuery = resultProductsQuery + $scope.products_Ids[product_id] + ',';
+            if($scope.products_Ids.hasOwnProperty(product_id)){
+                resultProductsQuery = resultProductsQuery + $scope.products_Ids[product_id] + ',';
+            }
+
         }
         resultProductsQuery = resultProductsQuery.slice(0, -1);
         // ***************************************
@@ -444,21 +519,24 @@ app.controller('jiesuanController', function ($scope, remoteApiService, payServi
         var upadatedIndex;  //被修改的地址的序号
         var defaultIndex;
         for(var i in $scope.contacts){
-            if($scope.contacts[i].isDefault){
-                defaultIndex = i;
+            if($scope.contacts.hasOwnProperty(i)){
+                if($scope.contacts[i].isDefault){
+                    defaultIndex = i;
+                }
+                if($scope.contacts[i].addressId == addressId){
+                    upadatedIndex = i;
+                    $scope.contacts[i].name = $scope.modifyAddress.receiptName;
+                    $scope.contacts[i].phone = $scope.modifyAddress.phone;
+                    $scope.contacts[i].areaId = $scope.modifyAddress.province.id;
+                    $scope.contacts[i].cityId = $scope.modifyAddress.city.id;
+                    $scope.contacts[i].countyId = $scope.modifyAddress.county.id || null;
+                    $scope.contacts[i].townId = $scope.modifyAddress.town.id || null;
+                    $scope.contacts[i].address = $scope.modifyAddress.province.name + ' ' + $scope.modifyAddress.city.name + ' ' + ($scope.modifyAddress.county.name || '') + ' ' + ($scope.modifyAddress.town.name || '') + ' ' + $scope.modifyAddress.detailAddress;
+                    $scope.contacts[i].zipCode = $scope.modifyAddress.zipCode;
+                    $scope.contacts[i].isDefault = $scope.modifyAddress.isDefault;
+                }
             }
-            if($scope.contacts[i].addressId == addressId){
-                upadatedIndex = i;
-                $scope.contacts[i].name = $scope.modifyAddress.receiptName;
-                $scope.contacts[i].phone = $scope.modifyAddress.phone;
-                $scope.contacts[i].areaId = $scope.modifyAddress.province.id;
-                $scope.contacts[i].cityId = $scope.modifyAddress.city.id;
-                $scope.contacts[i].countyId = $scope.modifyAddress.county.id || null;
-                $scope.contacts[i].townId = $scope.modifyAddress.town.id || null;
-                $scope.contacts[i].address = $scope.modifyAddress.province.name + ' ' + $scope.modifyAddress.city.name + ' ' + ($scope.modifyAddress.county.name || '') + ' ' + ($scope.modifyAddress.town.name || '') + ' ' + $scope.modifyAddress.detailAddress;
-                $scope.contacts[i].zipCode = $scope.modifyAddress.zipCode;
-                $scope.contacts[i].isDefault = $scope.modifyAddress.isDefault;
-            }
+
         }
         if(defaultIndex && defaultIndex!=upadatedIndex){
             if($scope.modifyAddress.isDefault){
@@ -490,9 +568,11 @@ app.controller('jiesuanController', function ($scope, remoteApiService, payServi
         remoteApiService.RSCAddressCity(productsQuery, $scope.selectOfProvinceCompanies._id)
             .then(function (data) {
                 for (var index in data.cityList) {
-                    var city = {};
-                    city = angular.copy(data.cityList[index]);
-                    $scope.cityListCompanies.push(city);
+                    if(data.cityList.hasOwnProperty(index)){
+                        var city = {};
+                        city = angular.copy(data.cityList[index]);
+                        $scope.cityListCompanies.push(city);
+                    }
                 }
                 //保存选中的市
                 //if($scope.selectedCompanyInfo){
@@ -521,9 +601,11 @@ app.controller('jiesuanController', function ($scope, remoteApiService, payServi
         remoteApiService.RSCAddressCounty(productsQuery, $scope.selectOfProvinceCompanies._id, $scope.selectOfCityCompanies._id)
             .then(function (data) {
                 for (var index in data.countyList) {
-                    var county = {};
-                    county = angular.copy(data.countyList[index]);
-                    $scope.countyListCompanies.push(county);
+                    if(data.countyList.hasOwnProperty(index)){
+                        var county = {};
+                        county = angular.copy(data.countyList[index]);
+                        $scope.countyListCompanies.push(county);
+                    }
                 }
                 //保存选过的县区
                 //if($scope.selectedCompanyInfo){
@@ -542,6 +624,19 @@ app.controller('jiesuanController', function ($scope, remoteApiService, payServi
                 $scope.RSCs = [];
                 getRSC();
             });
+
+    };
+    $scope.checkSelectingCompanyInPopRSCList = function () {
+        if($scope.RSCs){
+            var result = false;
+            for(var i=0;i<$scope.RSCs.length;i++){
+                //console.log($scope.RSCs[i]._id == $scope.selectingCompanyId);
+                if($scope.RSCs[i]._id == $scope.selectingCompanyId){
+                    result = true;
+                }
+            }
+            return result;
+        }
 
     };
     $scope.getRSCwithAllAddress = function(){
@@ -572,6 +667,8 @@ app.controller('jiesuanController', function ($scope, remoteApiService, payServi
         $scope.selectedConsigneeNum = -1;
         $scope.showConsigneePop = true;
         $scope.showPop = true;
+        $scope.isOverflow = true;
+
         $scope.popConsigneeName = "";
         $scope.popConsigneePhone = "";
         remoteApiService.queryConsignees()
@@ -617,7 +714,7 @@ app.controller('jiesuanController', function ($scope, remoteApiService, payServi
         remoteApiService.saveConsignees($scope.newConsigneeName, $scope.newConsigneePhone)
             .then(function (data) {
                 if(data.code==1000){
-                    console.log('保存收货人成功');
+                    //console.log('保存收货人成功');
                     $scope.consigneeName = $scope.newConsigneeName;
                     $scope.consigneePhone = $scope.newConsigneePhone;
                 }else{
@@ -628,6 +725,8 @@ app.controller('jiesuanController', function ($scope, remoteApiService, payServi
     $scope.consigneeSelected = function(){
         $scope.showPop = false;
         $scope.showConsigneePop=false;
+        $scope.isOverflow = false;
+
         if($scope.selectedConsigneeNum!=-1){
             $scope.consigneeName = $scope.oldConsignees[$scope.selectedConsigneeNum].consigneeName;
             $scope.consigneePhone = $scope.oldConsignees[$scope.selectedConsigneeNum].consigneePhone;
@@ -647,7 +746,8 @@ app.controller('jiesuanController', function ($scope, remoteApiService, payServi
             $scope.consigneePhone = newConsignee.consigneePhone;
             $scope.showPop = false;
             $scope.showConsigneePop=false;
-            console.log('保存收货人成功');
+            $scope.isOverflow = false;
+            //console.log('保存收货人成功');
             $scope.popNewConsigneeForm.name.$dirty = false;
         }else{
             remoteApiService.saveConsignees($scope.popConsigneeName, $scope.popConsigneePhone)
@@ -658,6 +758,7 @@ app.controller('jiesuanController', function ($scope, remoteApiService, payServi
                         $scope.consigneePhone = $scope.oldConsignees[0].consigneePhone;
                         $scope.showPop = false;
                         $scope.showConsigneePop=false;
+                        $scope.isOverflow = false;
                         $scope.popNewConsigneeForm.name.$dirty = false;
                         //console.log('保存收货人成功');
                     }else{

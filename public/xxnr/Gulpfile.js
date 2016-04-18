@@ -415,7 +415,7 @@ gulp.task('apply_county_js_minify', function() {
         './js/sweetalert.min.js',
         './js/myPlaceholderDirective.js',
         './js/fillProfile/applyCountyVeriController.js'])
-        .pipe(concat('applyCounty_js.js'))
+        .pipe(concat('applyCountyVerified_js.js'))
         .pipe(ngmin())
         .pipe(uglify({mangle: false}))
         .pipe(gulp.dest('./dev/js'))
@@ -488,6 +488,30 @@ gulp.task('xxnr_institute_js_minify', function() {
         .pipe(gulp.dest('./rev/xxnr_institute_js'));
 });
 
+gulp.task('rsc_management_js_minify', function() {
+    var revAll = new RevAll();
+    gulp.src([
+        './js/payService.js',
+        './js/shoppingCart/shoppingCartController.js',
+        './js/shoppingCart/shoppingCartService.js',
+        './js/rscManagement/rscMgmtController.js',
+        './js/login/loginController.js',
+        './js/login/loginService.js',
+        './js/headerFooterDirective.js',
+        './js/headerController.js',
+        './js/sweetalert.min.js',
+        './js/uploadService.js',
+        './js/sideService.js',
+        './js/myPlaceholderDirective.js'])
+        .pipe(concat('rsc_management_js.js'))
+        .pipe(ngmin())
+        .pipe(uglify({mangle: false}))
+        .pipe(gulp.dest('./dev/js'))
+        .pipe(revAll.revision())
+        .pipe(gulp.dest('./production_js'))
+        .pipe(revAll.manifestFile())
+        .pipe(gulp.dest('./rev/rsc_management_js'));
+});
 
 
 
@@ -514,7 +538,10 @@ gulp.task('rev', function() {
         'xxnr_bigdata.html',
         'xxnr_finance.html',
         'xxnr_institute.html',
-        'shareApp.html'])
+        'applyCountyVerified.html',
+        'shareApp.html',
+        'rsc_management.html'
+        ])
        //- 读取 rev-manifest.json 文件以及需要进行css名替换的文件
         .pipe(htmlreplace({
             css: 'production_css/styleAllInOne.css',
@@ -550,7 +577,8 @@ gulp.task('js_minify_all',
         'apply_county_js_minify',
         'xxnr_institute_js_minify',
         'xxnr_finance_js_minify',
-        'xxnr_bigdata_js_minify'
+        'xxnr_bigdata_js_minify',
+        'rsc_management_js_minify'
     ]);
 
 

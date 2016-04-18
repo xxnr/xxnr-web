@@ -1,0 +1,829 @@
+<div class="filter">
+    <div class="container">
+        <div class="caption"><span class="fa fa-truck mr5"></span> @(服务站管理)</div>
+    </div>
+</div>
+<div class="container" style="position: relative;">
+    <div class="rsc-sidebar">
+        <ul class="rsc-sidebar-ul">
+            <li class="checked">网点管理</li>
+            <li id="rsc-order-link">网点订单</a></li>
+            <li class="clear"></li>
+        </ul>
+    </div>
+    <div class="rsc-tab">
+        <div class="rsc-tab-ul">
+            <a href="#1">基础信息</a>
+            <a href="#2">服务范围</a>
+            <a class="clear"></a>
+        </div>
+    </div>
+    <div data-component="template" data-component-path="rscInfo" data-component-id="rscInfo">
+        <script type="text/html">
+            <div class="rsc-tab-block" style="display: none;">
+                {{if base}}
+                <table class="table table-bordered" border="0">
+                    <tr>
+                        <td class="col-xs-4 active">@(网点编号)</td>
+                        <td id="recInfoId">{{base.id}}</td>
+                    </tr>
+                    <tr>
+                        <td class="col-xs-4 active">@(网点名称)</td>
+                        <td class="rsc-base-td"><input type="text" value="{{base.companyName}}"  class="border-none" attrName="companyName" attrTitle = "网点名称" readonly><div class="edit-btn"><span class="fa fa-pencil"></span></div><div class="confirm-btn">确定</div></td>
+                    </tr>
+                    <tr>
+                        <td class="col-xs-4 active">@(负责人姓名)</td>
+                        <td class="rsc-base-td"><input type="text" value="{{base.name}}"  class="border-none" attrName="name" attrTitle="负责人姓名" readonly><div class="edit-btn"><span class="fa fa-pencil"></span></div><div class="confirm-btn">确定</div></td>
+                    </tr>
+                    <tr>
+                        <td class="col-xs-4 active">@(身份证号码)</td>
+                        <td class="rsc-base-td"><input type="text" value="{{base.IDNo}}" class="border-none" attrName="IDNo" attrTitle="身份证号码" readonly><div class="edit-btn"><span class="fa fa-pencil"></span></div><div class="confirm-btn">确定</div></td>
+                    </tr>
+                    <tr>
+                        <td class="col-xs-4 active">@(负责人手机)</td>
+                        <td class="rsc-base-td"><input type="text" value="{{base.phone}}"  class="border-none" attrName="phone" attrTitle="负责人手机" readonly><div class="edit-btn"><span class="fa fa-pencil"></span></div><div class="confirm-btn">确定</div></td>
+                    </tr>
+                    <tr>
+                        <td class="col-xs-4 active">@(所属地区)</td>
+                        <td>
+                            <select id="provinceList" class="rsc-select">
+                                {{if provinceList}}
+                                {{foreach province in provinceList}}
+                                <option {{if province.id == addressSelected.province}}selected{{fi}} province_id={{province.id}} value="{{province._id}}">{{province.name}}</option>
+                                {{end}}
+                                {{fi}}
+                            </select>
+                            <select id="cityList" class="rsc-select">
+                                {{if cityList}}
+                                {{foreach city in cityList}}
+                                <option {{if city.id == addressSelected.city}}selected{{fi}} city_id={{city.id}} value="{{city._id}}">{{city.name}}</option>
+                                {{end}}
+                                {{fi}}
+                            </select>
+                            <select id="countyList" class="rsc-select">
+                                {{if countyList && countyList.length != 0}}
+                                {{foreach county in countyList}}
+                                <option {{if county.id == addressSelected.county}}selected{{fi}} county_id={{county.id}} value="{{county._id}}">{{county.name}}</option>
+                                {{end}}
+                                {{fi}}
+                            </select>
+                            <select id="townList" class="rsc-select">
+                                {{if townList}}
+                                {{foreach town in townList}}
+                                <option {{if town.id == addressSelected.town}}selected{{fi}} town_id={{town.id}} value="{{town._id}}">{{town.name}}</option>
+                                {{end}}
+                                {{fi}}
+                            </select>
+                            {{if base && base.companyAddress}}
+                            {{(base.companyAddress.province ? base.companyAddress.province.name : '') + ( base.companyAddress.city ? base.companyAddress.city.name : '') + (base.companyAddress.county ? base.companyAddress.county.name : '')
+                            + (base.companyAddress.town ? base.companyAddress.town.name : '')}}
+                            {{fi}}
+                            <button id="save-address">保存</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="col-xs-4 active">@(详细地址)</td>
+                        <td class="rsc-base-td">
+                            {{if base.companyAddress}}
+                            <input type="text" value="{{base.companyAddress ? base.companyAddress.details : ''}}"  class="border-none" attrName="detailAddress" attrTitle="详细地址" readonly><div class="edit-btn">
+                            {{fi}}
+                            <span class="fa fa-pencil"></span></div><div class="confirm-btn">确定</div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="col-xs-4 active">@(用户名)</td>
+                        <td>{{base.account}}</td>
+                    </tr>
+                    <!--<tr>-->
+                        <!--<td class="col-xs-4 active">@(认证时间)</td>-->
+                        <!--<td></td>-->
+                    <!--</tr>-->
+                </table>
+                {{fi}}
+            </div>
+            <div class="rsc-tab-block" style="display: none;">
+                <table class="table table-bordered" border="0">
+                    <tr>
+                        <td class="col-xs-1 hidden-xs ui-left">@(序号)</td>
+                        <td class="ui-left col-xs-1">@(品牌)</td>
+                        <td class="ui-left col-xs-4">@(商品)</td>
+                        <td class="ui-left col-xs-2">@(操作)</td>
+                    </tr>
+                    {{if products && products['汽车']}}
+                    {{foreach brand in products['汽车']}}
+                    <tr>
+                        <td class="ui-left col-xs-1">{{$index + 1}}</td>
+                        <td class="ui-left col-xs-1">{{brand.name}}</td>
+                        <td class="ui-left col-xs-4">
+                            {{if brand.products}}
+                                {{foreach product in brand.products}}
+                                <span>{{if $index != 0 && brand.products.length != 1}}&nbsp;&nbsp;|&nbsp;&nbsp;{{fi}}{{product.name}}</span>
+                                {{end}}
+                            {{fi}}
+                        </td>
+                        <td class="ui-center col-xs-2"><span class="fa fa-pencil products-edit-btn" brand="{{brand.brand_id}}">编辑</span><span class="fa fa-trash products-delete-btn" brand="{{brand.brand_id}}" brand_name="{{brand.name}}">删除</span></td>
+                    </tr>
+                    {{end}}
+                    {{fi}}
+
+                    {{if products && products['化肥']}}
+                        {{foreach brand in products['化肥']}}
+                        <tr>
+                            <td class="ui-left col-xs-1">{{if products['汽车']}}{{products['汽车'].length + $index + 1}}{{else}}{{$index + 1}}{{fi}}</td>
+                            <td class="ui-left col-xs-1">{{brand.name}}</td>
+                            <td class="ui-left col-xs-4">
+                                {{if brand.products}}
+                                    {{foreach product in brand.products}}
+                                    {{if $index != 0 && brand.products.length != 1}}&nbsp;&nbsp;|&nbsp;&nbsp;{{fi}}{{product.name}}
+                                    {{end}}
+                                {{fi}}
+                            </td>
+                            <td class="ui-center col-xs-2"><span  class="fa fa-pencil products-edit-btn" brand="{{brand.brand_id}}">编辑</span><span class="fa fa-trash products-delete-btn" brand="{{brand.brand_id}}" brand_name="{{brand.name}}">删除</span></td>
+                        </tr>
+                        {{end}}
+                    {{fi}}
+                    <tr>
+                        <td class="col-xs-1 hidden-xs" id="add-brand">新增</td>
+                        <td class="ui-left col-xs-1"></td>
+                        <td class="ui-left col-xs-4"></td>
+                        <td class="ui-center col-xs-2"></td>
+                    </tr>
+                </table>
+            </div>
+        </script>
+    </div>
+    <div id="add-brand-box" data-component="template" data-component-path="rscAddBrand" data-component-id="rscAddBrand">
+        <script type="text/html">
+            <span class="fa fa-times-circle add-brand-close" id="add-brand-close"></span>
+            <div>
+                {{if brandsList && brandsList.length > 0 }}
+                {{foreach brand in brandsList}}
+                <span brand_id="{{brand._id}}" class="brands-bit">{{brand.name}}</span>
+                {{end}}
+                {{fi}}
+            </div>
+        </script>
+    </div>
+    <div id="products-edit-box" data-component="template" data-component-path="rscBrandInfo" data-component-id="rscBrandInfo">
+        <div class="products-edit-title">选择经营商品范围</div>
+        <script type="text/html">
+        <div class="products-edit-con">
+            <div class="products-edit-left">
+                <div class="products-edit-list">
+                    <div class="products-edit-sec-title">可选品牌、商品</div>
+                    <ul class="products-edit-list-ul">
+                        {{if brandProducts}}
+                            {{brandProducts.name}}
+                            {{foreach product in brandProductRest}}
+                            <li product_id="{{product._id}}" product_name="{{product.name}}">{{product.name}}</li>
+                            {{end}}
+                        {{fi}}
+                    </ul>
+                </div>
+            </div>
+            <button class="products-edit-center" id="rsc-add-products">添加</button>
+            <div class="products-edit-right">
+                <div class="products-edit-list">
+                    <div class="products-edit-sec-title">已选品牌、商品</div>
+                    <ul class="products-edit-list-ul" class="fa fa-minus">
+                        {{if brandProducts}}
+                            {{brandProducts.name}}
+                            {{foreach product in brandProductExisted.products}}
+                            <li product_id="{{product._id}}" product_name="{{product.name}}">
+                                {{product.name}}<span class="fa fa-times-circle products-delete"></span>
+                            </li>
+                            {{end}}
+                        {{fi}}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="products-edit-btn-box">
+            <button id="products-edit-confirm" class="products-confirm-btn">确定</button>
+            <button id="products-edit-cancel" class="products-cancle-btn">取消</button>
+        </div>
+        </script>
+    </div>
+</div>
+<div id="rsc-mask"></div>
+<script>
+    var rscInfo = {};
+    rscProductData = [];
+    rscInfo.products = {};
+    rscInfo.base = {};
+    rscInfo.provinceList = [];
+    rscInfo.cityList = [];
+    rscInfo.countyList = [];
+    rscInfo.townList = [];
+    rscInfo.addressSelected = {};
+
+    var rscProduct;
+    var rscProductList = {};
+    var flag_product = true;
+    var rscInfo_id = getUrlParam('id');
+
+    var rscBrandInfo;
+    var brandProductsList;
+    var brandProductsItems;
+
+    var rscAddBrand = {};
+    rscAddBrand.brandsList = [];
+
+    brandLoadInit();
+    var brandProductExisted = {};
+    brandProductExisted.products = [];
+    var brandProductRest = [];
+
+    var regexIdentityNo = /^(\d{15}$|^\d{18}$|^\d{17}(\d|X|x))$/;
+    var regexIdentityPhone = /^(((13[0-9]{1})|(15[0-9]{1})|(18[0-9]{1}))+\d{8})$/;
+
+    ON('#rscInfo', function(component){
+        rscInfo_load();
+
+    });
+
+    ON('#rscBrandInfo', function (component){
+        onAddProductsRefresh();
+    });
+
+    function rscInfo_load() {
+
+        $.components.GET(managerurl + '/api/brands/', null, function(response){
+            if(response.code != '1000') {
+                alert(response.message);
+                return;
+            }
+
+            SET('rscAddBrand.brandsList', response.brands);
+
+            $.components.GET(managerurl + '/api/v2.2/RSCInfo/' + rscInfo_id, null, function(response) {
+                if(response.code != '1000') {
+                    alert(response.message);
+                    return;
+                }
+
+                response.RSCInfo.id = response.id;
+                response.RSCInfo.account = response.account;
+                SET('rscInfo.base', response.RSCInfo);
+                if(response.RSCInfo && response.RSCInfo.companyAddress) {
+                    if (response.RSCInfo.companyAddress.province) {
+                        rscInfo.addressSelected.province = response.RSCInfo.companyAddress.province.id;
+                    }
+                    if ( response.RSCInfo.companyAddress.city) {
+                        rscInfo.addressSelected.city = response.RSCInfo.companyAddress.city.id;
+                    }
+                    if (response.RSCInfo.companyAddress.county) {
+                        rscInfo.addressSelected.county = response.RSCInfo.companyAddress.county.id;
+                    }
+                    if ( response.RSCInfo.companyAddress.town) {
+                        rscInfo.addressSelected.town = response.RSCInfo.companyAddress.town.id;
+                    }
+                }
+                SET('rscInfo.addressSelected', rscInfo.addressSelected);
+
+                rscProduct = response.RSCInfo.products ? response.RSCInfo.products: [];
+                rscProductData = rscProduct.slice(0);
+                for(var i = 0; i < rscProduct.length; i++) {
+                    var rscEle = {_id: rscProduct[i]._id, name:rscProduct[i].name};
+                    if(!hasElementObj(rscProductList, rscProduct[i].category)) {
+                        rscProductList[rscProduct[i].category.toString()] = [];
+                    }
+
+                    var n = hasElementArray(rscProductList[rscProduct[i].category.toString()],function(rscObj){
+                       if(rscObj.brand_id == rscProduct[i].brand.toString()) {
+                           return true;
+                       }
+                        return false;
+                    });
+                    if(n == -1) {
+                        rscProductList[rscProduct[i].category.toString()].push({brand_id:rscProduct[i].brand, products:[]});
+                        rscProductList[rscProduct[i].category.toString()][rscProductList[rscProduct[i].category].length-1].products.push(rscEle);
+                    } else {
+                        rscProductList[rscProduct[i].category.toString()][n].products.push(rscEle);
+                    }
+                }
+                for(m in rscProductList) {
+                    if(rscProductList.hasOwnProperty(m)){
+                        for(var n = 0; n < rscProductList[m].length; n++) {
+                            for(var o = 0; o < rscAddBrand.brandsList.slice(0).length; o++) {
+                                if(rscProductList[m][n].brand_id == rscAddBrand.brandsList.slice(0)[o]._id) {
+                                    rscProductList[m][n].name = rscAddBrand.brandsList.slice(0)[o].name;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+                SET('rscInfo.products',rscProductList);
+                getProvinceList();
+                $(".products-edit-btn").off('click').on('click', function () {
+                    var brandId = $(this).attr('brand');
+                    brands_load(brandId);
+                });
+
+                $(".products-delete-btn").off('click').on('click',function(){
+                    var brandId = $(this).attr('brand');
+                    if(confirm('确认删除' + $(this).attr('brand_name') + '下的所有商品？')) {
+                        brand_delete(brandId);
+                    }
+                });
+
+                $(".rsc-base-td .edit-btn").off('click').on('click',function(){
+                    $(this).next().show();
+                    $(this).parents('.rsc-base-td').find('input[type=text]').removeClass('border-none');
+                    $(this).parents('.rsc-base-td').find('input[type=text]').attr('readonly',false);
+                    $(this).remove();
+                });
+
+                $("#save-address").off('click').on('click',function(){
+                    var addressData = {
+                        id: $("#recInfoId").text().trim(),
+                        province: $("#provinceList").val() ? $("#provinceList").val() : '',
+                        city: $("#cityList").val() ? $("#cityList").val() : '',
+                        county: $("#countyList").val() ? $("#countyList").val() : '',
+                        town: $("#townList").val() ? $("#townList").val() : ''
+                    };
+                    $.components.PUT(managerurl + '/api/v2.2/RSC/modify',addressData , function(response){
+                        if(response.code == '1000') {
+                            alert('保存成功！');
+                            window.location.reload();
+                        } else {
+                            alert(response.message);
+                        }
+                    });
+                });
+
+                $(".confirm-btn").off('click').on('click', function () {
+                    var b_value = $(this).prev().val();
+                    var attrName = $(this).prev().attr('attrName');
+                    var attrTitle = $(this).prev().attr('attrTitle');
+                    var putData = {};
+                    putData.id = $("#recInfoId").text().trim();
+                    putData[attrName]= b_value;
+
+                    if(b_value.trim() == '') {
+                        alert(attrTitle + '不能为空');
+                        return;
+                    }
+
+                    if(attrName == 'IDNo' && !regexIdentityNo.test(b_value)) {
+                        alert("请输入正确的身份证号");
+                        return;
+                    }
+                    if(attrName == 'phone' && !regexIdentityPhone.test(b_value)) {
+                        alert("请输入正确的手机号");
+                        return;
+                    }
+
+                    $.components.PUT(managerurl + '/api/v2.2/RSC/modify',putData , function(response){
+                        if(response.code == '1000') {
+                            alert('修改成功！');
+                            window.location.reload();
+                        } else {
+                            alert(response.message);
+                        }
+                    });
+                    $(this).hide();
+                    $(this).before('<div class="edit-btn"><span class="fa fa-pencil"></span></div>');
+                    $(".rsc-base-td .edit-btn").off('click').on('click',function(){
+                        $(this).next().show();
+                        $(this).parents('.rsc-base-td').find('input[type=text]').removeClass('border-none');
+                        $(this).parents('.rsc-base-td').find('input[type=text]').attr('readonly',false);
+                        $(this).remove();
+                    });
+                    $(this).parents('.rsc-base-td').find('input[type=text]').addClass('border-none');
+                    $(this).parents('.rsc-base-td').find('input[type=text]').attr('readonly',true);
+                });
+
+                $("#add-brand").off('click').on('click',function(){
+                    $("#add-brand-box").show();
+                    $("#rsc-mask").show();
+                    $("#add-brand-close").click(function(){
+                        $("#add-brand-box").hide();
+                        $("#rsc-mask").hide();
+                    });
+
+                });
+
+            });
+        });
+    }
+
+    function hasElementObj(Obj, value) {
+        return Obj.hasOwnProperty(value);
+    }
+
+    //编辑商品弹框中数据的处理
+    function brands_load(brandId) {
+        $.components.GET(managerurl + '/api/products?brand=' + brandId + '&max=2147483647&online=true', null, function (response) {
+                brandLoadInit();
+                brandProductsItems = response.items;
+                if(brandProductsItems.length == 0) {
+                    alert('当前品牌下没有商品');
+                    return;
+                }
+                for(var i = 0; i < brandProductsItems.length; i++ ) {
+                    brandProductsList.products.push({_id:brandProductsItems[i]._id,name:brandProductsItems[i].name});
+                }
+                brandProductsList.name = brandProductsItems[0].brand.name;
+                brandProductsList.brandId = brandProductsItems[0].brand._id;
+                console.log(brandProductsItems[0]);
+                console.log(brandProductsItems[0].category);
+                console.log(rscProductList);
+                brandProductsList.category = brandProductsItems[0].category;
+                var m;
+                if(rscProductList[brandProductsList.category]) {
+                    m = rscProductList[brandProductsList.category];
+                } else {
+                    m = [];
+                }
+                for(var i = 0; i < m.length; i++ ) {
+                    if( m[i].brand_id == brandProductsList.brandId) {
+                        brandProductExisted.products = m[i].products.slice(0);
+                        break;
+                    }
+                }
+
+                brandProductRest = [];
+                if(brandProductsList.products.length != brandProductExisted.products.length) {
+                    for(var i = 0; i < brandProductsList.products.length; i++) {
+                        var e_flag = true;
+                        for(var j = 0; j < brandProductExisted.products.length; j++) {
+                            if(brandProductsList.products[i]._id == brandProductExisted.products[j]._id) {
+                                e_flag = false;
+                                break;
+                            }
+                        }
+                        if(e_flag) {
+                            brandProductRest.push(brandProductsList.products[i]);
+                        }
+                    }
+                }
+                SET('rscBrandInfo.brandProducts',brandProductsList);
+                SET('rscBrandInfo.brandProductExisted',brandProductExisted);
+                SET('rscBrandInfo.brandProductRest',brandProductRest);
+                $("#rsc-mask").hide();
+                $("#add-brand-box").hide();
+                $("#products-edit-box").show();
+                $("#rsc-mask").show();
+                onAddProductsRefresh();
+        });
+    }
+
+    //删除品牌
+    function brand_delete(id) {
+        var putData = {};
+        putData.id = $("#recInfoId").text().trim();
+        putData.products = rscProductData.slice(0);
+        for(var i = 0; i < putData.products.length; i++) {
+            if(putData.products[i].brand == id) {
+                putData.products.splice(i,1);
+            }
+        }
+        $.components.PUT(managerurl + '/api/v2.2/RSC/modify',putData , function(response){
+            if(response.code == '1000') {
+                alert('删除成功！');
+                window.location.reload();
+            } else {
+                alert(response.message);
+            }
+        });
+
+    }
+    //添加商品弹框中的事件绑定
+    function onAddProductsRefresh() {
+        $(".products-edit-left .products-edit-list-ul > li").off('click').on('click',function () {
+            $(".products-edit-left .products-edit-list-ul > li").removeClass('checked');
+            $(this).addClass('checked');
+        });
+        $("#rsc-add-products").off('click').on('click', function () {
+            if ($(".products-edit-list-ul > li.checked").length != 0) {
+                var p_id = $(".products-edit-list-ul > li.checked").attr('product_id');
+                var p_name = $(".products-edit-list-ul > li.checked").attr('product_name');
+
+                brandProductExisted.products.push({
+                    _id: p_id,
+                    name: p_name
+                });
+
+                rscProductData.push({
+                    _id: p_id,
+                    name: p_name
+                });
+
+                for(var i = 0 ; i < brandProductRest.length; i++) {
+                    if(brandProductRest[i]._id == p_id) {
+                        brandProductRest.splice(i,1);
+                        break;
+                    }
+                }
+
+                UPDATE('rscBrandInfo.brandProductExisted.products');
+                UPDATE('rscBrandInfo.brandProductRest');
+                onAddProductsRefresh();
+
+            }
+        });
+
+        $("#products-edit-cancel").off('click').on('click',function(){
+            $("#products-edit-box").hide();
+            $("#rsc-mask").hide();
+        });
+
+        $("#products-edit-confirm").off('click').on('click',function(){
+            var putData = {};
+            putData.id = $("#recInfoId").text().trim();
+            putData.products = rscProductData.slice(0);
+            $.components.PUT(managerurl + '/api/v2.2/RSC/modify',putData , function(response){
+                if(response.code == '1000') {
+                    alert('修改成功');
+                    $("#products-edit-box").hide();
+                    $("#rsc-mask").hide();
+                    window.location.reload();
+                } else {
+                    alert(response.message);
+                }
+            });
+        });
+
+        $(".products-delete").off('click').on('click',function () {
+            var p_id = $(this).parents('li').attr('product_id');
+            var p_name = $(this).parents('li').attr('product_name');
+            brandProductRest.push({
+                _id: p_id,
+                name: p_name
+            });
+
+            for(var i = 0 ; i < brandProductExisted.products.length; i++) {
+                if(brandProductExisted.products[i]._id == p_id) {
+                    brandProductExisted.products.splice(i,1);
+                    break;
+                }
+            }
+
+            for(var i = 0; i < rscProductData.length; i++) {
+                if(rscProductData[i]._id == p_id) {
+                    rscProductData.splice(i,1);
+                    break;
+                }
+            }
+
+            UPDATE('rscBrandInfo.brandProductExisted.products');
+            UPDATE('rscBrandInfo.brandProductRest');
+            onAddProductsRefresh();
+        });
+
+    }
+
+    //修改地址时的事件绑定
+    function onAddressChangeRefresh() {
+        $("#provinceList").off('change').on('change',function(){
+            var p_id;
+            if($("#provinceList").find('option:selected').length != 0) {
+                p_id = $("#provinceList").find('option:selected').attr('province_id');
+            } else {
+                p_id = $("#provinceList option").eq(0).attr('province_id');
+            }
+
+            getCityList(p_id);
+        });
+
+        $("#cityList").off('change').on('change',function(){
+            var p_id;
+            if($("#cityList").find('option:selected').length != 0) {
+                p_id = $("#cityList").find('option:selected').attr('city_id');
+            } else {
+                p_id = $("#cityList option").eq(0).attr('city_id');
+            }
+            getCountyList(p_id);
+        });
+
+        $("#countyList").off('change').on('change',function(){
+            var p_id;
+            if($("#countyList").find('option:selected').length != 0) {
+                p_id = $("#countyList").find('option:selected').attr('county_id');
+            } else {
+                p_id = $("#countyList option").eq(0).attr('county_id');
+            }
+            getTownList(p_id);
+        });
+
+        $(".products-edit-btn").off('click').on('click', function () {
+            var brandId = $(this).attr('brand');
+            brands_load(brandId);
+        });
+
+        $(".products-delete-btn").off('click').on('click',function(){
+            var brandId = $(this).attr('brand');
+            if(confirm('确认删除' + $(this).attr('brand_name') + '下的所有商品？')) {
+                brand_delete(brandId);
+            }
+        });
+
+        $("#add-brand").off('click').on('click',function(){
+            $("#add-brand-box").show();
+            $("#rsc-mask").show();
+            $(".brands-bit").off('click').on('click',function(){
+                brands_load($(this).attr('brand_id'));
+            });
+
+            $("#add-brand-close").click(function(){
+                $("#add-brand-box").hide();
+                $("#rsc-mask").hide();
+            });
+        });
+
+        $("#save-address").off('click').on('click',function(){
+            var addressData = {};
+            addressData.id = $("#recInfoId").text().trim();
+            addressData.province = $("#provinceList").val() ? $("#provinceList").val() : '';
+            addressData.city = $("#cityList").val() ? $("#cityList").val() : '';
+            addressData.county = $("#countyList").val() ? $("#countyList").val() : '';
+            addressData.town = $("#townList").val() ? $("#townList").val() : '';
+            $.components.PUT(managerurl + '/api/v2.2/RSC/modify',addressData , function(response){
+                if(response.code == '1000') {
+                    alert('保存成功！');
+                    window.location.reload();
+                } else {
+                    alert(response.message);
+                }
+            });
+        });
+
+        $(".rsc-base-td .edit-btn").off('click').on('click',function(){
+            $(this).next().show();
+            $(this).parents('.rsc-base-td').find('input[type=text]').removeClass('border-none');
+            $(this).parents('.rsc-base-td').find('input[type=text]').attr('readonly',false);
+            $(this).remove();
+        });
+
+        $(".confirm-btn").off('click').on('click', function () {
+            var b_value = $(this).prev().val();
+            var attrName = $(this).prev().attr('attrName');
+            var attrTitle = $(this).prev().attr('attrTitle');
+            var putData = {};
+            putData.id = $("#recInfoId").text().trim();
+            putData[attrName]= b_value;
+
+            if(b_value.trim() == '') {
+                alert(attrTitle + '不能为空');
+                return;
+            }
+            if(attrName == 'IDNo' && !regexIdentityNo.test(b_value)) {
+                alert("请输入正确的身份证号");
+                return;
+            }
+
+            $.components.PUT(managerurl + '/api/v2.2/RSC/modify',putData , function(response){
+                if(response.code == '1000') {
+                    alert('修改成功！');
+                    window.location.reload();
+                } else {
+                    alert(response.message);
+                }
+            });
+            $(this).hide();
+            $(this).before('<div class="edit-btn"><span class="fa fa-pencil"></span></div>');
+            $(".rsc-base-td .edit-btn").off('click').on('click',function(){
+                $(this).next().show();
+                $(this).parents('.rsc-base-td').find('input[type=text]').removeClass('border-none');
+                $(this).parents('.rsc-base-td').find('input[type=text]').attr('readonly',false);
+                $(this).remove();
+            });
+            $(this).parents('.rsc-base-td').find('input[type=text]').addClass('border-none');
+            $(this).parents('.rsc-base-td').find('input[type=text]').attr('readonly',true);
+        });
+    }
+
+
+    function brandLoadInit(){
+        rscBrandInfo = {};
+        rscBrandInfo.brandProducts = {};
+        brandProductsList = {};
+        brandProductsList.products = [];
+        brandProductsItems = {};
+        rscBrandInfo.brandProductExisted = {};
+        rscBrandInfo.brandProductRest = [];
+        brandProductExisted = {};
+        brandProductExisted.products = [];
+    }
+
+    function getProvinceList() {
+        $.components.GET(managerurl + '/api/area/getProvinceList/', null, function(response){
+            if(response.code != '1000') {
+                alert(response.message);
+                return;
+            }
+            SET('rscInfo.provinceList', response.datas.rows);
+            onAddressChangeRefresh();
+            var p_id;
+            if($("#provinceList").find('option:selected').length != 0) {
+                p_id = $("#provinceList").find('option:selected').attr('province_id');
+            } else {
+                p_id = $("#provinceList option").eq(0).attr('province_id');
+            }
+            getCityList(p_id);
+        });
+    }
+
+    function getCityList(id) {
+        rscInfo.addressSelected.province = id;
+        $.components.GET(managerurl + '/api/area/getCityList/?provinceId=' + id, null, function(response){
+            if(response.code != '1000') {
+                alert(response.message);
+                return;
+            }
+
+            SET('rscInfo.cityList', response.datas.rows);
+            onAddressChangeRefresh();
+            var p_id;
+            if($("#cityList").find('option:selected').length != 0) {
+                p_id = $("#cityList").find('option:selected').attr('city_id');
+            } else {
+                p_id = $("#cityList option").eq(0).attr('city_id');
+            }
+            getCountyList(p_id);
+        });
+    }
+
+    function getCountyList(id) {
+        rscInfo.addressSelected.city= id;
+        $.components.GET(managerurl + '/api/area/getCountyList/?cityId=' + id, null, function(response){
+            if(response.code != '1000') {
+                alert(response.message);
+                return;
+            }
+
+            SET('rscInfo.countyList', response.datas.rows);
+            onAddressChangeRefresh();
+            var p_id;
+            if($("#countyList").find('option:selected').length != 0) {
+                p_id = $("#countyList").find('option:selected').attr('county_id');
+            } else {
+                p_id = $("#countyList option").eq(0).attr('county_id');
+            }
+
+            getTownList(p_id);
+        });
+    }
+
+    function getTownList(id) {
+        rscInfo.addressSelected.county = id;
+        var p_id;
+        if($("#cityList").find('option:selected').length != 0) {
+            p_id = $("#cityList").find('option:selected').attr('city_id');
+        } else {
+            p_id = $("#cityList option").eq(0).attr('city_id');
+        }
+        var c_data = {countyId: id};
+        if(p_id) {
+            c_data.cityId = p_id;
+        }
+        $.components.GET(managerurl + '/api/area/getTownList/', c_data, function(response){
+            if(response.code != '1000') {
+                alert(response.message);
+                return;
+            }
+
+            SET('rscInfo.townList', response.datas.rows);
+            onAddressChangeRefresh();
+            rscDetailTabOnload();
+        });
+    }
+
+    function rscDetailTabOnload() {
+        //tab
+        var url = window.location.href;
+        var reg = /#.+/;
+        if (reg.test(url)) {
+            $(".rsc-tab-ul a").removeClass("checked");
+            var href = url.split('#')[1];
+            $(".rsc-tab-ul a[href=#" + href + "]").addClass("checked");
+            $(".rsc-tab-block").hide();
+            $(".rsc-tab-block").eq($(".rsc-tab-ul a[href=#" + href + "]").index()).show();
+        } else {
+            $(".rsc-tab-ul a").removeClass("checked");
+            $(".rsc-tab-ul a").eq(0).addClass("checked");
+            $(".rsc-tab-block").hide();
+            $(".rsc-tab-block").eq(0).show();
+        }
+    }
+
+    $(function(){
+
+        rscDetailTabOnload();
+
+        $(".rsc-tab-ul a").click(function(){
+            var i = $(this).index();
+            $(".rsc-tab-ul a").removeClass('checked');
+            $(this).addClass('checked');
+            $(".rsc-tab-block").hide();
+            $(".rsc-tab-block").eq(i).show();
+        });
+
+        $("#rsc-order-link").click(function(){
+            window.location.href = managerurl + "/rsc/rsc-order?id=" + rscInfo_id;
+        });
+
+    });
+</script>

@@ -26,7 +26,7 @@ app.controller('applyCountyController', function($scope, remoteApiService, commo
         id: 0
     }];
     $scope.profileTown = $scope.towns[0];
-
+    var sweetalert = commonService.sweetalert;
     $scope.focusShowValidate = function(formGroupNum) {
         $scope.fouceFormGroupNum = formGroupNum;
     };

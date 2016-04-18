@@ -1,0 +1,461 @@
+select {
+    outline: none;
+}
+
+.rsc-base-td {
+    position: relative;
+    cursor: pointer;
+}
+
+.rsc-base-td input[type=text].border-none {
+    border: 0;
+}
+
+.rsc-base-td input[type=text] {
+    padding: 0;
+    outline: none;
+    width: 80%;
+}
+
+.rsc-base-td .edit-btn {
+    position: absolute;
+    right: 10px;
+    height: 30px;
+    line-height: 30px;
+    top: 50%;
+    margin-top: -15px;
+    display: none;
+}
+
+.rsc-base-td .confirm-btn {
+    position: absolute;
+    right: 10px;
+    height: 30px;
+    line-height: 30px;
+    top: 50%;
+    margin-top: -15px;
+    display: none;
+}
+
+.rsc-base-td:hover .edit-btn {
+    display: block;
+}
+
+.products-edit-btn {
+    cursor: pointer;
+    margin-right: 10%;
+}
+
+#products-edit-box {
+    width: 50%;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    position: fixed;
+    top: 50%;
+    left: 25%;
+    margin-top: -225px;
+    height: 450px;
+    z-index: 100;
+    display: none;
+}
+
+.products-edit-left {
+     width: 40%;
+     position: absolute;
+     left: 0;
+     top: 0;
+     /* padding: 20px; */
+     overflow: hidden;
+     height: 100%;
+}
+
+.products-edit-right {
+    width: 40%;
+    position: absolute;
+    right: 0;
+    top: 0;
+    /* padding: 20px; */
+    overflow: hidden;
+    height: 100%;
+}
+
+.products-edit-sec-title {
+    height: 35px;
+    line-height: 35px;
+    text-align: center;
+}
+
+.products-edit-list {
+    width: 70%;
+    position: absolute;
+    top: 0;
+    left: 15%;
+}
+
+.products-edit-list-ul {
+    height: 350px;
+    overflow-y: auto;
+    padding: 10px;
+    border: 1px solid #ddd;
+    overflow-y: auto;
+}
+
+.products-edit-list-ul > li {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 0 10%;
+    cursor: pointer;
+    position: relative;
+}
+
+.products-edit-left .products-edit-list-ul > li:hover {
+    background-color: #ddd;
+}
+
+.products-edit-list-ul > li.checked {
+    background-color: #ddd;
+}
+
+.products-edit-center {
+    position: absolute;
+    top: 50%;
+    left: 47.5%;
+    margin-top: -15px;
+    width: 50px;
+    height: 30px;
+    text-align: center;
+    cursor: pointer;
+}
+
+.products-edit-btn-box {
+    position: absolute;
+    bottom: 20px;
+    width: 104px;
+    left: 50%;
+    margin-left: -50px;
+}
+
+.products-edit-btn {
+    cursor: pointer;
+}
+
+.products-edit-right .products-edit-list-ul li .fa-times-circle {
+    color: #777;
+    display: none;
+    position: absolute;
+    right: 0;
+}
+
+.products-edit-right .products-edit-list-ul li:hover .fa-times-circle {
+    display: inline-block;
+}
+
+.rsc-select {
+    width: 11%;
+}
+
+#add-brand {
+    cursor: pointer;
+}
+
+#add-brand-box {
+    position: fixed;
+    width: 50%;
+    left: 25%;
+    top: 50%;
+    height: 200px;
+    margin-top: -100px;
+    display: none;
+    overflow: auto;
+    background-color: #fff;
+    padding: 20px;
+    border: 1px solid #ddd;
+    z-index: 100;
+}
+
+#add-brand-box .brands-bit {
+    cursor: pointer;
+    height: 30px;
+    background-color: #ddd;
+    line-height: 30px;
+    display: inline-block;
+    padding: 0 10px;
+    border-radius: 5px;
+    margin-left: 20px;
+}
+
+#add-brand-box .brands-bit:hover {
+    color: #ddd;
+    background-color: #B5B5B5;
+}
+
+#add-brand-box .brands-bit:first-child {
+    margin-left: 0;
+}
+
+.products-delete-btn {
+    cursor: pointer;
+}
+
+.rsc-sidebar-ul li.clear {
+    width: 0;
+    height: 0;
+    font-size: 0;
+    line-height: 0;
+    float: none;
+    clear: both;
+}
+
+.rsc-tab-ul a {
+    display: block;
+    float: left;
+    width: 10%;
+    line-height: 35px;
+    height: 35px;
+    text-align: center;
+    background-color: #F8F8F8;
+    color: #b5b5b5;
+    cursor: pointer;
+    text-decoration: none;
+    border-top: 1px solid #DDDDDD;
+    border-right: 1px solid #DDDDDD;
+}
+
+.rsc-tab-ul a:hover {
+    text-decoration: none;
+}
+
+.rsc-tab-ul a:first-child {
+    border-left: 1px solid #DDDDDD;
+}
+
+.rsc-tab-ul a.checked {
+    float: left;
+    line-height: 35px;
+    height: 35px;
+    text-align: center;
+    background-color: #fff;
+    color: #747474;
+}
+
+.rsc-tab-ul a.clear {
+    width: 0;
+    height: 0;
+    line-height: 0;
+    font-size: 0;
+    padding: 0;
+    margin: 0;
+    border: 0;
+    float: none;
+    clear: both;
+}
+
+.products-delete {
+    line-height: 20px;
+}
+
+.products-confirm-btn {
+    margin-right: 10px;
+}
+
+.rsc-order-box {
+    border: 1px solid #ddd;
+    padding: 0 20px 10px;
+}
+
+.rsc-order-sec-title {
+    margin: 20px 20px 0;
+    line-height: 30px;
+    height: 30px;
+    background-color: #f8f8f8;
+    color: #b5b5b5;
+    padding-left: 20px;
+    border: 1px solid #ddd;
+}
+
+.rsc-order-info-con {
+    margin: 0px 20px 20px;
+    padding: 10px 20px;
+    border: 1px solid #ddd;
+    border-top: none;
+}
+
+.height-10px {
+    width: 100%;
+    height: 10px;
+}
+
+.deliver-status-detail {
+    position: absolute;
+    left: 20%;
+    top: 50%;
+    border: 1px solid #ddd;
+    background-color: #fff;
+    padding: 8px;
+    border-radius: 5px;
+    width: 100%;
+    font-size: 12px;
+    text-align: left;
+    z-index: 5;
+    display:none;
+}
+
+.deliver-status-hover:hover .deliver-status-detail {
+    display: block;
+}
+.deliver-status-hover {
+    cursor: pointer;
+}
+
+.add-brand-close {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+#rsc-mask {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background-color: #fff;
+    opacity: .8;
+    z-index: 99;
+    display: none;
+}
+
+@media screen and (min-width: 1601px){
+    .rsc-sidebar {
+        position: absolute;
+        width: 10%;
+        background-color: #EFEFEF;
+        height: 100%;
+        left: -10%;
+        top: -20px;
+        padding-top: 25px;
+        border-right: 1px solid #ddd;
+    }
+
+    .rsc-sidebar-ul li {
+        height: 35px;
+        line-height: 35px;
+        cursor: pointer;
+        text-align: center;
+    }
+
+    .rsc-sidebar-ul li.checked {
+        background-color: #dfdfdf;
+        border-top: 1px solid #D0CACA;
+        border-bottom: 1px solid #D0CACA;
+    }
+
+}
+
+@media screen and (min-width: 1501px) and (max-width: 1600px){
+    .rsc-sidebar {
+        position: absolute;
+        width: 6%;
+        background-color: #EFEFEF;
+        height: 100%;
+        left: -6%;
+        top: -20px;
+        padding-top: 25px;
+        border-right: 1px solid #ddd;
+    }
+
+    .rsc-sidebar-ul li {
+        height: 35px;
+        line-height: 35px;
+        cursor: pointer;
+        text-align: center;
+    }
+
+    .rsc-sidebar-ul li.checked {
+        background-color: #dfdfdf;
+        border-top: 1px solid #D0CACA;
+        border-bottom: 1px solid #D0CACA;
+    }
+
+}
+
+@media screen and (min-width: 1401px) and (max-width: 1500px){
+    .rsc-sidebar {
+        width: 100%;
+        background-color: #EFEFEF;
+        height: 35px;
+        margin-bottom: 25px;
+    }
+
+    .rsc-sidebar-ul li {
+        width: 50%;
+        height: 35px;
+        line-height: 35px;
+        cursor: pointer;
+        text-align: center;
+        float: left;
+    }
+
+    .rsc-sidebar-ul li.checked {
+        background-color: #dfdfdf;
+        border-top: 1px solid #D0CACA;
+        border-bottom: 1px solid #D0CACA;
+    }
+
+}
+
+@media screen and (min-width: 1366px) and (max-width: 1400px){
+    .rsc-sidebar {
+        position: absolute;
+        width: 10%;
+        background-color: #EFEFEF;
+        height: 100%;
+        left: -9%;
+        top: -20px;
+        padding-top: 25px;
+        border-right: 1px solid #ddd;
+    }
+
+    .rsc-sidebar-ul li {
+        height: 35px;
+        line-height: 35px;
+        cursor: pointer;
+        text-align: center;
+    }
+
+    .rsc-sidebar-ul li.checked {
+        background-color: #dfdfdf;
+        border-top: 1px solid #D0CACA;
+        border-bottom: 1px solid #D0CACA;
+    }
+
+}
+
+@media screen and (max-width: 1365px){
+    .rsc-sidebar {
+        width: 100%;
+        background-color: #EFEFEF;
+        height: 35px;
+        margin-bottom: 25px;
+    }
+
+    .rsc-sidebar-ul li {
+        width: 50%;
+        height: 35px;
+        line-height: 35px;
+        cursor: pointer;
+        text-align: center;
+        float: left;
+    }
+
+    .rsc-sidebar-ul li.checked {
+        background-color: #dfdfdf;
+        border-top: 1px solid #D0CACA;
+        border-bottom: 1px solid #D0CACA;
+    }
+
+}
+

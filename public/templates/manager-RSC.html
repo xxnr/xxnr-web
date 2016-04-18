@@ -1,0 +1,85 @@
+<div class="filter">
+    <div class="container">
+        <div class="caption"><span class="fa fa-truck mr5"></span> @(服务站管理)</div>
+        <div class="row">
+            <div class="col-md-3 col-sm-6 m">
+                <div data-component="textbox" data-component-path="rsc.filter.search" data-placeholder="" data-control-icon="fa-search">@(网点名称/负责人/电话)</div>
+                <div class="help" data-component="template" data-component-path="rsc.info"><script type="text/html">{{ count | pluralize(@('items','item','items','items')) }} / {{pages | pluralize(@('pages', 'page', 'pages', 'pages')) }}</script></div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container">
+    <div data-component="grid" data-component-path="rsc.grid" data-max="auto" data-options-page="@(Page: #)" data-options-button="@(查看更多服务站信息)" data-component-id="rsc.grid">
+        <script type="text/html">
+            <tr>
+                <!--TODO: 加判断-->
+                {{if RSCInfo}}
+                <td style="width:40px" class="silver hidden-xs" data-title="序号">$index</td>
+                <td style="width:120px" class=" silver hidden-xs1" data-title="网点编号">{{id}}</td>
+                <td style="width:120px" class=" silver hidden-xs1" data-title="网点名称">{{RSCInfo.companyName}}</td>
+                <td style="width:120px" class=" silver hidden-xs1" data-title="所在区域（三级)">
+                    {{if RSCInfo.companyAddress}}
+                    {{RSCInfo.companyAddress.province ? RSCInfo.companyAddress.province.name : ''}}
+                    {{RSCInfo.companyAddress.city ? RSCInfo.companyAddress.city.name : ''}}
+                    {{RSCInfo.companyAddress.county ? RSCInfo.companyAddress.county.name : ''}}
+                    {{fi}}
+                </td>
+                <!--<td style="width:120px" class=" silver hidden-xs1" data-title="认证日期"></td>-->
+                <td style="width:120px" class=" silver hidden-xs1" data-title="负责人姓名">{{RSCInfo.name}}</td>
+                <td style="width:120px" class=" silver hidden-xs1" data-title="手机号">{{RSCInfo.phone}}</td>
+                <td style="width:120px" class=" silver hidden-xs1 ui-center" data-title="站点信息"><a href="rsc-detail?id={{_id}}"><span class="fa fa-search"></span></a></td>
+                {{fi}}
+            </tr>
+        </script>
+    </div>
+</div>
+<script>
+    var rsc = {};
+
+    rsc.filter = {};
+    rsc.filter.page = 1;
+    rsc.grid = [];
+    rsc.info = {};
+
+    ON('#rsc.grid', function(component){
+        rsc.filter.max = component.max;
+        rsc_refresh(true);
+
+        component.next = function(page) {
+            rsc.filter.page = page;
+            rsc_refresh();
+        };
+    });
+
+
+    function rsc_refresh(reset) {
+
+        if(reset) {
+            rsc.filter.page = 1;
+            rsc.grid = [];
+        }
+
+        $.components.GET(managerurl + '/api/v2.2/RSCs', rsc.filter, function(response) {
+            if(response.code != '1000') {
+                alert(response.message);
+                return;
+            }
+
+            SET((reset ? '' : '+') + 'rsc.grid', response.RSCs);
+            if (!reset)
+                return;
+            rsc.info.count = response.count;
+            rsc.info.pages = response.pageCount;
+            UPDATE('rsc.info');
+        });
+    }
+
+    Delay_Search_WATCH('rsc.filter.search', function(path, value) {
+        if (NOTMODIFIED('rsc.filter', rsc.filter))
+            return;
+        rsc_refresh(path !== 'rsc.filter.page');
+    });
+
+
+</script>
