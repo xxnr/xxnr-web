@@ -72,6 +72,7 @@ app.use(require('./middlewares/website'));
 
 // set static file path
 app.use(express.static(path.join(__dirname, 'public/xxnr')));
+app.use(express.static(path.join(__dirname, 'public')));
 
 // routes
 app.use('/', require('./routes'));

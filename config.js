@@ -5,7 +5,7 @@ var config= {
     author: "xxnr",
 
 //ArelativeURLaddressintotheeshopmanagement
-    "manager-url": "/$manager",
+    "manager-url": "/manager",
 
 //Hiddensuperadminintheformusername:"password,",
 //manager-superadmin:"admin:admin,",

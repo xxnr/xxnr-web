@@ -7,10 +7,28 @@ var controllers = require('./controllers');
 var path = require('path');
 var middleware = require('./middlewares/authentication');
 
+global.F = {
+    config:require('./config'),
+    global:require('./global')
+};
+
 // front end page
-router.get('/', function(req, res){res.sendFile(path.join(__dirname, './public/xxnr/index.html'));});
+router.get('/', function(req, res){
+    res.sendFile(path.join(__dirname, './public/xxnr/index.html'));
+});
 router.get('/header', function(req, res){res.sendFile(path.join(__dirname, './public/xxnr/header.html'));});
 router.get('/footer', function(req, res){res.sendFile(path.join(__dirname, './public/xxnr/footer.html'));});
+
+// admin / manager
+router.get('/manager', middleware.backend_auth ,function(req, res, next){
+    res.render(path.join(__dirname, './views/manager'),
+        {
+            manager_url:F.config['manager-url'],
+            user_types:F.config['user_types'],
+            user:req.user
+        }
+    );
+});
 
 // area address APIs
 router.get('/api/v2.0/area/getAreaList', controllers.Area.json_province_query);
@@ -107,4 +125,8 @@ router.get('/api/v2.0/user/login', controllers.User.process_login);
 router.post('/api/v2.0/user/login', controllers.User.process_login);
 router.get('/api/v2.0/user/getpubkey', controllers.User.json_public_key);
 router.post('/api/v2.0/user/getpubkey', controllers.User.json_public_key);
+
+// backend admin APIs
+router.post(F.config['manager-url']+'/api/login/', controllers.Manager.process_login);
+
 module.exports = router;

@@ -8,6 +8,7 @@ var BackEndUserService = services.backenduser;
 var AuditService = services.auditservice;
 var ThrottleService = services.throttle;
 var tools = require('../common/tools');
+var path = require('path');
 
 exports.isLoggedIn_middleware = function(req, res, next){
     var token = null;
@@ -70,17 +71,17 @@ exports.isLoggedIn_middleware = function(req, res, next){
  * @param options
  * @param controller
  */
-exports.backend_auth = function(req, res, next, options, controller){
+exports.backend_auth = function(req, res, next){
     var token = null;
 
     // check if token is valid
-    var data = req.method === 'GET' ? controller.query : controller.body;
+    var data = req.data;
     if(data.token){
         // if data contains token
         // it means the request is from app
         token = data.token;
-    }else if (controller.req.cookie(F.config.backendtokencookie)){
-        token = controller.req.cookie(F.config.backendtokencookie);
+    }else if (req.cookies[F.config.backendtokencookie]){
+        token = req.cookies[F.config.backendtokencookie];
     }
 
     try {
@@ -90,7 +91,12 @@ exports.backend_auth = function(req, res, next, options, controller){
             if (err) {
                 // perhaps no user find
                 console.error('user not found:', err);
-                controller.view('login');
+                //controller.view('login');
+                res.render('./7.manager/login.html',
+                    {
+                        manager_url:"/manager",
+                        user:data
+                    });
                 return;
             }
 
@@ -106,18 +112,17 @@ exports.backend_auth = function(req, res, next, options, controller){
 //            }
 
             if (req.method == 'GET') {
-                controller.query['userId'] = payload.userId;
+                req.query['userId'] = payload.userId;
             } else {
-                controller.body.userId = payload.userId;
+                req.body.userId = payload.userId;
             }
 
             // check user auth
-            if(!controller.route){
-                controller.respond({code:1403, message: '您没有权限这样操作'});
+            if(!req.route){
+                res.respond({code:1403, message: '您没有权限这样操作'});
                 return;
             }
-
-            var route = controller.route.name.trim().toLowerCase();
+            var route = req.route.name.trim().toLowerCase();
             var method = req.method.trim().toLowerCase();
             if (route.endsWith('/'))
                 route = route.substring(0, route.length - 1);
@@ -125,7 +130,7 @@ exports.backend_auth = function(req, res, next, options, controller){
                 if (err || !hasPermission) {
                     if (err)
                         console.error('auth_middleware err:', err);
-                    controller.respond({code: 1403, message: '您没有权限这样操作'});
+                    res.respond({code: 1403, message: '您没有权限这样操作'});
                     return;
                 }
 
@@ -136,19 +141,25 @@ exports.backend_auth = function(req, res, next, options, controller){
                 var isSuperAdmin = data.toObject().role.isSuperAdmin;
                 if (isSuperAdmin) {
                     if (req.method == 'GET') {
-                        data.business = controller.query['business'];
+                        data.business = req.query['business'];
                     } else {
-                        data.business = controller.body.business;
+                        data.business = req.body.business;
                     }
                 }
 
-                controller.user = data;
+                req.user = data;
                 next();
             })
         })
     }catch(e){
         // authentication fail
-        controller.view('login');
+        //controller.view('login');
+        console.log(data);
+        res.render('./7.manager/login.html',
+            {
+                manager_url:"/manager",
+                user:data
+            });
     }
 };
 

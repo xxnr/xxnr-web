@@ -20,6 +20,7 @@ var PAYMENTSTATUS = require('../common/defs').PAYMENTSTATUS;
 var DELIVERSTATUS = require('../common/defs').DELIVERSTATUS;
 var DELIVERYTYPENAME = require('../common/defs').DELIVERYTYPENAME;
 var OFFLINEPAYTYPE = require('../common/defs').OFFLINEPAYTYPE;
+var config = require('../config');
 
 exports.install = function() {
 	// Auto-localize static HTML templates
@@ -1415,39 +1416,38 @@ function file_newsletter() {
 
 // Clears all email addreses in newsletter
 function json_newsletter_clear() {
-	var self = this;
+	//var self = this;
 	GETSCHEMA('Newsletter').workflow('clear', null, null, self.callback(), true);
 }
 
 // backend user
-function process_login(){
+exports.process_login = function(req, res, next) {
     var self = this;
-
-    if (!self.data.account){
-        self.respond({code:1001,message:'请输入账号'});
+    if (!req.data.account){
+		res.respond({code:1001,message:'请输入账号'});
         return;
     }
 
-    if (!self.data.password){
-        self.respond({code:1001,message:'请输入密码'});
+    if (!req.data.password){
+		res.respond({code:1001,message:'请输入密码'});
         return;
     }
 
     var options = {};
-    options.account = self.data.account;
-    options.password = tools.decrypt_password(decodeURI(self.data.password));
+    options.account = req.data.account;
+    options.password = tools.decrypt_password(decodeURI(req.data.password));
 //    options.password = self.data.password;
     BackEndUserService.login(options, function(err, user){
         if(err){
             // login fail
             console.log('backend user process_login err: ' + err);
-            self.respond({code:1001, message:'用户名密码错误'});
+			res.respond({code:1001, message:'用户名密码错误'});
             return
         }
 
         // login success
         // set cookie
-        setCookieAndResponse.call(self, user, false);
+        setCookieAndResponse.call(req, user, false);
     });
 }
 
@@ -1487,12 +1487,12 @@ function process_createUser(){
     });
 }
 
-var setCookieAndResponse = function(user, keepLogin){
-    var self = this;
+var setCookieAndResponse = function(req, res, user, keepLogin){
+    //var self = this;
 
     // Set cookie
-    var options = {_id:user._id};
-    var userAgent = self.data['user-agent'];
+    var options = {userid:user.userid};
+    var userAgent = req.data['user-agent'];
     if(REG_MOBILE.test(userAgent)){
         // is app
         options.appLoginId = U.GUID(10);
@@ -1501,31 +1501,31 @@ var setCookieAndResponse = function(user, keepLogin){
         options.webLoginId = U.GUID(10);
     }
 
-    var token = tools.generate_token(user._id, options.appLoginId, options.webLoginId);
+    var token = tools.generate_token(user.userid, options.appLoginId, options.webLoginId);
     BackEndUserService.update(options, function(err){
         if(err){
             console.log('setCookieAndResponse err: ' + err);
-            self.respond({code:1004, message:'登录失败'});
+            res.respond({code:1004, message:'登录失败'});
             return;
         }
 
         if(keepLogin){
-            if(F.isDebug){
-                self.res.cookie(F.config.backendtokencookie, token, new Date().add(F.config.token_cookie_expires_in));
+            if(config.isDebug){
+                res.cookie(config.backendtokencookie, token, new Date().add(config.token_cookie_expires_in));
             }else {
-                self.res.cookie(F.config.backendtokencookie, token, new Date().add(F.config.token_cookie_expires_in), {domain: F.config.domain});
+                res.cookie(config.backendtokencookie, token, new Date().add(config.token_cookie_expires_in), {domain: config.domain});
             }
         }else{
-            if(F.isDebug){
-                self.res.cookie(F.config.backendtokencookie, token);
+            if(config.isDebug){
+                res.cookie(config.backendtokencookie, token);
             }else {
-                self.res.cookie(F.config.backendtokencookie, token, null, {domain: F.config.domain});
+                res.cookie(config.backendtokencookie, token, null, {domain: config.domain});
             }
         }
 
         // Return results
         var result = {code: 1000, message: 'success', datas: user, token:token};
-        self.respond(result);
+        res.respond(result);
     });
 };
 
