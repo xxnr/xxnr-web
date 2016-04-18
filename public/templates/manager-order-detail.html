@@ -59,11 +59,11 @@
                 <tbody>
                 <tr>
                     <td class="ui-center active">@(序号)</td>
-                    <td class="ui-center col-xs-2 active">@(支付内容)</td>
+                    <td class="ui-center col-xs-1 active">@(支付内容)</td>
                     <td class="ui-center col-xs-1 active">@(支付状态)</td>
-                    <td class="ui-center col-xs-1 active">@(应支付金额)</td>
-                    <td class="ui-center col-xs-1 active">@(已支付金额)</td>
-                    <td class="ui-center col-xs-1 active">@(未支付金额)</td>
+                    <td class="ui-center col-xs-2 active">@(应支付金额)</td>
+                    <td class="ui-center col-xs-2 active">@(已支付金额)</td>
+                    <td class="ui-center col-xs-2 active">@(未支付金额)</td>
                     <td class="ui-center col-xs-1 active">@(已支付次数)</td>
                     <td class="ui-center col-xs-1 active">@(总支付次数)</td>
                     <td class="ui-center col-xs-1 active">@(关闭支付次数)</td>
@@ -72,7 +72,7 @@
                 {{ foreach s in subOrders }}
                 <tr>
                     <td class="ui-center">{{ $index+1 }}</td>
-                    <td class="ui-center col-xs-2">
+                    <td class="ui-center col-xs-1">
                         {{ if s.type == 'deposit' }}
                         阶段一：定金
                         {{ else }}
@@ -102,9 +102,9 @@
                         {{ fi }}
                         {{ fi }}
                     </td>
-                    <td class="ui-center col-xs-1" title="{{ s.price | price(2) }}">{{ s.price | price(2) }}</td>
-                    <td class="ui-center col-xs-1" title="{{ s.paidPrice | price(2) }}">{{ s.paidPrice | price(2) }}</td>
-                    <td class="ui-center col-xs-1" title="{{ (s.price - s.paidPrice) | toFixed(2) }}">{{ (s.price - s.paidPrice) | toFixed(2) }}</td>
+                    <td class="ui-center col-xs-2" title="{{ s.price | price(2) }}">{{ s.price | price(2) }}</td>
+                    <td class="ui-center col-xs-2" title="{{ s.paidPrice | price(2) }}">{{ s.paidPrice | price(2) }}</td>
+                    <td class="ui-center col-xs-2" title="{{ (s.price - s.paidPrice) | toFixed(2) }}">{{ (s.price - s.paidPrice) | toFixed(2) }}</td>
                     <td class="ui-center col-xs-1">{{ s.paidTimes }}</td>
                     <td class="ui-center col-xs-1">{{ s.payments.length }}</td>
                     <td class="ui-center col-xs-1">{{ s.closedTimes }}</td>
@@ -270,7 +270,7 @@
                                                     {{end}}
                                                 {{fi}}
                                             </div>
-                                            <div class="rsc-list-btn-box" style="margin-top: 20px;">
+                                            <div class="rsc-list-btn-box">
                                                 <button id="pay-confirm-btn" class="rsc-list-btn-l">确定</button>
                                                 <button id="pay-cancel-btn" class="rsc-list-btn-r">取消</button>
                                             </div>
@@ -482,7 +482,7 @@
                 dateCreated : data.dateCreated,
                 deposit : data.deposit,
                 totalPrice : data.order.totalPrice,
-                duePrice : data.order.duePrice,
+                duePrice : data.duePrice,
                 consigneeName : data.consigneeName,
                 consigneeAddress : data.deliveryType == 2 ? data.consigneeAddress : '',
                 consigneePhone : data.consigneePhone,
@@ -642,7 +642,7 @@
                 return ;
             }
             UPDATE('order.SKUs');
-            //orderInfoChangedRefresh();
+            orderInfoChangedRefresh();
         });
 
 
