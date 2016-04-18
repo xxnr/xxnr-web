@@ -1882,6 +1882,9 @@ OrderService.prototype.judgePaymentRefund = function(order, thePayment) {
 	    		if (payment.id == thePayment.paymentId) {
 	    			// the payment in the order is paid
 	    			if (parseInt(payment.payStatus) === PAYMENTSTATUS.PAID) {
+	    				if (payment.payType === thePayment.payType) {
+	    					return {refund: false, repeatNotify: true};
+	    				}
 	    				return {refund: true, refundReason: 1};
 	    			}
 	    			theSubOrderId = payment.suborderId;
@@ -1920,13 +1923,16 @@ OrderService.prototype.payNotify = function(paymentId, options){
     self.get({"paymentId": paymentId}, function(err, order) {
         // TODO: log err
         if (err) {
-            console.error('api-v1.0 payNotify OrderService get err:', err);
+            console.error('OrderService payNotify OrderService get err:', err);
             dri.sendDRI('[DRI] Fail to get order in order payNotify: ', 'paymentId:'+paymentId, err);
         }
         if (order) {
             var payment = {paymentId: paymentId};
             if (options && options.price) {
                 payment.price = parseFloat(parseFloat(options.price).toFixed(2));
+            }
+            if (options && options.payType) {
+                payment.payType = options.payType;
             }
             var result = self.judgePaymentRefund(order, payment);
             if (result && result.refund) {
@@ -1940,30 +1946,34 @@ OrderService.prototype.payNotify = function(paymentId, options){
                 }
                 PayService.payRefund(paymentOptions);
             } else {
-                if ((order.payStatus||PAYMENTSTATUS.UNPAID) == PAYMENTSTATUS.UNPAID || order.payStatus == PAYMENTSTATUS.PARTPAID) {
-                    self.paid(order.id, paymentId, options, function(err, result) {
-                        if (err) {
-                            if (result && result.refund) {
-                                // *TODO refund
-                                var paymentOptions = options;
-                                paymentOptions.paymentId = paymentId;
-                                if (!paymentOptions.orderId) {
-                                    paymentOptions.orderId = order.id;
-                                }
-                                if (result.refundReason) {
-                                    paymentOptions.refundReason = result.refundReason;
-                                }
-                                PayService.payRefund(paymentOptions);
-                            } else {
-                                console.error('api-v1.0 payNotify OrderService paid err:', err);
-                                // if err happen
-                                // send sms to dri
-                                var idsStr = 'orderId:' + order.id + ' paymentId:' + paymentId;
-                                dri.sendDRI('[DRI] Fail to update order in order payNotify: ', idsStr, err);
-                            }
-                        }
-                    }); // SchemaBuilderEntity.prototype.save = function(model, helper, callback, skip)
-                }
+            	if (result && result.repeatNotify) {
+            		console.error('OrderService payNotify repeatNotify:', paymentId, options);
+            	} else {
+	                if ((order.payStatus||PAYMENTSTATUS.UNPAID) == PAYMENTSTATUS.UNPAID || order.payStatus == PAYMENTSTATUS.PARTPAID) {
+	                    self.paid(order.id, paymentId, options, function(err, result) {
+	                        if (err) {
+	                            if (result && result.refund) {
+	                                // *TODO refund
+	                                var paymentOptions = options;
+	                                paymentOptions.paymentId = paymentId;
+	                                if (!paymentOptions.orderId) {
+	                                    paymentOptions.orderId = order.id;
+	                                }
+	                                if (result.refundReason) {
+	                                    paymentOptions.refundReason = result.refundReason;
+	                                }
+	                                PayService.payRefund(paymentOptions);
+	                            } else {
+	                                console.error('OrderService payNotify OrderService paid err:', err);
+	                                // if err happen
+	                                // send sms to dri
+	                                var idsStr = 'orderId:' + order.id + ' paymentId:' + paymentId;
+	                                dri.sendDRI('[DRI] Fail to update order in order payNotify: ', idsStr, err);
+	                            }
+	                        }
+	                    }); // SchemaBuilderEntity.prototype.save = function(model, helper, callback, skip)
+	                }
+	            }
             }
         } else {
             // not find order by paymentId
