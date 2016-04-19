@@ -375,7 +375,8 @@ UserService.prototype.getInviteeOrderNumber = function(invitees, callback) {
         return;
     }
 
-    UseOrdersNumberModel.find({userId:{$in:invitees}}).sort({dateUpdated:-1}).lean().exec(function (err, docs) {
+    // UseOrdersNumberModel.find({userId:{$in:invitees}}).sort({dateUpdated:-1}).lean().exec(function (err, docs) {
+    UseOrdersNumberModel.collection.find({userId:{$in:invitees}}).sort({dateUpdated:-1}).toArray(function (err, docs) {
         if (err) {
             console.error('User Service emptyInviteeOrderNumber findOne err:', err);
             callback(null, []);

@@ -1475,7 +1475,7 @@ function json_get_inviteeOrderbynamePinyin() {
                         return;
                     }
 
-                    if (inviteeOrderData) {
+                    if (inviteeOrderData && inviteeOrderData.length > 0) {
                         var inviteeOrders = {};
                         for (var i=0; i<inviteeOrderData.length; i++) {
                             var inviteeOrder = inviteeOrderData[i];
