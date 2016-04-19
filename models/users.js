@@ -56,7 +56,9 @@ var UserSchema = new mongoose.Schema({
             town:{type:mongoose.Schema.ObjectId, ref:"town"},
             details:String
         },
-        "products":[{type:mongoose.Schema.ObjectId, ref:"product"}]             // products RSC served
+        "products":[{type:mongoose.Schema.ObjectId, ref:"product"}],             // products RSC served
+        "supportEPOS":{type: Boolean},                                           // support EPOS, true: yes  false:no
+        "EPOSNo":{type:String}                                                   // RPOS No
     }
 });
 
