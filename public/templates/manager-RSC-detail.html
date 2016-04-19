@@ -107,7 +107,7 @@
                 服务站服务内容：
                 <br>
                 <div>支付方式：<label><input type="checkbox" name="payType" checked selected disabled>支持线下支付</label>&nbsp;&nbsp;&nbsp;<label><input type="checkbox" name="payType" id="EPOSSupport" maxlength="20" {{if base.supportEPOS}}checked{{fi}}>支持EPOS</label>&nbsp;&nbsp;&nbsp;
-                    <input type="text" id="EPOSNo" placeholder="填写绑定EPOS设备号" {{if !base.supportEPOS}}disabled{{fi}}  style="padding-left: 10px;" value="{{if base.EPOSNo}}{{if base.supportEPOS}}{{base.EPOSNo}}{{fi}}{{fi}}" maxlength="20">
+                    <input type="text" id="EPOSNo" placeholder="填写绑定EPOS设备号" {{if !base.supportEPOS}}disabled{{fi}}  style="padding-left: 10px;width:180px;" value="{{if base.EPOSNo}}{{if base.supportEPOS}}{{base.EPOSNo}}{{fi}}{{fi}}" maxlength="20">
                     <button id="EPOS_save" disabled>保存</button>
                 </div>
                 {{fi}}
