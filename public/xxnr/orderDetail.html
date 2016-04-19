@@ -140,7 +140,7 @@
                                     </li>
                                     <li class="ng-clock">{{subOrder.payType | payTypeToChineseWording}}</li>
                                     <li>
-                                        <div ng-show="subOrder.showAction && order.paySubOrderType == subOrder.type || subOrder.showAction && !order.paySubOrderType && order.orderStatus.type == (1 || 2)" class="orderOptions">
+                                        <div ng-show="order.paySubOrderType == subOrder.type && subOrder.showAction && order.orderStatus.type == (1 || 2)" class="orderOptions">
                                             <a href="" ng-click='order.action()' class="action_btn ng-cloak">{{order.actionName}}</a>
                                             <a href='' ng-click='order.modifyPay()' ng-show="order.modifyPay" class="modify-paymethod-actionName action_btn">修改付款方式</a>
                                         </div>
