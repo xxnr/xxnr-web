@@ -1461,6 +1461,7 @@ function json_get_inviteeOrderbynamePinyin() {
                 invitee.newOrdersNumber = 0;
                 invitee.namePinyin = user.namePinyin;
                 invitee.nameInitial = user.nameInitial;
+                invitee.nameInitialType = user.nameInitialType;
                 invitees.push(invitee);
                 inviteeIds.push(user.id);
             }
