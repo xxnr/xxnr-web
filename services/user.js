@@ -1,6 +1,7 @@
 /**
  * Created by pepelu on 2015/11/18.
  */
+var mongoose = require("mongoose");
 var bcrypt = require('bcrypt-nodejs');
 var tools = require('../common/tools');
 var crypto = require('crypto');
@@ -266,16 +267,29 @@ UserService.prototype.getInviteeOrderbynamePinyin = function(options, callback) 
         callback('_id required');
         return;
     }
+    var time = new Date();
 
-    UserModel.find({inviter: options._id})
+    // UserModel.find({inviter: options._id})
+    //     .sort({nameInitialType:1, namePinyin:1, dateinvited:-1})
+    //     .lean()
+    //     .exec(function(err, docs) {
+    //         if (err) {
+    //             console.error('User Service getInviteeOrderbynamePinyin error:', err);
+    //             callback('获取新农客户失败');
+    //         }
+
+    //         var data = {};
+    //         data.count = docs?docs.length:docs;
+    //         data.items = docs;
+    //         callback(null, data);
+    //     });
+    UserModel.collection.find({inviter: mongoose.Types.ObjectId(options._id)})
         .sort({nameInitialType:1, namePinyin:1, dateinvited:-1})
-        .lean()
-        .exec(function(err, docs) {
+        .toArray(function(err, docs) {
             if (err) {
                 console.error('User Service getInviteeOrderbynamePinyin error:', err);
                 callback('获取新农客户失败');
             }
-
             var data = {};
             data.count = docs?docs.length:docs;
             data.items = docs;
