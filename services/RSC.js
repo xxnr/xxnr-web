@@ -262,6 +262,7 @@ RSCService.prototype.modifyRSCInfo = function(id, setOptions, callback){
             setValues['RSCInfo.supportEPOS'] = false;
         }
     }
+    if(typeof setOptions.EPOSNo != 'undefined')
         setValues['RSCInfo.EPOSNo'] = setOptions.EPOSNo;
     
     UserModel.update({id:id}, {$set:setValues}, function(err, numUpdated){

@@ -101,7 +101,18 @@
                 </table>
                 {{fi}}
             </div>
-            <div class="rsc-tab-block" style="display: none;">
+            <div class="rsc-tab-block" style="display: none;border:1px solid #ddd;padding: 5px 10px;">
+                {{if base}}
+                <br>
+                服务站服务内容：
+                <br>
+                <div>支付方式：<label><input type="checkbox" name="payType" checked selected disabled>支持线下支付</label>&nbsp;&nbsp;&nbsp;<label><input type="checkbox" name="payType" id="EPOSSupport" maxlength="20" {{if base.supportEPOS}}checked{{fi}}>支持EPOS</label>&nbsp;&nbsp;&nbsp;
+                    <input type="text" id="EPOSNo" placeholder="填写绑定EPOS设备号" {{if !base.supportEPOS}}disabled{{fi}}  style="padding-left: 10px;" value="{{if base.EPOSNo}}{{if base.supportEPOS}}{{base.EPOSNo}}{{fi}}{{fi}}" maxlength="20">
+                    <button id="EPOS_save" disabled>保存</button>
+                </div>
+                {{fi}}
+                <br>
+                <div>服务站经营商品范围：</div>
                 <table class="table table-bordered" border="0">
                     <tr>
                         <td class="col-xs-1 hidden-xs ui-left">@(序号)</td>
@@ -236,6 +247,7 @@
 
     var regexIdentityNo = /^(\d{15}$|^\d{18}$|^\d{17}(\d|X|x))$/;
     var regexIdentityPhone = /^(((13[0-9]{1})|(15[0-9]{1})|(18[0-9]{1}))+\d{8})$/;
+    var regexIdentityEPOSNo = /^\d{20}$/;
 
     ON('#rscInfo', function(component){
         rscInfo_load();
@@ -319,6 +331,43 @@
                 $(".products-edit-btn").off('click').on('click', function () {
                     var brandId = $(this).attr('brand');
                     brands_load(brandId);
+                });
+
+                $("#EPOSSupport").off('click').on('click',function() {
+                    if(document.getElementById('EPOSSupport').checked) {
+                        document.getElementById('EPOSNo').disabled = false;
+                    } else {
+                        document.getElementById('EPOSNo').disabled = true;
+                        $("#EPOSNo").val('');
+                    }
+                    EPOSisChanged();
+                });
+
+                $("#EPOSNo").off('keyup').on('keyup',function(){
+                    EPOSisChanged();
+                });
+
+                $("#EPOS_save").off('click').on('click',function(){
+                    if(document.getElementById('EPOSSupport').checked && !(regexIdentityEPOSNo.test($("#EPOSNo").val()))) {
+                        alert('请输入正确的EPOS设备号');
+                        return;
+                    }
+
+                    var EPOSData = {};
+                    EPOSData.id = $("#recInfoId").text().trim();
+                    EPOSData.supportEPOS = document.getElementById('EPOSSupport').checked;
+                    EPOSData.EPOSNo = document.getElementById('EPOSSupport').checked ? $("#EPOSNo").val() : '';
+
+                    $.components.PUT(managerurl + '/api/v2.2/RSC/modify',EPOSData , function(response){
+                        if(response.code == '1000') {
+                            alert('修改成功！');
+                            SET('rscInfo.base.supportEPOS',EPOSData.supportEPOS);
+                            SET('rscInfo.base.EPOSNo', EPOSData.EPOSNo);
+                            window.location.reload();
+                        } else {
+                            alert(response.message);
+                        }
+                    });
                 });
 
                 $(".products-delete-btn").off('click').on('click',function(){
@@ -613,6 +662,43 @@
             brands_load(brandId);
         });
 
+        $("#EPOSSupport").off('click').on('click',function() {
+            if(document.getElementById('EPOSSupport').checked) {
+                document.getElementById('EPOSNo').disabled = false;
+            } else {
+                document.getElementById('EPOSNo').disabled = true;
+                $("#EPOSNo").val('');
+            }
+            EPOSisChanged();
+        });
+
+        $("#EPOSNo").off('keyup').on('keyup',function(){
+            EPOSisChanged();
+        });
+
+        $("#EPOS_save").off('click').on('click',function(){
+            if(document.getElementById('EPOSSupport').checked && !(regexIdentityEPOSNo.test($("#EPOSNo").val()))) {
+                alert('请输入正确的EPOS设备号');
+                return;
+            }
+
+            var EPOSData = {};
+            EPOSData.id = $("#recInfoId").text().trim();
+            EPOSData.supportEPOS = document.getElementById('EPOSSupport').checked;
+            EPOSData.EPOSNo = document.getElementById('EPOSSupport').checked ? $("#EPOSNo").val() : '';
+
+            $.components.PUT(managerurl + '/api/v2.2/RSC/modify',EPOSData , function(response){
+                if(response.code == '1000') {
+                    alert('修改成功！');
+                    SET('rscInfo.base.supportEPOS',EPOSData.supportEPOS);
+                    SET('rscInfo.base.EPOSNo', EPOSData.EPOSNo);
+                    window.location.reload();
+                } else {
+                    alert(response.message);
+                }
+            });
+        });
+
         $(".products-delete-btn").off('click').on('click',function(){
             var brandId = $(this).attr('brand');
             if(confirm('确认删除' + $(this).attr('brand_name') + '下的所有商品？')) {
@@ -807,6 +893,14 @@
             $(".rsc-tab-block").hide();
             $(".rsc-tab-block").eq(0).show();
         }
+    }
+
+    function EPOSisChanged() {
+        if(!(((document.getElementById('EPOSSupport').checked == true && rscInfo.base.supportEPOS) || (document.getElementById('EPOSSupport').checked == false && !rscInfo.base.supportEPOS)) && $("#EPOSNo").val() == rscInfo.base.EPOSNo)) {
+            document.getElementById('EPOS_save').disabled = false;
+            return;
+        }
+        document.getElementById('EPOS_save').disabled = true;
     }
 
     $(function(){
