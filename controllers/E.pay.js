@@ -7,7 +7,7 @@ var services = require('../services');
 var OrderService = services.order;
 var PayService = services.pay;
 var OFFLINEPAYTYPE = require('../common/defs').OFFLINEPAYTYPE;
-var EPOSNotify = MODULE('EPOSNotify');
+var EPOSNotify = require('../modules/EPOSNotify');
 
 exports.install = function() {
     // pay

@@ -12,3 +12,4 @@ exports.VCode = require('./B.vcode.js');
 exports.Product = require('./C.product.js');
 exports.Cart = require('./D.cart.js');
 exports.Pay = require('./E.pay.js');
+exports.RSC = require('./E.RSC.js');

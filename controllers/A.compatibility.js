@@ -1,3 +1,5 @@
+var express = require('express');
+var router = express.Router();
 var v10apis = [
 	
 	/**		*/ /*
@@ -121,6 +123,14 @@ exports.install = function() {
 		}
     }
 };
+
+function findRoute(route){
+	router.stack.forEach(function(r){
+		if(r.route && r.route.path == route){
+			return r.route.path
+		}
+	})
+}
 
 const V10UPGRADE_MESSAGE = "新新农人App升级啦！请到应用市场下载新版，体验更好的新农服务";
 

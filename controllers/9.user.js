@@ -57,29 +57,29 @@ exports.install = function() {
     // upload user photo for web
     //F.route('/api/v2.0/user/upload',                    userUpload, ['post', 'upload'], 1024*20, ['isLoggedIn']);
     // confirm user photo for web
-    F.route('/api/v2.0/user/confirmUpload',             confirmUpload, ['get', 'post'], ['isLoggedIn']);
+    //F.route('/api/v2.0/user/confirmUpload',             confirmUpload, ['get', 'post'], ['isLoggedIn']);
 
-    F.route('/api/v2.0/user/isAlive',                   isAlive, ['get'], ['isLoggedIn']);
+    //F.route('/api/v2.0/user/isAlive',                   isAlive, ['get'], ['isLoggedIn']);
 
     // check user in white list
-    F.route('/api/v2.0/user/isInWhiteList',             isInWhiteList, ['get', 'post'], ['isLoggedIn', 'isInWhiteList']);
+    //F.route('/api/v2.0/user/isInWhiteList',             isInWhiteList, ['get', 'post'], ['isLoggedIn', 'isInWhiteList']);
 
     // potential customer/intention products related APIs
-    F.route('/api/v2.1/intentionProducts',              json_intention_products, ['get'], ['isLoggedIn', 'isXXNRAgent']);
-    F.route('/api/v2.1/potentialCustomer/isAvailable',  json_potential_customer_available, ['get'], ['isLoggedIn', 'isXXNRAgent']);
-    F.route('/api/v2.1/potentialCustomer/add',          process_add_potential_customer, ['post'], ['isLoggedIn', 'isXXNRAgent']);
-    F.route('/api/v2.1/potentialCustomer/query',        json_potential_customer, ['get'], ['isLoggedIn', 'isXXNRAgent']);
+    //F.route('/api/v2.1/intentionProducts',              json_intention_products, ['get'], ['isLoggedIn', 'isXXNRAgent']);
+    //F.route('/api/v2.1/potentialCustomer/isAvailable',  json_potential_customer_available, ['get'], ['isLoggedIn', 'isXXNRAgent']);
+    //F.route('/api/v2.1/potentialCustomer/add',          process_add_potential_customer, ['post'], ['isLoggedIn', 'isXXNRAgent']);
+    //F.route('/api/v2.1/potentialCustomer/query',        json_potential_customer, ['get'], ['isLoggedIn', 'isXXNRAgent']);
     // order by name pinyin
-    F.route('/api/v2.1/potentialCustomer/queryAllOrderbyName',     json_potential_customer_orderby_namePinyin, ['get'], ['isLoggedIn', 'isXXNRAgent']);
+    //F.route('/api/v2.1/potentialCustomer/queryAllOrderbyName',     json_potential_customer_orderby_namePinyin, ['get'], ['isLoggedIn', 'isXXNRAgent']);
     // Whether order by name pinyin is latest
-    F.route('/api/v2.1/potentialCustomer/isLatest',     json_potential_customer_islatest, ['get'], ['isLoggedIn', 'isXXNRAgent']);
-    F.route('/api/v2.1/potentialCustomer/get',          json_potential_customer_get, ['get'], ['isLoggedIn', 'isXXNRAgent']);
+    //F.route('/api/v2.1/potentialCustomer/isLatest',     json_potential_customer_islatest, ['get'], ['isLoggedIn', 'isXXNRAgent']);
+    //F.route('/api/v2.1/potentialCustomer/get',          json_potential_customer_get, ['get'], ['isLoggedIn', 'isXXNRAgent']);
 
-    F.route('/api/v2.1/user/getNominatedInviter',       json_nominated_inviter_get, ['get'], ['isLoggedIn']);
+    //F.route('/api/v2.1/user/getNominatedInviter',       json_nominated_inviter_get, ['get'], ['isLoggedIn']);
 
     // user consignees
-    F.route('/api/v2.2/user/queryConsignees',           json_userconsignees_query, ['get'], ['isLoggedIn']);
-    F.route('/api/v2.2/user/saveConsignees',            process_userconsignees_save, ['get', 'post'], ['isLoggedIn']);
+    //F.route('/api/v2.2/user/queryConsignees',           json_userconsignees_query, ['get'], ['isLoggedIn']);
+    //F.route('/api/v2.2/user/saveConsignees',            process_userconsignees_save, ['get', 'post'], ['isLoggedIn']);
 
 	// v1.0
 	// LOGIN
@@ -1646,26 +1646,23 @@ exports.json_get_invitee_orders = function(req, res, next) {
     });
 };
 
-function isAlive() {
-    var self = this;
+exports.isAlive = function(req, res, next) {
     res.respond({code:1000, message:'isAlive'});
-}
+};
 
-function isInWhiteList() {
-    var self = this;
-    if (self.user && self.user.inWhiteList) {
+exports.isInWhiteList = function(req, res, next) {
+    if (req.user && req.user.inWhiteList) {
         res.respond({code:1000, message:'true'});
         return;
     }
     res.respond({code:1001, message:'false'});
-}
+};
 
 exports.json_usertypes_get = function(req, res, next) {
     res.respond({code: 1000, data: Global.usertypes});
 };
 
-function process_add_potential_customer(){
-    var self = this;
+exports.process_add_potential_customer = function(req, res, next){
     if(!req.data.name){
         res.respond({code:1001, message:'请输入姓名'});
         return;
@@ -1700,7 +1697,7 @@ function process_add_potential_customer(){
         return;
     }
 
-    PotentialCustomerService.add(self.user, req.data.name, req.data.phone, req.data.sex, req.data.address, req.data.buyIntentions, req.data.remarks, function(err){
+    PotentialCustomerService.add(req.user, req.data.name, req.data.phone, req.data.sex, req.data.address, req.data.buyIntentions, req.data.remarks, function(err){
         if(err){
             res.respond({code:1001, message:err});
             return;
@@ -1708,21 +1705,20 @@ function process_add_potential_customer(){
 
         res.respond({code:1000, message:'success'});
     });
-}
+};
 
-function json_potential_customer(){
-    var self = this;
+exports.json_potential_customer = function(req, res, next){
     var returnType = req.data.type;
     if(!returnType) {
         var page = U.parseInt(req.data.page, 1) - 1;
         var max = U.parseInt(req.data.max, 20);
-        PotentialCustomerService.queryPage(self.user, page, max, function (err, potentialCustomers, totalCount, pageCount) {
+        PotentialCustomerService.queryPage(req.user, page, max, function (err, potentialCustomers, totalCount, pageCount) {
             if (err) {
                 res.respond({code: 1001, message: '获取潜在客户列表失败'});
                 return;
             }
 
-            PotentialCustomerService.countLeftToday(self.user, function (err, count) {
+            PotentialCustomerService.countLeftToday(req.user, function (err, count) {
                 if (err) {
                     res.respond({code: 1001, message: '查询客户列表失败'});
                     return;
@@ -1740,11 +1736,10 @@ function json_potential_customer(){
             });
         });
     }
-}
+};
 
-function json_potential_customer_orderby_namePinyin(){
-    var self = this;
-    PotentialCustomerService.queryOrderbynamePinyin(self.user, function (err, potentialCustomers) {
+exports.json_potential_customer_orderby_namePinyin = function(req, res, next){
+    PotentialCustomerService.queryOrderbynamePinyin(req.user, function (err, potentialCustomers) {
         if (err) {
             res.respond({code: 1001, message: '获取潜在客户列表失败'});
             return;
@@ -1757,18 +1752,17 @@ function json_potential_customer_orderby_namePinyin(){
             potentialCustomers: potentialCustomers ? potentialCustomers : []
         });
     });
-}
+};
 
-function json_potential_customer_islatest(){
-    var self = this;
+exports.json_potential_customer_islatest = function(req, res, next){
     var count = req.data.count || 0;
-    PotentialCustomerService.queryOrderbynamePinyin(self.user, function (err, potentialCustomers) {
+    PotentialCustomerService.queryOrderbynamePinyin(req.user, function (err, potentialCustomers) {
         if (err) {
             res.respond({code: 1001, message: '获取潜在客户列表失败'});
             return;
         }
 
-        PotentialCustomerService.countLeftToday(self.user, function (err, countLeftToday) {
+        PotentialCustomerService.countLeftToday(req.user, function (err, countLeftToday) {
             if (err) {
                 res.respond({code: 1001, message: '查询客户列表失败'});
                 return;
@@ -1783,10 +1777,9 @@ function json_potential_customer_islatest(){
             });
         });
     });
-}
+};
 
-function json_intention_products(){
-    var self = this;
+exports.json_intention_products = function(req, res, next){
     IntentionProductService.query(function(err, products){
         if(err){
             res.respond({code:1001, message:'获取意向商品列表失败'});
@@ -1802,10 +1795,9 @@ function json_intention_products(){
 
         res.respond({code:1000, message:'success', intentionProducts:products});
     })
-}
+};
 
-function json_potential_customer_available(){
-    var self = this;
+exports.json_potential_customer_available = function(req, res, next){
     if(!req.data.phone || !tools.isPhone(req.data.phone.toString())){
         res.respond({code:1001, message:'请填写正确的手机号'});
         return;
@@ -1819,10 +1811,9 @@ function json_potential_customer_available(){
 
         res.respond({code:1000, available:available, message:message});
     })
-}
+};
 
-function json_potential_customer_get(){
-    var self = this;
+exports.json_potential_customer_get = function(req, res, next){
     if(!req.data._id){
         res.respond({code:1001, message:'请填写_id'});
         return;
@@ -1836,7 +1827,7 @@ function json_potential_customer_get(){
 
         res.respond({code:1000, message:'success', potentialCustomer:doc});
     })
-}
+};
 
 function convert_user_type_info(user, data){
     user.isVerified = data.isVerified;
@@ -1865,9 +1856,8 @@ function convert_user_type_info(user, data){
     }
 }
 
-function json_nominated_inviter_get(){
-    var self = this;
-    var user = self.user;
+exports.json_nominated_inviter_get = function(req, res, next){
+    var user = req.user;
     PotentialCustomerService.getByPhone(user.account, function(err, customer){
         if(err){
             res.respond({code:1001, message:'查询失败'});
@@ -1881,14 +1871,13 @@ function json_nominated_inviter_get(){
 
         res.respond({code:1000, message:'success', nominated_inviter:{phone:customer.user.account, name:customer.user.name}});
     })
-}
+};
 
 /**
  * query user consignees for ZITI delivery
  * @return {[object]{code:number message:string datas:object}}
  */
-function json_userconsignees_query() {
-    var self = this;
+exports.json_userconsignees_query = function(req, res, next) {
     var page = req.data['page'];
     var max = req.data['max'];
     var userId = req.data['userId'];
@@ -1912,14 +1901,13 @@ function json_userconsignees_query() {
 
         res.respond({code:1000,message:'success',datas:{total:data.count,rows:data.items,page:data.page,pages:data.pages}});
     });
-}
+};
 
 /**
  * save user consignees
  * @return {[object]{code:number message:string}}
  */
-function process_userconsignees_save() {
-    var self = this;
+exports.process_userconsignees_save = function(req, res, next) {
     var consigneeName = req.data['consigneeName'];
     var consigneePhone = req.data['consigneePhone'];
     var userId = req.data['userId'];
@@ -1951,4 +1939,4 @@ function process_userconsignees_save() {
         res.respond({code:1000,message:'success'});
         return;
     });
-}
+};

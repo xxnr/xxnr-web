@@ -161,6 +161,22 @@ router.post('/api/v2.0/user/uploadPortrait', middleware.isLoggedIn_middleware, c
 router.post('/api/v2.0/user/upload', middleware.isLoggedIn_middleware, controllers.User.userUpload);
 router.get('/api/v2.0/user/confirmUpload', middleware.isLoggedIn_middleware, controllers.User.confirmUpload);
 router.post('/api/v2.0/user/confirmUpload', middleware.isLoggedIn_middleware, controllers.User.confirmUpload);
+router.get('/api/v2.0/user/isAlive', middleware.isLoggedIn_middleware, controllers.User.isAlive);
+router.get('/api/v2.0/user/isInWhiteList', middleware.isLoggedIn_middleware, middleware.isInWhiteList_middleware, controllers.User.isInWhiteList);
+router.post('/api/v2.0/user/isInWhiteList', middleware.isLoggedIn_middleware, middleware.isInWhiteList_middleware, controllers.User.isInWhiteList);
+router.get('/api/v2.1/user/getNominatedInviter', middleware.isLoggedIn_middleware, controllers.User.json_nominated_inviter_get);
+router.get('/api/v2.2/user/queryConsignees', middleware.isLoggedIn_middleware, controllers.User.json_userconsignees_query);
+router.get('/api/v2.2/user/saveConsignees', middleware.isLoggedIn_middleware, controllers.User.process_userconsignees_save);
+router.post('/api/v2.2/user/saveConsignees', middleware.isLoggedIn_middleware, controllers.User.process_userconsignees_save);
+
+// potential customer/intention products related APIs
+router.get('/api/v2.1/intentionProducts', middleware.isLoggedIn_middleware, middleware.isXXNRAgent_middleware, controllers.User.json_intention_products);
+router.get('/api/v2.1/potentialCustomer/isAvailable', middleware.isLoggedIn_middleware, middleware.isXXNRAgent_middleware, controllers.User.json_potential_customer_available);
+router.post('/api/v2.1/potentialCustomer/add', middleware.isLoggedIn_middleware, middleware.isXXNRAgent_middleware, controllers.User.process_add_potential_customer);
+router.get('/api/v2.1/potentialCustomer/query', middleware.isLoggedIn_middleware, middleware.isXXNRAgent_middleware, controllers.User.json_potential_customer);
+router.get('/api/v2.1/potentialCustomer/queryAllOrderbyName', middleware.isLoggedIn_middleware, middleware.isXXNRAgent_middleware, controllers.User.json_potential_customer_orderby_namePinyin);
+router.get('/api/v2.1/potentialCustomer/isLatest', middleware.isLoggedIn_middleware, middleware.isXXNRAgent_middleware, controllers.User.json_potential_customer_islatest);
+router.get('/api/v2.1/potentialCustomer/get', middleware.isLoggedIn_middleware, middleware.isXXNRAgent_middleware, controllers.User.json_potential_customer_get);
 
 // pay related APIs
 router.get('/alipay', middleware.isInWhiteList_middleware, middleware.throttle, controllers.Pay.alipayOrder);
@@ -179,6 +195,18 @@ router.get('/api/v2.2/RSC/confirmOfflinePay', middleware.isLoggedIn_middleware, 
 router.post('/dynamic/alipay/refund_fastpay_by_platform_nopwd_notify.asp', controllers.Pay.alipayRefundNotify);
 router.post('/unionpay/refundnotify', controllers.Pay.unionpayRefundNotify);
 
+// RSC realted APIs
+router.get('/api/v2.2/RSC/info/get', middleware.isLoggedIn_middleware, controllers.RSC.json_RSC_info_get);
+router.post('/api/v2.2/RSC/info/fill', middleware.isLoggedIn_middleware, controllers.RSC.process_RSC_info_fill);
+router.get('/api/v2.2/RSC/address/province', middleware.isLoggedIn_middleware, controllers.RSC.json_RSC_address_province_query);
+router.get('/api/v2.2/RSC/address/city', middleware.isLoggedIn_middleware, controllers.RSC.json_RSC_address_city_query);
+router.get('/api/v2.2/RSC/address/county', middleware.isLoggedIn_middleware, controllers.RSC.json_RSC_address_county_query);
+router.get('/api/v2.2/RSC/address/town', middleware.isLoggedIn_middleware, controllers.RSC.json_RSC_address_town_query);
+router.get('/api/v2.2/RSC', middleware.isLoggedIn_middleware, controllers.RSC.json_RSC_query);
+router.get('/api/v2.2/RSC/orderDetail', middleware.isLoggedIn_middleware, middleware.isRSC_middleware, controllers.RSC.json_RSC_order_detail);
+router.get('/api/v2.2/RSC/orders', middleware.isLoggedIn_middleware, middleware.isRSC_middleware, controllers.RSC.json_RSC_orders_get);
+router.post('/api/v2.2/RSC/order/deliverStatus/delivering', middleware.isLoggedIn_middleware, middleware.isRSC_middleware, controllers.RSC.process_RSC_order_deliverStatus_delivering);
+router.post('/api/v2.2/RSC/order/selfDelivery', middleware.isLoggedIn_middleware, middleware.isRSC_middleware, middleware.throttle, controllers.RSC.process_self_delivery);
 
 // backend admin APIs
 router.get(F.config['manager-url']+'/api/login/', controllers.Manager.process_login);
