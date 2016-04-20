@@ -2,7 +2,7 @@
 <html ng-app="xxnr.manager">
 <head>
 	<title>Manager v@{config.version}</title>
-	<% include ../partials/static %>
+	<% include ./partials/static %>
 	<script>
 //		var managerurl="@{!CONFIG('manager-url')}";
 //        var usertypes=JSON.parse('@{!CONFIG("user_types")}');
@@ -10,7 +10,7 @@
 		var managerurl = '<%= manager_url %>';
 		var currency='@{!config.custom.currency_entity}';
 //		var su=JSON.parse('@{json(user)}');
-		var su=JSON.parse(<%- JSON.stringify(user) %>);
+		var su= <%- JSON.stringify(user) %>;
         su.roles = su.role.view_roles;
 	</script>
 </head>

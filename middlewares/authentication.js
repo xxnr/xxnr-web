@@ -122,7 +122,7 @@ exports.backend_auth = function(req, res, next){
                 res.respond({code:1403, message: '您没有权限这样操作'});
                 return;
             }
-            var route = req.route.name.trim().toLowerCase();
+            var route = req.route.path.trim().toLowerCase();
             var method = req.method.trim().toLowerCase();
             if (route.endsWith('/'))
                 route = route.substring(0, route.length - 1);

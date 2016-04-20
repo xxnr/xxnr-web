@@ -1444,10 +1444,10 @@ exports.process_login = function(req, res, next) {
 			res.respond({code:1001, message:'用户名密码错误'});
             return
         }
-
+		console.log('user'+user);
         // login success
         // set cookie
-        setCookieAndResponse.call(req, user, false);
+        setCookieAndResponse(req,res ,user, false);
     });
 }
 
@@ -1491,8 +1491,8 @@ var setCookieAndResponse = function(req, res, user, keepLogin){
     //var self = this;
 
     // Set cookie
-    var options = {userid:user.userid};
-    var userAgent = req.data['user-agent'];
+	var options = {_id:user._id};
+	var userAgent = req.data["user-agent"] || 'web';
     if(REG_MOBILE.test(userAgent)){
         // is app
         options.appLoginId = U.GUID(10);
@@ -1501,9 +1501,10 @@ var setCookieAndResponse = function(req, res, user, keepLogin){
         options.webLoginId = U.GUID(10);
     }
 
-    var token = tools.generate_token(user.userid, options.appLoginId, options.webLoginId);
+    var token = tools.generate_token(user._id, options.appLoginId, options.webLoginId);
     BackEndUserService.update(options, function(err){
         if(err){
+
             console.log('setCookieAndResponse err: ' + err);
             res.respond({code:1004, message:'登录失败'});
             return;

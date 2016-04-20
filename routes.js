@@ -127,6 +127,7 @@ router.get('/api/v2.0/user/getpubkey', controllers.User.json_public_key);
 router.post('/api/v2.0/user/getpubkey', controllers.User.json_public_key);
 
 // backend admin APIs
+router.get(F.config['manager-url']+'/api/login/', controllers.Manager.process_login);
 router.post(F.config['manager-url']+'/api/login/', controllers.Manager.process_login);
 
 module.exports = router;
