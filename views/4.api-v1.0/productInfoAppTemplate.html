@@ -1,15 +1,11 @@
-@{layout('')}
-
-<!DOCTYPE html>
 <html>
 <head>
-    <title>@{model.title} - 新新农人</title>
+    <title><%= result.title %> - 新新农人</title>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=10" />
     <meta name="format-detection" content="telephone=no" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=0.5, maximum-scale=2.0, user-scalable=yes" />
     <meta name="robots" content="all,follow" />
-    @{head}
     <style>
         .container{margin: 0 auto;width: 90%;}
         .container #product_info{margin-top: 5px;padding-left: 5px;padding-right: 5px;padding-bottom: 5px;}
@@ -22,7 +18,7 @@
         <div id="product_info"></div>
     </div>
             
-    @{json(model, 'product')}
+    <% json(result.product)%>
 
     <script src="/js/jquery.min.js"></script>
     <script  type="text/javascript">

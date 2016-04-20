@@ -53,7 +53,7 @@ exports.install = function() {
     // get product detail for app
     //F.route('/api/v2.0/product/getAppProductDetails/', getAppProductDetails, ['post', 'get']);
     // product app info page (app_body app_standard app_support)
-    F.route('/product/{productInfo}/{productId}/', view_product_info);
+    //F.route('/product/{productInfo}/{productId}/', view_product_info);
     // get min pay price
     // F.route('/api/v2.0/getMinPayPrice/',       getMinPayPrice, ['get'], ['isLoggedIn']);
     //F.route('/api/v2.0/getMinPayPrice/',       getMinPayPrice, ['post', 'get'], ['isLoggedIn']);
@@ -357,14 +357,15 @@ exports.getAppProductDetails = function(req, res, next) {
 };
 
 // get product info page
-function view_product_info(productInfo, productId) {
+exports.view_product_info =function(req, res,next,productInfo, productId) {
     var self = this;
     var options = {};
     options.id = productId;
 
     ProductService.get(options, function(err, data) {
         if (err || !data) {
-            self.throw404();
+            //self.throw404();
+            res.status(404).send('404: Page not found');
             return;
         }
         var result = {};
@@ -378,10 +379,16 @@ function view_product_info(productInfo, productId) {
             }
             result.productInfo = data[productInfo];
         } else {
-            self.throw404();
+            //self.throw404();
+            res.status(404).send('404: Page not found');
             return;
         }
-        self.view('productInfoAppTemplate', result);
+        //self.view('productInfoAppTemplate', result);
+        res.render(path.join(__dirname, './views/4.api-v1.0/productInfoAppTemplate'),
+            {
+                result:result
+            }
+        );
     });
 }
 

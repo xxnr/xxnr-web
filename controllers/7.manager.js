@@ -21,7 +21,7 @@ var DELIVERSTATUS = require('../common/defs').DELIVERSTATUS;
 var DELIVERYTYPENAME = require('../common/defs').DELIVERYTYPENAME;
 var OFFLINEPAYTYPE = require('../common/defs').OFFLINEPAYTYPE;
 var config = require('../config');
-
+var path = require('path');
 exports.install = function() {
 	// Auto-localize static HTML templates
 	F.localize('All templates', '/templates/');
@@ -2106,4 +2106,13 @@ function process_orders_RSCInfo_update(){
 
 		self.respond({code:1000, message:'success'});
 	})
+}
+exports.manager = function(req, res, next){
+	res.render(path.join(__dirname, '../views/manager'),
+		{
+			manager_url:F.config['manager-url'],
+			user_types:F.config['user_types'],
+			user:req.user
+		}
+	);
 }

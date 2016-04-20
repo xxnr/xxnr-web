@@ -1,7 +1,7 @@
 var services = require('../services');
 var tools = require('../common/tools');
 var NewsService = services.news;
-
+var path = require('path');
 exports.install = function() {
     // NEWS
     //F.route('/api/v2.0/news/',                           json_news_query);
@@ -9,9 +9,9 @@ exports.install = function() {
     //F.route('/api/v2.0/news/categories/',                json_news_categories);
 
     // NEWS detail view
-    F.route('/news/{id}/',                               view_news_detail);
+    //F.route('/news/{id}/',                               view_news_detail);     //rewrite by CUIDI
     // NEWS detail share view
-    F.route('/sharenews/{id}/',                          view_newsshare_detail);
+    //F.route('/sharenews/{id}/',                          view_newsshare_detail);   //rewrite by CUIDI
 };
 
 // Gets all news
@@ -100,34 +100,48 @@ exports.json_news_read = function(req, res, next) {
 };
 
 // Gets news detail page for app
-function view_news_detail(id) {
+exports.view_news_detail = function(req,res,next) {
     var self = this;
     var options = {};
+    var id = req.params.id;
     options.id = id;
     // only get online news
     options.status = '2';
     NewsService.get(options, function (err, result) {
         if (err || !result) {
-            self.throw404();
+            //self.throw404();
+            res.status(404).send('404: Page not found');
             return;
         }
-        self.view('newsAppDetailTemplate', result);
+        //self.view('newsAppDetailTemplate', result);
+        res.render(path.join(__dirname, '../views/9.new/newsAppDetailTemplate.html'),
+            {
+                result:result
+            }
+        );
     });
 }
 
 // Gets news detail share page for app
-function view_newsshare_detail(id) {
+exports.view_newsshare_detail = function(req,res,next) {
     var self = this;
     var options = {};
+    var id = req.params.id;
     options.id = id;
     // only get online news
     options.status = '2';
     NewsService.get(options, function (err, result) {
         if (err || !result) {
-            self.throw404();
+            //self.throw404();
+            res.status(404).send('404: Page not found');
             return;
         }
-        result['shareurl'] = 'http://' + self.req.uri.host + '/newsshare/' + id;
-        self.view('newsAppDetailTemplate', result);
+        result['shareurl'] = 'http://' + req.hostname + '/newsshare/' + id;
+        //self.view('newsAppDetailTemplate', result);
+        res.render(path.join(__dirname, '../views/9.new/newsAppDetailTemplate.html'),
+            {
+                result:result
+            }
+        );
     });
 }

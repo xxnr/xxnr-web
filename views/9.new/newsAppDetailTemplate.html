@@ -1,15 +1,12 @@
-@{layout('')}
-
 <!DOCTYPE html>
 <html>
 <head>
-    <title>@{model.title} - 新新农人</title>
+    <title><%= result.title %> - 新新农人</title>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=10" />
     <meta name="format-detection" content="telephone=no" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=0.5, maximum-scale=2.0, user-scalable=yes" />
     <meta name="robots" content="all,follow" />
-    @{head}
     <style>
         body, ul, ol, li, p, h1, h2, h3, h4, h5, button, input, optgroup, select, textarea {margin: 0;padding: 0;}
         a {text-decoration: none;}
@@ -35,7 +32,7 @@
 </head>
 
 <body>
-    @{if model.shareurl}
+    <% if(result.shareurl){ %>
     <style>
     body{padding-top: 70px;}
     </style>
@@ -53,10 +50,10 @@
             </button>
         </div>
     </div>
-    @{fi}
+    <% } %>
 	<div class="container">
         <div class="title">
-            <h2>@{model.title}</h2>
+            <h2><%= result.title %></h2>
         </div>
         <div class="info">
             <div id="createdate"></div>
@@ -64,9 +61,7 @@
         </div>
         <div id="news_body"></div>
     </div>
-            
-    @{json(model, 'news')}
-
+    <%- result.newsbody %>
     <script src="/js/jquery.min.js"></script>
     <script src="/js/moment.min.js"></script>
     <script  type="text/javascript">

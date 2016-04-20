@@ -19,16 +19,14 @@ router.get('/', function(req, res){
 router.get('/header', function(req, res){res.sendFile(path.join(__dirname, './public/xxnr/header.html'));});
 router.get('/footer', function(req, res){res.sendFile(path.join(__dirname, './public/xxnr/footer.html'));});
 
-// admin / manager
-router.get('/manager', middleware.backend_auth ,function(req, res, next){
-    res.render(path.join(__dirname, './views/manager'),
-        {
-            manager_url:F.config['manager-url'],
-            user_types:F.config['user_types'],
-            user:req.user
-        }
-    );
-});
+// view render pages
+
+//// admin / manager
+router.get('/manager', middleware.backend_auth ,controllers.Manager.manager);
+//// app related pages
+router.get('/product/:productInfo/:productId/',controllers.Api_v1_0.view_product_info);
+router.get('/news/:id/',controllers.News.view_news_detail);
+router.get('/sharenews/:id/',controllers.News.view_newsshare_detail);
 
 // area address APIs
 router.get('/api/v2.0/area/getAreaList', controllers.Area.json_province_query);
