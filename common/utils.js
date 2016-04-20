@@ -58,7 +58,7 @@ var NUMBER = 'number';
 var OBJECT = 'object';
 var BOOLEAN = 'boolean';
 var NEWLINE = '\r\n';
-var VERSION = (typeof(framework) !== UNDEFINED ? ' v' + framework.version_header : '');
+var VERSION = (typeof(F) !== UNDEFINED ? ' v' + F.config.version : '');
 var isWindows = require('os').platform().substring(0, 3).toLowerCase() === 'win';
 var dnscache = {};
 
@@ -1497,7 +1497,7 @@ exports.validate = function(model, properties, prepare, builder, resource, path,
 exports.validate_builder = function(model, error, schema, collection, path, index) {
 
     var entity = collection[schema];
-    var prepare = entity.onValidation || framework.onValidation;
+    var prepare = entity.onValidation;
 
     var current = path === undefined ? '' : path + '.';
     var properties = entity.properties;
@@ -1677,13 +1677,13 @@ exports.combine = function() {
                 p += (v[0] !== '/' ? (p[p.length - 1] !== '/' ? '/' : '') : '') + v;
         }
 
-        if (framework.isWindows)
+        if (isWindows)
             return p.replace(regexpPATH, '/');
 
         return p;
     }
 
-    p = framework.directory;
+    p = process.cwd();
 
     for (var i = 0, length = arguments.length; i < length; i++) {
         var v = arguments[i];
@@ -1691,7 +1691,7 @@ exports.combine = function() {
             p += (v[0] !== '/' ? (p[p.length - 1] !== '/' ? '/' : '') : '') + v;
     }
 
-    if (framework.isWindows)
+    if (isWindows)
         return p.replace(regexpPATH, '/');
 
     return p;
@@ -4826,6 +4826,11 @@ exports.queue = function(name, max, fn) {
     })(name);
 
     return true;
+};
+
+exports.createDirectory = function(dir){
+    if (!fs.existsSync(dir))
+        fs.mkdirSync(dir);
 };
 
 global.async = exports.async;

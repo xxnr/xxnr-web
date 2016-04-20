@@ -30,7 +30,8 @@
 var fs = require("fs");
 var express = require('express');
 var bodyParser = require('body-parser');
-var cookieParser = require('cookie-parser')
+var cookieParser = require('cookie-parser');
+var busboy = require('connect-busboy');
 var https = require('https');
 var http = require('http');
 var path = require('path');
@@ -41,6 +42,10 @@ global.F = {
 	config:require('./config'),
 	global:require('./global')
 };
+global.RELEASE = true;
+global.isDebug = false;
+global.framework_image = global.Image = require('./modules/image');
+
 var app = express();
 
 // certificate
@@ -64,8 +69,16 @@ app.use(bodyParser.json({
 }));
 app.use(bodyParser.urlencoded({extended: false}));
 
-// cookieParser;
+// cookieParser
 app.use(cookieParser());
+
+// busboy
+app.use(busboy({
+	limits: {
+		fileSize: F.config.file_size_limit,
+		files: F.config.file_count_limit
+	}
+}));
 
 // website common middleware
 app.use(require('./middlewares/website'));

@@ -7,17 +7,14 @@ var controllers = require('./controllers');
 var path = require('path');
 var middleware = require('./middlewares/authentication');
 
-global.F = {
-    config:require('./config'),
-    global:require('./global')
-};
-
 // front end page
 router.get('/', function(req, res){
     res.sendFile(path.join(__dirname, './public/xxnr/index.html'));
 });
 router.get('/header', function(req, res){res.sendFile(path.join(__dirname, './public/xxnr/header.html'));});
 router.get('/footer', function(req, res){res.sendFile(path.join(__dirname, './public/xxnr/footer.html'));});
+router.get('/images/:type(small|large|original|thumbnail)/:filename.jpg', controllers.Default.file_image);
+router.get('/images/:type(small|large|original|thumbnail)/:category/:filename.jpg', controllers.Default.file_image);
 
 // view render pages
 
@@ -97,6 +94,10 @@ router.get('/api/v2.2/order/getDeliveryCode', middleware.isLoggedIn_middleware, 
 router.get('/app/order/getOderList', middleware.isLoggedIn_middleware, controllers.Order.api10_getOrders);
 router.post('/app/order/getOderList', middleware.isLoggedIn_middleware, controllers.Order.api10_getOrders);
 
+// Vcod
+router.get('/api/v2.0/sms', controllers.VCode.generate_sms);
+router.post('/api/v2.0/sms', controllers.VCode.generate_sms);
+
 // news APIs
 router.get('/api/v2.0/news', controllers.News.json_news_query);
 router.get('/api/v2.0/news/categories', controllers.News.json_news_categories);
@@ -123,6 +124,61 @@ router.get('/api/v2.0/user/login', controllers.User.process_login);
 router.post('/api/v2.0/user/login', controllers.User.process_login);
 router.get('/api/v2.0/user/getpubkey', controllers.User.json_public_key);
 router.post('/api/v2.0/user/getpubkey', controllers.User.json_public_key);
+router.get('/api/v2.0/user/register', controllers.User.process_register);
+router.post('/api/v2.0/user/register', controllers.User.process_register);
+router.get('/api/v2.0/user/get', middleware.isLoggedIn_middleware, controllers.User.json_user_get);
+router.post('/api/v2.0/user/get', middleware.isLoggedIn_middleware, controllers.User.json_user_get);
+router.get('/api/v2.0/user/resetpwd', controllers.User.process_resetpwd);
+router.post('/api/v2.0/user/resetpwd', controllers.User.process_resetpwd);
+router.get('/api/v2.0/user/modifypwd', middleware.isLoggedIn_middleware, controllers.User.json_user_modifypwd);
+router.post('/api/v2.0/user/modifypwd', middleware.isLoggedIn_middleware, controllers.User.json_user_modifypwd);
+router.get('/api/v2.0/user/modify', middleware.isLoggedIn_middleware, controllers.User.json_user_modify);
+router.post('/api/v2.0/user/modify', middleware.isLoggedIn_middleware, controllers.User.json_user_modify);
+router.get('/api/v2.0/point/findPointList', middleware.isLoggedIn_middleware, controllers.User.json_userscore_get);
+router.post('/api/v2.0/point/findPointList', middleware.isLoggedIn_middleware, controllers.User.json_userscore_get);
+router.get('/api/v2.0/user/findAccount', controllers.User.json_user_findaccount);
+router.post('/api/v2.0/user/findAccount', controllers.User.json_user_findaccount);
+router.get('/api/v2.0/user/bindInviter', middleware.isLoggedIn_middleware, controllers.User.process_bind_inviter);
+router.post('/api/v2.0/user/bindInviter', middleware.isLoggedIn_middleware, controllers.User.process_bind_inviter);
+router.get('/api/v2.0/user/getInviter', middleware.isLoggedIn_middleware, controllers.User.json_get_inviter);
+router.get('/api/v2.0/user/getInviteeOrderbyName', middleware.isLoggedIn_middleware, controllers.User.json_get_inviteeOrderbynamePinyin);
+router.get('/api/v2.0/user/getInvitee', middleware.isLoggedIn_middleware, controllers.User.json_get_invitee);
+router.post('/api/v2.0/user/getInvitee', middleware.isLoggedIn_middleware, controllers.User.json_get_invitee);
+router.get('/api/v2.0/user/getInviteeOrders', middleware.isLoggedIn_middleware, controllers.User.json_get_invitee_orders);
+router.post('/api/v2.0/user/getInviteeOrders', middleware.isLoggedIn_middleware, controllers.User.json_get_invitee_orders);
+router.get('/api/v2.0/usertypes', controllers.User.json_usertypes_get);
+router.get('/api/v2.0/user/getUserAddressList', middleware.isLoggedIn_middleware, controllers.User.json_useraddresslist_query);
+router.post('/api/v2.0/user/getUserAddressList', middleware.isLoggedIn_middleware, controllers.User.json_useraddresslist_query);
+router.get('/api/v2.0/user/saveUserAddress', middleware.isLoggedIn_middleware, controllers.User.json_useraddress_create);
+router.post('/api/v2.0/user/saveUserAddress', middleware.isLoggedIn_middleware, controllers.User.json_useraddress_create);
+router.get('/api/v2.0/user/updateUserAddress', middleware.isLoggedIn_middleware, controllers.User.json_useraddress_update);
+router.post('/api/v2.0/user/updateUserAddress', middleware.isLoggedIn_middleware, controllers.User.json_useraddress_update);
+router.get('/api/v2.0/user/deleteUserAddress', middleware.isLoggedIn_middleware, controllers.User.json_useraddress_remove);
+router.post('/api/v2.0/user/deleteUserAddress', middleware.isLoggedIn_middleware, controllers.User.json_useraddress_remove);
+router.get('/api/v2.0/user/sign', middleware.isLoggedIn_middleware, controllers.User.process_user_sign);
+router.post('/api/v2.0/user/sign', middleware.isLoggedIn_middleware, controllers.User.process_user_sign);
+router.post('/api/v2.0/user/uploadPortrait', middleware.isLoggedIn_middleware, controllers.User.uploadPhoto);
+router.post('/api/v2.0/user/upload', middleware.isLoggedIn_middleware, controllers.User.userUpload);
+router.get('/api/v2.0/user/confirmUpload', middleware.isLoggedIn_middleware, controllers.User.confirmUpload);
+router.post('/api/v2.0/user/confirmUpload', middleware.isLoggedIn_middleware, controllers.User.confirmUpload);
+
+// pay related APIs
+router.get('/alipay', middleware.isInWhiteList_middleware, middleware.throttle, controllers.Pay.alipayOrder);
+router.post('/alipay', middleware.isInWhiteList_middleware, middleware.throttle, controllers.Pay.alipayOrder);
+router.get('/unionpay', middleware.isInWhiteList_middleware, middleware.throttle, controllers.Pay.unionPayOrder);
+router.post('/unionpay', middleware.isInWhiteList_middleware, middleware.throttle, controllers.Pay.unionPayOrder);
+router.get('/offlinepay', controllers.Pay.offlinePay);
+router.get('/EPOSpay', controllers.Pay.EPOSPay);
+router.post('/dynamic/alipay/nofity.asp', controllers.Pay.alipayNotify);
+router.post('/dynamic/alipay/notify.asp', controllers.Pay.alipayNotify);
+router.post('/unionpay/nofity', controllers.Pay.unionpayNotify);
+router.post('/unionpay/notify', controllers.Pay.unionpayNotify);
+router.post('/EPOS/notify', controllers.Pay.process_EPOSNotify);
+router.get('/api/v2.2/getOfflinePayType', controllers.Pay.json_offline_pay_type);
+router.get('/api/v2.2/RSC/confirmOfflinePay', middleware.isLoggedIn_middleware, middleware.isRSC_middleware, controllers.Pay.process_RSC_confirm_OfflinePay);
+router.post('/dynamic/alipay/refund_fastpay_by_platform_nopwd_notify.asp', controllers.Pay.alipayRefundNotify);
+router.post('/unionpay/refundnotify', controllers.Pay.unionpayRefundNotify);
+
 
 // backend admin APIs
 router.get(F.config['manager-url']+'/api/login/', controllers.Manager.process_login);

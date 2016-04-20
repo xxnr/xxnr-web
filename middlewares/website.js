@@ -3,22 +3,6 @@
  */
 module.exports = function(req, res, next){
     req.data = req.method == 'GET'? req.query : req.body;
-    res.success = function(data){
-        res.status(200);
-        if(!data){
-            data = {code:1000, message:'success'};
-        }
-
-        return res.json(data);
-    };
-
-    res.fail = function(data){
-        if(!data){
-            data = {code:1001, message:'Unknown failure'};
-        }
-
-        return res.json(data);
-    };
 
     res.jsonp = function(obj, name){
         var val = obj;
