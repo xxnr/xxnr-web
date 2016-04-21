@@ -36,7 +36,8 @@
 
 .rsc-list-btn-box {
     position: relative;
-    margin-top: 45px;
+    margin-top: 20px;
+    height: 30px;
 }
 
 .rsc-list-btn-box button {
@@ -103,7 +104,6 @@
 #confirm-offline-pay-box {
     position: fixed;
     width: 30%;
-    height: 200px;
     left: 35%;
     top: 50%;
     margin-top: -100px;
