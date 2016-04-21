@@ -357,11 +357,11 @@ exports.getAppProductDetails = function(req, res, next) {
 };
 
 // get product info page
-exports.view_product_info =function(req, res,next,productInfo, productId) {
+exports.view_product_info =function(req, res,next) {
     var self = this;
     var options = {};
-    options.id = productId;
-
+    options.id = req.params.productId;
+    productInfo = req.params.productInfo;
     ProductService.get(options, function(err, data) {
         if (err || !data) {
             //self.throw404();
@@ -384,7 +384,7 @@ exports.view_product_info =function(req, res,next,productInfo, productId) {
             return;
         }
         //self.view('productInfoAppTemplate', result);
-        res.render(path.join(__dirname, './views/4.api-v1.0/productInfoAppTemplate'),
+        res.render(path.join(__dirname, '../views/4.api-v1.0/productInfoAppTemplate'),
             {
                 result:result
             }
