@@ -177,9 +177,12 @@ router.get('/api/v2.1/potentialCustomer/queryAllOrderbyName', middleware.isLogge
 router.get('/api/v2.1/potentialCustomer/isLatest', middleware.isLoggedIn_middleware, middleware.isXXNRAgent_middleware, controllers.User.json_potential_customer_islatest);
 router.get('/api/v2.1/potentialCustomer/get', middleware.isLoggedIn_middleware, middleware.isXXNRAgent_middleware, controllers.User.json_potential_customer_get);
 
-// pay related APIs
+// pay related views
 router.get('/alipay', middleware.isInWhiteList_middleware, middleware.throttle, controllers.Pay.alipayOrder);
 router.post('/alipay', middleware.isInWhiteList_middleware, middleware.throttle, controllers.Pay.alipayOrder);
+router.get('/alipay/success', controllers.Pay.aliPaySuccess);
+
+// pay related APIs
 router.get('/unionpay', middleware.isInWhiteList_middleware, middleware.throttle, controllers.Pay.unionPayOrder);
 router.post('/unionpay', middleware.isInWhiteList_middleware, middleware.throttle, controllers.Pay.unionPayOrder);
 router.get('/offlinepay', controllers.Pay.offlinePay);

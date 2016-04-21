@@ -66,7 +66,7 @@ app.controller('categoryController', function($scope, remoteApiService, commonSe
                             }
                             attributes_choices.push(choice);
                         }
-                        $scope.search_categories.splice(-1, -1,
+                        $scope.$parent.search_categories.splice(-1, -1,
                             {
                                 name: attributes[i]._id.name,
                                 index: attributes[i]._id.name,
@@ -75,47 +75,89 @@ app.controller('categoryController', function($scope, remoteApiService, commonSe
                             });
 
                     }
+                    console.log($scope.$parent.search_categories);
+                    for(var j = 1;j<$scope.$parent.search_categories.length-1;j++){   //生成queryAttribute 的字符串
+                        var a = {
+                            name:"",
+                            value:
+                            {
+                                '$in':[]
+                            }
+                        };
+                        for(var z in $scope.$parent.search_categories[j].choices){
+                            if($scope.$parent.search_categories[j].choices[z].isSelected === true){
+                                a.name = $scope.$parent.search_categories[j].name;
+                                a.value['$in'].push($scope.$parent.search_categories[j].choices[z].name);
+                                hasAttributes = true;
+                            }
+
+                        }
+                        if(a.name){
+                            queryAttributes.push(a);
+                        }
+                    }
+                    //console.log(queryAttributes);
+                    if(!hasAttributes){
+                        queryAttributes = [];
+                    }
+                    $scope.$parent.brandsStr = $scope.getSelectedBrands($scope.$parent.search_categories[0].choices,false);
+                    $scope.$parent.brandsStr = $scope.stringifyBrands($scope.$parent.brandsStr,false).slice(0,-1);
+
+                    if($scope.$parent.search_categories.slice(-1)[0].current_query != '' && $scope.$parent.search_categories.slice(-1)[0].current_query != '全部'){
+                        var matches = $scope.$parent.search_categories.slice(-1)[0].current_query.match(/\d+/g);
+                        var lowPrice = matches.length > 0 ? matches[0] : 0;
+                        var highPrice = matches.length > 1 ? matches[1] : 10000000;
+                        price = lowPrice+","+highPrice;
+                    }else{
+                        price = null;
+                    }
+                    getPagedGoods(current_page,product_count_per_page,$scope.$parent.categoryId,$scope.$parent.brandsStr, queryAttributes.length==0?null:queryAttributes, price);
+                    generate_page();
                 });
         }
-        for(var j = 1;j<$scope.$parent.search_categories.length-1;j++){   //生成queryAttribute 的字符串
-            var a = {
-                name:"",
-                value:
-                {
-                    '$in':[]
+        else{
+            for(var j = 1;j<$scope.$parent.search_categories.length-1;j++){   //生成queryAttribute 的字符串
+                var a = {
+                    name:"",
+                    value:
+                    {
+                        '$in':[]
+                    }
+                };
+                for(var k in $scope.$parent.search_categories[j].choices){
+                    if($scope.$parent.search_categories[j].choices[k].isSelected === true){
+                        a.name = $scope.$parent.search_categories[j].name;
+                        a.value['$in'].push($scope.$parent.search_categories[j].choices[k].name);
+                        hasAttributes = true;
+                    }
+
                 }
-            };
-            for(var k in $scope.$parent.search_categories[j].choices){
-                if($scope.$parent.search_categories[j].choices[k].isSelected === true){
-                    a.name = $scope.$parent.search_categories[j].name;
-                    a.value['$in'].push($scope.$parent.search_categories[j].choices[k].name);
-                    hasAttributes = true;
+                if(a.name){
+                    queryAttributes.push(a);
                 }
-
             }
-            if(a.name){
-                queryAttributes.push(a);
+            if(!hasAttributes){
+                queryAttributes = [];
             }
+            $scope.$parent.brandsStr = $scope.getSelectedBrands($scope.$parent.search_categories[0].choices,false);
+            $scope.$parent.brandsStr = $scope.stringifyBrands($scope.$parent.brandsStr,false).slice(0,-1);
+
+            if($scope.$parent.search_categories.slice(-1)[0].current_query != '' && $scope.$parent.search_categories.slice(-1)[0].current_query != '全部'){
+                var matches = $scope.$parent.search_categories.slice(-1)[0].current_query.match(/\d+/g);
+                var lowPrice = matches.length > 0 ? matches[0] : 0;
+                var highPrice = matches.length > 1 ? matches[1] : 10000000;
+                price = lowPrice+","+highPrice;
+            }else{
+                price = null;
+            }
+            getPagedGoods(current_page,product_count_per_page,$scope.$parent.categoryId,$scope.$parent.brandsStr, queryAttributes.length==0?null:queryAttributes, price);
+            generate_page();
         }
 
 
 
-        if(!hasAttributes){
-            queryAttributes = null;
-        }
-        $scope.$parent.brandsStr = $scope.getSelectedBrands($scope.$parent.search_categories[0].choices,false);
-        $scope.$parent.brandsStr = $scope.stringifyBrands($scope.$parent.brandsStr,false).slice(0,-1);
 
-        if($scope.$parent.search_categories.slice(-1)[0].current_query != '' && $scope.$parent.search_categories.slice(-1)[0].current_query != '全部'){
-            var matches = $scope.$parent.search_categories.slice(-1)[0].current_query.match(/\d+/g);
-            var lowPrice = matches.length > 0 ? matches[0] : 0;
-            var highPrice = matches.length > 1 ? matches[1] : 10000000;
-            price = lowPrice+","+highPrice;
-        }else{
-            price = null;
-        }
-        getPagedGoods(current_page,product_count_per_page,$scope.$parent.categoryId,$scope.$parent.brandsStr, queryAttributes, price);
-        generate_page();
+
     };
     var generate_page = function(){
         $scope.$parent.pages = [];
@@ -135,7 +177,7 @@ app.controller('categoryController', function($scope, remoteApiService, commonSe
     };
     var getPagedGoods = function(page,count_per_page,categoryId,brandsStr, queryAttributesArray ,reservePrice){
         if(!hasAttributes){
-            queryAttributes = null;
+            queryAttributes = [];
         }
         if(!price){
             prive = null;

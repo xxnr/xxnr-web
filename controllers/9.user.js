@@ -1446,6 +1446,7 @@ exports.json_get_inviteeOrderbynamePinyin = function(req, res, next) {
                 invitee.newOrdersNumber = 0;
                 invitee.namePinyin = user.namePinyin;
                 invitee.nameInitial = user.nameInitial;
+                invitee.nameInitialType = user.nameInitialType;
                 invitees.push(invitee);
                 inviteeIds.push(user.id);
             }
@@ -1459,7 +1460,7 @@ exports.json_get_inviteeOrderbynamePinyin = function(req, res, next) {
                         return;
                     }
 
-                    if (inviteeOrderData) {
+                    if (inviteeOrderData && inviteeOrderData.length > 0) {
                         var inviteeOrders = {};
                         for (var i=0; i<inviteeOrderData.length; i++) {
                             var inviteeOrder = inviteeOrderData[i];

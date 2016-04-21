@@ -255,6 +255,15 @@ RSCService.prototype.modifyRSCInfo = function(id, setOptions, callback){
         setValues['RSCInfo.companyAddress.details'] = setOptions.detailAddress;
     if(setOptions.products && tools.isArray(setOptions.products))
         setValues['RSCInfo.products'] = setOptions.products;
+    if(typeof setOptions.supportEPOS != 'undefined') {
+        if (setOptions.supportEPOS) {
+            setValues['RSCInfo.supportEPOS'] = true;
+        } else {
+            setValues['RSCInfo.supportEPOS'] = false;
+        }
+    }
+    if(typeof setOptions.EPOSNo != 'undefined')
+        setValues['RSCInfo.EPOSNo'] = setOptions.EPOSNo;
     
     UserModel.update({id:id}, {$set:setValues}, function(err, numUpdated){
         if(err){
