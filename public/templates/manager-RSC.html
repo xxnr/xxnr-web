@@ -1,16 +1,16 @@
 <div class="filter">
     <div class="container">
-        <div class="caption"><span class="fa fa-truck mr5"></span> @(服务站管理)</div>
+        <div class="caption"><span class="fa fa-truck mr5"></span> 服务站管理</div>
         <div class="row">
             <div class="col-md-3 col-sm-6 m">
-                <div data-component="textbox" data-component-path="rsc.filter.search" data-placeholder="" data-control-icon="fa-search">@(网点名称/负责人/电话)</div>
-                <div class="help" data-component="template" data-component-path="rsc.info"><script type="text/html">{{ count | pluralize(@('items','item','items','items')) }} / {{pages | pluralize(@('pages', 'page', 'pages', 'pages')) }}</script></div>
+                <div data-component="textbox" data-component-path="rsc.filter.search" data-placeholder="" data-control-icon="fa-search">网点名称/负责人/电话</div>
+                <div class="help" data-component="template" data-component-path="rsc.info"><script type="text/html">{{ count | pluralize('items','item','items','items') }} / {{pages | pluralize('pages', 'page', 'pages', 'pages') }}</script></div>
             </div>
         </div>
     </div>
 </div>
 <div class="container">
-    <div data-component="grid" data-component-path="rsc.grid" data-max="auto" data-options-page="@(Page: #)" data-options-button="@(查看更多服务站信息)" data-component-id="rsc.grid">
+    <div data-component="grid" data-component-path="rsc.grid" data-max="auto" data-options-page="Page: #" data-options-button="查看更多服务站信息" data-component-id="rsc.grid">
         <script type="text/html">
             <tr>
                 <!--TODO: 加判断-->

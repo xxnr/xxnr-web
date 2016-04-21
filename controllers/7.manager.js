@@ -195,7 +195,9 @@ exports.manager = function(req, res, next){
 			manager_url:F.config['manager-url'],
 			user_types:F.config['user_types'],
 			currency_entity:F.config['currency_entity'],
-			user:req.user
+			user:req.user,
+			version:F.config['version'],
+			author:F.config['author']
 		}
 	);
 };
