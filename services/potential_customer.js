@@ -172,9 +172,9 @@ PotentialCustomerService.prototype.queryOrderbynamePinyin = function(user, callb
                 .populate('address.city')
                 .populate('address.county')
                 .populate('address.town')
-                .select('name phone remarks isRegistered sex address dateTimeAdded dateTimeRegistered user namePinyin nameInitial');
+                .select('name phone remarks isRegistered sex address dateTimeAdded dateTimeRegistered user namePinyin nameInitial nameInitialType');
         } else{
-            query = query.select('name phone remarks isRegistered sex namePinyin nameInitial');
+            query = query.select('name phone remarks isRegistered sex namePinyin nameInitial nameInitialType');
         }
 
         query.sort({nameInitialType:1, namePinyin:1})
@@ -314,7 +314,7 @@ PotentialCustomerService.prototype.getById = function(id, callback){
         .populate({path:'address.county', select:'-_id -__v'})
         .populate({path:'address.town', select:'-_id -__v'})
         .populate({path:'user', select:'-_id name'})
-        .select('name phone sex address buyIntentions remarks user isRegistered dateTimeRegistered namePinyin nameInitial')
+        .select('name phone sex address buyIntentions remarks user isRegistered dateTimeRegistered namePinyin nameInitial nameInitialType')
         .lean()
         .exec(function(err, doc){
         if(err){

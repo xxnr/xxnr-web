@@ -1461,6 +1461,7 @@ function json_get_inviteeOrderbynamePinyin() {
                 invitee.newOrdersNumber = 0;
                 invitee.namePinyin = user.namePinyin;
                 invitee.nameInitial = user.nameInitial;
+                invitee.nameInitialType = user.nameInitialType;
                 invitees.push(invitee);
                 inviteeIds.push(user.id);
             }
@@ -1474,7 +1475,7 @@ function json_get_inviteeOrderbynamePinyin() {
                         return;
                     }
 
-                    if (inviteeOrderData) {
+                    if (inviteeOrderData && inviteeOrderData.length > 0) {
                         var inviteeOrders = {};
                         for (var i=0; i<inviteeOrderData.length; i++) {
                             var inviteeOrder = inviteeOrderData[i];
