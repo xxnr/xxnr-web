@@ -314,7 +314,7 @@ OrderService.prototype.create = function(options, callback) {
 		self.addUserOrderNumber({userId:order.buyerId});
 
 		// Writes stats
-		require('../modules/webcounter').increment('orders');
+		//require('../modules/webcounter').increment('orders');
 	});
 };
 
@@ -350,7 +350,7 @@ OrderService.prototype.add = function(options, callback) {
 		self.addUserOrderNumber({userId:order.buyerId});
 
 		// Writes stats
-		require('../modules/webcounter').increment('orders');
+		//require('../modules/webcounter').increment('orders');
 	});
 
 };

@@ -65,8 +65,8 @@ router.post('/api/v2.0/getShoppingCartOffline', controllers.Api_v1_0.getShopping
 router.get('/api/v2.0/products/:attributeName', controllers.Api_v1_0.getAttributes);
 router.get('/api/v2.0/ad/getAdList', controllers.Api_v1_0.api10_getBanners);
 router.post('/api/v2.0/ad/getAdList', controllers.Api_v1_0.api10_getBanners);
-router.get('/app/ad/getAdList', controllers.Api_v1_0.api10_getBanners);
-router.post('/app/ad/getAdList', controllers.Api_v1_0.api10_getBanners);
+router.get('/app/ad/getAdList', controllers.Compatibility.processV10AppCall, controllers.Api_v1_0.api10_getBanners);
+router.post('/app/ad/getAdList', controllers.Compatibility.processV10AppCall, controllers.Api_v1_0.api10_getBanners);
 router.get('/api/v2.0/product/getAppProductDetails', controllers.Api_v1_0.getAppProductDetails);
 router.post('/api/v2.0/product/getAppProductDetails', controllers.Api_v1_0.getAppProductDetails);
 router.get('/api/v2.0/getMinPayPrice', middleware.isLoggedIn_middleware, controllers.Api_v1_0.getMinPayPrice);
@@ -207,6 +207,9 @@ router.get('/api/v2.2/RSC/orderDetail', middleware.isLoggedIn_middleware, middle
 router.get('/api/v2.2/RSC/orders', middleware.isLoggedIn_middleware, middleware.isRSC_middleware, controllers.RSC.json_RSC_orders_get);
 router.post('/api/v2.2/RSC/order/deliverStatus/delivering', middleware.isLoggedIn_middleware, middleware.isRSC_middleware, controllers.RSC.process_RSC_order_deliverStatus_delivering);
 router.post('/api/v2.2/RSC/order/selfDelivery', middleware.isLoggedIn_middleware, middleware.isRSC_middleware, middleware.throttle, controllers.RSC.process_self_delivery);
+
+// compatibility APIs
+controllers.Compatibility.compatibilityAPIs(router);
 
 // backend admin APIs
 router.get(F.config['manager-url']+'/api/login/', controllers.Manager.process_login);

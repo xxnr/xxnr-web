@@ -1,7 +1,5 @@
-var express = require('express');
-var router = express.Router();
+
 var v10apis = [
-	
 	/**		*/ /*
 	GET_NYC(*/ "/app/goods/getGoodsListPage", /*GetGoodsData.class),
 	/**	化肥	*/ /*
@@ -30,8 +28,7 @@ var v10apis = [
 	GETINDEXPIC(*/ "/home/index/getIndexPic", /*BannerResult.class),
 	/** 批量上传购物车数据*/ /*
 	SHOPPING_UPLOADING(*/ "/app/shopCart/addToCartBatch", /*BannerResult.class),
-	/** 首页轮播图	*/ /*
-	GETHOMEPIC(*/ "/app/ad/getAdList", /*HomeImageResult.class),
+
 	/** 首页签到	*/ /*
 	SIGN_IN_POINT(*/ "/app/point/signInPoint", /*PointResult.class),
 	/**	找回密码	*/ /*
@@ -92,61 +89,35 @@ var v10apis = [
 	SELECT_ADDRESS(*/ "/app/order/addBuildingUserId", /* ResponseResult.class),
 	/**版本更新接口 	*/ /*
 	LATEST_VERSION(*/ "/app/version/latestVersion", /* ResponseResult.class),
-	
+
 	/**支付完成回调接口	*/ /*
-	PAY_BACK(*/"app/order/payNotify", /*Payback.class ),*/
+	PAY_BACK(*/"/app/order/payNotify", /*Payback.class ),*/
 ];
 
-exports.install = function() {
-	for(var i=0; i<v10apis.length; i++){
-        var v10api = v10apis[i];
-        var route = F.findRoute(v10api);
-            
-        if(route){
-            route.execute = new function(v20execute){
-                this.compatibleFunction = function(){
-                    var result = processV10AppCall.apply(this, arguments);
-
-                    if(result.processed){
-                        return result.v10result;
-                    }
-
-                    var v20execute = arguments.callee.v20execute;
-                    return v20execute.apply(this, arguments);
-                };
-
-                this.compatibleFunction.v20execute = v20execute;
-            }(route.execute).compatibleFunction;
-        }
-		else{
-			F.route(v10api, processV10AppCall, ['post', 'get', 'upload'], 8);
-		}
-    }
+exports.compatibilityAPIs = function(router) {
+	var self = this;
+	for (var i = 0; i < v10apis.length; i++) {
+		var v10api = v10apis[i];
+		router.get(v10api, self.processV10AppCall);
+		router.post(v10api, self.processV10AppCall);
+	}
 };
-
-function findRoute(route){
-	router.stack.forEach(function(r){
-		if(r.route && r.route.path == route){
-			return r.route.path
-		}
-	})
-}
 
 const V10UPGRADE_MESSAGE = "新新农人App升级啦！请到应用市场下载新版，体验更好的新农服务";
 
-function processV10AppCall(){
-    if(!this.data["user-agent"]){
-		if(this.flags.indexOf('upload') >= 0) { // v1.0 android app send all data with 'upload' flag, and no 'user-agent' specified
-			if(this.name.indexOf('app/ad/getAdList') >= 0){
-				this.data['bannerType'] = 'upgrade';
-				return {processed: false, v10result: undefined };
+exports.processV10AppCall = function(req, res, next){
+    if(!req.data["user-agent"]){
+		//if(req.flags.indexOf('upload') >= 0) { // v1.0 android app send all data with 'upload' flag, and no 'user-agent' specified
+			if(req.path.indexOf('app/ad/getAdList') >= 0){
+				req.data['bannerType'] = 'upgrade';
+				next();
 			}
 			else{
-				this.json({'code':"1812", "message":V10UPGRADE_MESSAGE});
-				return {processed: true, v10result: undefined };
+				res.respond({'code':"1812", "message":V10UPGRADE_MESSAGE});
+				return;
 			}
-		}
+		//}
+	} else{
+		next();
 	}
-
-    return {processed: false, v10result: undefined };
-}
+};
