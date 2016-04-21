@@ -296,7 +296,7 @@ exports.getAppProductDetails = function(req, res, next) {
 exports.view_product_info =function(req, res,next) {
     var options = {};
     options.id = req.params.productId;
-    productInfo = req.params.productInfo;
+    var productInfo = req.params.productInfo;
     ProductService.get(options, function(err, data) {
         if (err || !data) {
             res.status(404).send('404: Page not found');

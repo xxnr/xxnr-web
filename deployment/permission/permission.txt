@@ -1,111 +1,111 @@
 #common
-/$manager/upload, post, super_admin, business_admin, product_op, news_editor, customer_op
-/$manager/upload/base64, post, super_admin, business_admin, product_op, news_editor, customer_op
+/manager/upload, post, super_admin, business_admin, product_op, news_editor, customer_op
+/manager/upload/base64, post, super_admin, business_admin, product_op, news_editor, customer_op
 
 #products
-/$manager/products/uploadImage, post, super_admin, business_admin, product_op
-/$manager/api/products/, get, super_admin, business_admin, product_op
-/$manager/api/products/, post, super_admin, business_admin, product_op
-/$manager/api/products/{id}, get, super_admin, business_admin, product_op
-/$manager/api/products/, delete, super_admin, business_admin, product_op
-/$manager/api/products/import, post, super_admin, business_admin, product_op
-/$manager/api/products/categories, get, super_admin, business_admin, product_op
-/$manager/api/products/category, post, super_admin, business_admin, product_op
-/$manager/api/products/attr/{attributeName}/, get, super_admin, business_admin, product_op
-/$manager/api/products/attribute/add/, post, super_admin, business_admin, product_op
-/$manager/api/products/attributes/, get, super_admin, business_admin, product_op
+/manager/products/uploadImage, post, super_admin, business_admin, product_op
+/manager/api/products/, get, super_admin, business_admin, product_op
+/manager/api/products/, post, super_admin, business_admin, product_op
+/manager/api/products/{id}, get, super_admin, business_admin, product_op
+/manager/api/products/, delete, super_admin, business_admin, product_op
+/manager/api/products/import, post, super_admin, business_admin, product_op
+/manager/api/products/categories, get, super_admin, business_admin, product_op
+/manager/api/products/category, post, super_admin, business_admin, product_op
+/manager/api/products/attr/{attributeName}/, get, super_admin, business_admin, product_op
+/manager/api/products/attribute/add/, post, super_admin, business_admin, product_op
+/manager/api/products/attributes/, get, super_admin, business_admin, product_op
 
 #SKUs
-/$manager/api/v2.1/SKU/add/, post, super_admin, business_admin, product_op
-/$manager/api/v2.1/SKU/update/{id}/, post, super_admin, business_admin, product_op
-/$manager/api/v2.1/SKU/attribute/add/, post, super_admin, business_admin, product_op
-/$manager/api/v2.1/SKU/attributes/, get, super_admin, business_admin, product_op
-/$manager/api/v2.1/SKU/query/, get, super_admin, business_admin, product_op
-/$manager/api/v2.1/SKU/remove/{id}/, get, super_admin, business_admin, product_op
-/$manager/api/v2.1/SKU/additions/, get, super_admin, business_admin, product_op
-/$manager/api/v2.1/SKU/addition/add/, post, super_admin, business_admin, product_op
+/manager/api/v2.1/SKU/add/, post, super_admin, business_admin, product_op
+/manager/api/v2.1/SKU/update/{id}/, post, super_admin, business_admin, product_op
+/manager/api/v2.1/SKU/attribute/add/, post, super_admin, business_admin, product_op
+/manager/api/v2.1/SKU/attributes/, get, super_admin, business_admin, product_op
+/manager/api/v2.1/SKU/query/, get, super_admin, business_admin, product_op
+/manager/api/v2.1/SKU/remove/{id}/, get, super_admin, business_admin, product_op
+/manager/api/v2.1/SKU/additions/, get, super_admin, business_admin, product_op
+/manager/api/v2.1/SKU/addition/add/, post, super_admin, business_admin, product_op
 
 #news
-/$manager/news/uploadImage, post, super_admin, news_editor
-/$manager/api/news/, get, super_admin, news_editor
-/$manager/api/news/, post, super_admin, news_editor
-/$manager/api/news/{id}, get, super_admin, news_editor
-/$manager/api/news/updatestatus, post, super_admin, news_editor
-/$manager/api/news, delete, super_admin, news_editor
-/$manager/api/news/categories, get, super_admin, news_editor
-/$manager/api/news/category, post, super_admin, news_editor
+/manager/news/uploadImage, post, super_admin, news_editor
+/manager/api/news/, get, super_admin, news_editor
+/manager/api/news/, post, super_admin, news_editor
+/manager/api/news/{id}, get, super_admin, news_editor
+/manager/api/news/updatestatus, post, super_admin, news_editor
+/manager/api/news, delete, super_admin, news_editor
+/manager/api/news/categories, get, super_admin, news_editor
+/manager/api/news/category, post, super_admin, news_editor
 
 #auditlogs
-/$manager/api/auditlogs/, get, super_admin
-/$manager/api/auditlogs/{id}, get, super_admin
+/manager/api/auditlogs/, get, super_admin
+/manager/api/auditlogs/{id}, get, super_admin
 
 #payrefunds
-/$manager/api/payrefunds/, get, super_admin
-/$manager/api/payrefunds/{id}, get, super_admin
-/$manager/api/payrefunds/refundsubmit/, put, super_admin
+/manager/api/payrefunds/, get, super_admin
+/manager/api/payrefunds/{id}, get, super_admin
+/manager/api/payrefunds/refundsubmit/, put, super_admin
 
 #files
-/$manager/api/files/clear, get, super_admin
+/manager/api/files/clear, get, super_admin
 
 #dashboard
-/$manager/api/dashboard, get, super_admin
-/$manager/api/dashboard/online, get, super_admin
+/manager/api/dashboard, get, super_admin
+/manager/api/dashboard/online, get, super_admin
 
 #orders
-/$manager/api/orders, get, super_admin, business_admin, customer_op
-/$manager/api/orders, put, super_admin, business_admin, customer_op
-/$manager/api/orders/{id}, get, super_admin, business_admin, customer_op
+/manager/api/orders, get, super_admin, business_admin, customer_op
+/manager/api/orders, put, super_admin, business_admin, customer_op
+/manager/api/orders/{id}, get, super_admin, business_admin, customer_op
 
 #backend users
-/$manager/api/backend/user/create, post, super_admin, business_admin
-/$manager/api/backend/users, get, super_admin, business_admin
-/api/backend/user/password/modify, post, super_admin, business_admin
-/api/backend/users, post, super_admin, business_admin
+/manager/api/backend/user/create, post, super_admin, business_admin
+/manager/api/backend/users, get, super_admin, business_admin
+/manager/backend/user/password/modify, post, super_admin, business_admin
+/manager/backend/users, post, super_admin, business_admin
 
 #users
-/$manager/api/users/, get, super_admin, customer_op
-/$manager/api/users/{id}/, get, super_admin, customer_op
-/$manager/api/users/, put, super_admin, customer_op
+/manager/api/users/, get, super_admin, customer_op
+/manager/api/users/{id}/, get, super_admin, customer_op
+/manager/api/users/, put, super_admin, customer_op
 
 #potential customer
-/api/v2.1/potentialCustomer/query, get, super_admin, customer_op
-/api/v2.1/potentialCustomer/{_id}, get, super_admin, customer_op
-/api/v2.1/agentinfo/{_id}, get, super_admin, customer_op
+/manager/v2.1/potentialCustomer/query, get, super_admin, customer_op
+/manager/v2.1/potentialCustomer/{_id}, get, super_admin, customer_op
+/manager/v2.1/agentinfo/{_id}, get, super_admin, customer_op
 
 #permission
-/api/permissions, get, super_admin
+/manager/permissions, get, super_admin
 
 #role
-/api/roles, get, super_admin
+/manager/roles, get, super_admin
 
 #system
-/api/backup/website, get, super_admin
-/api/backup/database, get, super_admin
-/api/restore/database, post, super_admin
+/manager/backup/website, get, super_admin
+/manager/backup/database, get, super_admin
+/manager/restore/database, post, super_admin
 
 #setting
-/api/settings, get, super_admin
-/api/settings, put, super_admin
+/manager/settings, get, super_admin
+/manager/settings, put, super_admin
 
 #newsletter
-/api/newsletter, get, super_admin
-/api/newsletter/csv, get, super_admin
+/manager/newsletter, get, super_admin
+/manager/newsletter/csv, get, super_admin
 
 #widget
-/api/widgets, get, super_admin
-/api/widgets, post, super_admin
-/api/widgets, delete, super_admin
-/api/widgets/{id}, get, super_admin
+/manager/widgets, get, super_admin
+/manager/widgets, post, super_admin
+/manager/widgets, delete, super_admin
+/manager/widgets/{id}, get, super_admin
 
 #pages
-/api/pages, get, super_admin
-/api/pages, post, super_admin
-/api/pages, delete, super_admin
-/api/pages/{id}, get, super_admin
-/api/pages/preview, json, super_admin
-/api/pages/dependencies, get, super_admin
-/api/pages/sitemap, get, super_admin
+/manager/pages, get, super_admin
+/manager/pages, post, super_admin
+/manager/pages, delete, super_admin
+/manager/pages/{id}, get, super_admin
+/manager/pages/preview, json, super_admin
+/manager/pages/dependencies, get, super_admin
+/manager/pages/sitemap, get, super_admin
 
 #RSCs
-/api/v2.2/RSCInfo/{_id}, get, super_admin
-/api/v2.2/RSCs, get, super_admin
+/manager/v2.2/RSCInfo/{_id}, get, super_admin
+/manager/v2.2/RSCs, get, super_admin

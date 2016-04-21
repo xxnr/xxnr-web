@@ -35,7 +35,7 @@
 				<!-- <a class="jrouting" href="@{CONFIG('manager-url')}/pages/" title="@(Pages)" data-role="pages"><span class="fa fa-file-text"></span></a>
 				<a class="jrouting" href="@{CONFIG('manager-url')}/newsletter/" title="@(Newsletter)" data-role="newsletter"><span class="fa fa-envelope"></span></a>
 				<a class="jrouting" href="@{CONFIG('manager-url')}/system/" title="@(System)" data-role="system"><span class="fa fa-database"></span></a> -->
-                <div class="account">账户：@{user.account}<a href="" ng-click="logout()" title="退出"><span class="fa fa-sign-out"></span></a></div>
+                <div class="account">账户：<%= user.account%><a href="" ng-click="logout()" title="退出"><span class="fa fa-sign-out"></span></a></div>
 			</nav>
 		</div>
 	</header>
