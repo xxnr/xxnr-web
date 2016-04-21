@@ -71,7 +71,9 @@ var config= {
     directory_public: '/public/',
 
     default_request_timeout: 5000,
-    default_maximum_file_descriptors: 0
+    default_maximum_file_descriptors: 0,
+    //
+    currency_entity:"￥"
 };
 
 module.exports=config;

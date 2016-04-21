@@ -1,20 +1,20 @@
 ﻿<div class="filter" style="padding-bottom:9px">
     <div class="container">
-        <div class="caption"><span class="fa fa-navicon mr5"></span> @(商品管理)</div>
+        <div class="caption"><span class="fa fa-navicon mr5"></span> 商品管理</div>
         <div class="row">
             <div class="col-md-3 col-sm-6 m">
-                <div data-component="textbox" data-component-path="products.filter.search" data-placeholder="@(查找商品...)" data-control-icon="fa-search"></div>
-                <div class="help" data-component="template" data-component-path="products.info"><script type="text/html">{{ count | pluralize(@('items','item','items','items')) }} / {{ pages | pluralize(@('pages','page','pages','pages')) }}</script></div>
+                <div data-component="textbox" data-component-path="products.filter.search" data-placeholder="查找商品..." data-control-icon="fa-search"></div>
+                <div class="help" data-component="template" data-component-path="products.info"><script type="text/html">{{ count | pluralize('items','item','items','items') }} / {{ pages | pluralize('pages','page','pages','pages') }}</script></div>
             </div>
             <div class="col-md-3 col-sm-6 m">
-                <div data-component="dropdown" data-component-path="products.filter.category" data-source="products.categories" data-empty="true" data-empty-text="@(全部商品)" data-source-value="id"></div>
+                <div data-component="dropdown" data-component-path="products.filter.category" data-source="products.categories" data-empty="true" data-empty-text="全部商品" data-source-value="id"></div>
             </div>
             <div class="col-md-6 m">
                 <div class="row">
-                    <div class="col-xs-3"><a href="javascript:void(0)" data-component="click" class="linkbutton" data-component-path="products_huafei_new"><span class="fa fa-plus-circle"></span>@(新增化肥)</a></div>
-                    <div class="col-xs-3"><a href="javascript:void(0)" data-component="click" class="linkbutton" data-component-path="products_qiche_new"><span class="fa fa-plus-circle"></span>@(新增汽车)</a></div>
-                    <!-- <div class="col-xs-3"><a href="javascript:void(0)" data-component="click" class="linkbutton" data-component-path="products_import"><span class="fa fa-cloud-upload"></span>@(Import CSV)</a></div> -->
-                    <div class="col-xs-3"><a href="javascript:void(0)" data-component="click" class="linkbutton" data-component-path="products_category"><span class="fa fa-folder"></span>@(更新分类)</a></div>
+                    <div class="col-xs-3"><a href="javascript:void(0)" data-component="click" class="linkbutton" data-component-path="products_huafei_new"><span class="fa fa-plus-circle"></span>新增化肥</a></div>
+                    <div class="col-xs-3"><a href="javascript:void(0)" data-component="click" class="linkbutton" data-component-path="products_qiche_new"><span class="fa fa-plus-circle"></span>新增汽车</a></div>
+                    <!-- <div class="col-xs-3"><a href="javascript:void(0)" data-component="click" class="linkbutton" data-component-path="products_import"><span class="fa fa-cloud-upload"></span>Import CSV</a></div> -->
+                    <div class="col-xs-3"><a href="javascript:void(0)" data-component="click" class="linkbutton" data-component-path="products_category"><span class="fa fa-folder"></span>更新分类</a></div>
                 </div>
             </div>
         </div>
@@ -22,33 +22,33 @@
 </div>
 
 <div class="container">
-    <div data-component="grid" data-component-path="products.grid" data-max="auto" data-options-page="@(Page: #)" data-options-button="@(查看更多商品)" data-component-id="products.grid">
+    <div data-component="grid" data-component-path="products.grid" data-max="auto" data-options-page="Page: #" data-options-button="查看更多商品" data-component-id="products.grid">
         <script type="text/html">
             <tr>
                 <td style="width:30px" class="silver hidden-xs">$index</td>
                 <td style="width:80px" class="silver hidden-xs" data-title="商品ID">{{ id }}</td>
                 <td style="width:60px" data-title="主图">{{ if pictures && pictures.length }}<img width="100%" src="/images/thumbnail/{{ pictures[0] }}.jpg"></img>{{ fi }}</td>
-                <td style="width:300px" class="hidden-xs" data-title="商品">{{ if online }}<b class="mr5 fs11 green">@(Online)</b>{{ fi}}{{ if istop }}<b class="mr5 fs11 red">@(TOP)</b>{{ fi }}{{ name }}</td>
+                <td style="width:300px" class="hidden-xs" data-title="商品">{{ if online }}<b class="mr5 fs11 green">Online</b>{{ fi}}{{ if istop }}<b class="mr5 fs11 red">TOP</b>{{ fi }}{{ name }}</td>
                 <td style="width:50px" class="silver hidden-xs" data-title="类目"> {{ category }}</td>
                 <td style="width:60px" class="silver hidden-xs" data-title="品牌"> {{ if brand }} {{brand.name }} {{ fi }}</td>
                 <td style="width:60px" class="ui-right active" data-title="平台价">{{ if SKUPrice}} {{ SKUPrice.min | price(2) }} {{ fi }}</td>
                 <td style="width:60px" class="ui-right active" data-title="定金">{{ deposit | price(2) }}</td>
-                <td style="width:100px" class="ui-right active" data-title="创建时间">{{ datecreated | format('@(yyyy-MM-dd HH:mm:ss)') }}</td>
+                <td style="width:100px" class="ui-right active" data-title="创建时间">{{ datecreated | format('yyyy-MM-dd HH:mm:ss') }}</td>
                 <td style="width:80px" class="ui-right">
-                    <button name="edit" title="@(编辑)"><span class="fa fa-pencil"></span></button>
+                    <button name="edit" title="编辑"><span class="fa fa-pencil"></span></button>
                     {{ if online }}
-                    <button name="offline" title="@(下架)"><span class="fa fa-stop"></span></button>
+                    <button name="offline" title="下架"><span class="fa fa-stop"></span></button>
                     {{ else }}
-                    <button name="online" title="@(上架)"><span class="fa fa-play"></span></button>
+                    <button name="online" title="上架"><span class="fa fa-play"></span></button>
                     {{ fi }}
-                    <button name="remove" title="@(删除)"><span class="fa fa-times"></span></button>
+                    <button name="remove" title="删除"><span class="fa fa-times"></span></button>
                 </td>
             </tr>
         </script>
     </div>
 </div>
 
-<div data-component="form" data-title="@(新增商品)" data-component-path="common.form" data-if="value === 'products'" data-width="1200px" data-component-id="products.form">
+<div data-component="form" data-title="新增商品" data-component-path="common.form" data-if="value === 'products'" data-width="1200px" data-component-id="products.form">
     <div class="padding">
         <div data-component="visible" data-component-path="products.form.id">
             <div data-component="template" data-component-path="products.form" class="padding" style="padding-bottom:0">
@@ -56,11 +56,11 @@
                     <table class="table table-bordered" border="0">
                         <tbody>
                         <tr>
-                            <td class="col-xs-5 active">@(# id)</td>
+                            <td class="col-xs-5 active"># id</td>
                             <td>{{ id }}</td>
                         </tr>
                         <tr>
-                            <td class="col-xs-5 active">@(Created)</td>
+                            <td class="col-xs-5 active">Created</td>
                             <td>{{ datecreated | format('yyyy-MM-dd') }}</td>
                         </tr>
                         </tbody>
@@ -73,12 +73,12 @@
     <div class="productinfo" style="padding-bottom:0">
         <div class="row">
             <div class="col-md-2 m">
-                <h3 class="ui-center">@(商品属性)</h3>
+                <h3 class="ui-center">商品属性</h3>
             </div>
             <div class="col-md-10">
                 <div class="hidden" data-component="texthidden" data-component-path="products.form.category" data-readonly="readonly"></div>
                 <div class="brand col-md-7 m">
-                    <div data-component="dropdown" data-component-path="products.form.brand._id" data-source="products.brands" data-source-value="_id" data-source-text="name">@(品牌)</div>
+                    <div data-component="dropdown" data-component-path="products.form.brand._id" data-source="products.brands" data-source-value="_id" data-source-text="name">品牌</div>
                 </div>
 
                 <div data-component="template" data-component-path="products" class="attribute_list">
@@ -150,27 +150,27 @@
     <div>
         <div class="row">
             <div class="col-md-2 m">
-                <h3 class="ui-center">@(基本信息)</h3>
+                <h3 class="ui-center">基本信息</h3>
             </div>
             <div class="col-md-10">
                 <div class="col-md-8">
-                    <div class="mb10" data-component="textbox" data-component-path="products.form.name" data-required="true">@(商品名称)</div>
-                    <div class="mb10" data-component="textbox" data-component-path="products.form.deposit" data-component-type="currency" data-increment="true" data-icon="fa-jpy">@(定金)</div>
-                    <!--<div class="mb10" data-component="textbox" data-component-path="products.form.originprice">@(市场价格)</div>
-                    <div class="mb10" data-component="textbox" data-component-path="products.form.stock">@(库存数量)</div>
-                    <div class="mb10" data-component="textbox" data-component-path="products.form.reference">@(商品货号)</div>-->
-                    <div class="mb10" data-component="textbox" data-component-path="products.form.description">@(商品描述)</div>
-                    <div class="mb10" data-component="fileupload" data-component-path="products.form.pictures" data-placeholder="@(添加图片)" data-accept="image/png,image/jpeg" data-multiple="true" data-icon="fa-camera" data-extension="false">@(商品主图)</div>
+                    <div class="mb10" data-component="textbox" data-component-path="products.form.name" data-required="true">商品名称</div>
+                    <div class="mb10" data-component="textbox" data-component-path="products.form.deposit" data-component-type="currency" data-increment="true" data-icon="fa-jpy">定金</div>
+                    <!--<div class="mb10" data-component="textbox" data-component-path="products.form.originprice">市场价格</div>
+                    <div class="mb10" data-component="textbox" data-component-path="products.form.stock">库存数量</div>
+                    <div class="mb10" data-component="textbox" data-component-path="products.form.reference">商品货号</div>-->
+                    <div class="mb10" data-component="textbox" data-component-path="products.form.description">商品描述</div>
+                    <div class="mb10" data-component="fileupload" data-component-path="products.form.pictures" data-placeholder="添加图片" data-accept="image/png,image/jpeg" data-multiple="true" data-icon="fa-camera" data-extension="false">商品主图</div>
                     <div class="mb10" data-component="pictures" data-component-path="products.form.pictures"></div>
                 </div>
                 <div class="col-md-8">
-                    <div data-component="checkbox" data-component-path="products.form.istop" style="margin-top:10px" class="red">@(<b>置顶商品</b>)</div>
+                    <div data-component="checkbox" data-component-path="products.form.istop" style="margin-top:10px" class="red"><b>置顶商品</b></div>
                 </div>
                 <!--<div class="col-md-8">-->
-                <!--<div data-component="checkbox" data-component-path="products.form.online" style="margin-top:10px" class="red">@(<b>商品上线</b>)</div>-->
+                <!--<div data-component="checkbox" data-component-path="products.form.online" style="margin-top:10px" class="red"><b>商品上线</b></div>-->
                 <!--</div>-->
                 <div class="col-md-8">
-                    <div data-component="checkbox" data-component-path="products.form.presale" style="margin-top:10px" class="red">@(<b>预售商品</b>)</div>
+                    <div data-component="checkbox" data-component-path="products.form.presale" style="margin-top:10px" class="red"><b>预售商品</b></div>
                 </div>
             </div>
         </div>
@@ -178,20 +178,20 @@
     <hr>
     <div>
         <div class="silver padding" style="padding-bottom: 0px;padding-top: 0px;">
-            <h3>@(SKU)</h3>
+            <h3>SKU</h3>
         </div>
         <div data-component="template" class="padding" data-component-path="products" style="padding-top: 0px;">
             <script type="text/html">
                 <table class="table table-bordered" border="0">
                     <tr>
-                        <td class="hidden-xs ui-center nopadding">@(序号)</td>
+                        <td class="hidden-xs ui-center nopadding">序号</td>
                         {{ foreach SKUAttribute in SKUAttributes}}
                         <td class="hidden-xs ui-center">{{SKUAttribute.name}}</td>
                         {{ end }}
-                        <td class="col-xs-3 hidden-xs ui-center">@(附加项目)</td>
-                        <td class="col-xs-1 hidden-xs ui-center">@(市场价)</td>
-                        <td class="col-xs-1 hidden-xs ui-center">@(平台价)</td>
-                        <td class="col-xs-2 hidden-xs ui-center nopadding">@(操作)</td>
+                        <td class="col-xs-3 hidden-xs ui-center">附加项目</td>
+                        <td class="col-xs-1 hidden-xs ui-center">市场价</td>
+                        <td class="col-xs-1 hidden-xs ui-center">平台价</td>
+                        <td class="col-xs-2 hidden-xs ui-center nopadding">操作</td>
                     </tr>
                     {{ foreach SKU in SKUs }}
                     <tr class="SKU">
@@ -225,7 +225,7 @@
                             <div class="multiselect">
                                 <div class="selectBox" onclick="showCheckboxes({{$index}})">
                                     <select>
-                                        <option>@(请选择附加选项)</option>
+                                        <option>请选择附加选项</option>
                                     </select>
                                     <div class="overSelect"></div>
                                 </div>
@@ -265,19 +265,19 @@
                         <td class="col-xs-2 hidden-xs ui-center nopadding">
                             {{ if SKU._id }}
                                 {{ if !SKUChanged[$index] }}
-                                    <button class="button_disabled" title="没有可提交的内容">@(提交)</button>
+                                    <button class="button_disabled" title="没有可提交的内容">提交</button>
                                 {{ else }}
-                                    <button onclick="update_SKU({{$index}})" title="该SKU有未提交的修改">@(提交)</button>
+                                    <button onclick="update_SKU({{$index}})" title="该SKU有未提交的修改">提交</button>
                                 {{ fi }}
                                 {{ if SKU.online }}
-                                    <button name="offline" title="@(下架)" onclick="online_SKU('{{$index}}', false)"><span class="fa fa-stop"></span></button>
+                                    <button name="offline" title="下架" onclick="online_SKU('{{$index}}', false)"><span class="fa fa-stop"></span></button>
                                 {{ else }}
-                                    <button name="online" title="@(上架)" onclick="online_SKU('{{$index}}', true)"><span class="fa fa-play"></span></button>
+                                    <button name="online" title="上架" onclick="online_SKU('{{$index}}', true)"><span class="fa fa-play"></span></button>
                                 {{ fi }}
-                                <button name="copy" onclick="copy_SKU({{$index}})">@(复制)</button>
+                                <button name="copy" onclick="copy_SKU({{$index}})">复制</button>
                             {{ else }}
-                                <button name="new_SKU" onclick="add_SKU({{$index}})">@(添加)</button>
-                                <button name="cancel_new_SKU" onclick="cancel_new_SKU({{$index}})">@(取消)</button>
+                                <button name="new_SKU" onclick="add_SKU({{$index}})">添加</button>
+                                <button name="cancel_new_SKU" onclick="cancel_new_SKU({{$index}})">取消</button>
                             {{ fi }}
                         </td>
                     </tr>
@@ -285,7 +285,7 @@
                     <tr class="new_SKU">
                         <td class="col-xs-1 hidden-xs ui-center nopadding">
                             <a href="javascript:void(0)" onclick="new_SKU_in_page()">
-                                <span class="fa fa-plus-circle">@(SKU)</span>
+                                <span class="fa fa-plus-circle">SKU</span>
                             </a>
                         </td>
                         {{ foreach attribute in SKUAttributes}}
@@ -301,7 +301,7 @@
                         <td class="col-xs-3 hidden-xs ui-center new_SKU_addition">
                             <div class="ui-textbox-with-button new_attribute">
                                 <input class="col-md-4 nopadding h6" type="text"/>
-                                <div class="col-md-4 nopadding"><h6 class="nopadding">@(加价(元):)</h6></div>
+                                <div class="col-md-4 nopadding"><h6 class="nopadding">加价(元:)</h6></div>
                                 <input class="col-md-3 nopadding h6" type="text"/>
                                 <a class="col-md-1 account nopadding" href="javascript:void(0)" onclick="new_SKU_addition()">
                                     <span class="fa fa-plus-circle"></span>
@@ -320,49 +320,49 @@
     <div class="padding bg-smoke">
         <div class="row">
             <div class="col-md-2 m">
-                <h3 class="ui-center">@(商品详情)</h3>
+                <h3 class="ui-center">商品详情</h3>
             </div>
             <div class="col-md-10">
-                <div class="m" data-component="textarea" data-component-path="products.form.body" data-height="100px" data-name="product_body">@(商品详情)</div>
-                <div class="m" data-component="textarea" data-component-path="products.form.standard" data-height="100px" data-name="product_standard">@(参数规格)</div>
-                <div class="m" data-component="textarea" data-component-path="products.form.support" data-height="100px" data-name="product_support">@(服务说明)</div>
+                <div class="m" data-component="textarea" data-component-path="products.form.body" data-height="100px" data-name="product_body">商品详情</div>
+                <div class="m" data-component="textarea" data-component-path="products.form.standard" data-height="100px" data-name="product_standard">参数规格</div>
+                <div class="m" data-component="textarea" data-component-path="products.form.support" data-height="100px" data-name="product_support">服务说明</div>
             </div>
             <div class="col-md-2 m">
-                <h3 class="ui-center">@(APP商品详情)</h3>
+                <h3 class="ui-center">APP商品详情</h3>
             </div>
             <div class="col-md-10">
-                <div class="m" data-component="textarea" data-component-path="products.form.app_body" data-height="100px" data-name="product_app_body">@(APP商品详情)</div>
-                <div class="m" data-component="textarea" data-component-path="products.form.app_standard" data-height="100px" data-name="product_app_standard">@(APP参数规格)</div>
-                <div class="m" data-component="textarea" data-component-path="products.form.app_support" data-height="100px" data-name="product_app_support">@(APP服务说明)</div>
+                <div class="m" data-component="textarea" data-component-path="products.form.app_body" data-height="100px" data-name="product_app_body">APP商品详情</div>
+                <div class="m" data-component="textarea" data-component-path="products.form.app_standard" data-height="100px" data-name="product_app_standard">APP参数规格</div>
+                <div class="m" data-component="textarea" data-component-path="products.form.app_support" data-height="100px" data-name="product_app_support">APP服务说明</div>
             </div>
         </div>
     </div>
     <div data-component="error" data-component-path="products.response"></div>
     <div class="ui-form-buttons">
         <!-- <div data-component="validation" data-component-path="products.form.qiche">
-            <button name="submit">@(确认)</button>
+            <button name="submit">确认</button>
         </div> -->
-        <button name="submit">@(确认)</button>
-        <button name="cancel">@(取消)</button>
+        <button name="submit">确认</button>
+        <button name="cancel">取消</button>
     </div>
 </div>
 
-<div data-component="form" data-title="@(更新分类)" data-component-path="common.form" data-if="value === 'products.category'" data-width="450px" data-top="true" data-component-id="products.category">
+<div data-component="form" data-title="更新分类" data-component-path="common.form" data-if="value === 'products.category'" data-width="450px" data-top="true" data-component-id="products.category">
     <div class="padding">
         <div class="row">
             <div class="col-md-12">
-                <div class="silver">@(Replacement old category with new category name in all products which have old category.)</div>
+                <div class="silver">Replacement old category with new category name in all products which have old category.</div>
                 <hr />
-                <div data-component="dropdown" data-component-path="products.category.category_old" data-source="products.categories" data-required="true" data-empty="true" data-source-value="name" class="m">@(已存在的分类)</div>
-                <div data-component="textbox" data-component-path="products.category.category_new" data-required="true" class="m">@(新分类)</div>
+                <div data-component="dropdown" data-component-path="products.category.category_old" data-source="products.categories" data-required="true" data-empty="true" data-source-value="name" class="m">已存在的分类</div>
+                <div data-component="textbox" data-component-path="products.category.category_new" data-required="true" class="m">新分类</div>
             </div>
         </div>
     </div>
     <div class="ui-form-buttons">
         <div data-component="validation" data-component-path="products.category">
-            <button name="submit">@(确认)</button>
+            <button name="submit">确认</button>
         </div>
-        <button name="cancel">@(取消)</button>
+        <button name="cancel">取消</button>
     </div>
 </div>
 
@@ -488,14 +488,14 @@
                     product_form_refresh(row.id);
                     break;
                 case 'remove':
-                    if (!confirm('@(你确认要删除") ' + row.name + '"？【删除后不能恢复】'))
+                    if (!confirm('你确认要删除" ' + row.name + '"？【删除后不能恢复】'))
                         return;
                     $.components.DELETE(managerurl + '/api/products', { id: row.id }, function() {
                         products_refresh(true);
                     });
                     break;
                 case 'online':
-                    if (!confirm('@(你确定要上架你选择的商品吗?)'))
+                    if (!confirm('你确定要上架你选择的商品吗?'))
                         return;
                     $.components.POST(managerurl + '/api/products/updateStatus', { _id: row._id, online:true }, function(response) {
                         if(response.code == 1000) {
@@ -506,7 +506,7 @@
                     });
                     break;
                 case 'offline':
-                    if (!confirm('@(你确定要下架你选择的商品吗?)'))
+                    if (!confirm('你确定要下架你选择的商品吗?'))
                         return;
                     $.components.POST(managerurl + '/api/products/updateStatus', { _id:row._id, online:false }, function() {
                         products_refresh(true);
@@ -869,14 +869,14 @@
             SKU.name += ' - ' + attribute.value;
         });
         if(!PRICE_REGEX.test(SKU.price.market_price) || parseFloat(SKU.price.market_price) < 0){
-            alert('@(请填写正确的市场价)');
+            alert('请填写正确的市场价');
             return;
         }
         if(!PRICE_REGEX.test(SKU.price.platform_price) || parseFloat(SKU.price.platform_price) <= 0){
-            alert('@(请填写正确的平台价)');
+            alert('请填写正确的平台价');
             return;
         }
-        if (!confirm('@(你确认要更新SKU？)'))
+        if (!confirm('你确认要更新SKU？'))
             return;
         var _id = products.SKUs[index]._id;
         $.components.POST(managerurl+'/api/v2.1/SKU/update/' + _id, SKU, function(response){
@@ -944,15 +944,15 @@
             SKU.name += ' - ' + attribute.value;
         });
         if(!PRICE_REGEX.test(SKU.price.market_price) || parseFloat(SKU.price.market_price) < 0){
-            alert('@(请填写正确的市场价)');
+            alert('请填写正确的市场价');
             return;
         }
         if(!PRICE_REGEX.test(SKU.price.platform_price) || parseFloat(SKU.price.platform_price) <= 0){
-            alert('@(请填写正确的平台价)');
+            alert('请填写正确的平台价');
             return;
         }
         var add_SKU_processer = function() {
-            if (!confirm('@(你确认要添加SKU？)'))
+            if (!confirm('你确认要添加SKU？'))
                 return;
             $.components.POST(managerurl + '/api/v2.1/SKU/add/', SKU, function (response) {
                 if (response.code == 1000) {
@@ -970,7 +970,7 @@
         };
         if (!SKU.product){
             // no product yet, need to create product first
-            if(!confirm('@(商品尚未添加，是否添加商品？)')){
+            if(!confirm('商品尚未添加，是否添加商品？')){
                 return;
             }
 

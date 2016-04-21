@@ -1,6 +1,8 @@
 /**
  * Created by pepelu on 2016/4/11.
  */
+var services = require('../services');
+var AuditService = services.auditservice;
 var path = require('path');
 module.exports = function(req, res, next){
     req.data = req.method == 'GET'? req.query : req.body;

@@ -18,8 +18,7 @@ router.get('/images/:type(small|large|original|thumbnail)/:category/:filename.jp
 
 // view render pages
 
-//// admin / manager
-router.get('/manager', middleware.backend_auth ,controllers.Manager.manager);
+
 //// app related pages
 router.get('/product/:productInfo/:productId/',controllers.Api_v1_0.view_product_info);
 router.get('/news/:id/',controllers.News.view_news_detail);
@@ -217,5 +216,32 @@ controllers.Compatibility.compatibilityAPIs(router);
 // backend admin APIs
 router.get(F.config['manager-url']+'/api/login/', controllers.Manager.process_login);
 router.post(F.config['manager-url']+'/api/login/', controllers.Manager.process_login);
+
+//7.manager
+router.get(F.config['manager-url']+'/api/dashboard/online/',middleware.backend_auth ,controllers.Manager.json_dashboard_online);
+router.get(F.config['manager-url']+'/api/orders/',middleware.backend_auth ,controllers.Manager.json_orders_query);
+router.get(F.config['manager-url']+ '/api/orders/:id/',middleware.backend_auth ,controllers.Manager.json_orders_read);
+router.get(F.config['manager-url']+ '/api/v2.2/RSC/queryByProducts',middleware.backend_auth ,controllers.Manager.json_RSC_query_by_products);
+router.get(F.config['manager-url']+ '/api/backend/users',middleware.backend_auth ,controllers.Manager.json_be_users);
+router.put(F.config['manager-url']+ '/api/orders/RSCInfo/',middleware.backend_auth,middleware.auditing_middleware ,controllers.Manager.process_orders_RSCInfo_update);
+router.put(F.config['manager-url']+ '/api/orders/subOrders/',middleware.backend_auth,middleware.auditing_middleware,controllers.Manager.json_subOrders_payments_update);
+router.put(F.config['manager-url']+  '/api/orders/SKUs/',middleware.backend_auth,middleware.auditing_middleware,controllers.Manager.json_orders_SKUs_update);
+
+router.get(F.config['manager-url']+ '/api/brands/',	middleware.backend_auth,controllers.Manager.json_brands);
+
+router.get(F.config['manager-url']+  '/api/products/',middleware.backend_auth,controllers.Manager.json_products_query);
+router.post(F.config['manager-url']+  '/api/products/',middleware.backend_auth,middleware.auditing_middleware,controllers.Manager.json_products_save);
+router.post(F.config['manager-url']+  '/api/products/updateStatus',middleware.backend_auth,middleware.auditing_middleware,controllers.Manager.process_products_updateStatus);
+router.delete(F.config['manager-url']+ '/api/products/',middleware.backend_auth,middleware.auditing_middleware,controllers.Manager.json_products_remove);
+router.get(F.config['manager-url']+ '/api/products/categories/',middleware.backend_auth,controllers.Manager.json_products_categories);
+router.get(F.config['manager-url']+ '/api/products/attributes/',middleware.backend_auth,controllers.Manager.json_products_attributes);
+router.get(F.config['manager-url']+ '/api/products/:id/',middleware.backend_auth,controllers.Manager.json_products_read);
+
+// USERS
+router.get(F.config['manager-url']+ '/api/users/',middleware.backend_auth,controllers.Manager.json_users_query);
+
+//// admin / manager
+router.get('/manager', middleware.backend_auth ,controllers.Manager.manager);
+router.get('/manager/*', middleware.backend_auth ,controllers.Manager.manager);
 
 module.exports = router;
