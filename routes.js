@@ -239,6 +239,15 @@ router.get(F.config['manager-url']+ '/api/products/:id/',middleware.backend_auth
 
 // USERS
 router.get(F.config['manager-url']+ '/api/users/',middleware.backend_auth,controllers.Manager.json_users_query);
+router.get(F.config['manager-url']+ '/api/users/:id/',middleware.backend_auth,controllers.Manager.json_users_read);
+router.put(F.config['manager-url']+ '/api/users/',middleware.backend_auth,middleware.auditing_middleware,controllers.Manager.json_users_save);
+
+// potential customer
+router.get(F.config['manager-url']+ '/api/v2.1/agentinfo/:id',middleware.backend_auth,controllers.Manager.json_agent_info_get);
+
+// RSC
+router.get(F.config['manager-url']+ '/api/v2.2/RSCInfo/:id',middleware.backend_auth,controllers.Manager.json_RSC_info_get);
+
 
 //// admin / manager
 router.get('/manager', middleware.backend_auth ,controllers.Manager.manager);
