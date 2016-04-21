@@ -390,7 +390,7 @@ exports.view_product_info =function(req, res,next) {
             }
         );
     });
-}
+};
 
 exports.getCategories = function(req, res, next){
     CategoryService.all(function(err, categories){

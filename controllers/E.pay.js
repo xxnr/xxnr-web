@@ -8,6 +8,7 @@ var OrderService = services.order;
 var PayService = services.pay;
 var OFFLINEPAYTYPE = require('../common/defs').OFFLINEPAYTYPE;
 var EPOSNotify = require('../modules/EPOSNotify');
+var path = require('path');
 
 exports.install = function() {
     // pay
@@ -30,7 +31,7 @@ exports.install = function() {
     //F.route('/dynamic/alipay/refund_fastpay_by_platform_nopwd_notify.asp', alipayRefundNotify, ['post','raw']);
     //F.route('/unionpay/refundnotify', unionpayRefundNotify, ['post','raw']);
     // pay success
-    F.route('/alipay/success', aliPaySuccess);
+    //F.route('/alipay/success', aliPaySuccess);
     // // test alipay refund
     // F.route('/api/alipay/refund/', refundTest, ['get'], ['isLoggedIn']);
   
@@ -167,7 +168,7 @@ exports.alipayOrder = function(req, res, next){
                     param.notify_url = ((alipay.alipay_config.notify_host || 'http://' + require("node-ip/lib/ip").address('public')) + ":" + alipay.alipay_config.notify_host_port + alipay.alipay_config.create_direct_pay_by_user_notify_url);
                     param.return_url = ((alipay.alipay_config.return_host || 'http://' + require("node-ip/lib/ip").address('public')) + ":" + alipay.alipay_config.return_host_port + alipay.alipay_config.create_direct_pay_by_user_return_url);
                     param.extra_common_param = JSON.stringify({orderId:orderId});
-                    self.view('alipay', alipay.build_direct_pay_by_user_param(param));
+                    res.render(path.join(__dirname, '../views/4.api-v1.0/alipay'), alipay.build_direct_pay_by_user_param(param));
                 });
                 break;
             default:
@@ -709,9 +710,9 @@ function payRefund(options) {
 // pay success
 
 // alipay success front page view
-function aliPaySuccess(){
-    this.view('alipaySuccess', null);
-}
+exports.aliPaySuccess = function(req, res, next){
+    res.render(path.join(__dirname, '../views/4.api-v1.0/alipaySuccess'), null);
+};
 
 exports.EPOSPay = function(req, res, next){
     req.payType = PAYTYPE.EPOS;

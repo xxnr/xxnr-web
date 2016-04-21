@@ -1,6 +1,7 @@
 /**
  * Created by pepelu on 2016/4/11.
  */
+var path = require('path');
 module.exports = function(req, res, next){
     req.data = req.method == 'GET'? req.query : req.body;
 
@@ -57,6 +58,24 @@ module.exports = function(req, res, next){
             AuditService.saveLog(req.auditInfo, arguments);
         }
     };
+
+    var allowcache = req.get('pragma') !== 'no-cache';
+    if(!res.get('Expires'))
+        res.set('Expires', new Date().add('M', 2));
+
+    res.set('Cache-Control', 'public, max-age=5184000');
+    if(path.extname(req.path) === 'html') {
+        res.set('Pragma', 'no-cache');
+        res.set('Cache-Control', 'no-cache, no-store, max-age=0, must-revalidate');
+
+        if (RELEASE && allowcache && !res.get('Expires'))
+            res.set('Expires', new Date());
+    }
+    else {
+        res.set('Cache-Control', 'public' + (RELEASE && allowcache ? ', max-age=5184000' : ''));
+        if (RELEASE && allowcache && !res.get('Expires'))
+            res.set('Expires', new Date().add('M', 2));
+    }
 
     next();
 };
