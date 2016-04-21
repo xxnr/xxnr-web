@@ -27,7 +27,7 @@ exports.install = function() {
 	F.localize('All templates', '/templates/');
 
 	// COMMON
-	F.route(CONFIG('manager-url') + '/*', 									'~manager', ['get'], ['backend_auth']);
+	//F.route(CONFIG('manager-url') + '/*', 									'~manager', ['get'], ['backend_auth']);
 	F.route(CONFIG('manager-url') + '/upload/',                  			upload, ['post', 'upload'], 3084, ['backend_auth']); // 3 MB
 	F.route(CONFIG('manager-url') + '/upload/base64/',           			upload_base64, ['post'], 2048, ['backend_auth']); // 2 MB
 	// AREA
@@ -47,18 +47,18 @@ exports.install = function() {
 
 	// DASHBOARD
 	F.route(CONFIG('manager-url') + '/api/dashboard/',           			json_dashboard, ['get'], ['backend_auth']);
-	F.route(CONFIG('manager-url') + '/api/dashboard/online/',    			json_dashboard_online, ['get'], ['backend_auth']);
+	//F.route(CONFIG('manager-url') + '/api/dashboard/online/',    			json_dashboard_online, ['get'], ['backend_auth']);
 	// F.route(CONFIG('manager-url') + '/api/dashboard/clear/',     			json_dashboard_clear);
 
 	// ORDERS
-	F.route(CONFIG('manager-url') + '/api/orders/',              			json_orders_query, ['get'], ['backend_auth']);
-	F.route(CONFIG('manager-url') + '/api/orders/{id}/',         			json_orders_read, ['get'], ['backend_auth']);
+	//F.route(CONFIG('manager-url') + '/api/orders/',              			json_orders_query, ['get'], ['backend_auth']);
+	//F.route(CONFIG('manager-url') + '/api/orders/{id}/',         			json_orders_read, ['get'], ['backend_auth']);
 	// F.route(CONFIG('manager-url') + '/api/orders/payments/',              	json_orders_payments_update, ['put'], ['backend_auth']);
-	F.route(CONFIG('manager-url') + '/api/orders/subOrders/',              	json_subOrders_payments_update, ['put'], ['backend_auth', 'auditing']);
+	//F.route(CONFIG('manager-url') + '/api/orders/subOrders/',              	json_subOrders_payments_update, ['put'], ['backend_auth', 'auditing']);
 	F.route(CONFIG('manager-url') + '/api/orders/products/',              	json_orders_products_update, ['put'], ['backend_auth', 'auditing']);
-	F.route(CONFIG('manager-url') + '/api/orders/SKUs/',              		json_orders_SKUs_update, ['put'], ['backend_auth', 'auditing']);
+	//F.route(CONFIG('manager-url') + '/api/orders/SKUs/',              		json_orders_SKUs_update, ['put'], ['backend_auth', 'auditing']);
 	F.route(CONFIG('manager-url') + '/api/orders/SKUsDelivery/',            json_orders_SKUs_delivery, ['put'], ['backend_auth', 'auditing']);
-	F.route(CONFIG('manager-url') + '/api/orders/RSCInfo/',					process_orders_RSCInfo_update, ['put'], ['backend_auth', 'auditing']);
+	//F.route(CONFIG('manager-url') + '/api/orders/RSCInfo/',					process_orders_RSCInfo_update, ['put'], ['backend_auth', 'auditing']);
 	F.route(CONFIG('manager-url') + '/api/orders/confirmOfflinePay',    	process_order_confirm_OfflinePay, ['get'], ['backend_auth', 'auditing']);
 	F.route(CONFIG('manager-url') + '/api/order/getOfflinePayType',          json_offline_pay_type, ['get'], ['backend_auth']);
 
@@ -67,28 +67,28 @@ exports.install = function() {
 	// F.route(CONFIG('manager-url') + '/api/orders/clear/',        			json_orders_clear);
 
 	// USERS
-	F.route(CONFIG('manager-url') + '/api/users/',              			json_users_query, ['get'], ['backend_auth']);
+	//F.route(CONFIG('manager-url') + '/api/users/',              			json_users_query, ['get'], ['backend_auth']);
 	F.route(CONFIG('manager-url') + '/api/users/{id}/',         			json_users_read, ['get'], ['backend_auth']);
     F.route(CONFIG('manager-url') + '/api/users/',              			json_users_save, ['put'], ['backend_auth', 'auditing']);
 	// F.route(CONFIG('manager-url') + '/api/users/',              			json_users_remove, ['delete']);
 	// F.route(CONFIG('manager-url') + '/api/users/clear/',        			json_users_clear);
 
 	// BRANDS
-	F.route(CONFIG('manager-url') + '/api/brands/',							json_brands,	['get'],['backend_auth']);
+	//F.route(CONFIG('manager-url') + '/api/brands/',							json_brands,	['get'],['backend_auth']);
 
 	// PRODUCTS
-	F.route(CONFIG('manager-url') + '/api/products/',            			json_products_query, ['get'], ['backend_auth']);
-	F.route(CONFIG('manager-url') + '/api/products/',            			json_products_save, ['post'], ['backend_auth', 'auditing']);
-	F.route(CONFIG('manager-url') + '/api/products/updateStatus',			process_products_updateStatus, ['post'], ['backend_auth', 'auditing']);
-	F.route(CONFIG('manager-url') + '/api/products/{id}/',       			json_products_read, ['get'], ['backend_auth']);
-	F.route(CONFIG('manager-url') + '/api/products/',            			json_products_remove, ['delete'], ['backend_auth', 'auditing']);
+	//F.route(CONFIG('manager-url') + '/api/products/',            			json_products_query, ['get'], ['backend_auth']);
+	//F.route(CONFIG('manager-url') + '/api/products/',            			json_products_save, ['post'], ['backend_auth', 'auditing']);
+	//F.route(CONFIG('manager-url') + '/api/products/updateStatus',			process_products_updateStatus, ['post'], ['backend_auth', 'auditing']);
+	//F.route(CONFIG('manager-url') + '/api/products/{id}/',       			json_products_read, ['get'], ['backend_auth']);
+	//F.route(CONFIG('manager-url') + '/api/products/',            			json_products_remove, ['delete'], ['backend_auth', 'auditing']);
 	// F.route(CONFIG('manager-url') + '/api/products/clear/',      			json_products_clear);
 	F.route(CONFIG('manager-url') + '/api/products/import/',     			json_products_import, ['upload'], 1024, ['backend_auth']);
-	F.route(CONFIG('manager-url') + '/api/products/categories/', 			json_products_categories, ['get'], ['backend_auth']);
+	//F.route(CONFIG('manager-url') + '/api/products/categories/', 			json_products_categories, ['get'], ['backend_auth']);
 	F.route(CONFIG('manager-url') + '/api/products/category/',   			json_products_category_replace, ['post'] ,['backend_auth', 'auditing']);
 	F.route(CONFIG('manager-url') + '/api/products/attr/{attributeName}/',	json_products_attribute, ['get'], ['backend_auth']);
 	F.route(CONFIG('manager-url') + '/api/products/attribute/add',			process_product_attributes_add,	['post'], ['backend_auth', 'auditing']);
-	F.route(CONFIG('manager-url') + '/api/products/attributes/',			json_products_attributes, ['get'], ['backend_auth']);
+	//F.route(CONFIG('manager-url') + '/api/products/attributes/',			json_products_attributes, ['get'], ['backend_auth']);
 
 	// NEWS
 	F.route(CONFIG('manager-url') + '/api/news/',            				json_news_query, ['get'], ['backend_auth']);
@@ -135,9 +135,9 @@ exports.install = function() {
 	// F.route(CONFIG('manager-url') + '/api/restore/database/',    			file_restore_database, ['upload', 15000], 20000, ['backend_auth']);
 
     // backend user
-    F.route(CONFIG('manager-url') + '/api/login/',                          process_login, ['post'], ['auditing']);
+    //F.route(CONFIG('manager-url') + '/api/login/',                          process_login, ['post'], ['auditing']);
     F.route(CONFIG('manager-url') + '/api/backend/user/create/',            process_createUser, ['post'], ['backend_auth', 'auditing']);
-    F.route(CONFIG('manager-url') + '/api/backend/users',                   json_be_users, ['get'], ['backend_auth']);
+    //F.route(CONFIG('manager-url') + '/api/backend/users',                   json_be_users, ['get'], ['backend_auth']);
     F.route(CONFIG('manager-url') + '/api/backend/user/password/modify',    process_modify_password, ['post'], ['auditing']);
     F.route(CONFIG('manager-url') + '/api/backend/users/',                  json_be_users_update, ['post'], ['backend_auth', 'auditing']);
 
@@ -170,7 +170,7 @@ exports.install = function() {
 	F.route(CONFIG('manager-url') + '/api/v2.2/RSCInfo/{_id}',				json_RSC_info_get, ['get'], ['backend_auth']);
 	F.route(CONFIG('manager-url') + '/api/v2.2/RSCs',						json_RSC_query, ['get'], ['backend_auth']);
 	F.route(CONFIG('manager-url') + '/api/v2.2/RSC/modify',					process_RSC_modify, ['put'], ['backend_auth']);
-	F.route(CONFIG('manager-url') + '/api/v2.2/RSC/queryByProducts',		json_RSC_query_by_products,['get'],['backend_auth']);
+	//F.route(CONFIG('manager-url') + '/api/v2.2/RSC/queryByProducts',		json_RSC_query_by_products,['get'],['backend_auth']);
 	// RSC orders
 	F.route(CONFIG('manager-url') + '/api/v2.2/RSC/orders/',              	json_RSCorders_query, ['get'], ['backend_auth']);
 
@@ -187,6 +187,18 @@ var files = DB('files', null, require('total.js/database/database').BUILT_IN_DB)
 // COMMON
 // ==========================================================================
 var moment = require('moment');
+
+// admin manager page render
+exports.manager = function(req, res, next){
+	res.render(path.join(__dirname, '../views/manager'),
+		{
+			manager_url:F.config['manager-url'],
+			user_types:F.config['user_types'],
+			currency_entity:F.config['currency_entity'],
+			user:req.user
+		}
+	);
+};
 
 // CKEditor Upload picture
 function CKEditor_uploadImage() {
@@ -441,18 +453,18 @@ function json_dashboard() {
 }
 
 // Reads online users
-function json_dashboard_online() {
+exports.json_dashboard_online = function(req,res,next) {
 	var self = this;
-	var counter = MODULE('webcounter');
-	var memory = process.memoryUsage();
+	//var counter = require('../modules/webcounter');
+	//var memory = process.memoryUsage();
 	var model = {};
-	model.visitors = counter.online();
-	model.today = counter.today();
-	model.last = counter.today().last;
-	model.memoryused = (memory.heapUsed / 1024 / 1024).floor(2);
-	model.memorytotal = (memory.heapTotal / 1024 / 1024).floor(2);
-	self.json(model);
-}
+	//model.visitors = counter.online();
+	//model.today = counter.today();
+	//model.last = counter.today().last;
+	//model.memoryused = (memory.heapUsed / 1024 / 1024).floor(2);
+	//model.memorytotal = (memory.heapTotal / 1024 / 1024).floor(2);
+	res.json(model);
+};
 
 // Clear visitor statistics
 function json_dashboard_clear() {
@@ -474,49 +486,66 @@ function json_dashboard_clear() {
 // ==========================================================================
 
 // Gets all products
-function json_products_query() {
+exports.json_products_query =function(req,res,next) {
 	var self = this;
-
-	ProductService.query(self.query, self.callback());
+	ProductService.query(req.query, function(err,data){
+		if (err) {
+			console.error('manager json_products_query err:', err);
+			res.respond(err);
+			return;
+		}
+		if(data){
+			res.respond(data);
+		}
+	});
 }
 
 // Saves (update or create) specific product
-function json_products_save() {
+exports.json_products_save = function(req,res,next) {
 	var self = this;
 
-    ProductService.save(self.body, function(err, product){
+    ProductService.save(req.body, function(err, product){
 		if(err){
 			console.error('manager json_products_save err:', err);
-			self.respond({code:1004, message:err});
+			res.respond({code:1004, message:err});
 			return;
 		}
 
-		self.respond({code:1000, product:product});
+		res.respond({code:1000, product:product});
 	});
 
 	// Clears view cache
-	setTimeout(function() {
-		F.cache.removeAll('cache.');
-	}, 2000);
+	//setTimeout(function() {
+	//	F.cache.removeAll('cache.');
+	//}, 2000);
 }
 
-function process_products_updateStatus(){
+exports.process_products_updateStatus = function(req,res,next){
 	var self = this;
-	ProductService.updateStatus(self.body._id, self.body.online, function(err){
+	ProductService.updateStatus(req.body._id, req.body.online, function(err){
 		if(err){
 			console.error('manager process_products_updateStatus err:', err);
-			self.respond({code:1004, message:err});
+			res.respond({code:1004, message:err});
 			return;
 		}
 
-		self.respond({code:1000});
+		res.respond({code:1000});
 	})
 }
 
 // Removes specific product
-function json_products_remove() {
+exports.json_products_remove = function(req,res,next) {
 	var self = this;
-	ProductService.remove(self.body.id, self.callback());
+	ProductService.remove(req.body.id, function(err,data) {
+		if (err) {
+			console.error('manager json_products_remove err:', err);
+			res.respond(err);
+			return;
+		}
+		if (data) {
+			res.respond(data);
+		}
+	});
 }
 
 // Clears all products
@@ -533,16 +562,16 @@ function json_products_import() {
 }
 
 // Reads all product categories
-function json_products_categories() {
+exports.json_products_categories = function(req,res,next){
 	var self = this;
 
 	CategoryService.all(function(err, categories){
 		if(err){
-			self.respond({code:1004, message:'fail to query category'});
+			res.respond({code:1004, message:'fail to query category'});
 			return;
 		}
 
-		self.respond(categories);
+		res.respond(categories);
 	})
 }
 
@@ -568,39 +597,46 @@ function json_products_attribute(attributeName) {
 	})
 }
 
-function json_brands(){
+exports.json_brands = function(req,res,next){
 	var self = this;
-	var category = self.data.category;
+	var category = req.data.category;
 	BrandService.query(category, function(err, brands){
 		if(err){
 			console.error('manager json_brands query brands err:', err);
-			self.respond({code:1004, message:'获取品牌列表失败', error:err});
+			res.respond({code:1004, message:'获取品牌列表失败', error:err});
 			return;
 		}
-
-		self.respond({code:1000, brands:brands});
+		res.respond({code:1000, brands:brands});
 	})
 }
 
-function json_products_attributes(){
+exports.json_products_attributes = function(req,res,next){
 	var self = this;
-	ProductService.getAttributes(self.data.category, self.data.brand, self.data.name, function(err, attributes){
+	ProductService.getAttributes(req.data.category, req.data.brand, req.data.name, function(err, attributes){
 		if (err) {
 			console.error('manager json_products_attributes err:', err);
-			self.respond({code: 1004, message: '获取商品属性列表失败', error: err});
+			res.respond({code: 1004, message: '获取商品属性列表失败', error: err});
 			return;
 		}
-
-		self.respond({code:1000, message:'success', attributes:attributes});
+		res.respond({code:1000, message:'success', attributes:attributes});
 	}, 1)
 }
 
 // Reads a specific product by ID
-function json_products_read(id) {
+exports.json_products_read = function(req,res,next) {
 	var self = this;
 	var options = {};
-	options.id = id;
-	ProductService.get(options, self.callback());
+	options.id = req.params.id;
+	ProductService.get(options, function(err,data){
+		if (err) {
+			console.error('manager json_products_read err:', err);
+			res.respond(err);
+			return;
+		}
+		if(data){
+			res.respond(data);
+		}
+	});
 }
 
 // ==========================================================================
@@ -608,82 +644,82 @@ function json_products_read(id) {
 // ==========================================================================
 
 // Reads all orders
-function json_orders_query() {
-    var self = this;
-    OrderService.query(self.query, function (err, orders) {
-    	if (err) {
+exports.json_orders_query = function(req,res,next) {
+	var self = this;
+	OrderService.query(req.query, function (err, orders) {
+		if (err) {
 			console.error('manager json_orders_query err:', err);
-			self.respond({code:1004, message:'系统错误，没有找到订单信息。'});
+			res.respond({code:1004, message:'系统错误，没有找到订单信息。'});
 			return;
 		}
-        if (orders) {
-	        var items = orders.items;
-	        var length = items.length;
-	        var arr = [];
-	        for (var i = 0; i < length; i++) {
-                // var item = items[i];
-                var order = items[i];
-                var item = {
-                    'id':order.id,
-                    'paymentId':order.paymentId,
-                    'price':order.price,
-                    'deposit':order.deposit,
-                    'consigneeAddress':order.consigneeAddress,
-                    'consigneeName':order.consigneeName,
-                    'consigneePhone':order.consigneePhone,
-                    'buyerName':order.buyerName,
-                    'buyerPhone':order.buyerPhone,
-                    'payType':order.payType,
-                    'products':order.products || [],
-                    'SKUs':order.SKUs || [],
-                    'duePrice':typeof(order.duePrice) != 'undefined' ? parseFloat(order.duePrice.toFixed(2)) : null,
-                    'deliveryType':order.deliveryType,
-                    'payStatus':order.payStatus,
-                    'deliverStatus':order.deliverStatus,
-                    'RSCInfo':order.RSCInfo,
-                    'isClosed':order.isClosed
-                };
-                // 订单合成状态
-                item.typeValue = OrderService.orderType(order);
-                // 创建时间
-                item.dateCreated = order.dateCreated;
-                // 支付时间
-                if (order.payStatus == PAYMENTSTATUS.PAID && order.datePaid) {
-                    item.datePaid = order.datePaid;
-                }
-                // 待收货时间
-                if (order.payStatus == PAYMENTSTATUS.PAID && order.deliverStatus !== DELIVERSTATUS.UNDELIVERED && order.datePendingDeliver) {
-                    item.datePendingDeliver = order.datePendingDeliver;
-                }
-                // 全部发货时间
-                if (order.deliverStatus == DELIVERSTATUS.DELIVERED && order.dateDelivered) {
-                    item.dateDelivered = order.dateDelivered;
-                }
-                // 完成时间
-                if (order.deliverStatus == DELIVERSTATUS.RECEIVED && order.dateCompleted) {
-                    item.dateCompleted = order.dateCompleted;
-                }
-                var orderInfo = {'totalPrice':order.price.toFixed(2), 'deposit':order.deposit.toFixed(2), 'dateCreated':order.dateCreated, 'orderStatus': OrderService.orderStatus(order)};
-                item.order = orderInfo;
-                arr[i] = item;
-            }
-            orders.items = arr;
-        }
-        self.respond({code:1000, message:'success', datas:orders});
-    });
-}
+		if (orders) {
+			var items = orders.items;
+			var length = items.length;
+			var arr = [];
+			for (var i = 0; i < length; i++) {
+				// var item = items[i];
+				var order = items[i];
+				var item = {
+					'id':order.id,
+					'paymentId':order.paymentId,
+					'price':order.price,
+					'deposit':order.deposit,
+					'consigneeAddress':order.consigneeAddress,
+					'consigneeName':order.consigneeName,
+					'consigneePhone':order.consigneePhone,
+					'buyerName':order.buyerName,
+					'buyerPhone':order.buyerPhone,
+					'payType':order.payType,
+					'products':order.products || [],
+					'SKUs':order.SKUs || [],
+					'duePrice':typeof(order.duePrice) != 'undefined' ? parseFloat(order.duePrice.toFixed(2)) : null,
+					'deliveryType':order.deliveryType,
+					'payStatus':order.payStatus,
+					'deliverStatus':order.deliverStatus,
+					'RSCInfo':order.RSCInfo,
+					'isClosed':order.isClosed
+				};
+				// 订单合成状态
+				item.typeValue = OrderService.orderType(order);
+				// 创建时间
+				item.dateCreated = order.dateCreated;
+				// 支付时间
+				if (order.payStatus == PAYMENTSTATUS.PAID && order.datePaid) {
+					item.datePaid = order.datePaid;
+				}
+				// 待收货时间
+				if (order.payStatus == PAYMENTSTATUS.PAID && order.deliverStatus !== DELIVERSTATUS.UNDELIVERED && order.datePendingDeliver) {
+					item.datePendingDeliver = order.datePendingDeliver;
+				}
+				// 全部发货时间
+				if (order.deliverStatus == DELIVERSTATUS.DELIVERED && order.dateDelivered) {
+					item.dateDelivered = order.dateDelivered;
+				}
+				// 完成时间
+				if (order.deliverStatus == DELIVERSTATUS.RECEIVED && order.dateCompleted) {
+					item.dateCompleted = order.dateCompleted;
+				}
+				var orderInfo = {'totalPrice':order.price.toFixed(2), 'deposit':order.deposit.toFixed(2), 'dateCreated':order.dateCreated, 'orderStatus': OrderService.orderStatus(order)};
+				item.order = orderInfo;
+				arr[i] = item;
+			}
+			orders.items = arr;
+		}
+		res.respond({code:1000, message:'success', datas:orders});
+	});
+};
 
 // Updates specific order sub order payments
-function json_subOrders_payments_update() {
+exports.json_subOrders_payments_update = function(req,res,next) {
 	var self = this;
-	var orderid = self.body && self.body.id ? self.body.id: null;
-	var subOrders = self.body && self.body.subOrders ? self.body.subOrders: null;
+	var orderid = req.body && req.body.id ? req.body.id: null;
+	var subOrders = req.body && req.body.subOrders ? req.body.subOrders: null;
 	if (!orderid) {
-		self.respond({code:1001, message:'请求参数错误', error:[{'error':'更新失败，缺少订单ID'}]});
+		res.respond({code:1001, message:'请求参数错误', error:[{'error':'更新失败，缺少订单ID'}]});
 		return;
 	}
 	if (!subOrders) {
-		self.respond({code:1001, message:'请求参数错误', error:[{'error':'更新失败，缺少子订单列表'}]});
+		res.respond({code:1001, message:'请求参数错误', error:[{'error':'更新失败，缺少子订单列表'}]});
 		return;
 	}
 	var updatepayments = {};
@@ -701,16 +737,16 @@ function json_subOrders_payments_update() {
        	}
     }
     var options = {'id':orderid,'payments':updatepayments};
-    if (self.user) {
-    	options.backendUser = self.user;
+    if (req.user) {
+    	options.backendUser = req.user;
     }
     OrderService.updatePayments(options, function(err) {
 		if (err) {
 			console.error('manager json_subOrders_payments_update err:', err);
-			self.respond({code:1004, message:'系统错误，更新失败', error:[{'error':'系统错误，更新失败'}]});
+			res.respond({code:1004, message:'系统错误，更新失败', error:[{'error':'系统错误，更新失败'}]});
 			return;
 		}
-		self.respond({code:1000, message:'success', success: true});
+		res.respond({code:1000, message:'success', success: true});
 	});
 }
 
@@ -748,16 +784,16 @@ function json_orders_products_update() {
 }
 
 // Updates specific order SKUs
-function json_orders_SKUs_update() {
+exports.json_orders_SKUs_update = function(req,res,next) {
 	var self = this;
-	var orderid = self.body && self.body.id ? self.body.id: null;
-	var SKUs = self.body && self.body.SKUs ? self.body.SKUs: null;
+	var orderid = req.body && req.body.id ? req.body.id: null;
+	var SKUs = req.body && req.body.SKUs ? req.body.SKUs: null;
 	if (!orderid) {
-		self.respond({code:1001, message:'请求参数错误', error:[{'error':'更新失败，缺少订单ID'}]});
+		res.respond({code:1001, message:'请求参数错误', error:[{'error':'更新失败，缺少订单ID'}]});
 		return;
 	}
 	if (!SKUs) {
-		self.respond({code:1001, message:'请求参数错误', error:[{'error':'更新失败，缺少商品列表'}]});
+		res.respond({code:1001, message:'请求参数错误', error:[{'error':'更新失败，缺少商品列表'}]});
 		return;
 	}
 	var updateSKUs = {};
@@ -777,10 +813,10 @@ function json_orders_SKUs_update() {
     OrderService.updateSKUs(options, function(err) {
 		if (err) {
 			console.error('manager json_orders_SKUs_update err:', err);
-			self.respond({code:1004, message:'系统错误，更新失败', error:[{'error':'系统错误，更新失败'}]});
+			res.respond({code:1004, message:'系统错误，更新失败', error:[{'error':'系统错误，更新失败'}]});
 			return;
 		}
-		self.respond({code:1000, message:'success', success: true});
+		res.respond({code:1000, message:'success', success: true});
 	});
 }
 
@@ -933,18 +969,18 @@ function json_offline_pay_type(){
 }
 
 // Reads a specific order by ID
-function json_orders_read(id) {
+exports.json_orders_read = function(req,res,next) {
 	var self = this;
 	var options = {};
-	options.id = id;
+	options.id = req.params.id;
 	
 	OrderService.get(options, function(err, order, payment) {
 		if (err) {
 			console.error('manager json_orders_read error:', err);
-			self.respond({code:1004, message:'系统错误，没有找到订单信息', error:[{'error':'系统错误，没有找到订单信息'}]});
+			res.respond({code:1004, message:'系统错误，没有找到订单信息', error:[{'error':'系统错误，没有找到订单信息'}]});
 			return;
 		}
-        self.respond({code:1000, message:'success', datas: convertOrderToShow(order, payment)});
+        res.respond({code:1000, message:'success', datas: convertOrderToShow(order, payment)});
     });
 }
 
@@ -1047,10 +1083,19 @@ var convertOrderToShow = function(order, payment){
 // ==========================================================================
 
 // Reads all users
-function json_users_query() {
+exports.json_users_query = function(req,res,next) {
 	var self = this;
+	UserService.query(self.query, function(err,data){
+		if (err) {
+			console.error('manager json_users_query err:', err);
+			res.respond(err);
+			return;
+		}
+		if(data){
+			res.respond(data);
+		}
 
-	UserService.query(self.query, self.callback());
+	});
 }
 
 // Saves specific user (user must exist)
@@ -1535,9 +1580,19 @@ function json_permissions(){
     AuthService.getPermissionList(self.callback());
 }
 
-function json_be_users(){
+exports.json_be_users = function(req,res,next){
     var self=this;
-    BackEndUserService.getUserList(self.callback());
+    BackEndUserService.getUserList(function(err,data){
+		if (err) {
+			console.error('manager json_be_users err:', err);
+			res.respond(err);
+			return;
+		}
+		if(data){
+			res.respond(data);
+		}
+
+	});
 }
 
 function json_roles(){
@@ -1997,13 +2052,13 @@ function json_RSCorders_query() {
     });
 }
 
-function json_RSC_query_by_products(){
+exports.json_RSC_query_by_products = function(req,res,next){
 	var self = this;
-	var productIds = self.data.productIds.split(',');
+	var productIds = req.data.productIds.split(',');
 
 	ProductService.queryProductsById(productIds, function(err, products){
 		if(err){
-			self.respond({code: 1002, message: '查询失败' + err});
+			res.respond({code: 1002, message: '查询失败' + err});
 			return;
 		}
 
@@ -2014,11 +2069,11 @@ function json_RSC_query_by_products(){
 
 		RSCService.getRSCList(product_ids, null, null, null, null, null, null, function(err, RSCs, count, pageCount){
 			if(err){
-				self.respond({code: 1002, message: '查询失败' + err});
+				res.respond({code: 1002, message: '查询失败' + err});
 				return;
 			}
 
-			self.respond({code:1000, message:'success', RSCs:RSCs});
+			res.respond({code:1000, message:'success', RSCs:RSCs});
 		});
 	})
 }
@@ -2094,25 +2149,16 @@ function json_payrefund_update() {
 	});
 }
 
-function process_orders_RSCInfo_update(){
+exports.process_orders_RSCInfo_update= function(req,res,next){
 	var self = this;
-	var orderId = self.data.id;
-	var RSCInfo = self.data.RSCInfo;
+	var orderId = req.data.id;
+	var RSCInfo = req.data.RSCInfo;
 	OrderService.updateRSCInfo(orderId, RSCInfo, function(err){
 		if(err){
-			self.respond({code:1002, message:err});
+			res.respond({code:1002, message:err});
 			return;
 		}
 
-		self.respond({code:1000, message:'success'});
+		res.respond({code:1000, message:'success'});
 	})
-}
-exports.manager = function(req, res, next){
-	res.render(path.join(__dirname, '../views/manager'),
-		{
-			manager_url:F.config['manager-url'],
-			user_types:F.config['user_types'],
-			user:req.user
-		}
-	);
 }
