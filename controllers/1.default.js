@@ -468,9 +468,6 @@ function responseImage(req, res, filename, fnProcess, headers, done) {
 }
 
 function responseFile(req, res, filename, downloadName, headers, done, key) {
-
-	var self = this;
-
 	if (res.success || res.headersSent) {
 		if (done)
 			done();
@@ -536,7 +533,7 @@ function responseFile(req, res, filename, downloadName, headers, done, key) {
 			setTimeout(function() {
 				responseFile(req, res, filename, downloadName, headers, done, key);
 			}, 500);
-			return self;
+			return;
 		}
 
 		// waiting
@@ -548,7 +545,7 @@ function responseFile(req, res, filename, downloadName, headers, done, key) {
 			responseFile(req, res, filename, downloadName, headers, done, key);
 		});
 
-		return self;
+		return;
 	}
 
 	var index = name.lastIndexOf(';');

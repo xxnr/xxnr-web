@@ -101,7 +101,6 @@ exports.json_news_read = function(req, res, next) {
 
 // Gets news detail page for app
 exports.view_news_detail = function(req,res,next) {
-    var self = this;
     var options = {};
     var id = req.params.id;
     options.id = id;
@@ -109,22 +108,20 @@ exports.view_news_detail = function(req,res,next) {
     options.status = '2';
     NewsService.get(options, function (err, result) {
         if (err || !result) {
-            //self.throw404();
             res.status(404).send('404: Page not found');
             return;
         }
-        //self.view('newsAppDetailTemplate', result);
+
         res.render(path.join(__dirname, '../views/9.new/newsAppDetailTemplate.html'),
             {
-                result:result
+                result: result
             }
         );
     });
-}
+};
 
 // Gets news detail share page for app
 exports.view_newsshare_detail = function(req,res,next) {
-    var self = this;
     var options = {};
     var id = req.params.id;
     options.id = id;
@@ -132,16 +129,15 @@ exports.view_newsshare_detail = function(req,res,next) {
     options.status = '2';
     NewsService.get(options, function (err, result) {
         if (err || !result) {
-            //self.throw404();
             res.status(404).send('404: Page not found');
             return;
         }
         result['shareurl'] = 'http://' + req.hostname + '/newsshare/' + id;
-        //self.view('newsAppDetailTemplate', result);
+
         res.render(path.join(__dirname, '../views/9.new/newsAppDetailTemplate.html'),
             {
                 result:result
             }
         );
     });
-}
+};

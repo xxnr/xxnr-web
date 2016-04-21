@@ -49,7 +49,6 @@ var moment = require('moment-timezone');
 
 // common pay function
 function payOrder(req, payExecutor){
-    var self = this;
     var orderId = req.data['orderId'];
     var payPrice = req.data['price'];
 
@@ -145,7 +144,6 @@ function payOrder(req, payExecutor){
 }
 
 exports.alipayOrder = function(req, res, next){
-    var self = this;
     var consumer = req.data['consumer']||'website';
     req.payType = PAYTYPE.ZHIFUBAO;
 
@@ -271,78 +269,6 @@ exports.offlinePay = function(req, res, next){
     });
 };
 
-// pay notify
-// // common pay notify function
-// function payNotify(paymentId, options){
-//     var self = this;
-//     // order paid
-//     OrderService.get({"paymentId": paymentId}, function(err, order) {
-//         // TODO: log err
-//         if (err) {
-//             console.error('api-v1.0 payNotify OrderService get err:', err);
-//             dri.sendDRI('[DRI] Fail to get order in order payNotify: ', 'paymentId:'+paymentId, err);
-//         }
-//         if (order) {
-//             var payment = {paymentId: paymentId};
-//             if (options && options.price) {
-//                 payment.price = parseFloat(parseFloat(options.price).toFixed(2));
-//             }
-//             var result = OrderService.judgePaymentRefund(order, payment);
-//             if (result && result.refund) {
-//                 var paymentOptions = options;
-//                 paymentOptions.paymentId = paymentId;
-//                 if (!paymentOptions.orderId) {
-//                     paymentOptions.orderId = order.id;
-//                 }
-//                 if (result.refundReason) {
-//                     paymentOptions.refundReason = result.refundReason;
-//                 }
-//                 payRefund.call(self, paymentOptions);
-//             } else {
-//                 if ((order.payStatus||PAYMENTSTATUS.UNPAID) == PAYMENTSTATUS.UNPAID || order.payStatus == PAYMENTSTATUS.PARTPAID) {
-//                     OrderService.paid(order.id, paymentId, options, function(err, result) {
-//                         if (err) {
-//                             if (result && result.refund) {
-//                                 // *TODO refund
-//                                 var paymentOptions = options;
-//                                 paymentOptions.paymentId = paymentId;
-//                                 if (!paymentOptions.orderId) {
-//                                     paymentOptions.orderId = order.id;
-//                                 }
-//                                 if (result.refundReason) {
-//                                     paymentOptions.refundReason = result.refundReason;
-//                                 }
-//                                 payRefund.call(self, paymentOptions);
-//                             } else {
-//                                 console.error('api-v1.0 payNotify OrderService paid err:', err);
-//                                 // if err happen
-//                                 // send sms to dri
-//                                 var idsStr = 'orderId:' + order.id + ' paymentId:' + paymentId;
-//                                 dri.sendDRI('[DRI] Fail to update order in order payNotify: ', idsStr, err);
-//                             }
-//                         }
-//                     }); // SchemaBuilderEntity.prototype.save = function(model, helper, callback, skip)
-//                 }
-//             }
-//         } else {
-//             // not find order by paymentId
-//             // *TODO refund or other methods
-//             var paymentOptions = options;
-//             paymentOptions.paymentId = paymentId;
-//             if (!paymentOptions.orderId) {
-//                 paymentOptions.orderId = order.id;
-//             }
-//             paymentOptions.refundReason = 3;
-//             payRefund.call(self, paymentOptions);
-//         }
-//     });
-
-//     // pay success log
-//     var payLog = options;
-//     payLog.paymentId = paymentId;
-//     OrderService.savePaidLog(payLog);
-// }
-
 // alipay notify function
 exports.alipayNotify = function(req, res, next) {
     console.log('alipayNotify body:', req.body);
@@ -377,12 +303,7 @@ exports.alipayNotify = function(req, res, next) {
             }
 
             OrderService.payNotify(paymentId, options);
-            // payNotify.call(self, paymentId, options);
             res.send('success');
-            // // alipay success log
-            // var payLog = options;
-            // payLog.paymentId = paymentId;
-            // OrderService.savePaidLog(payLog);
         } else {
             res.send('success');
         }
@@ -443,15 +364,10 @@ exports.unionpayNotify = function(req, res, next) {
                 }
 
                 OrderService.payNotify(paymentId, options);
-                // payNotify.call(self, paymentId, options);
                 res.send('success');
 
                 // update the third-party platform payment
                 OrderService.updateThirdpartyPayment(paymentId);
-                // // unionpay success log
-                // var payLog = options;
-                // payLog.paymnetId = paymentId;
-                // OrderService.savePaidLog(payLog);
             } else {
                 console.error('unionpayNotify error : respCode is ', body['respCode'], 'body:', body);
                 res.send('success'); // tell the notifier we successfully handled the notification
@@ -503,7 +419,6 @@ exports.process_RSC_confirm_OfflinePay = function(req, res, next){
         var options = {payType:offlinePayType, price:payment.payPrice ? payment.payPrice : payment.price, datePaid:new Date()};
 
         OrderService.payNotify(paymentId, options);
-        // payNotify.call(self, paymentId, options);
         res.send('success');
     });
 };
@@ -627,93 +542,6 @@ exports.unionpayRefundNotify = function(req, res, next) {
     });
 };
 
-// var OrderPaidLog = require('../models').orderpaidlog;
-// var OrderPaymentsRefund = require('../models').orderpaymentsrefund;
-// function refundTest() {
-//     var self = this;
-//     //var paymentId = '9561ec5220';
-//     //var paymentId = '4573828f46';
-//     //var paymentId = 'e546c378ca';
-//     var paymentId = '3b074a1876';
-
-//     OrderPaymentsRefund.findOne({paymentId: paymentId, payType: 2}, function(err, orderPaymentRefund){
-//         if (err) {
-//             res.respond('not find refund');
-//             return;
-//         }
-//         res.respond('refund success');
-//         if (orderPaymentRefund && orderPaymentRefund.refundReason !== 3) {
-//             // TODO refund
-//             // console.log(orderPaymentRefund);
-//             if (orderPaymentRefund.payType === PAYTYPE.ZHIFUBAO) {
-//                 console.log('zhifubao refund:', orderPaymentRefund);
-//                //  var type = 'nopwd';
-//                //  PayService.alipayRefund(type, orderPaymentRefund, function(err, result) {
-//                //     if (err) {
-//                //         console.error('payRefund PayService alipayRefundNopwd err:', err);
-//                //         return;
-//                //     }
-//                //     console.log(result);
-//                // });
-//             } else if (orderPaymentRefund.payType === PAYTYPE.UNIONPAY) {
-//                console.log('unionpay refund:', orderPaymentRefund);
-//                // PayService.unionpayRefund(orderPaymentRefund, function(err, result) {
-//                //      if (err) {
-//                //          console.error('payRefund PayService unionpayRefund err:', err);
-//                //          return;
-//                //      }
-//                //      if (result) {
-//                //          console.log(result);
-//                //      }
-//                //      return;
-//                // });
-//             }
-//         }
-//     });
-// }
-
-// // pay refund
-// function payRefund(options) {
-//     var self = this;
-//     if (options) {
-//         PayService.savePaymentRefund(options, function(err, orderPaymentRefund) {
-//             if (err) {
-//                 console.error('payRefund PayService save err:', err);
-//                 console.error(orderPaymentRefund);
-//             } else {
-//                 console.log(orderPaymentRefund);
-//             }
-//             // if (orderPaymentRefund && orderPaymentRefund.refundReason !== 3) {
-//             //     // TODO refund
-//             //     // console.log(orderPaymentRefund);
-//             //     if (orderPaymentRefund.payType === PAYTYPE.ZHIFUBAO) {
-//             //         console.log('zhifubao refund:', orderPaymentRefund);
-//             //         var type = 'nopwd';
-//             //         PayService.alipayRefund(type, orderPaymentRefund, function(err, result) {
-//             //            if (err) {
-//             //                console.error('payRefund PayService alipayRefundNopwd err:', err);
-//             //                return;
-//             //            }
-//             //            console.log(result);
-//             //        });
-//             //     } else if (orderPaymentRefund.payType === PAYTYPE.UNIONPAY) {
-//             //        // console.log(orderPaymentRefund);
-//             //        PayService.unionpayRefund(orderPaymentRefund, function(err, result) {
-//             //             if (err) {
-//             //                 console.error('payRefund PayService unionpayRefund err:', err);
-//             //                 return;
-//             //             }
-//             //             if (result) {
-//             //                 console.log(result);
-//             //             }
-//             //             return;
-//             //        });
-//             //     }
-//             // }
-//         });
-//     }
-// }
-
 // pay success
 
 // alipay success front page view
@@ -750,7 +578,6 @@ exports.process_EPOSNotify = function(req, res, next){
             // paid successfully
             var options = {payType: PAYTYPE.EPOS, price: price, datePaid: datePaid, queryId: orderId, notify_time:currentTime};
             OrderService.payNotify(paymentId, options);
-            // payNotify.call(self, paymentId, options);
         }
 
         res.respond({orderId:orderId, merchantMsgProcessId:0, merchantMsgProcessTime:currentTime, merchantRecMsgProcessState:1});

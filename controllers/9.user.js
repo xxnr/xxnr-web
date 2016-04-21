@@ -138,7 +138,6 @@ var files = DB('files', null, require('total.js/database/database').BUILT_IN_DB)
 
 // Login
 exports.process_login = function(req, res, next) {
-    var self = this;
     var options = {};
     if (!req.data.account){
         res.respond({code:1001,message:'请输入账号'});
@@ -192,7 +191,6 @@ exports.process_login = function(req, res, next) {
 
 var setCookieAndResponse = function(req, res, user, keepLogin){
     // Set cookie
-    // self.res.cookie(config.usercookie, F.encrypt({ userid: user.userid, ip: self.req.ip }, 'user'), new Date().add('5 minutes'));
     var options = {userid:user.userid};
     var userAgent = req.data['user-agent'];
     if(REG_MOBILE.test(userAgent)){
@@ -775,60 +773,7 @@ exports.json_useraddresslist_query = function(req, res, next, callback) {
             callback ? callback(arr) : res.respond({'code': '1000', 'message': 'success', 'datas': {"total": count, "rows": arr}});
         }
     });
-}
-
-// Query useraddress list (v1.0 app)
-function json_useraddressslist_query_lagency(){
-    var self = this;
-    var options = {};
-
-    if (!req.data.userId) {
-        res.respond({'code': '1001', 'message': '请求参数错误，无效的userId参数'});
-        return;
-    }
-    options.userid = req.data.userId;
-    options.ip = self.req.ip;
-
-    UseraddressService.query(options, function (err, data) {
-        // Error
-        if (err) {
-            console.error('user json_useraddressslist_query_lagency UseraddressService query err:', err);
-            if (data) {
-                res.respond(data);
-                return;
-            } else {
-                res.respond({'code': '1001', 'message': '未查询到收货地址'});
-                return;
-            }
-        } else {
-            var items = data.items;
-            var count = data.count;
-            var arr = new Array(count);
-
-            for (var i = 0; i < count; i++) {
-                var item = items[i];
-                arr[i] = {"areaName": item.provincename,
-                    "areaId": item.provinceid,
-                    "cityName": item.cityname,
-                    "cityId": item.cityid,
-                    "countyName": item.countyname,
-                    "countyId": item.countyid,
-                    "address": item.cityname + (item.countyname || '') + item.address,
-                    "receiptPhone": item.receiptphone,
-                    "receiptPeople": item.receiptpeople,
-                    "userId": item.userid,
-                    "type": item.type,
-                    "addressId": item.id,
-                    "zipCode": item.zipcode || '',
-                    "townId": item.townid,
-                    "townName": item.townname
-                };
-            }
-            // Return results
-            res.respond({'code': '1000', 'message': 'success', 'datas': {"total": count, "rows": arr}});
-        }
-    });
-}
+};
 
 // Create useraddress
 exports.json_useraddress_create = function(req, res, next) {
