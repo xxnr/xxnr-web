@@ -68,8 +68,8 @@ exports.install = function() {
 
 	// USERS
 	//F.route(CONFIG('manager-url') + '/api/users/',              			json_users_query, ['get'], ['backend_auth']);
-	F.route(CONFIG('manager-url') + '/api/users/{id}/',         			json_users_read, ['get'], ['backend_auth']);
-    F.route(CONFIG('manager-url') + '/api/users/',              			json_users_save, ['put'], ['backend_auth', 'auditing']);
+	//F.route(CONFIG('manager-url') + '/api/users/{id}/',         			json_users_read, ['get'], ['backend_auth']);
+    //F.route(CONFIG('manager-url') + '/api/users/',              			json_users_save, ['put'], ['backend_auth', 'auditing']);
 	// F.route(CONFIG('manager-url') + '/api/users/',              			json_users_remove, ['delete']);
 	// F.route(CONFIG('manager-url') + '/api/users/clear/',        			json_users_clear);
 
@@ -164,10 +164,10 @@ exports.install = function() {
 	// potential customer
 	F.route(CONFIG('manager-url') + '/api/v2.1/potentialCustomer/query',	json_potential_customer_query,	['get'], ['backend_auth']);
 	F.route(CONFIG('manager-url') + '/api/v2.1/potentialCustomer/{_id}',	json_potential_customer_get, ['get'], ['backend_auth']);
-	F.route(CONFIG('manager-url') + '/api/v2.1/agentinfo/{_id}',			json_agent_info_get, ['get'], ['backend_auth']);
+	//F.route(CONFIG('manager-url') + '/api/v2.1/agentinfo/{_id}',			json_agent_info_get, ['get'], ['backend_auth']);
 
 	// RSC
-	F.route(CONFIG('manager-url') + '/api/v2.2/RSCInfo/{_id}',				json_RSC_info_get, ['get'], ['backend_auth']);
+	//F.route(CONFIG('manager-url') + '/api/v2.2/RSCInfo/{_id}',				json_RSC_info_get, ['get'], ['backend_auth']);
 	F.route(CONFIG('manager-url') + '/api/v2.2/RSCs',						json_RSC_query, ['get'], ['backend_auth']);
 	F.route(CONFIG('manager-url') + '/api/v2.2/RSC/modify',					process_RSC_modify, ['put'], ['backend_auth']);
 	//F.route(CONFIG('manager-url') + '/api/v2.2/RSC/queryByProducts',		json_RSC_query_by_products,['get'],['backend_auth']);
@@ -1085,7 +1085,7 @@ var convertOrderToShow = function(order, payment){
 // Reads all users
 exports.json_users_query = function(req,res,next) {
 	var self = this;
-	UserService.query(self.query, function(err,data){
+	UserService.query(req.query, function(err,data){
 		if (err) {
 			console.error('manager json_users_query err:', err);
 			res.respond(err);
@@ -1099,30 +1099,30 @@ exports.json_users_query = function(req,res,next) {
 }
 
 // Saves specific user (user must exist)
-function json_users_save() {
+exports.json_users_save = function(req,res,next) {
 	var self = this;
-    if(!self.data.id){
-        self.respond({code:1001, message:'id required'});
+    if(!req.data.id){
+        res.respond({code:1001, message:'id required'});
     }
 
     var options = {};
 
-    if(self.data.id)
-        options.id = self.data.id;
-    if(self.data.type)
-        options.type = self.data.type;
-	if(self.data.typeVerified)
-		options.typeVerified = self.data.typeVerified;
+    if(req.data.id)
+        options.id = req.data.id;
+    if(req.data.type)
+        options.type = req.data.type;
+	if(req.data.typeVerified)
+		options.typeVerified = req.data.typeVerified;
 
 	// self.body.$save(self.callback());
 	UserService.update(options, function(err){
         if(err){
         	console.error('manager json_users_save err:', err);
-            self.respond({code:1004, message:'系统错误，更新失败'});
+            res.respond({code:1004, message:'系统错误，更新失败'});
             return;
         }
 
-        self.respond({code:1000, message:'success'});
+        res.respond({code:1000, message:'success'});
     });
 }
 
@@ -1133,18 +1133,18 @@ function json_users_save() {
 // }
 
 // Reads a specific user by ID
-function json_users_read(id) {
+exports.json_users_read = function(req,res,next) {
 	var self = this;
 	var options = {};
-	options.userid = id;
+	options.userid = req.params.id;
 	UserService.get(options, function(err, user) {
         if (err) {
         	console.error('manager json_users_read err:', err);
-            self.respond({code: 1004, message: 'get user err:' + err});
+            res.respond({code: 1004, message: 'get user err:' + err});
             return;
         }
 
-		self.respond({code: 1000, user: user});
+		res.respond({code: 1000, user: user});
     });
 }
 
@@ -1895,21 +1895,21 @@ function json_potential_customer_get(_id){
 	})
 }
 
-function json_agent_info_get(id){
+exports.json_agent_info_get = function(req,res,next){
 	var self = this;
-	UserService.get({userid:id}, function(err, user){
+	UserService.get({userid:req.params.id}, function(err, user){
 		if(err || !user){
-			self.respond({code:1001, message:'获取新农经纪人信息失败'});
+			res.respond({code:1001, message:'获取新农经纪人信息失败'});
 			return;
 		}
 
 		PotentialCustomerService.getStatistic(user._id, function(err, totalCount, registeredCount, registeredAndBindedCount){
 			if(err){
-				self.respond({code:1001, message:'获取新农经纪人信息失败'});
+				res.respond({code:1001, message:'获取新农经纪人信息失败'});
 				return;
 			}
 
-			self.respond({code:1000, agent:{name:user.name, phone: user.account, address:user.address, totalCount:totalCount, registeredCount:registeredCount, registeredAndBindedCount:registeredAndBindedCount}});
+			res.respond({code:1000, agent:{name:user.name, phone: user.account, address:user.address, totalCount:totalCount, registeredCount:registeredCount, registeredAndBindedCount:registeredAndBindedCount}});
 		})
 	})
 }
@@ -1918,11 +1918,11 @@ function json_agent_info_get(id){
 // RSC
 // ==========================================================================
 
-function json_RSC_info_get(id){
+exports.json_RSC_info_get = function(req,res,next){
 	var self = this;
-	UserService.getRSCInfoById(id, function(err, user){
+	UserService.getRSCInfoById(req.params.id, function(err, user){
 		if(err){
-			self.respond({code:1001, message:'查询失败'});
+			res.respond({code:1001, message:'查询失败'});
 			return;
 		}
 
@@ -1937,7 +1937,7 @@ function json_RSC_info_get(id){
 				delete RSCInfo.products;
 			}
 		}
-		self.respond({code:1000, message:'success', RSCInfo:RSCInfo, id:user.id, account:user.account});
+		res.respond({code:1000, message:'success', RSCInfo:RSCInfo, id:user.id, account:user.account});
 	})
 }
 
