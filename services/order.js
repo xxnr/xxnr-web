@@ -20,7 +20,7 @@ var mongoose = require('mongoose');
 var DeliveryCodeModel = require('../models').deliveryCode;
 var umengConfig = require('../configuration/umeng_config');
 var UMENG = MODULE('umeng');
-var PayService = require('../services').order;
+var PayService = require('../services/pay');
 var dri = require('../common/dri');
 
 // Service
@@ -1945,6 +1945,7 @@ OrderService.prototype.payNotify = function(paymentId, options){
                     paymentOptions.refundReason = result.refundReason;
                 }
                 PayService.payRefund(paymentOptions);
+                self.closedSpecialPayment(order.id, paymentId, options);
             } else {
             	if (result && result.repeatNotify) {
             		console.error('OrderService payNotify repeatNotify:', paymentId, options);
@@ -1992,6 +1993,37 @@ OrderService.prototype.payNotify = function(paymentId, options){
     var payLog = options;
     payLog.paymentId = paymentId;
     self.savePaidLog(payLog);
+};
+
+// Sets the payment status to closed (the special bug, the one payment pay more than the price), payment 一次支付就超额了
+OrderService.prototype.closedSpecialPayment = function(id, paymentId, options) {
+	var self = this;
+
+	// find and update the payment not PAID
+	var query = { id: id, payments: { $elemMatch: { id: paymentId, payStatus: { $eq: PAYMENTSTATUS.UNPAID }, isClosed: false } } };
+	var date = new Date();
+	var values = {'payments.$.isClosed':true, 'payments.$.specialClosed':true, 'payments.$.dateSpecialClosed':date};
+	if (options.backendUser) {
+		values['payments.$.dateSet'] = date;
+		values['payments.$.backendUser'] = options.backendUser._id;
+		values['payments.$.backendUserAccount'] = options.backendUser.account;
+	}
+	if (options.RSC && options.RSC._id && options.RSC.RSCInfo) {
+		values['payments.$.RSC'] = options.RSC._id;
+		values['payments.$.RSCCompanyName'] = options.RSC.RSCInfo.companyName;
+	}
+	
+	OrderModel.update(query, {$set:values}, function(err, count) {
+        if (err) {
+            console.error('OrderService closedSpecialPayment update err:', err, 'paymentId: '+paymentId, options);
+            return;
+        }
+
+        if (count.n > 0) {
+            console.error('OrderService closedSpecialPayment updated:', 'paymentId: '+paymentId, options);
+        }
+        return;
+	});
 };
 
 OrderService.prototype.getPaymentInOrder = function (order, paymentId) {
