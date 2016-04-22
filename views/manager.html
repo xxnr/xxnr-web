@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html ng-app="xxnr.manager">
 <head>
-	<title>Manager v@{config.version}</title>
+	<title>Manager v<%= version %></title>
 	<% include ./partials/static %>
 	<script>
 //		var managerurl="@{!CONFIG('manager-url')}";
@@ -61,8 +61,8 @@
 	</div>
 
 	<footer>
-		<div>&copy; 2016 <a href="http://www.xinxinnongren.com">@{config.author}</a>.</div>
-		<div class="fs11 silver">All rights reserved for @{config.author}.</div>
+		<div>&copy; 2016 <a href="http://www.xinxinnongren.com"><%= author %></a>.</div>
+		<div class="fs11 silver">All rights reserved for <%= author %>.</div>
 	</footer>
 	<script src="/3rd-party/js/jquery/2.1.3/jquery.min.js"></script>
 	<script src="/3rd-party/js/Chart.js/1.0.2/Chart.min.js"></script>
@@ -73,8 +73,5 @@
 	<script src="/js/default.js"></script>
 	<script src="/js/ui.js"></script>
 	<script src="/js/manager.js"></script>
-
-	@{section('script')}
-
 </body>
 </html>
