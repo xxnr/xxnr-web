@@ -1,10 +1,10 @@
 <div class="filter">
     <div class="container">
-        <div class="caption"><span class="fa fa-truck mr5"></span> @(订单详情)</div>
+        <div class="caption"><span class="fa fa-truck mr5"></span> 订单详情</div>
         <div class="row">
             <div class="col-md-3 col-sm-6 m">
-                <!--<div data-component="textbox" data-component-path="rsc.filter.search" data-placeholder="" data-control-icon="fa-search">@(网点名称/负责人/电话)</div>-->
-                <!--<div class="help" data-component="template" data-component-path="rsc.info"><script type="text/html">{{ count | pluralize(@('items','item','items','items')) }} / {{pages | pluralize(@('pages', 'page', 'pages', 'pages')) }}</script></div>-->
+                <!--<div data-component="textbox" data-component-path="rsc.filter.search" data-placeholder="" data-control-icon="fa-search">网点名称/负责人/电话</div>-->
+                <!--<div class="help" data-component="template" data-component-path="rsc.info"><script type="text/html">{{ count | pluralize('items','item','items','items') }} / {{pages | pluralize('pages', 'page', 'pages', 'pages') }}</script></div>-->
             </div>
         </div>
     </div>
@@ -12,11 +12,11 @@
 <div class="container">
     <div data-component="template" data-component-path="orderInfo" data-component-id="orderInfo">
         <script type="text/html">
-            <div class="order-detail-title">@(订单信息)</div>
+            <div class="order-detail-title">订单信息</div>
             <div class="order-detail-con">
                 <div>订单状态： {{payStatus}} {{deliverStatus}}</div>
                 <div>订单号：{{id}}</div>
-                <div>下单时间：{{dateCreated | format('@(yyyy-MM-dd HH:mm:ss)')}}</div>
+                <div>下单时间：{{dateCreated | format('yyyy-MM-dd HH:mm:ss')}}</div>
                 <div>总价：{{totalPrice | price(2)}}</div>
                 {{if isPhased}}
                 <div>订金：{{deposit | price(2)}}</div>
@@ -33,7 +33,7 @@
     </div>
     <div data-component="template" data-component-path="deliveryInfo" data-component-id="deliveryInfo">
         <script type="text/html">
-            <div class="order-detail-title">@(配送信息)</div>
+            <div class="order-detail-title">配送信息</div>
             <div class="order-detail-con">
                 <div>配送方式：{{deliveryType}}</div>
                 {{if RSCInfo && RSCInfo.companyName}}
@@ -51,23 +51,23 @@
     </div>
     <div data-component="template" data-component-path="order">
         <script type="text/html">
-            <div class="order-detail-title">@(支付信息)</div>
+            <div class="order-detail-title">支付信息</div>
         {{if subOrders}}
         {{ if subOrders && subOrders.length > 0 }}
         <div class="order-detail-con">
             <table class="table table-bordered" border="0">
                 <tbody>
                 <tr>
-                    <td class="ui-center active">@(序号)</td>
-                    <td class="ui-center col-xs-1 active">@(支付内容)</td>
-                    <td class="ui-center col-xs-1 active">@(支付状态)</td>
-                    <td class="ui-center col-xs-2 active">@(应支付金额)</td>
-                    <td class="ui-center col-xs-2 active">@(已支付金额)</td>
-                    <td class="ui-center col-xs-2 active">@(未支付金额)</td>
-                    <td class="ui-center col-xs-1 active">@(已支付次数)</td>
-                    <td class="ui-center col-xs-1 active">@(总支付次数)</td>
-                    <td class="ui-center col-xs-1 active">@(关闭支付次数)</td>
-                    <td class="ui-center col-xs-2 active">@(最后一次支付时间)</td>
+                    <td class="ui-center active">序号</td>
+                    <td class="ui-center col-xs-1 active">支付内容</td>
+                    <td class="ui-center col-xs-1 active">支付状态</td>
+                    <td class="ui-center col-xs-2 active">应支付金额</td>
+                    <td class="ui-center col-xs-2 active">已支付金额</td>
+                    <td class="ui-center col-xs-2 active">未支付金额</td>
+                    <td class="ui-center col-xs-1 active">已支付次数</td>
+                    <td class="ui-center col-xs-1 active">总支付次数</td>
+                    <td class="ui-center col-xs-1 active">关闭支付次数</td>
+                    <td class="ui-center col-xs-2 active">最后一次支付时间</td>
                 </tr>
                 {{ foreach s in subOrders }}
                 <tr>
@@ -110,7 +110,7 @@
                     <td class="ui-center col-xs-1">{{ s.closedTimes }}</td>
                     <td class="ui-center col-xs-2">
                         {{ if s.datePaid }}
-                        {{ s.datePaid | format('@(yyyy-MM-dd HH:mm:ss)') }}
+                        {{ s.datePaid | format('yyyy-MM-dd HH:mm:ss') }}
                         {{ else }}
                         -
                         {{ fi }}
@@ -119,14 +119,14 @@
                 {{ end }}
                 {{ else }}
                 <tr>
-                    <td class="ui-center col-xs-1 active">@(订单ID)</td>
-                    <td class="ui-center col-xs-1 active">@(支付ID)</td>
-                    <td class="ui-center col-xs-1 active">@(支付方式)</td>
-                    <td class="ui-center col-xs-1 active">@(支付状态)</td>
-                    <td class="ui-center col-xs-1 active">@(应支付金额)</td>
-                    <td class="ui-center col-xs-1 active">@(定金)</td>
-                    <td class="ui-center col-xs-1 active">@(尾款)</td>
-                    <td class="ui-center col-xs-1 active">@(支付完成时间)</td>
+                    <td class="ui-center col-xs-1 active">订单ID</td>
+                    <td class="ui-center col-xs-1 active">支付ID</td>
+                    <td class="ui-center col-xs-1 active">支付方式</td>
+                    <td class="ui-center col-xs-1 active">支付状态</td>
+                    <td class="ui-center col-xs-1 active">应支付金额</td>
+                    <td class="ui-center col-xs-1 active">定金</td>
+                    <td class="ui-center col-xs-1 active">尾款</td>
+                    <td class="ui-center col-xs-1 active">支付完成时间</td>
                 </tr>
                 <tr>
                     <td class="ui-center col-xs-1">{{ id }}</td>
@@ -166,7 +166,7 @@
                     <td class="ui-center col-xs-1">{{ (price - deposit) | toFixed(2) }}</td>
                     <td class="ui-center col-xs-1">
                         {{ if datePaid }}
-                        {{ datePaid | format('@(yyyy-MM-dd HH:mm:ss)') }}
+                        {{ datePaid | format('yyyy-MM-dd HH:mm:ss') }}
                         {{ else }}
                         -
                         {{ fi }}
@@ -182,21 +182,21 @@
     <div data-component="template" data-component-path="order">
         <script type="text/html">
             {{ if subOrders && subOrders.length > 0 }}
-            <div class="order-detail-title">@(订单支付详情)</div>
+            <div class="order-detail-title">订单支付详情</div>
             <div class="order-detail-con" style="padding-bottom: 30px;position: relative;">
                 <table class="table table-bordered" border="0">
                     <tbody>
                     <tr>
-                        <td class="ui-center active">@(序号)</td>
-                        <td class="ui-center col-xs-1 active">@(支付内容)</td>
-                        <td class="ui-center col-xs-1 active">@(支付ID)</td>
-                        <td class="ui-center col-xs-1 active">@(笔数)</td>
-                        <td class="ui-center col-xs-1 active">@(支付金额)</td>
-                        <td class="ui-center col-xs-1 active">@(支付方式)</td>
-                        <td class="ui-center col-xs-1 active">@(支付状态)</td>
-                        <td class="ui-center col-xs-2 active">@(支付时间)</td>
-                        <td class="ui-center col-xs-2 active">@(支付网点)</td>
-                        <td class="ui-center col-xs-2 active">@(操作人)</td>
+                        <td class="ui-center active">序号</td>
+                        <td class="ui-center col-xs-1 active">支付内容</td>
+                        <td class="ui-center col-xs-1 active">支付ID</td>
+                        <td class="ui-center col-xs-1 active">笔数</td>
+                        <td class="ui-center col-xs-1 active">支付金额</td>
+                        <td class="ui-center col-xs-1 active">支付方式</td>
+                        <td class="ui-center col-xs-1 active">支付状态</td>
+                        <td class="ui-center col-xs-2 active">支付时间</td>
+                        <td class="ui-center col-xs-2 active">支付网点</td>
+                        <td class="ui-center col-xs-2 active">操作人</td>
                     </tr>
                     {{ foreach p in paymentsList }}
                     {{if p.payStatus == 2 || (order.payment && order.payment.id == p.id)}}
@@ -239,7 +239,7 @@
                                             <div>付款金额：{{p.price}}</div>
                                             <div>付款网点：
                                                 <select id="confirm-rsc-list">
-                                                    <option selected disabled hidden value=''>@(请选择服务站)</option>
+                                                    <option selected disabled hidden value=''>请选择服务站</option>
                                                     {{ foreach RSC in RSCs }}
                                                     <option RSC="{{ RSC._id }}" value="{{RSC._id}}" companyName="{{RSC.RSCInfo.companyName}}" name="{{RSC.RSCInfo.name}}" phone="{{ RSC.RSCInfo.phone}}"
                                                             {{if RSC.RSCInfo.companyAddress}}
@@ -289,7 +289,7 @@
                         </td>
                         <td class="ui-center col-xs-2">
                             {{ if p.datePaid }}
-                            {{ p.datePaid | format('@(yyyy-MM-dd HH:mm:ss)') }}
+                            {{ p.datePaid | format('yyyy-MM-dd HH:mm:ss') }}
                             {{ else }}
                             -
                             {{ fi }}
@@ -312,19 +312,19 @@
     <div data-component="template" data-component-path="order">
         <script type="text/html">
             {{ if products && products.length > 0 }}
-            <div class="order-detail-title">@(商品信息)</div>
+            <div class="order-detail-title">商品信息</div>
             <div class="order-detail-con">
                 <div>
                     <table class="table table-bordered" border="0">
                         <tbody>
                         <tr>
-                            <td class="ui-center hidden-xs active">@(序号)</td>
-                            <td class="ui-center col-xs-1 hidden-xs active">@(商品ID)</td>
-                            <td class="ui-center col-xs-3 hidden-xs active">@(商品名称)</td>
-                            <td class="ui-center col-xs-2 active">@(单价)</td>
-                            <td class="ui-center col-xs-2 active">@(订金)</td>
-                            <td class="ui-center col-xs-1 active">@(数量)</td>
-                            <td class="ui-center col-xs-2 active">@(发货状态)</td>
+                            <td class="ui-center hidden-xs active">序号</td>
+                            <td class="ui-center col-xs-1 hidden-xs active">商品ID</td>
+                            <td class="ui-center col-xs-3 hidden-xs active">商品名称</td>
+                            <td class="ui-center col-xs-2 active">单价</td>
+                            <td class="ui-center col-xs-2 active">订金</td>
+                            <td class="ui-center col-xs-1 active">数量</td>
+                            <td class="ui-center col-xs-2 active">发货状态</td>
                         </tr>
                         {{ foreach p in products }}
                         <tr>
@@ -351,20 +351,20 @@
     <div data-component="template" data-component-path="order">
         <script type="text/html">
             {{ if SKUs && SKUs.length > 0 }}
-            <div class="order-detail-title">@(商品SKU信息)</div>
+            <div class="order-detail-title">商品SKU信息</div>
             <div class="order-detail-con">
                 <table class="table table-bordered" border="0">
                     <tbody>
                     <tr>
-                        <td class="ui-center hidden-xs active">@(序号)</td>
-                        <td class="ui-center col-xs-1 active">@(商品ID)</td>
-                        <td class="ui-center col-xs-3  active">@(商品名称)</td>
-                        <td class="ui-center col-xs-1 active">@(单价)</td>
-                        <td class="ui-center col-xs-1 active">@(订金)</td>
-                        <td class="ui-center col-xs-1 active">@(数量)</td>
-                        <td class="ui-center col-xs-1 active">@(合计)</td>
-                        <td class="ui-center col-xs-2 active">@(发货状态)</td>
-                        <td class="ui-center col-xs-2 active">@(操作)</td>
+                        <td class="ui-center hidden-xs active">序号</td>
+                        <td class="ui-center col-xs-1 active">商品ID</td>
+                        <td class="ui-center col-xs-3  active">商品名称</td>
+                        <td class="ui-center col-xs-1 active">单价</td>
+                        <td class="ui-center col-xs-1 active">订金</td>
+                        <td class="ui-center col-xs-1 active">数量</td>
+                        <td class="ui-center col-xs-1 active">合计</td>
+                        <td class="ui-center col-xs-2 active">发货状态</td>
+                        <td class="ui-center col-xs-2 active">操作</td>
                     </tr>
                     {{ foreach s in SKUs }}
                     <tr>
@@ -386,11 +386,11 @@
                                     {{else}}
                                         {{if s.dateRSCReceived}}
                                             <li>发货到服务站</li>
-                                            <li>{{s.dateRSCReceived | format('@(yyyy-MM-dd HH:mm:ss)')}}</li>
+                                            <li>{{s.dateRSCReceived | format('yyyy-MM-dd HH:mm:ss')}}</li>
                                         {{fi}}
                                         {{if s.dateDelivered && deliveryType == 2 && (s.deliverStatus == 2 || s.deliverStatus == 5)}}
                                             <li>开始配送</li>
-                                            <li>{{s.dateDelivered | format('@(yyyy-MM-dd HH:mm:ss)')}}</li>
+                                            <li>{{s.dateDelivered | format('yyyy-MM-dd HH:mm:ss')}}</li>
                                         {{fi}}
                                         {{if s.dateConfirmed && s.deliverStatus == 5}}
                                             {{if order.deliveryType == 1}}
@@ -398,7 +398,7 @@
                                             {{else}}
                                             <li>配送完成</li>
                                             {{fi}}
-                                            <li>{{s.dateConfirmed | format('@(yyyy-MM-dd HH:mm:ss)')}}</li>
+                                            <li>{{s.dateConfirmed | format('yyyy-MM-dd HH:mm:ss')}}</li>
                                         {{fi}}
                                     {{fi}}
                                 </ul>
@@ -425,7 +425,7 @@
         <script type="text/html">
             <div class="rsc-list-title">请选择需要匹配的配送站：</div>
             <select id="RSCList">
-                <option selected disabled hidden value=''>@(请选择服务站)</option>
+                <option selected disabled hidden value=''>请选择服务站</option>
                 {{ foreach RSC in RSCList }}
                 <option RSC="{{ RSC._id }}" companyName="{{RSC.RSCInfo.companyName}}" name="{{RSC.RSCInfo.name}}" phone="{{ RSC.RSCInfo.phone}}"
                         {{if RSC.RSCInfo.companyAddress}}

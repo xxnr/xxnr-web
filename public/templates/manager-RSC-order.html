@@ -1,9 +1,9 @@
 <div class="filter">
     <div class="container">
-        <div class="caption"><span class="fa fa-truck mr5"></span> @(服务站管理)</div>
+        <div class="caption"><span class="fa fa-truck mr5"></span> 服务站管理</div>
         <div class="row">
             <div class="col-md-3 col-sm-6 m">
-                <div class="help" data-component="template" data-component-path="rscOrder.info"><script type="text/html">{{ count | pluralize(@('items','item','items','items')) }} / {{pages | pluralize(@('pages', 'page', 'pages', 'pages')) }}</script></div>
+                <div class="help" data-component="template" data-component-path="rscOrder.info"><script type="text/html">{{ count | pluralize('items','item','items','items') }} / {{pages | pluralize('pages', 'page', 'pages', 'pages') }}</script></div>
             </div>
         </div>
     </div>
@@ -26,11 +26,11 @@
             <a class="clear"></a>
         </div>
     </div>
-    <div data-component="grid" data-component-path="rscOrder.grid" data-max="auto" data-options-page="@(Page: #)" data-options-button="@(查看更多订单)" data-component-id="rscOrder.grid" class="rsc-order-box">
+    <div data-component="grid" data-component-path="rscOrder.grid" data-max="auto" data-options-page="Page: #" data-options-button="查看更多订单" data-component-id="rscOrder.grid" class="rsc-order-box">
         <script type="text/html">
             <tr>
                 <td style="width:80px" class="silver hidden-xs" data-title="订单号">{{id}}</td>
-                <td style="width:120px" class=" silver hidden-xs1" data-title="下单时间">{{dateCreated | format('@(yyyy-MM-dd HH:mm:ss)')}}</td>
+                <td style="width:120px" class=" silver hidden-xs1" data-title="下单时间">{{dateCreated | format('yyyy-MM-dd HH:mm:ss')}}</td>
                 <td style="width:160px" class=" silver hidden-xs1" data-title="商品名称">
                     {{foreach sku in SKUs}}
                         {{sku.name}}{{if SKUs && SKUs.length != 1 && $index != 0}},{{fi}}
@@ -47,7 +47,7 @@
     </div>
 
 </div>
-<div data-component="form" data-component-path="common.form" data-if="value === 'rscOrder'" data-title="@(订单详情)" data-component-id="rscOrder.form" data-width="1000px">
+<div data-component="form" data-component-path="common.form" data-if="value === 'rscOrder'" data-title="订单详情" data-component-id="rscOrder.form" data-width="1000px">
     <div data-component="template" data-component-path="rscOrder.form">
         <script type="text/html">
             <div>
@@ -59,7 +59,7 @@
                         {{ if payStatuses }}{{payStatuses[payStatus]}}{{ fi }}&nbsp;&nbsp;{{ if deliverStatuses }}{{deliverStatuses[deliverStatus]}}{{ fi }}
                     </div>
                     <div>订单号：{{ id }}</div>
-                    <div>下单时间：{{dateCreated | format('@(yyyy-MM-dd HH:mm:ss)')}}</div>
+                    <div>下单时间：{{dateCreated | format('yyyy-MM-dd HH:mm:ss')}}</div>
                     <div>总价：{{totalPrice | price(2)}}</div>
                     <div>订金：{{deposit | price(2)}}</div>
                     <div>尾款：{{(totalPrice - deposit) | price(2)}}</div>
@@ -97,14 +97,14 @@
                     <table class="table table-bordered" border="0" style="border-bottom: 0;margin-bottom: 0;">
                         <tbody>
                         <tr>
-                            <td class="ui-center hidden-xs active">@(序号)</td>
-                            <td class="ui-center hidden-xs active">@(商品ID)</td>
-                            <td class="ui-center col-xs-3 hidden-xs active">@(商品名称)</td>
-                            <td class="ui-center col-xs-2 active">@(单价)</td>
-                            <td class="ui-center col-xs-1 active">@(订金)</td>
-                            <td class="ui-center col-xs-1 active">@(数量)</td>
-                            <td class="ui-center col-xs-2 active">@(合计)</td>
-                            <td class="ui-center col-xs-2 active">@(发货状态)</td>
+                            <td class="ui-center hidden-xs active">序号</td>
+                            <td class="ui-center hidden-xs active">商品ID</td>
+                            <td class="ui-center col-xs-3 hidden-xs active">商品名称</td>
+                            <td class="ui-center col-xs-2 active">单价</td>
+                            <td class="ui-center col-xs-1 active">订金</td>
+                            <td class="ui-center col-xs-1 active">数量</td>
+                            <td class="ui-center col-xs-2 active">合计</td>
+                            <td class="ui-center col-xs-2 active">发货状态</td>
                         </tr>
                         {{ foreach s in form.SKUs }}
                         <tr>
@@ -126,18 +126,18 @@
                                         {{else}}
                                             {{if s.dateRSCReceived}}
                                                 <li>发货到服务站</li>
-                                                <li>{{s.dateRSCReceived | format('@(yyyy-MM-dd HH:mm:ss)')}}</li>
+                                                <li>{{s.dateRSCReceived | format('yyyy-MM-dd HH:mm:ss')}}</li>
                                             {{fi}}
                                             {{if s.dateDelivered && form.delivery && (form.delivery.type == 2 || form.delivery.type == 5)}}
                                                 <li>开始配送</li>
-                                                <li>{{s.dateDelivered | format('@(yyyy-MM-dd HH:mm:ss)')}}</li>
+                                                <li>{{s.dateDelivered | format('yyyy-MM-dd HH:mm:ss')}}</li>
                                             {{fi}}
                                                 {{if form.delivery && form.delivery.type == 1}}
                                                     <li>商品已自提</li>
                                                 {{else}}
                                                     <li>配送完成</li>
                                                 {{fi}}
-                                                <li>{{s.dateConfirmed | format('@(yyyy-MM-dd HH:mm:ss)')}}</li>
+                                                <li>{{s.dateConfirmed | format('yyyy-MM-dd HH:mm:ss')}}</li>
                                             {{fi}}
                                         {{fi}}
                                     </ul>
@@ -153,14 +153,14 @@
                     <table class="table table-bordered" border="0" style="border-bottom: 0;margin-bottom: 0;">
                         <tbody>
                         <tr>
-                            <td class="ui-center hidden-xs active">@(序号)</td>
-                            <td class="ui-center hidden-xs active">@(商品ID)</td>
-                            <td class="ui-center col-xs-3 hidden-xs active">@(商品名称)</td>
-                            <td class="ui-center col-xs-2 active">@(单价)</td>
-                            <td class="ui-center col-xs-1 active">@(订金)</td>
-                            <td class="ui-center col-xs-1 active">@(数量)</td>
-                            <td class="ui-center col-xs-2 active">@(合计)</td>
-                            <td class="ui-center col-xs-2 active">@(发货状态)</td>
+                            <td class="ui-center hidden-xs active">序号</td>
+                            <td class="ui-center hidden-xs active">商品ID</td>
+                            <td class="ui-center col-xs-3 hidden-xs active">商品名称</td>
+                            <td class="ui-center col-xs-2 active">单价</td>
+                            <td class="ui-center col-xs-1 active">订金</td>
+                            <td class="ui-center col-xs-1 active">数量</td>
+                            <td class="ui-center col-xs-2 active">合计</td>
+                            <td class="ui-center col-xs-2 active">发货状态</td>
                         </tr>
                         {{ foreach p in form.products }}
                         <tr>
@@ -182,18 +182,18 @@
                                         {{else}}
                                         {{if p.dateRSCReceived}}
                                         <li>发货到服务站</li>
-                                        <li>{{p.dateRSCReceived | format('@(yyyy-MM-dd HH:mm:ss)')}}</li>
+                                        <li>{{p.dateRSCReceived | format('yyyy-MM-dd HH:mm:ss')}}</li>
                                         {{fi}}
                                         {{if p.dateDelivered && form.delivery && (form.delivery.type == 2 || form.delivery.type == 5)}}
                                         <li>开始配送</li>
-                                        <li>{{p.dateDelivered | format('@(yyyy-MM-dd HH:mm:ss)')}}</li>
+                                        <li>{{p.dateDelivered | format('yyyy-MM-dd HH:mm:ss')}}</li>
                                         {{fi}}
                                         {{if form.delivery && form.delivery.type == 1}}
                                         <li>商品已自提</li>
                                         {{else}}
                                         <li>配送完成</li>
                                         {{fi}}
-                                        <li>{{p.dateConfirmed | format('@(yyyy-MM-dd HH:mm:ss)')}}</li>
+                                        <li>{{p.dateConfirmed | format('yyyy-MM-dd HH:mm:ss')}}</li>
                                         {{fi}}
                                         {{fi}}
                                     </ul>
