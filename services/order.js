@@ -920,6 +920,9 @@ OrderService.prototype.paid = function(id, paymentId, options, callback) {
 		values['payments.$.RSC'] = options.RSC._id;
 		values['payments.$.RSCCompanyName'] = options.RSC.RSCInfo.companyName;
 	}
+	if (options.EPOSNo) {
+		values['payments.$.EPOSNo'] = options.EPOSNo;
+	}
 	// find and update the payment not PAID
 	var query = { id: id, payments: { $elemMatch: { id: paymentId, payStatus: { $ne: PAYMENTSTATUS.PAID } } } };
 	OrderModel.update(query, {$set:values}, function(err, count) {

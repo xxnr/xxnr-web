@@ -1911,14 +1911,37 @@ function process_RSC_modify(){
 		return;
 	}
 
-	RSCService.modifyRSCInfo(self.data.id, self.data, function(err){
-		if(err){
-			self.respond({code:1002, message:err});
-			return;
-		}
+	if(typeof self.data.EPOSNo != 'undefined') {
+		UserService.getRSCInfoByEPOSNo(self.data.EPOSNo, function(err, RSC) {
+			if(err){
+				console.error('manager process_RSC_modify UserService getRSCInfoByEPOSNo err:', err);
+				self.respond({code:1002, message:err});
+				return;
+			}
+			if (RSC) {
+				self.respond({code:1002, message:"此设备号已经被绑定过了", RSC: RSC});
+				return;
+			} else {
+				RSCService.modifyRSCInfo(self.data.id, self.data, function(err){
+					if(err){
+						self.respond({code:1002, message:err});
+						return;
+					}
 
-		self.respond({code:1000, message:'success'});
-	})
+					self.respond({code:1000, message:'success'});
+				});
+			}
+		});
+	} else {
+		RSCService.modifyRSCInfo(self.data.id, self.data, function(err){
+			if(err){
+				self.respond({code:1002, message:err});
+				return;
+			}
+
+			self.respond({code:1000, message:'success'});
+		});
+	}
 }
 
 function json_RSCorders_query() {
