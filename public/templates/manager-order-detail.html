@@ -35,7 +35,7 @@
         <script type="text/html">
             <div class="order-detail-title">@(配送信息)</div>
             <div class="order-detail-con">
-                <div>配送方式：{{deliveryType}}</div>
+                <div>配送方式：{{deliveryType ? deliveryType : ''}}</div>
                 {{if RSCInfo && RSCInfo.companyName}}
                 <div class="rsc-list-box">
                     <div>服务站名称：{{RSCInfo.companyName}}</div>
@@ -195,7 +195,7 @@
                         <td class="ui-center col-xs-1 active">@(支付方式)</td>
                         <td class="ui-center col-xs-1 active">@(支付状态)</td>
                         <td class="ui-center col-xs-2 active">@(支付时间)</td>
-                        <td class="ui-center col-xs-2 active">@(支付网点)</td>
+                        <td class="ui-center col-xs-2 active">@(支付网点/终端号)</td>
                         <td class="ui-center col-xs-2 active">@(操作人)</td>
                     </tr>
                     {{ foreach p in paymentsList }}
@@ -294,8 +294,15 @@
                             -
                             {{ fi }}
                         </td>
-                        <td class="ui-center col-xs-2">
-                            {{p.RSCCompanyName}}
+                        <td class="ui-center col-xs-2" style="word-break: break-all;">
+                            <div>
+                                {{if p.EPOSNo}}
+                                {{p.EPOSNo}}
+                                {{fi}}
+                            </div>
+                            <div>
+                                {{p.RSCCompanyName}}
+                            </div>
                         </td>
                         <td class="ui-center col-xs-2">
                             {{p.backendUserAccount}}
