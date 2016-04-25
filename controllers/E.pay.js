@@ -15,7 +15,7 @@ exports.install = function() {
     F.route('/alipay', alipayOrder, ['post', 'get'], ['isInWhiteList', 'throttle']);
     F.route('/unionpay', unionPayOrder, ['post', 'get'], ['isInWhiteList', 'throttle']);
     F.route('/offlinepay', offlinePay, ['get'], ['isLoggedIn']);
-    F.route('/EPOSpay', EPOSPay, ['get']);
+    F.route('/EPOSpay', EPOSPay, ['get'], ['isInWhiteList']);
     // pay notify
     // old url
     F.route('/dynamic/alipay/nofity.asp', alipayNotify, ['post','raw']);
