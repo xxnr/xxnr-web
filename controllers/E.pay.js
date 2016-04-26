@@ -361,23 +361,28 @@ function alipayNotify() {
             return;
         }
 
+        // 支付ID
         var paymentId = body.out_trade_no;
         var status = body.trade_status;
         var price = body.total_fee || null;
         if (status == 'TRADE_SUCCESS') {
+            // 当前接收的时间
             var options = {payType:PAYTYPE.ZHIFUBAO, datePaid: new Date()};
             if (price) {
                 options.price = price;
             }
+            // Alipay 流水号
             if (body.trade_no) {
                 options.queryId = body.trade_no;
             }
+            // 支付ID对应我们的订单号
             if (body.extra_common_param && body.extra_common_param.length > 0) {
                 var extra_common_param = JSON.parse(body.extra_common_param);
                 if (extra_common_param && extra_common_param.orderId) {
                     options.orderId = extra_common_param.orderId;
                 }
             }
+            // Alipay 回调的时间
             if (body.notify_time) {
                 options.notify_time = body.notify_time;
             }
@@ -440,11 +445,15 @@ function unionpayNotify() {
         if (result.substring(0, 'success'.length) === 'success') {
             if (body['respCode'] === 00 || body['respCode'] === '00') {
                 var paymentInfo = JSON.parse(new Buffer(body.reqReserved, 'base64').toString());
+                // 支付ID
                 var paymentId = body.orderId || paymentInfo.paymentId;
+                // 支付ID对应我们的订单号  当前接收的时间
                 var options = {price: (parseFloat(body.txnAmt)/100).toFixed(2), orderId:paymentInfo.orderId, payType:PAYTYPE.UNIONPAY, datePaid: new Date()};
+                // Unionpay 回调的时间
                 if (body.txnTime) {
                     options.notify_time = moment(body.txnTime,"YYYYMMDDHHmmss").format("YYYY-MM-DD HH:mm:ss");
                 }
+                // Unionpay 流水号
                 if (body.queryId) {
                     options.queryId = body.queryId;
                 }
@@ -754,17 +763,24 @@ function process_EPOSNotify(){
             return;
         }
 
+        // 支付ID
         var paymentId = memo['商户支付号'];
         var status = decryptedParams.dealStatus;
         var price = (decryptedParams.amount/100) || 0;
+        // 支付ID对应我们的订单号
         var orderId = memo['商户订单号'];
-        var datePaid = new Date(decryptedParams.dealDate + ' ' + decryptedParams.dealTime);
+        // EPOS 回调的时间(目前是用户受卡时间，暂当做回调时间)
+        var notify_time = new Date(decryptedParams.dealDate + ' ' + decryptedParams.dealTime);
+        // 当前接收的时间
         var currentTime = new Date();
+        // EPOS 设备号
         var EPOSNo = decryptedParams.deviceId;
+        // EPOS 流水号
+        var queryId = decryptedParams.orderId;
 
         if(status == 1) {
             // paid successfully
-            var options = {payType: PAYTYPE.EPOS, price: price, datePaid: datePaid, orderId: orderId, notify_time:currentTime};
+            var options = {payType: PAYTYPE.EPOS, price: price, datePaid: currentTime, orderId: orderId, notify_time:notify_time, queryId: queryId};
             if (EPOSNo) {
                 options.EPOSNo = EPOSNo;
                 UserService.getRSCInfoByEPOSNo(EPOSNo, function(err, RSC) {
