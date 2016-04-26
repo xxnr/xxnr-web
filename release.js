@@ -52,7 +52,7 @@ var app = express();
 var privateKey = fs.readFileSync('private_key.pem').toString();
 var certificate = fs.readFileSync('cert.pem').toString();
 var options = {key:privateKey, cert:certificate};
-
+app.disable('etag');
 app.set('jsonp callback name', 'JSON_CALLBACK');
 
 //view template setting

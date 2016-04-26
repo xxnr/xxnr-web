@@ -154,7 +154,6 @@ exports.backend_auth = function(req, res, next){
     }catch(e){
         // authentication fail
         //controller.view('login');
-        console.log(data);
         res.render('./7.manager/login.html',
             {
                 manager_url:"/manager",

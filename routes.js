@@ -228,7 +228,7 @@ router.put(F.config['manager-url']+ '/api/orders/subOrders/',middleware.backend_
 router.put(F.config['manager-url']+  '/api/orders/SKUs/',middleware.backend_auth,middleware.auditing_middleware,controllers.Manager.json_orders_SKUs_update);
 router.get(F.config['manager-url']+ '/api/brands/',	middleware.backend_auth,controllers.Manager.json_brands);
 router.get(F.config['manager-url']+  '/api/products/',middleware.backend_auth,controllers.Manager.json_products_query);
-router.post(F.config['manager-url']+  '/api/products/',middleware.backend_auth,middleware.auditing_middleware,controllers.Manager.json_products_save);
+router.post(F.config['manager-url']+  '/api/products',middleware.backend_auth,middleware.auditing_middleware,controllers.Manager.json_products_save);
 router.post(F.config['manager-url']+  '/api/products/updateStatus',middleware.backend_auth,middleware.auditing_middleware,controllers.Manager.process_products_updateStatus);
 router.post(F.config['manager-url']+ '/api/products/',middleware.backend_auth,middleware.auditing_middleware,controllers.Manager.json_products_remove);
 router.get(F.config['manager-url']+ '/api/products/categories/',middleware.backend_auth,controllers.Manager.json_products_categories);
@@ -240,10 +240,11 @@ router.get(F.config['manager-url']+'/api/payrefunds', middleware.backend_auth, c
 router.get(F.config['manager-url']+'/api/v2.2/RSC/orders', middleware.backend_auth, controllers.Manager.json_RSCorders_query);
 router.put(F.config['manager-url']+'/api/v2.2/RSC/modify', middleware.backend_auth, controllers.Manager.process_RSC_modify);
 router.get(F.config['manager-url']+'/api/v2.2/RSCs', middleware.backend_auth, controllers.Manager.json_RSC_query);
-router.get(F.config['manager-url']+'/api/v2.1/potentialCustomer/:_id', middleware.backend_auth, controllers.Manager.json_potential_customer_get);
 router.get(F.config['manager-url']+'/api/v2.1/potentialCustomer/query', middleware.backend_auth, controllers.Manager.json_potential_customer_query);
+router.get(F.config['manager-url']+'/api/v2.1/potentialCustomer/:_id', middleware.backend_auth, controllers.Manager.json_potential_customer_get);
 router.post(F.config['manager-url']+'/api/v2.1/SKU/addition/add', middleware.backend_auth, controllers.Manager.process_SKU_Addition_add);
 router.get(F.config['manager-url']+'/api/v2.1/SKU/additions', middleware.backend_auth, controllers.Manager.json_SKU_Additions_get);
+
 router.get(F.config['manager-url']+'/api/v2.1/SKU/online/:id', middleware.backend_auth, controllers.Manager.process_SKU_online);
 router.get(F.config['manager-url']+'/api/v2.1/SKU/query', middleware.backend_auth, controllers.Manager.json_SKU_get);
 router.get(F.config['manager-url']+'/api/v2.1/SKU/attributes', middleware.backend_auth, controllers.Manager.json_SKU_Attributes_get);

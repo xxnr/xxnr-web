@@ -54,18 +54,16 @@ module.exports = function(req, res, next){
         res.status(200);
 
         var callbackName = req.data.callback;
-        callbackName ? res.jsonp(data, callbackName) : res.json(data);
+        if(!res.finished) {
+            callbackName ? res.jsonp(data, callbackName) : res.json(data);
 
-        if (req.auditInfo) {
-            AuditService.saveLog(req.auditInfo, arguments);
+            if (req.auditInfo) {
+                AuditService.saveLog(req.auditInfo, arguments);
+            }
         }
     };
 
     var allowcache = req.get('pragma') !== 'no-cache';
-    if(!res.get('Expires'))
-        res.set('Expires', new Date().add('M', 2));
-
-    res.set('Cache-Control', 'public, max-age=5184000');
     if(path.extname(req.path) === 'html') {
         res.set('Pragma', 'no-cache');
         res.set('Cache-Control', 'no-cache, no-store, max-age=0, must-revalidate');
@@ -73,7 +71,7 @@ module.exports = function(req, res, next){
         if (RELEASE && allowcache && !res.get('Expires'))
             res.set('Expires', new Date());
     }
-    else {
+    else if(path.extname(req.path) === 'js' || path.extname(req.path) === 'css') {
         res.set('Cache-Control', 'public' + (RELEASE && allowcache ? ', max-age=5184000' : ''));
         if (RELEASE && allowcache && !res.get('Expires'))
             res.set('Expires', new Date().add('M', 2));

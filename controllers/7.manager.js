@@ -1541,7 +1541,7 @@ var setCookieAndResponse = function(req, res, user, keepLogin){
             res.respond({code:1004, message:'登录失败'});
             return;
         }
-console.log(user);
+
         if(keepLogin){
             if(config.isDebug){
                 res.cookie(config.backendtokencookie, token, {expires:new Date().add(config.token_cookie_expires_in)});
