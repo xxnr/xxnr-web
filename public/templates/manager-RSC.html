@@ -16,7 +16,8 @@
                 <!--TODO: 加判断-->
                 {{if RSCInfo}}
                 <td style="width:40px" class="silver hidden-xs" data-title="序号">$index</td>
-                <td style="width:120px" class=" silver hidden-xs1" data-title="网点编号">{{id}}</td>
+                <td style="width:120px" class=" silver hidden-xs1" data-title="网点ID" title="{{id}}">{{id}}</td>
+                <td style="width:120px" class=" silver hidden-xs1" data-title="网点编号" title="{{RSCInfo.IDNo}}">{{RSCInfo.IDNo}}</td>
                 <td style="width:120px" class=" silver hidden-xs1" data-title="网点名称">{{RSCInfo.companyName}}</td>
                 <td style="width:120px" class=" silver hidden-xs1" data-title="所在区域（三级)">
                     {{if RSCInfo.companyAddress}}

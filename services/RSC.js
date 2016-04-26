@@ -212,7 +212,7 @@ RSCService.prototype.getRSCList = function(products, province, city, county, tow
             .populate('RSCInfo.companyAddress.city')
             .populate('RSCInfo.companyAddress.county')
             .populate('RSCInfo.companyAddress.town')
-            .select('id RSCInfo.name RSCInfo.phone RSCInfo.companyName RSCInfo.companyAddress')
+            .select('id RSCInfo.IDNo RSCInfo.name RSCInfo.phone RSCInfo.companyName RSCInfo.companyAddress')
             .skip(page * max)
             .limit(max)
             .exec(function (err, RSCs) {
