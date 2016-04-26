@@ -375,7 +375,8 @@ UserService.prototype.getInviteeOrderNumber = function(invitees, callback) {
         return;
     }
 
-    UseOrdersNumberModel.find({userId:{$in:invitees}}).sort({dateUpdated:-1}).lean().exec(function (err, docs) {
+    // UseOrdersNumberModel.find({userId:{$in:invitees}}).sort({dateUpdated:-1}).lean().exec(function (err, docs) {
+    UseOrdersNumberModel.collection.find({userId:{$in:invitees}}).sort({dateUpdated:-1}).toArray(function (err, docs) {
         if (err) {
             console.error('User Service emptyInviteeOrderNumber findOne err:', err);
             callback(null, []);
@@ -497,7 +498,30 @@ UserService.prototype.getRSCInfoById = function(_id, callback){
             }
 
             callback(null, user);
-        })
+        });
+};
+
+/**
+ * get RSCInfo By RSC's EPOS number
+ * @param  {[String]}   EPOSNo   RSC EPOS number
+ * @param  {Function}  callback return RSC info
+ */
+UserService.prototype.getRSCInfoByEPOSNo = function(EPOSNo, callback){
+    if(!EPOSNo){
+        callback('need EPOSNo');
+        return;
+    }
+    var query = {'RSCInfo.supportEPOS': true, 'RSCInfo.EPOSNo': EPOSNo};
+    UserModel.findOne(query)
+        .select('_id id account RSCInfo')
+        .exec(function(err, rsc){
+            if(err){
+                console.error('User Service getRSCInfoByEPOSNo findOne err:', err);
+                callback('error find RSC');
+                return;
+            }
+            callback(null, rsc);
+        });
 };
 
 /**
