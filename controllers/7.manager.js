@@ -1911,7 +1911,7 @@ function process_RSC_modify(){
 		return;
 	}
 
-	if(typeof self.data.EPOSNo != 'undefined') {
+	if(typeof self.data.EPOSNo != 'undefined' && self.data.EPOSNo) {
 		UserService.getRSCInfoByEPOSNo(self.data.EPOSNo, function(err, RSC) {
 			if(err){
 				console.error('manager process_RSC_modify UserService getRSCInfoByEPOSNo err:', err);
