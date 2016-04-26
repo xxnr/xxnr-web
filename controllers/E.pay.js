@@ -6,6 +6,7 @@ var tools = require('../common/tools');
 var services = require('../services');
 var OrderService = services.order;
 var PayService = services.pay;
+var UserService = services.user;
 var OFFLINEPAYTYPE = require('../common/defs').OFFLINEPAYTYPE;
 var EPOSNotify = MODULE('EPOSNotify');
 
@@ -14,7 +15,7 @@ exports.install = function() {
     F.route('/alipay', alipayOrder, ['post', 'get'], ['isInWhiteList', 'throttle']);
     F.route('/unionpay', unionPayOrder, ['post', 'get'], ['isInWhiteList', 'throttle']);
     F.route('/offlinepay', offlinePay, ['get'], ['isLoggedIn']);
-    F.route('/EPOSpay', EPOSPay, ['get']);
+    F.route('/EPOSpay', EPOSPay, ['get'], ['isInWhiteList']);
     // pay notify
     // old url
     F.route('/dynamic/alipay/nofity.asp', alipayNotify, ['post','raw']);
@@ -506,6 +507,9 @@ function process_RSC_confirm_OfflinePay(){
         }
 
         var options = {payType:offlinePayType, price:payment.payPrice ? payment.payPrice : payment.price, datePaid:new Date()};
+        if (RSC && RSC.RSCInfo) {
+            options.RSC = {'_id':RSC._id, 'RSCInfo': RSC.RSCInfo};
+        }
 
         OrderService.payNotify(paymentId, options);
         // payNotify.call(self, paymentId, options);
@@ -756,11 +760,25 @@ function process_EPOSNotify(){
         var orderId = memo['商户订单号'];
         var datePaid = new Date(decryptedParams.dealDate + ' ' + decryptedParams.dealTime);
         var currentTime = new Date();
+        var EPOSNo = decryptedParams.deviceId;
 
         if(status == 1) {
             // paid successfully
-            var options = {payType: PAYTYPE.EPOS, price: price, datePaid: datePaid, queryId: orderId, notify_time:currentTime};
-            OrderService.payNotify(paymentId, options);
+            var options = {payType: PAYTYPE.EPOS, price: price, datePaid: datePaid, orderId: orderId, notify_time:currentTime};
+            if (EPOSNo) {
+                options.EPOSNo = EPOSNo;
+                UserService.getRSCInfoByEPOSNo(EPOSNo, function(err, RSC) {
+                    if(err) console.error('pay process_EPOSNotify UserService getRSCInfoByEPOSNo err:', err, 'EPOSNo: '+EPOSNo);
+                    if (!RSC) {
+                        console.error('pay process_EPOSNotify UserService getRSCInfoByEPOSNo not find RSC, EPOSNo:', EPOSNo);
+                    } else {
+                        options.RSC = RSC;
+                    }
+                    OrderService.payNotify(paymentId, options);
+                });
+            } else {
+                OrderService.payNotify(paymentId, options);
+            }
             // payNotify.call(self, paymentId, options);
         }
 

@@ -920,6 +920,9 @@ OrderService.prototype.paid = function(id, paymentId, options, callback) {
 		values['payments.$.RSC'] = options.RSC._id;
 		values['payments.$.RSCCompanyName'] = options.RSC.RSCInfo.companyName;
 	}
+	if (options.EPOSNo) {
+		values['payments.$.EPOSNo'] = options.EPOSNo;
+	}
 	// find and update the payment not PAID
 	var query = { id: id, payments: { $elemMatch: { id: paymentId, payStatus: { $ne: PAYMENTSTATUS.PAID } } } };
 	OrderModel.update(query, {$set:values}, function(err, count) {
@@ -1736,7 +1739,7 @@ OrderService.prototype._checkPayStatus = function(order, callback) {
 OrderService.prototype.savePaidLog = function(paidLog, callback) {
 	try {
 		if (paidLog && !paidLog.orderId) {
-			OrderModel.findOne({'payments.id':{$ne:paidLog.paymentId}}, function(err, doc) {
+			OrderModel.findOne({'payments.id':{$eq:paidLog.paymentId}}, function(err, doc) {
 				if (doc) {
 					paidLog.orderId = doc.id;
 				}
@@ -1981,9 +1984,6 @@ OrderService.prototype.payNotify = function(paymentId, options){
             // refund or other methods
             var paymentOptions = options;
             paymentOptions.paymentId = paymentId;
-            if (!paymentOptions.orderId) {
-                paymentOptions.orderId = order.id;
-            }
             paymentOptions.refundReason = 3;
             PayService.payRefund(paymentOptions);
         }
