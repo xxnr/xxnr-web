@@ -4,6 +4,8 @@ var config= {
     version: "2.1.0",
     author: "xxnr",
     'etag-version': '',
+    serviceStartTime:'2015-11-17',
+    currentTimeZoneDiff:8,
 
 //ArelativeURLaddressintotheeshopmanagement
     "manager-url": "/manager",

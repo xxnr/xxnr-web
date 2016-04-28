@@ -778,4 +778,24 @@ UserService.prototype.query = function(options, callback) {
     })
 };
 
+UserService.prototype.getTestAccountList = function(callback) {
+    UserModel.find({isTestAccount: true})
+        .select('id')
+        .lean()
+        .exec(function (err, testAccounts) {
+            if (err) {
+                console.error(err);
+                callback(err);
+                return;
+            }
+
+            var testAccountList = [];
+            testAccounts.forEach(function (testAccount) {
+                testAccountList.push(testAccount.id);
+            });
+
+            callback(null, testAccountList);
+        })
+};
+
 module.exports = new UserService();

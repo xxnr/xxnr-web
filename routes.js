@@ -282,11 +282,17 @@ router.get(F.config['manager-url']+'/api/area/getCountyList', middleware.backend
 router.post(F.config['manager-url']+'/api/area/getCountyList', middleware.backend_auth, controllers.Manager.json_county_query);
 router.get(F.config['manager-url']+'/api/area/getTownList', middleware.backend_auth, controllers.Manager.json_town_query);
 router.post(F.config['manager-url']+'/api/area/getTownList', middleware.backend_auth, controllers.Manager.json_town_query);
-
 // USERS
 router.get(F.config['manager-url']+ '/api/users/',middleware.backend_auth,controllers.Manager.json_users_query);
 router.get(F.config['manager-url']+ '/api/users/:id/',middleware.backend_auth,controllers.Manager.json_users_read);
 router.put(F.config['manager-url']+ '/api/users/',middleware.backend_auth,middleware.auditing_middleware,controllers.Manager.json_users_save);
+// Dashboard
+router.get(F.config['manager-url']+'/api/dashboard/getDailyReport', middleware.backend_auth, controllers.Manager.getDailyReport);
+router.get(F.config['manager-url']+'/api/dashboard/getWeeklyReport', middleware.backend_auth, controllers.Manager.getWeeklyReport);
+router.get(F.config['manager-url']+'/api/dashboard/getStatistic', middleware.backend_auth, controllers.Manager.getStatistic);
+router.get(F.config['manager-url']+'/api/dashboard/queryDailyReport', middleware.backend_auth, controllers.Manager.queryDailyReport);
+router.get(F.config['manager-url']+'/api/dashboard/queryWeeklyReport', middleware.backend_auth, controllers.Manager.queryWeeklyReport);
+router.get(F.config['manager-url']+'/api/dashboard/lastUpdateTime', middleware.backend_auth, controllers.Manager.lastUpdateTime);
 
 // potential customer
 router.get(F.config['manager-url']+ '/api/v2.1/agentinfo/:id',middleware.backend_auth,controllers.Manager.json_agent_info_get);

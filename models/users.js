@@ -59,7 +59,8 @@ var UserSchema = new mongoose.Schema({
         "products":[{type:mongoose.Schema.ObjectId, ref:"product"}],             // products RSC served
         "supportEPOS":{type: Boolean},                                           // support EPOS, true: yes  false:no
         "EPOSNo":{type:String}                                                   // RPOS No
-    }
+    },
+    "isTestAccount":{type:Boolean, default:false}                               // is test account
 });
 
 var PotentialCustomerSchema = new mongoose.Schema({

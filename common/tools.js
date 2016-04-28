@@ -14,6 +14,7 @@ var regexIdentityNo = /^(\d{15}$|^\d{18}$|^\d{17}(\d|X|x))$/;
 var regexpXXNRHost = new RegExp('(.*\.|^)xinxinnongren\.com.*');
 var config = require('../config');
 var Global = require('../global.js');
+var moment = require('moment-timezone');
 
 /*
     Phone in china validation
@@ -336,4 +337,31 @@ exports.stringPinyin = function(options) {
     } else {
         return {'error':'no string', 'strPinyin':strPinyin, 'initial':initial, 'initialType':initialType};
     }
+};
+
+exports.getWeekStartEndTime = function(weekMinus){
+    var currentTime = new Date();
+    var dayOfWeek = currentTime.getDay();
+    if(dayOfWeek == 0){
+        // getDay will return 0 if it is Sunday
+        dayOfWeek = 7;
+    }
+
+    var startTime = new Date(currentTime.add('d', weekMinus*7-dayOfWeek+1).format('yyyy-MM-dd')).add('h', -F.config.currentTimeZoneDiff);
+    var endTime = new Date(currentTime.add('d', (weekMinus+1)*7-dayOfWeek+1).format('yyyy-MM-dd')).add('h', -F.config.currentTimeZoneDiff);
+    if(weekMinus == 0){
+        endTime = new Date(F.config.serviceStartTime).add('h', -F.config.currentTimeZoneDiff);
+    }
+
+    return {startTime: startTime, endTime: endTime};
+};
+
+exports.getWeekStartTimeByDate = function(date){
+     var dayOfWeek = date.getDay();
+    if(dayOfWeek == 0){
+        // getDay will return 0 if it is Sunday
+        dayOfWeek = 7;
+    }
+
+    return new Date(date.add('d', 1-dayOfWeek).format('yyyy-MM-dd')).add('h', -F.config.currentTimeZoneDiff);
 };

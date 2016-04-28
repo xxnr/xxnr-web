@@ -24,6 +24,8 @@ require('./whitelist');
 require('./auditlogs');
 require('./frontendUserAccess');
 require('./userrelevances');
+require('./hourlyReport');
+require('./user_sign');
 
 //user
 exports.user = mongoose.model('user');
@@ -82,6 +84,11 @@ exports.auditlog = mongoose.model('auditlog');
 exports.frontendUserAccess = mongoose.model('frontendUserAccess');
 // delivery code
 exports.deliveryCode = mongoose.model('deliveryCode');
+// hourly report
+exports.hourlyReport = mongoose.model('hourlyReport');
+exports.reportUpdateTime = mongoose.model('reportUpdateTime');
+// user sign
+exports.userSign = mongoose.model('user_sign');
 
 exports.getModel = function (name, options) {
     options = options || {};

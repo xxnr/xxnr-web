@@ -16,6 +16,7 @@ var AuditlogService = services.auditservice;
 var PayService = services.pay;
 var AreaService = services.area;
 var RSCService = services.RSC;
+var DashboardService = services.dashboard;
 var PAYMENTSTATUS = require('../common/defs').PAYMENTSTATUS;
 var DELIVERSTATUS = require('../common/defs').DELIVERSTATUS;
 var DELIVERYTYPENAME = require('../common/defs').DELIVERYTYPENAME;
@@ -2132,5 +2133,107 @@ exports.process_orders_RSCInfo_update= function(req,res,next){
 		}
 
 		res.respond({code:1000, message:'success'});
+	})
+};
+
+exports.lastUpdateTime = function(req, res, next){
+	DashboardService.lastUpdateTime(function(err, lastUpdateTime){
+		if(err){
+			res.respond({code:1001, message:'获取更新时间失败'});
+			return;
+		}
+
+		res.respond({code:1000, lastUpdateTime: lastUpdateTime});
+	})
+};
+
+exports.getDailyReport = function(req, res, next) {
+	var dateMinus = U.parseInt(req.data.date, 0);
+	var currentTime = new Date();
+	var date = currentTime.add('d', dateMinus).format('yyyyMMdd');
+
+	var dailyReportResult = {
+		code: 1000,
+		registeredUserCount: 0,
+		orderCount: 0,
+		paidOrderCount: 0,
+		paidAmount: 0
+	};
+
+	DashboardService.queryDailyReport(date, date, function (err, dailyReports) {
+		if (!err) {
+			var dailyReport = dailyReports[0];
+			dailyReportResult.registeredUserCount = dailyReport.registeredUserCount;
+			dailyReportResult.orderCount = dailyReport.orderCount;
+			dailyReportResult.paidOrderCount = dailyReport.paidOrderCount;
+			dailyReportResult.paidAmount = parseFloat(dailyReport.paidAmount.toFixed(2));
+		}
+
+		res.respond(dailyReportResult);
+	})
+};
+
+exports.getStatistic = function(req, res, next) {
+	var statisticResult = {
+		code:1000,
+		registeredUserCount: 0,
+		orderCount: 0,
+		completedOrderCount: 0,
+		paidAmount: 0
+	};
+
+	DashboardService.getStatistic(function (err, statistic) {
+		if (!err) {
+			statisticResult.registeredUserCount = statistic.registeredUserCount;
+			statisticResult.orderCount = statistic.orderCount;
+			statisticResult.completedOrderCount = statistic.completedOrderCount;
+			statisticResult.paidAmount = parseFloat(statistic.paidAmount.toFixed(2));
+		}
+
+		res.respond(statisticResult);
+	})
+};
+
+exports.getWeeklyReport = function(req, res, next) {
+	var weekMinus = U.parseInt(req.data.week, 0);
+	var weekStartEndTime = tools.getWeekStartEndTime(weekMinus);
+	var date = weekStartEndTime.startTime.format('yyyyMMdd');
+
+	var weeklyReportResult = {
+		code: 1000,
+		registeredUserCount: 0,
+		orderCount: 0,
+		paidOrderCount: 0,
+		paidAmount: 0
+	};
+
+	DashboardService.queryWeeklyReport(date, date, function(err, weeklyReports){
+		if(!err){
+			var weeklyReport = weeklyReports[0];
+			weeklyReportResult.registeredUserCount = weeklyReport.registeredUserCount;
+			weeklyReportResult.orderCount = weeklyReport.orderCount;
+			weeklyReportResult.paidOrderCount = weeklyReport.paidOrderCount;
+			weeklyReportResult.paidAmount = parseFloat(weeklyReport.paidAmount.toFixed(2));
+		}
+
+		res.respond(weeklyReportResult);
+	})
+};
+
+exports.queryDailyReport = function(req, res, next){
+	var dateStart = new Date(req.data.dateStart).format('yyyyMMdd');
+	var dateEnd = new Date(req.data.dateEnd).format('yyyyMMdd');
+
+	DashboardService.queryDailyReport(dateStart, dateEnd, function(err, dailyReports){
+		res.respond({code:1000, dailyReports:dailyReports || []});
+	})
+};
+
+exports.queryWeeklyReport = function(req, res, next){
+	var dateStart = tools.getWeekStartTimeByDate(new Date(req.data.dateStart)).format('yyyyMMdd');
+	var dateEnd = new Date(req.data.dateEnd).format('yyyyMMdd');
+
+	DashboardService.queryWeeklyReport(dateStart, dateEnd, function(err, WeeklyReports){
+		res.respond({code:1000, WeeklyReports:WeeklyReports || []});
 	})
 };
