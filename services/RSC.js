@@ -8,10 +8,16 @@ var tools = require('../common/tools');
 var RSCService = function(){};
 
 // Method
-RSCService.prototype.getProvinceList = function(products, callback) {
+RSCService.prototype.getProvinceList = function(products, callback, options) {
     var query = {RSCInfo: {$exists: true}};
     if (tools.isArray(products) && products.length > 0) {
         query['RSCInfo.products'] = {$all: products};
+    }
+    if (options) {
+        if (typeof options.EPOS != 'undefined') {
+            query['RSCInfo.supportEPOS'] = true;
+            query['RSCInfo.EPOSNo'] = {$exists: true};
+        }
     }
 
     UserModel.find(query)
@@ -40,10 +46,16 @@ RSCService.prototype.getProvinceList = function(products, callback) {
         })
 };
 
-RSCService.prototype.getCityList = function(products, province, callback) {
+RSCService.prototype.getCityList = function(products, province, callback, options) {
     var query = {RSCInfo: {$exists: true}};
     if (tools.isArray(products) && products.length > 0) {
         query['RSCInfo.products'] = {$all: products};
+    }
+    if (options) {
+        if (typeof options.EPOS != 'undefined') {
+            query['RSCInfo.supportEPOS'] = true;
+            query['RSCInfo.EPOSNo'] = {$exists: true};
+        }
     }
 
     if (province) {
@@ -76,10 +88,16 @@ RSCService.prototype.getCityList = function(products, province, callback) {
         })
 };
 
-RSCService.prototype.getCountyList = function(products, province, city, callback) {
+RSCService.prototype.getCountyList = function(products, province, city, callback, options) {
     var query = {RSCInfo: {$exists: true}};
     if (tools.isArray(products) && products.length > 0) {
         query['RSCInfo.products'] = {$all: products};
+    }
+    if (options) {
+        if (typeof options.EPOS != 'undefined') {
+            query['RSCInfo.supportEPOS'] = true;
+            query['RSCInfo.EPOSNo'] = {$exists: true};
+        }
     }
 
     if (province) {
@@ -116,10 +134,16 @@ RSCService.prototype.getCountyList = function(products, province, city, callback
         })
 };
 
-RSCService.prototype.getTownList = function(products, province, city, county, callback) {
+RSCService.prototype.getTownList = function(products, province, city, county, callback, options) {
     var query = {RSCInfo: {$exists: true}};
     if (tools.isArray(products) && products.length > 0) {
         query['RSCInfo.products'] = {$all: products};
+    }
+    if (options) {
+        if (typeof options.EPOS != 'undefined') {
+            query['RSCInfo.supportEPOS'] = true;
+            query['RSCInfo.EPOSNo'] = {$exists: true};
+        }
     }
 
     if (province) {
@@ -160,10 +184,16 @@ RSCService.prototype.getTownList = function(products, province, city, county, ca
         })
 };
 
-RSCService.prototype.getRSCList = function(products, province, city, county, town, page, max, callback, search) {
+RSCService.prototype.getRSCList = function(products, province, city, county, town, page, max, callback, search, options) {
     var query = {RSCInfo:{$exists:true}, typeVerified:{$all:[5]}};
     if(tools.isArray(products) && products.length>0){
         query['RSCInfo.products'] = {$all: products};
+    }
+    if (options) {
+        if (typeof options.EPOS != 'undefined') {
+            query['RSCInfo.supportEPOS'] = true;
+            query['RSCInfo.EPOSNo'] = {$exists: true};
+        }
     }
 
     if(province){
