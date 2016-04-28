@@ -8,7 +8,7 @@
 			</div>
 			<div class="col-md-3 col-sm-6 m">
 				<!--<div data-component="dropdown" data-component-path="orders.filter.type" data-options="@(全部订单)|0;@(Uncompleted)|1;@(Uncompleted and not paid)|2;@(Uncompleted and paid)|3;@(Completed)|4" data-component-type="number"></div>-->
-				<div data-component="dropdown" data-component-path="orders.filter.type" data-options="@(全部订单)|;@(待付款)|1;@(待发货)|2;@(待收货)|3;@(完成)|4;@(已关闭)|0" data-empty="true" data-empty-text="@(全部订单)">@(状态筛选)</div>
+				<div data-component="dropdown" data-component-path="orders.filter.type" data-options="@(全部订单)|;@(待付款)|1;@(服务站待发货)|2;@(待收货)|3;@(完成)|4;@(发货到服务站)|5;@(付款待审核)|6;@(已关闭)|0" data-empty="true" data-empty-text="@(全部订单)">@(状态筛选)</div>
 			</div>
 		</div>
 	</div>
@@ -36,7 +36,7 @@
 					配送到户
 				{{ fi }}
 			</td>
-	        <td style="width:90px" data-title="状态">
+	        <td style="width:100px" data-title="状态">
 	        	{{ if payStatus==1 }}
 	        		<span class="mr5 red">未付款</span>
 	        	{{ else }}
@@ -51,13 +51,13 @@
 	        		{{ fi }}
 	        	{{ fi }}
 	        	{{ if deliverStatus==1 }}
-	        		<span class="red">未发货</span>
+	        		<span class="red">未发货到服务站</span>
 	        	{{ else }}
 	        		{{ if deliverStatus==2 }}
-	        			<span class="green">已发货</span>
+	        			<span class="green">服务站已发货</span>
 	        		{{ else }}
 	        			{{ if deliverStatus==3 }}
-	        				<span class="red">部分发货</span>
+	        				<span class="red">服务站部分发货</span>
 	        			{{ else }}
 							{{ if deliverStatus==4 }}
 								<span class="red">已到服务站</span>
@@ -170,13 +170,13 @@
 				        		{{ fi }}
 				        	{{ fi }}
 				        	{{ if deliverStatus==1 }}
-				        		<span class="red">未发货</span>
+				        		<span class="red">未发货到服务站</span>
 				        	{{ else }}
 				        		{{ if deliverStatus==2 }}
-				        			<span class="green">已发货</span>
+				        			<span class="green">服务站已发货</span>
 				        		{{ else }}
 				        			{{ if deliverStatus==3 }}
-				        				<span class="red">部分发货</span>
+				        				<span class="red">服务站部分发货</span>
 				        			{{ else }}
 										{{ if deliverStatus==4 }}
 											<span class="red">已到服务站</span>
@@ -756,7 +756,7 @@
 
 							SET('orders.form', $.extend({}, response), true);
 							SET('orders.payStatuses',[{name:'未付款',value:1},{name:'已付款',value:2}], true);
-							SET('orders.deliverStatuses',[{name:'未发货',value:1},{name:'已发货',value:2},{name:'已到服务站',value:4},{name:'已收货',value:5}], true);
+							SET('orders.deliverStatuses',[{name:'未发货到服务站',value:1},{name:'服务站已发货',value:2},{name:'已到服务站',value:4},{name:'已收货',value:5}], true);
 							SET('orders.payTypes',[{name:'支付宝',value:1},{name:'银联',value:2},{name:'现金',value:3},{name:'线下POS机',value:4},{name:'EPOS', value:5}], true);
 							SET('orders.response', null);
 							SET('orders.subOrdersresponse', null);
