@@ -295,11 +295,11 @@
                             {{ fi }}
                         </td>
                         <td class="ui-center col-xs-2" style="word-break: break-all;">
-                            <div>
-                                {{if p.EPOSNo}}
-                                {{p.EPOSNo}}
-                                {{fi}}
-                            </div>
+                            {{if p.EPOSNo}}
+                                <div>
+                                    {{p.EPOSNo}}
+                                </div>
+                            {{fi}}
                             <div>
                                 {{p.RSCCompanyName}}
                             </div>
@@ -472,7 +472,7 @@
     order.paymentsList = [];
 
     var payStatus = {1:'未付款',2:'已付款',3: '部分付款'};
-    var deliverStatus = {1:'未发货', 2: '已发货', 3: '部分发货', 4: '已到服务站',5: '已收货'};
+    var deliverStatus = {1:'未发货到服务站', 2: '服务站已发货', 3: '服务站部分发货', 4: '已到服务站',5: '已收货'};
 
     ON('#orderInfo', function (component) {
         orderDetailLoad();
@@ -518,9 +518,9 @@
             console.log(order.paymentsList);
             UPDATE('order.subOrders');
             SET('order.payStatuses', {1:'未付款',2:'已付款',3: '部分付款'}, true);
-            SET('order.deliveryStatuses', {1:'未发货', 2: '配送中', 3: '部分发货', 4: '已到服务站',5: '已收货'}, true);
+            SET('order.deliveryStatuses', {1:'未发货到服务站', 2: '配送中', 3: '服务站部分发货', 4: '已到服务站',5: '已收货'}, true);
             SET('order.payTypes', {1:'支付宝', 2: '银联', 3: '现金', 4: '线下POS机', 5: 'EPOS'}, true);
-            SET('order.deliverStatusesArray', [{name:'未发货',value:1},{name:'已发货',value:2},{name:'已到服务站',value:4},{name:'已收货',value:5}]);
+            SET('order.deliverStatusesArray', [{name:'未发货到服务站',value:1},{name:'服务站已发货',value:2},{name:'已到服务站',value:4},{name:'已收货',value:5}]);
             var productIds = "";
             order.SKUs.forEach(function(SKU){
                 productIds += SKU.productId+',';

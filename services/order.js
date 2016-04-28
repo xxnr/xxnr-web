@@ -245,6 +245,16 @@ OrderService.prototype.query = function(options, callback) {
 		mongoOptions["payStatus"] = { $eq: PAYMENTSTATUS.PAID };
 		mongoOptions["deliverStatus"] = { $eq: DELIVERSTATUS.RECEIVED };
 	}
+	// need deliver to RSC
+	if (type === 5) {
+		mongoOptions["$or"] = [{payStatus: { $eq: PAYMENTSTATUS.PARTPAID }, depositPaid: { $eq: true }, SKUs: { $elemMatch: { deliverStatus: { $eq: DELIVERSTATUS.UNDELIVERED } } }}, 
+								{payStatus: { $eq: PAYMENTSTATUS.PAID }, SKUs: { $elemMatch: { deliverStatus: { $eq: DELIVERSTATUS.UNDELIVERED } } }}];
+	}
+	// pendingApprove
+	if (type === 6) {
+		mongoOptions["$or"] = [{isClosed: { $ne: true }, payStatus: { $eq: PAYMENTSTATUS.UNPAID }, pendingApprove: { $eq: true }}, 
+								{payStatus: { $ne: PAYMENTSTATUS.UNPAID }, pendingApprove: { $eq: true }}];
+	}
 
 	if (options.buyer) {
 		mongoOptions["buyerId"] = options.buyer;
