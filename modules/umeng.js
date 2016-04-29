@@ -12,9 +12,9 @@ var Umeng = function(){};
 
 /**
  * sign umeng message
- * @param  {object} params          message info
- * @param  {string} appMasterSecret secret key
- * @return {string} sign info
+ * @param  {Object} params          message info
+ * @param  {String} appMasterSecret secret key
+ * @return {String} sign info
  */
 Umeng.prototype.sign = function(params, appMasterSecret) {
 	// sign
@@ -27,7 +27,7 @@ Umeng.prototype.sign = function(params, appMasterSecret) {
 
 /**
  * umeng send function
- * @param  {object}   options		umeng send key/value options
+ * @param  {Object}   options		umeng send key/value options
  * @param  {Function} callback 		callback function
  * @return {null}     only callback
  */
@@ -43,6 +43,8 @@ Umeng.prototype.umengSend = function(params, appMasterSecret, callback) {
 		callback('appMasterSecret is null');
 		return;
 	}
+
+	params.production_mode = umengConfig.production_mode;
 	var sign = self.sign(params, appMasterSecret);
 	var httpOptions = {method: umengConfig.sendMethod, host: umengConfig.host, path: umengConfig.sendPath+'?sign='+sign};
 	tools.httpRequest({httpOptions: httpOptions, postData: JSON.stringify(params)}, function(err, result) {
@@ -57,9 +59,10 @@ Umeng.prototype.umengSend = function(params, appMasterSecret, callback) {
 
 /**
  * send Android Customized cast
- * @param  {number}   type     message type
- * @param  {string}   alias    Customized cast alias
- * @param  {object}   options  umeng send key/value options
+ * @param  {Number}   type     message type
+ * @param  {String}   alias    Customized cast alias
+ * @param  {String}   aliasType aliasType user or RSC
+ * @param  {Object}   options  umeng send key/value options
  * @param  {Function} callback callback function
  * @return {null}              only callback
  */
@@ -132,9 +135,10 @@ Umeng.prototype.sendAndroidCustomizedcast = function(type, alias, aliasType, opt
 
 /**
  * send IOS Customized cast
- * @param  {number}   type     message type
- * @param  {string}   alias    Customized cast alias
- * @param  {object}   options  umeng send key/value options
+ * @param  {Number}   type     message type
+ * @param  {String}   alias    Customized cast alias
+ * @param  {String}   aliasType aliasType user or RSC
+ * @param  {Object}   options  umeng send key/value options
  * @param  {Function} callback callback function
  * @return {null}              only callback
  */
@@ -165,7 +169,8 @@ Umeng.prototype.sendIOSCustomizedcast = function(type, alias, aliasType, options
 		// 必填 严格按照APNs定义来填写
 		aps: {
 	        alert: umengConfig.body[type][aliasType].text          // 必填
-	    }
+	    },
+		page: umengConfig.body[type][aliasType].IOSpage
     };
     // "badge": xx,           // 可选        
     // "sound": "xx",         // 可选         
@@ -175,6 +180,9 @@ Umeng.prototype.sendIOSCustomizedcast = function(type, alias, aliasType, options
     // 可选 用户自定义内容, "d","p"为友盟保留字段，key不可以是"d","p"
     if (options.orderId) {
     	customizedcast.payload.orderId = options.orderId;
+    }
+    if (options.IOSpage) {
+    	customizedcast.payload.page = options.IOSpage;
     }
 
     // send 
@@ -189,22 +197,24 @@ Umeng.prototype.sendIOSCustomizedcast = function(type, alias, aliasType, options
 };
 
 /**
- * send Customized cast
- * @param  {number}   type     message type
- * @param  {string}   alias    Customized cast alias
- * @param  {object}   options  umeng send key/value options {orderId}
- * @param  {Function} callback callback function
- * @return {null}              only callback
+ * retry send Android or IOS Customized cast
+ * @param  {Number}   type     message type
+ * @param  {String}   alias    Customized cast alias
+ * @param  {String}   aliasType aliasType user or RSC
+ * @param  {Object}   options  umeng send key/value options
+ * @param  {String}   deviceType deviceType Android or IOS
+ * @param  {Number}   times    the time of send Android Customized cast
+ * @return {null}
  */
-Umeng.prototype.sendCustomizedcast = function(type, alias, aliasType, options, times, callback) {
+Umeng.prototype.retrySendCustomizedcast = function(type, alias, aliasType, options, deviceType, times) {
+	// retry send Android Customized cast
 	var self = this;
 	if (!times) {
 		times = 1;
 	}
-	// send Android Customized cast
-    self.sendAndroidCustomizedcast(type, alias, aliasType, options, function(err, result) {
+	var callback = function(err, result) {
     	if (err) {
-			console.error('Umeng sendCustomizedcast sendAndroidCustomizedcast err:', err, result ? result : '');
+			console.error('Umeng retrySendCustomizedcast sendCustomizedcast ' + deviceType + ' err:', err, result ? result : '');
 			if (err == 500 && result) {
 				var data = JSON.parse(result);
 				// when umeng result error_code in retryCodes, retry send..
@@ -214,10 +224,10 @@ Umeng.prototype.sendCustomizedcast = function(type, alias, aliasType, options, t
 						if (data["data"]["error_code"]==code) {
 							if (times && times < 2) {
 								setTimeout(function() {
-									self.sendCustomizedcast(type, alias, aliasType, options, times+1)
+									self.retrySendCustomizedcast(type, alias, aliasType, options, deviceType, times+1)
 									}, 10000);
 							} else {
-								console.error('Umeng sendCustomizedcast sendAndroidCustomizedcast send the max times...');
+								console.error('Umeng retrySendCustomizedcast sendCustomizedcast ' + deviceType + ' send the max times...');
 							}
 							break;
 						}
@@ -225,9 +235,30 @@ Umeng.prototype.sendCustomizedcast = function(type, alias, aliasType, options, t
 				}
 			}
 		} else {
-			console.log('Umeng sendCustomizedcast sendAndroidCustomizedcast result:', result);
+			console.log('Umeng retrySendCustomizedcast sendCustomizedcast ' + deviceType + ' result:', result);
 		}
-    });
+		return;
+    };
+	if (deviceType == 'Android') {
+    	self.sendAndroidCustomizedcast(type, alias, aliasType, options, callback);
+   	}
+   	if (deviceType == 'IOS') {
+   		self.sendIOSCustomizedcast(type, alias, aliasType, options, callback);
+   	}
+};
+
+/**
+ * send Customized cast
+ * @param  {Number}   type     message type
+ * @param  {String}   alias    Customized cast alias
+ * @param  {Object}   options  umeng send key/value options {orderId}
+ */
+Umeng.prototype.sendCustomizedcast = function(type, alias, aliasType, options) {
+	var self = this;
+	// send Android Customized cast
+	self.retrySendCustomizedcast(type, alias, aliasType, options, "Android");
+	// send IOS Customized cast
+	self.retrySendCustomizedcast(type, alias, aliasType, options, "IOS");
 };
 
 module.exports = new Umeng();

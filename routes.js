@@ -186,7 +186,7 @@ router.get('/alipay/success', controllers.Pay.aliPaySuccess);
 router.get('/unionpay', middleware.isInWhiteList_middleware, middleware.throttle, controllers.Pay.unionPayOrder);
 router.post('/unionpay', middleware.isInWhiteList_middleware, middleware.throttle, controllers.Pay.unionPayOrder);
 router.get('/offlinepay', controllers.Pay.offlinePay);
-router.get('/EPOSpay', controllers.Pay.EPOSPay);
+router.get('/EPOSpay', middleware.isInWhiteList_middleware, controllers.Pay.EPOSPay);
 router.post('/dynamic/alipay/nofity.asp', controllers.Pay.alipayNotify);
 router.post('/dynamic/alipay/notify.asp', controllers.Pay.alipayNotify);
 router.post('/unionpay/nofity', controllers.Pay.unionpayNotify);

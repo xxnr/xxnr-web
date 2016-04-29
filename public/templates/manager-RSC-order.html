@@ -117,7 +117,7 @@
                             <td class="ui-center col-xs-2 active">{{(s.count * s.price) | price(2)}}</td>
                             <td class="ui-center col-xs-2 deliver-status-hover" style="position: relative;">
                                 {{ foreach d in deliverStatusesArray }}
-                                {{ if s.deliverStatus == d.value }}{{ d.name }}{{ fi }}
+                                    {{ if s.deliverStatus == d.value }}{{ d.name }}{{ fi }}
                                 {{ end }}
                                 <div class="deliver-status-detail" >
                                     <ul>
@@ -132,13 +132,12 @@
                                                 <li>开始配送</li>
                                                 <li>{{s.dateDelivered | format('yyyy-MM-dd HH:mm:ss')}}</li>
                                             {{fi}}
-                                                {{if form.delivery && form.delivery.type == 1}}
-                                                    <li>商品已自提</li>
-                                                {{else}}
-                                                    <li>配送完成</li>
-                                                {{fi}}
-                                                <li>{{s.dateConfirmed | format('yyyy-MM-dd HH:mm:ss')}}</li>
+                                            {{if form.delivery && form.delivery.type == 1}}
+                                                <li>商品已自提</li>
+                                            {{else}}
+                                                <li>配送完成</li>
                                             {{fi}}
+                                            <li>{{s.dateConfirmed | format('@(yyyy-MM-dd HH:mm:ss)')}}</li>
                                         {{fi}}
                                     </ul>
                                 </div>
@@ -149,7 +148,7 @@
                     </table>
                     {{ fi }}
 
-                    {{ if form.SKUs && form.SKUs.length > 0 }}
+                    {{ if form.products && form.products.length > 0 }}
                     <table class="table table-bordered" border="0" style="border-bottom: 0;margin-bottom: 0;">
                         <tbody>
                         <tr>
@@ -173,28 +172,27 @@
                             <td class="ui-center col-xs-2 active">{{(p.count * p.price) | price(2)}}</td>
                             <td class="ui-center col-xs-2 deliver-status-hover" style="position: relative;">
                                 {{ foreach d in deliverStatusesArray }}
-                                {{ if p.deliverStatus == d.value }}{{ d.name }}{{ fi }}
+                                    {{ if p.deliverStatus == d.value }}{{ d.name }}{{ fi }}
                                 {{ end }}
                                 <div class="deliver-status-detail" >
                                     <ul>
                                         {{if !p.dateRSCReceived && !p.dateDelivered && !p.dateConfirmed}}
                                         <li>暂无物流信息</li>
                                         {{else}}
-                                        {{if p.dateRSCReceived}}
-                                        <li>发货到服务站</li>
-                                        <li>{{p.dateRSCReceived | format('yyyy-MM-dd HH:mm:ss')}}</li>
-                                        {{fi}}
-                                        {{if p.dateDelivered && form.delivery && (form.delivery.type == 2 || form.delivery.type == 5)}}
-                                        <li>开始配送</li>
-                                        <li>{{p.dateDelivered | format('yyyy-MM-dd HH:mm:ss')}}</li>
-                                        {{fi}}
-                                        {{if form.delivery && form.delivery.type == 1}}
-                                        <li>商品已自提</li>
-                                        {{else}}
-                                        <li>配送完成</li>
-                                        {{fi}}
-                                        <li>{{p.dateConfirmed | format('yyyy-MM-dd HH:mm:ss')}}</li>
-                                        {{fi}}
+                                            {{if p.dateRSCReceived}}
+                                                <li>发货到服务站</li>
+                                                <li>{{p.dateRSCReceived | format('@(yyyy-MM-dd HH:mm:ss)')}}</li>
+                                            {{fi}}
+                                            {{if p.dateDelivered && form.delivery && (form.delivery.type == 2 || form.delivery.type == 5)}}
+                                                <li>开始配送</li>
+                                                <li>{{p.dateDelivered | format('@(yyyy-MM-dd HH:mm:ss)')}}</li>
+                                            {{fi}}
+                                            {{if form.delivery && form.delivery.type == 1}}
+                                                <li>商品已自提</li>
+                                            {{else}}
+                                                <li>配送完成</li>
+                                            {{fi}}
+                                            <li>{{p.dateConfirmed | format('@(yyyy-MM-dd HH:mm:ss)')}}</li>
                                         {{fi}}
                                     </ul>
                                 </div>

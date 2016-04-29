@@ -1944,15 +1944,28 @@ exports.process_RSC_modify = function(req, res, next){
 		return;
 	}
 
-	RSCService.modifyRSCInfo(req.data.id, req.data, function(err){
-		if(err){
-			res.respond({code:1002, message:err});
-			return;
-		}
+			if(err){
+				console.error('manager process_RSC_modify UserService getRSCInfoByEPOSNo err:', err);
+				return;
+			}
+			if (RSC) {
+				return;
+			} else {
+					if(err){
+						return;
+					}
 
-		res.respond({code:1000, message:'success'});
-	})
-};
+				});
+			}
+		});
+	} else {
+			if(err){
+				return;
+			}
+
+		});
+	}
+}
 
 exports.json_RSCorders_query = function(req, res, next) {
     if (!req.data.RSCId) {

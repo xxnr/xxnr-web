@@ -20,7 +20,7 @@ var mongoose = require('mongoose');
 var DeliveryCodeModel = require('../models').deliveryCode;
 var umengConfig = require('../configuration/umeng_config');
 var UMENG = require('../modules/umeng');
-var PayService = require('../services').order;
+var PayService = require('../services/pay');
 var dri = require('../common/dri');
 
 // Service
@@ -244,6 +244,16 @@ OrderService.prototype.query = function(options, callback) {
 	if (type === 4) {
 		mongoOptions["payStatus"] = { $eq: PAYMENTSTATUS.PAID };
 		mongoOptions["deliverStatus"] = { $eq: DELIVERSTATUS.RECEIVED };
+	}
+	// need deliver to RSC
+	if (type === 5) {
+		mongoOptions["$or"] = [{payStatus: { $eq: PAYMENTSTATUS.PARTPAID }, depositPaid: { $eq: true }, SKUs: { $elemMatch: { deliverStatus: { $eq: DELIVERSTATUS.UNDELIVERED } } }}, 
+								{payStatus: { $eq: PAYMENTSTATUS.PAID }, SKUs: { $elemMatch: { deliverStatus: { $eq: DELIVERSTATUS.UNDELIVERED } } }}];
+	}
+	// pendingApprove
+	if (type === 6) {
+		mongoOptions["$or"] = [{isClosed: { $ne: true }, payStatus: { $eq: PAYMENTSTATUS.UNPAID }, pendingApprove: { $eq: true }}, 
+								{payStatus: { $ne: PAYMENTSTATUS.UNPAID }, pendingApprove: { $eq: true }}];
 	}
 
 	if (options.buyer) {
@@ -919,6 +929,9 @@ OrderService.prototype.paid = function(id, paymentId, options, callback) {
 	if (options.RSC && options.RSC._id && options.RSC.RSCInfo) {
 		values['payments.$.RSC'] = options.RSC._id;
 		values['payments.$.RSCCompanyName'] = options.RSC.RSCInfo.companyName;
+	}
+	if (options.EPOSNo) {
+		values['payments.$.EPOSNo'] = options.EPOSNo;
 	}
 	// find and update the payment not PAID
 	var query = { id: id, payments: { $elemMatch: { id: paymentId, payStatus: { $ne: PAYMENTSTATUS.PAID } } } };
@@ -1736,7 +1749,7 @@ OrderService.prototype._checkPayStatus = function(order, callback) {
 OrderService.prototype.savePaidLog = function(paidLog, callback) {
 	try {
 		if (paidLog && !paidLog.orderId) {
-			OrderModel.findOne({'payments.id':{$ne:paidLog.paymentId}}, function(err, doc) {
+			OrderModel.findOne({'payments.id':{$eq:paidLog.paymentId}}, function(err, doc) {
 				if (doc) {
 					paidLog.orderId = doc.id;
 				}
@@ -1945,6 +1958,7 @@ OrderService.prototype.payNotify = function(paymentId, options){
                     paymentOptions.refundReason = result.refundReason;
                 }
                 PayService.payRefund(paymentOptions);
+                self.closedSpecialPayment(order.id, paymentId, options);
             } else {
             	if (result && result.repeatNotify) {
             		console.error('OrderService payNotify repeatNotify:', paymentId, options);
@@ -1980,9 +1994,6 @@ OrderService.prototype.payNotify = function(paymentId, options){
             // refund or other methods
             var paymentOptions = options;
             paymentOptions.paymentId = paymentId;
-            if (!paymentOptions.orderId) {
-                paymentOptions.orderId = order.id;
-            }
             paymentOptions.refundReason = 3;
             PayService.payRefund(paymentOptions);
         }
@@ -1992,6 +2003,37 @@ OrderService.prototype.payNotify = function(paymentId, options){
     var payLog = options;
     payLog.paymentId = paymentId;
     self.savePaidLog(payLog);
+};
+
+// Sets the payment status to closed (the special bug, the one payment pay more than the price), payment 一次支付就超额了
+OrderService.prototype.closedSpecialPayment = function(id, paymentId, options) {
+	var self = this;
+
+	// find and update the payment not PAID
+	var query = { id: id, payments: { $elemMatch: { id: paymentId, payStatus: { $eq: PAYMENTSTATUS.UNPAID }, isClosed: false } } };
+	var date = new Date();
+	var values = {'payments.$.isClosed':true, 'payments.$.specialClosed':true, 'payments.$.dateSpecialClosed':date};
+	if (options.backendUser) {
+		values['payments.$.dateSet'] = date;
+		values['payments.$.backendUser'] = options.backendUser._id;
+		values['payments.$.backendUserAccount'] = options.backendUser.account;
+	}
+	if (options.RSC && options.RSC._id && options.RSC.RSCInfo) {
+		values['payments.$.RSC'] = options.RSC._id;
+		values['payments.$.RSCCompanyName'] = options.RSC.RSCInfo.companyName;
+	}
+	
+	OrderModel.update(query, {$set:values}, function(err, count) {
+        if (err) {
+            console.error('OrderService closedSpecialPayment update err:', err, 'paymentId: '+paymentId, options);
+            return;
+        }
+
+        if (count.n > 0) {
+            console.error('OrderService closedSpecialPayment updated:', 'paymentId: '+paymentId, options);
+        }
+        return;
+	});
 };
 
 OrderService.prototype.getPaymentInOrder = function (order, paymentId) {
