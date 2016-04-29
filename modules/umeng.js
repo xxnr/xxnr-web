@@ -169,7 +169,8 @@ Umeng.prototype.sendIOSCustomizedcast = function(type, alias, aliasType, options
 		// 必填 严格按照APNs定义来填写
 		aps: {
 	        alert: umengConfig.body[type][aliasType].text          // 必填
-	    }
+	    },
+		page: umengConfig.body[type][aliasType].IOSpage
     };
     // "badge": xx,           // 可选        
     // "sound": "xx",         // 可选         
