@@ -30,11 +30,12 @@
 
     </slide>
   </div>
-  <div class="index-nav">
-    <div class="nav-bit">1</div>
-    <div class="nav-bit">2</div>
-    <div class="nav-bit">3</div>
-  </div>
+  <!--<div class="index-nav">-->
+    <!--<div class="nav-bit">1</div>-->
+    <!--<div class="nav-bit">2</div>-->
+    <!--<div class="nav-bit">3</div>-->
+  <!--</div>-->
+  <section-tabs></section-tabs>
   <div class="xxnr-title">
     xx精选
     <div class="title-more">更多产品</div>
@@ -58,7 +59,7 @@
 
 <script>
   import slide from '../components/vue-slide.vue'
-
+  import sectionTabs from '../components/SectionTabs.vue'
   export default {
     data () {
       return {
@@ -134,7 +135,7 @@
       }
     },
     components: {
-      slide
+      slide,sectionTabs
     }
   }
 </script>
