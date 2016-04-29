@@ -43,6 +43,8 @@ Umeng.prototype.umengSend = function(params, appMasterSecret, callback) {
 		callback('appMasterSecret is null');
 		return;
 	}
+
+	params.production_mode = umengConfig.production_mode;
 	var sign = self.sign(params, appMasterSecret);
 	var httpOptions = {method: umengConfig.sendMethod, host: umengConfig.host, path: umengConfig.sendPath+'?sign='+sign};
 	tools.httpRequest({httpOptions: httpOptions, postData: JSON.stringify(params)}, function(err, result) {
