@@ -66,7 +66,7 @@ exports.generateAuthCode = function (length) {
 
 function sendPhoneMessage(phonenumber, content) {
 
-    var options = (config.phone_message_options).parseJSON();
+    var options = config.phone_message_options;
     var httpOptions = options.http_request_options;
 
     httpOptions.path = options['url'] + querystring.stringify({

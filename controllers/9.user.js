@@ -11,6 +11,7 @@ var UseraddressService = services.useraddress;
 var AreaService = services.area;
 var CartService = services.cart;
 var OrderService = services.order;
+var vCodeService = services.vCode;
 var IntentionProductService = services.intention_product;
 var PotentialCustomerService = services.potential_customer;
 var REG_MOBILE = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|Tablet|IOS/i;
@@ -309,7 +310,7 @@ exports.process_register = function(req, res, next) {
     options.useragent = req.data["user-agent"] || 'web';
 
     var vcodeoptions = {'target': req.data.account.toString(), 'code_type': 'register', 'code': req.data.smsCode};
-    GETSCHEMA('VCode').workflow('verify', null, vcodeoptions, function (err, result) {
+    vCodeService.verify(vcodeoptions, function(err, result){
         if (err || !result) {
             res.respond({'code': '1001', 'message': '验证码验证错误'});
             return;
@@ -374,7 +375,7 @@ exports.process_resetpwd = function(req, res, next) {
     options.ip = req.ip;
 
     vcodeoptions = {'target': req.data.account.toString(), 'code_type': 'resetpwd', 'code': req.data.smsCode};
-    GETSCHEMA('VCode').workflow('verify', null, vcodeoptions, function (err, result) {
+    vCodeService.verify(vcodeoptions, function(err, result){
         if (err || !result) {
             res.respond({'code': '1001', 'message': '验证码验证错误'});
             return;

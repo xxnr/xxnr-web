@@ -55,3 +55,6 @@ exports.pay = require('./pay');
 
 // dashboard
 exports.dashboard = require('./dashboard');
+
+// vCode
+exports.vCode = require('./vCode');

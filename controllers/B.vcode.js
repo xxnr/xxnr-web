@@ -1,6 +1,7 @@
 var tools = require('../common/tools');
 var services = require('../services');
 var UserService = services.user;
+var vCodeService = services.vCode;
 
 exports.install = function() {
 	// SMS
@@ -108,7 +109,7 @@ function generate_vcode(code_type, target, target_type, mobile_code, callback) {
     options.code_type = code_type;
     options.target_type = target_type;
 
-    GETSCHEMA('VCode').get(options, function(err, vcode) {
+    vCodeService.get(options, function(err, vcode){
         if (err) {
             return callback(err);
         }
@@ -139,7 +140,7 @@ function generate_vcode(code_type, target, target_type, mobile_code, callback) {
                     }
                 }
 
-                GETSCHEMA('VCode').workflow('update', vcode, null, function(err) {
+                vCodeService.update(vcode, function(err){
                     if (err) {
                         return callback(err);
                     }
@@ -148,7 +149,7 @@ function generate_vcode(code_type, target, target_type, mobile_code, callback) {
                 }, true);
             }
         } else {
-            GETSCHEMA('VCode').workflow('create', null, options, function(err, newVCode) {
+            vCodeService.create(options, function(err, newVCode){
                 if (err) {
                     return callback(err);
                 }

@@ -26,6 +26,7 @@ require('./frontendUserAccess');
 require('./userrelevances');
 require('./hourlyReport');
 require('./user_sign');
+require('./vcodes');
 
 //user
 exports.user = mongoose.model('user');
@@ -89,6 +90,8 @@ exports.hourlyReport = mongoose.model('hourlyReport');
 exports.reportUpdateTime = mongoose.model('reportUpdateTime');
 // user sign
 exports.userSign = mongoose.model('user_sign');
+// vcode
+exports.vcode = mongoose.model('vcode');
 
 exports.getModel = function (name, options) {
     options = options || {};

@@ -37,10 +37,10 @@ var config= {
     token_cookie_expires_in: "30days",
 
 //vcodevalidtime10mins
-    vcode_resend_valid: "600000",
+    vcode_resend_valid: 600000,
 
 //vcodenextsendtime
-    vcode_resend_interval: "60000",
+    vcode_resend_interval: 60000,
 
 //sendphonemessageoptions
     phone_message_options: {
