@@ -1,23 +1,25 @@
 import Vue from 'vue'
-//import VueRouter from 'vue-router'
-
-//Vue.use(VueRouter);
 import App from './App.vue'
-//Vue.use(slide);
-
-
-new Vue({
-  el: 'body',
-  components: { App }
-});
-
-
-
-
+import VueRouter from 'vue-router'
+import homeView from './views/home.vue'
 //new Vue({
 //  el: 'body',
-//  components: { Test: Test}
+//  store,
+//  components: { App }
 //});
+Vue.use(VueRouter);
+var router = new VueRouter();
+router.map({
+  '/home': {
+    component: homeView
+  }
+});
+//默认/重定向到home页
+router.redirect({
+  '/': "/home"
+});
+router.start(Vue.extend(App), '#root')
+window.router = router
 
 
 
