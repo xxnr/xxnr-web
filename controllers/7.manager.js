@@ -1944,25 +1944,35 @@ exports.process_RSC_modify = function(req, res, next){
 		return;
 	}
 
+	if(typeof req.data.EPOSNo != 'undefined' && req.data.EPOSNo) {
+		UserService.getRSCInfoByEPOSNo(req.data.EPOSNo, function(err, RSC) {
 			if(err){
 				console.error('manager process_RSC_modify UserService getRSCInfoByEPOSNo err:', err);
+				res.respond({code:1002, message:err});
 				return;
 			}
 			if (RSC) {
+				res.respond({code:1002, message:"此设备号已经被绑定过了", RSC: RSC});
 				return;
 			} else {
+				RSCService.modifyRSCInfo(req.data.id, req.data, function(err){
 					if(err){
+						res.respond({code:1002, message:err});
 						return;
 					}
 
+					res.respond({code:1000, message:'success'});
 				});
 			}
 		});
 	} else {
+		RSCService.modifyRSCInfo(req.data.id, req.data, function(err){
 			if(err){
+				res.respond({code:1002, message:err});
 				return;
 			}
 
+			res.respond({code:1000, message:'success'});
 		});
 	}
 }
