@@ -170,7 +170,9 @@ Umeng.prototype.sendIOSCustomizedcast = function(type, alias, aliasType, options
 		aps: {
 	        alert: umengConfig.body[type][aliasType].text          // 必填
 	    },
-		page: umengConfig.body[type][aliasType].IOSpage
+		page: umengConfig.body[type][aliasType].IOSpage,
+		title: umengConfig.body[type][aliasType].title,
+	    text:  umengConfig.body[type][aliasType].text
     };
     // "badge": xx,           // 可选        
     // "sound": "xx",         // 可选         
