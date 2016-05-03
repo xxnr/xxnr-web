@@ -36,6 +36,7 @@
     <!--<div class="nav-bit">3</div>-->
   <!--</div>-->
   <section-tabs></section-tabs>
+  <products-list :products="indexCars"></products-list>
   <div class="xxnr-title">
     xx精选
     <div class="title-more">更多产品</div>
@@ -60,13 +61,16 @@
 <script>
   import slide from '../components/vue-slide.vue'
   import sectionTabs from '../components/SectionTabs.vue'
+  import productsList from '../components/ProductsList.vue'
+  import { getIndexCars } from '../vuex/actions'
 
   export default {
     vuex:{
       getters:{
-
+        indexCars:state => state.indexCarsList.indexCars
       },
       actions:{
+        getIndexCars
       }
     },
     data () {
@@ -143,9 +147,10 @@
       }
     },
     components: {
-      slide,sectionTabs
+      slide,sectionTabs,productsList
     },
     created () {
+      this.getIndexCars()
     }
   }
 </script>
