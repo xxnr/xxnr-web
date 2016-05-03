@@ -1,21 +1,25 @@
 <template>
   <div class="section-tabs">
     <div v-for="category in categories">
-      {{category}}
+      {{category.name}}
     </div>
   </div>
 </template>
 
 <script>
+  import { getCategories } from '../vuex/actions'
+
   export default {
-    vuex: {
-      getters: {
-        categories: function (state) {
-          return state.sectionTabs.categories
-        }
+    vuex:{
+      getters:{
+        categories: state => state.sectionTabs.categories
       },
-      actions: {
+      actions:{
+        getCategories
       }
+    },
+    created () {
+      this.getCategories()
     }
   }
 </script>

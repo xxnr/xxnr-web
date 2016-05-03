@@ -1,13 +1,11 @@
 import api from '../api/remoteHttpApi'
 import * as types from './mutation-types'
 
-export const getCategories = ({dispatch}) => {
+export const getCategories = ({dispatch,state}) => {
   api.getCategories(response => {
-    console.log(response);
-    console.log('haha');
-    dispatch(types.GET_CATEGORIES)
+    dispatch(types.GET_CATEGORIES,response.data.categories)
   }, response => {
     console.log(response);
-    dispatch(types.GET_CATEGORIES)
+    //dispatch(types.GET_CATEGORIES)
   })
 }

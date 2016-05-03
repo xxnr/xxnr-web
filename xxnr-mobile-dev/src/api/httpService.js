@@ -13,6 +13,6 @@ import VueResource from 'vue-resource'
 
 Vue.use(VueResource);
 Vue.http.options.xhr = {withCredentials: true};
-export const jsonpGet = (url,params,cb,errCb) =>{
-  Vue.http.jsonp(url).then(cb,errCb);
+export const jsonpGet = (url,params,cb,errCb) => {
+  Vue.http.jsonp(url,{params:params}).then(cb,errCb);
 }

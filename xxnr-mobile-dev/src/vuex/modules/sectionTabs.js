@@ -1,11 +1,17 @@
+import {
+  GET_CATEGORIES
+} from '../mutation-types'
+
 // initial state
 const state = {
-  categories: ['汽车','化肥']
+  categories: []
 }
 
 // mutations
 const mutations = {
-
+  [GET_CATEGORIES](state , categories){
+    state.categories = categories;
+  }
 }
 
 export default {
