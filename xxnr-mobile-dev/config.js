@@ -12,5 +12,8 @@ module.exports = {
   dev: {
     port: 8080,
     proxyTable: {}
-  }
+  },
+  API_ROOT: (process.env.NODE_ENV === 'production')
+    ? 'http://m.xinxinnongren.com/'
+    :'http://localhost:8070/'
 }

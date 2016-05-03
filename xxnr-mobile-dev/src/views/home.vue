@@ -60,7 +60,16 @@
 <script>
   import slide from '../components/vue-slide.vue'
   import sectionTabs from '../components/SectionTabs.vue'
+  import { getCategories } from '../vuex/actions'
   export default {
+    vuex:{
+      getters:{
+
+      },
+      actions:{
+        getCategories
+      }
+    },
     data () {
       return {
         someList: [
@@ -136,6 +145,9 @@
     },
     components: {
       slide,sectionTabs
+    },
+    created () {
+      this.getCategories()
     }
   }
 </script>
