@@ -51,7 +51,11 @@ var app = express();
 // certificate
 var privateKey = fs.readFileSync('private_key.pem').toString();
 var certificate = fs.readFileSync('cert.pem').toString();
-var options = {key:privateKey, cert:certificate};
+var options = {
+	key:privateKey,
+	cert:certificate
+};
+
 app.disable('etag');
 app.set('jsonp callback name', 'JSON_CALLBACK');
 
@@ -87,8 +91,14 @@ app.use(require('./middlewares/website'));
 app.use(express.static(path.join(__dirname, 'public/xxnr')));
 app.use(express.static(path.join(__dirname, 'public')));
 
+var routes = require('./routes');
 // routes
-app.use('/', require('./routes'));
+app.use('/', routes.secureFrontendApis);
+app.use('/', routes.frontendApis);
+app.use('/', routes.frontendPages);
+app.use('/', routes.appRelatedPages);
+app.use('/', routes.backendApis);
+app.use('/', routes.backendPages);
 
 http.createServer(app).listen(80);
 console.info('application listen at port 80');
