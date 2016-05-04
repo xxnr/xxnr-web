@@ -2,6 +2,7 @@
  * Created by pepelu on 2016/4/27.
  */
 var mongoose = require('mongoose');
+var config = require('../config');
 
 var schema = new mongoose.Schema({
     registeredUserCount:Number,         // registered user count in this hour
@@ -26,8 +27,29 @@ var schema = new mongoose.Schema({
 });
 
 var reportUpdateTimeSchema = new mongoose.Schema({
-    hourly:Date
+    hourly:{type:Date, default:function(){return new Date(config.serviceStartTime)}},
+    agentReport:{type:Date, default:function(){return new Date(config.serviceStartTime)}}
 });
+
+var agentReportSchema = new mongoose.Schema({
+    agent:{type:mongoose.Schema.ObjectId, ref:"user"},
+    name:String,
+    phone:String,
+    newInviteeCount:Number,                         // new invitee count per day
+    newPotentialCustomerCount:Number,               // new potential customer count per day
+    totalInviteeCount:Number,                       // total invitee count until this day
+    totalPotentialCustomerCount:Number,             // total potential customer count until this day
+    totalCompletedOrderCount:Number,                // total completed order count until this day
+    totalPaidAmount:Number,                         // total paid amount until this day
+    dateTime:{type:Date, default:Date.now},
+    dayInBeijingTime:{type:String},
+    weekInBeijingTime:{type:String},
+    monthInBeijingTime:{type:String},
+    yearInBeijingTime:{type:String}
+});
+
+agentReportSchema.index({agent:1, dayInBeijingTime:1}, {unique:true});
 
 mongoose.model('hourlyReport', schema);
 mongoose.model('reportUpdateTime', reportUpdateTimeSchema);
+mongoose.model('agentReport', agentReportSchema);

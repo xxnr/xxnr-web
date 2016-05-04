@@ -58,6 +58,8 @@ var config= {
 //usertypeidmustbeincreasingprogressively
     user_types: {"1": "普通用户", "5": "县级经销商", "6": "新农经纪人"},
     default_user_type: 1,
+    XXNRAgentId:6,
+    RSCId:5,
 
 //userminpayprice
     minPayPrice: 3000,

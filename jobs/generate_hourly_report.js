@@ -7,6 +7,7 @@ var DashboardService = services.dashboard;
 var ReportUpdateTimeModel = require('../models').reportUpdateTime;
 var utils = require('../common/utils');
 const millisecondsInHour = 60*60*1000;
+const concurrency = 10000;
 
 ReportUpdateTimeModel.findOne({}, function(err, updateTime){
     var lastModifyTime = new Date(config.serviceStartTime).getTime();
@@ -34,8 +35,8 @@ ReportUpdateTimeModel.findOne({}, function(err, updateTime){
         Promise.all(promises)
             .then(function () {
                 hourDiff = hourDiff - max;
-                if(hourDiff > 10000){
-                    batchGenerateHourlyReport(max, max + 10000);
+                if(hourDiff > concurrency){
+                    batchGenerateHourlyReport(max, max + concurrency);
                 } else if (hourDiff > 0) {
                     batchGenerateHourlyReport(max, max + hourDiff);
                 } else{
@@ -57,8 +58,8 @@ ReportUpdateTimeModel.findOne({}, function(err, updateTime){
             })
     };
 
-    if(hourDiff > 10000){
-        batchGenerateHourlyReport(0, 10000);
+    if(hourDiff > concurrency){
+        batchGenerateHourlyReport(0, concurrency);
     } else{
         batchGenerateHourlyReport(0, hourDiff);
     }

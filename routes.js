@@ -293,6 +293,7 @@ router.get(F.config['manager-url']+'/api/dashboard/getStatistic', middleware.bac
 router.get(F.config['manager-url']+'/api/dashboard/queryDailyReport', middleware.backend_auth, controllers.Manager.queryDailyReport);
 router.get(F.config['manager-url']+'/api/dashboard/queryWeeklyReport', middleware.backend_auth, controllers.Manager.queryWeeklyReport);
 router.get(F.config['manager-url']+'/api/dashboard/lastUpdateTime', middleware.backend_auth, controllers.Manager.lastUpdateTime);
+router.get(F.config['manager-url']+'/api/dashboard/queryAgentReportYesterday', middleware.backend_auth, controllers.Manager.queryAgentReportYesterday);
 
 // potential customer
 router.get(F.config['manager-url']+ '/api/v2.1/agentinfo/:id',middleware.backend_auth,controllers.Manager.json_agent_info_get);
