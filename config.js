@@ -6,6 +6,8 @@ var config= {
     'etag-version': '',
     serviceStartTime:'2015-11-17',
     currentTimeZoneDiff:8,
+    environment:'dev',
+    secure:false,
 
 //ArelativeURLaddressintotheeshopmanagement
     "manager-url": "/manager",
