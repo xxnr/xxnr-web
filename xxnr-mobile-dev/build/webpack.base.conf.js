@@ -17,7 +17,7 @@ module.exports = {
     fallback: [path.join(__dirname, '../node_modules')],
     alias: {
       'src': path.resolve(__dirname, '../src'),
-      'assets': path.resolve(__dirname, '../static/assets'),
+      'assets': path.resolve(__dirname, '../static'),
       'components': path.resolve(__dirname, '../src/components')
     }
   },
@@ -63,6 +63,9 @@ module.exports = {
     ]
   },
   vue: {
-    loaders: utils.cssLoaders()
+    loaders: utils.cssLoaders(),
+    html: {
+      root: path.resolve(__dirname, '../static')
+    }
   }
 }
