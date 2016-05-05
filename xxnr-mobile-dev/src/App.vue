@@ -1,16 +1,17 @@
 <template>
     <xxnr-header></xxnr-header>
-    <router-view keep-alive></router-view>
+    <div class="mainContainer">
+      <router-view keep-alive></router-view>
+    </div>
 </template>
 <script>
-  import ProductItem from './components/product-item.vue'
   import XxnrHeader from './components/XxnrHeader.vue'
   import store from './vuex/store'
 
   export default {
     store,
     components: {
-      ProductItem, XxnrHeader
+      XxnrHeader
     },
     ready() {
       this.$broadcast('slider')
@@ -87,6 +88,9 @@
     width: 10px;
     height: 10px;
     border-radius: 5px;
+  }
+  .mainContainer{
+    padding-top: 30px;
   }
 
 

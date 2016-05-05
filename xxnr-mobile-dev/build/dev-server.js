@@ -2,7 +2,17 @@ var path = require('path')
 var express = require('express')
 var webpack = require('webpack')
 var config = require('../config')
+var bodyParser = require('body-parser');
+var cookieParser = require('cookie-parser');
+var busboy = require('connect-busboy');
+var fs = require("fs");
+var https = require('https');
+var http = require('http');
 var proxyMiddleware = require('http-proxy-middleware')
+
+
+
+
 var webpackConfig = process.env.NODE_ENV === 'testing'
   ? require('./webpack.prod.conf')
   : require('./webpack.dev.conf')
@@ -55,6 +65,41 @@ app.use(hotMiddleware)
 // serve pure static assets
 var staticPath = path.posix.join(config.build.assetsPublicPath, config.build.assetsSubDirectory)
 app.use(staticPath, express.static('./static'))
+
+require('../../modules/database');
+global.U = require('../../common/utils');
+global.F = {
+  config:require('../../config'),
+  global:require('../../global')
+};
+global.RELEASE = true;
+global.isDebug = false;
+global.framework_image = global.Image = require('../../modules/image');
+
+// bodyParser based on content type
+app.use(bodyParser.json({
+  'limit': '1mb'
+}));
+app.use(bodyParser.urlencoded({extended: false}));
+
+// cookieParser
+app.use(cookieParser());
+
+// busboy
+app.use(busboy({
+  limits: {
+    fileSize: F.config.file_size_limit,
+    files: F.config.file_count_limit
+  }
+}));
+
+
+// website common middleware
+app.use(require('../../middlewares/website'));
+
+// routes
+app.use('/', require('../../routes'));
+
 
 module.exports = app.listen(port, function (err) {
   if (err) {

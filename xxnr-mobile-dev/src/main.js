@@ -1,21 +1,22 @@
 import Vue from 'vue'
 import App from './App.vue'
 import VueRouter from 'vue-router'
-import homeView from './views/home.vue'
 
-Vue.use(VueRouter);
-var router = new VueRouter();
-router.map({
-  '/home': {
-    component: homeView
-  }
-});
+import { configRouter } from './route-config'
+// install router
+Vue.use(VueRouter)
 
-//默认/重定向到home页
-router.redirect({
-  '/': "/home"
-});
+// create router
+const router = new VueRouter({
+  history: true,
+  saveScrollPosition: true
+})
+
+// configure router
+configRouter(router)
+
 router.start(Vue.extend(App), '#root')
+// just for debugging
 window.router = router
 
 

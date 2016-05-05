@@ -1,7 +1,7 @@
 <template>
   <div class="mobile-header">
     {{headerTitle}}
-    <div class="header-bit header-back">{{backButtonDisplay}}</div>
+    <div class="header-bit header-back" v-link="{ path:'/home'}" v-if="backButtonDisplay"> < </div>
     <div class="header-bit header-right">{{rightButton}}</div>
   </div>
 </template>
@@ -34,6 +34,9 @@
     text-align: center;
     color: #fff;
     /*font-weight: bold;*/
+    position: fixed;
+    width: 100%;
+    z-index: 100;
   }
   .header-bit {
     position: absolute;
