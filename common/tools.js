@@ -226,13 +226,11 @@ exports.verify_token = function(token){
 };
 
 exports.isXXNRAgent = function(verifiedTypes){
-    const XXNRAgentId = '6';
-    return verifiedTypes && verifiedTypes.indexOf(XXNRAgentId) != -1;
+    return verifiedTypes && verifiedTypes.indexOf(config.XXNRAgentId) != -1;
 };
 
 exports.isRSC = function(verifiedTypes){
-    const RSCId = '5';
-    return verifiedTypes && verifiedTypes.indexOf(RSCId) != -1;
+    return verifiedTypes && verifiedTypes.indexOf(config.RSCId) != -1;
 };
 
 exports.isValidIdentityNo = function(identityNo){

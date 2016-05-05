@@ -2,7 +2,6 @@
  * Created by pepelu on 2015/12/8.
  */
 
-require('total.js');
 var services = require('../services');
 var dri = require('../common/dri');
 var OrderService = services.order;

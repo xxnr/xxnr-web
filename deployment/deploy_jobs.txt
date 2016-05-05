@@ -9,3 +9,4 @@
 #101.200.194.203
 0 4 * * * node /root/website-git/jobs/close_order.js >> /home/xxnr/web/deployment/jobs/close_order/close_order_`date +\%Y\%m`.log
 1 * * * * node /root/website-git/jobs/generate_hourly_report.js >> /home/xxnr/web/deployment/jobs/generate_hourly_report/generate_hourly_report_`date +\%Y\%m\%D\%H`.log
+0 4 * * * node /root/website-git/jobs/generate_agent_report.js >> /home/xxnr/web/deployment/jobs/generate_hourly_report/generate_agent_report_`date +\%Y\%m\%D`.log

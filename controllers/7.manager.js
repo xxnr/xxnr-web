@@ -2248,6 +2248,11 @@ exports.queryDailyReport = function(req, res, next){
 	var dateEnd = new Date(req.data.dateEnd).format('yyyyMMdd');
 
 	DashboardService.queryDailyReport(dateStart, dateEnd, function(err, dailyReports){
+		if(err){
+			res.respond({code:1001, message:'获取每日概况失败'});
+			return;
+		}
+
 		res.respond({code:1000, dailyReports:dailyReports || []});
 	})
 };
@@ -2257,6 +2262,29 @@ exports.queryWeeklyReport = function(req, res, next){
 	var dateEnd = new Date(req.data.dateEnd).format('yyyyMMdd');
 
 	DashboardService.queryWeeklyReport(dateStart, dateEnd, function(err, WeeklyReports){
+		if(err){
+			res.respond({code:1001, message:'获取每周业绩失败'});
+			return;
+		}
+
 		res.respond({code:1000, WeeklyReports:WeeklyReports || []});
 	})
+};
+
+exports.queryAgentReportYesterday = function(req, res, next){
+	DashboardService.queryAgentReportYesterday(function(err, agentReportYesterday){
+		if(err){
+			res.respond({code:1001, message:'获取经纪人数据失败'});
+			return;
+		}
+
+		DashboardService.lastUpdateTime(function(err, lastUpdateTime){
+			if(err){
+				res.respond({code:1001, message:'获取更新时间失败'});
+				return;
+			}
+
+			res.respond({code:1000, agentReportYesterday:agentReportYesterday, lastUpdateTime:lastUpdateTime.agentReport});
+		})
+	}, req.data.sort)
 };

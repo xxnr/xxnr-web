@@ -6,6 +6,8 @@ var config= {
     'etag-version': '',
     serviceStartTime:'2015-11-17',
     currentTimeZoneDiff:8,
+    environment:'dev',
+    secure:false,
 
 //ArelativeURLaddressintotheeshopmanagement
     "manager-url": "/manager",
@@ -58,6 +60,8 @@ var config= {
 //usertypeidmustbeincreasingprogressively
     user_types: {"1": "普通用户", "5": "县级经销商", "6": "新农经纪人"},
     default_user_type: 1,
+    XXNRAgentId:6,
+    RSCId:5,
 
 //userminpayprice
     minPayPrice: 3000,
