@@ -1801,7 +1801,9 @@ OrderService.prototype.getByRSC = function(RSC, page, max, type, callback, searc
 				query.isClosed = false;
 				break;
 			case 2:		//待审核
-				query.pendingApprove = true;
+				// query.pendingApprove = true;
+				query["$or"] = [{isClosed: { $ne: true }, payStatus: { $eq: PAYMENTSTATUS.UNPAID }, pendingApprove: { $eq: true }}, 
+								{payStatus: { $ne: PAYMENTSTATUS.UNPAID }, pendingApprove: { $eq: true }}];
 				break;
 			case 3:		//待配送
 				query.payStatus = PAYMENTSTATUS.PAID;
@@ -1823,9 +1825,17 @@ OrderService.prototype.getByRSC = function(RSC, page, max, type, callback, searc
 	}
 
 	if (search) {
-		query.$or = [{buyerPhone: new RegExp('^'+search)},
-			{consigneePhone: new RegExp('^'+search)},
-			{id: new RegExp('^'+search)}];
+		if (query && query.$or) {
+			query.$or.concat([
+				{buyerPhone: new RegExp('^'+search)},
+				{consigneePhone: new RegExp('^'+search)},
+				{id: new RegExp('^'+search)}
+			]);
+		} else {
+			query.$or = [{buyerPhone: new RegExp('^'+search)},
+				{consigneePhone: new RegExp('^'+search)},
+				{id: new RegExp('^'+search)}];
+		}
 	}
 
 	OrderModel.count(query, function(err, count){
