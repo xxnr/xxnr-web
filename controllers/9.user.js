@@ -401,6 +401,7 @@ exports.process_resetpwd = function(req, res, next) {
 
 // Get user
 exports.json_user_get = function(req, res, next) {
+    var self = this;
     req.data.id = req.data.userId = (req.data.id || req.data.userId);
     var options = {};
 
@@ -451,7 +452,7 @@ exports.json_user_get = function(req, res, next) {
             if (flags.indexOf('score') >= 0) {
                 responds['score'] = (respond);
                 respond = function (user) {
-                    json_userscore_get(req, res, next, function (score) {
+                    self.json_userscore_get(req, res, next, function (score) {
                         user.score = score;
                         // console.log('user = ' + JSON.stringify(user));
                         responds['score'](user);
@@ -462,7 +463,7 @@ exports.json_user_get = function(req, res, next) {
             if (flags.indexOf('address') >= 0) {
                 responds['address'] = respond;
                 respond = function (user) {
-                    json_useraddresslist_query(req, res, next, function (addresses) {
+                    self.json_useraddresslist_query(req, res, next, function (addresses) {
                         user.addresses = addresses;
                         user.defaultAddress = getDefaultAddress(addresses);
                         responds['address'](user);
