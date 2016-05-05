@@ -40,7 +40,7 @@ exports.install = function() {
 	//F.middleware('isRSC', middleware.isRSC_middleware);
 };
 
-var files = DB('files', null, require('total.js/database/database').BUILT_IN_DB).binary;
+var files = DB('files', null, require('../modules/database/database').BUILT_IN_DB).binary;
 var temporary = {
 	path: {},
 	processing : {}

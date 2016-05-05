@@ -70,7 +70,7 @@ var config= {
 
     // file upload limit
     file_size_limit: 20 * 1024 * 1024, // 20MB
-    file_count_limit: 1,
+    file_count_limit: 10,
 
     // directory-path
     directory_temp: '/tmp/',

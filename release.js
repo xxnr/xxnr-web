@@ -100,6 +100,16 @@ app.use('/', routes.appRelatedPages);
 app.use('/', routes.backendApis);
 app.use('/', routes.backendPages);
 
+app.use(function (err, req, res, next) {
+	if(F.config.environment === 'production'){
+		res.status(500);
+		res.end();
+		return;
+	}
+
+	next(err);
+});
+
 http.createServer(app).listen(80);
 console.info('application listen at port 80');
 https.createServer(options, app).listen(443);

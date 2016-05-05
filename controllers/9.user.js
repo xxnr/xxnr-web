@@ -135,7 +135,7 @@ Global.default_user_type = config.default_user_type;
 // LOGIN
 // ==========================================================================
 
-var files = DB('files', null, require('total.js/database/database').BUILT_IN_DB).binary;
+var files = DB('files', null, require('../modules/database/database').BUILT_IN_DB).binary;
 
 // Login
 exports.process_login = function(req, res, next) {

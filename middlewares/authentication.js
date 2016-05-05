@@ -92,24 +92,9 @@ exports.backend_auth = function(req, res, next){
                 // perhaps no user find
                 console.error('user not found:', err);
                 //controller.view('login');
-                res.render('./7.manager/login.html',
-                    {
-                        manager_url:"/manager",
-                        user:data
-                    });
+                backend_auth_fail(req, res, data);
                 return;
             }
-
-//            var valid = payload.appLoginId ?
-//                payload.appLoginId == data.appLoginId :
-//                payload.webLoginId ?
-//                    payload.webLoginId == data.webLoginId :
-//                    false;
-//
-//            if (!valid) {
-//                controller.view('login');
-//                return;
-//            }
 
             if (req.method == 'GET') {
                 req.query['userId'] = payload.userId;
@@ -154,13 +139,22 @@ exports.backend_auth = function(req, res, next){
     }catch(e){
         // authentication fail
         //controller.view('login');
-        res.render('./7.manager/login.html',
-            {
-                manager_url:"/manager",
-                user:data
-            });
+        backend_auth_fail(req, res, data);
     }
 };
+
+function backend_auth_fail(req, res, data){
+    var isMobile = tools.isMobile(req);
+    if(isMobile){
+        res.respond({code: 1401, message: '请先登录'});
+    } else {
+        res.render('./7.manager/login.html',
+            {
+                manager_url: "/manager",
+                user: data
+            });
+    }
+}
 
 /**
  * check user in user white list

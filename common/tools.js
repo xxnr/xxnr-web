@@ -15,6 +15,7 @@ var regexpXXNRHost = new RegExp('(.*\.|^)xinxinnongren\.com.*');
 var config = require('../config');
 var Global = require('../global.js');
 var moment = require('moment-timezone');
+var REG_MOBILE = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|Tablet/i;
 
 /*
     Phone in china validation
@@ -362,4 +363,8 @@ exports.getWeekStartTimeByDate = function(date){
     }
 
     return new Date(date.add('d', 1-dayOfWeek).format('yyyy-MM-dd')).add('h', -F.config.currentTimeZoneDiff);
+};
+
+exports.isMobile = function(req){
+    return REG_MOBILE.test(req.get('user-agent'));
 };
