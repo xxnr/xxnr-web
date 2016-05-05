@@ -75,6 +75,7 @@ var config= {
     // directory-path
     directory_temp: '/tmp/',
     directory_public: '/public/',
+    directory_xxnr_public: '/public/xxnr/',
 
     default_request_timeout: 5000,
     default_maximum_file_descriptors: 0,

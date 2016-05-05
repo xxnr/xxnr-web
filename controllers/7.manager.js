@@ -667,24 +667,24 @@ exports.json_orders_query = function(req,res,next) {
 				// var item = items[i];
 				var order = items[i];
 				var item = {
-					'id':order.id,
-					'paymentId':order.paymentId,
-					'price':order.price,
-					'deposit':order.deposit,
-					'consigneeAddress':order.consigneeAddress,
-					'consigneeName':order.consigneeName,
-					'consigneePhone':order.consigneePhone,
-					'buyerName':order.buyerName,
-					'buyerPhone':order.buyerPhone,
-					'payType':order.payType,
-					'products':order.products || [],
-					'SKUs':order.SKUs || [],
-					'duePrice':typeof(order.duePrice) != 'undefined' ? parseFloat(order.duePrice.toFixed(2)) : null,
-					'deliveryType':order.deliveryType,
-					'payStatus':order.payStatus,
-					'deliverStatus':order.deliverStatus,
-					'RSCInfo':order.RSCInfo,
-					'isClosed':order.isClosed
+					'id': order.id,
+					'paymentId': order.paymentId,
+					'price': order.price,
+					'deposit': order.deposit,
+					'consigneeAddress': order.consigneeAddress,
+					'consigneeName': order.consigneeName,
+					'consigneePhone': order.consigneePhone,
+					'buyerName': order.buyerName,
+					'buyerPhone': order.buyerPhone,
+					'payType': order.payType,
+					'products': order.products || [],
+					'SKUs': order.SKUs || [],
+					'duePrice': typeof(order.duePrice) != 'undefined' ? parseFloat(order.duePrice.toFixed(2)) : null,
+					'deliveryType': order.deliveryType,
+					'payStatus': order.payStatus,
+					'deliverStatus': order.deliverStatus,
+					'RSCInfo': order.RSCInfo,
+					'isClosed': order.isClosed
 				};
 				// 订单合成状态
 				item.typeValue = OrderService.orderType(order);
@@ -706,7 +706,13 @@ exports.json_orders_query = function(req,res,next) {
 				if (order.deliverStatus == DELIVERSTATUS.RECEIVED && order.dateCompleted) {
 					item.dateCompleted = order.dateCompleted;
 				}
-				var orderInfo = {'totalPrice':order.price.toFixed(2), 'deposit':order.deposit.toFixed(2), 'dateCreated':order.dateCreated, 'orderStatus': OrderService.orderStatus(order)};
+				var orderInfo = {
+					'totalPrice': order.price.toFixed(2),
+					'deposit': order.deposit.toFixed(2),
+					'dateCreated': order.dateCreated,
+					'orderStatus': OrderService.orderStatus(order),
+					'pendingDeliverToRSC': OrderService.pendingDeliverToRSC(order)
+				};
 				item.order = orderInfo;
 				arr[i] = item;
 			}

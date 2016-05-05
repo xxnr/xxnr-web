@@ -88,7 +88,7 @@ app.use(busboy({
 app.use(require('./middlewares/website'));
 
 // set static file path
-app.use(express.static(path.join(__dirname, 'public/xxnr')));
+app.use(express.static(path.join(__dirname, F.config.directory_xxnr_public)));
 app.use(express.static(path.join(__dirname, 'public')));
 
 var routes = require('./routes');

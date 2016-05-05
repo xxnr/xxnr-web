@@ -9,10 +9,10 @@ var middleware = require('../middlewares/authentication');
 
 // front end page
 router.get('/', function(req, res){
-    res.sendFile(path.join(__dirname, './public/xxnr/index.html'));
+    res.sendFile(path.join(__dirname, '.'+ F.config.directory_xxnr_public + 'index.html'));
 });
-router.get('/header', function(req, res){res.sendFile(path.join(__dirname, '../public/xxnr/header.html'));});
-router.get('/footer', function(req, res){res.sendFile(path.join(__dirname, '../public/xxnr/footer.html'));});
+router.get('/header', function(req, res){res.sendFile(path.join(__dirname, '..' + F.config.directory_xxnr_public + 'header.html'));});
+router.get('/footer', function(req, res){res.sendFile(path.join(__dirname, '..' + F.config.directory_xxnr_public + 'footer.html'));});
 router.get('/images/:type(small|large|original|thumbnail)/:filename.jpg', controllers.Default.file_image);
 router.get('/images/:type(small|large|original|thumbnail)/:category/:filename.jpg', controllers.Default.file_image);
 
