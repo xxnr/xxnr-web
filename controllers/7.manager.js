@@ -991,7 +991,7 @@ exports.json_orders_read = function(req,res,next) {
 		}
         res.respond({code:1000, message:'success', datas: convertOrderToShow(order, payment)});
     });
-}
+};
 
 var convertOrderToShow = function(order, payment){
     var subOrdersPayments = {};					// suborder all payments
@@ -1062,26 +1062,32 @@ var convertOrderToShow = function(order, payment){
 		if (order.duePrice)
 			order.duePrice = parseFloat(order.duePrice.toFixed(2));
 		// 订单合成状态
-        order.orderType = OrderService.orderType(order);
-		var orderInfo = {'totalPrice':parseFloat(order.price.toFixed(2)),'deposit':parseFloat(order.deposit.toFixed(2)),'dateCreated':order.dateCreated, 'orderStatus': OrderService.orderStatus(order)};
-        // 支付时间
-	    if (order.payStatus == PAYMENTSTATUS.PAID && order.datePaid) {
-	        orderInfo.datePaid = order.datePaid;
-	    }
-	    // 待收货时间
-	    if (order.datePendingDeliver) {
-	        orderInfo.datePendingDeliver = order.datePendingDeliver;
-	    }
-	    // 全部发货时间
-	    if (order.deliverStatus == DELIVERSTATUS.DELIVERED && order.dateDelivered) {
-	        orderInfo.dateDelivered = order.dateDelivered;
-	    }
-	    // 完成时间
-	    if (order.deliverStatus == DELIVERSTATUS.RECEIVED && order.dateCompleted) {
-	        orderInfo.dateCompleted = order.dateCompleted;
-	    }
+		order.orderType = OrderService.orderType(order);
+		var orderInfo = {
+			'totalPrice': parseFloat(order.price.toFixed(2)),
+			'deposit': parseFloat(order.deposit.toFixed(2)),
+			'dateCreated': order.dateCreated,
+			'orderStatus': OrderService.orderStatus(order),
+			'pendingDeliverToRSC': OrderService.pendingDeliverToRSC(order)
+		};
+		// 支付时间
+		if (order.payStatus == PAYMENTSTATUS.PAID && order.datePaid) {
+			orderInfo.datePaid = order.datePaid;
+		}
+		// 待收货时间
+		if (order.datePendingDeliver) {
+			orderInfo.datePendingDeliver = order.datePendingDeliver;
+		}
+		// 全部发货时间
+		if (order.deliverStatus == DELIVERSTATUS.DELIVERED && order.dateDelivered) {
+			orderInfo.dateDelivered = order.dateDelivered;
+		}
+		// 完成时间
+		if (order.deliverStatus == DELIVERSTATUS.RECEIVED && order.dateCompleted) {
+			orderInfo.dateCompleted = order.dateCompleted;
+		}
 		orderInfo.payment = payment;
-        order.order = orderInfo;
+		order.order = orderInfo;
 	}
 
     return order;

@@ -2132,7 +2132,7 @@ OrderService.prototype.getById = function(id, callback) {
 	});
 };
 
-OrderService.prototype.pendingDeliverToRSC = function(order){
+OrderService.prototype.pendingDeliverToRSC = function(order) {
     return (order.payStatus == PAYMENTSTATUS.PAID || (order.payStatus == PAYMENTSTATUS.PARTPAID && order.depositPaid)) && order.deliverStatus != DELIVERSTATUS.DELIVERED;
 };
 
