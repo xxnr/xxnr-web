@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="container" style="padding: 0">
     <!-- pagination example -->
     <div class="timeline">
       <div
@@ -27,7 +27,6 @@
         <h1>{{item.title}}</h1>
         <button @click="turnTo(($index+2))">to page{{$index+1}}</button>
       </div>
-
     </slide>
   </div>
   <!--<div class="index-nav">-->
@@ -36,11 +35,19 @@
     <!--<div class="nav-bit">3</div>-->
   <!--</div>-->
   <section-tabs></section-tabs>
-  <index-products-block-list :products="indexCars"></index-products-block-list>
-  <index-products-block-list :products="indexHuafei"></index-products-block-list>
-  <div class="xxnr-title">
-    xx精选
-    <div class="title-more">更多产品</div>
+  <div class="container">
+    <div class="container">
+      <div class="xxnr-title xxnr-title-car">
+        汽车精选
+        <div class="title-more"><a href="/6C7D8F66">更多产品&nbsp;></a></div>
+      </div>
+      <index-products-block-list :products="indexCars"></index-products-block-list>
+      <div class="xxnr-title xxnr-title-huafei">
+        化肥精选
+        <div class="title-more"><a href="/531680A5">更多产品&nbsp;></a></div>
+      </div>
+      <index-products-block-list :products="indexHuafei"></index-products-block-list>
+    </div>
   </div>
   <div class="container">
     <div class="clear"></div>
@@ -175,9 +182,20 @@
   .xxnr-title {
     position: relative;
     padding: 0 2%;
-    height: 30px;
-    line-height: 30px;
+    height: 15px;
+    line-height: 15px;
     font-size: 15px;
+    margin: 16px 0;
+    border-left: 4px solid #ff8822;
+    color: #323232;
+  }
+
+  .xxnr-title-huafei {
+    border-color: #33AA44;
+  }
+
+  .xxnr-title-car {
+    border-color: #FF8822;
   }
 
   .title-more {
@@ -185,7 +203,7 @@
     right: 2%;
     font-size: 12px;
     line-height: 12px;
-    bottom: 5px;
+    bottom: 0px;
   }
 
   .container {
@@ -232,6 +250,7 @@
     flex: auto;
     font-size: 15px;
     border-left: 1px solid #ccc;
+    color: #909090;
   }
 
   .footer-link a:first-child {

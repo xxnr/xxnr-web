@@ -2,7 +2,16 @@
   <div class="products clearfix">
     <a href="">
       <div class="product" v-for="product in products">
-        {{product.name}}
+        <div class="product-img">
+          <img :src="product.imgUrl">
+        </div>
+        <div class="product-name">{{product.name}}</div>
+        <div class="product-presale" v-if="product.presale">
+          即将上线
+        </div>
+        <div class="product-price" v-else>
+          ¥{{product.price}}
+        </div>
       </div>
     </a>
   </div>
@@ -14,12 +23,44 @@
   }
 </script>
 
-<style>
-  .products div{
-    float: left;
-  }
+<style scoped>
   .product{
-    height: 200px;
-    width: 50%;
+    float: left;
+    width: 49%;
+    margin-left: 2%;
+    margin-bottom: 15px;
+    height: 220px;
+  }
+
+  .product:nth-child(2n+1) {
+    margin-left: 0;
+  }
+
+  .product-name {
+    font-size: 12px;
+    line-height: 15px;
+    height: 30px;
+    overflow: hidden;
+    margin-top: 5px;
+  }
+
+  .product-img {
+    border: 1px solid #c7c7c7;
+  }
+
+  .product-img img{
+    width: 100%;
+    height: 150px;
+  }
+
+  .product-price {
+    color: #ff4e00;
+    font-size: 16px;
+    line-height: 30px;
+  }
+
+  .product-presale {
+    color: #909090;
+    font-size: 16px;
   }
 </style>

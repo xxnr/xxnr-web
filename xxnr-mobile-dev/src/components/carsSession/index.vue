@@ -1,7 +1,5 @@
 <template>
-  <div class="container">
-    <products-rows-list :products="carsRows"></products-rows-list>
-  </div>
+  <products-rows-list :products="carsRows"></products-rows-list>
 </template>
 
 <script>

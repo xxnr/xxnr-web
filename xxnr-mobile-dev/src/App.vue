@@ -27,7 +27,7 @@
 
   body {
     font-family: "Microsoft YaHei", "Lucida Sans Unicode", "Myriad Pro", "Hiragino Sans GB", "Heiti SC", Verdana, simsun;
-    background-color: #F5F5F5;
+    background-color: #fafafa;
     color: #595757;
   }
   input {

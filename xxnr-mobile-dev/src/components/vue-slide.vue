@@ -185,18 +185,20 @@ export default {
 .timeline {
     position: absolute;
     bottom: 10px;
-    z-index: 100;
+    z-index: 99;
     left: 50%;
     margin-left: -25px;
 }
 
 .item {
-    width: 10px;
-    height: 10px;
+    width: 6px;
+    height: 6px;
     border-radius: 50%;
-    background-color: #ccc;
+    background-color: #131313;
     float: left;
     margin-left: 10px;
+    border: 2px solid #fff;
+    opacity: .5;
 }
 
 .item:first-child {
@@ -204,7 +206,11 @@ export default {
 }
 
 .item.active {
-    background-color: #999;
+    background-color: #00EBB4;
+    opacity: 1;
+    width: 9px;
+    height: 9px;
+    margin-top: -2px;
 }
 
 .container {
