@@ -503,6 +503,11 @@
 		}
 
 		$.components.GET(managerurl + '/api/users/', users.filter, function(response) {
+			if(response.code!=1000) {
+				alert(response.message);
+			}
+
+			response = response.users;
             response.items.forEach(function(item){
 				if(item.typeVerified){
 					item.typeNameVerified = [];
