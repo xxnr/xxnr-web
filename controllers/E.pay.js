@@ -106,36 +106,15 @@ function payOrder(req, payExecutor){
             if (req.payType) {
                 reqOptions.payType = req.payType;
             }
-            if (req.payType && req.payType !== payment.payType) {
-                OrderService.updatepayType({'paytype':req.payType,'orderid':order.id,'paymentid':payment.id}, function(err) {
-                    if(err) {
-                        console.error('pay payOrder OrderService updateOrderPaytype err:', err);
-                        res.respond({'code':'1001','message':'修改支付方式出错'});
-                        return;
-                    }
-                    payment.payType = req.payType;
-                    order.payType = req.payType;
-                    OrderService.getPayOrderPaymentInfo(order, payment, payPrice, reqOptions, function (err, resultPayment, resultPayPrice) {
-                        if (err) {
-                            console.error('pay payOrder OrderService getPayOrderPaymentInfo err:', err);
-                            res.respond({code:1001, message:'获取支付信息出错'});
-                            return;
-                        }
-                        payExecutor(resultPayment.id, parseFloat(resultPayPrice).toFixed(2), req.ip, order.id, resultPayment);
-                        return;
-                    });
-                });
-            } else {
-                OrderService.getPayOrderPaymentInfo(order, payment, payPrice, reqOptions, function (err, resultPayment, resultPayPrice) {
-                    if (err) {
-                        console.error('pay payOrder OrderService getPayOrderPaymentInfo err:', err);
-                        res.respond({code:1001, message:'获取支付信息出错'});
-                        return;
-                    }
-                    payExecutor(resultPayment.id, parseFloat(resultPayPrice).toFixed(2), req.ip, order.id, resultPayment);
+            OrderService.getPayOrderPaymentInfo(order, payment, payPrice, reqOptions, function (err, resultPayment, resultPayPrice) {
+                if (err) {
+                    console.error('pay payOrder OrderService getPayOrderPaymentInfo err:', err);
+                    res.respond({code:1001, message:'获取支付信息出错'});
                     return;
-                });
-            }
+                }
+                payExecutor(resultPayment.id, parseFloat(resultPayPrice).toFixed(2), self.ip, order.id, resultPayment);
+                return;
+            });
         } catch (e) {
             console.error('pay payOrder OrderService getPayOrderPaymentInfo err:', e);
             res.respond({"code":1001, "mesage":"获取支付信息出错"});
