@@ -53,7 +53,7 @@ Umeng.prototype.umengSend = function(params, appMasterSecret, callback) {
 			callback(err, result);
 			return;
 		}
-		console.log(result);
+		callback(null, result);
 	});
 };
 
@@ -125,11 +125,11 @@ Umeng.prototype.sendAndroidCustomizedcast = function(type, alias, aliasType, opt
     // send 
     self.umengSend(customizedcast, umengConfig.androidAppMasterSecret, function(err, result) {
     	if (err) {
-			console.error('Umeng sendAndroidCustomizedcast umengSend err:', err);
+			console.error('Umeng sendAndroidCustomizedcast umengSend err:', err, 'alias: '+alias);
 			callback(err, result);
 			return;
 		}
-		console.log(result);
+		callback(null, result);
     });
 };
 
@@ -190,11 +190,11 @@ Umeng.prototype.sendIOSCustomizedcast = function(type, alias, aliasType, options
     // send 
     self.umengSend(customizedcast, umengConfig.iosAppMasterSecret, function(err, result) {
     	if (err) {
-			console.error('Umeng sendIOSCustomizedcast umengSend err:', err);
+			console.error('Umeng sendIOSCustomizedcast umengSend err:', err, 'alias: '+alias);
 			callback(err, result);
 			return;
 		}
-		console.log(result);
+		callback(null, result);
     });
 };
 
@@ -237,7 +237,7 @@ Umeng.prototype.retrySendCustomizedcast = function(type, alias, aliasType, optio
 				}
 			}
 		} else {
-			console.log('Umeng retrySendCustomizedcast sendCustomizedcast ' + deviceType + ' result:', result);
+			console.log('Umeng retrySendCustomizedcast sendCustomizedcast ' + deviceType + ' result:', result, 'alias: '+alias);
 		}
 		return;
     };
