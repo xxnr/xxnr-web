@@ -8,7 +8,7 @@ var path = require('path');
 var middleware = require('../middlewares/authentication');
 
 //// admin / manager
-router.get('/manager', middleware.backend_auth ,controllers.Manager.manager);
-router.get('/manager/*', middleware.backend_auth ,controllers.Manager.manager);
+router.get(F.config['manager-url'], middleware.backend_auth ,controllers.Manager.manager);
+router.get(F.config['manager-url']+'/*', middleware.backend_auth ,controllers.Manager.manager);
 
 module.exports = router;

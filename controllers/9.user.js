@@ -451,7 +451,7 @@ exports.json_user_get = function(req, res, next) {
             if (flags.indexOf('score') >= 0) {
                 responds['score'] = (respond);
                 respond = function (user) {
-                    exports.json_userscore_get(req, res, next, function (score) {
+                    json_userscore_get(req, res, next, function (score) {
                         user.score = score;
                         // console.log('user = ' + JSON.stringify(user));
                         responds['score'](user);
@@ -462,20 +462,10 @@ exports.json_user_get = function(req, res, next) {
             if (flags.indexOf('address') >= 0) {
                 responds['address'] = respond;
                 respond = function (user) {
-                    exports.json_useraddresslist_query(req, res, next, function (addresses) {
+                    json_useraddresslist_query(req, res, next, function (addresses) {
                         user.addresses = addresses;
                         user.defaultAddress = getDefaultAddress(addresses);
                         responds['address'](user);
-                    });
-                };
-            }
-
-            if (flags.indexOf('order') >= 0) {
-                responds['order'] = respond;
-                respond = function (user) {
-                    require("./8.order").getOrders(req, res, next, function (orders) {
-                        user.orders = orders;
-                        responds['order'](user);
                     });
                 };
             }
@@ -486,7 +476,7 @@ exports.json_user_get = function(req, res, next) {
 };
 
 // Get user score
-exports.json_userscore_get = function(req, res, next, callback) {
+var json_userscore_get = function(req, res, next, callback) {
     var options = {};
 
     if (req.data.userId)
@@ -504,6 +494,10 @@ exports.json_userscore_get = function(req, res, next, callback) {
         var score = data.score || 0;
         callback ? callback(score) : res.respond({'code': '1000', 'message': 'success', 'datas': {"total": 0, "userId": data.id, "pointLaterTrade": (score || 0), "score":(score || 0), "rows": []}});
     });
+};
+
+exports.json_userscore_get = function(req, res, next){
+    json_userscore_get(req, res, next);
 };
 
 // Modify user password
@@ -724,8 +718,7 @@ exports.json_user_findaccount = function(req, res, next) {
 // User Address
 // ==========================================================================
 
-// Query useraddress list
-exports.json_useraddresslist_query = function(req, res, next, callback) {
+var json_useraddresslist_query = function(req, res, next ,callback){
     var options = {};
 
     if (!req.data.userId) {
@@ -774,6 +767,11 @@ exports.json_useraddresslist_query = function(req, res, next, callback) {
             callback ? callback(arr) : res.respond({'code': '1000', 'message': 'success', 'datas': {"total": count, "rows": arr}});
         }
     });
+};
+
+// Query useraddress list
+exports.json_useraddresslist_get = function(req, res, next) {
+    json_useraddresslist_query(req, res, next);
 };
 
 // Create useraddress

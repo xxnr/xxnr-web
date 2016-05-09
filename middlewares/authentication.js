@@ -107,7 +107,8 @@ exports.backend_auth = function(req, res, next){
                 res.respond({code:1403, message: '您没有权限这样操作'});
                 return;
             }
-            var route = req.route.path.trim().toLowerCase();
+
+            var route = req.route.path.toString().trim().toLowerCase();
             var method = req.method.trim().toLowerCase();
             if (route.endsWith('/'))
                 route = route.substring(0, route.length - 1);
@@ -150,7 +151,7 @@ function backend_auth_fail(req, res, data){
     } else {
         res.render('./7.manager/login.html',
             {
-                manager_url: "/manager",
+                manager_url: F.config['manager-url'],
                 user: data
             });
     }

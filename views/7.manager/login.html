@@ -58,7 +58,7 @@
                             // Error handling
                             SET('orders.response', response);
                             if (response.code == 1000) {
-                                window.location.href = "/manager";
+                                window.location.href = managerurl;
                             }else{
                                 alert(response.message);
                             }

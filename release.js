@@ -67,6 +67,19 @@ app.engine('html', require('ejs-mate'));
 /**
  * middleware
  */
+app.use(function (req, res, next) {
+	if (req.headers['content-type']){
+		req.headers['content-type'] = req.headers['content-type'].replace('charset=utf8', 'charset=utf-8');
+	}
+
+	// utf-8 is not a valid content-encoding while old android app will add this header improperly, so we need to remove them.
+	if(req.headers['content-encoding'] && req.headers['content-encoding'].toLocaleLowerCase() === 'utf-8'){
+    	delete req.headers['content-encoding'];
+	}
+
+	return next();
+});
+
 // bodyParser based on content type
 app.use(bodyParser.json({
 	'limit': '1mb'
