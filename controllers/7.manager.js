@@ -20,6 +20,7 @@ var PAYMENTSTATUS = require('../common/defs').PAYMENTSTATUS;
 var DELIVERSTATUS = require('../common/defs').DELIVERSTATUS;
 var DELIVERYTYPENAME = require('../common/defs').DELIVERYTYPENAME;
 var OFFLINEPAYTYPE = require('../common/defs').OFFLINEPAYTYPE;
+var DELIVERYTYPE =  require('../common/defs').DELIVERYTYPE;
 
 exports.install = function() {
 	// Auto-localize static HTML templates
