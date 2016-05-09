@@ -21,8 +21,11 @@ var PAYMENTSTATUS = require('../common/defs').PAYMENTSTATUS;
 var DELIVERSTATUS = require('../common/defs').DELIVERSTATUS;
 var DELIVERYTYPENAME = require('../common/defs').DELIVERYTYPENAME;
 var OFFLINEPAYTYPE = require('../common/defs').OFFLINEPAYTYPE;
+var DELIVERYTYPE =  require('../common/defs').DELIVERYTYPE;
+
 var config = require('../config');
 var path = require('path');
+
 exports.install = function() {
 	// Auto-localize static HTML templates
 	F.localize('All templates', '/templates/');
@@ -701,7 +704,13 @@ exports.json_orders_query = function(req,res,next) {
 				if (order.deliverStatus == DELIVERSTATUS.RECEIVED && order.dateCompleted) {
 					item.dateCompleted = order.dateCompleted;
 				}
-				var orderInfo = {'totalPrice':order.price.toFixed(2), 'deposit':order.deposit.toFixed(2), 'dateCreated':order.dateCreated, 'orderStatus': OrderService.orderStatus(order)};
+				var orderInfo = {
+					'totalPrice':order.price.toFixed(2), 
+					'deposit':order.deposit.toFixed(2), 
+					'dateCreated':order.dateCreated, 
+					'orderStatus': OrderService.orderStatus(order),
+					'pendingDeliverToRSC': OrderService.pendingDeliverToRSC(order)
+				};
 				item.order = orderInfo;
 				arr[i] = item;
 			}
@@ -1051,26 +1060,32 @@ var convertOrderToShow = function(order, payment){
 		if (order.duePrice)
 			order.duePrice = parseFloat(order.duePrice.toFixed(2));
 		// 订单合成状态
-        order.orderType = OrderService.orderType(order);
-		var orderInfo = {'totalPrice':parseFloat(order.price.toFixed(2)),'deposit':parseFloat(order.deposit.toFixed(2)),'dateCreated':order.dateCreated, 'orderStatus': OrderService.orderStatus(order)};
-        // 支付时间
-	    if (order.payStatus == PAYMENTSTATUS.PAID && order.datePaid) {
-	        orderInfo.datePaid = order.datePaid;
-	    }
-	    // 待收货时间
-	    if (order.datePendingDeliver) {
-	        orderInfo.datePendingDeliver = order.datePendingDeliver;
-	    }
-	    // 全部发货时间
-	    if (order.deliverStatus == DELIVERSTATUS.DELIVERED && order.dateDelivered) {
-	        orderInfo.dateDelivered = order.dateDelivered;
-	    }
-	    // 完成时间
-	    if (order.deliverStatus == DELIVERSTATUS.RECEIVED && order.dateCompleted) {
-	        orderInfo.dateCompleted = order.dateCompleted;
-	    }
+		order.orderType = OrderService.orderType(order);
+		var orderInfo = {
+			'totalPrice': parseFloat(order.price.toFixed(2)),
+			'deposit': parseFloat(order.deposit.toFixed(2)),
+			'dateCreated': order.dateCreated,
+			'orderStatus': OrderService.orderStatus(order),
+			'pendingDeliverToRSC': OrderService.pendingDeliverToRSC(order)
+		};
+		// 支付时间
+		if (order.payStatus == PAYMENTSTATUS.PAID && order.datePaid) {
+			orderInfo.datePaid = order.datePaid;
+		}
+		// 待收货时间
+		if (order.datePendingDeliver) {
+			orderInfo.datePendingDeliver = order.datePendingDeliver;
+		}
+		// 全部发货时间
+		if (order.deliverStatus == DELIVERSTATUS.DELIVERED && order.dateDelivered) {
+			orderInfo.dateDelivered = order.dateDelivered;
+		}
+		// 完成时间
+		if (order.deliverStatus == DELIVERSTATUS.RECEIVED && order.dateCompleted) {
+			orderInfo.dateCompleted = order.dateCompleted;
+		}
 		orderInfo.payment = payment;
-        order.order = orderInfo;
+		order.order = orderInfo;
 	}
 
     return order;
@@ -1090,9 +1105,8 @@ exports.json_users_query = function(req,res,next) {
 			return;
 		}
 		if(data){
-			res.respond(data);
+			res.respond({code:1000, users:data || []});
 		}
-
 	});
 }
 
