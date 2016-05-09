@@ -432,7 +432,7 @@ exports.process_RSC_confirm_OfflinePay = function(req, res, next){
         }
 
         OrderService.payNotify(paymentId, options);
-        res.send('success');
+        res.respond({code:1000, message:'success'});
     });
 };
 
