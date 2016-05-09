@@ -14,6 +14,6 @@ module.exports = {
     proxyTable: {}
   },
   API_ROOT: (process.env.NODE_ENV === 'production')
-    ? 'http://m.xinxinnongren.com/'
+    ? '/'
     :'/'
 }

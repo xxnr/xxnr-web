@@ -1,5 +1,6 @@
 <template>
   <div class="container" style="padding: 0">
+    <app-download-overlay></app-download-overlay>
     <!-- pagination example -->
     <div class="timeline">
       <div
@@ -39,12 +40,12 @@
     <div class="container">
       <div class="xxnr-title xxnr-title-car">
         汽车精选
-        <div class="title-more"><a href="/6C7D8F66">更多产品&nbsp;></a></div>
+        <div class="title-more"><a @click="showBackBtn()" v-link="{ path: '/6C7D8F66' }">更多产品&nbsp;></a></div>
       </div>
       <index-products-block-list :products="indexCars"></index-products-block-list>
       <div class="xxnr-title xxnr-title-huafei">
         化肥精选
-        <div class="title-more"><a href="/531680A5">更多产品&nbsp;></a></div>
+        <div class="title-more"><a @click="showBackBtn()" v-link="{ path: '/531680A5' }">更多产品&nbsp;></a></div>
       </div>
       <index-products-block-list :products="indexHuafei"></index-products-block-list>
     </div>
@@ -70,7 +71,8 @@
   import slide from '../vue-slide.vue'
   import sectionTabs from './SectionTabs.vue'
   import IndexProductsBlockList from './IndexProductsBlockList.vue'
-  import { getIndexCars,getIndexHeafei } from '../../vuex/actions'
+  import appDownloadOverlay from './appDownloadOverlay.vue'
+  import { getIndexCars,getIndexHeafei,showBackBtn } from '../../vuex/actions'
 
   export default {
     vuex:{
@@ -80,7 +82,8 @@
       },
       actions:{
         getIndexCars,
-        getIndexHeafei
+        getIndexHeafei,
+          showBackBtn
       }
     },
     data () {
@@ -157,7 +160,7 @@
       }
     },
     components: {
-      slide,sectionTabs,IndexProductsBlockList
+      slide,sectionTabs,IndexProductsBlockList,appDownloadOverlay
     },
     created () {
       this.getIndexCars();

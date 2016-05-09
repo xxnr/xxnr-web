@@ -58,3 +58,6 @@ export const showBackBtn = ({dispatch,state}) => {
 export const hideBackBtn = ({dispatch,state}) => {
   dispatch(types.HIDE_BACKBUTTON)
 }
+export const closeAppDownload = ({dispatch,state}) => {
+  dispatch(types.CLOSE_APPDOWNLOAD)
+}

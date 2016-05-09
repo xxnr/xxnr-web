@@ -2,11 +2,8 @@
   <div class="section-tabs clearfix">
       <div class="section-tab" v-for="category in categories" v-if="$index < 2">
         <a @click="showBackBtn()" v-link="{ path: '/'+ category.id}">
-          <span v-if="category.name == '汽车'" class="orange">
+          <span v-bind:class="{ 'orange': category.name == '汽车', 'blue': category.name == '化肥' }">
               {{category.name}}专场
-          </span>
-          <span v-else class="blue">
-            {{category.name}}专场
           </span>
         <img src="/assets/images/car.png" class="section-tab-icon" v-if="category.name == '汽车'"/>
         <img src="/assets/images/fertilizer.png" class="section-tab-icon" v-if="category.name == '化肥'"/>

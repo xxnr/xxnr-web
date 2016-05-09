@@ -6,7 +6,7 @@
 
 <script>
   import ProductsRowsList from '../ProductsRowsList.vue'
-  import { getHuafeiRowsViewCars,hideBackBtn } from '../../vuex/actions'
+  import { getHuafeiRowsViewCars,hideBackBtn,showBackBtn } from '../../vuex/actions'
 
   export default {
     vuex:{
@@ -14,7 +14,7 @@
         huafeiRows:state => state.rowsViewProducts.rowsViewHuafei
       },
       actions:{
-        getHuafeiRowsViewCars,hideBackBtn
+        getHuafeiRowsViewCars,hideBackBtn,showBackBtn
       }
     },
     components: {
@@ -28,9 +28,11 @@
         }
         transition.next()
       }
+
     },
     created () {
       this.getHuafeiRowsViewCars();
+      this.showBackBtn();
     }
   }
 </script>

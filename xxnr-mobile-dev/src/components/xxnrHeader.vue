@@ -1,8 +1,8 @@
 <template>
   <div class="mobile-header">
     {{headerTitle}}
-    <div class="header-bit header-back" v-link="{ path:'/home'}" v-if="backButtonDisplay"> < </div>
-    <div class="header-bit header-right">{{rightButton}}</div>
+    <div class="header-bit header-back" v-link="{ path:'/home'}" v-if="backButtonDisplay"><img src="/assets/images/header_back_arrow.png" alt=""> </div>
+    <div class="header-bit header-right" v-if="rightButton">{{rightButton}}</div>
   </div>
 </template>
 
@@ -10,15 +10,9 @@
   export default {
     vuex: {
       getters: {
-        headerTitle: function (state) {
-          return state.header.headerTitle
-        },
-        rightButton: function (state) {
-          return state.header.rightButton
-        },
-        backButtonDisplay: function (state) {
-          return state.header.backButtonDisplay
-        }
+        headerTitle: state => state.header.headerTitle,
+        rightButton: state => state.header.rightButton,
+        backButtonDisplay: state => state.header.backButtonDisplay
       },
       actions: {
       }
@@ -47,7 +41,10 @@
   .header-back {
     left: 2%;
   }
-
+  .header-back img{
+    height: 20px;
+    padding-top: 6px;
+  }
   .header-right {
     right: 2%;
   }

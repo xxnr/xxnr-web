@@ -6,7 +6,7 @@ import {
 // initial state
 const state = {
   headerTitle: '新新农人',
-  rightButton: 'xxnr',
+  rightButton: false,
   backButtonDisplay:false
 }
 
