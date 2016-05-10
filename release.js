@@ -50,11 +50,11 @@ var app = express();
 
 // certificate
 var privateKey = fs.readFileSync('private_key.pem').toString();
-// var certificate = fs.readFileSync('cert.pem').toString();
-// var options = {
-// 	key:privateKey,
-// 	cert:certificate
-// };
+var certificate = fs.readFileSync('cert.pem').toString();
+var options = {
+	key:privateKey,
+	cert:certificate
+};
 
 app.disable('etag');
 app.set('jsonp callback name', 'JSON_CALLBACK');
@@ -125,5 +125,5 @@ app.use(function (err, req, res, next) {
 
 http.createServer(app).listen(80);
 console.info('application listen at port 80');
-// https.createServer(options, app).listen(443);
-// console.info('application listen at port 443');
+https.createServer(options, app).listen(443);
+console.info('application listen at port 443');
