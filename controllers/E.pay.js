@@ -113,7 +113,7 @@ function payOrder(req, res, payExecutor){
                     res.respond({code:1001, message:'获取支付信息出错'});
                     return;
                 }
-                payExecutor(resultPayment.id, parseFloat(resultPayPrice).toFixed(2), self.ip, order.id, resultPayment);
+                payExecutor(resultPayment.id, parseFloat(resultPayPrice).toFixed(2), req.ip, order.id, resultPayment);
                 return;
             });
         } catch (e) {
