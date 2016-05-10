@@ -1181,16 +1181,18 @@ OrderService.prototype.getPayOrderPaymentInfo = function(order, payment, payPric
     var query = {'id':order.id, 'payments.id':payment.id};
     var setValues = {};
     var newPayment = {};
+    var resultPayPrice;
     // pay price is logical
     if (payPrice && (tools.isPrice(payPrice.toString()) && parseFloat(payPrice) && parseFloat(parseFloat(payPrice).toFixed(2)) >= 0.01 && parseFloat(parseFloat(payPrice).toFixed(2)) < payment.price)) {
     	// this payPrice must equal the payment payPrice, avoiding alipay or unionpay created the payment
     	if (payment.payPrice && parseFloat(parseFloat(payment.payPrice).toFixed(2)) == parseFloat(parseFloat(payPrice).toFixed(2))) {
-    		callback(null, payment, payPrice);
+    		// callback(null, payment, payPrice);
     		if (options && options.payType) {
 	        	if (!payment.payType || payment.payType !== options.payType) {
-		            setValues = {'payments.$.payType': options.payType};
+		            setValues = {'payments.$.payType': options.payType, 'payType': options.payType};
 		        }
 		    }
+		    resultPayPrice = payPrice;
     	} else {
     		setValues = {'payments.$.isClosed':true};
          	var paymentOption = {paymentId: U.GUID(10), slice: payment.slice, price: payment.price, suborderId: payment.suborderId};
@@ -1205,12 +1207,13 @@ OrderService.prototype.getPayOrderPaymentInfo = function(order, payment, payPric
     } else {
     	// the payment payPrice is null or must equal the payment price, avoiding alipay or unionpay created the payment
     	if (!payment.payPrice || parseFloat(parseFloat(payment.payPrice).toFixed(2)) == parseFloat(parseFloat(payment.price).toFixed(2))) {
-	    	callback(null, payment, payment.price);
+	    	// callback(null, payment, payment.price);
     		if (options && options.payType) {
 	        	if (!payment.payType || payment.payType !== options.payType) {
-		            setValues = {'payments.$.payType': options.payType};
+		            setValues = {'payments.$.payType': options.payType, 'payType': options.payType};
 		        }
 		    }
+		    resultPayPrice = payment.price;
 	    } else {
     		setValues = {'payments.$.isClosed':true};
 			var paymentOption = {paymentId: U.GUID(10), slice: payment.slice, price: payment.price, suborderId: payment.suborderId};
@@ -1256,10 +1259,20 @@ OrderService.prototype.getPayOrderPaymentInfo = function(order, payment, payPric
 			        } else {
 			        	callback(null, newPayment, newPayment.price);
 			        }
+			        // update order paystatus
+					self.checkPayStatus({id:order.id}, function(err, order, payment) {});
 			        return;
 			    });
+			} else {
+				callback(null, payment, resultPayPrice);
+				// update order paystatus
+				self.checkPayStatus({id:order.id}, function(err, order, payment) {});
+				return;
 			}
 	    });
+	} else {
+		callback(null, payment, resultPayPrice);
+		return;
 	}
 };
 
