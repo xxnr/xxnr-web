@@ -503,7 +503,7 @@
 		}
 
 		$.components.GET(managerurl + '/api/users/', users.filter, function(response) {
-			if(response.code!=1000) {
+			if(response.code!=1000){
 				alert(response.message);
 			}
 

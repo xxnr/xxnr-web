@@ -67,6 +67,19 @@ app.engine('html', require('ejs-mate'));
 /**
  * middleware
  */
+app.use(function (req, res, next) {
+	if (req.headers['content-type']){
+		req.headers['content-type'] = req.headers['content-type'].replace('charset=utf8', 'charset=utf-8');
+	}
+
+	// utf-8 is not a valid content-encoding while old android app will add this header improperly, so we need to remove them.
+	if(req.headers['content-encoding'] && req.headers['content-encoding'].toLocaleLowerCase() === 'utf-8'){
+    	delete req.headers['content-encoding'];
+	}
+
+	return next();
+});
+
 // bodyParser based on content type
 app.use(bodyParser.json({
 	'limit': '1mb'
@@ -88,7 +101,7 @@ app.use(busboy({
 app.use(require('./middlewares/website'));
 
 // set static file path
-app.use(express.static(path.join(__dirname, 'public/xxnr')));
+app.use(express.static(path.join(__dirname, F.config.directory_xxnr_public)));
 app.use(express.static(path.join(__dirname, 'public')));
 
 var routes = require('./routes');
@@ -99,6 +112,16 @@ app.use('/', routes.frontendPages);
 app.use('/', routes.appRelatedPages);
 app.use('/', routes.backendApis);
 app.use('/', routes.backendPages);
+
+app.use(function (err, req, res, next) {
+	if(F.config.environment === 'production'){
+		res.status(500);
+		res.end();
+		return;
+	}
+
+	next(err);
+});
 
 http.createServer(app).listen(80);
 console.info('application listen at port 80');

@@ -22,7 +22,6 @@ var DELIVERSTATUS = require('../common/defs').DELIVERSTATUS;
 var DELIVERYTYPENAME = require('../common/defs').DELIVERYTYPENAME;
 var OFFLINEPAYTYPE = require('../common/defs').OFFLINEPAYTYPE;
 var DELIVERYTYPE =  require('../common/defs').DELIVERYTYPE;
-
 var config = require('../config');
 var path = require('path');
 
@@ -32,7 +31,7 @@ exports.install = function() {
 
 	// COMMON
 	//F.route(CONFIG('manager-url') + '/*', 									'~manager', ['get'], ['backend_auth']);
-	F.route(CONFIG('manager-url') + '/upload/',                  			upload, ['post', 'upload'], 3084, ['backend_auth']); // 3 MB
+	//F.route(CONFIG('manager-url') + '/upload/',                  			upload, ['post', 'upload'], 3084, ['backend_auth']); // 3 MB
 	F.route(CONFIG('manager-url') + '/upload/base64/',           			upload_base64, ['post'], 2048, ['backend_auth']); // 2 MB
 	// AREA
 	//F.route(CONFIG('manager-url') + '/api/area/getProvinceList/',			json_province_query, ['get', 'post'], ['backend_auth']);
@@ -185,7 +184,7 @@ exports.install = function() {
 
 };
 
-var files = DB('files', null, require('total.js/database/database').BUILT_IN_DB).binary;
+var files = DB('files', null, require('../modules/database/database').BUILT_IN_DB).binary;
 
 // ==========================================================================
 // COMMON
@@ -247,33 +246,38 @@ exports.CKEditor_uploadImage = function(req, res, next) {
 };
 
 // Upload (multiple) pictures
-function upload(callback) {
-
-	var self = this;
-	var async = [];
+exports.upload = function(req, res, next) {
 	var id = [];
 
-	self.files.wait(function(file, next) {
-		file.read(function(err, data) {
-			// Store current file into the HDD
-			var index = file.filename.lastIndexOf('.');
-
-			if (index === -1)
-				file.extension = '.dat';
-			else
-				file.extension = file.filename.substring(index);
-
-			id.push(files.insert(file.filename, file.type, data) + file.extension);
-
-			// Next file
-			setTimeout(next, 100);
+	req.busboy.on('file', function(fieldname, file, filename, encoding, mimetype){
+		var buffers = [];
+		file.on('data', function(data){
+			buffers.push(data);
 		});
 
-	}, function() {
-		// Returns response
-		callback ? callback(id) : res.json(id);
+		file.on('end', function(){
+			console.log('file end');
+			var fileBuf = Buffer.concat(buffers);
+
+			// Store current file into the HDD
+			var index = filename.lastIndexOf('.');
+			var extension = filename.substring(index+1);
+
+			if (index === -1)
+				extension = '.dat';
+			else
+				extension = filename.substring(index);
+
+			id.push(files.insert(filename, mimetype, fileBuf) + extension);
+		})
 	});
-}
+
+	req.busboy.on('finish', function(){
+		res.json(id);
+	});
+
+	req.pipe(req.busboy);
+};
 
 // Upload base64
 function upload_base64() {
@@ -665,24 +669,24 @@ exports.json_orders_query = function(req,res,next) {
 				// var item = items[i];
 				var order = items[i];
 				var item = {
-					'id':order.id,
-					'paymentId':order.paymentId,
-					'price':order.price,
-					'deposit':order.deposit,
-					'consigneeAddress':order.consigneeAddress,
-					'consigneeName':order.consigneeName,
-					'consigneePhone':order.consigneePhone,
-					'buyerName':order.buyerName,
-					'buyerPhone':order.buyerPhone,
-					'payType':order.payType,
-					'products':order.products || [],
-					'SKUs':order.SKUs || [],
-					'duePrice':typeof(order.duePrice) != 'undefined' ? parseFloat(order.duePrice.toFixed(2)) : null,
-					'deliveryType':order.deliveryType,
-					'payStatus':order.payStatus,
-					'deliverStatus':order.deliverStatus,
-					'RSCInfo':order.RSCInfo,
-					'isClosed':order.isClosed
+					'id': order.id,
+					'paymentId': order.paymentId,
+					'price': order.price,
+					'deposit': order.deposit,
+					'consigneeAddress': order.consigneeAddress,
+					'consigneeName': order.consigneeName,
+					'consigneePhone': order.consigneePhone,
+					'buyerName': order.buyerName,
+					'buyerPhone': order.buyerPhone,
+					'payType': order.payType,
+					'products': order.products || [],
+					'SKUs': order.SKUs || [],
+					'duePrice': typeof(order.duePrice) != 'undefined' ? parseFloat(order.duePrice.toFixed(2)) : null,
+					'deliveryType': order.deliveryType,
+					'payStatus': order.payStatus,
+					'deliverStatus': order.deliverStatus,
+					'RSCInfo': order.RSCInfo,
+					'isClosed': order.isClosed
 				};
 				// 订单合成状态
 				item.typeValue = OrderService.orderType(order);
@@ -705,9 +709,9 @@ exports.json_orders_query = function(req,res,next) {
 					item.dateCompleted = order.dateCompleted;
 				}
 				var orderInfo = {
-					'totalPrice':order.price.toFixed(2), 
-					'deposit':order.deposit.toFixed(2), 
-					'dateCreated':order.dateCreated, 
+					'totalPrice': order.price.toFixed(2),
+					'deposit': order.deposit.toFixed(2),
+					'dateCreated': order.dateCreated,
 					'orderStatus': OrderService.orderStatus(order),
 					'pendingDeliverToRSC': OrderService.pendingDeliverToRSC(order)
 				};
@@ -989,7 +993,7 @@ exports.json_orders_read = function(req,res,next) {
 		}
         res.respond({code:1000, message:'success', datas: convertOrderToShow(order, payment)});
     });
-}
+};
 
 var convertOrderToShow = function(order, payment){
     var subOrdersPayments = {};					// suborder all payments
@@ -1097,7 +1101,6 @@ var convertOrderToShow = function(order, payment){
 
 // Reads all users
 exports.json_users_query = function(req,res,next) {
-	var self = this;
 	UserService.query(req.query, function(err,data){
 		if (err) {
 			console.error('manager json_users_query err:', err);
@@ -1108,7 +1111,7 @@ exports.json_users_query = function(req,res,next) {
 			res.respond({code:1000, users:data || []});
 		}
 	});
-}
+};
 
 // Saves specific user (user must exist)
 exports.json_users_save = function(req,res,next) {

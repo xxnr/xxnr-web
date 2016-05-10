@@ -129,8 +129,8 @@ router.post('/api/v2.0/user/getInvitee', middleware.isLoggedIn_middleware, contr
 router.get('/api/v2.0/user/getInviteeOrders', middleware.isLoggedIn_middleware, controllers.User.json_get_invitee_orders);
 router.post('/api/v2.0/user/getInviteeOrders', middleware.isLoggedIn_middleware, controllers.User.json_get_invitee_orders);
 router.get('/api/v2.0/usertypes', controllers.User.json_usertypes_get);
-router.get('/api/v2.0/user/getUserAddressList', middleware.isLoggedIn_middleware, controllers.User.json_useraddresslist_query);
-router.post('/api/v2.0/user/getUserAddressList', middleware.isLoggedIn_middleware, controllers.User.json_useraddresslist_query);
+router.get('/api/v2.0/user/getUserAddressList', middleware.isLoggedIn_middleware, controllers.User.json_useraddresslist_get);
+router.post('/api/v2.0/user/getUserAddressList', middleware.isLoggedIn_middleware, controllers.User.json_useraddresslist_get);
 router.get('/api/v2.0/user/saveUserAddress', middleware.isLoggedIn_middleware, controllers.User.json_useraddress_create);
 router.post('/api/v2.0/user/saveUserAddress', middleware.isLoggedIn_middleware, controllers.User.json_useraddress_create);
 router.get('/api/v2.0/user/updateUserAddress', middleware.isLoggedIn_middleware, controllers.User.json_useraddress_update);

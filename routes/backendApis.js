@@ -12,6 +12,7 @@ router.get(F.config['manager-url']+'/api/login/', controllers.Manager.process_lo
 router.post(F.config['manager-url']+'/api/login/', controllers.Manager.process_login);
 
 //7.manager
+router.post(F.config['manager-url']+'/upload', middleware.backend_auth, controllers.Manager.upload);
 router.get(F.config['manager-url']+'/api/dashboard/online/',middleware.backend_auth ,controllers.Manager.json_dashboard_online);
 router.get(F.config['manager-url']+'/api/orders/',middleware.backend_auth ,controllers.Manager.json_orders_query);
 router.get(F.config['manager-url']+ '/api/orders/:id/',middleware.backend_auth ,controllers.Manager.json_orders_read);
