@@ -52,3 +52,9 @@ exports.deliveryCode = require('./deliveryCode');
 
 // pay
 exports.pay = require('./pay');
+
+// dashboard
+exports.dashboard = require('./dashboard');
+
+// vCode
+exports.vCode = require('./vCode');

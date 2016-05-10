@@ -4,6 +4,10 @@ var config= {
     version: "2.1.0",
     author: "xxnr",
     'etag-version': '',
+    serviceStartTime:'2015-11-17',
+    currentTimeZoneDiff:8,
+    environment:'dev',
+    secure:false,
 
 //ArelativeURLaddressintotheeshopmanagement
     "manager-url": "/manager",
@@ -35,10 +39,10 @@ var config= {
     token_cookie_expires_in: "30days",
 
 //vcodevalidtime10mins
-    vcode_resend_valid: "600000",
+    vcode_resend_valid: 600000,
 
 //vcodenextsendtime
-    vcode_resend_interval: "60000",
+    vcode_resend_interval: 60000,
 
 //sendphonemessageoptions
     phone_message_options: {
@@ -56,6 +60,8 @@ var config= {
 //usertypeidmustbeincreasingprogressively
     user_types: {"1": "普通用户", "5": "县级经销商", "6": "新农经纪人"},
     default_user_type: 1,
+    XXNRAgentId:'6',
+    RSCId:'5',
 
 //userminpayprice
     minPayPrice: 3000,
@@ -64,11 +70,12 @@ var config= {
 
     // file upload limit
     file_size_limit: 20 * 1024 * 1024, // 20MB
-    file_count_limit: 1,
+    file_count_limit: 10,
 
     // directory-path
     directory_temp: '/tmp/',
     directory_public: '/public/',
+    directory_xxnr_public: '/public/xxnr/',
 
     default_request_timeout: 5000,
     default_maximum_file_descriptors: 0,

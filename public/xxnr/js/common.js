@@ -328,6 +328,9 @@ app.filter('payTypeToChineseWording', function() {
             case 4:
                 output = "线下POS机";
                 break;
+            case 5:
+                output = "EPOS支付";
+                break;
             default:
                 output = "";
         }

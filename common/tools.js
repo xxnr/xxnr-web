@@ -14,6 +14,8 @@ var regexIdentityNo = /^(\d{15}$|^\d{18}$|^\d{17}(\d|X|x))$/;
 var regexpXXNRHost = new RegExp('(.*\.|^)xinxinnongren\.com.*');
 var config = require('../config');
 var Global = require('../global.js');
+var moment = require('moment-timezone');
+var REG_MOBILE = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|Tablet/i;
 
 /*
     Phone in china validation
@@ -65,7 +67,7 @@ exports.generateAuthCode = function (length) {
 
 function sendPhoneMessage(phonenumber, content) {
 
-    var options = (config.phone_message_options).parseJSON();
+    var options = config.phone_message_options;
     var httpOptions = options.http_request_options;
 
     httpOptions.path = options['url'] + querystring.stringify({
@@ -225,13 +227,11 @@ exports.verify_token = function(token){
 };
 
 exports.isXXNRAgent = function(verifiedTypes){
-    const XXNRAgentId = '6';
-    return verifiedTypes && verifiedTypes.indexOf(XXNRAgentId) != -1;
+    return verifiedTypes && verifiedTypes.indexOf(config.XXNRAgentId) != -1;
 };
 
 exports.isRSC = function(verifiedTypes){
-    const RSCId = '5';
-    return verifiedTypes && verifiedTypes.indexOf(RSCId) != -1;
+    return verifiedTypes && verifiedTypes.indexOf(config.RSCId) != -1;
 };
 
 exports.isValidIdentityNo = function(identityNo){
@@ -336,4 +336,35 @@ exports.stringPinyin = function(options) {
     } else {
         return {'error':'no string', 'strPinyin':strPinyin, 'initial':initial, 'initialType':initialType};
     }
+};
+
+exports.getWeekStartEndTime = function(weekMinus){
+    var currentTime = new Date();
+    var dayOfWeek = currentTime.getDay();
+    if(dayOfWeek == 0){
+        // getDay will return 0 if it is Sunday
+        dayOfWeek = 7;
+    }
+
+    var startTime = new Date(currentTime.add('d', weekMinus*7-dayOfWeek+1).format('yyyy-MM-dd')).add('h', -F.config.currentTimeZoneDiff);
+    var endTime = new Date(currentTime.add('d', (weekMinus+1)*7-dayOfWeek+1).format('yyyy-MM-dd')).add('h', -F.config.currentTimeZoneDiff);
+    if(weekMinus == 0){
+        endTime = new Date(F.config.serviceStartTime).add('h', -F.config.currentTimeZoneDiff);
+    }
+
+    return {startTime: startTime, endTime: endTime};
+};
+
+exports.getWeekStartTimeByDate = function(date){
+     var dayOfWeek = date.getDay();
+    if(dayOfWeek == 0){
+        // getDay will return 0 if it is Sunday
+        dayOfWeek = 7;
+    }
+
+    return new Date(date.add('d', 1-dayOfWeek).format('yyyy-MM-dd')).add('h', -F.config.currentTimeZoneDiff);
+};
+
+exports.isMobile = function(req){
+    return REG_MOBILE.test(req.get('user-agent'));
 };

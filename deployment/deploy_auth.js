@@ -6,7 +6,7 @@ var config = require('../configuration/mongoose_config');
 var permission = require('./permission');
 var mongoose = require('mongoose');
 var async = require('async');
-mongoose.connect(config.db[config.environment],{user:'xxnr',pass:'xxnr001'});
+//mongoose.connect(config.db[config.environment],{user:'xxnr',pass:'xxnr001'});
 
 async.series({
     one: permission.deploy_roles,

@@ -20,7 +20,7 @@ var mongoose = require('mongoose');
 var DeliveryCodeModel = require('../models').deliveryCode;
 var umengConfig = require('../configuration/umeng_config');
 var UMENG = require('../modules/umeng');
-var PayService = require('../services').order;
+var PayService = require('../services/pay');
 var dri = require('../common/dri');
 
 // Service
@@ -244,6 +244,16 @@ OrderService.prototype.query = function(options, callback) {
 	if (type === 4) {
 		mongoOptions["payStatus"] = { $eq: PAYMENTSTATUS.PAID };
 		mongoOptions["deliverStatus"] = { $eq: DELIVERSTATUS.RECEIVED };
+	}
+	// need deliver to RSC
+	if (type === 5) {
+		mongoOptions["$or"] = [{payStatus: { $eq: PAYMENTSTATUS.PARTPAID }, depositPaid: { $eq: true }, SKUs: { $elemMatch: { deliverStatus: { $eq: DELIVERSTATUS.UNDELIVERED } } }}, 
+								{payStatus: { $eq: PAYMENTSTATUS.PAID }, SKUs: { $elemMatch: { deliverStatus: { $eq: DELIVERSTATUS.UNDELIVERED } } }}];
+	}
+	// pendingApprove
+	if (type === 6) {
+		mongoOptions["$or"] = [{isClosed: { $ne: true }, payStatus: { $eq: PAYMENTSTATUS.UNPAID }, pendingApprove: { $eq: true }}, 
+								{payStatus: { $ne: PAYMENTSTATUS.UNPAID }, pendingApprove: { $eq: true }}];
 	}
 
 	if (options.buyer) {
@@ -920,6 +930,9 @@ OrderService.prototype.paid = function(id, paymentId, options, callback) {
 		values['payments.$.RSC'] = options.RSC._id;
 		values['payments.$.RSCCompanyName'] = options.RSC.RSCInfo.companyName;
 	}
+	if (options.EPOSNo) {
+		values['payments.$.EPOSNo'] = options.EPOSNo;
+	}
 	// find and update the payment not PAID
 	var query = { id: id, payments: { $elemMatch: { id: paymentId, payStatus: { $ne: PAYMENTSTATUS.PAID } } } };
 	OrderModel.update(query, {$set:values}, function(err, count) {
@@ -1168,16 +1181,18 @@ OrderService.prototype.getPayOrderPaymentInfo = function(order, payment, payPric
     var query = {'id':order.id, 'payments.id':payment.id};
     var setValues = {};
     var newPayment = {};
+    var resultPayPrice;
     // pay price is logical
     if (payPrice && (tools.isPrice(payPrice.toString()) && parseFloat(payPrice) && parseFloat(parseFloat(payPrice).toFixed(2)) >= 0.01 && parseFloat(parseFloat(payPrice).toFixed(2)) < payment.price)) {
     	// this payPrice must equal the payment payPrice, avoiding alipay or unionpay created the payment
     	if (payment.payPrice && parseFloat(parseFloat(payment.payPrice).toFixed(2)) == parseFloat(parseFloat(payPrice).toFixed(2))) {
-    		callback(null, payment, payPrice);
+    		// callback(null, payment, payPrice);
     		if (options && options.payType) {
 	        	if (!payment.payType || payment.payType !== options.payType) {
-		            setValues = {'payments.$.payType': options.payType};
+		            setValues = {'payments.$.payType': options.payType, 'payType': options.payType};
 		        }
 		    }
+		    resultPayPrice = payPrice;
     	} else {
     		setValues = {'payments.$.isClosed':true};
          	var paymentOption = {paymentId: U.GUID(10), slice: payment.slice, price: payment.price, suborderId: payment.suborderId};
@@ -1192,12 +1207,13 @@ OrderService.prototype.getPayOrderPaymentInfo = function(order, payment, payPric
     } else {
     	// the payment payPrice is null or must equal the payment price, avoiding alipay or unionpay created the payment
     	if (!payment.payPrice || parseFloat(parseFloat(payment.payPrice).toFixed(2)) == parseFloat(parseFloat(payment.price).toFixed(2))) {
-	    	callback(null, payment, payment.price);
+	    	// callback(null, payment, payment.price);
     		if (options && options.payType) {
 	        	if (!payment.payType || payment.payType !== options.payType) {
-		            setValues = {'payments.$.payType': options.payType};
+		            setValues = {'payments.$.payType': options.payType, 'payType': options.payType};
 		        }
 		    }
+		    resultPayPrice = payment.price;
 	    } else {
     		setValues = {'payments.$.isClosed':true};
 			var paymentOption = {paymentId: U.GUID(10), slice: payment.slice, price: payment.price, suborderId: payment.suborderId};
@@ -1243,10 +1259,20 @@ OrderService.prototype.getPayOrderPaymentInfo = function(order, payment, payPric
 			        } else {
 			        	callback(null, newPayment, newPayment.price);
 			        }
+			        // update order paystatus
+					self.checkPayStatus({id:order.id}, function(err, order, payment) {});
 			        return;
 			    });
+			} else {
+				callback(null, payment, resultPayPrice);
+				// update order paystatus
+				self.checkPayStatus({id:order.id}, function(err, order, payment) {});
+				return;
 			}
 	    });
+	} else {
+		callback(null, payment, resultPayPrice);
+		return;
 	}
 };
 
@@ -1736,7 +1762,7 @@ OrderService.prototype._checkPayStatus = function(order, callback) {
 OrderService.prototype.savePaidLog = function(paidLog, callback) {
 	try {
 		if (paidLog && !paidLog.orderId) {
-			OrderModel.findOne({'payments.id':{$ne:paidLog.paymentId}}, function(err, doc) {
+			OrderModel.findOne({'payments.id':{$eq:paidLog.paymentId}}, function(err, doc) {
 				if (doc) {
 					paidLog.orderId = doc.id;
 				}
@@ -1788,7 +1814,9 @@ OrderService.prototype.getByRSC = function(RSC, page, max, type, callback, searc
 				query.isClosed = false;
 				break;
 			case 2:		//待审核
-				query.pendingApprove = true;
+				// query.pendingApprove = true;
+				query["$or"] = [{isClosed: { $ne: true }, payStatus: { $eq: PAYMENTSTATUS.UNPAID }, pendingApprove: { $eq: true }}, 
+								{payStatus: { $ne: PAYMENTSTATUS.UNPAID }, pendingApprove: { $eq: true }}];
 				break;
 			case 3:		//待配送
 				query.payStatus = PAYMENTSTATUS.PAID;
@@ -1810,9 +1838,17 @@ OrderService.prototype.getByRSC = function(RSC, page, max, type, callback, searc
 	}
 
 	if (search) {
-		query.$or = [{buyerPhone: new RegExp('^'+search)},
-			{consigneePhone: new RegExp('^'+search)},
-			{id: new RegExp('^'+search)}];
+		if (query && query.$or) {
+			query.$or.concat([
+				{buyerPhone: new RegExp('^'+search)},
+				{consigneePhone: new RegExp('^'+search)},
+				{id: new RegExp('^'+search)}
+			]);
+		} else {
+			query.$or = [{buyerPhone: new RegExp('^'+search)},
+				{consigneePhone: new RegExp('^'+search)},
+				{id: new RegExp('^'+search)}];
+		}
 	}
 
 	OrderModel.count(query, function(err, count){
@@ -1945,6 +1981,7 @@ OrderService.prototype.payNotify = function(paymentId, options){
                     paymentOptions.refundReason = result.refundReason;
                 }
                 PayService.payRefund(paymentOptions);
+                self.closedSpecialPayment(order.id, paymentId, options);
             } else {
             	if (result && result.repeatNotify) {
             		console.error('OrderService payNotify repeatNotify:', paymentId, options);
@@ -1980,9 +2017,6 @@ OrderService.prototype.payNotify = function(paymentId, options){
             // refund or other methods
             var paymentOptions = options;
             paymentOptions.paymentId = paymentId;
-            if (!paymentOptions.orderId) {
-                paymentOptions.orderId = order.id;
-            }
             paymentOptions.refundReason = 3;
             PayService.payRefund(paymentOptions);
         }
@@ -1992,6 +2026,37 @@ OrderService.prototype.payNotify = function(paymentId, options){
     var payLog = options;
     payLog.paymentId = paymentId;
     self.savePaidLog(payLog);
+};
+
+// Sets the payment status to closed (the special bug, the one payment pay more than the price), payment 一次支付就超额了
+OrderService.prototype.closedSpecialPayment = function(id, paymentId, options) {
+	var self = this;
+
+	// find and update the payment not PAID
+	var query = { id: id, payments: { $elemMatch: { id: paymentId, payStatus: { $eq: PAYMENTSTATUS.UNPAID }, isClosed: false } } };
+	var date = new Date();
+	var values = {'payments.$.isClosed':true, 'payments.$.specialClosed':true, 'payments.$.dateSpecialClosed':date};
+	if (options.backendUser) {
+		values['payments.$.dateSet'] = date;
+		values['payments.$.backendUser'] = options.backendUser._id;
+		values['payments.$.backendUserAccount'] = options.backendUser.account;
+	}
+	if (options.RSC && options.RSC._id && options.RSC.RSCInfo) {
+		values['payments.$.RSC'] = options.RSC._id;
+		values['payments.$.RSCCompanyName'] = options.RSC.RSCInfo.companyName;
+	}
+	
+	OrderModel.update(query, {$set:values}, function(err, count) {
+        if (err) {
+            console.error('OrderService closedSpecialPayment update err:', err, 'paymentId: '+paymentId, options);
+            return;
+        }
+
+        if (count.n > 0) {
+            console.error('OrderService closedSpecialPayment updated:', 'paymentId: '+paymentId, options);
+        }
+        return;
+	});
 };
 
 OrderService.prototype.getPaymentInOrder = function (order, paymentId) {
@@ -2078,6 +2143,10 @@ OrderService.prototype.getById = function(id, callback) {
 			callback(null, null);
 		}
 	});
+};
+
+OrderService.prototype.pendingDeliverToRSC = function(order) {
+    return (order.payStatus == PAYMENTSTATUS.PAID || (order.payStatus == PAYMENTSTATUS.PARTPAID && order.depositPaid)) && order.deliverStatus != DELIVERSTATUS.DELIVERED;
 };
 
 module.exports = new OrderService();

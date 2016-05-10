@@ -76,14 +76,17 @@ var schema = new mongoose.Schema({
         'dateCreated': {type: Date, default: Date.now},								// 生成日期
 		'datePaid': Date,															// 支付日期
 		'dateSet': Date,															// 后台用户设置的日期
-		'payStatus': {type:Number, required:true, default: PAYMENTSTATUS.UNPAID},	// 支付状态
+		'payStatus': {type:Number, required:true, default: PAYMENTSTATUS.UNPAID},	// 支付状态 1:未支付 2:已支付
 		'payType': {type:Number, required:true},									// 支付类型
 		'isClosed': {type:Boolean, required:true, default:false},					// 本支付是否关闭
+		'specialClosed': {type:Boolean},											// 本支付是否是特殊方式关闭的（1、一次支付就超额的bug）
+		'dateSpecialClosed': {type: Date},											// 本支付特殊方式关闭的时间
 		'thirdPartyRecorded': {type:Boolean, default:false},						// 本支付是否在第三方支付平台生成
 		'backendUser':{type: mongoose.Schema.ObjectId, ref:'backenduser'},			// 设置本条信息的后台用户
 		'backendUserAccount':{type: String},										// 设置本条信息的后台用户账户
 		'RSC':{type:mongoose.Schema.ObjectId, ref:'user'},							// 支付时的相关RSC
-		'RSCCompanyName':{type: String}												// 支付时的相关RSC公司名
+		'RSCCompanyName':{type: String},											// 支付时的相关RSC公司名
+		'EPOSNo':{type: String}														// EPOS支付时相对应的设备号
 	}],
 	'subOrders': [{
 	    'id': {type: String, index: true, unique: true, required: true},			// 子订单ID
@@ -106,9 +109,8 @@ var schema = new mongoose.Schema({
 
 schema.index({dateCreated: -1});
 schema.index({buyerId: 1, dateCreated: -1});
-schema.index({isClosed: 1, payStatus: 1, buyerId: 1, dateCreated: -1});
-schema.index({payStatus: 1, deliveryType: 1, deliverStatus: 1, buyerId: 1, dateCreated: -1});
-schema.index({confirmed: -1, payStatus: 1, deliveryType: 1, deliverStatus: 1, buyerId: 1, dateCreated: -1});
+schema.index({isClosed: 1, payStatus: 1, pendingApprove: 1, buyerId: 1, dateCreated: -1});
+schema.index({payStatus: 1, deliveryType: 1, deliverStatus: 1, depositPaid: 1, "SKUs.deliverStatus": 1, buyerId: 1, dateCreated: -1});
 schema.index({id:"text", buyerId:"text", buyerName:"text", buyerPhone:"text", consigneeName:"text", consigneePhone:"text", paymentId:"text"});
 schema.index({'RSCInfo.RSC': 1, buyerPhone:1, consigneePhone:1, id:1, dateCreated: -1});
 

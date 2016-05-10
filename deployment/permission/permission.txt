@@ -50,6 +50,7 @@
 #dashboard
 /manager/api/dashboard, get, super_admin
 /manager/api/dashboard/online, get, super_admin
+/manager/api/dashboard/getDailyReport, get, super_admin
 
 #orders
 /manager/api/orders, get, super_admin, business_admin, customer_op
