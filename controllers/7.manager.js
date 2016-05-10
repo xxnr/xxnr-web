@@ -21,9 +21,9 @@ var PAYMENTSTATUS = require('../common/defs').PAYMENTSTATUS;
 var DELIVERSTATUS = require('../common/defs').DELIVERSTATUS;
 var DELIVERYTYPENAME = require('../common/defs').DELIVERYTYPENAME;
 var OFFLINEPAYTYPE = require('../common/defs').OFFLINEPAYTYPE;
+var DELIVERYTYPE =  require('../common/defs').DELIVERYTYPE;
 var config = require('../config');
 var path = require('path');
-var DELIVERYTYPE =  require('../common/defs').DELIVERYTYPE;
 
 exports.install = function() {
 	// Auto-localize static HTML templates
@@ -1108,9 +1108,8 @@ exports.json_users_query = function(req,res,next) {
 			return;
 		}
 		if(data){
-			res.respond({code:1000, users:data});
+			res.respond({code:1000, users:data || []});
 		}
-
 	});
 };
 
