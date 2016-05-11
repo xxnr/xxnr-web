@@ -2182,7 +2182,7 @@ exports.lastUpdateTime = function(req, res, next){
 			return;
 		}
 
-		res.respond({code:1000, lastUpdateTime: lastUpdateTime});
+		res.respond({code:1000, lastUpdateTime: lastUpdateTime, serviceStartTime: F.config.serviceStartTime});
 	})
 };
 

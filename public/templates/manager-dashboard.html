@@ -1,3 +1,6 @@
+<link rel="stylesheet" href="/css/pikaday.css"/>
+<script src="/js/pikaday.js"></script>
+<script src="/js/echarts.common.min.js"></script>
 <div class="filter" style="padding-bottom:9px">
 	<div class="container">
 		<div class="caption"><span class="fa fa-dashboard mr5"></span> Dashboard</div>
@@ -137,8 +140,17 @@
 			<div class="col-md-12">
 				<h3 class="ui-left">业务趋势</h3>
 			</div>
+			<div class="col-md-12 m">
+				<div class="quick-view dates-select">
+					<span>筛选日期：</span>
+					<input type="text" id="dailiesStartDate">
+					<span>至</span>
+					<input type="text" id="dailiesEndDate">
+					<button data-name="datesselect">确定</button>
+				</div>
+			</div>
 			<div class="col-md-12">
-				<div class="ui-right quick-view">
+				<div class="quick-view">
 					<span>快速查看：</span>
 					<div class="selected" data-name="last7days">最近7天</div>
 					<div data-name="last30days">最近30天</div>
@@ -194,7 +206,6 @@
 	</div>
 </div>
 
-<script src="/js/echarts.common.min.js"></script>
 <script>
 
 	var dashboard = {};
@@ -214,7 +225,10 @@
 	dashboard.dailiesresponse;
 	dashboard.dailiesSelected;
 	dashboard.dailiesChartSelected;
-	dashboard.dailiesChart = {'users':{'legend':['用户数'],'yAxis':'数量'},'orders':{'legend':['下单订单数', '已付款订单数'],'yAxis':'数量'},'paidAmount':{'legend':['已付金额'],'yAxis':'销量'}};
+	dashboard.dailiesChart = {'users':{'legend':['用户数'],'yAxis':'数量','dataKey':['registeredUserCount']},'orders':{'legend':['下单订单数', '已付款订单数'],'yAxis':'数量','dataKey':['orderCount', 'paidOrderCount']},'paidAmount':{'legend':['已付金额'],'yAxis':'销量','dataKey':['paidAmount']}};
+	dashboard.dailiesChartDatas;
+	dashboard.dailiesStartDate;
+	dashboard.dailiesEndDate;
 
 	function dashboard_refresh() {
 		dashboardInit();
@@ -262,11 +276,15 @@
 		$.components.GET(managerurl + '/api/dashboard/lastUpdateTime', null, function(response) {
 			var key = 'dashboard.statistic';
 			if (response && response.code && response.code==1000) {
-				var endTime;
+				var startTime, endTime;
 				response = response;
 				if (response && response.lastUpdateTime && response.lastUpdateTime.hourly) {
 					endTime = response.lastUpdateTime.hourly;
 				}
+				if (response && response.serviceStartTime) {
+					startTime = response.serviceStartTime;
+				}
+				
 				$.components.GET(managerurl + '/api/dashboard/getStatistic', null, function(response) {
 					if (response && response.code && response.code==1000) {
 						response = response;
@@ -278,6 +296,7 @@
 								response.EndTime = moment(endTime).format('YYYY-MM-DD');
 							}
 						}
+						datePicker_init(startTime?startTime:null, endTime?endTime:moment().format('YYYY-MM-DD'));
 					} else {
 						if (response.error || response.message) {
 							key = 'dashboard.statisticresponse';
@@ -289,6 +308,7 @@
 						} else {
 							response = {};
 						}
+						SET(responsekey, response);
 					}
 					SET(key, response);
 				});
@@ -300,6 +320,7 @@
 					} else {
 						response = response.error;
 					}
+					SET(key, response);
 				} else {
 					response = {};
 				}
@@ -334,6 +355,29 @@
 			}
         });
 
+        $('.quick-view button').off('click').on('click', function() {
+        	var el = $(this);
+			var dataName = el.attr('data-name');
+			switch (dataName) {
+				case 'datesselect':
+					var dateStart = $('#dailiesStartDate').val();
+					var dateEnd = $('#dailiesEndDate').val();
+					if (dateStart && dateEnd && dateEnd >= dateStart) {
+						if (dashboard.dailiesStartDate != dateStart || dashboard.dailiesEndDate != dateEnd) {
+							getDailies(dataName, dateStart, dateEnd);
+						}
+					} else {
+						alert('请选择正确的时间段');
+					}
+					break;
+				default:
+					dashboard.dailiesSelected = 'others';
+					break;
+			}
+			$(".quick-view").find('.selected').removeClass('selected');
+			el.addClass('selected');
+		});
+    
         $('.chart-buttons div').off('click').on('click', function() {
 			var el = $(this);
 			var dataName = el.attr('data-name');
@@ -347,15 +391,24 @@
 				}
 			}
         });
-	}
+    }
 
 	function getDailies(nameSelected, dateStart, dateEnd) {
 		dashboard.dailiesSelected = nameSelected;
+		dashboard.dailiesStartDate = dateStart;
+		dashboard.dailiesEndDate = dateEnd;
 		$.components.GET(managerurl + '/api/dashboard/queryDailyReport?dateStart='+dateStart+'&dateEnd='+dateEnd, null, function(response) {
+			var errorkey = 'dashboard.dailiesresponse';
+			var errorresponse = [];
+			SET(errorkey, errorresponse);
 			var key = 'dashboard.dailies';
 			if (response && response.code && response.code==1000) {
+				var resultDatas = fixDailyDatas(response.dailyReports);
 				response = response.dailyReports;
 				dashboard.dailies = response;
+				if (resultDatas && resultDatas.dailiesChartDatas) {
+					dashboard.dailiesChartDatas = resultDatas.dailiesChartDatas;
+				}
 		        dashboard_charts('users', $('.chart-buttons').children('div:first'));
 			} else {
 				if (response.error || response.message) {
@@ -373,7 +426,53 @@
 		});
 	}
 
-	
+	function fixDailyDatas(dailyReports) {
+		var result = {dailiesChartDatas:{}};
+		if (dailyReports) {
+			var today =  moment().format('YYYY-MM-DD');
+			var len = dailyReports.length;
+			var xAxis = [];
+			var series = {};
+
+			var chartKeys = Object.keys(dashboard.dailiesChart);
+			var seriesDatas = {};
+            while (len--) {
+            	var date = dailyReports[len]['day'];
+            	
+            	// chartKey xAxis
+                xAxis.push(date ? date : date);
+
+        		// chartKey series
+        		for (var i=0; i < chartKeys.length; i++) {
+					var chartKey = chartKeys[i];
+					if (!seriesDatas[chartKey]) {
+						seriesDatas[chartKey] = {};
+					}
+					var defaultOptions = dashboard.dailiesChart[chartKey]?dashboard.dailiesChart[chartKey]:null;
+					var dataKey = defaultOptions && defaultOptions['dataKey']?defaultOptions['dataKey']:[];
+					series[chartKey] = [];
+					for (var j=0; j < dataKey.length; j++) {
+						if (!seriesDatas[chartKey][dataKey[j]]) {
+			        		seriesDatas[chartKey][dataKey[j]] = {
+			        			name:defaultOptions && defaultOptions['legend'] && defaultOptions['legend'].length > j ? defaultOptions['legend'][j] : '',
+			        			type:'bar',
+			        			data: []
+			        		};
+			        	}
+			        	var value = dailyReports[len][dataKey[j]];
+			        	if (value && chartKey == 'paidAmount') {
+			        		value = parseFloat(parseInt(parseFloat(value)*100)/100);
+			        	}
+			        	seriesDatas[chartKey][dataKey[j]].data.push(value?parseFloat(value):0);
+			        	series[chartKey].push(seriesDatas[chartKey][dataKey[j]]);
+		        	}
+		        }
+            }
+            result.dailiesChartDatas = {xAxis:xAxis, series:series};
+		}
+		return result;
+	}
+
 	function dashboard_charts(chartKey, button) {
 		if (button) {
 			$(".chart-buttons").find('.selected').removeClass('selected');
@@ -381,76 +480,79 @@
 		}
 		dashboard.dailiesChartSelected = chartKey;
 		var defaultOptions = dashboard.dailiesChart[chartKey]?dashboard.dailiesChart[chartKey]:null;
-		var dataKey;
-		switch (chartKey) {
-			case 'users':
-				dataKey = ['registeredUserCount'];
-				break;
-			case 'orders':
-				dataKey = ['orderCount', 'paidOrderCount'];
-				break;
-			case 'paidAmount':
-				dataKey = ['paidAmount'];
-				break;
-		}
-		if (dataKey && dashboard.dailies && dashboard.dailies.length > 0) {
+		if (dashboard.dailiesChartDatas) {
 			var domChart = document.getElementById('chart');
 			var myChart = echarts.init(domChart);
 
-	        // 指定图表的配置项和数据
-	        var option = {
+			// 指定图表的配置项和数据
+			var option = {
 	            title: {},
 	            tooltip: {},
 	            legend: {
-	                data:defaultOptions && defaultOptions['legend'] ? defaultOptions['legend'] : []
+	                data: defaultOptions && defaultOptions['legend'] ? defaultOptions['legend'] : []
 	            },
 	            xAxis: {
-	                data: (function (){
-	                	var res = [];
-		                var len = dashboard.dailies.length;
-		                while (len--) {
-		                    res.push(dashboard.dailies[len]['day']?dashboard.dailies[len]['day']:'');
-		                }
-		                return res;
-		            })()
+	                data: dashboard.dailiesChartDatas['xAxis'] ? dashboard.dailiesChartDatas['xAxis'] : []
 	            },
 	            yAxis: {
 	            	name: defaultOptions && defaultOptions['yAxis'] ? defaultOptions['yAxis'] : ''
 	            },
-	            series: (function (){
-                	var res = [];
-	                var len = dashboard.dailies.length;
-	                var datas = {};
-                	var i = 0;
-                	while (i < dataKey.length) {
-                		datas[dataKey[i]] = {
-                			name:defaultOptions && defaultOptions['legend'] && defaultOptions['legend'].length > i ? defaultOptions['legend'][i] : '',
-                			type:'bar',
-                			data: []
-                		};
-                		i += 1;
-                	}
-	                while (len--) {
-	                	i = 0;
-	                	while (i < dataKey.length) {
-                			datas[dataKey[i]].data.push(dashboard.dailies[len][dataKey[i]]?dashboard.dailies[len][dataKey[i]]:0);
-                			i += 1;
-                		}
-	                }
-	                i = 0;
-	                while (i < dataKey.length) {
-	                	if (dataKey[i] && datas[dataKey[i]]) {
-	                		res.push(datas[dataKey[i]]);
-	                	}
-	                	i += 1;
-	                }
-	                return res;
-	            })()
+	            series: dashboard.dailiesChartDatas['series'] && dashboard.dailiesChartDatas['series'][chartKey] ? dashboard.dailiesChartDatas['series'][chartKey] : [],
+	            color: ['#C1222A', '#B5C334', '#FDCF10', '#E97C24']
 	        };
 
 	        // 使用刚指定的配置项和数据显示图表。
 	        myChart.setOption(option);
 	    }
+	}
+
+	function datePicker_init(minDate, maxDate) {
+		
+		// start date
+		var startoptions = {
+			field: $('#dailiesStartDate')[0],
+			yearRange: [2000,2020],
+			i18n: i18n,
+			bound: true,
+			format: 'YYYY-MM-DD',
+			onSelect: function() {
+			    $('#dailiesStartDate').val(this.getMoment().format('YYYY-MM-DD'));
+			    var d = this.getMoment().format('YYYY-MM-DD');
+			    $(".dates-select").find('.selected').removeClass('selected');
+			}
+		}
+		if (minDate) {
+			startoptions.minDate = new Date(minDate);
+		}
+		if (maxDate) {
+			startoptions.maxDate = new Date(maxDate);
+		}
+		var startpicker = new Pikaday(startoptions);
+
+		startpicker.setMoment(moment().dayOfYear(366));
+
+		// end date
+		var endoptions = {
+			field: $('#dailiesEndDate')[0],
+			yearRange: [2000,2020],
+			i18n: i18n,
+			bound: true,
+			format: 'YYYY-MM-DD',
+			onSelect: function() {
+			    $('#dailiesEndDate').val(this.getMoment().format('YYYY-MM-DD'));
+			    var d = this.getMoment().format('YYYY-MM-DD');
+			    $(".dates-select").find('.selected').removeClass('selected');
+			}
+		}
+		if (minDate) {
+			endoptions.minDate = new Date(minDate);
+		}
+		if (maxDate) {
+			endoptions.maxDate = new Date(maxDate);
+		}
+		var endpicker = new Pikaday(endoptions);
+
+		endpicker.setMoment(moment().dayOfYear(366));
 	}
 
 	dashboard_refresh();

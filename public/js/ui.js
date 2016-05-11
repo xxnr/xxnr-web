@@ -501,6 +501,7 @@ COMPONENT('textboxtags', function() {
 			builder += template({ name: arr[i] });
 
 		container.append(builder);
+		alert('2');
 	};
 
 	self.state = function(type) {
@@ -747,9 +748,9 @@ COMPONENT('form', function() {
 
 	self.noValid();
 	self.noDirty();
-	self.submit = function(hide, button) { self.hide(); };
-	self.cancel = function(hide) { self.hide(); };
-	self.close = function(hide){ self.hide(); };
+	self.submit = function(hide, button) { self.hide(); document.documentElement.style.overflow='visible'; };
+	self.cancel = function(hide) { self.hide(); document.documentElement.style.overflow='visible'; };
+	self.close = function(hide){ self.hide(); document.documentElement.style.overflow='visible'; };
 
 	self.make = function() {
 		var content = self.element.html();
@@ -790,6 +791,7 @@ COMPONENT('form', function() {
 		var isHidden = !EVALUATE(self.path, self.condition);
 		self.element.toggleClass('hidden', isHidden);
 		if (!isHidden) {
+			document.documentElement.style.overflow='hidden';
 			var el = self.element.find('input');
 
 			if (el.length === 0)

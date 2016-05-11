@@ -9,7 +9,6 @@ li{list-style:none;}
 table {border-collapse:collapse;border-spacing:0;}
 /* reset end */
 
-html { overflow: hidden; }
 html,body { margin: 0; height: 100%; position: relative; }
 body { background-color: white; padding: 0; color: gray; font-smoothing: antialiased; overflow-y: scroll; overflow-x: hidden; overflow-scrolling: touch; font-family: "微软雅黑","Microsoft YaHei","Helvetica Neue",Helvetica,Arial,sans-serif;}
 header { background-color: #E0E0E0; height: 40px; margin-bottom: 30px; }
@@ -216,6 +215,11 @@ canvas { display: block; }
 .quick-view div { float: left; margin:0 8px; cursor: pointer; }
 .quick-view div:hover { color: #008000; }
 .quick-view .selected { color: #008000; cursor: auto; }
+.quick-view input { float: left; width: 100px; border: 1px solid gray; border-radius: 3px; text-align: center; }
+.dates-select span, .dates-select input { padding: 2px 5px; }
+.dates-select button { padding: 1px 10px; margin-left: 10px; border: 1px solid gray; border-radius: 3px; background-color: #FFFFFF; text-align: center; }
+.dates-select button:hover { border: 1px solid #008000; background-color: #008000; color: #FFFFFF; }
+.dates-select .selected { border: 1px solid #008000; background-color: #008000; color: #FFFFFF; }
 
 .chart-buttons { font-size: 12px; }
 .chart-buttons span { float: left; line-height: 26px; }
@@ -422,3 +426,7 @@ span.ellipse.clickable {
 	font-weight: bold;
 	cursor: default;
 }
+
+
+.pika-single .pika-button { text-align: center; }
+/* dash board end */

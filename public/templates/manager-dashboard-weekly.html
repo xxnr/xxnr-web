@@ -1,3 +1,6 @@
+<link rel="stylesheet" href="/css/pikaday.css"/>
+<script src="/js/pikaday.js"></script>
+<script src="/js/echarts.common.min.js"></script>
 <div class="filter" style="padding-bottom:9px">
 	<div class="container">
 		<div class="caption"><span class="fa fa-dashboard mr5"></span> Dashboard</div>
@@ -106,6 +109,15 @@
 				<h3 class="ui-left">业务趋势</h3>
 			</div>
 			<div class="col-md-12">
+				<div class="quick-view dates-select">
+					<span>筛选日期：</span>
+					<input type="text" id="weekliesStartDate">
+					<span>至</span>
+					<input type="text" id="weekliesEndDate">
+					<button class="selected" data-name="datesselect">确定</button>
+				</div>
+			</div>
+			<div class="col-md-12">
 				<div data-component="template" data-component-path="dashboard">
 					<script type="text/html">
 						{{ if weekly }}
@@ -164,7 +176,6 @@
 	</div>
 </div>
 
-<script src="/js/echarts.common.min.js"></script>
 <script>
 
 	var dashboard = {};
@@ -179,6 +190,9 @@
 	dashboard.weekliesChartSelected;
 	dashboard.weekliesChart = {'users':{'legend':['用户数'],'yAxis':'数量','dataKey':['registeredUserCount']},'orders':{'legend':['下单订单数', '已付款订单数'],'yAxis':'数量','dataKey':['orderCount', 'paidOrderCount']},'paidAmount':{'legend':['已付金额'],'yAxis':'销量','dataKey':['paidAmount']}};
 	dashboard.weekliesChartDatas;
+	dashboard.weekliesUpdateDate;
+	dashboard.weekliesStartDate;
+	dashboard.weekliesEndDate;
 
 	function dashboard_refresh() {
 		dashboardInit();
@@ -232,10 +246,62 @@
 			SET(key, response);
 		});
 		// weeklies
-		dashboard.weekliesSelected = 'last7days';
-		var dateStart = '2015-10-01';
+		var dateStart = moment().add(-7 * 12, 'days').format('YYYY-MM-DD');
 		var dateEnd = moment().format('YYYY-MM-DD');
+		var firstDate = firstDateofWeek(dateEnd, 'YYYY-MM-DD');
+		if (firstDate) {
+			dateStart = firstDate.add(-7 * 12, 'days').format('YYYY-MM-DD');
+		}
 		getWeeklies(dateStart, dateEnd);
+		$.components.GET(managerurl + '/api/dashboard/lastUpdateTime', null, function(response) {
+			if (response && response.code && response.code==1000) {
+				var startTime, endTime;
+				if (response && response.lastUpdateTime && response.lastUpdateTime.hourly) {
+					endTime = response.lastUpdateTime.hourly;
+					dashboard.weekliesUpdateDate = endTime?moment(endTime).format('YYYY-MM-DD'):moment().format('YYYY-MM-DD');
+				}
+				if (response && response.serviceStartTime) {
+					startTime = response.serviceStartTime;
+				}
+				datePickers_init(startTime?startTime:null, endTime?moment(endTime).format('YYYY-MM-DD'):moment().format('YYYY-MM-DD'), dateStart, dateEnd);
+				// weeklies
+				getWeeklies(dateStart, endTime && moment(endTime).format('YYYY-MM-DD') < dateEnd ? moment(endTime).format('YYYY-MM-DD') : dateEnd);
+			} else {
+				if (response.error || response.message) {
+					if (response.message) {
+						response = [{error: response.message}];
+					} else {
+						response = response.error;
+					}
+				} else {
+					response = {};
+				}
+				SET('dashboard.weekliesresponse', response);
+				datePickers_init(null, null, dateStart, dateEnd);
+			}
+		});
+		$('.quick-view button').off('click').on('click', function() {
+        	var el = $(this);
+			var dataName = el.attr('data-name');
+			switch (dataName) {
+				case 'datesselect':
+					var dateStart = $('#weekliesStartDate').val();
+					var dateEnd = $('#weekliesEndDate').val();
+					if (dateStart && dateEnd && dateEnd >= dateStart) {
+						if (dashboard.dailiesStartDate != dateStart || dashboard.dailiesEndDate != dateEnd) {
+							getWeeklies(dateStart, dateEnd);
+						}
+					} else {
+						alert('请选择正确的时间段');
+					}
+					break;
+				default:
+					break;
+			}
+			$(".quick-view").find('.selected').removeClass('selected');
+			el.addClass('selected');
+		});
+
         $('.chart-buttons div').off('click').on('click', function() {
 			var el = $(this);
 			var dataName = el.attr('data-name');
@@ -252,7 +318,12 @@
 	}
 
 	function getWeeklies(dateStart, dateEnd) {
+		dashboard.dailiesStartDate = dateStart;
+		dashboard.dailiesEndDate = dateEnd;
 		$.components.GET(managerurl + '/api/dashboard/queryWeeklyReport?dateStart='+dateStart+'&dateEnd='+dateEnd, null, function(response) {
+			var errorkey = 'dashboard.weekliesresponse';
+			var errorresponse = [];
+			SET(errorkey, errorresponse);
 			var key = 'dashboard.weeklies';
 			if (response && response.code && response.code==1000) {
 				var resultDatas = fixWeeklyDatas(response.weeklyReports);
@@ -266,7 +337,10 @@
 					dashboard.weekliesChartDatas = resultDatas.weekliesChartDatas;
 				}
 		        dashboard_charts('users', $('.chart-buttons').children('div:first'));
-		        dashboard.weekly = {startDate:dateStart, endDate:dateEnd, dates:moment(dateEnd).diff(moment(dateStart), 'days')};
+		        var updateDate = dashboard.weekliesUpdateDate;
+		        var endDate = firstDateofWeek(updateDate) == firstDateofWeek(dateEnd) && updateDate > dateEnd ? updateDate : dateEnd;
+
+		        dashboard.weekly = {startDate:dateStart, endDate: endDate, dates:moment(endDate).diff(moment(dateStart), 'days')};
 		        SET('dashboard.weekly', dashboard.weekly);
 			} else {
 				if (response.error || response.message) {
@@ -287,7 +361,7 @@
 	function fixWeeklyDatas(weeklyReports) {
 		var result = {weeklies:weeklyReports, weekliesChartDatas:{}};
 		if (weeklyReports) {
-			var today =  moment().format('YYYY-MM-DD');
+			var updateDate = dashboard.weekliesUpdateDate;
 			var len = weeklyReports.length;
 			var xAxis = [];
 			var series = {};
@@ -303,8 +377,8 @@
             	if (date) {
 					var dayOfweek = moment(date,'YYYYMMDD').day();
 					endDate = moment(date,'YYYYMMDD').add(dayOfweek==0?0:(7-dayOfweek), 'days').format('YYYY-MM-DD');
-					if (today < endDate) {
-						endDate = today;
+					if (updateDate < endDate) {
+						endDate = updateDate;
 					}
 					startDate = moment(date,'YYYYMMDD').add(dayOfweek==0?(1-7):(1-dayOfweek), 'days').format('YYYY-MM-DD');
 				}
@@ -330,7 +404,12 @@
 			        			data: []
 			        		};
 			        	}
-			        	seriesDatas[chartKey][dataKey[j]].data.push(weeklyReports[len][dataKey[j]]?weeklyReports[len][dataKey[j]]:0);
+			        	var value = weeklyReports[len][dataKey[j]];
+			        	if (value && chartKey == 'paidAmount') {
+			        		value = parseFloat(parseInt(parseFloat(value)*100)/100);
+			        	}
+			        	seriesDatas[chartKey][dataKey[j]].data.push(value?parseFloat(value):0);
+			        	// seriesDatas[chartKey][dataKey[j]].data.push(weeklyReports[len][dataKey[j]]?weeklyReports[len][dataKey[j]]:0);
 			        	series[chartKey].push(seriesDatas[chartKey][dataKey[j]]);
 		        	}
 		        }
@@ -339,6 +418,17 @@
             result.weekliesChartDatas = {xAxis:xAxis, series:series};
 		}
 		return result;
+	}
+
+	function firstDateofWeek(date, format) {
+		if (!date) 
+			return null;
+
+		if (!format) {
+			format = 'YYYYMMDD';
+		}
+		var dayOfweek = moment(date,format).day();
+		return moment(date,format).add(dayOfweek==0?(1-7):(1-dayOfweek), 'days');
 	}
 	
 	function dashboard_charts(chartKey, button) {
@@ -365,85 +455,50 @@
 	            yAxis: {
 	            	name: defaultOptions && defaultOptions['yAxis'] ? defaultOptions['yAxis'] : ''
 	            },
-	            series: dashboard.weekliesChartDatas['series'] && dashboard.weekliesChartDatas['series'][chartKey] ? dashboard.weekliesChartDatas['series'][chartKey] : []
+	            series: dashboard.weekliesChartDatas['series'] && dashboard.weekliesChartDatas['series'][chartKey] ? dashboard.weekliesChartDatas['series'][chartKey] : [],
+	            color: ['#C1222A', '#B5C334', '#FDCF10', '#E97C24']
 	        };
 
 	        // 使用刚指定的配置项和数据显示图表。
 	        myChart.setOption(option);
 	    }
+	}
 
+	function datePickers_init(minDate, maxDate, defaultStartDate, defaultEndDate) {
+		// start date
+		datePicker_init('weekliesStartDate', minDate, maxDate, defaultStartDate);
+		// end date
+		datePicker_init('weekliesEndDate', minDate, maxDate, defaultEndDate);
+	}
 
-		// var defaultOptions = dashboard.weekliesChart[chartKey]?dashboard.weekliesChart[chartKey]:null;
-		// var dataKey = dashboard.weekliesChart[chartKey] && dashboard.weekliesChart[chartKey]['dataKey']?dashboard.weekliesChart[chartKey]['dataKey']:null;
-		// switch (chartKey) {
-		// 	case 'users':
-		// 		dataKey = ['registeredUserCount'];
-		// 		break;
-		// 	case 'orders':
-		// 		dataKey = ['orderCount', 'paidOrderCount'];
-		// 		break;
-		// 	case 'paidAmount':
-		// 		dataKey = ['paidAmount'];
-		// 		break;
-		// }
-		// if (dataKey && dashboard.weeklies && dashboard.weeklies.length > 0) {
-		// 	var domChart = document.getElementById('chart');
-		// 	var myChart = echarts.init(domChart);
+	function datePicker_init(pickerId, minDate, maxDate, defaultDate) {
+		var options = {
+			field: $('#'+pickerId)[0],
+			yearRange: [2000,2020],
+			i18n: i18n,
+			bound: true,
+			format: 'YYYY-MM-DD',
+			onSelect: function() {
+			    $('#'+pickerId).val(this.getMoment().format('YYYY-MM-DD'));
+			    var d = this.getMoment().format('YYYY-MM-DD');
+			    $(".dates-select").find('.selected').removeClass('selected');
+			}
+		}
+		if (minDate) {
+			options.minDate = new Date(minDate);
+		}
+		if (maxDate) {
+			options.maxDate = new Date(maxDate);
+		}
+		if (defaultDate) {
+			options.defaultDate = new Date(defaultDate);
+			options.setDefaultDate = true;
+		} 
+		var startpicker = new Pikaday(options);
 
-		//	// 指定图表的配置项和数据
-		// var option = {
-	 //            title: {},
-	 //            tooltip: {},
-	 //            legend: {
-	 //                data:defaultOptions && defaultOptions['legend'] ? defaultOptions['legend'] : []
-	 //            },
-	 //            xAxis: {
-	 //                data: (function (){
-	 //                	var res = [];
-		//                 var len = dashboard.weeklies.length;
-		//                 while (len--) {
-		//                     res.push(dashboard.weeklies[len]['week']?dashboard.weeklies[len]['week']:'');
-		//                 }
-		//                 return res;
-		//             })()
-	 //            },
-	 //            yAxis: {
-	 //            	name: defaultOptions && defaultOptions['yAxis'] ? defaultOptions['yAxis'] : ''
-	 //            },
-	 //            series: (function (){
-  //               	var res = [];
-	 //                var len = dashboard.weeklies.length;
-	 //                var datas = {};
-  //               	var i = 0;
-  //               	while (i < dataKey.length) {
-  //               		datas[dataKey[i]] = {
-  //               			name:defaultOptions && defaultOptions['legend'] && defaultOptions['legend'].length > i ? defaultOptions['legend'][i] : '',
-  //               			type:'bar',
-  //               			data: []
-  //               		};
-  //               		i += 1;
-  //               	}
-	 //                while (len--) {
-	 //                	i = 0;
-	 //                	while (i < dataKey.length) {
-  //               			datas[dataKey[i]].data.push(dashboard.weeklies[len][dataKey[i]]?dashboard.weeklies[len][dataKey[i]]:0);
-  //               			i += 1;
-  //               		}
-	 //                }
-	 //                i = 0;
-	 //                while (i < dataKey.length) {
-	 //                	if (dataKey[i] && datas[dataKey[i]]) {
-	 //                		res.push(datas[dataKey[i]]);
-	 //                	}
-	 //                	i += 1;
-	 //                }
-	 //                return res;
-	 //            })()
-	 //        };
-
-	 //        // 使用刚指定的配置项和数据显示图表。
-	 //        myChart.setOption(option);
-	 //    }
+		if (!defaultDate) {
+			startpicker.setMoment(moment().dayOfYear(366));
+		}
 	}
 
 	dashboard_refresh();
