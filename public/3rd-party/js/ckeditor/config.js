@@ -42,6 +42,4 @@ CKEDITOR.editorConfig = function( config ) {
 	config.uploadUrl = "$manager/api/products/";
 	// Upload file url
 	config.filebrowserUploadUrl = "uploadImage";
-	config.startupFocus = true;
-
 };
