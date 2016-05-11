@@ -25,7 +25,7 @@ var config= {
     tokencookie: "token",
     usercookie: "__user",
     domain: ".xinxinnongren.com",
-    usercookie_expires_in: "30days",
+    usercookie_expires_in: "30 days",
     shopingCartcookie: "__scart",
 
 //usersign
@@ -34,9 +34,9 @@ var config= {
 
 //usertokenoptions
     user_token_algorithm: "RS256",
-    user_token_expires_in: "30days",
+    user_token_expires_in: "30 days",
     user_token_issuer: "www.xinxinnongren.com",
-    token_cookie_expires_in: "30days",
+    token_cookie_expires_in: "30 days",
 
 //vcodevalidtime10mins
     vcode_resend_valid: 600000,
