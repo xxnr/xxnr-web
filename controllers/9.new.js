@@ -2,6 +2,7 @@ var services = require('../services');
 var tools = require('../common/tools');
 var NewsService = services.news;
 var path = require('path');
+var moment = require('moment-timezone');
 exports.install = function() {
     // NEWS
     //F.route('/api/v2.0/news/',                           json_news_query);
@@ -112,6 +113,9 @@ exports.view_news_detail = function(req,res,next) {
             return;
         }
 
+        var result = result.toObject();
+        var datecreated = JSON.stringify(result.datecreated);
+        result.datecreated = moment(datecreated,"YYYY-MM-DDTHH:mm:ssZ").format('YYYY-MM-DD HH:mm:ss');
         res.render(path.join(__dirname, '../views/9.new/newsAppDetailTemplate.html'),
             {
                 result: result
@@ -132,8 +136,11 @@ exports.view_newsshare_detail = function(req,res,next) {
             res.status(404).send('404: Page not found');
             return;
         }
-        result['shareurl'] = 'http://' + req.hostname + '/newsshare/' + id;
 
+        var result = result.toObject();
+        var datecreated = JSON.stringify(result.datecreated);
+        result.shareurl = 'http://' + req.hostname + '/newsshare/' + id;
+        result.datecreated = moment(datecreated,"YYYY-MM-DDTHH:mm:ssZ").format('YYYY-MM-DD HH:mm:ss');
         res.render(path.join(__dirname, '../views/9.new/newsAppDetailTemplate.html'),
             {
                 result:result

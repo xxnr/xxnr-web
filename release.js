@@ -71,6 +71,8 @@ app.use(function (req, res, next) {
     	delete req.headers['content-encoding'];
 	}
 
+	// APP will add extra slash at the beginning of the path improperly, here to remove them
+	req.path.replace(/\/*/, '/');
 	return next();
 });
 
@@ -121,12 +123,10 @@ http.createServer(app).listen(80);
 console.info('application listen at port 80');
 
 if(config.secure) {
-	// certificate
-	var privateKey = fs.readFileSync('private_key.pem').toString();
-	var certificate = fs.readFileSync('cert.pem').toString();
 	var options = {
-		key: privateKey,
-		cert: certificate
+		ca:fs.readFileSync('xxnr.ca-bundle'),
+		key: fs.readFileSync('xxnr.key'),
+		cert: fs.readFileSync('xxnr.crt')
 	};
 
 	https.createServer(options, app).listen(443);

@@ -253,8 +253,7 @@ exports.offlinePay = function(req, res, next){
 // alipay notify function
 exports.alipayNotify = function(req, res, next) {
     console.log('alipayNotify body:', req.body);
-    var qs = require('querystring');
-    var body = qs.parse(req.body);
+    var body = req.body;
     
     AlipayNotify.verifyNotify(body, function(isValid) {
         if (!isValid) {
@@ -310,7 +309,7 @@ exports.unionpayNotify = function(req, res, next) {
     }
 
     var qs = require('querystring');
-    var body = qs.parse(req.body);
+    var body = req.body;
 
     var php_processor = require("../common/php_processor");
     var commandLine = '\"' + require('path').resolve(__filename + '/../../external/unionPay/upacp_sdk_php/demo/utf8/' + 'Verify.php') + '\"';
@@ -319,7 +318,7 @@ exports.unionpayNotify = function(req, res, next) {
         commandLine += ' --test';
     }
 
-    commandLine += ` --data=${new Buffer(req.body).toString('base64')} --json=${new Buffer(JSON.stringify(body)).toString('base64')}`;
+    commandLine += ` --data=${new Buffer(qs.stringify(body)).toString('base64')} --json=${new Buffer(JSON.stringify(body)).toString('base64')}`;
 
     new php_processor(commandLine).execute(function(output, error) {
         if (error) {
@@ -424,8 +423,7 @@ exports.json_offline_pay_type = function(req, res, next){
 
 // alipay refund notify
 exports.alipayRefundNotify = function(req, res, next) {
-    var qs = require('querystring');
-    var body = qs.parse(req.body);
+    var body = req.body;
     
     console.log('alipayRefundNotify info:', body);
     AlipayNotify.verifyNotify(body, function(isValid) {
@@ -480,7 +478,7 @@ exports.unionpayRefundNotify = function(req, res, next) {
     }
 
     var qs = require('querystring');
-    var body = qs.parse(req.body);
+    var body = req.body;
 
     var php_processor = require("../common/php_processor");
     var commandLine = '\"' + require('path').resolve(__filename + '/../../external/unionPay/upacp_sdk_php/demo/utf8/' + 'Verify.php') + '\"';
@@ -489,7 +487,7 @@ exports.unionpayRefundNotify = function(req, res, next) {
         commandLine += ' --test';
     }
 
-    commandLine += ` --data=${new Buffer(req.body).toString('base64')} --json=${new Buffer(JSON.stringify(body)).toString('base64')}`;
+    commandLine += ` --data=${new Buffer(qs.stringify(body)).toString('base64')} --json=${new Buffer(JSON.stringify(body)).toString('base64')}`;
 
     new php_processor(commandLine).execute(function(output, error) {
         if (error) {

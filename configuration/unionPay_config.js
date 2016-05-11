@@ -55,7 +55,7 @@ module.exports = Object.freeze({
 	notification:Object.freeze({
 		host: null,
 		port:80,
-		front:"/my_xxnr.html",
+		front:"/unionpay/success",
 		back:"/unionpay/notify",
 		refundback:"/unionpay/refundnotify"
 	})

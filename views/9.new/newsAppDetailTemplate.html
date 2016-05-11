@@ -32,45 +32,37 @@
 </head>
 
 <body>
-    <% if(result.shareurl){ %>
-    <style>
+<% if(result.shareurl){ %>
+<style>
     body{padding-top: 70px;}
-    </style>
-    <div class="top">
-        <div class="top-wrap">
-            <div class="top-wrap-info">
-                <img src="/images/app_logo.png" />
-                <div class="app-desc">
-                    <p class="title">新新农人</p>
-                    <p class="describe">农业互联网综合服务领先者</p>
-                </div>
+</style>
+<div class="top">
+    <div class="top-wrap">
+        <div class="top-wrap-info">
+            <img src="/images/app_logo.png" />
+            <div class="app-desc">
+                <p class="title">新新农人</p>
+                <p class="describe">农业互联网综合服务领先者</p>
             </div>
-            <button class="download-app">
-                <a href="http://a.app.qq.com/o/simple.jsp?pkgname=com.ksfc.newfarmer">下载APP</a>
-            </button>
         </div>
+        <button class="download-app">
+            <a href="http://a.app.qq.com/o/simple.jsp?pkgname=com.ksfc.newfarmer">下载APP</a>
+        </button>
     </div>
-    <% } %>
-	<div class="container">
-        <div class="title">
-            <h2><%= result.title %></h2>
-        </div>
-        <div class="info">
-            <div id="createdate"></div>
-            <div id="tags"></div>
-        </div>
-        <div id="news_body"></div>
+</div>
+<% } %>
+<div class="container">
+    <div class="title">
+        <h2><%= result.title %></h2>
     </div>
-    <%- result.newsbody %>
-    <script src="/js/jquery.min.js"></script>
-    <script src="/js/moment.min.js"></script>
-    <script  type="text/javascript">
-        var data = JSON.parse($('#news').html());
-        var time_s = new Date(data.datecreated);
-        $("#createdate").html(moment(time_s).format('YYYY-MM-DD HH:mm:ss'));
-        $("#tags").html('标签：' + data.category);
-        $("#news_body").html(data.newsbody);
-    </script>
-  
+    <div class="info">
+        <div id="createdate"><%- result.datecreated %></div>
+        <% if(result.category){ %><div id="tags">标签：<%- result.category %></div><% } %>
+    </div>
+    <div id="news_body">
+        <%- result.newsbody %>
+    </div>
+</div>
+
 </body>
 </html>
