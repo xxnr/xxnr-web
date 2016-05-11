@@ -212,70 +212,45 @@ exports.CKEditor_uploadImage = function(req, res, next) {
 	var default_extension = '.jpg';
 	var type_avail = ['png', 'jpg', "jpeg"];
 
-	req.busboy.on('file', function(fieldname, file, filename, encoding, mimetype) {
-		var buffers = [];
-		file.on('data', function(data) {
-			buffers.push(data);
-		});
-
-		file.on('end', function(){
-			var photoBuf = Buffer.concat(buffers);
-
-			// Store current file into the HDD
-			var index = filename.lastIndexOf('.');
-			var extension = filename.substring(index+1);
-			if (type_avail.find(extension.toLowerCase())) {
-				if (photoBuf.length <= 2*1024*1024) {
-					id = files.insert(filename, mimetype, photoBuf) + default_extension;
-					var imageurl = "/images/original/" + id;
-					var options = {'callback':CKEditorFuncNum, 'imageurl':imageurl, 'message':''};
-					res.render(path.join(__dirname, '../views/7.manager/uploadImageResponse'), options);
-				} else {
-					var options = {'callback':CKEditorFuncNum, 'imageurl':'', 'message':'文件大小不得大于2M'};
-					res.render(path.join(__dirname, '../views/7.manager/uploadImageResponse'), options);
-				}
+	req.files.forEach(function (file) {
+		// Store current file into the HDD
+		var index = file.originalname.lastIndexOf('.');
+		var extension = file.originalname.substring(index + 1);
+		if (type_avail.find(extension.toLowerCase())) {
+			if (file.size <= 2 * 1024 * 1024) {
+				id = files.insert(file.originalname, file.mimetype, file.buffer) + default_extension;
+				var imageurl = "/images/original/" + id;
+				var options = {'callback': CKEditorFuncNum, 'imageurl': imageurl, 'message': ''};
+				res.render(path.join(__dirname, '../views/7.manager/uploadImageResponse'), options);
 			} else {
-				var options = {'callback':CKEditorFuncNum, 'imageurl':'', 'message':'文件格式不正确（必须为.jpg/.png文件）'};
+				var options = {'callback': CKEditorFuncNum, 'imageurl': '', 'message': '文件大小不得大于2M'};
 				res.render(path.join(__dirname, '../views/7.manager/uploadImageResponse'), options);
 			}
-		});
+		} else {
+			var options = {'callback': CKEditorFuncNum, 'imageurl': '', 'message': '文件格式不正确（必须为.jpg/.png文件）'};
+			res.render(path.join(__dirname, '../views/7.manager/uploadImageResponse'), options);
+		}
 	});
-
-	req.pipe(req.busboy);
 };
 
 // Upload (multiple) pictures
 exports.upload = function(req, res, next) {
 	var id = [];
 
-	req.busboy.on('file', function(fieldname, file, filename, encoding, mimetype){
-		var buffers = [];
-		file.on('data', function(data){
-			buffers.push(data);
-		});
+	req.files.forEach(function (file) {
+		// Store current file into the HDD
+		var index = file.originalname.lastIndexOf('.');
+		var extension = file.originalname.substring(index + 1);
 
-		file.on('end', function(){
-			console.log('file end');
-			var fileBuf = Buffer.concat(buffers);
+		if (index === -1)
+			extension = '.dat';
+		else
+			extension = file.originalname.substring(index);
 
-			// Store current file into the HDD
-			var index = filename.lastIndexOf('.');
-			var extension = filename.substring(index+1);
-
-			if (index === -1)
-				extension = '.dat';
-			else
-				extension = filename.substring(index);
-
-			id.push(files.insert(filename, mimetype, fileBuf) + extension);
-		})
+		id.push(files.insert(file.originalname, file.mimetype, file.buffer) + extension);
 	});
 
-	req.busboy.on('finish', function(){
-		res.json(id);
-	});
-
-	req.pipe(req.busboy);
+	res.json(id);
 };
 
 // Upload base64

@@ -31,8 +31,8 @@ process.chdir(__dirname);
 var fs = require("fs");
 var express = require('express');
 var bodyParser = require('body-parser');
+var multer  = require('multer');
 var cookieParser = require('cookie-parser');
-var busboy = require('connect-busboy');
 var https = require('https');
 var http = require('http');
 var path = require('path');
@@ -81,17 +81,10 @@ app.use(bodyParser.json({
 	'limit': '1mb'
 }));
 app.use(bodyParser.urlencoded({extended: false}));
+app.use('/', multer({ storage: multer.memoryStorage() }).any());
 
 // cookieParser
 app.use(cookieParser());
-
-// busboy
-app.use(busboy({
-	limits: {
-		fileSize: F.config.file_size_limit,
-		files: F.config.file_count_limit
-	}
-}));
 
 // website common middleware
 app.use(require('./middlewares/website'));
