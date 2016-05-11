@@ -224,20 +224,19 @@ exports.CKEditor_uploadImage = function(req, res, next) {
 			// Store current file into the HDD
 			var index = filename.lastIndexOf('.');
 			var extension = filename.substring(index+1);
-
 			if (type_avail.find(extension.toLowerCase())) {
 				if (photoBuf.length <= 2*1024*1024) {
-					id = files.insert(file.filename, file.type, photoBuf) + default_extension;
+					id = files.insert(filename, mimetype, photoBuf) + default_extension;
 					var imageurl = "/images/original/" + id;
 					var options = {'callback':CKEditorFuncNum, 'imageurl':imageurl, 'message':''};
-					res.render(path.join(__dirname, '../views/7.manager/uploadImageResponse', options))
+					res.render(path.join(__dirname, '../views/7.manager/uploadImageResponse'), options);
 				} else {
 					var options = {'callback':CKEditorFuncNum, 'imageurl':'', 'message':'文件大小不得大于2M'};
-					res.render(path.join(__dirname, '../views/7.manager/uploadImageResponse', options))
+					res.render(path.join(__dirname, '../views/7.manager/uploadImageResponse'), options);
 				}
 			} else {
 				var options = {'callback':CKEditorFuncNum, 'imageurl':'', 'message':'文件格式不正确（必须为.jpg/.png文件）'};
-				res.render(path.join(__dirname, '../views/7.manager/uploadImageResponse', options))
+				res.render(path.join(__dirname, '../views/7.manager/uploadImageResponse'), options);
 			}
 		});
 	});
