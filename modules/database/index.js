@@ -3,7 +3,7 @@
  */
 var path = require('path');
 var fs = require('fs');
-var directory = path.dirname(process.argv[1]);
+var directory = process.cwd();
 var databases = {};
 var databaseClass = require('./database');
 var builtinDBClass = require('./built-in');

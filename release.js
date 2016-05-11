@@ -27,6 +27,7 @@
 //framework.setWorkingDirectory(__dirname);
 //framework.http('release', options);
 
+process.chdir(__dirname);
 var fs = require("fs");
 var express = require('express');
 var bodyParser = require('body-parser');

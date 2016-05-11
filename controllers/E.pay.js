@@ -49,7 +49,7 @@ var moment = require('moment-timezone');
 // pay order
 
 // common pay function
-function payOrder(req, payExecutor){
+function payOrder(req, res, payExecutor){
     var orderId = req.data['orderId'];
     var payPrice = req.data['price'];
 
@@ -113,7 +113,7 @@ function payOrder(req, payExecutor){
                     res.respond({code:1001, message:'获取支付信息出错'});
                     return;
                 }
-                payExecutor(resultPayment.id, parseFloat(resultPayPrice).toFixed(2), self.ip, order.id, resultPayment);
+                payExecutor(resultPayment.id, parseFloat(resultPayPrice).toFixed(2), req.ip, order.id, resultPayment);
                 return;
             });
         } catch (e) {
@@ -128,7 +128,7 @@ exports.alipayOrder = function(req, res, next){
     var consumer = req.data['consumer']||'website';
     req.payType = PAYTYPE.ZHIFUBAO;
 
-    payOrder(req, function(paymentId, totalPrice, ip, orderId, payment) {
+    payOrder(req, res, function(paymentId, totalPrice, ip, orderId, payment) {
         switch(consumer) {
             case 'app':
                 var response = {"code":1000, "paymentId":paymentId, "price":totalPrice};
@@ -159,7 +159,7 @@ exports.unionPayOrder = function(req, res, next) {
     // before starting test, we have to enable test account : login http://open.unionpay.com with xxnr 12121312(our test parameters is bound with xxnr)
     //     then go to right top corner => "my test" => "my product" => "not tested" => select one tet type => click "start to test"
     req.payType = PAYTYPE.UNIONPAY;
-    payOrder(req, function(paymentId, totalPrice, ip, orderId, payment) {
+    payOrder(req, res, function(paymentId, totalPrice, ip, orderId, payment) {
         var consumer = req.data['consumer']||'website';
         var phpPage = null;
 
@@ -238,7 +238,7 @@ exports.offlinePay = function(req, res, next){
 
     // forbidden multi pay for offline pay, which means offline pay can only pay off
     req.data.price = null;
-    payOrder(req, function(paymentId, totalPrice, ip, orderId, payment) {
+    payOrder(req, res, function(paymentId, totalPrice, ip, orderId, payment) {
         OrderService.changeToPendingApprove(orderId, function(err){
             if(err){
                 res.respond({code:1002, message:'更改订单状态失败'});
@@ -544,7 +544,7 @@ exports.aliPaySuccess = function(req, res, next){
 
 exports.EPOSPay = function(req, res, next){
     req.payType = PAYTYPE.EPOS;
-    payOrder(req, function(paymentId, totalPrice, ip, orderId, payment) {
+    payOrder(req, res, function(paymentId, totalPrice, ip, orderId, payment) {
         res.respond({code:1000, message:'success', "paymentId":paymentId, "price":totalPrice});
     });
 };
