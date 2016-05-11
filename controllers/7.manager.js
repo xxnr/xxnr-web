@@ -1049,8 +1049,8 @@ var convertOrderToShow = function(order, payment){
 			subOrders.push(subOrder);
 		}
 		order.subOrders = subOrders;
+		delete order.payments;
 	}
-	delete order.payments;
 
 	// order status and type
 	if (order) {

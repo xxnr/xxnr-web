@@ -71,6 +71,8 @@ app.use(function (req, res, next) {
     	delete req.headers['content-encoding'];
 	}
 
+	// APP will add extra slash at the beginning of the path improperly, here to remove them
+	req.path.replace(/\/*/, '/');
 	return next();
 });
 
