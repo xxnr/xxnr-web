@@ -4,10 +4,9 @@
 var services = require('../services');
 var AuditService = services.auditservice;
 var path = require('path');
-module.exports = function(req, res, next){
-    req.data = req.method == 'GET'? req.query : req.body;
-
-    res.jsonp = function(obj, name){
+module.exports = function(req, res, next) {
+    req.data = req.method == 'GET' ? req.query : req.body;
+    res.jsonp = function (obj, name) {
         var val = obj;
 
         // settings
@@ -50,11 +49,11 @@ module.exports = function(req, res, next){
         return res.send(body);
     };
 
-    res.respond = function(data) {
+    res.respond = function (data) {
         res.status(200);
 
         var callbackName = req.data.callback;
-        if(!res.finished) {
+        if (!res.finished) {
             callbackName ? res.jsonp(data, callbackName) : res.json(data);
 
             if (req.auditInfo) {
@@ -64,14 +63,14 @@ module.exports = function(req, res, next){
     };
 
     var allowcache = req.get('pragma') !== 'no-cache';
-    if(path.extname(req.path) === 'html') {
+    if (path.extname(req.path) === 'html') {
         res.set('Pragma', 'no-cache');
         res.set('Cache-Control', 'no-cache, no-store, max-age=0, must-revalidate');
 
         if (RELEASE && allowcache && !res.get('Expires'))
             res.set('Expires', new Date());
     }
-    else if(path.extname(req.path) === 'js' || path.extname(req.path) === 'css') {
+    else if (path.extname(req.path) === 'js' || path.extname(req.path) === 'css') {
         res.set('Cache-Control', 'public' + (RELEASE && allowcache ? ', max-age=5184000' : ''));
         if (RELEASE && allowcache && !res.get('Expires'))
             res.set('Expires', new Date().add('M', 2));
