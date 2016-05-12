@@ -182,7 +182,7 @@
 							    	<td style="width:60px" class="silver hidden-xs ui-center active">注册用户数</td>
 							    	<td style="width:60px" class="silver hidden-xs ui-center active">订单数</td>
 							    	<td style="width:60px" class="silver hidden-xs ui-center active">付款订单数</td>
-							    	<td style="width:90px" class="silver hidden-xs ui-center active">已支付金额（元）</td>
+							    	<td style="width:90px" class="silver hidden-xs ui-right active">已支付金额（元）</td>
 							    </tr>
 							    {{ foreach daily in dailies }}
 							    	<tr>
@@ -191,7 +191,7 @@
 								    	<td style="width:60px" class="silver hidden-xs ui-center">{{ daily.registeredUserCount | format(0) }}</td>
 								    	<td style="width:60px" class="silver hidden-xs ui-center">{{ daily.orderCount | format(0) }}</td>
 								    	<td style="width:60px" class="silver hidden-xs ui-center">{{ daily.paidOrderCount | format(0) }}</td>
-								    	<td style="width:90px" class="silver hidden-xs ui-center">{{ daily.paidAmount | price(2) }}</td>
+								    	<td style="width:90px" class="silver hidden-xs ui-right">{{ daily.paidAmount | price(2) }}</td>
 								    </tr>
 								{{ end }}
 							</tbody>
@@ -229,6 +229,8 @@
 	dashboard.dailiesChartDatas;
 	dashboard.dailiesStartDate;
 	dashboard.dailiesEndDate;
+	dashboard.dailiesUpdateDate;
+	var dailiesstartpicker, dailiesendpicker;
 
 	function dashboard_refresh() {
 		dashboardInit();
@@ -280,6 +282,7 @@
 				response = response;
 				if (response && response.lastUpdateTime && response.lastUpdateTime.hourly) {
 					endTime = response.lastUpdateTime.hourly;
+					dashboard.dailiesUpdateDate = endTime?moment(endTime).format('YYYY-MM-DD'):moment().format('YYYY-MM-DD');
 				}
 				if (response && response.serviceStartTime) {
 					startTime = response.serviceStartTime;
@@ -296,7 +299,7 @@
 								response.EndTime = moment(endTime).format('YYYY-MM-DD');
 							}
 						}
-						datePicker_init(startTime?startTime:null, endTime?endTime:moment().format('YYYY-MM-DD'));
+						
 					} else {
 						if (response.error || response.message) {
 							key = 'dashboard.statisticresponse';
@@ -312,6 +315,13 @@
 					}
 					SET(key, response);
 				});
+
+				// dailies
+				var dateStart = moment().add(-6, 'days').format('YYYY-MM-DD');
+				var dateEnd = moment().format('YYYY-MM-DD');
+				dateEnd = dashboard.dailiesUpdateDate && dashboard.dailiesUpdateDate < dateEnd ? dashboard.dailiesUpdateDate : dateEnd;
+				datePickers_init(startTime?startTime:null, endTime?endTime:moment().format('YYYY-MM-DD'), dateStart, dateEnd);
+				getDailies('last7days', dateStart, dateEnd);
 			} else {
 				if (response.error || response.message) {
 					key = 'dashboard.statisticresponse';
@@ -327,10 +337,10 @@
 				SET(key, response);
 			}
 		});
-		// dailies
-		var dateStart = moment().add(-6, 'days').format('YYYY-MM-DD');
-		var dateEnd = moment().format('YYYY-MM-DD');
-		getDailies('last7days', dateStart, dateEnd);
+		// // dailies
+		// var dateStart = moment().add(-6, 'days').format('YYYY-MM-DD');
+		// var dateEnd = moment().format('YYYY-MM-DD');
+		// getDailies('last7days', dateStart, dateEnd);
 		$('.quick-view div').off('click').on('click', function() {
 			var el = $(this);
 			var dataName = el.attr('data-name');
@@ -377,6 +387,10 @@
 			$(".quick-view").find('.selected').removeClass('selected');
 			el.addClass('selected');
 		});
+
+		$('.dates-select input').off('click').on('click', function() {
+			$(".dates-select").find('.selected').removeClass('selected');
+		});
     
         $('.chart-buttons div').off('click').on('click', function() {
 			var el = $(this);
@@ -397,6 +411,12 @@
 		dashboard.dailiesSelected = nameSelected;
 		dashboard.dailiesStartDate = dateStart;
 		dashboard.dailiesEndDate = dateEnd;
+		if (dailiesstartpicker) {
+			dailiesstartpicker.setMoment(moment(dateStart));
+		}
+		if (dailiesendpicker) {
+			dailiesendpicker.setMoment(moment(dateEnd));
+		}
 		$.components.GET(managerurl + '/api/dashboard/queryDailyReport?dateStart='+dateStart+'&dateEnd='+dateEnd, null, function(response) {
 			var errorkey = 'dashboard.dailiesresponse';
 			var errorresponse = [];
@@ -506,53 +526,42 @@
 	    }
 	}
 
-	function datePicker_init(minDate, maxDate) {
-		
+	function datePickers_init(minDate, maxDate, defaultStartDate, defaultEndDate) {
 		// start date
-		var startoptions = {
-			field: $('#dailiesStartDate')[0],
-			yearRange: [2000,2020],
-			i18n: i18n,
-			bound: true,
-			format: 'YYYY-MM-DD',
-			onSelect: function() {
-			    $('#dailiesStartDate').val(this.getMoment().format('YYYY-MM-DD'));
-			    var d = this.getMoment().format('YYYY-MM-DD');
-			    $(".dates-select").find('.selected').removeClass('selected');
-			}
-		}
-		if (minDate) {
-			startoptions.minDate = new Date(minDate);
-		}
-		if (maxDate) {
-			startoptions.maxDate = new Date(maxDate);
-		}
-		var startpicker = new Pikaday(startoptions);
-
-		startpicker.setMoment(moment().dayOfYear(366));
-
+		dailiesstartpicker = datePicker_init('dailiesStartDate', minDate, maxDate, defaultStartDate);
 		// end date
-		var endoptions = {
-			field: $('#dailiesEndDate')[0],
+		dailiesendpicker = datePicker_init('dailiesEndDate', minDate, maxDate, defaultEndDate);
+	}
+
+	function datePicker_init(pickerId, minDate, maxDate, defaultDate) {
+		var options = {
+			field: $('#'+pickerId)[0],
 			yearRange: [2000,2020],
 			i18n: i18n,
 			bound: true,
 			format: 'YYYY-MM-DD',
 			onSelect: function() {
-			    $('#dailiesEndDate').val(this.getMoment().format('YYYY-MM-DD'));
+			    $('#'+pickerId).val(this.getMoment().format('YYYY-MM-DD'));
 			    var d = this.getMoment().format('YYYY-MM-DD');
 			    $(".dates-select").find('.selected').removeClass('selected');
 			}
 		}
 		if (minDate) {
-			endoptions.minDate = new Date(minDate);
+			options.minDate = new Date(minDate);
 		}
 		if (maxDate) {
-			endoptions.maxDate = new Date(maxDate);
+			options.maxDate = new Date(maxDate);
 		}
-		var endpicker = new Pikaday(endoptions);
+		if (defaultDate) {
+			options.defaultDate = new Date(defaultDate);
+			options.setDefaultDate = true;
+		} 
+		var startpicker = new Pikaday(options);
 
-		endpicker.setMoment(moment().dayOfYear(366));
+		if (!defaultDate) {
+			startpicker.setMoment(moment().dayOfYear(366));
+		}
+		return startpicker;
 	}
 
 	dashboard_refresh();

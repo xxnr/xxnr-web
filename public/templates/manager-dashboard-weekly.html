@@ -152,7 +152,7 @@
 							    	<td style="width:60px" class="silver hidden-xs ui-center active">注册用户数</td>
 							    	<td style="width:60px" class="silver hidden-xs ui-center active">订单数</td>
 							    	<td style="width:60px" class="silver hidden-xs ui-center active">付款订单数</td>
-							    	<td style="width:90px" class="silver hidden-xs ui-center active">已支付金额（元）</td>
+							    	<td style="width:90px" class="silver hidden-xs ui-right active">已支付金额（元）</td>
 							    </tr>
 							    {{ foreach weekly in weeklies }}
 							    	<tr>
@@ -161,7 +161,7 @@
 								    	<td style="width:60px" class="silver hidden-xs ui-center">{{ weekly.registeredUserCount | format(0) }}</td>
 								    	<td style="width:60px" class="silver hidden-xs ui-center">{{ weekly.orderCount | format(0) }}</td>
 								    	<td style="width:60px" class="silver hidden-xs ui-center">{{ weekly.paidOrderCount | format(0) }}</td>
-								    	<td style="width:90px" class="silver hidden-xs ui-center">{{ weekly.paidAmount | price(2) }}</td>
+								    	<td style="width:90px" class="silver hidden-xs ui-right">{{ weekly.paidAmount | price(2) }}</td>
 								    </tr>
 								{{ end }}
 							</tbody>

@@ -86,7 +86,7 @@
 							    		</div>
 							    	</td>
 							    	<td style="width:60px" class="silver hidden-xs ui-center active">已完成订单数</td>
-							    	<td style="width:80px" class="silver hidden-xs ui-center active">已完成金额（元）</td>
+							    	<td style="width:80px" class="silver hidden-xs ui-right active">已完成金额（元）</td>
 							    </tr>
 							    {{ foreach agent in agents }}
 							    	<tr>
@@ -98,7 +98,7 @@
 								    	<td style="width:60px" class="silver hidden-xs ui-center">{{ agent.newPotentialCustomerCount | format(0) }}</td>
 								    	<td style="width:60px" class="silver hidden-xs ui-center">{{ agent.totalPotentialCustomerCount | format(0) }}</td>
 								    	<td style="width:60px" class="silver hidden-xs ui-center">{{ agent.totalCompletedOrderCount | format(0) }}</td>
-								    	<td style="width:80px" class="silver hidden-xs ui-center" title="{{ agent.totalPaidAmount | format(0) }}">{{ agent.totalPaidAmount | price(2) }}</td>
+								    	<td style="width:80px" class="silver hidden-xs ui-right" title="{{ agent.totalPaidAmount | format(0) }}">{{ agent.totalPaidAmount | price(2) }}</td>
 								    </tr>
 								{{ end }}
 							</tbody>
@@ -219,8 +219,8 @@
 	        items: count,
 	        itemsOnPage: pageCount,
 	        currentPage: currentPage?currentPage:0,
-			prevText: '上一页',
-			nextText: '下一页',
+			prevText: '<',
+			nextText: '>',
 	        cssStyle: 'light-theme',
 	        onPageClick: function(pageNumber, event) {
 	        	redirectURL(pageNumber);
