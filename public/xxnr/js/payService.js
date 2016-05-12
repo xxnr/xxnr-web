@@ -13,6 +13,6 @@ app.service('payService', function(BaseUrl){
 
     this.unionPayUrl = function(orderId,payPrice){
         payPriceString = payPrice?"&price="+payPrice:"";
-        return _unionPayUrlBase + orderId + payPriceString +'&notifyUrl=/alipay/success';
+        return _unionPayUrlBase + orderId + payPriceString;
     }
 });
