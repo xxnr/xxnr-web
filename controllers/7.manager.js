@@ -954,7 +954,7 @@ function json_orders_read(id) {
     });
 }
 
-var convertOrderToShow = function(order, payment){
+var convertOrderToShow = function(order, orderpayment){
     var subOrdersPayments = {};					// suborder all payments
 
 	if (order && order.payments) {
@@ -1047,7 +1047,7 @@ var convertOrderToShow = function(order, payment){
 		if (order.deliverStatus == DELIVERSTATUS.RECEIVED && order.dateCompleted) {
 			orderInfo.dateCompleted = order.dateCompleted;
 		}
-		orderInfo.payment = payment;
+		orderInfo.payment = orderpayment;
 		order.order = orderInfo;
 	}
 
