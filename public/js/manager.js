@@ -246,6 +246,7 @@ function success() {
 			el.fadeOut(300);
 		}, 1000);
 	});
+	document.documentElement.style.overflow='visible';
 }
 
 function can(name) {

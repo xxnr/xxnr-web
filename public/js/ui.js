@@ -744,13 +744,14 @@ COMPONENT('form', function() {
 
 	var hide = self.hide = function() {
 		self.set('');
+		document.documentElement.style.overflow='visible';
 	};
 
 	self.noValid();
 	self.noDirty();
-	self.submit = function(hide, button) { self.hide(); document.documentElement.style.overflow='visible'; };
-	self.cancel = function(hide) { self.hide(); document.documentElement.style.overflow='visible'; };
-	self.close = function(hide){ self.hide(); document.documentElement.style.overflow='visible'; };
+	self.submit = function(hide, button) { self.hide(); };
+	self.cancel = function(hide) { self.hide(); };
+	self.close = function(hide){ self.hide(); };
 
 	self.make = function() {
 		var content = self.element.html();
