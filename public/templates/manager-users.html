@@ -274,36 +274,34 @@
                             <li><div class="product-name">订单商品</div><sapn>(数量x)</sapn></li>
                         </ul>
                     </td>
-                    <td class="ui-right col-xs-2">创建时间</td>
+                    <td class="ui-right col-xs-3">创建时间</td>
                     <td class="ui-right col-xs-2">收货人电话</td>
                     <td class="ui-right col-xs-2">支付金额</td>
                 </tr>
                 {{ foreach order in items }}
-                    {{ if order.payStatus=='1'}}
-                        <tr>
-                            <td class="col-xs-2 hidden-xs ui-right">{{ order.id }}</td>
-                            <td class="ui-right col-xs-4 hidden-xs">
-                                <ul>
-									{{ foreach product in order.products }}
-										<li><div class="product-name" title="{{product.name}}">{{ product.name }}</div><sapn>({{ product.count }}x)</sapn></li>
-									{{ end }}
-									{{ foreach SKU in order.SKUs }}
-										<li><div class="product-name" title="{{SKU.name}}">{{SKU.name}}</div><span>({{SKU.count}}x)</span></li>
-									{{ end }}
-                                </ul>
-                            </td>
-                            <td class="ui-right col-xs-3 hidden-xs">{{ order.dateCreated | format('yyyy-MM-dd hh:mm:ss') }}</td>
-                            <td class="ui-right col-xs-2 hidden-xs">{{ order.consigneePhone }}</td>
-                            <td class="ui-right col-xs-2 hidden-xs">{{ order.deposit }}</td>
-                        </tr>
-                    {{ fi }}
+                    <tr>
+                        <td class="col-xs-2 hidden-xs ui-right">{{ order.id }}</td>
+                        <td class="ui-right col-xs-3 hidden-xs">
+                            <ul>
+								{{ foreach product in order.products }}
+									<li><div class="product-name hidden-xs col-xs-9" title="{{product.name}}">{{ product.name }}</div><sapn class="col-xs-2">({{ product.count }}x)</sapn></li>
+								{{ end }}
+								{{ foreach SKU in order.SKUs }}
+									<li><div class="product-name hidden-xs col-xs-9" title="{{SKU.name}}">{{SKU.name}}</div><span class="col-xs-2">({{SKU.count}}x)</span></li>
+								{{ end }}
+                            </ul>
+                        </td>
+                        <td class="ui-right col-xs-3 hidden-xs">{{ order.dateCreated | format('yyyy-MM-dd hh:mm:ss') }}</td>
+                        <td class="ui-right col-xs-2 hidden-xs">{{ order.consigneePhone }}</td>
+                        <td class="ui-right col-xs-2 hidden-xs">{{ order.price | price(2) }}</td>
+                    </tr>
                 {{ end }}
             </table>
-            <button name="more-orders" class="ui-grid-more">
-                <span class="fa fa-plus-circle"></span>
-                查看更多订单
-            </button>
         </script>
+        <!-- <button name="more-orders" class="ui-grid-more">
+            <span class="fa fa-plus-circle"></span>
+            查看更多订单
+        </button> -->
     </div>
 </div>
 <script>
@@ -430,8 +428,16 @@
 				// 	});
 				// 	break;
                 case 'order':
-                    $.components.GET(managerurl + '/api/orders/?buyer=' + row.id, null, function(response) {
-                        SET('users.orders.form', response);
+                    $.components.GET(managerurl + '/api/orders/?buyer=' + row.id + '&type=2', null, function(response) {
+                    	if (response.code!=1000) {
+                    		var message = "获取订单信息错误";
+                    		if (response.message) {
+                    			message = response.message;
+                    		}
+                            alert(message);
+                            return;
+                        }
+                        SET('users.orders.form', response.datas);
                         SET('common.form','users_orders');
                     });
                     break;
@@ -503,6 +509,11 @@
 		}
 
 		$.components.GET(managerurl + '/api/users/', users.filter, function(response) {
+			if(response.code!=1000){
+				alert(response.message);
+			}
+
+			response = response.users;
             response.items.forEach(function(item){
 				if(item.typeVerified){
 					item.typeNameVerified = [];

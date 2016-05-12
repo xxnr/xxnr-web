@@ -14,6 +14,7 @@ var CartService = services.cart;
 var BrandService = services.brand;
 var CategoryService = services.category;
 var PayService = services.pay;
+var path = require('path');
 
 exports.install = function() {
 	//fix api// F.route('/api/v2.0/getProductDetails/', getProductDetails, ['post', 'get']);

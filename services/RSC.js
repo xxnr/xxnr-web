@@ -8,11 +8,8 @@ var tools = require('../common/tools');
 var RSCService = function(){};
 
 // Method
-RSCService.prototype.getProvinceList = function(products, callback) {
-    var query = {RSCInfo: {$exists: true}};
-    if (tools.isArray(products) && products.length > 0) {
-        query['RSCInfo.products'] = {$all: products};
-    }
+RSCService.prototype.getProvinceList = function(products, callback, options) {
+    var query = buildQuery(products, null, null, null, null, null, options);
 
     UserModel.find(query)
         .populate('RSCInfo.companyAddress.province')
@@ -40,15 +37,8 @@ RSCService.prototype.getProvinceList = function(products, callback) {
         })
 };
 
-RSCService.prototype.getCityList = function(products, province, callback) {
-    var query = {RSCInfo: {$exists: true}};
-    if (tools.isArray(products) && products.length > 0) {
-        query['RSCInfo.products'] = {$all: products};
-    }
-
-    if (province) {
-        query['RSCInfo.companyAddress.province'] = province;
-    }
+RSCService.prototype.getCityList = function(products, province, callback, options) {
+    var query = buildQuery(products, province, null, null, null, null, options);
 
     UserModel.find(query)
         .populate('RSCInfo.companyAddress.province')
@@ -76,19 +66,8 @@ RSCService.prototype.getCityList = function(products, province, callback) {
         })
 };
 
-RSCService.prototype.getCountyList = function(products, province, city, callback) {
-    var query = {RSCInfo: {$exists: true}};
-    if (tools.isArray(products) && products.length > 0) {
-        query['RSCInfo.products'] = {$all: products};
-    }
-
-    if (province) {
-        query['RSCInfo.companyAddress.province'] = province;
-    }
-
-    if (city) {
-        query['RSCInfo.companyAddress.city'] = city;
-    }
+RSCService.prototype.getCountyList = function(products, province, city, callback, options) {
+    var query = buildQuery(products, province, city, null, null, null, options);
 
     UserModel.find(query)
         .populate('RSCInfo.companyAddress.province')
@@ -116,23 +95,8 @@ RSCService.prototype.getCountyList = function(products, province, city, callback
         })
 };
 
-RSCService.prototype.getTownList = function(products, province, city, county, callback) {
-    var query = {RSCInfo: {$exists: true}};
-    if (tools.isArray(products) && products.length > 0) {
-        query['RSCInfo.products'] = {$all: products};
-    }
-
-    if (province) {
-        query['RSCInfo.companyAddress.province'] = province;
-    }
-
-    if (city) {
-        query['RSCInfo.companyAddress.city'] = city;
-    }
-
-    if (county) {
-        query['RSCInfo.companyAddress.county'] = county;
-    }
+RSCService.prototype.getTownList = function(products, province, city, county, callback, options) {
+    var query = buildQuery(products, province, city, county, null, null, options);
 
     UserModel.find(query)
         .populate('RSCInfo.companyAddress.province')
@@ -160,27 +124,8 @@ RSCService.prototype.getTownList = function(products, province, city, county, ca
         })
 };
 
-RSCService.prototype.getRSCList = function(products, province, city, county, town, page, max, callback, search) {
-    var query = {RSCInfo:{$exists:true}, typeVerified:{$all:[5]}};
-    if(tools.isArray(products) && products.length>0){
-        query['RSCInfo.products'] = {$all: products};
-    }
-
-    if(province){
-        query['RSCInfo.companyAddress.province'] = province;
-    }
-
-    if(city){
-        query['RSCInfo.companyAddress.city'] = city;
-    }
-
-    if(county){
-        query['RSCInfo.companyAddress.county'] = county;
-    }
-
-    if(town){
-        query['RSCInfo.companyAddress.town'] = town;
-    }
+RSCService.prototype.getRSCList = function(products, province, city, county, town, page, max, callback, search, options) {
+    var query = buildQuery(products, province, city, county, town, search, options);
 
     if(page<0 || !page){
         page = 0;
@@ -192,12 +137,6 @@ RSCService.prototype.getRSCList = function(products, province, city, county, tow
 
     if(max>50){
         max = 50;
-    }
-
-    if(search){
-        query.$or = [{'RSCInfo.name':new RegExp(search)}
-            , {'RSCInfo.phone':new RegExp(search)}
-            , {'RSCInfo.companyName':new RegExp(search)}];
     }
 
     UserModel.count(query, function(err, count) {
@@ -212,7 +151,7 @@ RSCService.prototype.getRSCList = function(products, province, city, county, tow
             .populate('RSCInfo.companyAddress.city')
             .populate('RSCInfo.companyAddress.county')
             .populate('RSCInfo.companyAddress.town')
-            .select('id RSCInfo.name RSCInfo.phone RSCInfo.companyName RSCInfo.companyAddress')
+            .select('id RSCInfo.IDNo RSCInfo.name RSCInfo.phone RSCInfo.companyName RSCInfo.companyAddress')
             .skip(page * max)
             .limit(max)
             .exec(function (err, RSCs) {
@@ -279,5 +218,42 @@ RSCService.prototype.modifyRSCInfo = function(id, setOptions, callback){
         callback();
     })
 };
+
+function buildQuery(products, province, city, county, town, search, options){
+    var query = {RSCInfo:{$exists:true}, typeVerified:{$all:[5]}};
+    if(tools.isArray(products) && products.length>0){
+        query['RSCInfo.products'] = {$all: products};
+    }
+    if (options) {
+        if (typeof options.EPOS != 'undefined') {
+            query['RSCInfo.supportEPOS'] = true;
+            query['RSCInfo.EPOSNo'] = {$exists: true};
+        }
+    }
+
+    if(province){
+        query['RSCInfo.companyAddress.province'] = province;
+    }
+
+    if(city){
+        query['RSCInfo.companyAddress.city'] = city;
+    }
+
+    if(county){
+        query['RSCInfo.companyAddress.county'] = county;
+    }
+
+    if(town){
+        query['RSCInfo.companyAddress.town'] = town;
+    }
+
+    if(search){
+        query.$or = [{'RSCInfo.name':new RegExp(search)}
+            , {'RSCInfo.phone':new RegExp(search)}
+            , {'RSCInfo.companyName':new RegExp(search)}];
+    }
+
+    return query;
+}
 
 module.exports = new RSCService();

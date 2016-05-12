@@ -501,6 +501,7 @@ COMPONENT('textboxtags', function() {
 			builder += template({ name: arr[i] });
 
 		container.append(builder);
+		alert('2');
 	};
 
 	self.state = function(type) {
@@ -743,6 +744,7 @@ COMPONENT('form', function() {
 
 	var hide = self.hide = function() {
 		self.set('');
+		document.documentElement.style.overflow='visible';
 	};
 
 	self.noValid();
@@ -790,6 +792,7 @@ COMPONENT('form', function() {
 		var isHidden = !EVALUATE(self.path, self.condition);
 		self.element.toggleClass('hidden', isHidden);
 		if (!isHidden) {
+			document.documentElement.style.overflow='hidden';
 			var el = self.element.find('input');
 
 			if (el.length === 0)

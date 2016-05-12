@@ -16,19 +16,22 @@ var AuditlogService = services.auditservice;
 var PayService = services.pay;
 var AreaService = services.area;
 var RSCService = services.RSC;
+var DashboardService = services.dashboard;
 var PAYMENTSTATUS = require('../common/defs').PAYMENTSTATUS;
 var DELIVERSTATUS = require('../common/defs').DELIVERSTATUS;
 var DELIVERYTYPENAME = require('../common/defs').DELIVERYTYPENAME;
 var OFFLINEPAYTYPE = require('../common/defs').OFFLINEPAYTYPE;
+var DELIVERYTYPE =  require('../common/defs').DELIVERYTYPE;
 var config = require('../config');
 var path = require('path');
+
 exports.install = function() {
 	// Auto-localize static HTML templates
 	F.localize('All templates', '/templates/');
 
 	// COMMON
 	//F.route(CONFIG('manager-url') + '/*', 									'~manager', ['get'], ['backend_auth']);
-	F.route(CONFIG('manager-url') + '/upload/',                  			upload, ['post', 'upload'], 3084, ['backend_auth']); // 3 MB
+	//F.route(CONFIG('manager-url') + '/upload/',                  			upload, ['post', 'upload'], 3084, ['backend_auth']); // 3 MB
 	F.route(CONFIG('manager-url') + '/upload/base64/',           			upload_base64, ['post'], 2048, ['backend_auth']); // 2 MB
 	// AREA
 	//F.route(CONFIG('manager-url') + '/api/area/getProvinceList/',			json_province_query, ['get', 'post'], ['backend_auth']);
@@ -181,7 +184,7 @@ exports.install = function() {
 
 };
 
-var files = DB('files', null, require('total.js/database/database').BUILT_IN_DB).binary;
+var files = DB('files', null, require('../modules/database/database').BUILT_IN_DB).binary;
 
 // ==========================================================================
 // COMMON
@@ -209,67 +212,46 @@ exports.CKEditor_uploadImage = function(req, res, next) {
 	var default_extension = '.jpg';
 	var type_avail = ['png', 'jpg', "jpeg"];
 
-	req.busboy.on('file', function(fieldname, file, filename, encoding, mimetype) {
-		var buffers = [];
-		file.on('data', function(data) {
-			buffers.push(data);
-		});
-
-		file.on('end', function(){
-			var photoBuf = Buffer.concat(buffers);
-
-			// Store current file into the HDD
-			var index = filename.lastIndexOf('.');
-			var extension = filename.substring(index+1);
-
-			if (type_avail.find(extension.toLowerCase())) {
-				if (photoBuf.length <= 2*1024*1024) {
-					id = files.insert(file.filename, file.type, photoBuf) + default_extension;
-					var imageurl = "/images/original/" + id;
-					var options = {'callback':CKEditorFuncNum, 'imageurl':imageurl, 'message':''};
-					res.render(path.join(__dirname, '../views/7.manager/uploadImageResponse', options))
-				} else {
-					var options = {'callback':CKEditorFuncNum, 'imageurl':'', 'message':'文件大小不得大于2M'};
-					res.render(path.join(__dirname, '../views/7.manager/uploadImageResponse', options))
-				}
+	req.files.forEach(function (file) {
+		// Store current file into the HDD
+		var index = file.originalname.lastIndexOf('.');
+		var extension = file.originalname.substring(index + 1);
+		if (type_avail.find(extension.toLowerCase())) {
+			if (file.size <= 2 * 1024 * 1024) {
+				id = files.insert(file.originalname, file.mimetype, file.buffer) + default_extension;
+				var imageurl = "/images/original/" + id;
+				var options = {'callback': CKEditorFuncNum, 'imageurl': imageurl, 'message': ''};
+				res.render(path.join(__dirname, '../views/7.manager/uploadImageResponse'), options);
 			} else {
-				var options = {'callback':CKEditorFuncNum, 'imageurl':'', 'message':'文件格式不正确（必须为.jpg/.png文件）'};
-				res.render(path.join(__dirname, '../views/7.manager/uploadImageResponse', options))
+				var options = {'callback': CKEditorFuncNum, 'imageurl': '', 'message': '文件大小不得大于2M'};
+				res.render(path.join(__dirname, '../views/7.manager/uploadImageResponse'), options);
 			}
-		});
+		} else {
+			var options = {'callback': CKEditorFuncNum, 'imageurl': '', 'message': '文件格式不正确（必须为.jpg/.png文件）'};
+			res.render(path.join(__dirname, '../views/7.manager/uploadImageResponse'), options);
+		}
 	});
-
-	req.pipe(req.busboy);
 };
 
 // Upload (multiple) pictures
-function upload(callback) {
-
-	var self = this;
-	var async = [];
+exports.upload = function(req, res, next) {
 	var id = [];
 
-	self.files.wait(function(file, next) {
-		file.read(function(err, data) {
-			// Store current file into the HDD
-			var index = file.filename.lastIndexOf('.');
+	req.files.forEach(function (file) {
+		// Store current file into the HDD
+		var index = file.originalname.lastIndexOf('.');
+		var extension = file.originalname.substring(index + 1);
 
-			if (index === -1)
-				file.extension = '.dat';
-			else
-				file.extension = file.filename.substring(index);
+		if (index === -1)
+			extension = '.dat';
+		else
+			extension = file.originalname.substring(index);
 
-			id.push(files.insert(file.filename, file.type, data) + file.extension);
-
-			// Next file
-			setTimeout(next, 100);
-		});
-
-	}, function() {
-		// Returns response
-		callback ? callback(id) : res.json(id);
+		id.push(files.insert(file.originalname, file.mimetype, file.buffer) + extension);
 	});
-}
+
+	res.json(id);
+};
 
 // Upload base64
 function upload_base64() {
@@ -661,24 +643,24 @@ exports.json_orders_query = function(req,res,next) {
 				// var item = items[i];
 				var order = items[i];
 				var item = {
-					'id':order.id,
-					'paymentId':order.paymentId,
-					'price':order.price,
-					'deposit':order.deposit,
-					'consigneeAddress':order.consigneeAddress,
-					'consigneeName':order.consigneeName,
-					'consigneePhone':order.consigneePhone,
-					'buyerName':order.buyerName,
-					'buyerPhone':order.buyerPhone,
-					'payType':order.payType,
-					'products':order.products || [],
-					'SKUs':order.SKUs || [],
-					'duePrice':typeof(order.duePrice) != 'undefined' ? parseFloat(order.duePrice.toFixed(2)) : null,
-					'deliveryType':order.deliveryType,
-					'payStatus':order.payStatus,
-					'deliverStatus':order.deliverStatus,
-					'RSCInfo':order.RSCInfo,
-					'isClosed':order.isClosed
+					'id': order.id,
+					'paymentId': order.paymentId,
+					'price': order.price,
+					'deposit': order.deposit,
+					'consigneeAddress': order.consigneeAddress,
+					'consigneeName': order.consigneeName,
+					'consigneePhone': order.consigneePhone,
+					'buyerName': order.buyerName,
+					'buyerPhone': order.buyerPhone,
+					'payType': order.payType,
+					'products': order.products || [],
+					'SKUs': order.SKUs || [],
+					'duePrice': typeof(order.duePrice) != 'undefined' ? parseFloat(order.duePrice.toFixed(2)) : null,
+					'deliveryType': order.deliveryType,
+					'payStatus': order.payStatus,
+					'deliverStatus': order.deliverStatus,
+					'RSCInfo': order.RSCInfo,
+					'isClosed': order.isClosed
 				};
 				// 订单合成状态
 				item.typeValue = OrderService.orderType(order);
@@ -700,7 +682,13 @@ exports.json_orders_query = function(req,res,next) {
 				if (order.deliverStatus == DELIVERSTATUS.RECEIVED && order.dateCompleted) {
 					item.dateCompleted = order.dateCompleted;
 				}
-				var orderInfo = {'totalPrice':order.price.toFixed(2), 'deposit':order.deposit.toFixed(2), 'dateCreated':order.dateCreated, 'orderStatus': OrderService.orderStatus(order)};
+				var orderInfo = {
+					'totalPrice': order.price.toFixed(2),
+					'deposit': order.deposit.toFixed(2),
+					'dateCreated': order.dateCreated,
+					'orderStatus': OrderService.orderStatus(order),
+					'pendingDeliverToRSC': OrderService.pendingDeliverToRSC(order)
+				};
 				item.order = orderInfo;
 				arr[i] = item;
 			}
@@ -979,7 +967,7 @@ exports.json_orders_read = function(req,res,next) {
 		}
         res.respond({code:1000, message:'success', datas: convertOrderToShow(order, payment)});
     });
-}
+};
 
 var convertOrderToShow = function(order, payment){
     var subOrdersPayments = {};					// suborder all payments
@@ -1036,8 +1024,8 @@ var convertOrderToShow = function(order, payment){
 			subOrders.push(subOrder);
 		}
 		order.subOrders = subOrders;
+		delete order.payments;
 	}
-	delete order.payments;
 
 	// order status and type
 	if (order) {
@@ -1050,26 +1038,32 @@ var convertOrderToShow = function(order, payment){
 		if (order.duePrice)
 			order.duePrice = parseFloat(order.duePrice.toFixed(2));
 		// 订单合成状态
-        order.orderType = OrderService.orderType(order);
-		var orderInfo = {'totalPrice':parseFloat(order.price.toFixed(2)),'deposit':parseFloat(order.deposit.toFixed(2)),'dateCreated':order.dateCreated, 'orderStatus': OrderService.orderStatus(order)};
-        // 支付时间
-	    if (order.payStatus == PAYMENTSTATUS.PAID && order.datePaid) {
-	        orderInfo.datePaid = order.datePaid;
-	    }
-	    // 待收货时间
-	    if (order.datePendingDeliver) {
-	        orderInfo.datePendingDeliver = order.datePendingDeliver;
-	    }
-	    // 全部发货时间
-	    if (order.deliverStatus == DELIVERSTATUS.DELIVERED && order.dateDelivered) {
-	        orderInfo.dateDelivered = order.dateDelivered;
-	    }
-	    // 完成时间
-	    if (order.deliverStatus == DELIVERSTATUS.RECEIVED && order.dateCompleted) {
-	        orderInfo.dateCompleted = order.dateCompleted;
-	    }
+		order.orderType = OrderService.orderType(order);
+		var orderInfo = {
+			'totalPrice': parseFloat(order.price.toFixed(2)),
+			'deposit': parseFloat(order.deposit.toFixed(2)),
+			'dateCreated': order.dateCreated,
+			'orderStatus': OrderService.orderStatus(order),
+			'pendingDeliverToRSC': OrderService.pendingDeliverToRSC(order)
+		};
+		// 支付时间
+		if (order.payStatus == PAYMENTSTATUS.PAID && order.datePaid) {
+			orderInfo.datePaid = order.datePaid;
+		}
+		// 待收货时间
+		if (order.datePendingDeliver) {
+			orderInfo.datePendingDeliver = order.datePendingDeliver;
+		}
+		// 全部发货时间
+		if (order.deliverStatus == DELIVERSTATUS.DELIVERED && order.dateDelivered) {
+			orderInfo.dateDelivered = order.dateDelivered;
+		}
+		// 完成时间
+		if (order.deliverStatus == DELIVERSTATUS.RECEIVED && order.dateCompleted) {
+			orderInfo.dateCompleted = order.dateCompleted;
+		}
 		orderInfo.payment = payment;
-        order.order = orderInfo;
+		order.order = orderInfo;
 	}
 
     return order;
@@ -1081,7 +1075,6 @@ var convertOrderToShow = function(order, payment){
 
 // Reads all users
 exports.json_users_query = function(req,res,next) {
-	var self = this;
 	UserService.query(req.query, function(err,data){
 		if (err) {
 			console.error('manager json_users_query err:', err);
@@ -1089,11 +1082,10 @@ exports.json_users_query = function(req,res,next) {
 			return;
 		}
 		if(data){
-			res.respond(data);
+			res.respond({code:1000, users:data || []});
 		}
-
 	});
-}
+};
 
 // Saves specific user (user must exist)
 exports.json_users_save = function(req,res,next) {
@@ -1943,15 +1935,38 @@ exports.process_RSC_modify = function(req, res, next){
 		return;
 	}
 
-	RSCService.modifyRSCInfo(req.data.id, req.data, function(err){
-		if(err){
-			res.respond({code:1002, message:err});
-			return;
-		}
+	if(typeof req.data.EPOSNo != 'undefined' && req.data.EPOSNo) {
+		UserService.getRSCInfoByEPOSNo(req.data.EPOSNo, function(err, RSC) {
+			if(err){
+				console.error('manager process_RSC_modify UserService getRSCInfoByEPOSNo err:', err);
+				res.respond({code:1002, message:err});
+				return;
+			}
+			if (RSC) {
+				res.respond({code:1002, message:"此设备号已经被绑定过了", RSC: RSC});
+				return;
+			} else {
+				RSCService.modifyRSCInfo(req.data.id, req.data, function(err){
+					if(err){
+						res.respond({code:1002, message:err});
+						return;
+					}
 
-		res.respond({code:1000, message:'success'});
-	})
-};
+					res.respond({code:1000, message:'success'});
+				});
+			}
+		});
+	} else {
+		RSCService.modifyRSCInfo(req.data.id, req.data, function(err){
+			if(err){
+				res.respond({code:1002, message:err});
+				return;
+			}
+
+			res.respond({code:1000, message:'success'});
+		});
+	}
+}
 
 exports.json_RSCorders_query = function(req, res, next) {
     if (!req.data.RSCId) {
@@ -2133,4 +2148,161 @@ exports.process_orders_RSCInfo_update= function(req,res,next){
 
 		res.respond({code:1000, message:'success'});
 	})
+};
+
+exports.lastUpdateTime = function(req, res, next){
+	DashboardService.lastUpdateTime(function(err, lastUpdateTime){
+		if(err){
+			res.respond({code:1001, message:'获取更新时间失败'});
+			return;
+		}
+
+		res.respond({code:1000, lastUpdateTime: lastUpdateTime, serviceStartTime: F.config.serviceStartTime});
+	})
+};
+
+exports.getDailyReport = function(req, res, next) {
+	var currentTime = new Date();
+	var date = currentTime.format('yyyyMMdd');
+	if (req.data.date) {
+		date = new Date(req.data.date).format('yyyyMMdd');
+	}
+
+	var dailyReportResult = {
+		code: 1000,
+		registeredUserCount: 0,
+		orderCount: 0,
+		paidOrderCount: 0,
+		paidAmount: 0,
+		lastUpdateTime: currentTime
+	};
+
+	DashboardService.lastUpdateTime(function (err, lastUpdateTime) {
+		if (err) {
+			res.respond({code:1001, message:'获取更新时间失败'});
+			return;
+		}
+		if (lastUpdateTime) {
+			if (lastUpdateTime.hourly) {
+				dailyReportResult.lastUpdateTime = lastUpdateTime.hourly;
+			}
+			DashboardService.queryDailyReport(date, date, function (err, dailyReports) {
+				if (!err) {
+					var dailyReport = dailyReports[0];
+					dailyReportResult.registeredUserCount = dailyReport.registeredUserCount;
+					dailyReportResult.orderCount = dailyReport.orderCount;
+					dailyReportResult.paidOrderCount = dailyReport.paidOrderCount;
+					dailyReportResult.paidAmount = parseFloat(dailyReport.paidAmount.toFixed(2));
+				}
+
+				res.respond(dailyReportResult);
+			});
+		} else {
+			res.respond({code:1001, message:'没有获取到更新时间'});
+			return;
+		}
+	});
+};
+
+exports.getStatistic = function(req, res, next) {
+	var statisticResult = {
+		code:1000,
+		registeredUserCount: 0,
+		orderCount: 0,
+		completedOrderCount: 0,
+		paidAmount: 0,
+		serviceStartTime: config.serviceStartTime
+	};
+
+	DashboardService.getStatistic(function (err, statistic) {
+		if (!err) {
+			statisticResult.registeredUserCount = statistic.registeredUserCount;
+			statisticResult.orderCount = statistic.orderCount;
+			statisticResult.completedOrderCount = statistic.completedOrderCount;
+			statisticResult.paidAmount = parseFloat(statistic.paidAmount.toFixed(2));
+		}
+
+		res.respond(statisticResult);
+	})
+};
+
+exports.getWeeklyReport = function(req, res, next) {
+	// var weekMinus = U.parseInt(req.data.week, 0);
+	// var weekStartEndTime = tools.getWeekStartEndTime(weekMinus);
+	// var date = weekStartEndTime.startTime.format('yyyyMMdd');
+	var currentTime = new Date();
+	var date = currentTime;
+	if (req.data.date) {
+		date = new Date(req.data.date);
+	}
+	var startDate = tools.getWeekStartTimeByDate(date).format('yyyyMMdd');
+
+	var weeklyReportResult = {
+		code: 1000,
+		registeredUserCount: 0,
+		orderCount: 0,
+		paidOrderCount: 0,
+		paidAmount: 0
+	};
+
+	DashboardService.queryWeeklyReport(startDate, startDate, function(err, weeklyReports){
+		if(!err){
+			var weeklyReport = weeklyReports[0];
+			weeklyReportResult.registeredUserCount = weeklyReport.registeredUserCount;
+			weeklyReportResult.orderCount = weeklyReport.orderCount;
+			weeklyReportResult.paidOrderCount = weeklyReport.paidOrderCount;
+			weeklyReportResult.paidAmount = parseFloat(weeklyReport.paidAmount.toFixed(2));
+		}
+
+		res.respond(weeklyReportResult);
+	})
+};
+
+exports.queryDailyReport = function(req, res, next){
+	var dateStart = new Date(req.data.dateStart).format('yyyyMMdd');
+	var dateEnd = new Date(req.data.dateEnd).format('yyyyMMdd');
+
+	DashboardService.queryDailyReport(dateStart, dateEnd, function(err, dailyReports){
+		if(err){
+			res.respond({code:1001, message:'获取每日概况失败'});
+			return;
+		}
+
+		res.respond({code:1000, dailyReports:dailyReports || []});
+	})
+};
+
+exports.queryWeeklyReport = function(req, res, next){
+	var dateStart = tools.getWeekStartTimeByDate(new Date(req.data.dateStart)).format('yyyyMMdd');
+	var dateEnd = new Date(req.data.dateEnd).format('yyyyMMdd');
+
+	DashboardService.queryWeeklyReport(dateStart, dateEnd, function(err, WeeklyReports){
+		if(err){
+			res.respond({code:1001, message:'获取每周业绩失败'});
+			return;
+		}
+
+		res.respond({code:1000, weeklyReports:WeeklyReports || []});
+	})
+};
+
+exports.queryAgentReportYesterday = function(req, res, next){
+	DashboardService.queryAgentReportYesterday(function(err, result){
+		if(err){
+			res.respond({code:1001, message:'获取经纪人数据失败'});
+			return;
+		}
+
+		DashboardService.lastUpdateTime(function(err, lastUpdateTime){
+			if(err){
+				res.respond({code:1001, message:'获取更新时间失败'});
+				return;
+			}
+			if (result) {
+				res.respond({code:1000, agentReportYesterday:result.items, lastUpdateTime:lastUpdateTime.agentReport, page: result.page, pages: result.pages, count: result.count});
+				return;
+			}
+			res.respond({code:1001, message:'没有获取到经纪人数据'});
+		})
+	}, req.data.sort, req.data.sortOrder, req.data.page)
 };

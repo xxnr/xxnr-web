@@ -11,6 +11,7 @@ var UseraddressService = services.useraddress;
 var AreaService = services.area;
 var CartService = services.cart;
 var OrderService = services.order;
+var vCodeService = services.vCode;
 var IntentionProductService = services.intention_product;
 var PotentialCustomerService = services.potential_customer;
 var REG_MOBILE = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|Tablet|IOS/i;
@@ -134,7 +135,7 @@ Global.default_user_type = config.default_user_type;
 // LOGIN
 // ==========================================================================
 
-var files = DB('files', null, require('total.js/database/database').BUILT_IN_DB).binary;
+var files = DB('files', null, require('../modules/database/database').BUILT_IN_DB).binary;
 
 // Login
 exports.process_login = function(req, res, next) {
@@ -309,7 +310,7 @@ exports.process_register = function(req, res, next) {
     options.useragent = req.data["user-agent"] || 'web';
 
     var vcodeoptions = {'target': req.data.account.toString(), 'code_type': 'register', 'code': req.data.smsCode};
-    GETSCHEMA('VCode').workflow('verify', null, vcodeoptions, function (err, result) {
+    vCodeService.verify(vcodeoptions, function(err, result){
         if (err || !result) {
             res.respond({'code': '1001', 'message': '验证码验证错误'});
             return;
@@ -374,7 +375,7 @@ exports.process_resetpwd = function(req, res, next) {
     options.ip = req.ip;
 
     vcodeoptions = {'target': req.data.account.toString(), 'code_type': 'resetpwd', 'code': req.data.smsCode};
-    GETSCHEMA('VCode').workflow('verify', null, vcodeoptions, function (err, result) {
+    vCodeService.verify(vcodeoptions, function(err, result){
         if (err || !result) {
             res.respond({'code': '1001', 'message': '验证码验证错误'});
             return;
@@ -468,16 +469,6 @@ exports.json_user_get = function(req, res, next) {
                     });
                 };
             }
-
-            if (flags.indexOf('order') >= 0) {
-                responds['order'] = respond;
-                respond = function (user) {
-                    require("./8.order").getOrders(req, res, next, function (orders) {
-                        user.orders = orders;
-                        responds['order'](user);
-                    });
-                };
-            }
         }
 
         respond(user);
@@ -485,7 +476,7 @@ exports.json_user_get = function(req, res, next) {
 };
 
 // Get user score
-exports.json_userscore_get = function(req, res, next, callback) {
+var json_userscore_get = function(req, res, next, callback) {
     var options = {};
 
     if (req.data.userId)
@@ -503,6 +494,10 @@ exports.json_userscore_get = function(req, res, next, callback) {
         var score = data.score || 0;
         callback ? callback(score) : res.respond({'code': '1000', 'message': 'success', 'datas': {"total": 0, "userId": data.id, "pointLaterTrade": (score || 0), "score":(score || 0), "rows": []}});
     });
+};
+
+exports.json_userscore_get = function(req, res, next){
+    json_userscore_get(req, res, next);
 };
 
 // Modify user password
@@ -723,8 +718,7 @@ exports.json_user_findaccount = function(req, res, next) {
 // User Address
 // ==========================================================================
 
-// Query useraddress list
-exports.json_useraddresslist_query = function(req, res, next, callback) {
+var json_useraddresslist_query = function(req, res, next ,callback){
     var options = {};
 
     if (!req.data.userId) {
@@ -773,6 +767,11 @@ exports.json_useraddresslist_query = function(req, res, next, callback) {
             callback ? callback(arr) : res.respond({'code': '1000', 'message': 'success', 'datas': {"total": count, "rows": arr}});
         }
     });
+};
+
+// Query useraddress list
+exports.json_useraddresslist_get = function(req, res, next) {
+    json_useraddresslist_query(req, res, next);
 };
 
 // Create useraddress
@@ -1081,69 +1080,53 @@ exports.uploadPhoto = function(req, res, next) {
         return;
     }
 
-    req.busboy.on('file', function(fieldname, file, filename, encoding, mimetype) {
-        var buffers = [];
-        file.on('data', function(data) {
-            buffers.push(data);
-        });
-
-        file.on('end', function(){
-            var photoBuf = Buffer.concat(buffers);
+    req.files.forEach(function(file){
+        UserService.get({userid:userId}, function(err, data) {
             if (err) {
-                console.error('uploadPhoto fail:', err);
-                res.respond({code:1001,message:'上传失败'});
+                res.respond({code:1001, message:err});
                 return;
             }
 
-            UserService.get({userid:userId}, function(err, data) {
+            var index = file.originalname.lastIndexOf('.');
+            var extension = file.originalname.substring(index + 1);
+            if (!type_avail.find(extension.toLowerCase())) {
+                res.respond({'code': 1001, 'message': '文件格式不正确（必须为.jpg/.png文件）'});
+                return;
+            }
+
+            if (file.size > 500*1024) {
+                res.respond({code: 1001, message: '文件大小不得大于500K'});
+                return;
+            }
+
+            // Store current file into the HDD
+            id = files.insert(file.originalname, file.mimetype, file.buffer) + default_extension;
+            var imageurl = "/images/original/" + id;
+            var oldPhotoId = null;
+            if (data.photo) {
+                oldPhotoId = data.photo.substring(data.photo.lastIndexOf('/')+1, data.photo.lastIndexOf('.'));
+            }
+            // start to update user info
+            UserService.update({userid:userId, photo:imageurl}, function(err) {
                 if (err) {
-                    res.respond({code:1001, message:err});
+                    console.error('User uploadPhoto fail:', err);
+                    res.respond({code:1001, message:'上传失败'});
                     return;
                 }
 
-                var index = filename.lastIndexOf('.');
-                var extension = filename.substring(index + 1);
-                if (!type_avail.find(extension.toLowerCase())) {
-                    res.respond({'code': 1001, 'message': '文件格式不正确（必须为.jpg/.png文件）'});
-                    return;
+                res.respond({code:1000, message:'上传成功', imageUrl:imageurl});
+
+                // success, delete old photo
+                if (oldPhotoId) {
+                    files.remove(oldPhotoId, function(err, data) {
+                        if (err) {
+                            console.error('User uploadPhoto fail:', err);
+                        }
+                    });
                 }
-
-                if (photoBuf.length > 500*1024) {
-                    res.respond({code: 1001, message: '文件大小不得大于500K'});
-                    return;
-                }
-
-                // Store current file into the HDD
-                id = files.insert(filename, mimetype, photoBuf) + default_extension;
-                var imageurl = "/images/original/" + id;
-                var oldPhotoId = null;
-                if (data.photo) {
-                    oldPhotoId = data.photo.substring(data.photo.lastIndexOf('/')+1, data.photo.lastIndexOf('.'));
-                }
-                // start to update user info
-                UserService.update({userid:userId, photo:imageurl}, function(err) {
-                    if (err) {
-                        console.error('User uploadPhoto fail:', err);
-                        res.respond({code:1001, message:'上传失败'});
-                        return;
-                    }
-
-                    res.respond({code:1000, message:'上传成功', imageUrl:imageurl});
-
-                    // success, delete old photo
-                    if (oldPhotoId) {
-                        files.remove(oldPhotoId, function(err, data) {
-                            if (err) {
-                                console.error('User uploadPhoto fail:', err);
-                            }
-                        });
-                    }
-                });
             });
         });
     });
-
-    req.pipe(req.busboy);
 };
 
 // user upload(photo) for web
@@ -1157,14 +1140,7 @@ exports.userUpload = function(req, res, next) {
         return;
     }
 
-    req.busboy.on('file', function(fieldname, file, filename, encoding, mimetype) {
-        var buffers = [];
-        file.on('data', function(data) {
-            buffers.push(data);
-        });
-
-        file.on('end', function(){
-            var photoBuf = Buffer.concat(buffers);
+    req.files.forEach(function(file){
             UserService.get({userid:userId}, function(err, data) {
                 if (err) {
                     // maybe user not find
@@ -1172,27 +1148,24 @@ exports.userUpload = function(req, res, next) {
                     return;
                 }
 
-                var index = filename.lastIndexOf('.');
-                var extension = filename.substring(index + 1);
+                var index = file.originalname.lastIndexOf('.');
+                var extension = file.originalname.substring(index + 1);
                 if (!type_avail.find(extension.toLowerCase())) {
                     res.respond({'code': 1001, 'message': '文件格式不正确（必须为.jpg/.png文件）'});
                     return;
                 }
 
-                if (photoBuf.length > 2*1024*1024) {
+                if (file.size > 2*1024*1024) {
                     res.respond({code: 1001, message: '文件大小不得大于2MB'});
                     return;
                 }
 
                 // Store current file into the HDD
-                id = files.insert(filename, mimetype, photoBuf) + default_extension;
+                id = files.insert(file.originalname, file.mimetype, file.buffer) + default_extension;
                 var imageurl = "/images/original/" + id;
                 res.respond({code:1000, message:'上传成功', imageUrl:imageurl});
             });
-        })
     });
-
-    req.pipe(req.busboy);
 };
 
 // confirm user upload(photo)

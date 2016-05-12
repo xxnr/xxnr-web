@@ -6,6 +6,7 @@ var tools = require('../common/tools');
 var services = require('../services');
 var OrderService = services.order;
 var PayService = services.pay;
+var UserService = services.user;
 var OFFLINEPAYTYPE = require('../common/defs').OFFLINEPAYTYPE;
 var EPOSNotify = require('../modules/EPOSNotify');
 var path = require('path');
@@ -48,7 +49,7 @@ var moment = require('moment-timezone');
 // pay order
 
 // common pay function
-function payOrder(req, payExecutor){
+function payOrder(req, res, payExecutor){
     var orderId = req.data['orderId'];
     var payPrice = req.data['price'];
 
@@ -105,36 +106,16 @@ function payOrder(req, payExecutor){
             if (req.payType) {
                 reqOptions.payType = req.payType;
             }
-            if (req.payType && req.payType !== payment.payType) {
-                OrderService.updatepayType({'paytype':req.payType,'orderid':order.id,'paymentid':payment.id}, function(err) {
-                    if(err) {
-                        console.error('pay payOrder OrderService updateOrderPaytype err:', err);
-                        res.respond({'code':'1001','message':'修改支付方式出错'});
-                        return;
-                    }
-                    payment.payType = req.payType;
-                    order.payType = req.payType;
-                    OrderService.getPayOrderPaymentInfo(order, payment, payPrice, reqOptions, function (err, resultPayment, resultPayPrice) {
-                        if (err) {
-                            console.error('pay payOrder OrderService getPayOrderPaymentInfo err:', err);
-                            res.respond({code:1001, message:'获取支付信息出错'});
-                            return;
-                        }
-                        payExecutor(resultPayment.id, parseFloat(resultPayPrice).toFixed(2), req.ip, order.id, resultPayment);
-                        return;
-                    });
-                });
-            } else {
-                OrderService.getPayOrderPaymentInfo(order, payment, payPrice, reqOptions, function (err, resultPayment, resultPayPrice) {
-                    if (err) {
-                        console.error('pay payOrder OrderService getPayOrderPaymentInfo err:', err);
-                        res.respond({code:1001, message:'获取支付信息出错'});
-                        return;
-                    }
-                    payExecutor(resultPayment.id, parseFloat(resultPayPrice).toFixed(2), req.ip, order.id, resultPayment);
+
+            OrderService.getPayOrderPaymentInfo(order, payment, payPrice, reqOptions, function (err, resultPayment, resultPayPrice) {
+                if (err) {
+                    console.error('pay payOrder OrderService getPayOrderPaymentInfo err:', err);
+                    res.respond({code:1001, message:'获取支付信息出错'});
                     return;
-                });
-            }
+                }
+                payExecutor(resultPayment.id, parseFloat(resultPayPrice).toFixed(2), req.ip, order.id, resultPayment);
+                return;
+            });
         } catch (e) {
             console.error('pay payOrder OrderService getPayOrderPaymentInfo err:', e);
             res.respond({"code":1001, "mesage":"获取支付信息出错"});
@@ -147,7 +128,7 @@ exports.alipayOrder = function(req, res, next){
     var consumer = req.data['consumer']||'website';
     req.payType = PAYTYPE.ZHIFUBAO;
 
-    payOrder(req, function(paymentId, totalPrice, ip, orderId, payment) {
+    payOrder(req, res, function(paymentId, totalPrice, ip, orderId, payment) {
         switch(consumer) {
             case 'app':
                 var response = {"code":1000, "paymentId":paymentId, "price":totalPrice};
@@ -178,7 +159,7 @@ exports.unionPayOrder = function(req, res, next) {
     // before starting test, we have to enable test account : login http://open.unionpay.com with xxnr 12121312(our test parameters is bound with xxnr)
     //     then go to right top corner => "my test" => "my product" => "not tested" => select one tet type => click "start to test"
     req.payType = PAYTYPE.UNIONPAY;
-    payOrder(req, function(paymentId, totalPrice, ip, orderId, payment) {
+    payOrder(req, res, function(paymentId, totalPrice, ip, orderId, payment) {
         var consumer = req.data['consumer']||'website';
         var phpPage = null;
 
@@ -257,7 +238,7 @@ exports.offlinePay = function(req, res, next){
 
     // forbidden multi pay for offline pay, which means offline pay can only pay off
     req.data.price = null;
-    payOrder(req, function(paymentId, totalPrice, ip, orderId, payment) {
+    payOrder(req, res, function(paymentId, totalPrice, ip, orderId, payment) {
         OrderService.changeToPendingApprove(orderId, function(err){
             if(err){
                 res.respond({code:1002, message:'更改订单状态失败'});
@@ -272,8 +253,7 @@ exports.offlinePay = function(req, res, next){
 // alipay notify function
 exports.alipayNotify = function(req, res, next) {
     console.log('alipayNotify body:', req.body);
-    var qs = require('querystring');
-    var body = qs.parse(req.body);
+    var body = req.body;
     
     AlipayNotify.verifyNotify(body, function(isValid) {
         if (!isValid) {
@@ -281,23 +261,28 @@ exports.alipayNotify = function(req, res, next) {
             return;
         }
 
+        // 支付ID
         var paymentId = body.out_trade_no;
         var status = body.trade_status;
         var price = body.total_fee || null;
         if (status == 'TRADE_SUCCESS') {
+            // 当前接收的时间
             var options = {payType:PAYTYPE.ZHIFUBAO, datePaid: new Date()};
             if (price) {
                 options.price = price;
             }
+            // Alipay 流水号
             if (body.trade_no) {
                 options.queryId = body.trade_no;
             }
+            // 支付ID对应我们的订单号
             if (body.extra_common_param && body.extra_common_param.length > 0) {
                 var extra_common_param = JSON.parse(body.extra_common_param);
                 if (extra_common_param && extra_common_param.orderId) {
                     options.orderId = extra_common_param.orderId;
                 }
             }
+            // Alipay 回调的时间
             if (body.notify_time) {
                 options.notify_time = body.notify_time;
             }
@@ -324,7 +309,7 @@ exports.unionpayNotify = function(req, res, next) {
     }
 
     var qs = require('querystring');
-    var body = qs.parse(req.body);
+    var body = req.body;
 
     var php_processor = require("../common/php_processor");
     var commandLine = '\"' + require('path').resolve(__filename + '/../../external/unionPay/upacp_sdk_php/demo/utf8/' + 'Verify.php') + '\"';
@@ -333,7 +318,7 @@ exports.unionpayNotify = function(req, res, next) {
         commandLine += ' --test';
     }
 
-    commandLine += ` --data=${new Buffer(req.body).toString('base64')} --json=${new Buffer(JSON.stringify(body)).toString('base64')}`;
+    commandLine += ` --data=${new Buffer(qs.stringify(body)).toString('base64')} --json=${new Buffer(JSON.stringify(body)).toString('base64')}`;
 
     new php_processor(commandLine).execute(function(output, error) {
         if (error) {
@@ -354,11 +339,15 @@ exports.unionpayNotify = function(req, res, next) {
         if (result.substring(0, 'success'.length) === 'success') {
             if (body['respCode'] === 00 || body['respCode'] === '00') {
                 var paymentInfo = JSON.parse(new Buffer(body.reqReserved, 'base64').toString());
+                // 支付ID
                 var paymentId = body.orderId || paymentInfo.paymentId;
+                // 支付ID对应我们的订单号  当前接收的时间
                 var options = {price: (parseFloat(body.txnAmt)/100).toFixed(2), orderId:paymentInfo.orderId, payType:PAYTYPE.UNIONPAY, datePaid: new Date()};
+                // Unionpay 回调的时间
                 if (body.txnTime) {
                     options.notify_time = moment(body.txnTime,"YYYYMMDDHHmmss").format("YYYY-MM-DD HH:mm:ss");
                 }
+                // Unionpay 流水号
                 if (body.queryId) {
                     options.queryId = body.queryId;
                 }
@@ -417,9 +406,12 @@ exports.process_RSC_confirm_OfflinePay = function(req, res, next){
         }
 
         var options = {payType:offlinePayType, price:payment.payPrice ? payment.payPrice : payment.price, datePaid:new Date()};
+        if (RSC && RSC.RSCInfo) {
+            options.RSC = {'_id':RSC._id, 'RSCInfo': RSC.RSCInfo};
+        }
 
         OrderService.payNotify(paymentId, options);
-        res.send('success');
+        res.respond({code:1000, message:'success'});
     });
 };
 
@@ -431,8 +423,7 @@ exports.json_offline_pay_type = function(req, res, next){
 
 // alipay refund notify
 exports.alipayRefundNotify = function(req, res, next) {
-    var qs = require('querystring');
-    var body = qs.parse(req.body);
+    var body = req.body;
     
     console.log('alipayRefundNotify info:', body);
     AlipayNotify.verifyNotify(body, function(isValid) {
@@ -487,7 +478,7 @@ exports.unionpayRefundNotify = function(req, res, next) {
     }
 
     var qs = require('querystring');
-    var body = qs.parse(req.body);
+    var body = req.body;
 
     var php_processor = require("../common/php_processor");
     var commandLine = '\"' + require('path').resolve(__filename + '/../../external/unionPay/upacp_sdk_php/demo/utf8/' + 'Verify.php') + '\"';
@@ -496,7 +487,7 @@ exports.unionpayRefundNotify = function(req, res, next) {
         commandLine += ' --test';
     }
 
-    commandLine += ` --data=${new Buffer(req.body).toString('base64')} --json=${new Buffer(JSON.stringify(body)).toString('base64')}`;
+    commandLine += ` --data=${new Buffer(qs.stringify(body)).toString('base64')} --json=${new Buffer(JSON.stringify(body)).toString('base64')}`;
 
     new php_processor(commandLine).execute(function(output, error) {
         if (error) {
@@ -551,7 +542,7 @@ exports.aliPaySuccess = function(req, res, next){
 
 exports.EPOSPay = function(req, res, next){
     req.payType = PAYTYPE.EPOS;
-    payOrder(req, function(paymentId, totalPrice, ip, orderId, payment) {
+    payOrder(req, res, function(paymentId, totalPrice, ip, orderId, payment) {
         res.respond({code:1000, message:'success', "paymentId":paymentId, "price":totalPrice});
     });
 };
@@ -567,17 +558,39 @@ exports.process_EPOSNotify = function(req, res, next){
             return;
         }
 
+        // 支付ID
         var paymentId = memo['商户支付号'];
         var status = decryptedParams.dealStatus;
         var price = (decryptedParams.amount/100) || 0;
+        // 支付ID对应我们的订单号
         var orderId = memo['商户订单号'];
-        var datePaid = new Date(decryptedParams.dealDate + ' ' + decryptedParams.dealTime);
+        // EPOS 回调的时间(目前是用户受卡时间，暂当做回调时间)
+        var notify_time = new Date(decryptedParams.dealDate + ' ' + decryptedParams.dealTime);
+        // 当前接收的时间
         var currentTime = new Date();
+        // EPOS 设备号
+        var EPOSNo = decryptedParams.deviceId;
+        // EPOS 流水号
+        var queryId = decryptedParams.orderId;
 
         if(status == 1) {
             // paid successfully
-            var options = {payType: PAYTYPE.EPOS, price: price, datePaid: datePaid, queryId: orderId, notify_time:currentTime};
-            OrderService.payNotify(paymentId, options);
+            var options = {payType: PAYTYPE.EPOS, price: price, datePaid: currentTime, orderId: orderId, notify_time:notify_time, queryId: queryId};
+            if (EPOSNo) {
+                options.EPOSNo = EPOSNo;
+                UserService.getRSCInfoByEPOSNo(EPOSNo, function(err, RSC) {
+                    if(err) console.error('pay process_EPOSNotify UserService getRSCInfoByEPOSNo err:', err, 'EPOSNo: '+EPOSNo);
+                    if (!RSC) {
+                        console.error('pay process_EPOSNotify UserService getRSCInfoByEPOSNo not find RSC, EPOSNo:', EPOSNo);
+                    } else {
+                        options.RSC = RSC;
+                    }
+                    OrderService.payNotify(paymentId, options);
+                });
+            } else {
+                OrderService.payNotify(paymentId, options);
+            }
+            // payNotify.call(self, paymentId, options);
         }
 
         res.respond({orderId:orderId, merchantMsgProcessId:0, merchantMsgProcessTime:currentTime, merchantRecMsgProcessState:1});

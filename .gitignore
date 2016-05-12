@@ -4,3 +4,6 @@ databases-online
 tmp
 *.pid
 *.pem
+*.ca-bundle
+*.crt
+*.key
