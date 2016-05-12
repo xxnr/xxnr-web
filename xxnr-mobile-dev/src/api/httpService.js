@@ -20,7 +20,6 @@ export const jsonpGet = (url,params,cb,errCb) => {
 
 Vue.http.options.emulateJSON=false;
 export const jsonpPost = (url,data,cb,errCb) => {
-
   Vue.http.post(url,data).then(cb,errCb);
 }
 

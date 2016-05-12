@@ -1,6 +1,6 @@
 import api from '../api/remoteHttpApi'
 import * as types from './mutation-types'
-
+let jsencrypt = require('../jsencrypt')
 export const getCategories = ({dispatch,state}) => {
   api.getCategories(response => {
     dispatch(types.GET_CATEGORIES,response.data.categories)
@@ -60,4 +60,37 @@ export const hideBackBtn = ({dispatch,state}) => {
 }
 export const closeAppDownload = ({dispatch,state}) => {
   dispatch(types.CLOSE_APPDOWNLOAD)
+}
+export const changeRightBtnHome = ({dispatch,state}) => {
+  dispatch(types.CHANGE_RIGHTBTN_HOME)
+}
+export const changeRightBtnMyXXNR = ({dispatch,state}) => {
+  dispatch(types.CHANGE_RIGHTBTN_XXNR)
+}
+export const goBack = ({dispatch,state}) => {
+  window.history.back();
+}
+
+export const login = ({dispatch,state},PhoneNumber,password) => {
+  api.getPublicKey(response => {
+    var public_key = response.data.public_key;
+    var encrypt = new jsencrypt.default.JSEncryptExports.JSEncrypt();
+    encrypt.setPublicKey(public_key);
+    var encrypted = encrypt.encrypt(password);
+    //console.log(encrypted)
+    api.login(
+      {account:PhoneNumber, password:encrypted, keepLogin:true}
+      ,response => {
+      if (response.data.code == 1000) {
+        sessionStorage.setItem('user', JSON.stringify(response.data.datas));
+        window.location.href = '/';
+      }else{
+        //TODO
+
+      }
+    })
+  }, response => {
+    console.log(response);
+    //dispatch(types.GET_CATEGORIES)
+  })
 }

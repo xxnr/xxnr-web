@@ -1,12 +1,13 @@
 <template>
   <div class="mobile-header">
     {{headerTitle}}
-    <div class="header-bit header-back" v-link="{ path:'/home'}" v-if="backButtonDisplay"><img src="/assets/images/header_back_arrow.png" alt=""> </div>
-    <div class="header-bit header-right" v-if="rightButton">{{rightButton}}</div>
+    <div class="header-bit header-back" @click="goBack()" v-if="backButtonDisplay"><img src="/assets/images/header_back_arrow.png" alt=""> </div>
+    <div class="header-bit header-right" v-if="rightButton"><a @click="showBackBtn()" v-link="{ path: '/my_xxnr'}">{{rightButton}}</a></div>
   </div>
 </template>
 
 <script>
+  import {showBackBtn,goBack} from '../vuex/actions'
   export default {
     vuex: {
       getters: {
@@ -15,6 +16,7 @@
         backButtonDisplay: state => state.header.backButtonDisplay
       },
       actions: {
+        showBackBtn,goBack
       }
     }
   }

@@ -1,0 +1,3 @@
+<template>
+  myNonReceiving
+</template>
