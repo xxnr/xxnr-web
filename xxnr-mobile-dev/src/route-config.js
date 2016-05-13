@@ -19,6 +19,8 @@ export function configRouter (router) {
       name: 'login', //具名路由
       component: require('./components/login/index.vue')
     },
+	'/productDetail': {
+      component: require('./components/productDetail/index.vue')
     '/register':{
       component: require('./components/register/index.vue')
     },

@@ -1,19 +1,19 @@
 <template>
   <div class="products clearfix">
-    <a href="">
-      <div class="product" v-for="product in products">
-        <div class="product-img">
-          <img :src="product.imgUrl">
-        </div>
-        <div class="product-name">{{product.name}}</div>
-        <div class="product-presale" v-if="product.presale">
-          即将上线
-        </div>
-        <div class="product-price" v-else>
-          ¥{{product.price}}
-        </div>
+    <div class="product" v-for="product in products">
+      <a v-link="{path: '/productDetail?id=' + product.id}">
+      <div class="product-img">
+        <img :src="product.imgUrl">
       </div>
-    </a>
+      <div class="product-name">{{product.name}}</div>
+      <div class="product-presale" v-if="product.presale">
+        即将上线
+      </div>
+      <div class="product-price" v-else>
+        ¥{{product.price}}
+      </div>
+      </a>
+    </div>
   </div>
 </template>
 

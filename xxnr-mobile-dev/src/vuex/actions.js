@@ -140,3 +140,24 @@ export const getOrders = ({dispatch,state},typeValue) => {
   })
   dispatch(types.LOG_OUT);
 }
+
+export const getProductDetail = ({dispatch,state}, id) => {
+  api.getProductDetail(
+    {goodsId: id},
+    response => {
+    //console.log(response);
+    dispatch(types.GET_PRODUCTDETAIL, response.data)
+  },response => {
+   // console.log(response);
+  })
+}
+
+export const getSliderImages = ({dispatch, state}) => {
+  api.getSliderImages(
+    response => {
+    dispatch(types.GET_SLIDERIMAGES, response.data.datas.rows)
+    }, response => {
+      //console.log(response);
+      console.log('aaa');
+    })
+}

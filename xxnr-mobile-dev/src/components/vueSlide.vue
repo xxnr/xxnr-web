@@ -1,26 +1,26 @@
 <script>
 export default {
-    props: ['slide', 'pages'],
+    props: ['slider', 'pages'],
     ready () {
-        this.$on('slideTo', (num) => {
-            this.turnTo(num)
-        })
-        this.$on('slideNext', () => {
-            this.next()
-        })
-        this.$on('slidePre', () => {
-            this.pre()
-        })
-        var self = this;
-        this.$on('slider', () => {
-            setInterval(function() {
-                if(!self.slide.init.canNext) {
-                    self.turnTo(1);
-                } else {
-                    self.next();
-                }
-            }, 5000);
-        });
+//        this.$on('slideTo', (num) => {
+//            this.turnTo(num)
+//        })
+//        this.$on('slideNext', () => {
+//            this.next()
+//        })
+//        this.$on('slidePre', () => {
+//            this.pre()
+//        })
+//        var self = this;
+//        this.$on('slider', () => {
+//            setInterval(function() {
+//                if(!self.slide.init.canNext) {
+//                    self.turnTo(1);
+//                } else {
+//                    self.next();
+//                }
+//            }, 5000);
+//        });
     },
     methods: {
         swipeUp (move) {
@@ -161,6 +161,40 @@ export default {
         }
     }
 }
+
+//export default {
+//  props: ['slider'],
+//  ready() {
+//    console.log('111');
+//    this.$on('turnTo', (num) => {
+//      console.log(num);
+//    })
+//  },
+//  methods: {
+////    turnTo (num) {
+////      console.log(num);
+////            let index = Math.ceil(num) - 1
+////            let len = this.pages.length
+////            let step = 0
+////            if (index > this.pages.length - 1) {
+////                console.error("there are no more pages")
+////                return false
+////            }
+////            this.slide.init.currentPage = Math.ceil(num)
+////            for (let i = 0; i<len; i++) {
+////                if(this.pages[i].current+this.pages[i].origin == 0){
+////                    step = index - i
+////                    break;
+////                }
+////            }
+////            for(let page of this.pages) {
+////                page.current = page.current - step * 100;
+////                this.styleCompute(page)
+////            }
+////            this.checkState()
+////        }
+//  }
+//}
 </script>
 <style>
 .slider {

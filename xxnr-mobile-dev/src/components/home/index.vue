@@ -1,40 +1,35 @@
 <template>
   <div class="container" style="padding: 0">
     <app-download-overlay></app-download-overlay>
-    <!-- pagination example -->
-    <div class="timeline">
-      <div
-        class="item"
-        @click='turnTo (1)'
-        :class='{"active": slide.init.currentPage == 1}'
-      ></div>
-      <div
-        class="item"
-        @click='turnTo (2)'
-        :class='{"active": slide.init.currentPage == 2}'
-      ></div>
-      <div
-        class="item"
-        @click='turnTo (3)'
-        :class='{"active": slide.init.currentPage == 3}'
-      ></div>
-    </div>
-    <slide :pages="someList" :slide="slide">
+    <!--&lt;!&ndash; pagination example &ndash;&gt;-->
+    <!--<div class="timeline">-->
+      <!--<div-->
+        <!--class="item"-->
+        <!--@click='turnTo (1)'-->
+        <!--:class='{"active": slide.init.currentPage == 1}'-->
+      <!--</div>-->
+      <!--<div-->
+        <!--class="item"-->
+        <!--@click='turnTo (2)'-->
+        <!--:class='{"active": slide.init.currentPage == 2}'-->
+      <!--</div>-->
+      <!--<div-->
+        <!--class="item"-->
+        <!--@click='turnTo (3)'-->
+        <!--:class='{"active": slide.init.currentPage == 3}'-->
+      <!--</div>-->
+    <!--</div>-->
+    <slide :slide="slide">
       <!-- slot  -->
       <div
-        v-for="item in someList"
+        v-for="slide in slider"
         class="slider-item page{{$index}}"
-        :style="someList[$index].style">
-        <h1>{{item.title}}</h1>
+        >
         <button @click="turnTo(($index+2))">to page{{$index+1}}</button>
       </div>
     </slide>
+    <div v-for="slide in slider" class="slider-item page {{$index}}"></div>
   </div>
-  <!--<div class="index-nav">-->
-    <!--<div class="nav-bit">1</div>-->
-    <!--<div class="nav-bit">2</div>-->
-    <!--<div class="nav-bit">3</div>-->
-  <!--</div>-->
   <section-tabs></section-tabs>
   <div class="container">
     <div class="container">
@@ -68,87 +63,89 @@
 </template>
 
 <script>
-  import slide from '../vue-slide.vue'
+  import slide from '../vueSlide.vue'
   import sectionTabs from './SectionTabs.vue'
   import IndexProductsBlockList from './IndexProductsBlockList.vue'
   import appDownloadOverlay from './appDownloadOverlay.vue'
-  import { getIndexCars,getIndexHeafei,showBackBtn,changeRightBtnHome,changeRightBtnPathHome } from '../../vuex/actions'
+  import { getIndexCars,getIndexHeafei,showBackBtn,changeRightBtnHome,changeRightBtnPathHome,getSliderImages } from '../../vuex/actions'
 
   export default {
     vuex:{
       getters:{
         indexCars:state => state.indexCarsList.indexCars,
-        indexHuafei:state => state.indexCarsList.indexHuafei
+        indexHuafei:state => state.indexCarsList.indexHuafei,
+        slider: state => state.vueSlider.slider
       },
       actions:{
         getIndexCars,
         getIndexHeafei,
         showBackBtn,
         changeRightBtnHome,
-        changeRightBtnPathHome
+        changeRightBtnPathHome,
+        getSliderImages
       }
     },
-    data () {
-      return {
-        someList: [
-          {
-            title: '1',
-            img: 'testimg-1.png',
-            //slide init
-            origin: 0,
-            current: 0,
-            style: {
-              'background-image': 'url(./static/assets/images/testimg-1.png)',
-              'background-size': 'cover',
-              //transform
-              'transform': `translateX(0%)`
-            }
-          },
-          {
-            title: '2',
-            img: 'testimg-2.png',
+//    data () {
+//      return {
+//        someList: [
+//          {
+//            title: '1',
+//            img: 'testimg-1.png',
+//            //slide init
+//            origin: 0,
+//            current: 0,
+//            style: {
+//              'background-image': 'url(./static/assets/images/testimg-1.png)',
+//              'background-size': 'cover',
+//              //transform
+//              'transform': `translateX(0%)`
+//            }
+//          },
+//          {
+//            title: '2',
+//            img: 'testimg-2.png',
+//
+//            origin: 100,
+//            current: 0,
+//            style: {
+//              'background-image': 'url(./static/assets/images/testimg-2.png)',
+//              'background-size': 'cover',
+//              'transform': `translateX(${ 100 }%)`
+//            }
+//          },
+//          {
+//            title: '3',
+//            img: 'testimg-3.png',
+//            origin: 200,
+//            current: 0,
+//            style: {
+//              'background-image': 'url(./static/assets/images/testimg-3.png)',
+//              'background-size': 'cover',
+//              'transform': `translateX(${ 200 }%)`
+//            }
+//          }
+//        ],
+//        slide: {
+//          init: {
+//            pageNum: 3,
+//            currentPage: 1,
+//            canPre: false,
+//            canNext: true,
+//            start: {},
+//            end: {},
+//            tracking: false,
+//            thresholdTime: 500,
+//            thresholdDistance: 100
+//          }
+//        }
+//      }
 
-            origin: 100,
-            current: 0,
-            style: {
-              'background-image': 'url(./static/assets/images/testimg-2.png)',
-              'background-size': 'cover',
-              'transform': `translateX(${ 100 }%)`
-            }
-          },
-          {
-            title: '3',
-            img: 'testimg-3.png',
-            origin: 200,
-            current: 0,
-            style: {
-              'background-image': 'url(./static/assets/images/testimg-3.png)',
-              'background-size': 'cover',
-              'transform': `translateX(${ 200 }%)`
-            }
-          }
-        ],
-        slide: {
-          init: {
-            pageNum: 3,
-            currentPage: 1,
-            canPre: false,
-            canNext: true,
-            start: {},
-            end: {},
-            tracking: false,
-            thresholdTime: 500,
-            thresholdDistance: 100
-          }
-        }
-      }
-
-    },
+   // },
     methods: {
       turnTo(num)
       {
         console.log(num)
-        this.$broadcast('slideTo', num)
+        //this.$broadcast('slideTo', num)
       }
       ,
       slideNext()
@@ -162,11 +159,12 @@
       }
     },
     components: {
-      slide,sectionTabs,IndexProductsBlockList,appDownloadOverlay
+      sectionTabs,IndexProductsBlockList,appDownloadOverlay,slide
     },
     created () {
       this.getIndexCars();
       this.getIndexHeafei();
+	  this.getSliderImages();
     },
     route: {
       deactivate (transition) {

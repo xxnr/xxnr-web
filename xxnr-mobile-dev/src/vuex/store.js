@@ -6,6 +6,8 @@ import indexCarsList from './modules/indexCarsList'
 import rowsViewProducts from './modules/rowsViewProducts'
 import auth from './modules/auth'
 import myOrders from './modules/myOrders'
+import productDetail from './modules/productDetail'
+import vueSlider from './modules/vueSlider'
 
 import {
   CLOSE_APPDOWNLOAD
@@ -29,7 +31,9 @@ export default new Vuex.Store({
     indexCarsList,
     rowsViewProducts,
     auth,
-    myOrders
+    myOrders,
+	productDetail, 
+	vueSlider
   },
   strict: debug
 })
