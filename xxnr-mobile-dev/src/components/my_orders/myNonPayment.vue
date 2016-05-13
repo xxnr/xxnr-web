@@ -1,3 +1,0 @@
-<template>
-  myNonPayment
-</template>

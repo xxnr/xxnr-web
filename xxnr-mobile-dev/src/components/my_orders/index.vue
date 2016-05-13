@@ -1,20 +1,37 @@
 <template>
   <div class="my_orders--section">
     <div class="orders-tabs">
-      <div class="orders-tab" v-link="{ name: 'myAllOrders'}">全部</div>
-      <div class="orders-tab" v-link="{ name: 'myNonPayment'}">待付款</div>
-      <div class="orders-tab" v-link="{ name: 'myNonDeliver'}">待发货</div>
-      <div class="orders-tab" v-link="{ name: 'mynNonReceiving'}">待收货</div>
-      <div class="orders-tab" v-link="{ name: 'myCompleted'}">已完成</div>
+      <div class="orders-tab" @click="getOrders()" >全部</div>
+      <div class="orders-tab" @click="getOrders(1)" >待付款</div>
+      <div class="orders-tab" @click="getOrders(2)" >待发货</div>
+      <div class="orders-tab" @click="getOrders(3)" >待收货</div>
+      <div class="orders-tab" @click="getOrders(4)" >已完成</div>
     </div>
-    <router-view>
-    </router-view>
+    <orders-list :orders="orders"></orders-list>
   </div>
 
 </template>
 
 <script>
-//  import myOrder from './orderList.vue'
+  import ordersList from '../ordersList.vue'
+  import { getOrders } from '../../vuex/actions'
+
+  export default {
+    vuex:{
+      getters:{
+        orders: state => state.myOrders.ordersList
+      },
+      actions:{
+        getOrders
+      }
+    },
+    components:{
+      ordersList
+    },
+    created(){
+      this.getOrders(null)
+    }
+  }
 </script>
 
 <style>

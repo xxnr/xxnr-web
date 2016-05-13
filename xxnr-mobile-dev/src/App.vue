@@ -19,6 +19,7 @@
   }
 </script>
 <style>
+  [v-cloak] { display: none }
   html, body, p, div, ul, li, a, span {
     border: 0;
     padding: 0;

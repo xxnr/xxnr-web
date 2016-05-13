@@ -4,6 +4,8 @@ import header from './modules/header'
 import sectionTabs from './modules/sectionTabs'
 import indexCarsList from './modules/indexCarsList'
 import rowsViewProducts from './modules/rowsViewProducts'
+import auth from './modules/auth'
+import myOrders from './modules/myOrders'
 
 import {
   CLOSE_APPDOWNLOAD
@@ -22,7 +24,12 @@ export default new Vuex.Store({
     }
   },
   modules: {
-    header,sectionTabs,indexCarsList,rowsViewProducts
+    header,
+    sectionTabs,
+    indexCarsList,
+    rowsViewProducts,
+    auth,
+    myOrders
   },
   strict: debug
 })

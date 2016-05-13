@@ -1,6 +1,8 @@
 import api from '../api/remoteHttpApi'
 import * as types from './mutation-types'
+import {getCookie,removeCookie} from '../utils/authService'
 let jsencrypt = require('../jsencrypt')
+
 export const getCategories = ({dispatch,state}) => {
   api.getCategories(response => {
     dispatch(types.GET_CATEGORIES,response.data.categories)
@@ -64,6 +66,13 @@ export const closeAppDownload = ({dispatch,state}) => {
 export const changeRightBtnHome = ({dispatch,state}) => {
   dispatch(types.CHANGE_RIGHTBTN_HOME)
 }
+export const changeRightBtnPathHome = ({dispatch,state}) => {
+  dispatch(types.CHANGE_RIGHTBTNPATH_HOME)
+}
+export const changeRightBtnPathMyxxnr = ({dispatch,state}) => {
+  dispatch(types.CHANGE_RIGHTBTNPATH_MYXXNR)
+}
+
 export const changeRightBtnMyXXNR = ({dispatch,state}) => {
   dispatch(types.CHANGE_RIGHTBTN_XXNR)
 }
@@ -93,4 +102,41 @@ export const login = ({dispatch,state},PhoneNumber,password) => {
     console.log(response);
     //dispatch(types.GET_CATEGORIES)
   })
+}
+
+export const getCookieUser = ({dispatch,state}) => {
+  const user = getCookie('__user');
+  if(user){
+    dispatch(types.GET_COOKIEUSER,user);
+  }
+}
+
+export const getUserInfo = ({dispatch,state},userId) => {
+  api.getUserInfo(
+    {'userId':userId},
+    response => {
+    dispatch(types.GET_USERINFO,response.data.datas);
+  }, response => {
+    console.log(response);
+    //dispatch(types.GET_CATEGORIES)
+  })
+}
+
+export const logout = ({dispatch,state}) => {
+  removeCookie('__user');
+  removeCookie('__scart');
+  removeCookie('token');
+  dispatch(types.LOG_OUT);
+}
+
+export const getOrders = ({dispatch,state},typeValue) => {
+  api.getOrdersList(
+    {'typeValue':typeValue},
+    response => {
+    dispatch(types.GET_ORDERS_LIST,response.data.items);
+  }, response => {
+    console.log(response);
+    //dispatch(types.GET_CATEGORIES)
+  })
+  dispatch(types.LOG_OUT);
 }

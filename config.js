@@ -25,6 +25,7 @@ var config= {
     tokencookie: "token",
     usercookie: "__user",
     domain: ".xinxinnongren.com",
+    CookieDomain: "localhost:8080",
     usercookie_expires_in: "30 days",
     shopingCartcookie: "__scart",
 

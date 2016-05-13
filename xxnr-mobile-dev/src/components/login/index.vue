@@ -6,7 +6,7 @@
     </div>
     <div class="login-input password-input">
       <img src="" alt="">
-      <input v-model="password" type="text" placeholder="请输入密码">
+      <input v-model="password" type="password" placeholder="请输入密码">
     </div>
     <div class="forget-pass">
       忘记密码？

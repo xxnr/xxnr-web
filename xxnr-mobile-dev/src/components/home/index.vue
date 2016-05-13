@@ -72,7 +72,7 @@
   import sectionTabs from './SectionTabs.vue'
   import IndexProductsBlockList from './IndexProductsBlockList.vue'
   import appDownloadOverlay from './appDownloadOverlay.vue'
-  import { getIndexCars,getIndexHeafei,showBackBtn,changeRightBtnHome } from '../../vuex/actions'
+  import { getIndexCars,getIndexHeafei,showBackBtn,changeRightBtnHome,changeRightBtnPathHome } from '../../vuex/actions'
 
   export default {
     vuex:{
@@ -83,8 +83,9 @@
       actions:{
         getIndexCars,
         getIndexHeafei,
-          showBackBtn,
-          changeRightBtnHome
+        showBackBtn,
+        changeRightBtnHome,
+        changeRightBtnPathHome
       }
     },
     data () {
@@ -172,6 +173,7 @@
         //when back to /my_xxnr hide the backBtn
         if (transition.to.path === '/my_xxnr') {
           this.changeRightBtnHome();
+          this.changeRightBtnPathHome();
         }
         transition.next()
       }

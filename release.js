@@ -112,8 +112,9 @@ app.use(function (err, req, res, next) {
 	next(err);
 });
 
-http.createServer(app).listen(80);
-console.info('application listen at port 80');
+http.createServer(app).listen(8070);
+console.info('application listen at port 8070');
+
 
 if(config.secure) {
 	var options = {
@@ -122,6 +123,6 @@ if(config.secure) {
 		cert: fs.readFileSync('xxnr.crt')
 	};
 
-	https.createServer(options, app).listen(443);
-	console.info('application listen at port 443');
+	https.createServer(options, app).listen(1111);
+	console.info('application listen at port 1111');
 }

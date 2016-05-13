@@ -17,6 +17,12 @@ export default {
   },
   login: function (params,cb,errCb) {
     jsonpGet(API_ROOT + 'api/v2.0/user/login',params,cb,errCb);
+  },
+  getUserInfo: function (params,cb,errCb) {
+    jsonpGet(API_ROOT + 'api/v2.0/user/get/',params,cb,errCb);
+  },
+  getOrdersList: function(params,cb,errCb){
+    jsonpGet(API_ROOT + 'api/v2.0/order/getOderList',params,cb,errCb);
   }
 }
 

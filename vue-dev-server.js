@@ -12,7 +12,7 @@ var proxyMiddleware = require('http-proxy-middleware')
 
 
 
-
+process.chdir(__dirname+"/xxnr-mobile-dev");
 var webpackConfig = process.env.NODE_ENV === 'testing'
   ? require('./xxnr-mobile-dev/build/webpack.prod.conf')
   : require('./xxnr-mobile-dev/build/webpack.dev.conf')
@@ -98,8 +98,13 @@ app.use(busboy({
 app.use(require('./middlewares/website'));
 
 // routes
-app.use('/', require('./routes'));
-
+var routes = require('./routes');
+app.use('/', routes.secureFrontendApis);
+app.use('/', routes.frontendApis);
+app.use('/', routes.frontendPages);
+app.use('/', routes.appRelatedPages);
+app.use('/', routes.backendApis);
+app.use('/', routes.backendPages);
 
 module.exports = app.listen(port, function (err) {
   if (err) {
