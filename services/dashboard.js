@@ -458,11 +458,11 @@ DashboardService.prototype.generateAgentReport = function(dateMinus, callback){
     })
 };
 
-DashboardService.prototype.queryAgentReportYesterday = function(callback, sortBy, order){
+DashboardService.prototype.queryAgentReportYesterday = function(callback, sortBy, order, page, max){
     var yesterday = new Date().add('d', -1).format('yyyyMMdd');
     var sort = {totalPaidAmount:-1};
     var order = U.parseInt(order, -1);
-    switch(sort){
+    switch(sortBy){
         case 'NEWINVITEE':
             sort = {newInviteeCount:order};
             break;
@@ -483,17 +483,44 @@ DashboardService.prototype.queryAgentReportYesterday = function(callback, sortBy
             break;
     }
 
-    AgentReportModel.find({dayInBeijingTime: yesterday})
-        .select('-_id agent name phone newInviteeCount totalInviteeCount newPotentialCustomerCount totalPotentialCustomerCount totalCompletedOrderCount totalPaidAmount')
-        .sort(sort)
-        .exec(function(err, agentReports){
+    page = U.parseInt(page) - 1;
+    page = page < 0 ? 0 : page;
+    max = U.parseInt(max, 20);
+    var take = U.parseInt(max);
+    var skip = U.parseInt(page * max);
+
+    AgentReportModel.count({dayInBeijingTime: yesterday}).exec(function(err, count){
         if(err){
             console.error(err);
             return;
         }
+        AgentReportModel.find({dayInBeijingTime: yesterday})
+            .select('-_id agent name phone newInviteeCount totalInviteeCount newPotentialCustomerCount totalPotentialCustomerCount totalCompletedOrderCount totalPaidAmount')
+            .sort(sort)
+            .skip(skip)
+            .limit(take)
+            .lean()
+            .exec(function(err, agentReports){
+            if(err){
+                console.error(err);
+                return;
+            }
+            count = count || agentReports.length;
+            var data = {};
 
-        callback(null, agentReports);
-    })
+            data.count = count;
+            data.items = agentReports;
+
+            // Gets page count
+            data.pages = Math.floor(count / max) + (count % max ? 1 : 0);
+
+            if (data.pages === 0)
+                data.pages = 1;
+
+            data.page = page + 1;
+            callback(null, data);
+        });
+    });
 };
 
 var getUserRegisteredCount = function(dateStart, dateEnd, callback) {

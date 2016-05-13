@@ -1,0 +1,506 @@
+<link rel="stylesheet" href="/css/pikaday.css"/>
+<script src="/js/pikaday.js"></script>
+<script src="/js/echarts.common.min.js"></script>
+<div class="filter" style="padding-bottom:9px">
+	<div class="container">
+		<div class="caption"><span class="fa fa-dashboard mr5"></span> Dashboard</div>
+	</div>
+</div>
+
+<div class="container dashboard">
+	<div class="filter col-md-2" style="padding: 25px 15px;">
+		<h3 class="ui-left">经营数据</h3>
+        <ul class="dashboard-sidebar">
+            <li name="daily">- 每日概况</li>
+            <li class="selected">- 每周业绩</li>
+            <li class="cl"></li>
+        </ul>
+        <br />
+        <h3 class="ui-left">经纪人数据</h3>
+        <ul class="dashboard-sidebar">
+            <li name="agentRank">- 业绩排行</li>
+            <li class="cl"></li>
+        </ul>
+    </div>
+    <div class="col-md-10">
+	<div class="mb50">
+		<div class="row">
+			<div class="col-md-12">
+				<h3 class="ui-left">本周动态</h3>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-12">
+				<div data-component="template" data-component-path="dashboard">
+					<script type="text/html">
+					{{ if thisweek }}
+						<p>统计时间 {{ if thisweek.startDate && thisweek.endDate }}（{{ thisweek.startDate }} ~ {{ thisweek.endDate }}） {{ fi }} {{ if thisweek.dates }}共{{ thisweek.dates }}天{{fi}}</p>
+						<div class="box">
+							<div class="col-md-3">
+								<div class="mb10">注册用户数</div>
+								<div class="num">{{ thisweek.registeredUserCount | format(0) }}</div>
+							</div>
+							<div class="col-md-3">
+								<div class="mb10">订单数</div>
+								<div class="num">{{ thisweek.orderCount | format(0) }}</div>
+							</div>
+							<div class="col-md-3">
+								<div class="mb10">付款订单数</div>
+								<div class="num">{{ thisweek.paidOrderCount | format(0) }}</div>
+							</div>
+							<div class="col-md-3">
+								<div class="mb10">已支付金额（元）</div>
+								<div class="num">{{ thisweek.paidAmount | price(2) }}</div>
+							</div>
+							<div class="cl"></div>
+						</div>
+						
+					{{ fi }}
+					</script>
+				</div>
+				<div data-component="error" data-component-path="dashboard.thisweekresponse"></div>
+			</div>
+		</div>
+	</div>
+
+	<div class="mb50">
+		<div class="row">
+			<div class="col-md-12">
+				<h3 class="ui-left">上周统计</h3>
+			</div>
+		</div>
+		<div class="row m">
+			<div class="col-md-12">
+				<div data-component="template" data-component-path="dashboard">
+					<script type="text/html">
+					{{ if lastweek }}
+						<p>统计时间 {{ if lastweek.startDate && lastweek.endDate }}（{{ lastweek.startDate }} ~ {{ lastweek.endDate }}） {{ fi }} {{ if lastweek.dates }}共{{ lastweek.dates }}天{{fi}}</p>
+						<div class="box">
+							<div class="col-md-3">
+								<div class="mb10">注册用户数</div>
+								<div class="num">{{ lastweek.registeredUserCount | format(0) }}</div>
+							</div>
+							<div class="col-md-3">
+								<div class="mb10">订单数</div>
+								<div class="num">{{ lastweek.orderCount | format(0) }}</div>
+							</div>
+							<div class="col-md-3">
+								<div class="mb10">付款订单数</div>
+								<div class="num">{{ lastweek.paidOrderCount | format(0) }}</div>
+							</div>
+							<div class="col-md-3">
+								<div class="mb10">已支付金额（元）</div>
+								<div class="num">{{ lastweek.paidAmount | price(2) }}</div>
+							</div>
+							<div class="cl"></div>
+						</div>
+						
+					{{ fi }}
+					</script>
+				</div>
+				<div data-component="error" data-component-path="dashboard.lastweekresponse"></div>
+			</div>
+		</div>
+	</div>
+
+	<div class="mb50">
+		<div class="row m">
+			<div class="col-md-12">
+				<h3 class="ui-left">业务趋势</h3>
+			</div>
+			<div class="col-md-12">
+				<div class="quick-view dates-select">
+					<span>筛选日期：</span>
+					<input type="text" id="weekliesStartDate">
+					<span>至</span>
+					<input type="text" id="weekliesEndDate">
+					<button class="selected" data-name="datesselect">确定</button>
+				</div>
+			</div>
+			<div class="col-md-12">
+				<div data-component="template" data-component-path="dashboard">
+					<script type="text/html">
+						{{ if weekly }}
+							<p>统计时间 {{ if weekly.startDate && weekly.endDate }}（{{ weekly.startDate }} ~ {{ weekly.endDate }}） {{ fi }} {{ if weekly.dates }}共{{ weekly.dates }}天{{fi}}</p>
+						{{ fi }}
+					</script>
+				</div>
+			</div>
+		</div>
+		<div class="row m">
+			<div class="col-md-12 m">
+				<div class="chart-buttons">
+					<span>数据指标：</span>
+					<div class="selected" data-name="users">用户数</div>
+					<div data-name="orders">订单数</div>
+					<div data-name="paidAmount">已付金额</div>
+				</div>
+			</div>
+			<div class="col-md-12" id="chart" style="height:400px;"></div>
+		</div>
+		<div class="row m">
+			<div class="col-md-12">
+				<div data-component="template" data-component-path="dashboard" class="ui-grid">
+					<script type="text/html">
+					{{ if weeklies && weeklies.length > 0 }}
+						<p>数据报表</p>
+						<table class="table" width="100%" cellpadding="0" cellspacing="0" border="0" style="font-size:14px;">
+							<tbody>
+								<tr>
+									<td style="width:30px" class="silver hidden-xs ui-center active">序号</td>
+							    	<td style="width:100px" class="silver hidden-xs ui-center active">日期（时间段）</td>
+							    	<td style="width:60px" class="silver hidden-xs ui-center active">注册用户数</td>
+							    	<td style="width:60px" class="silver hidden-xs ui-center active">订单数</td>
+							    	<td style="width:60px" class="silver hidden-xs ui-center active">付款订单数</td>
+							    	<td style="width:90px" class="silver hidden-xs ui-right active">已支付金额（元）</td>
+							    </tr>
+							    {{ foreach weekly in weeklies }}
+							    	<tr>
+										<td style="width:30px" class="silver hidden-xs ui-center">{{ $index + 1 }}</td>
+								    	<td style="width:100px" class="silver hidden-xs ui-center">{{ if weekly.weekIndex }}{{ weekly.weekIndex }}{{ else }}{{ weekly.week }}{{ fi }}</td>
+								    	<td style="width:60px" class="silver hidden-xs ui-center">{{ weekly.registeredUserCount | format(0) }}</td>
+								    	<td style="width:60px" class="silver hidden-xs ui-center">{{ weekly.orderCount | format(0) }}</td>
+								    	<td style="width:60px" class="silver hidden-xs ui-center">{{ weekly.paidOrderCount | format(0) }}</td>
+								    	<td style="width:90px" class="silver hidden-xs ui-right">{{ weekly.paidAmount | price(2) }}</td>
+								    </tr>
+								{{ end }}
+							</tbody>
+						</table>
+					{{ fi }}
+					</script>
+				</div>
+				
+				<div data-component="error" data-component-path="dashboard.weekliesresponse"></div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+
+	var dashboard = {};
+
+	dashboard.thisweek;
+	dashboard.thisweekresponse;
+	dashboard.lastweek;
+	dashboard.lastweekresponse;
+	dashboard.weeklies = [];
+	dashboard.weekly;
+	dashboard.weekliesresponse;
+	dashboard.weekliesChartSelected;
+	dashboard.weekliesChart = {'users':{'legend':['用户数'],'yAxis':'数量','dataKey':['registeredUserCount']},'orders':{'legend':['下单订单数', '已付款订单数'],'yAxis':'数量','dataKey':['orderCount', 'paidOrderCount']},'paidAmount':{'legend':['已付金额'],'yAxis':'销量','dataKey':['paidAmount']}};
+	dashboard.weekliesChartDatas;
+	dashboard.weekliesUpdateDate;
+	dashboard.weekliesStartDate;
+	dashboard.weekliesEndDate;
+
+	function dashboard_refresh() {
+		dashboardInit();
+		// thisweek
+		$.components.GET(managerurl + '/api/dashboard/getWeeklyReport', null, function(response) {
+			var key = 'dashboard.thisweek';
+			if (response && response.code && response.code==1000) {
+				response = response;
+				var today = moment();
+				var dayOfweek = today.day();
+				response.endDate = today.format('YYYY-MM-DD');
+				response.startDate = moment().add(dayOfweek==0?(1-7):(1-dayOfweek), 'days').format('YYYY-MM-DD');
+				response.dates = dayOfweek==0?7:dayOfweek;
+			} else {
+				if (response.error || response.message) {
+					key = 'dashboard.thisweekresponse';
+					if (response.message) {
+						response = [{error: response.message}];
+					} else {
+						response = response.error;
+					}
+				} else {
+					response = {};
+				}
+			}
+			SET(key, response);
+		});
+		// lastweek
+		var lastweekDate = moment().add(-7, 'days').format('YYYY-MM-DD');
+		$.components.GET(managerurl + '/api/dashboard/getWeeklyReport?date='+lastweekDate, null, function(response) {
+			var key = 'dashboard.lastweek';
+			if (response && response.code && response.code==1000) {
+				response = response;
+				var date = moment(lastweekDate);
+				var dayOfweek = date.day();
+				response.endDate = moment(lastweekDate).add(dayOfweek==0?0:(7-dayOfweek), 'days').format('YYYY-MM-DD');
+				response.startDate = moment(lastweekDate).add(dayOfweek==0?(1-7):(1-dayOfweek), 'days').format('YYYY-MM-DD');
+				response.dates = 7;
+			} else {
+				if (response.error || response.message) {
+					key = 'dashboard.lastweekresponse';
+					if (response.message) {
+						response = [{error: response.message}];
+					} else {
+						response = response.error;
+					}
+				} else {
+					response = {};
+				}
+			}
+			SET(key, response);
+		});
+		// weeklies
+		var dateStart = moment().add(-7 * 12, 'days').format('YYYY-MM-DD');
+		var dateEnd = moment().format('YYYY-MM-DD');
+		var firstDate = firstDateofWeek(dateEnd, 'YYYY-MM-DD');
+		if (firstDate) {
+			dateStart = firstDate.add(-7 * 12, 'days').format('YYYY-MM-DD');
+		}
+		getWeeklies(dateStart, dateEnd);
+		$.components.GET(managerurl + '/api/dashboard/lastUpdateTime', null, function(response) {
+			if (response && response.code && response.code==1000) {
+				var startTime, endTime;
+				if (response && response.lastUpdateTime && response.lastUpdateTime.hourly) {
+					endTime = response.lastUpdateTime.hourly;
+					dashboard.weekliesUpdateDate = endTime?moment(endTime).format('YYYY-MM-DD'):moment().format('YYYY-MM-DD');
+				}
+				if (response && response.serviceStartTime) {
+					startTime = response.serviceStartTime;
+				}
+				datePickers_init(startTime?startTime:null, endTime?moment(endTime).format('YYYY-MM-DD'):moment().format('YYYY-MM-DD'), dateStart, dateEnd);
+				// weeklies
+				getWeeklies(dateStart, endTime && moment(endTime).format('YYYY-MM-DD') < dateEnd ? moment(endTime).format('YYYY-MM-DD') : dateEnd);
+			} else {
+				if (response.error || response.message) {
+					if (response.message) {
+						response = [{error: response.message}];
+					} else {
+						response = response.error;
+					}
+				} else {
+					response = {};
+				}
+				SET('dashboard.weekliesresponse', response);
+				datePickers_init(null, null, dateStart, dateEnd);
+			}
+		});
+		$('.quick-view button').off('click').on('click', function() {
+        	var el = $(this);
+			var dataName = el.attr('data-name');
+			switch (dataName) {
+				case 'datesselect':
+					var dateStart = $('#weekliesStartDate').val();
+					var dateEnd = $('#weekliesEndDate').val();
+					if (dateStart && dateEnd && dateEnd >= dateStart) {
+						if (dashboard.dailiesStartDate != dateStart || dashboard.dailiesEndDate != dateEnd) {
+							getWeeklies(dateStart, dateEnd);
+						}
+					} else {
+						alert('请选择正确的时间段');
+					}
+					break;
+				default:
+					break;
+			}
+			$(".quick-view").find('.selected').removeClass('selected');
+			el.addClass('selected');
+		});
+
+        $('.chart-buttons div').off('click').on('click', function() {
+			var el = $(this);
+			var dataName = el.attr('data-name');
+			if (dataName && dataName !== dashboard.weekliesChartSelected) {
+				switch (dataName) {
+					case 'users':
+					case 'orders':
+					case 'paidAmount':
+						dashboard_charts(dataName, el);
+						break;
+				}
+			}
+        });
+	}
+
+	function getWeeklies(dateStart, dateEnd) {
+		dashboard.dailiesStartDate = dateStart;
+		dashboard.dailiesEndDate = dateEnd;
+		$.components.GET(managerurl + '/api/dashboard/queryWeeklyReport?dateStart='+dateStart+'&dateEnd='+dateEnd, null, function(response) {
+			var errorkey = 'dashboard.weekliesresponse';
+			var errorresponse = [];
+			SET(errorkey, errorresponse);
+			var key = 'dashboard.weeklies';
+			if (response && response.code && response.code==1000) {
+				var resultDatas = fixWeeklyDatas(response.weeklyReports);
+				if (resultDatas && resultDatas.weeklies) {
+					response = resultDatas.weeklies;
+				} else {
+					response = response.weeklyReports;
+				}
+				dashboard.weeklies = response;
+				if (resultDatas && resultDatas.weekliesChartDatas) {
+					dashboard.weekliesChartDatas = resultDatas.weekliesChartDatas;
+				}
+		        dashboard_charts('users', $('.chart-buttons').children('div:first'));
+		        var updateDate = dashboard.weekliesUpdateDate;
+		        var endDate = firstDateofWeek(updateDate) == firstDateofWeek(dateEnd) && updateDate > dateEnd ? updateDate : dateEnd;
+
+		        dashboard.weekly = {startDate:dateStart, endDate: endDate, dates:moment(endDate).diff(moment(dateStart), 'days')};
+		        SET('dashboard.weekly', dashboard.weekly);
+			} else {
+				if (response.error || response.message) {
+					key = 'dashboard.weekliesresponse';
+					if (response.message) {
+						response = [{error: response.message}];
+					} else {
+						response = response.error;
+					}
+				} else {
+					response = {};
+				}
+			}
+			SET(key, response);
+		});
+	}
+
+	function fixWeeklyDatas(weeklyReports) {
+		var result = {weeklies:weeklyReports, weekliesChartDatas:{}};
+		if (weeklyReports) {
+			var updateDate = dashboard.weekliesUpdateDate;
+			var len = weeklyReports.length;
+			var xAxis = [];
+			var series = {};
+
+			var chartKeys = Object.keys(dashboard.weekliesChart);
+			var seriesDatas = {};
+            while (len--) {
+            	var date = weeklyReports[len]['week'];
+            	var week = date ? moment(date,'YYYYMMDD').week() : null;
+
+            	// weeklies
+            	var endDate, startDate;
+            	if (date) {
+					var dayOfweek = moment(date,'YYYYMMDD').day();
+					endDate = moment(date,'YYYYMMDD').add(dayOfweek==0?0:(7-dayOfweek), 'days').format('YYYY-MM-DD');
+					if (updateDate < endDate) {
+						endDate = updateDate;
+					}
+					startDate = moment(date,'YYYYMMDD').add(dayOfweek==0?(1-7):(1-dayOfweek), 'days').format('YYYY-MM-DD');
+				}
+            	weeklyReports[len].weekIndex = week ? '第'+week+'周'+'('+startDate+'~'+endDate+')' : date;
+            	
+            	// chartKey xAxis
+                xAxis.push(week ? moment(date,'YYYYMMDD').format('YYYY')+'-'+week : date);
+
+        		// chartKey series
+        		for (var i=0; i < chartKeys.length; i++) {
+					var chartKey = chartKeys[i];
+					if (!seriesDatas[chartKey]) {
+						seriesDatas[chartKey] = {};
+					}
+					var defaultOptions = dashboard.weekliesChart[chartKey]?dashboard.weekliesChart[chartKey]:null;
+					var dataKey = defaultOptions && defaultOptions['dataKey']?defaultOptions['dataKey']:[];
+					series[chartKey] = [];
+					for (var j=0; j < dataKey.length; j++) {
+						if (!seriesDatas[chartKey][dataKey[j]]) {
+			        		seriesDatas[chartKey][dataKey[j]] = {
+			        			name:defaultOptions && defaultOptions['legend'] && defaultOptions['legend'].length > j ? defaultOptions['legend'][j] : '',
+			        			type:'bar',
+			        			data: []
+			        		};
+			        	}
+			        	var value = weeklyReports[len][dataKey[j]];
+			        	if (value && chartKey == 'paidAmount') {
+			        		value = parseFloat(parseInt(parseFloat(value)*100)/100);
+			        	}
+			        	seriesDatas[chartKey][dataKey[j]].data.push(value?parseFloat(value):0);
+			        	// seriesDatas[chartKey][dataKey[j]].data.push(weeklyReports[len][dataKey[j]]?weeklyReports[len][dataKey[j]]:0);
+			        	series[chartKey].push(seriesDatas[chartKey][dataKey[j]]);
+		        	}
+		        }
+            }
+            result.weeklies = weeklyReports;
+            result.weekliesChartDatas = {xAxis:xAxis, series:series};
+		}
+		return result;
+	}
+
+	function firstDateofWeek(date, format) {
+		if (!date) 
+			return null;
+
+		if (!format) {
+			format = 'YYYYMMDD';
+		}
+		var dayOfweek = moment(date,format).day();
+		return moment(date,format).add(dayOfweek==0?(1-7):(1-dayOfweek), 'days');
+	}
+	
+	function dashboard_charts(chartKey, button) {
+		if (button) {
+			$(".chart-buttons").find('.selected').removeClass('selected');
+			button.addClass('selected');
+		}
+		dashboard.weekliesChartSelected = chartKey;
+		var defaultOptions = dashboard.weekliesChart[chartKey]?dashboard.weekliesChart[chartKey]:null;
+		if (dashboard.weekliesChartDatas) {
+			var domChart = document.getElementById('chart');
+			var myChart = echarts.init(domChart);
+
+			// 指定图表的配置项和数据
+			var option = {
+	            title: {},
+	            tooltip: {},
+	            legend: {
+	                data: defaultOptions && defaultOptions['legend'] ? defaultOptions['legend'] : []
+	            },
+	            xAxis: {
+	                data: dashboard.weekliesChartDatas['xAxis'] ? dashboard.weekliesChartDatas['xAxis'] : []
+	            },
+	            yAxis: {
+	            	name: defaultOptions && defaultOptions['yAxis'] ? defaultOptions['yAxis'] : ''
+	            },
+	            series: dashboard.weekliesChartDatas['series'] && dashboard.weekliesChartDatas['series'][chartKey] ? dashboard.weekliesChartDatas['series'][chartKey] : [],
+	            color: ['#C1222A', '#B5C334', '#FDCF10', '#E97C24']
+	        };
+
+	        // 使用刚指定的配置项和数据显示图表。
+	        myChart.setOption(option);
+	    }
+	}
+
+	function datePickers_init(minDate, maxDate, defaultStartDate, defaultEndDate) {
+		// start date
+		datePicker_init('weekliesStartDate', minDate, maxDate, defaultStartDate);
+		// end date
+		datePicker_init('weekliesEndDate', minDate, maxDate, defaultEndDate);
+	}
+
+	function datePicker_init(pickerId, minDate, maxDate, defaultDate) {
+		var options = {
+			field: $('#'+pickerId)[0],
+			yearRange: [2000,2020],
+			i18n: i18n,
+			bound: true,
+			format: 'YYYY-MM-DD',
+			onSelect: function() {
+			    $('#'+pickerId).val(this.getMoment().format('YYYY-MM-DD'));
+			    var d = this.getMoment().format('YYYY-MM-DD');
+			    $(".dates-select").find('.selected').removeClass('selected');
+			}
+		}
+		if (minDate) {
+			options.minDate = new Date(minDate);
+		}
+		if (maxDate) {
+			options.maxDate = new Date(maxDate);
+		}
+		if (defaultDate) {
+			options.defaultDate = new Date(defaultDate);
+			options.setDefaultDate = true;
+		} 
+		var startpicker = new Pikaday(options);
+
+		if (!defaultDate) {
+			startpicker.setMoment(moment().dayOfYear(366));
+		}
+	}
+
+	dashboard_refresh();
+
+</script>

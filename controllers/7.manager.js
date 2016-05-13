@@ -969,7 +969,7 @@ exports.json_orders_read = function(req,res,next) {
     });
 };
 
-var convertOrderToShow = function(order, payment){
+var convertOrderToShow = function(order, orderpayment){
     var subOrdersPayments = {};					// suborder all payments
 
 	if (order && order.payments) {
@@ -1062,7 +1062,7 @@ var convertOrderToShow = function(order, payment){
 		if (order.deliverStatus == DELIVERSTATUS.RECEIVED && order.dateCompleted) {
 			orderInfo.dateCompleted = order.dateCompleted;
 		}
-		orderInfo.payment = payment;
+		orderInfo.payment = orderpayment;
 		order.order = orderInfo;
 	}
 
@@ -2157,34 +2157,51 @@ exports.lastUpdateTime = function(req, res, next){
 			return;
 		}
 
-		res.respond({code:1000, lastUpdateTime: lastUpdateTime});
+		res.respond({code:1000, lastUpdateTime: lastUpdateTime, serviceStartTime: F.config.serviceStartTime});
 	})
 };
 
 exports.getDailyReport = function(req, res, next) {
-	var dateMinus = U.parseInt(req.data.date, 0);
 	var currentTime = new Date();
-	var date = currentTime.add('d', dateMinus).format('yyyyMMdd');
+	var date = currentTime.format('yyyyMMdd');
+	if (req.data.date) {
+		date = new Date(req.data.date).format('yyyyMMdd');
+	}
 
 	var dailyReportResult = {
 		code: 1000,
 		registeredUserCount: 0,
 		orderCount: 0,
 		paidOrderCount: 0,
-		paidAmount: 0
+		paidAmount: 0,
+		lastUpdateTime: currentTime
 	};
 
-	DashboardService.queryDailyReport(date, date, function (err, dailyReports) {
-		if (!err) {
-			var dailyReport = dailyReports[0];
-			dailyReportResult.registeredUserCount = dailyReport.registeredUserCount;
-			dailyReportResult.orderCount = dailyReport.orderCount;
-			dailyReportResult.paidOrderCount = dailyReport.paidOrderCount;
-			dailyReportResult.paidAmount = parseFloat(dailyReport.paidAmount.toFixed(2));
+	DashboardService.lastUpdateTime(function (err, lastUpdateTime) {
+		if (err) {
+			res.respond({code:1001, message:'获取更新时间失败'});
+			return;
 		}
+		if (lastUpdateTime) {
+			if (lastUpdateTime.hourly) {
+				dailyReportResult.lastUpdateTime = lastUpdateTime.hourly;
+			}
+			DashboardService.queryDailyReport(date, date, function (err, dailyReports) {
+				if (!err) {
+					var dailyReport = dailyReports[0];
+					dailyReportResult.registeredUserCount = dailyReport.registeredUserCount;
+					dailyReportResult.orderCount = dailyReport.orderCount;
+					dailyReportResult.paidOrderCount = dailyReport.paidOrderCount;
+					dailyReportResult.paidAmount = parseFloat(dailyReport.paidAmount.toFixed(2));
+				}
 
-		res.respond(dailyReportResult);
-	})
+				res.respond(dailyReportResult);
+			});
+		} else {
+			res.respond({code:1001, message:'没有获取到更新时间'});
+			return;
+		}
+	});
 };
 
 exports.getStatistic = function(req, res, next) {
@@ -2193,7 +2210,8 @@ exports.getStatistic = function(req, res, next) {
 		registeredUserCount: 0,
 		orderCount: 0,
 		completedOrderCount: 0,
-		paidAmount: 0
+		paidAmount: 0,
+		serviceStartTime: config.serviceStartTime
 	};
 
 	DashboardService.getStatistic(function (err, statistic) {
@@ -2209,9 +2227,15 @@ exports.getStatistic = function(req, res, next) {
 };
 
 exports.getWeeklyReport = function(req, res, next) {
-	var weekMinus = U.parseInt(req.data.week, 0);
-	var weekStartEndTime = tools.getWeekStartEndTime(weekMinus);
-	var date = weekStartEndTime.startTime.format('yyyyMMdd');
+	// var weekMinus = U.parseInt(req.data.week, 0);
+	// var weekStartEndTime = tools.getWeekStartEndTime(weekMinus);
+	// var date = weekStartEndTime.startTime.format('yyyyMMdd');
+	var currentTime = new Date();
+	var date = currentTime;
+	if (req.data.date) {
+		date = new Date(req.data.date);
+	}
+	var startDate = tools.getWeekStartTimeByDate(date).format('yyyyMMdd');
 
 	var weeklyReportResult = {
 		code: 1000,
@@ -2221,7 +2245,7 @@ exports.getWeeklyReport = function(req, res, next) {
 		paidAmount: 0
 	};
 
-	DashboardService.queryWeeklyReport(date, date, function(err, weeklyReports){
+	DashboardService.queryWeeklyReport(startDate, startDate, function(err, weeklyReports){
 		if(!err){
 			var weeklyReport = weeklyReports[0];
 			weeklyReportResult.registeredUserCount = weeklyReport.registeredUserCount;
@@ -2258,12 +2282,12 @@ exports.queryWeeklyReport = function(req, res, next){
 			return;
 		}
 
-		res.respond({code:1000, WeeklyReports:WeeklyReports || []});
+		res.respond({code:1000, weeklyReports:WeeklyReports || []});
 	})
 };
 
 exports.queryAgentReportYesterday = function(req, res, next){
-	DashboardService.queryAgentReportYesterday(function(err, agentReportYesterday){
+	DashboardService.queryAgentReportYesterday(function(err, result){
 		if(err){
 			res.respond({code:1001, message:'获取经纪人数据失败'});
 			return;
@@ -2274,8 +2298,11 @@ exports.queryAgentReportYesterday = function(req, res, next){
 				res.respond({code:1001, message:'获取更新时间失败'});
 				return;
 			}
-
-			res.respond({code:1000, agentReportYesterday:agentReportYesterday, lastUpdateTime:lastUpdateTime.agentReport});
+			if (result) {
+				res.respond({code:1000, agentReportYesterday:result.items, lastUpdateTime:lastUpdateTime.agentReport, page: result.page, pages: result.pages, count: result.count});
+				return;
+			}
+			res.respond({code:1001, message:'没有获取到经纪人数据'});
 		})
-	}, req.data.sort)
+	}, req.data.sort, req.data.sortOrder, req.data.page)
 };

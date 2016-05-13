@@ -152,7 +152,8 @@ function backend_auth_fail(req, res, data){
         res.render('./7.manager/login.html',
             {
                 manager_url: F.config['manager-url'],
-                user: data
+                user: data,
+                version: F.config['version']
             });
     }
 }
