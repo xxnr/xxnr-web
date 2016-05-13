@@ -15,16 +15,16 @@
 
 <body>
 	<div class="container">
-        <div id="product_info"></div>
+        <div id="product_info"><%- result.productInfo %></div>
     </div>
             
-    <%= result.productInfo%>
 
-    <script src="/js/jquery.min.js"></script>
-    <script  type="text/javascript">
-        var data = JSON.parse($('#product').html());
-        $("#product_info").html(data.productInfo);
-    </script>
+
+    <!--<script src="/js/jquery.min.js"></script>-->
+    <!--<script  type="text/javascript">-->
+        <!--var data = JSON.parse($('#product').html());-->
+        <!--$("#product_info").html(data.productInfo);-->
+    <!--</script>-->
   
 </body>
 </html>
