@@ -12,10 +12,10 @@ const concurrency = 10000;
 ReportUpdateTimeModel.findOne({}, function(err, updateTime){
     var lastModifyTime = new Date(config.serviceStartTime).getTime();
     if(updateTime && updateTime.agentReport) {
-        lastModifyTime = new Date(updateTime.agentReport).getTime();
+        lastModifyTime = new Date(updateTime.agentReport).add('h', -currentTimeZoneDiff).getTime();
     }
 
-    var currentTime = new Date().getTime();
+    var currentTime = new Date().add('h', -currentTimeZoneDiff).getTime();
     var dayDiff = parseInt(currentTime/millisecondsInDay) - parseInt(lastModifyTime/millisecondsInDay);
     var recordedCount = dayDiff;
     var batchGenerateAgentReport = function(i, max) {
