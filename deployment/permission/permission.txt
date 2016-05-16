@@ -1,83 +1,115 @@
 #common
 /manager/upload, post, super_admin, business_admin, product_op, news_editor, customer_op
-/manager/upload/base64, post, super_admin, business_admin, product_op, news_editor, customer_op
-
-#products
-/manager/products/uploadImage, post, super_admin, business_admin, product_op
-/manager/api/products/, get, super_admin, business_admin, product_op
-/manager/api/products/, post, super_admin, business_admin, product_op
-/manager/api/products/{id}, get, super_admin, business_admin, product_op
-/manager/api/products/, delete, super_admin, business_admin, product_op
-/manager/api/products/import, post, super_admin, business_admin, product_op
-/manager/api/products/categories, get, super_admin, business_admin, product_op
-/manager/api/products/category, post, super_admin, business_admin, product_op
-/manager/api/products/attr/{attributeName}/, get, super_admin, business_admin, product_op
-/manager/api/products/attribute/add/, post, super_admin, business_admin, product_op
-/manager/api/products/attributes/, get, super_admin, business_admin, product_op
-
-#SKUs
-/manager/api/v2.1/SKU/add/, post, super_admin, business_admin, product_op
-/manager/api/v2.1/SKU/update/{id}/, post, super_admin, business_admin, product_op
-/manager/api/v2.1/SKU/attribute/add/, post, super_admin, business_admin, product_op
-/manager/api/v2.1/SKU/attributes/, get, super_admin, business_admin, product_op
-/manager/api/v2.1/SKU/query/, get, super_admin, business_admin, product_op
-/manager/api/v2.1/SKU/remove/{id}/, get, super_admin, business_admin, product_op
-/manager/api/v2.1/SKU/additions/, get, super_admin, business_admin, product_op
-/manager/api/v2.1/SKU/addition/add/, post, super_admin, business_admin, product_op
-
-#news
-/manager/news/uploadImage, post, super_admin, news_editor
-/manager/api/news/, get, super_admin, news_editor
-/manager/api/news/, post, super_admin, news_editor
-/manager/api/news/{id}, get, super_admin, news_editor
-/manager/api/news/updatestatus, post, super_admin, news_editor
-/manager/api/news, delete, super_admin, news_editor
-/manager/api/news/categories, get, super_admin, news_editor
-/manager/api/news/category, post, super_admin, news_editor
-
-#auditlogs
-/manager/api/auditlogs/, get, super_admin
-/manager/api/auditlogs/{id}, get, super_admin
-
-#payrefunds
-/manager/api/payrefunds/, get, super_admin
-/manager/api/payrefunds/{id}, get, super_admin
-/manager/api/payrefunds/refundsubmit/, put, super_admin
-
-#files
-/manager/api/files/clear, get, super_admin
+/manager/api/brands, get, super_admin, business_admin, product_op, customer_op
 
 #dashboard
 /manager/api/dashboard, get, super_admin
 /manager/api/dashboard/online, get, super_admin
-/manager/api/dashboard/getDailyReport, get, super_admin
+/manager/api/dashboard/getDailyReport, get, super_admin, customer_op, dashboard
+/manager/api/dashboard/getWeeklyReport, get, super_admin, customer_op, dashboard
+/manager/api/dashboard/getStatistic, get, super_admin, customer_op, dashboard
+/manager/api/dashboard/queryDailyReport, get, super_admin, customer_op, dashboard
+/manager/api/dashboard/queryWeeklyReport, get, super_admin, customer_op, dashboard
+/manager/api/dashboard/lastUpdateTime, get, super_admin, customer_op, dashboard
+/manager/api/dashboard/queryAgentReportYesterday, get, super_admin, customer_op, dashboard
 
 #orders
 /manager/api/orders, get, super_admin, business_admin, customer_op
-/manager/api/orders, put, super_admin, business_admin, customer_op
-/manager/api/orders/{id}, get, super_admin, business_admin, customer_op
+/manager/api/orders/:id, get, super_admin, business_admin, customer_op
+/manager/api/order/getOfflinePayType, get, super_admin, business_admin, customer_op
+/manager/api/orders/confirmOfflinePay, post, super_admin, business_admin, customer_op
+/manager/api/orders/RSCInfo, put, super_admin, business_admin, customer_op 
+/manager/api/orders/subOrders, put, super_admin, business_admin
+/manager/api/orders/SKUs, put, super_admin, business_admin
+/manager/api/orders/SKUsDelivery, put, super_admin, business_admin, customer_op
+/manager/api/orders/products, put, super_admin, business_admin
 
-#backend users
-/manager/api/backend/user/create, post, super_admin, business_admin
-/manager/api/backend/users, get, super_admin, business_admin
-/manager/backend/user/password/modify, post, super_admin, business_admin
-/manager/backend/users, post, super_admin, business_admin
+#products
+/manager/products/uploadImage, post, super_admin, business_admin, product_op
+/manager/api/products, get, super_admin, business_admin, product_op
+/manager/api/products, post, super_admin, business_admin, product_op
+/manager/api/products/:id, get, super_admin, business_admin, product_op
+/manager/api/products/categories, get, super_admin, business_admin, product_op
+/manager/api/products/category, post, super_admin, business_admin, product_op
+/manager/api/products/attr/:attributeName, get, super_admin, business_admin, product_op
+/manager/api/products/attribute/add, post, super_admin, business_admin, product_op
+/manager/api/products/attributes, get, super_admin, business_admin, product_op
+/manager/api/products/updateStatus, post, super_admin, business_admin, product_op
+
+#SKUs
+/manager/api/v2.1/SKU/add, post, super_admin, business_admin, product_op
+/manager/api/v2.1/SKU/update/:id, post, super_admin, business_admin, product_op
+/manager/api/v2.1/SKU/attribute/add, post, super_admin, business_admin, product_op
+/manager/api/v2.1/SKU/attributes, get, super_admin, business_admin, product_op
+/manager/api/v2.1/SKU/query, get, super_admin, business_admin, product_op
+/manager/api/v2.1/SKU/remove/:id, get, super_admin, business_admin, product_op
+/manager/api/v2.1/SKU/additions, get, super_admin, business_admin, product_op
+/manager/api/v2.1/SKU/addition/add, post, super_admin, business_admin, product_op
+/manager/api/v2.1/SKU/online/:id, get, super_admin, business_admin, product_op
+
+#news
+/manager/news/uploadImage, post, super_admin, news_editor
+/manager/api/news, get, super_admin, news_editor
+/manager/api/news, post, super_admin, news_editor
+/manager/api/news, delete, super_admin, news_editor
+/manager/api/news/:id, get, super_admin, news_editor
+/manager/api/news/updatestatus, post, super_admin, news_editor
+/manager/api/news/categories, get, super_admin, news_editor
+/manager/api/news/category, post, super_admin, news_editor
 
 #users
-/manager/api/users/, get, super_admin, customer_op
-/manager/api/users/{id}/, get, super_admin, customer_op
-/manager/api/users/, put, super_admin, customer_op
+/manager/api/users, get, super_admin, customer_op
+/manager/api/users/:id, get, super_admin, customer_op
+/manager/api/users, put, super_admin, customer_op
+
+#agentinfo
+/managerapi/v2.1/agentinfo/:id, get, super_admin, customer_op
 
 #potential customer
 /manager/v2.1/potentialCustomer/query, get, super_admin, customer_op
-/manager/v2.1/potentialCustomer/{_id}, get, super_admin, customer_op
-/manager/v2.1/agentinfo/{_id}, get, super_admin, customer_op
+/manager/v2.1/potentialCustomer/:_id, get, super_admin, customer_op
+
+#RSCs
+/manager/v2.2/RSCInfo/:_id, get, super_admin, customer_op
+/manager/v2.2/RSCs, get, super_admin
+/manager/api/v2.2/RSC/orders, get, super_admin
+/manager/api/v2.2/RSC/modify, put, super_admin
+/manager/api/v2.2/RSC/queryByProducts, get, super_admin, customer_op
+
+# area
+/manager/api/area/getProvinceList, get, super_admin
+/manager/api/area/getCityList, get, super_admin
+/manager/api/area/getCountyList, get, super_admin
+/manager/api/area/getTownList, get, super_admin
+
+#payrefunds
+/manager/api/payrefunds, get, super_admin
+/manager/api/payrefunds/:id, get, super_admin
+/manager/api/payrefunds/refundsubmit, put, super_admin
+
+#auditlogs
+/manager/api/auditlogs, get, super_admin
+/manager/api/auditlogs/:id, get, super_admin
+
+#backend users
+/manager/api/backend/users, get, super_admin
+/manager/api/backend/users, post, super_admin
+/manager/api/backend/user/create, post, super_admin
+/manager/api/backend/user/password/modify, post, super_admin
 
 #permission
 /manager/permissions, get, super_admin
 
 #role
 /manager/roles, get, super_admin
+
+#businesses
+/manager/api/businesses, get, super_admin
+
+
+
+#files
+/manager/api/files/clear, get, super_admin
 
 #system
 /manager/backup/website, get, super_admin
@@ -96,17 +128,13 @@
 /manager/widgets, get, super_admin
 /manager/widgets, post, super_admin
 /manager/widgets, delete, super_admin
-/manager/widgets/{id}, get, super_admin
+/manager/widgets/:id, get, super_admin
 
 #pages
 /manager/pages, get, super_admin
 /manager/pages, post, super_admin
 /manager/pages, delete, super_admin
-/manager/pages/{id}, get, super_admin
+/manager/pages/:id, get, super_admin
 /manager/pages/preview, json, super_admin
 /manager/pages/dependencies, get, super_admin
 /manager/pages/sitemap, get, super_admin
-
-#RSCs
-/manager/v2.2/RSCInfo/{_id}, get, super_admin
-/manager/v2.2/RSCs, get, super_admin

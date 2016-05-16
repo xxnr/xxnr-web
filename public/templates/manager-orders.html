@@ -648,7 +648,7 @@
 		</div>
 
 		<div class="padding" style="padding-top: 0px;">
-			<div data-component="template" data-component-path="orders" class="SKUslist">
+			<div data-component="template" data-component-path="orders" class="SKUslist ui-grid">
 			<script type="text/html">
 				{{ if form.SKUs && form.SKUs.length > 0 }}
 					<div class="silver"><strong>订单商品SKU</strong></div>
@@ -656,24 +656,22 @@
 					<table class="table table-bordered" border="0">
 						<tbody>
 							<tr>
-								<td class="ui-center hidden-xs active">商品ID</td>
-								<td class="ui-center hidden-xs active">商品SKU ID</td>
-								<td class="ui-center col-xs-4 hidden-xs active">商品名称</td>
-		                        <td class="ui-center col-xs-2 active">单价</td>
-		                        <td class="ui-center col-xs-2 active">订金</td>
+								<td class="ui-center col-xs-1 hidden-xs active">商品ID</td>
+								<td class="ui-center col-xs-1 hidden-xs active">商品SKU ID</td>
+								<td class="ui-center col-xs-3 hidden-xs active">商品名称</td>
+		                        <td class="ui-center col-xs-2 active">价格</td>
 								<td class="ui-center col-xs-1 active">数量</td>
-								<td class="ui-center col-xs-4 active">附加项</td>
+								<td class="ui-center col-xs-3 active">附加项</td>
 								<td class="ui-center col-xs-2 active">发货状态</td>
 							</tr>
 							{{ foreach s in form.SKUs }}
 							<tr>
-								<td class="ui-center hidden-xs">{{ s.productId }}</td>
-								<td class="ui-center hidden-xs">{{ s.ref }}</td>
-								<td class="ui-center col-xs-4 hidden-xs" title="{{ s.name }}">{{ s.name }}</td>
-		                        <td class="ui-center col-xs-2">{{ s.price | price(2) }}</td>
-		                        <td class="ui-center col-xs-2">{{ s.deposit | price(2) }}</td>
-								<td class="ui-center col-xs-1">{{ s.count }}x</td>
-								<td class="ui-center col-xs-4">
+								<td class="ui-center col-xs-1 hidden-xs" title="{{ s.productId }}">{{ s.productId }}</td>
+								<td class="ui-center col-xs-1 hidden-xs" title="{{ s.ref }}">{{ s.ref }}</td>
+								<td class="ui-center col-xs-3 hidden-xs" title="{{ s.name }}">{{ s.name }}</td>
+		                        <td class="ui-center col-xs-2">单价：{{ s.price | price(2) }}</br>定金：{{ s.deposit | price(2) }}</td>
+								<td class="ui-center col-xs-1" title="{{ s.count }}x">{{ s.count }}x</td>
+								<td class="ui-center col-xs-3">
 									{{ if s.additions && s.additions.length > 0 }}
 										{{ foreach addition in s.additions }}
 											{{ addition.name }} - {{ addition.price | price(2) }}

@@ -700,7 +700,7 @@
 
         var getData = {paymentId: paymentId, offlinePayType: offlinePayType, RSCId: RSCId};
 
-        $.components.GET(managerurl + '/api/orders/confirmOfflinePay', getData, function(response) {
+        $.components.POST(managerurl + '/api/orders/confirmOfflinePay', getData, function(response) {
             if(response.code != '1000') {
                 alert(response.message);
                 return;

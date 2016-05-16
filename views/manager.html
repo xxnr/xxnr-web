@@ -3,13 +3,10 @@
 <head>
 	<title>Manager v<%= version %></title>
 	<% include ./partials/static %>
-	<script>
-//		var managerurl="@{!CONFIG('manager-url')}";
-//        var usertypes=JSON.parse('@{!CONFIG("user_types")}');
+	<script type="text/javascript">
 		var usertypes= <%- JSON.stringify(user_types) %>;
 		var managerurl = '<%= manager_url %>';
 		var currency= "<%= currency_entity %>";
-//		var su=JSON.parse('@{json(user)}');
 		var su= <%- JSON.stringify(user) %>;
         su.roles = su.role.view_roles;
 	</script>
@@ -32,20 +29,18 @@
 	<header>
 		<div class="container">
 			<nav>
-				<!--<a href="/" title="E-shop" class="highlight"><span class="fa fa-globe"></span></a>-->
-				<a class="jrouting" href="<%= manager_url %>/" title="统计" data-role="dashboard"><span class="fa fa-dashboard"></span></a>
-				<a class="jrouting" href="<%= manager_url %>/orders/" title="订单" data-role="orders"><span class="fa fa-shopping-cart"></span></a>
-				<a class="jrouting" href="<%= manager_url %>/products/" title="商品" data-role="products"><span class="fa fa-navicon"></span></a>
-				<a class="jrouting" href="<%= manager_url %>/users/" title="用户" data-role="users"><span class="fa fa-users"></span></a>
-				<a class="jrouting" href="<%= manager_url %>/rsc/" title="服务站管理" data-role="rsc"><span class="fa fa-truck"></span></a>
-				<a class="jrouting" href="<%= manager_url %>/news/" title="资讯" data-role="news"><span class="fa fa-newspaper-o"></span></a>
-				<a class="jrouting" href="<%= manager_url %>/payrefunds/" title="退款" data-role="payrefunds"><span class="fa fa-money"></span></a>
-				<a class="jrouting" href="<%= manager_url %>/auditlogs/" title="审计" data-role="auditlogs"><span class="fa fa-history"></span></a>
-				<a class="jrouting" href="<%= manager_url %>/settings/" title="设置" data-role="settings"><span class="fa fa-cog"></span></a>
-				<!-- <a class="jrouting" href="@{CONFIG('manager-url')}/pages/" title="@(Pages)" data-role="pages"><span class="fa fa-file-text"></span></a>
-				<a class="jrouting" href="@{CONFIG('manager-url')}/newsletter/" title="@(Newsletter)" data-role="newsletter"><span class="fa fa-envelope"></span></a>
-				<a class="jrouting" href="@{CONFIG('manager-url')}/system/" title="@(System)" data-role="system"><span class="fa fa-database"></span></a> -->
-                <div class="account">账户：<%= user.account%><a href="" ng-click="logout()" title="退出"><span class="fa fa-sign-out"></span></a></div>
+			<ul>
+				<li><a class="jrouting" href="<%= manager_url %>/" title="统计" data-role="dashboard"><span class="fa fa-dashboard"></span></a></li>
+				<li><a class="jrouting" href="<%= manager_url %>/orders/" title="订单" data-role="orders"><span class="fa fa-shopping-cart"></span></a></li>
+				<li><a class="jrouting" href="<%= manager_url %>/products/" title="商品" data-role="products"><span class="fa fa-navicon"></span></a></li>
+				<li><a class="jrouting" href="<%= manager_url %>/users/" title="用户" data-role="users"><span class="fa fa-users"></span></a></li>
+				<li><a class="jrouting" href="<%= manager_url %>/rsc/" title="服务站管理" data-role="rsc"><span class="fa fa-truck"></span></a></li>
+				<li><a class="jrouting" href="<%= manager_url %>/news/" title="资讯" data-role="news"><span class="fa fa-newspaper-o"></span></a></li>
+				<li><a class="jrouting" href="<%= manager_url %>/payrefunds/" title="退款" data-role="payrefunds"><span class="fa fa-money"></span></a></li>
+				<li><a class="jrouting" href="<%= manager_url %>/auditlogs/" title="审计" data-role="auditlogs"><span class="fa fa-history"></span></a></li>
+				<li><a class="jrouting" href="<%= manager_url %>/settings/" title="设置" data-role="settings"><span class="fa fa-cog"></span></a></li>
+            	<div class="account">账户：<%= user.account%><a href="" ng-click="logout()" title="退出"><span class="fa fa-sign-out"></span></a></div>
+            </ul>
 			</nav>
 		</div>
 	</header>

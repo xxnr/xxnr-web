@@ -46,11 +46,11 @@ exports.install = function() {
 	//F.route(CONFIG('manager-url') + '/news/uploadImage/',    				CKEditor_uploadImage, ['post', 'upload'], 20480, ['backend_auth']); // 20 MB
 
 	// FILES
-	F.route(CONFIG('manager-url') + '/api/files/clear/',         			json_files_clear, ['get'], ['backend_auth']);
+	// // F.route(CONFIG('manager-url') + '/api/files/clear/',         			json_files_clear, ['get'], ['backend_auth']);
 
 	// DASHBOARD
-	F.route(CONFIG('manager-url') + '/api/dashboard/',           			json_dashboard, ['get'], ['backend_auth']);
-	//F.route(CONFIG('manager-url') + '/api/dashboard/online/',    			json_dashboard_online, ['get'], ['backend_auth']);
+	// F.route(CONFIG('manager-url') + '/api/dashboard/',           			json_dashboard, ['get'], ['backend_auth']);
+	// F.route(CONFIG('manager-url') + '/api/dashboard/online/',    			json_dashboard_online, ['get'], ['backend_auth']);
 	// F.route(CONFIG('manager-url') + '/api/dashboard/clear/',     			json_dashboard_clear);
 
 	// ORDERS
@@ -62,7 +62,7 @@ exports.install = function() {
 	//F.route(CONFIG('manager-url') + '/api/orders/SKUs/',              		json_orders_SKUs_update, ['put'], ['backend_auth', 'auditing']);
 	//F.route(CONFIG('manager-url') + '/api/orders/SKUsDelivery/',            json_orders_SKUs_delivery, ['put'], ['backend_auth', 'auditing']);
 	//F.route(CONFIG('manager-url') + '/api/orders/RSCInfo/',					process_orders_RSCInfo_update, ['put'], ['backend_auth', 'auditing']);
-	//F.route(CONFIG('manager-url') + '/api/orders/confirmOfflinePay',    	process_order_confirm_OfflinePay, ['get'], ['backend_auth', 'auditing']);
+	//F.route(CONFIG('manager-url') + '/api/orders/confirmOfflinePay',    	process_order_confirm_OfflinePay, ['post'], ['backend_auth', 'auditing']);
 	//F.route(CONFIG('manager-url') + '/api/order/getOfflinePayType',          json_offline_pay_type, ['get'], ['backend_auth']);
 
 	// F.route(CONFIG('manager-url') + '/api/orders/',              			json_orders_save, ['put'], ['backend_auth']);
@@ -85,8 +85,8 @@ exports.install = function() {
 	//F.route(CONFIG('manager-url') + '/api/products/updateStatus',			process_products_updateStatus, ['post'], ['backend_auth', 'auditing']);
 	//F.route(CONFIG('manager-url') + '/api/products/{id}/',       			json_products_read, ['get'], ['backend_auth']);
 	//F.route(CONFIG('manager-url') + '/api/products/',            			json_products_remove, ['delete'], ['backend_auth', 'auditing']);
-	// F.route(CONFIG('manager-url') + '/api/products/clear/',      			json_products_clear);
-	F.route(CONFIG('manager-url') + '/api/products/import/',     			json_products_import, ['upload'], 1024, ['backend_auth']);
+	// // F.route(CONFIG('manager-url') + '/api/products/clear/',      			json_products_clear);
+	// // F.route(CONFIG('manager-url') + '/api/products/import/',     			json_products_import, ['upload'], 1024, ['backend_auth']);
 	//F.route(CONFIG('manager-url') + '/api/products/categories/', 			json_products_categories, ['get'], ['backend_auth']);
 	F.route(CONFIG('manager-url') + '/api/products/category/',   			json_products_category_replace, ['post'] ,['backend_auth', 'auditing']);
 	//F.route(CONFIG('manager-url') + '/api/products/attr/{attributeName}/',	json_products_attribute, ['get'], ['backend_auth']);
@@ -1890,7 +1890,7 @@ exports.json_agent_info_get = function(req,res,next){
 // ==========================================================================
 
 exports.json_RSC_info_get = function(req,res,next){
-	UserService.getRSCInfoById(req.params.id, function(err, user){
+	UserService.getRSCInfoById(req.params._id, function(err, user){
 		if(err){
 			res.respond({code:1001, message:'查询失败'});
 			return;
@@ -1957,6 +1957,7 @@ exports.process_RSC_modify = function(req, res, next){
 			}
 		});
 	} else {
+		console.log(req.data);
 		RSCService.modifyRSCInfo(req.data.id, req.data, function(err){
 			if(err){
 				res.respond({code:1002, message:err});
@@ -2102,12 +2103,12 @@ exports.json_payrefund_read = function(req, res, next) {
 // Update pay refund
 exports.json_payrefund_update = function(req, res, next) {
 	var refundid = req.body && req.body.id ? req.body.id: null;
-	var refundstatus = req.body && req.body.status ? req.body.status: null;
-	if(!refundid){
+	var refundstatus = req.body.status;
+	if(!refundid) {
 		res.respond({code:1001, message:'请填写refund ID', error:[{'error':'请填写refund ID'}]});
 		return;
 	}
-	if(!refundstatus){
+	if(refundstatus !== 0 && !refundstatus) {
 		res.respond({code:1001, message:'请填写退款状态', error:[{'error':'请填写退款状态'}]});
 		return;
 	}
