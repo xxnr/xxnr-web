@@ -7,3 +7,4 @@ tmp
 *.ca-bundle
 *.crt
 *.key
+/test/casper_test/*.png
