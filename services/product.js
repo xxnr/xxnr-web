@@ -154,16 +154,14 @@ ProductService.prototype.query = function(options, callback, oldSchema) {
 };
 
 function updateSKUName(product) {
+    var SKUService = require('./SKU');
     SKUModel.find({product: product._id}, function (err, SKUs) {
         if (err) {
             console.error(err);
         }
 
         SKUs.forEach(function (SKU) {
-            SKU.name = product.name;
-            SKU.attributes.forEach(function (attribute) {
-                SKU.name += ' - ' + attribute.value;
-            });
+            SKU.name = SKUService.getSKUName(product.name, SKU.attributes);
             SKU.save(function (err) {
                 if (err) {
                     console.error(err);
@@ -172,7 +170,8 @@ function updateSKUName(product) {
         })
     });
 
-    require('./SKU').refresh_product_SKUAttributes(product._id, function(){});
+    // use this to refresh default SKU for product
+    SKUService.refresh_product_SKUAttributes(product._id, function(){});
 }
 
 // Saves the product into the database

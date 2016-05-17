@@ -1704,7 +1704,7 @@ exports.process_SKU_add = function(req, res, next) {
 		return;
 	}
 
-	SKUService.addSKU(req.data.name, req.data.product, req.data.attributes, req.data.additions, req.data.price, function (err, SKU) {
+	SKUService.addSKU(req.data.product, req.data.attributes, req.data.additions, req.data.price, function (err, SKU) {
 		if (err) {
 			console.error('process_SKU_add error', err);
 			if(11000 == err.code){
@@ -1727,7 +1727,7 @@ exports.process_SKU_update = function(req, res, next){
 		return;
 	}
 
-	SKUService.updateSKU(id, req.data.price, req.data.attributes, req.data.additions, req.data.name, function(err){
+	SKUService.updateSKU(id, req.data.price, req.data.attributes, req.data.additions, function(err){
 		if(err){
 			console.error('updateSKU error', err);
 			if(11000 == err.code){
