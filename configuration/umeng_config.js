@@ -65,6 +65,6 @@ umengConfig.body[delivery] = {
     }
 };
 umengConfig.retryCodes = [2028, 4000, 4001, 4002, 4009, 4021, 4023];
-umengConfig.production_mode = false;
+umengConfig.production_mode = true;
 
 module.exports = umengConfig;
