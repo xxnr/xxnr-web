@@ -46,7 +46,39 @@ module.exports = function(req, res, next) {
             body = callback + '(' + body + ');';
         }
 
+        this.set('Cache-Control', 'no-cache, no-store, max-age=0, must-revalidate');
         return res.send(body);
+    };
+
+    res.json = function(obj){
+        var val = obj;
+
+        // allow status / body
+        if (arguments.length === 2) {
+            // res.json(body, status) backwards compat
+            if (typeof arguments[1] === 'number') {
+                deprecate('res.json(obj, status): Use res.status(status).json(obj) instead');
+                this.statusCode = arguments[1];
+            } else {
+                deprecate('res.json(status, obj): Use res.status(status).json(obj) instead');
+                this.statusCode = arguments[0];
+                val = arguments[1];
+            }
+        }
+
+        // settings
+        var app = this.app;
+        var replacer = app.get('json replacer');
+        var spaces = app.get('json spaces');
+        var body = JSON.stringify(val, replacer, spaces);
+
+        // content-type
+        if (!this.get('Content-Type')) {
+            this.set('Content-Type', 'application/json');
+        }
+
+        this.set('Cache-Control', 'no-cache, no-store, max-age=0, must-revalidate');
+        return this.send(body);
     };
 
     res.respond = function (data) {
