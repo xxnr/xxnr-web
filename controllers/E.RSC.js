@@ -242,24 +242,33 @@ function process_RSC_order_deliverStatus_delivering(){
 
 function json_RSC_address_province_query(){
     var self = this;
-    if(!self.data.products){
+    var options = null;
+    if(typeof self.data.EPOS != 'undefined') {
+        options = {EPOS:true};
+    }
+    console.log(options);
+    if(!self.data.products && !options){
         self.respond({code:1001, message:'请先选择商品'});
         return;
     }
 
-    RSCService.getProvinceList(self.data.products.split(','), function(err, provinceList){
+    RSCService.getProvinceList(self.data.products?self.data.products.split(','):[], function(err, provinceList){
         if(err || !provinceList){
             self.respond({code:1002, message:'查询失败'});
             return;
         }
 
         self.respond({code:1000, message:'success', provinceList: provinceList});
-    })
+    }, options);
 }
 
 function json_RSC_address_city_query(){
     var self = this;
-    if(!self.data.products){
+    var options = null;
+    if(typeof self.data.EPOS != 'undefined') {
+        options = {EPOS:true};
+    }
+    if(!self.data.products && !options){
         self.respond({code:1001, message:'请先选择商品'});
         return;
     }
@@ -269,19 +278,23 @@ function json_RSC_address_city_query(){
         return;
     }
 
-    RSCService.getCityList(self.data.products.split(','), self.data.province, function(err, cityList){
+    RSCService.getCityList(self.data.products?self.data.products.split(','):[], self.data.province, function(err, cityList){
         if(err || !cityList){
             self.respond({code:1002, message:'查询失败'});
             return;
         }
 
         self.respond({code:1000, message:'success', cityList: cityList});
-    })
+    }, options);
 }
 
 function json_RSC_address_county_query(){
     var self = this;
-    if(!self.data.products){
+    var options = null;
+    if(typeof self.data.EPOS != 'undefined') {
+        options = {EPOS:true};
+    }
+    if(!self.data.products && !options){
         self.respond({code:1001, message:'请先选择商品'});
         return;
     }
@@ -296,19 +309,23 @@ function json_RSC_address_county_query(){
         return;
     }
 
-    RSCService.getCountyList(self.data.products.split(','), self.data.province, self.data.city, function(err, countyList){
+    RSCService.getCountyList(self.data.products?self.data.products.split(','):[], self.data.province, self.data.city, function(err, countyList){
         if(err || !countyList){
             self.respond({code:1002, message:'查询失败'});
             return;
         }
 
         self.respond({code:1000, message:'success', countyList: countyList});
-    })
+    }, options);
 }
 
 function json_RSC_address_town_query(){
     var self = this;
-    if(!self.data.products){
+    var options = null;
+    if(typeof self.data.EPOS != 'undefined') {
+        options = {EPOS:true};
+    }
+    if(!self.data.products && !options){
         self.respond({code:1001, message:'请先选择商品'});
         return;
     }
@@ -323,32 +340,36 @@ function json_RSC_address_town_query(){
         return;
     }
 
-    RSCService.getTownList(self.data.products.split(','), self.data.province, self.data.city, self.data.county, function(err, townList){
+    RSCService.getTownList(self.data.products?self.data.products.split(','):[], self.data.province, self.data.city, self.data.county, function(err, townList){
         if(err || !townList){
             self.respond({code:1002, message:'查询失败'});
             return;
         }
 
         self.respond({code:1000, message:'success', townList: townList});
-    })
+    }, options);
 }
 
 function json_RSC_query(){
     var self = this;
-    if(!self.data.products){
+    var options = null;
+    if(typeof self.data.EPOS != 'undefined') {
+        options = {EPOS:true};
+    }
+    if(!self.data.products && !options){
         self.respond({code:1001, message:'请先选择商品'});
         return;
     }
     var page = U.parseInt(self.data.page, 1) - 1;
     var max = U.parseInt(self.data.max, 20);
-    RSCService.getRSCList(self.data.products.split(','), self.data.province, self.data.city, self.data.county, self.data.town, page, max, function(err, RSCs, count, pageCount){
+    RSCService.getRSCList(self.data.products?self.data.products.split(','):[], self.data.province, self.data.city, self.data.county, self.data.town, page, max, function(err, RSCs, count, pageCount){
         if(err || !RSCs){
             self.respond({code:1002, message:'查询失败'});
             return;
         }
 
         self.respond({code:1000, message:'success', RSCs: RSCs, count:count, pageCount:pageCount});
-    })
+    }, null, options);
 }
 
 function generate_RSC_order_type(orders){

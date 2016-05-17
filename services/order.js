@@ -245,6 +245,16 @@ OrderService.prototype.query = function(options, callback) {
 		mongoOptions["payStatus"] = { $eq: PAYMENTSTATUS.PAID };
 		mongoOptions["deliverStatus"] = { $eq: DELIVERSTATUS.RECEIVED };
 	}
+	// need deliver to RSC
+	if (type === 5) {
+		mongoOptions["$or"] = [{payStatus: { $eq: PAYMENTSTATUS.PARTPAID }, depositPaid: { $eq: true }, SKUs: { $elemMatch: { deliverStatus: { $eq: DELIVERSTATUS.UNDELIVERED } } }}, 
+								{payStatus: { $eq: PAYMENTSTATUS.PAID }, SKUs: { $elemMatch: { deliverStatus: { $eq: DELIVERSTATUS.UNDELIVERED } } }}];
+	}
+	// pendingApprove
+	if (type === 6) {
+		mongoOptions["$or"] = [{isClosed: { $ne: true }, payStatus: { $eq: PAYMENTSTATUS.UNPAID }, pendingApprove: { $eq: true }}, 
+								{payStatus: { $ne: PAYMENTSTATUS.UNPAID }, pendingApprove: { $eq: true }}];
+	}
 
 	if (options.buyer) {
 		mongoOptions["buyerId"] = options.buyer;
@@ -1171,16 +1181,18 @@ OrderService.prototype.getPayOrderPaymentInfo = function(order, payment, payPric
     var query = {'id':order.id, 'payments.id':payment.id};
     var setValues = {};
     var newPayment = {};
+    var resultPayPrice;
     // pay price is logical
     if (payPrice && (tools.isPrice(payPrice.toString()) && parseFloat(payPrice) && parseFloat(parseFloat(payPrice).toFixed(2)) >= 0.01 && parseFloat(parseFloat(payPrice).toFixed(2)) < payment.price)) {
     	// this payPrice must equal the payment payPrice, avoiding alipay or unionpay created the payment
     	if (payment.payPrice && parseFloat(parseFloat(payment.payPrice).toFixed(2)) == parseFloat(parseFloat(payPrice).toFixed(2))) {
-    		callback(null, payment, payPrice);
+    		// callback(null, payment, payPrice);
     		if (options && options.payType) {
 	        	if (!payment.payType || payment.payType !== options.payType) {
-		            setValues = {'payments.$.payType': options.payType};
+		            setValues = {'payments.$.payType': options.payType, 'payType': options.payType};
 		        }
 		    }
+		    resultPayPrice = payPrice;
     	} else {
     		setValues = {'payments.$.isClosed':true};
          	var paymentOption = {paymentId: U.GUID(10), slice: payment.slice, price: payment.price, suborderId: payment.suborderId};
@@ -1195,12 +1207,13 @@ OrderService.prototype.getPayOrderPaymentInfo = function(order, payment, payPric
     } else {
     	// the payment payPrice is null or must equal the payment price, avoiding alipay or unionpay created the payment
     	if (!payment.payPrice || parseFloat(parseFloat(payment.payPrice).toFixed(2)) == parseFloat(parseFloat(payment.price).toFixed(2))) {
-	    	callback(null, payment, payment.price);
+	    	// callback(null, payment, payment.price);
     		if (options && options.payType) {
 	        	if (!payment.payType || payment.payType !== options.payType) {
-		            setValues = {'payments.$.payType': options.payType};
+		            setValues = {'payments.$.payType': options.payType, 'payType': options.payType};
 		        }
 		    }
+		    resultPayPrice = payment.price;
 	    } else {
     		setValues = {'payments.$.isClosed':true};
 			var paymentOption = {paymentId: U.GUID(10), slice: payment.slice, price: payment.price, suborderId: payment.suborderId};
@@ -1246,10 +1259,20 @@ OrderService.prototype.getPayOrderPaymentInfo = function(order, payment, payPric
 			        } else {
 			        	callback(null, newPayment, newPayment.price);
 			        }
+			        // update order paystatus
+					self.checkPayStatus({id:order.id}, function(err, order, payment) {});
 			        return;
 			    });
+			} else {
+				callback(null, payment, resultPayPrice);
+				// update order paystatus
+				self.checkPayStatus({id:order.id}, function(err, order, payment) {});
+				return;
 			}
 	    });
+	} else {
+		callback(null, payment, resultPayPrice);
+		return;
 	}
 };
 
@@ -1791,7 +1814,9 @@ OrderService.prototype.getByRSC = function(RSC, page, max, type, callback, searc
 				query.isClosed = false;
 				break;
 			case 2:		//待审核
-				query.pendingApprove = true;
+				// query.pendingApprove = true;
+				query["$or"] = [{isClosed: { $ne: true }, payStatus: { $eq: PAYMENTSTATUS.UNPAID }, pendingApprove: { $eq: true }}, 
+								{payStatus: { $ne: PAYMENTSTATUS.UNPAID }, pendingApprove: { $eq: true }}];
 				break;
 			case 3:		//待配送
 				query.payStatus = PAYMENTSTATUS.PAID;
@@ -1813,9 +1838,17 @@ OrderService.prototype.getByRSC = function(RSC, page, max, type, callback, searc
 	}
 
 	if (search) {
-		query.$or = [{buyerPhone: new RegExp('^'+search)},
-			{consigneePhone: new RegExp('^'+search)},
-			{id: new RegExp('^'+search)}];
+		if (query && query.$or) {
+			query.$or.concat([
+				{buyerPhone: new RegExp('^'+search)},
+				{consigneePhone: new RegExp('^'+search)},
+				{id: new RegExp('^'+search)}
+			]);
+		} else {
+			query.$or = [{buyerPhone: new RegExp('^'+search)},
+				{consigneePhone: new RegExp('^'+search)},
+				{id: new RegExp('^'+search)}];
+		}
 	}
 
 	OrderModel.count(query, function(err, count){
@@ -2110,6 +2143,10 @@ OrderService.prototype.getById = function(id, callback) {
 			callback(null, null);
 		}
 	});
+};
+
+OrderService.prototype.pendingDeliverToRSC = function(order) {
+    return (order.payStatus == PAYMENTSTATUS.PAID || (order.payStatus == PAYMENTSTATUS.PARTPAID && order.depositPaid)) && order.deliverStatus != DELIVERSTATUS.DELIVERED;
 };
 
 module.exports = new OrderService();
