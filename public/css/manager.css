@@ -16,7 +16,7 @@ header { background-color: #E0E0E0; margin-bottom: 30px; }
 nav { font-size: 20px; position: relative; display: inline-block; font-smoothing: antialiased; width: 100%; }
 nav ul {display: inline-table; width: 100%;}
 nav ul li {display: inline-block; border-left: 1px solid #D0D0D0;}
-nav ul li:last-child { border-right: 1px solid #D0D0D0; }
+nav ul li:last-of-type { border-right: 1px solid #D0D0D0; }
 nav a { color: gray; padding: 6px 0 0; position: relative; display: inline-block; min-width: 60px; text-align: center; height: 40px; }
 /*nav a:first-child { border-left: 1px solid #D0D0D0; }*/
 nav a:hover { color: #303030; text-decoration: none; }
