@@ -422,7 +422,7 @@ DashboardService.prototype.generateAgentReport = function(dateMinus, callback){
                             if(err){
                                 if(11000 == err.code){
                                     // already has record of this hour, need update
-                                    AgentReportModel.findOneAndUpdate({name:agent.name, dayInBeijingTime:dayInBeijingTime}, {$set:agentDailyRecord}, function(err){
+                                    AgentReportModel.findOneAndUpdate({agent:agent._id, dayInBeijingTime:dayInBeijingTime}, {$set:agentDailyRecord}, function(err){
                                         if(err){
                                             console.error(err);
                                             reject(err);
