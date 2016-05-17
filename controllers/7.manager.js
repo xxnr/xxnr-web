@@ -63,7 +63,7 @@ exports.install = function() {
 	//F.route(CONFIG('manager-url') + '/api/orders/SKUsDelivery/',            json_orders_SKUs_delivery, ['put'], ['backend_auth', 'auditing']);
 	//F.route(CONFIG('manager-url') + '/api/orders/RSCInfo/',					process_orders_RSCInfo_update, ['put'], ['backend_auth', 'auditing']);
 	//F.route(CONFIG('manager-url') + '/api/orders/confirmOfflinePay',    	process_order_confirm_OfflinePay, ['post'], ['backend_auth', 'auditing']);
-	//F.route(CONFIG('manager-url') + '/api/order/getOfflinePayType',          json_offline_pay_type, ['get'], ['backend_auth']);
+	//F.route(CONFIG('manager-url') + '/api/getOfflinePayType',          json_offline_pay_type, ['get'], ['backend_auth']);
 
 	// F.route(CONFIG('manager-url') + '/api/orders/',              			json_orders_save, ['put'], ['backend_auth']);
 	// F.route(CONFIG('manager-url') + '/api/orders/',              			json_orders_remove, ['delete']);
@@ -616,6 +616,10 @@ exports.json_products_read = function(req,res,next) {
 			res.respond(err);
 			return;
 		}
+        if (!data) {
+			res.respond({'code':1001,'message':'未查询到商品'});
+			return;
+		}
 		if(data){
 			res.respond(data);
 		}
@@ -911,6 +915,11 @@ exports.process_order_confirm_OfflinePay = function(req, res, next){
 		//	return;
 		//}
 
+        if (!order) {
+			res.respond({'code':1001,'message':'未查询到订单'});
+			return;
+		}
+
 		if(!order.pendingApprove){
 			res.respond({code:1002, message:'该订单没有待审核的线下支付'});
 			return;
@@ -963,6 +972,10 @@ exports.json_orders_read = function(req,res,next) {
 		if (err) {
 			console.error('manager json_orders_read error:', err);
 			res.respond({code:1004, message:'系统错误，没有找到订单信息', error:[{'error':'系统错误，没有找到订单信息'}]});
+			return;
+		}
+		if (!order) {
+			res.respond({'code':1001,'message':'未查询到订单'});
 			return;
 		}
         res.respond({code:1000, message:'success', datas: convertOrderToShow(order, payment)});
@@ -1132,6 +1145,10 @@ exports.json_users_read = function(req,res,next) {
             res.respond({code: 1004, message: 'get user err:' + err});
             return;
         }
+        if (!user) {
+			res.respond({'code':1001,'message':'未查询到用户'});
+			return;
+		}
 
 		res.respond({code: 1000, user: user});
     });
@@ -1223,6 +1240,15 @@ exports.json_news_read = function(req, res, next) {
 	var options = {};
 	options.id = id;
     NewsService.get(options, function(err, news){
+    	if(err){
+            console.error('manager json_news_read err:', err);
+			res.respond({code:1004, message:'系统错误，没有找到资讯', error:[{'error':'系统错误，没有找到资讯'}]});
+            return;
+        }
+        if (!news) {
+			res.respond({'code':1001,'message':'未查询到资讯'});
+			return;
+		}
 		res.respond(news);
 	});
 };
@@ -1252,6 +1278,10 @@ exports.json_auditlog_read = function(req, res, next) {
 		if (err) {
 			console.error('manager json_auditlog_read err:', err);
 			res.respond({code: 1004, message: 'get audit logs err:' + err});
+			return;
+		}
+        if (!datas) {
+			res.respond({'code':1001,'message':'未查询到audit log'});
 			return;
 		}
 		res.respond({code:1000, message:'success', datas:datas});

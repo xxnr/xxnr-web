@@ -1,6 +1,7 @@
 #common
 /manager/upload, post, super_admin, business_admin, product_op, news_editor, customer_op
 /manager/api/brands, get, super_admin, business_admin, product_op, customer_op
+/manager/api/getOfflinePayType, get, super_admin, business_admin, customer_op
 
 #dashboard
 /manager/api/dashboard, get, super_admin
@@ -16,7 +17,6 @@
 #orders
 /manager/api/orders, get, super_admin, business_admin, customer_op
 /manager/api/orders/:id, get, super_admin, business_admin, customer_op
-/manager/api/order/getOfflinePayType, get, super_admin, business_admin, customer_op
 /manager/api/orders/confirmOfflinePay, post, super_admin, business_admin, customer_op
 /manager/api/orders/RSCInfo, put, super_admin, business_admin, customer_op 
 /manager/api/orders/subOrders, put, super_admin, business_admin

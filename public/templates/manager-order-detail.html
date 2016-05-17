@@ -656,7 +656,7 @@
     }
 
     function getOfflinePayType() {
-        $.components.GET(managerurl + '/api/order/getOfflinePayType', null, function(typeResponse) {
+        $.components.GET(managerurl + '/api/getOfflinePayType', null, function(typeResponse) {
             if(typeResponse.code != '1000') {
                 alert(typeResponse.message);
                 return;

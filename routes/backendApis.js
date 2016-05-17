@@ -15,6 +15,7 @@ router.post(F.config['manager-url']+'/api/login', controllers.Manager.process_lo
 // common
 router.post(F.config['manager-url']+'/upload', middleware.backend_auth, controllers.Manager.upload);
 router.get(F.config['manager-url']+ '/api/brands',	middleware.backend_auth,controllers.Manager.json_brands);
+router.get(F.config['manager-url']+'/api/getOfflinePayType', middleware.backend_auth, controllers.Manager.json_offline_pay_type);
 
 // Dashboard
 // old
@@ -30,14 +31,13 @@ router.get(F.config['manager-url']+'/api/dashboard/queryAgentReportYesterday', m
 
 // orders
 router.get(F.config['manager-url']+'/api/orders',middleware.backend_auth ,controllers.Manager.json_orders_query);
-router.get(F.config['manager-url']+ '/api/orders/:id',middleware.backend_auth ,controllers.Manager.json_orders_read);
-router.get(F.config['manager-url']+'/api/order/getOfflinePayType', middleware.backend_auth, controllers.Manager.json_offline_pay_type);
 router.post(F.config['manager-url']+'/api/orders/confirmOfflinePay', middleware.backend_auth, middleware.auditing_middleware, controllers.Manager.process_order_confirm_OfflinePay);
 router.put(F.config['manager-url']+ '/api/orders/RSCInfo',middleware.backend_auth,middleware.auditing_middleware ,controllers.Manager.process_orders_RSCInfo_update);
 router.put(F.config['manager-url']+ '/api/orders/subOrders',middleware.backend_auth,middleware.auditing_middleware,controllers.Manager.json_subOrders_payments_update);
 router.put(F.config['manager-url']+  '/api/orders/SKUs',middleware.backend_auth,middleware.auditing_middleware,controllers.Manager.json_orders_SKUs_update);
 router.put(F.config['manager-url']+'/api/orders/SKUsDelivery', middleware.backend_auth, middleware.auditing_middleware, controllers.Manager.json_orders_SKUs_delivery);
 router.put(F.config['manager-url']+'/api/orders/products', middleware.backend_auth, middleware.auditing_middleware, controllers.Manager.json_orders_products_update);
+router.get(F.config['manager-url']+ '/api/orders/:id',middleware.backend_auth ,controllers.Manager.json_orders_read);
 
 // products
 router.post(F.config['manager-url']+'/products/uploadImage', middleware.backend_auth, controllers.Manager.CKEditor_uploadImage);
