@@ -19,8 +19,9 @@ export function configRouter (router) {
       name: 'login', //具名路由
       component: require('./components/login/index.vue')
     },
-	'/productDetail': {
-      component: require('./components/productDetail/index.vue')
+    '/productDetail': {
+        component: require('./components/productDetail/index.vue')
+    },
     '/register':{
       component: require('./components/register/index.vue')
     },
@@ -28,29 +29,18 @@ export function configRouter (router) {
       name:'myOrders',
       component: require('./components/my_orders/index.vue'),
       auth: true // 这里 auth 是一个自定义字段
-      //subRoutes:{
-      //  'allOrders': {
-      //    name: 'myAllOrders', //具名路由
-      //    component: require('./components/my_orders/myAllOrders.vue')
-      //  },
-      //  'nonPayment': {
-      //    name: 'myNonPayment',
-      //    component: require('./components/my_orders/myNonPayment.vue')
-      //  },
-      //  'nonDeliver': {
-      //    name: 'myNonDeliver',
-      //    component: require('./components/my_orders/myNonDeliver.vue')
-      //  },
-      //  'nonReceiving': {
-      //    name: 'mynNonReceiving',
-      //    component: require('./components/my_orders/myNonReceiving.vue')
-      //  },
-      //  'completed': {
-      //    name: 'myCompleted',
-      //    component: require('./components/my_orders/myCompleted.vue')
-      //  }
-      //}
-    }
+
+    },
+    '/my_points': {
+      name: 'myPoints',
+      component: require('./components/my_points/index.vue'),
+      auth: true // 这里 auth 是一个自定义字段
+    },
+    '/my_invitation': {
+      name: 'myInvitation',
+      component: require('./components/my_invitation/index.vue'),
+      auth: true // 这里 auth 是一个自定义字段
+    },
   });
   router.beforeEach((transition) => {
     if (transition.to.auth) {
@@ -59,6 +49,7 @@ export function configRouter (router) {
         let redirect = encodeURIComponent(transition.to.path);
         transition.redirect('/login?redirect=' + redirect);
         //redirect 作为参数，登录之后跳转回来
+        //console.log('Wrong way!');
       }else{
         transition.next();
       }

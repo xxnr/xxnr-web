@@ -2,7 +2,6 @@ import api from '../api/remoteHttpApi'
 import * as types from './mutation-types'
 import {getCookie,removeCookie} from '../utils/authService'
 let jsencrypt = require('../jsencrypt')
-
 export const getCategories = ({dispatch,state}) => {
   api.getCategories(response => {
     dispatch(types.GET_CATEGORIES,response.data.categories)
@@ -81,6 +80,7 @@ export const goBack = ({dispatch,state}) => {
 }
 
 export const login = ({dispatch,state},PhoneNumber,password) => {
+  dispatch(types.RESET_TOASTMSG);
   api.getPublicKey(response => {
     var public_key = response.data.public_key;
     var encrypt = new jsencrypt.default.JSEncryptExports.JSEncrypt();
@@ -92,10 +92,11 @@ export const login = ({dispatch,state},PhoneNumber,password) => {
       ,response => {
       if (response.data.code == 1000) {
         sessionStorage.setItem('user', JSON.stringify(response.data.datas));
+        //console.log(this.$route);
         window.location.href = '/';
       }else{
-        //TODO
-
+        console.log(response);
+        dispatch(types.SET_TOASTMSG,response.data.message);
       }
     })
   }, response => {
@@ -160,4 +161,59 @@ export const getSliderImages = ({dispatch, state}) => {
       //console.log(response);
       console.log('aaa');
     })
+}
+
+export const sendRegisterCode = ({dispatch, state},phoneNum) => {
+  dispatch(types.RESET_TOASTMSG);
+  api.sendRegisterCode(
+    {tel:phoneNum,bizcode:'register'},
+    response => {
+      dispatch(types.SET_TOASTMSG,response.data.message);
+  }, response => {
+    //console.log(response);
+    console.log('aaa');
+  })
+}
+
+
+export const register = ({dispatch,state},phoneNumber,password,registerCode) => {
+  api.getPublicKey(response => {
+    var public_key = response.data.public_key;
+    var encrypt = new jsencrypt.default.JSEncryptExports.JSEncrypt();
+    encrypt.setPublicKey(public_key);
+    var encrypted = encrypt.encrypt(password);
+    //console.log(encrypted)
+    api.register(
+      {account:phoneNumber, password:encrypted, smsCode:registerCode}
+      ,response => {
+      if (response.data.code == 1000) {
+      //sessionStorage.setItem('user', JSON.stringify(response.data.datas));
+      window.location.href = '/';
+      }else{
+        //TODO
+
+      }
+    })
+  }, response => {
+    console.log(response);
+    //dispatch(types.GET_CATEGORIES)
+  })
+}
+
+export const bindInviter = ({dispatch,state},inviterPhone) => {
+  let userId = state.auth.user.userid;
+  api.bindInviter(
+    {'userId':userId,'inviter':inviterPhone},
+    response => {
+      if (response.data.code == 1000) {
+      //sessionStorage.setItem('user', JSON.stringify(response.data.datas));
+      window.location.href = '/';
+      }else{
+        //TODO
+
+      }
+    }, response => {
+      console.log(response);
+      //dispatch(types.GET_CATEGORIES)
+  })
 }

@@ -14,11 +14,12 @@
       XxnrHeader
     },
     ready() {
-      this.$broadcast('slider')
+
     }
   }
 </script>
 <style>
+  /*some common css style */
   [v-cloak] { display: none }
   html, body, p, div, ul, li, a, span {
     border: 0;
@@ -81,6 +82,21 @@
   input[type="radio"] {
     display: none;
   }
+  .roundInput{
+    border: 1px solid #C7C7C7;
+    border-radius: 5px;
+    color:#B0B0B0;
+    height: 35px;
+    padding-left: 10px;
+    font-size: 18px;
+    box-sizing: border-box;
+  }
+  .xxnr_Btn{
+    background: #00B38A;
+    border-radius: 5px;
+    border: 0px;
+    color: #FBFFFE;
+  }
 
   label {
     background: #CCC;
@@ -93,6 +109,62 @@
   .mainContainer{
     padding-top: 30px;
   }
+  @keyframes fadein {
+     from { opacity: 0; }
+     to   { opacity: 1; }
+   }
 
+  /* Firefox < 16 */
+  @-moz-keyframes fadein {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+
+  /* Safari, Chrome and Opera > 12.1 */
+  @-webkit-keyframes fadein {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+
+  /* Internet Explorer */
+  @-ms-keyframes fadein {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+
+  /* Opera < 12.1 */
+  @-o-keyframes fadein {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+
+  @keyframes fadeout {
+    from { opacity: 1; }
+    to   { opacity: 0; }
+  }
+
+  /* Firefox < 16 */
+  @-moz-keyframes fadeout {
+    from { opacity: 1; }
+    to   { opacity: 0; }
+  }
+
+  /* Safari, Chrome and Opera > 12.1 */
+  @-webkit-keyframes fadeout {
+    from { opacity: 1; }
+    to   { opacity: 0; }
+  }
+
+  /* Internet Explorer */
+  @-ms-keyframes fadeout {
+    from { opacity: 1; }
+    to   { opacity: 0; }
+  }
+
+  /* Opera < 12.1 */
+  @-o-keyframes fadeout {
+    from { opacity: 1; }
+    to   { opacity: 0; }
+  }
 
 </style>

@@ -3,7 +3,7 @@
     {{headerTitle}}
     <div class="header-bit header-back" @click="goBack()" v-if="backButtonDisplay"><img src="/assets/images/header_back_arrow.png" alt=""> </div>
     <div class="header-bit header-right" v-if="rightButton">
-      <a @click="showBackBtn()" href="#!/{{rightButtonGoingPath}}">
+      <a v-link="{path: '/' + rightButtonGoingPath}">
         <img :src="rightButton" alt="">
       </a>
     </div>

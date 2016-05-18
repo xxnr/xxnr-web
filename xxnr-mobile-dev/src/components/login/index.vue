@@ -1,38 +1,75 @@
 <template>
   <div class="login-section">
     <div class="login-input phone-input">
-      <img src="" alt="">
+      <img src="/assets/images/my_xxnr_user.png" alt="">
       <input v-model="phoneNum" type="text" placeholder="请输入手机号">
     </div>
     <div class="login-input password-input">
-      <img src="" alt="">
+      <img src="/assets/images/my_xxnr_password.png" alt="">
       <input v-model="password" type="password" placeholder="请输入密码">
     </div>
-    <div class="forget-pass">
-      忘记密码？
-    </div>
-    <button class="login-btn" @click="login(phoneNum,password)">
+    <!--<div class="forget-pass">-->
+      <!--忘记密码？-->
+    <!--</div>-->
+    <button class="login-btn" @click="login(phoneNum,password),showToast()">
       确认登录
     </button>
     <div class="reg-section">
-      还没有帐号？<a href="">立即注册</a>
+      还没有帐号？<a href="" v-link="{ path: '/register'}" >立即注册</a>
     </div>
+  </div>
+  <div v-show="toastMsg.length>0">
+    <xxnr-toast :show.sync="toastShow" >
+      <p>{{toastMsg}}</p>
+    </xxnr-toast>
   </div>
 </template>
 
 <script>
-  import { login } from '../../vuex/actions'
+  import { login,showBackBtn,changeRightBtnMyXXNR,changeRightBtnPathMyxxnr } from '../../vuex/actions'
+  import xxnrToast from '../../xxnr_mobile_ui/xxnrToast.vue'
 
   export default {
+    data: function () {
+      return {
+        toastShow:false
+      }
+    },
+    methods: {
+      showToast:function(){
+        this.toastShow=true;
+      }
+    },
     vuex:{
       getters:{
+        toastMsg: state => state.toastMsg
       },
       actions:{
-        login
+        login,
+        showBackBtn,
+        changeRightBtnMyXXNR,
+        changeRightBtnPathMyxxnr
       },
     },
+    components: {
+      xxnrToast
+    },
     created () {
-    }
+      this.showBackBtn()
+    },
+    route: {
+      deactivate (transition) {
+        //when back to /home hide the backBtn
+        if (transition.to.path === '/home') {
+          this.changeRightBtnMyXXNR();
+          this.changeRightBtnPathMyxxnr();
+        }
+        transition.next()
+      },
+      activate(){
+        this.showBackBtn();
+      }
+    },
   }
 </script>
 
@@ -49,6 +86,11 @@
   .login-input input{
     padding-left: 25px;
     font-size: 15px;
+  }
+  .login-input img{
+    height: 22px;
+    width: 17px;
+    margin-top: 10px;
   }
   .forget-pass{
     text-align: right;

@@ -17,6 +17,9 @@ export default {
   login: function (params,cb,errCb) {
     jsonpGet(API_ROOT + 'api/v2.0/user/login',params,cb,errCb);
   },
+  register: function (params,cb,errCb) {
+    jsonpGet(API_ROOT + 'api/v2.0/user/register',params,cb,errCb);
+  },
   getUserInfo: function (params,cb,errCb) {
     jsonpGet(API_ROOT + 'api/v2.0/user/get/',params,cb,errCb);
   },
@@ -28,6 +31,12 @@ export default {
   },
   getSliderImages: function(cb, errCb) {
     jsonpGet(API_ROOT + "api/v2.0/ad/getAdList", null, cb, errCb);
+  },
+  sendRegisterCode: function(params,cb,errCb) {
+    jsonpGet(API_ROOT + "api/v2.0/sms", params, cb, errCb);
+  },
+  bindInviter: function(params,cb,errCb) {
+    jsonpGet(API_ROOT + "api/v2.0/user/bindInviter", params, cb, errCb);
   }
 }
 

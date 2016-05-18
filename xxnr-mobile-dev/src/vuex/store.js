@@ -8,21 +8,32 @@ import auth from './modules/auth'
 import myOrders from './modules/myOrders'
 import productDetail from './modules/productDetail'
 import vueSlider from './modules/vueSlider'
-
+import register from './modules/register'
 import {
-  CLOSE_APPDOWNLOAD
+  CLOSE_APPDOWNLOAD,
+  SET_TOASTMSG,
+  RESET_TOASTMSG
 } from './mutation-types'
 Vue.use(Vuex)
 Vue.config.debug = true
 const debug = process.env.NODE_ENV !== 'production'
 
-export default new Vuex.Store({
+
+
+const store = new Vuex.Store({
   state : {
-    showAppDownload: true
+    showAppDownload: true,
+    toastMsg:""
   },
   mutations:{
     [CLOSE_APPDOWNLOAD](state){
       state.showAppDownload = false;
+    },
+    [SET_TOASTMSG](state,message){
+      state.toastMsg = message;
+    },
+    [RESET_TOASTMSG](state,data){
+      state.toastMsg = "";
     }
   },
   modules: {
@@ -32,8 +43,10 @@ export default new Vuex.Store({
     rowsViewProducts,
     auth,
     myOrders,
-	productDetail, 
-	vueSlider
+	  productDetail,
+	  vueSlider,
+    register
   },
   strict: debug
-})
+});
+export default store

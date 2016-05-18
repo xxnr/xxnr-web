@@ -6,7 +6,7 @@
 
 <script>
   import ProductsRowsList from '../ProductsRowsList.vue'
-  import { getHuafeiRowsViewCars,hideBackBtn,showBackBtn } from '../../vuex/actions'
+  import { getHuafeiRowsViewCars,hideBackBtn,showBackBtn,changeRightBtnMyXXNR,changeRightBtnPathMyxxnr } from '../../vuex/actions'
 
   export default {
     vuex:{
@@ -14,21 +14,24 @@
         huafeiRows:state => state.rowsViewProducts.rowsViewHuafei
       },
       actions:{
-        getHuafeiRowsViewCars,hideBackBtn,showBackBtn
+        getHuafeiRowsViewCars,hideBackBtn,showBackBtn,changeRightBtnMyXXNR,changeRightBtnPathMyxxnr
       }
     },
     components: {
       ProductsRowsList
     },
     route: {
-      canDeactivate (transition) {
+      deactivate (transition) {
         //when back to /home hide the backBtn
         if (transition.to.path === '/home') {
-          this.hideBackBtn();
+          this.changeRightBtnMyXXNR();
+          this.changeRightBtnPathMyxxnr();
         }
         transition.next()
+      },
+      activate(){
+        this.showBackBtn();
       }
-
     },
     created () {
       this.getHuafeiRowsViewCars();

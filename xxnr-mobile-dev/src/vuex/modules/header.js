@@ -12,7 +12,7 @@ const state = {
   headerTitle: '新新农人',
   rightButton: './static/assets/images/header_my_xxnr.png',
   backButtonDisplay:false,
-  rightButtonGoingPath: 'my_xxnr'
+  rightButtonGoingPath: 'home'
 }
 
 // mutations

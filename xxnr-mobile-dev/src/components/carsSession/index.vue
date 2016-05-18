@@ -4,7 +4,7 @@
 
 <script>
   import ProductsRowsList from '../ProductsRowsList.vue'
-  import { getCarsRowsViewCars,hideBackBtn } from '../../vuex/actions'
+  import { getCarsRowsViewCars,hideBackBtn,showBackBtn,changeRightBtnMyXXNR,changeRightBtnPathMyxxnr } from '../../vuex/actions'
 
   export default {
     vuex:{
@@ -12,7 +12,7 @@
         carsRows:state => state.rowsViewProducts.rowsViewCars
       },
       actions:{
-        getCarsRowsViewCars,hideBackBtn
+        getCarsRowsViewCars,hideBackBtn,showBackBtn,changeRightBtnMyXXNR,changeRightBtnPathMyxxnr
       }
     },
     components: {
@@ -20,16 +20,21 @@
     },
     created () {
       this.getCarsRowsViewCars();
+      this.showBackBtn();
     },
     route: {
-        canDeactivate (transition) {
+      deactivate (transition) {
         //when back to /home hide the backBtn
         if (transition.to.path === '/home') {
-          this.hideBackBtn();
+          this.changeRightBtnMyXXNR();
+          this.changeRightBtnPathMyxxnr();
         }
         transition.next()
+      },
+      activate(){
+        this.showBackBtn();
       }
-    }
+    },
   }
 </script>
 

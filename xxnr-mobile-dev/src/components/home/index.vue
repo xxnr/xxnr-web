@@ -1,46 +1,19 @@
 <template>
   <div class="container" style="padding: 0">
     <app-download-overlay></app-download-overlay>
-    <!--&lt;!&ndash; pagination example &ndash;&gt;-->
-    <!--<div class="timeline">-->
-      <!--<div-->
-        <!--class="item"-->
-        <!--@click='turnTo (1)'-->
-        <!--:class='{"active": slide.init.currentPage == 1}'-->
-      <!--</div>-->
-      <!--<div-->
-        <!--class="item"-->
-        <!--@click='turnTo (2)'-->
-        <!--:class='{"active": slide.init.currentPage == 2}'-->
-      <!--</div>-->
-      <!--<div-->
-        <!--class="item"-->
-        <!--@click='turnTo (3)'-->
-        <!--:class='{"active": slide.init.currentPage == 3}'-->
-      <!--</div>-->
-    <!--</div>-->
-    <slide :slide="slide">
-      <!-- slot  -->
-      <div
-        v-for="slide in slider"
-        class="slider-item page{{$index}}"
-        >
-        <button @click="turnTo(($index+2))">to page{{$index+1}}</button>
-      </div>
-    </slide>
-    <div v-for="slide in slider" class="slider-item page {{$index}}"></div>
+    <vux-swiper :list="slider" height="180px" auto @on-index-change="onIndexChange"></vux-swiper>
   </div>
   <section-tabs></section-tabs>
   <div class="container">
     <div class="container">
       <div class="xxnr-title xxnr-title-car">
         汽车精选
-        <div class="title-more"><a @click="showBackBtn()" v-link="{ path: '/6C7D8F66' }">更多产品&nbsp;></a></div>
+        <div class="title-more"><a v-link="{ path: '/6C7D8F66' }">更多产品&nbsp;></a></div>
       </div>
       <index-products-block-list :products="indexCars"></index-products-block-list>
       <div class="xxnr-title xxnr-title-huafei">
         化肥精选
-        <div class="title-more"><a @click="showBackBtn()" v-link="{ path: '/531680A5' }">更多产品&nbsp;></a></div>
+        <div class="title-more"><a v-link="{ path: '/531680A5' }">更多产品&nbsp;></a></div>
       </div>
       <index-products-block-list :products="indexHuafei"></index-products-block-list>
     </div>
@@ -63,12 +36,11 @@
 </template>
 
 <script>
-  import slide from '../vueSlide.vue'
   import sectionTabs from './SectionTabs.vue'
   import IndexProductsBlockList from './IndexProductsBlockList.vue'
   import appDownloadOverlay from './appDownloadOverlay.vue'
-  import { getIndexCars,getIndexHeafei,showBackBtn,changeRightBtnHome,changeRightBtnPathHome,getSliderImages } from '../../vuex/actions'
-
+  import { getIndexCars,getIndexHeafei,showBackBtn,hideBackBtn,changeRightBtnHome,changeRightBtnPathHome,getSliderImages,changeRightBtnPathMyxxnr } from '../../vuex/actions'
+  import vuxSwiper from 'vux/components/swiper'
   export default {
     vuex:{
       getters:{
@@ -80,91 +52,27 @@
         getIndexCars,
         getIndexHeafei,
         showBackBtn,
+        hideBackBtn,
         changeRightBtnHome,
         changeRightBtnPathHome,
-        getSliderImages
+        getSliderImages,
+        changeRightBtnPathMyxxnr
       }
     },
-//    data () {
-//      return {
-//        someList: [
-//          {
-//            title: '1',
-//            img: 'testimg-1.png',
-//            //slide init
-//            origin: 0,
-//            current: 0,
-//            style: {
-//              'background-image': 'url(./static/assets/images/testimg-1.png)',
-//              'background-size': 'cover',
-//              //transform
-//              'transform': `translateX(0%)`
-//            }
-//          },
-//          {
-//            title: '2',
-//            img: 'testimg-2.png',
-//
-//            origin: 100,
-//            current: 0,
-//            style: {
-//              'background-image': 'url(./static/assets/images/testimg-2.png)',
-//              'background-size': 'cover',
-//              'transform': `translateX(${ 100 }%)`
-//            }
-//          },
-//          {
-//            title: '3',
-//            img: 'testimg-3.png',
-//            origin: 200,
-//            current: 0,
-//            style: {
-//              'background-image': 'url(./static/assets/images/testimg-3.png)',
-//              'background-size': 'cover',
-//              'transform': `translateX(${ 200 }%)`
-//            }
-//          }
-//        ],
-//        slide: {
-//          init: {
-//            pageNum: 3,
-//            currentPage: 1,
-//            canPre: false,
-//            canNext: true,
-//            start: {},
-//            end: {},
-//            tracking: false,
-//            thresholdTime: 500,
-//            thresholdDistance: 100
-//          }
-//        }
-//      }
-
-   // },
     methods: {
-      turnTo(num)
-      {
-        console.log(num)
-        //this.$broadcast('slideTo', num)
-      }
-      ,
-      slideNext()
-      {
-        this.$broadcast('slideNext')
-      }
-      ,
-      slidePre()
-      {
-        this.$broadcast('slidePre')
-      }
     },
     components: {
-      sectionTabs,IndexProductsBlockList,appDownloadOverlay,slide
+      sectionTabs,
+      IndexProductsBlockList,
+      appDownloadOverlay,
+      vuxSwiper
     },
     created () {
       this.getIndexCars();
       this.getIndexHeafei();
-	  this.getSliderImages();
+	    this.getSliderImages();
+      this.changeRightBtnPathMyxxnr();
+      this.hideBackBtn();
     },
     route: {
       deactivate (transition) {
@@ -174,24 +82,16 @@
           this.changeRightBtnPathHome();
         }
         transition.next()
+      },
+      activate(){
+        this.hideBackBtn();
       }
     }
   }
 </script>
 
 <style>
-
-  .index-nav {
-    display: flex;
-  }
-
-  .nav-bit {
-    flex: auto;
-    text-align: center;
-    height: 50px;
-    background-color: #ddd;
-  }
-
+  @import '~vux/vux.css';
   .xxnr-title {
     position: relative;
     padding: 0 2%;
@@ -270,62 +170,6 @@
     border-left: none;
   }
 
-  #slider {
-    max-width: 600px;
-    text-align: center;
-    margin: 0 auto;
-  }
-
-  #overflow {
-    width: 100%;
-    overflow: hidden;
-  }
-
-  #slides .inner {
-    width: 400%;
-  }
-
-  #slides .inner {
-    -webkit-transform: translateZ(0);
-    -moz-transform: translateZ(0);
-    -o-transform: translateZ(0);
-    -ms-transform: translateZ(0);
-    transform: translateZ(0);
-
-    -webkit-transition: all 800ms cubic-bezier(0.770, 0.000, 0.175, 1.000);
-    -moz-transition: all 800ms cubic-bezier(0.770, 0.000, 0.175, 1.000);
-    -o-transition: all 800ms cubic-bezier(0.770, 0.000, 0.175, 1.000);
-    -ms-transition: all 800ms cubic-bezier(0.770, 0.000, 0.175, 1.000);
-    transition: all 800ms cubic-bezier(0.770, 0.000, 0.175, 1.000);
-
-    -webkit-transition-timing-function: cubic-bezier(0.770, 0.000, 0.175, 1.000);
-    -moz-transition-timing-function: cubic-bezier(0.770, 0.000, 0.175, 1.000);
-    -o-transition-timing-function: cubic-bezier(0.770, 0.000, 0.175, 1.000);
-    -ms-transition-timing-function: cubic-bezier(0.770, 0.000, 0.175, 1.000);
-    transition-timing-function: cubic-bezier(0.770, 0.000, 0.175, 1.000);
-  }
-
-  #slides article {
-    width: 25%;
-    float: left;
-  }
-
-  #slide1:checked ~ #slides .inner {
-    margin-left: 0;
-  }
-
-  #slide2:checked ~ #slides .inner {
-    margin-left: -100%;
-  }
-
-  #slide3:checked ~ #slides .inner {
-    margin-left: -200%;
-  }
-
-  #slide4:checked ~ #slides .inner {
-    margin-left: -300%;
-  }
-
   input[type="radio"] {
     display: none;
   }
@@ -339,12 +183,17 @@
     border-radius: 5px;
   }
 
-  #slide1:checked ~ label[for="slide1"],
-  #slide2:checked ~ label[for="slide2"],
-  #slide3:checked ~ label[for="slide3"],
-  #slide4:checked ~ label[for="slide4"] {
-    background: #333;
+  .swiper .item .desc{
+    display: none;
   }
-
+  .indicator{
+    /*position: absolute;*/
+    left: 50%;
+    transform: translateX(-50%);
+    right:auto;
+  }
+  .icon_dot.active{
+    background: #01E8AB;
+  }
 
 </style>

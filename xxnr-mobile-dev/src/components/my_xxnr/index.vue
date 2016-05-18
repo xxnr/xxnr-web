@@ -8,28 +8,28 @@
     <img class="left-avatar" src="" alt="">
     <div class="profile_section--TextInfo">
       <p>{{userInfo.nickname}}</p>
-      <p>所在地区：
-      <span v-for="part in userInfo.address">
-        {{part.name}}
-      </span>
+      <p class="myxxnr--address">所在地区：
+        <span v-for="part in userInfo.address">
+          {{part.name}}
+        </span>
       </p>
-      <p>
+      <p class="myxxnr--type">
         类型：{{userInfo.userTypeInName}}
       </p>
     </div>
   </div>
 
   <div class="profile_options">
-    <div class="profile_option" v-link="userInfo?{ name: 'myOrders'}:{ name: 'login'}" >
+    <div class="profile_option" v-link="{ name: 'myOrders'}" >
       <img class="option_icon" src="/assets/images/my_xxnr_icon_order.png" alt="">我的订单
       <span class="span-right">
         查看全部订单
       </span>
     </div>
-    <div class="profile_option">
+    <div class="profile_option" v-link="{ name: 'myPoints'}">
       <img class="option_icon" src="/assets/images/my_xxnr_icon_point.png" alt="">我的积分
     </div>
-    <div class="profile_option">
+    <div class="profile_option" v-link="{ name: 'myInvitation'}">
       <img class="option_icon" src="/assets/images/my_xxnr_icon_peasant.png" alt="">新农代表
     </div>
     <div class="profile_option">
@@ -80,7 +80,6 @@
       deactivate (transition) {
         //when back to /home hide the backBtn
         if (transition.to.path === '/home') {
-          this.hideBackBtn();
           this.changeRightBtnMyXXNR();
           this.changeRightBtnPathMyxxnr();
         }
@@ -88,17 +87,19 @@
       },
       activate(){
         this.getUserInfo(this.user.userId);
+        this.showBackBtn();
       }
     },
     created () {
       this.changeRightBtnHome();
       this.getCookieUser();
       this.getUserInfo(this.user.userId);
+      this.showBackBtn();
     }
   }
 </script>
 
-<style>
+<style scoped>
   .profile_section--noUser{
     height: 160px;
     text-align: center;
@@ -116,6 +117,9 @@
   .profile_section--TextInfo{
     display: inline-block;
     padding-top: 45px;
+    padding-left: 12px;
+    float: left;
+    width: 65%;
   }
   .avatar{
     display: block;
@@ -125,18 +129,18 @@
     width: 70px;
     /*margin-top: 42px ;*/
     border-radius: 50%;
+
   }
   .left-avatar{
-    /*display: block;*/
-    /*margin: 0px auto;*/
+    float: left;
     padding: 40px 0;
     padding-left: 20px;
     height: 70px;
     width: 70px;
-    /*margin-top: 42px ;*/
     border-radius: 50%;
   }
   .profile_section--noUser button{
+
     color: #FFFFFF;
     height: 24px;
     width: 68px;
@@ -163,5 +167,12 @@
   }
   .span-right{
     float: right;
+  }
+  .myxxnr--address{
+    font-size: 14px;
+  }
+  .myxxnr--type{
+    font-size: 14px;
+
   }
 </style>
