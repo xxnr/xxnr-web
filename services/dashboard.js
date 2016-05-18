@@ -44,7 +44,7 @@ DashboardService.prototype.generateHourlyReport = function(hourMinus, callback) 
     var endTime = new Date(currentTime.add('h', -hourMinus + 1).format('yyyy-MM-dd hh')+':00:00').add('h', -config.currentTimeZoneDiff);
 
     // this time is used for recording into hourly report table.
-    var queryDateInBeijingTime =  new Date(currentTime.add('h', -hourMinus).format('yyyy-MM-dd hh')+':00:00').add('h', -config.currentTimeZoneDiff);
+    var queryDateInBeijingTime =  startTime;
 
     var registeredUserCount = 0;
     var orderCount = 0;
@@ -295,11 +295,11 @@ DashboardService.prototype.generateAgentReport = function(dateMinus, callback){
     }
 
     var currentTime = new Date();
-    var startTime = new Date(currentTime.add('d', -dateMinus).format('yyyy-MM-dd hh')+':00:00').add('h', -config.currentTimeZoneDiff);
-    var endTime = new Date(currentTime.add('d', -dateMinus + 1).format('yyyy-MM-dd hh')+':00:00').add('h', -config.currentTimeZoneDiff);
+    var startTime = new Date(currentTime.add('d', -dateMinus).format('yyyy-MM-dd')).add('h', -config.currentTimeZoneDiff);
+    var endTime = new Date(currentTime.add('d', -dateMinus + 1).format('yyyy-MM-dd')).add('h', -config.currentTimeZoneDiff);
 
     // this time is used for recording into hourly report table.
-    var queryDateInBeijingTime =  new Date(currentTime.add('d', -dateMinus).format('yyyy-MM-dd hh')+':00:00').add('h', -config.currentTimeZoneDiff);
+    var queryDateInBeijingTime =  startTime;
     var dayOfWeek = queryDateInBeijingTime.getDay();
     if(dayOfWeek == 0){
         // getDay will return 0 if it is Sunday

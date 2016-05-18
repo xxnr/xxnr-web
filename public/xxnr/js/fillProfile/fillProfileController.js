@@ -201,7 +201,6 @@ app.controller('fillProfileController', function($scope, remoteApiService, commo
     };
     $scope.$watch('profileProvince', function(newValue, oldValue) { 
         if (newValue === oldValue) { return; } 
-        console.log(oldValue); 
         if(oldValue.id == 0){
             $scope.provinces.shift();
             $scope.cities.shift();

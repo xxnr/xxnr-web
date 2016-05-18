@@ -394,13 +394,41 @@ app.filter('appendDotToLongName36', function() {
 /*************************************************************************************************
  **                                    common fix for IE8                                        **
  *************************************************************************************************/
-if (!window.console || !console.firebug) {
-    var names = ["log", "debug", "info", "warn", "error", "assert", "dir", "dirxml", "group", "groupEnd", "time", "timeEnd", "count", "trace", "profile", "profileEnd"];
-
-    window.console = {};
-    for (var i = 0; i < names.length; ++i)
-        window.console[names[i]] = function() {}
+//if (!window.console || !console.firebug) {
+//    var names = ["log", "debug", "info", "warn", "error", "assert", "dir", "dirxml", "group", "groupEnd", "time", "timeEnd", "count", "trace", "profile", "profileEnd"];
+//
+//    window.console = {};
+//    for (var i = 0; i < names.length; ++i)
+//        window.console[names[i]] = function() {}
+//}
+if (typeof Array.prototype.forEach != 'function') {
+    Array.prototype.forEach = function (callback) {
+        for (var i = 0; i < this.length; i++) {
+            callback.apply(this, [this[i], i, this]);
+        }
+    };
 }
+
+if (!Array.prototype.indexOf) {
+    Array.prototype.indexOf = function (elt /*, from*/) {
+        var len = this.length >>> 0;
+
+        var from = Number(arguments[1]) || 0;
+        from = (from < 0)
+            ? Math.ceil(from)
+            : Math.floor(from);
+        if (from < 0)
+            from += len;
+
+        for (; from < len; from++) {
+            if (from in this &&
+                this[from] === elt)
+                return from;
+        }
+        return -1;
+    };
+}
+
 Date.fromISO = function(s) {
     var day, tz,
         rx = /^(\d{4}\-\d\d\-\d\d([tT ][\d:\.]*)?)([zZ]|([+\-])(\d\d):(\d\d))?$/,
