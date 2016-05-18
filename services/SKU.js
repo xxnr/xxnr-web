@@ -555,15 +555,14 @@ SKUService.prototype.idJoinWithCount = function(options, callback){
             var SKU = SKUs[index];
             SKUModel.findOne({_id: SKU._id})
                 .populate('product')
-                .lean()
                 .exec(function (err, doc) {
                     if (err) {
                         callback(err);
                         return;
                     }
 
-                    var item = {SKU:doc.toObject()};
                     if (doc) {
+                        var item = {SKU:doc.toObject()};
                         doc.product.populate('brand', function(err, product){
                             if(err){
                                 console.error(err);
