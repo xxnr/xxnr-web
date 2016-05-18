@@ -2101,22 +2101,30 @@ OrderService.prototype.updateRSCInfo = function(orderId, RSCInfo, callback) {
 
 // umeng 自定义推送
 OrderService.prototype.umengSendCustomizedcast = function(type, userId, userType, options) {
+	var query = null;
 	if (userType == 'user') {
-		UMENG.sendCustomizedcast(type, userId, userType, options);
+		query = {id:userId};
 	} else if (userType == 'RSC') {
-		UserModel.findById(userId, function(err, user){
-	        if(err){
-	            console.error('OrderService umengSendCustomizedcast findById err:', err);
+		query = {_id:userId};
+	}
+	if (query) {
+		UserModel.findOne(query, function(err, user) {
+			if (err) {
+	            console.error('OrderService umengSendCustomizedcast findOne err:', err, 'userType:', userType);
 	            return;
 	        }
-
-	        if(!user) {
-	            console.error('OrderService umengSendCustomizedcast findById not find user...');
+	        if (!user) {
+	            console.error('OrderService umengSendCustomizedcast findOne not find user...', 'userType:', userType);
 	            return;
 	        }
-
-	        UMENG.sendCustomizedcast(type, user.id, userType, options);
-	    });
+	        if (user.appLoginAgent) {
+	        	options.appLoginAgent = user.appLoginAgent;
+	        }
+			UMENG.sendCustomizedcast(type, user.id, userType, options);
+		});
+	} else {
+		console.error('OrderService umengSendCustomizedcast query is null', 'userType:', userType);
+	    return;
 	}
 };
 
