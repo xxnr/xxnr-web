@@ -125,7 +125,7 @@ Umeng.prototype.sendAndroidCustomizedcast = function(type, alias, aliasType, opt
     // send 
     self.umengSend(customizedcast, umengConfig.androidAppMasterSecret, function(err, result) {
     	if (err) {
-			console.error('Umeng sendAndroidCustomizedcast umengSend err:', err, 'alias: '+alias);
+			console.error('Umeng sendAndroidCustomizedcast umengSend err:', err, 'aliasType: '+aliasType, 'alias: '+alias);
 			callback(err, result);
 			return;
 		}
@@ -190,7 +190,7 @@ Umeng.prototype.sendIOSCustomizedcast = function(type, alias, aliasType, options
     // send 
     self.umengSend(customizedcast, umengConfig.iosAppMasterSecret, function(err, result) {
     	if (err) {
-			console.error('Umeng sendIOSCustomizedcast umengSend err:', err, 'alias: '+alias);
+			console.error('Umeng sendIOSCustomizedcast umengSend err:', err, 'aliasType: '+aliasType, 'alias: '+alias);
 			callback(err, result);
 			return;
 		}
@@ -216,7 +216,7 @@ Umeng.prototype.retrySendCustomizedcast = function(type, alias, aliasType, optio
 	}
 	var callback = function(err, result) {
     	if (err) {
-			console.error('Umeng retrySendCustomizedcast sendCustomizedcast ' + deviceType + ' err:', err, result ? result : '');
+			console.error('Umeng retrySendCustomizedcast sendCustomizedcast ' + deviceType + ' err:', err, 'aliasType: '+aliasType, result ? result : '');
 			if (err == 500 && result) {
 				var data = JSON.parse(result);
 				// when umeng result error_code in retryCodes, retry send..
@@ -229,7 +229,7 @@ Umeng.prototype.retrySendCustomizedcast = function(type, alias, aliasType, optio
 									self.retrySendCustomizedcast(type, alias, aliasType, options, deviceType, times+1)
 									}, 10000);
 							} else {
-								console.error('Umeng retrySendCustomizedcast sendCustomizedcast ' + deviceType + ' send the max times...');
+								console.error('Umeng retrySendCustomizedcast sendCustomizedcast ' + deviceType + ' send the max times...', 'aliasType: '+aliasType);
 							}
 							break;
 						}
@@ -237,7 +237,7 @@ Umeng.prototype.retrySendCustomizedcast = function(type, alias, aliasType, optio
 				}
 			}
 		} else {
-			console.log('Umeng retrySendCustomizedcast sendCustomizedcast ' + deviceType + ' result:', result, 'alias: '+alias);
+			console.log('Umeng retrySendCustomizedcast sendCustomizedcast ' + deviceType + ' result:', result, 'aliasType: '+aliasType, 'alias: '+alias);
 		}
 		return;
     };
@@ -257,10 +257,23 @@ Umeng.prototype.retrySendCustomizedcast = function(type, alias, aliasType, optio
  */
 Umeng.prototype.sendCustomizedcast = function(type, alias, aliasType, options) {
 	var self = this;
-	// send Android Customized cast
-	self.retrySendCustomizedcast(type, alias, aliasType, options, "Android");
-	// send IOS Customized cast
-	self.retrySendCustomizedcast(type, alias, aliasType, options, "IOS");
+	if (options) {
+		if (!options.appLoginAgent) {
+			// send Android Customized cast
+			self.retrySendCustomizedcast(type, alias, aliasType, options, "Android");
+			// send IOS Customized cast
+			self.retrySendCustomizedcast(type, alias, aliasType, options, "IOS");
+		} else {
+			if (options.appLoginAgent.toLowerCase() == "android") {
+				// send Android Customized cast
+				self.retrySendCustomizedcast(type, alias, aliasType, options, "Android");
+			}
+			if (options.appLoginAgent.toLowerCase() == "ios") {
+				// send IOS Customized cast
+				self.retrySendCustomizedcast(type, alias, aliasType, options, "IOS");
+			}
+		}
+	}
 };
 
 module.exports = new Umeng();

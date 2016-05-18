@@ -23,6 +23,7 @@ var UserSchema = new mongoose.Schema({
     "dateinvited" : Date,                                                   //邀请时间
     "webLoginId" : String,                                                  // web login id
     "appLoginId" : String,                                                  // app login id
+    "appLoginAgent" : String,                                               // app login Agent
     "registerAgent": String,                                                // 注册时的设备
     "isUserInfoFullFilled":{type: Boolean, default: false},                   // 是否完善用户信息并获取积分
     "address":{                                                               // 用户所在地

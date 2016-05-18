@@ -81,6 +81,8 @@ UserService.prototype.update = function(options, callback) {
         setValue.dateinvited = options.dateinvited;
     if (options.appLoginId)
         setValue.appLoginId = options.appLoginId;
+    if (options.appLoginAgent)
+        setValue.appLoginAgent = options.appLoginAgent;
     if (options.webLoginId)
         setValue.webLoginId = options.webLoginId;
     if (options.address)

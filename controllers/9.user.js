@@ -197,6 +197,11 @@ var setCookieAndResponse = function(req, res, user, keepLogin){
     if(REG_MOBILE.test(userAgent)){
         // is app
         options.appLoginId = U.GUID(10);
+        // app login agent
+        var appLoginAgent = tools.testUserAgent(userAgent);
+        if (appLoginAgent) {
+            options.appLoginAgent = appLoginAgent;
+        }
     }else{
         // is web
         options.webLoginId = U.GUID(10);
