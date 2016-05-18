@@ -1,6 +1,7 @@
 var app = angular.module('xxnr_common');
 app.directive('header', function(){
     return{
+        replace:true,
         restrict: 'AE',
         templateUrl: function(element, attrs) {
            return attrs.templateUrl || 'header';
@@ -22,6 +23,7 @@ app.directive('header', function(){
     }
 }).directive('footer', function(){
   return{
+      replace:true,
         restrict: 'AE',
     templateUrl: function(element, attrs) {
         return attrs.templateUrl || 'footer';
