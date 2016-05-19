@@ -21,14 +21,14 @@
                         <div data-component="textbox" data-component-path="login.form.account" data-required="true" class="col-md-12">用户名</div>
                     </div>
                     <div class="row">
-                        <div data-component="textbox" data-component-type="password" data-component-path="login.form.password" data-required="true" class="col-md-12">密码</div>
+                        <div data-component="textbox" data-component-type="password" data-component-path="login.form.password" data-required="true" class="col-md-12" onkeydown="goLogin(event);">密码</div>
                     </div>
                 </div>
                 <br>
                 <div data-component="error" data-component-path="orders.response"></div>
                 <div class="ui-form-buttons">
                     <div data-component="validation" data-component-path="login.form">
-                        <button name="submit">登录</button>
+                        <button id="loginButton" name="submit">登录</button>
                     </div>
                 </div>
             </div>
@@ -56,6 +56,14 @@
                     });
                 };
             });
+
+            function goLogin(event) {
+                var theEvent = event || window.event;
+                var code = theEvent.keyCode || theEvent.which || theEvent.charCode;
+                if (code == 13) {
+                    $('#loginButton').click();
+                }
+            }
         </script>
 
     </body>

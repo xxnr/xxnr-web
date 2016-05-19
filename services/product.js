@@ -193,6 +193,12 @@ ProductService.prototype.save = function(model, callback) {
     if (model.datecreated)
         model.datecreated = model.datecreated.format();
 
+    if (model.brand) {
+        if (model.brand.name) {
+            model.brandName = model.brand.name;
+        }
+    }
+
     var updator = function() {
         // Updates database file
         ProductModel.update({id: model.id}, {$set: model}, function (err, numAffected) {
@@ -211,24 +217,26 @@ ProductService.prototype.save = function(model, callback) {
                         return;
                     }
 
-                    newProduct.populate('brand', function (err, doc) {
-                        if (err) {
-                            console.error('product populate err', err, 'model', model);
-                            callback(err);
-                            return;
-                        }
-
-                        newProduct.brandName = newProduct.brand.name;
-                        newProduct.save(function (err) {
+                    if (!newProduct.brandName) {
+                        newProduct.populate('brand', function (err, doc) {
                             if (err) {
-                                console.error('product save err', err, 'model', model);
+                                console.error('product populate err', err, 'model', model);
                                 callback(err);
                                 return;
                             }
 
-                            callback(null, doc);
+                            newProduct.brandName = newProduct.brand.name;
+                            newProduct.save(function (err) {
+                                if (err) {
+                                    console.error('product save err', err, 'model', model);
+                                    callback(err);
+                                    return;
+                                }
+
+                                callback(null, doc);
+                            });
                         });
-                    })
+                    }
                 });
             } else {
                 updateSKUName(model);
