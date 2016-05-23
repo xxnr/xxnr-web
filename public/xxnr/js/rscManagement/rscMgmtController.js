@@ -129,7 +129,7 @@ app.controller('rscManagementController', function($scope, $rootScope,remoteApiS
         }
         for (var i = 0; i < $scope.showTypes.length; i++) {
             if ($scope.showTypes[i].isSelected == true) {
-                $scope.show($scope.showTypes[i].id, i);
+                $scope.show($scope.showTypes[i].id, i,null,0,$scope.orderSearchInput);
             }
         }
     };
@@ -147,18 +147,6 @@ app.controller('rscManagementController', function($scope, $rootScope,remoteApiS
         }
     };
 
-    $scope.pre_page = function() {
-        if ($scope.current_page > 1) {
-            $scope.current_page--;
-            $scope.show_page($scope.current_page);
-        }
-    };
-    $scope.next_page = function() {
-        if ($scope.current_page < $scope.pageCount) {
-            $scope.current_page++;
-            $scope.show_page($scope.current_page);
-        }
-    };
 
     $scope.calculateTotalAdditionsPrice = function(additions){
         var totalAdditionsPrice = 0;
@@ -192,6 +180,7 @@ app.controller('rscManagementController', function($scope, $rootScope,remoteApiS
     };
 
     $scope.show = function(showTypeId,tabIndex,page,reset,orderQueryStr) {
+        //console.log(arguments);
         if (reset > 0) {
             $scope.current_page = 1;
         };
@@ -403,7 +392,9 @@ app.controller('rscManagementController', function($scope, $rootScope,remoteApiS
                     if(data.code == 1000){
                         sweetalert('开始配送成功', "rsc_management.html");
                         $scope.closePop();
-                    } else {
+                    }else if(data.code == 1401){
+                        sweetalert('你已被登出，请重新登录', "logon.html");
+                    }else {
                         sweetalert('开始配送失败', "rsc_management.html");
                         $scope.closePop();
                     }
@@ -443,9 +434,12 @@ app.controller('rscManagementController', function($scope, $rootScope,remoteApiS
                     }else if(data.code == 1000){
                         sweetalert('客户自提成功', "rsc_management.html");
                         $scope.closePop();
-                    } else {
-                            sweetalert('自提码错误，请重新输入');
-                            $scope.errorPickupCodeCount = $scope.errorPickupCodeCount + 1;
+                    }else if(data.code == 1401){
+                        sweetalert('你已被登出，请重新登录', "logon.html");
+                    }
+                    else {
+                        sweetalert('自提码错误，请重新输入');
+                        $scope.errorPickupCodeCount = $scope.errorPickupCodeCount + 1;
                     }
                 });
         }

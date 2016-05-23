@@ -18,6 +18,9 @@
     <!-- endbuild -->
     <!-- build:js -->
     <script src="js/jquery.min.js"></script>
+    <!--[if (gte IE 6)&(lte IE 8)]>
+    <script type="text/javascript" src="js/selectivizr-min.js"></script>
+    <![endif]-->
     <script src="js/angular.min.js"></script>
     <script src="js/angular-cookies.min.js"></script>
     <script src="js/common.js"></script>
@@ -80,7 +83,7 @@
                     <p>您还没有邀请用户,若您是新新农人的代理商，快去邀请客户吧~</p>
                 </div>
                 <div class="clients_info" ng-show="invitees.length!==0 && !showOrders">
-                    <p class="clients_count">我已邀请<span>{{invitees.length}}位</span>客户</p>
+                    <p class="clients_count">我已邀请<span>{{inviteesCount}}位</span>客户</p>
                     <ul class="clients_form">
                         <li class="form_title">
                             <ul class="row">
@@ -101,6 +104,15 @@
                             </ul>
                         </li>
                     </ul>
+                    <div class="invitees_list_pager">
+                        <div id="invitees_page_buttons">
+                            <ul class="row">
+                                <li ng-hide="inviteesPager.current_page==1" class="pre_btn"><a href="" ng-click="pre_page(inviteesPager)"><em class="ban ban_8_0">&nbsp;</em></a></li>
+                                <li ng-repeat="page in inviteesPager.pages"><a href="" ng-click="show_page(inviteesPager,page.id)" ng-class="{true:'current', false:''}[page.isSelected]">{{page.id}}</a></li>
+                                <li ng-hide="inviteesPager.current_page==pages_count" class="next_btn"><a href="" ng-click="next_page(inviteesPager)"><em class="ban ban_9_0">&nbsp;</em></a></li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
                 <div class="client_order" ng-show="showOrders">
                     <div class="orders_clientInfo">
@@ -155,9 +167,9 @@
                         <div class="invitee_orders_pager">
                             <div id="page_buttons">
                                 <ul class="row">
-                                    <li ng-hide="current_page==1" class="pre_btn"><a href="" ng-click="pre_page()"><em class="ban ban_8_0">&nbsp;</em></a></li>
-                                    <li ng-repeat="page in pages"><a href="" ng-click="show_page(page.id)" ng-class="{true:'current', false:''}[page.isSelected]">{{page.id}}</a></li>
-                                    <li ng-hide="current_page==pages_count" class="next_btn"><a href="" ng-click="next_page()"><em class="ban ban_9_0">&nbsp;</em></a></li>
+                                    <li ng-hide="inviteeOrdersPager.current_page==1" class="pre_btn"><a href="" ng-click="pre_page(inviteeOrdersPager)"><em class="ban ban_8_0">&nbsp;</em></a></li>
+                                    <li ng-repeat="page in inviteeOrdersPager.pages"><a href="" ng-click="show_page(inviteeOrdersPager,page.id)" ng-class="{true:'current', false:''}[page.isSelected]">{{page.id}}</a></li>
+                                    <li ng-hide="inviteeOrdersPager.current_page==pages_count" class="next_btn"><a href="" ng-click="next_page(inviteeOrdersPager)"><em class="ban ban_9_0">&nbsp;</em></a></li>
                                 </ul>
                             </div>
                         </div>

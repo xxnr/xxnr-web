@@ -17,6 +17,9 @@
     <!-- endbuild -->
     <!-- build:js -->
     <script src="js/jquery.min.js"></script>
+    <!--[if (gte IE 6)&(lte IE 8)]>
+    <script type="text/javascript" src="js/selectivizr-min.js"></script>
+    <![endif]-->
     <script src="js/angular.min.js"></script>
     <script src="js/angular-cookies.min.js"></script>
     <script src="js/common.js"></script>
@@ -33,6 +36,7 @@
     <script src="js/sideService.js"></script>
     <!-- <script src="js/angular-ui-router.min.js"></script> -->
     <!-- endbuild -->
+
 </head>
 <body ng-controller="shoppingCartController">
 <header ng-controller="headerController"></header>

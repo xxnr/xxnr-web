@@ -183,8 +183,9 @@ app.controller('fillProfileController', function($scope, remoteApiService, commo
                 };
                 $http(req).then(function successCallback(response) {
                     if (response.data.code == 1000) {
-
                         sweetalert('个人资料保存成功','my_xxnr.html');
+                    }else if(response.data.code == 1401){
+                        sweetalert('你已被登出，请重新登录', "logon.html");
                     }
                 }, function errorCallback(response) {
                     // called asynchronously if an error occurs

@@ -28,6 +28,7 @@ gulp.task('css_minify', function() {                                //- 创建�
 gulp.task('framework_js_minify', function() {
     var revAll = new RevAll();
     gulp.src(['./js/jquery.min.js',
+        './js/selectivizr-min.js',
         './js/angular.min.js',
         './js/angular-cookies.min.js',
         './js/common.js',

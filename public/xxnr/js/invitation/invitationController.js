@@ -11,58 +11,74 @@ app.controller('invitationController', function($scope, remoteApiService, common
     $scope.confirm = false;
     $scope.tabNum = 1;
     $scope.showOrders = false;
-    $scope.current_page = 1;
     var ordersPerPage = 20;
     var selectedInviteeId = '';
     if(Number(location.search[5]) | Number(location.search[5])===0) {
         $scope.tabNum = Number(location.search[5]);
     }
 
-    var generate_page = function(){
-        $scope.pages = [];
-        for(var id=1; id<=$scope.pages_count; id++){
-            $scope.pages.push({id:id, isSelected:false});
-        }
+    $scope.inviteeOrdersPager = {pager_num:1,current_page:1};
+    $scope.inviteesPager = {pager_num:2,current_page:1};
+    var pages_generator = function(pager){
+        resetPager(pager);
+        formatingPager(pager);
+    };
 
-        if($scope.pages.length >0) {
-            $scope.pages[0].isSelected = true;
+    function resetPager(pager){
+        pager.pages = [];
+        for(var id=1; id<=pager.pages_count; id++){
+            pager.pages.push({id:id, isSelected:false});
         }
-        for(var pageIndex in $scope.pages){
-            if($scope.pages[pageIndex].id == $scope.current_page){
-                $scope.pages[pageIndex].isSelected = true;
+        if(pager.pages.length >0) {
+            pager.pages[0].isSelected = true;
+        }
+        for(var pageIndex in pager.pages){
+            if(pager.pages[pageIndex].id == pager.current_page){
+                pager.pages[pageIndex].isSelected = true;
             }else {
-                $scope.pages[pageIndex].isSelected = false;
+                pager.pages[pageIndex].isSelected = false;
             }
         }
-        if($scope.pages.length<=7){                                                     // e.g.: 1 2 3 4 5 6 7
-            $scope.pages = $scope.pages;
-        }else if($scope.pages.length>7 && $scope.current_page<5){                              // e.g.: 1 2 3 4 5 ... 20
-            $scope.pages = $scope.pages.slice(0,6).concat($scope.pages[$scope.pages.length-1]);
-            $scope.pages[5].id = '...';
-        }else if($scope.pages.length>7 && $scope.current_page <= $scope.pages_count && $scope.current_page> $scope.pages_count - 4 ) {    // e.g.: 1 ... 16 17 18 19 20
-            $scope.pages = $scope.pages.slice(0,1).concat($scope.pages.slice($scope.pages.length-6,$scope.pages.length));
-            $scope.pages[1].id = '...';
+    }
+    var formatingPager = function(pager){
+        if(pager.pages.length<=7){                                                     // e.g.: 1 2 3 4 5 6 7
+            pager.pages = pager.pages;
+        }else if($scope.pages.length>7 && pager.current_page<5){                              // e.g.: 1 2 3 4 5 ... 20
+            pager.pages = pager.pages.slice(0,6).concat(pager.pages[pager.pages.length-1]);
+            pager.pages[5].id = '...';
+        }else if(pager.pages.length>7 && pager.current_page <= pager.pages_count && pager.current_page> pager.pages_count - 4 ) {    // e.g.: 1 ... 16 17 18 19 20
+            pager.pages = pager.pages.slice(0,1).concat(pager.pages.slice(pager.pages.length-6,pager.pages.length));
+            pager.pages[1].id = '...';
         }else{                                                                          // e.g.: 1 .. 8 9 10 ... 20
-            var tempFirst = $scope.pages[0];
-            var tempLast = $scope.pages[$scope.pages.length-1];
-            $scope.pages = $scope.pages.slice($scope.current_page-3,$scope.current_page+2);
-            $scope.pages[0].id = '...';
-            $scope.pages[$scope.pages.length-1].id = '...';
-            $scope.pages.push(tempLast);
-            $scope.pages.unshift(tempFirst);
+            var tempFirst = pager.pages[0];
+            var tempLast = pager.pages[pager.pages.length-1];
+            pager.pages = pager.pages.slice(pager.current_page-3,pager.current_page+2);
+            pager.pages[0].id = '...';
+            pager.pages[pager.pages.length-1].id = '...';
+            pager.pages.push(tempLast);
+            pager.pages.unshift(tempFirst);
         }
     };
 
-    remoteApiService.getInvitee()
-        .then(function (data) {
-            $scope.invitees = data.invitee;
-            for(var index in $scope.invitees){
-                if($scope.invitees.hasOwnProperty(index)){
-                    var d = Date.fromISO($scope.invitees[index].dateinvited);
-                    $scope.invitees[index].dateinvited = d.getFullYear().toString()+'-'+ (d.getMonth()+1).toString() +'-'+d.getDate().toString();
+
+    function getInvitees(page){
+        var _page = page ? page : 1;
+        remoteApiService.getInvitee(_page)
+            .then(function (data) {
+                $scope.invitees = data.invitee;
+                $scope.inviteesCount = data.total;
+                $scope.inviteesPager.pages_count = data.pages;
+                pages_generator($scope.inviteesPager);
+                for(var index in $scope.invitees){
+                    if($scope.invitees.hasOwnProperty(index)){
+                        var d = Date.fromISO($scope.invitees[index].dateinvited);
+                        $scope.invitees[index].dateinvited = d.getFullYear().toString()+'-'+ (d.getMonth()+1).toString() +'-'+d.getDate().toString();
+                    }
                 }
-            }
-        });
+            });
+    }
+    getInvitees();
+
 
     $scope.inviterPhoneNumberValidated = false;
     $scope.$watch('inviterNum',function(){
@@ -207,9 +223,8 @@ app.controller('invitationController', function($scope, remoteApiService, common
         selectedInviteeId = inviteeUserId;
         remoteApiService.getInviteeOrders(inviteeUserId,page,ordersPerPage)
             .then(function (data) {
-                $scope.pages_count = data.datas.pages;
-                // $scope.pages_count = 30;
-                generate_page();
+                $scope.inviteeOrdersPager.pages_count = data.datas.pages;
+                pages_generator($scope.inviteeOrdersPager);
                 $scope.phone = data.datas.account;
                 $scope.name = data.datas.name?data.datas.name:"该客户未设置姓名";
                 $scope.ordersNum = data.datas.total;
@@ -224,33 +239,37 @@ app.controller('invitationController', function($scope, remoteApiService, common
             });
     };
 
-    $scope.show_page = function(pageId){
+    $scope.show_page = function(pager,pageId){
         if(pageId!='...'){
-            $scope.current_page = pageId;
-            for(var pageIndex in $scope.pages){
-                if($scope.pages[pageIndex].id == pageId){
-                    $scope.pages[pageIndex].isSelected = true;
+            pager.current_page = pageId;
+            for(var pageIndex in pager.pages){
+                if(pager.pages[pageIndex].id == pageId){
+                    pager.pages[pageIndex].isSelected = true;
                 }else {
-                    $scope.pages[pageIndex].isSelected = false;
+                    pager.pages[pageIndex].isSelected = false;
                 }
             }
             $scope.orderList = [];
-            generate_page();
-            $scope.getInviteeOrders(selectedInviteeId,pageId);
+            pages_generator(pager);
+            if(pager.pager_num==1){
+                $scope.getInviteeOrders(selectedInviteeId,pageId);
+            }else if(pager.pager_num==2){
+                getInvitees(pageId);
+            }
         }
     };
 
-    $scope.pre_page = function(){
-        if($scope.current_page>1){
-            $scope.current_page--;
-            $scope.show_page($scope.current_page);
+    $scope.pre_page = function(pager){
+        if(pager.current_page>1){
+            pager.current_page--;
+            $scope.show_page(pager,pager.current_page);
         }
     };
 
-    $scope.next_page = function(){
-        if($scope.current_page<$scope.pages_count){
-            $scope.current_page++;
-            $scope.show_page($scope.current_page);
+    $scope.next_page = function(pager){
+        if(pager.current_page<pager.pages_count){
+            pager.current_page++;
+            $scope.show_page(pager,pager.current_page);
         }
     };
     var getOrderTypeName = function(typeNum) {
