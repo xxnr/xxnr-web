@@ -86,6 +86,12 @@ router.get(F.config['manager-url']+'/api/v2.2/RSC/orders', middleware.backend_au
 router.put(F.config['manager-url']+'/api/v2.2/RSC/modify', middleware.backend_auth, controllers.Manager.process_RSC_modify);
 router.get(F.config['manager-url']+ '/api/v2.2/RSC/queryByProducts',middleware.backend_auth ,controllers.Manager.json_RSC_query_by_products);
 
+// agents
+router.get(F.config['manager-url']+ '/api/agents', middleware.backend_auth, controllers.Manager.json_agents_query);
+router.get(F.config['manager-url']+ '/api/agents/invitees', middleware.backend_auth, controllers.Manager.json_agents_invitees_query);
+router.get(F.config['manager-url']+ '/api/agents/potentialCustomers', middleware.backend_auth, controllers.Manager.json_agents_potentialCustomers_query);
+router.get(F.config['manager-url']+ '/api/agents/:_id', middleware.backend_auth, controllers.Manager.json_agents_get);
+
 // area
 router.get(F.config['manager-url']+'/api/area/getProvinceList', middleware.backend_auth, controllers.Manager.json_province_query);
 router.get(F.config['manager-url']+'/api/area/getCityList', middleware.backend_auth, controllers.Manager.json_city_query);

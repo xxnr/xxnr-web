@@ -27,6 +27,7 @@
 					<% if (user.role.view_roles.indexOf('products') !== -1) { %><li><a class="jrouting" href="<%= manager_url %>/products/" title="商品" data-role="products"><span class="fa fa-navicon"></span></a></li><% } %>
 					<% if (user.role.view_roles.indexOf('users') !== -1) { %><li><a class="jrouting" href="<%= manager_url %>/users/" title="用户" data-role="users"><span class="fa fa-users"></span></a></li><% } %>
 					<% if (user.role.view_roles.indexOf('rsc') !== -1) { %><li><a class="jrouting" href="<%= manager_url %>/rsc/" title="服务站管理" data-role="rsc"><span class="fa fa-truck"></span></a></li><% } %>
+					<% if (user.role.view_roles.indexOf('agents') !== -1) { %><li><a class="jrouting" href="<%= manager_url %>/agents/" title="经纪人管理" data-role="agents"><span class="fa fa-user-secret"></span></a></li><% } %>
 					<% if (user.role.view_roles.indexOf('news') !== -1) { %><li><a class="jrouting" href="<%= manager_url %>/news/" title="资讯" data-role="news"><span class="fa fa-newspaper-o"></span></a></li><% } %>
 					<% if (user.role.view_roles.indexOf('payrefunds') !== -1) { %><li><a class="jrouting" href="<%= manager_url %>/payrefunds/" title="退款" data-role="payrefunds"><span class="fa fa-money"></span></a></li><% } %>
 					<% if (user.role.view_roles.indexOf('auditlogs') !== -1) { %><li><a class="jrouting" href="<%= manager_url %>/auditlogs/" title="审计" data-role="auditlogs"><span class="fa fa-history"></span></a></li><% } %>
@@ -57,6 +58,10 @@
 		<% if (user.role.view_roles.indexOf('users') !== -1) { %>
 		<div data-component="page" data-component-path="common.page" data-if="users" data-template="/templates/manager-users.html"></div>
 		<div data-component="page" data-component-path="common.page" data-if="potentialcustomers" data-template="/templates/manager-potentialcustomers.html"></div>
+		<% } %>
+		<% if (user.role.view_roles.indexOf('agents') !== -1) { %>
+		<div data-component="page" data-component-path="common.page" data-if="agents" data-template="/templates/manager-agents.html"></div>
+		<div data-component="page" data-component-path="common.page" data-if="agents-detail" data-template="/templates/manager-agents-detail.html"></div>
 		<% } %>
 		<% if (user.role.view_roles.indexOf('news') !== -1) { %>
 		<div data-component="page" data-component-path="common.page" data-if="news" data-template="/templates/manager-news.html"></div>
