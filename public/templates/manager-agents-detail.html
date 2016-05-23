@@ -1,0 +1,366 @@
+<script type="text/javascript" async src="/js/simplePagination.js"></script>
+<div class="filter">
+    <div class="container">
+        <div class="caption"><span class="fa fa-user-secret mr5"></span>经纪人管理</div>
+    </div>
+</div>
+<div class="container" style="position: relative;">
+    <div class="row m">
+        <div class="col-md-12 m">
+            <h3 class="ui-left">经纪人信息</h3>
+        </div>
+        <div class="col-md-8" data-component="template" data-component-path="agentInfo" data-component-id="agentInfo">
+            <script type="text/html">
+                {{if agent}}
+                <table class="table table-bordered" border="0">
+                    <tr>
+                        <td class="col-xs-4 active">姓名</td>
+                        <td class="col-xs-4">{{ agent.name ? agent.name : '-' }}</td>
+                    </tr>
+                    <tr>
+                        <td class="col-xs-4 active">手机</td>
+                        <td class="col-xs-4">{{ agent.account ? agent.account : '-' }}</td>
+                    </tr>
+                    <tr>
+                        <td class="col-xs-4 active">性别</td>
+                        {{ if agent.sex }}
+                            <td class="col-xs-4">女</td>
+                        {{ else }}
+                            <td class="col-xs-4">男</td>
+                        {{ fi }}
+                    </tr>
+                    <tr>
+                        <td class="col-xs-4 active">注册时间</td>
+                        <td class="col-xs-4">{{ if agent.datecreated }}{{ agent.datecreated | format('yyyy-MM-dd') }}{{ else }}-{{ fi }}</td>
+                    </tr>
+                    <tr>
+                        <td class="col-xs-4 active">所属地区</td>
+                        <td class="col-xs-4">
+                            {{ if agent.address }}
+                                {{ agent.address.province ?  agent.address.province.name : '' }} {{ agent.address.city ?  agent.address.city.name : ''}} {{ agent.address.county ?  agent.address.county.name : '' }} {{ agent.address.town ?  agent.address.town.name : '' }}
+                            {{ fi }}
+                        </td>
+                    </tr>
+                </table>
+                {{fi}}
+            </script>
+        </div>
+        <div data-component="error" data-component-path="agentInfo.agentresponse"></div>
+    </div>
+    <div class="row m">
+        <div class="col-md-12">
+            <h3 class="ui-left">经纪人客户信息</h3>
+        </div>
+        <div class="padding col-md-12">
+            <ul class="tabmenu">
+                <li data-value="invitee" class="selected">客户列表</li>
+                <li data-value="potentialCustomer">潜在客户列表</li>
+            </ul>
+            <div class="tablist">
+                <!-- <div id="invitee" class="tabinfo ui-grid" data-component="template" data-component-path="agentInfo" data-component-id="agentInfo.invitee">
+                    <script type="text/html">
+                    {{ if inviteeList && inviteeList.length > 0 }}
+                        {{ if count }}
+                            <div class="col-md-12 mb10">绑定客户数：{{count}}</div>
+                        {{ fi }}
+                        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 0;">
+                            <tbody>
+                                <tr>
+                                    <td style="width:30px" class="silver hidden-xs ui-center active">序号</td>
+                                    <td style="width:50px" class="silver hidden-xs ui-center active">会员ID</td>
+                                    <td style="width:60px" class="silver hidden-xs ui-center active">手机号</td>
+                                    <td style="width:50px" class="silver hidden-xs ui-center active">姓名</td>
+                                    <td style="width:30px" class="silver hidden-xs ui-center active">性别</td>
+                                    <td style="width:90px" class="silver hidden-xs ui-center active">所在地区</td>
+                                    <td style="width:50px" class="silver hidden-xs ui-center active">总积分</td>
+                                    <td style="width:50px" class="silver hidden-xs ui-center active">注册来源</td>
+                                    <td style="width:80px" class="silver hidden-xs ui-center active">认证用户</td>
+                                    <td style="width:50px" class="silver hidden-xs ui-center active">注册时间</td>
+                                    <td style="width:50px" class="silver hidden-xs ui-center active">邀请时间</td>
+                                </tr>
+                                {{ foreach invitee in inviteeList }}
+                                    <tr>
+                                        <td style="width:30px" class="hidden-xs ui-center">{{ $index + 1 }}</td>
+                                        <td style="width:50px" class="hidden-xs ui-center" title="{{ invitee.id }}">{{ invitee.id }}</td>
+                                        <td style="width:60px" class="hidden-xs ui-center" title="{{ invitee.account }}">{{ invitee.account }}</td>
+                                        <td style="width:50px" class="hidden-xs ui-center" title="{{ invitee.name }}">{{ invitee.name }}</td>
+                                        <td style="width:30px" class="hidden-xs ui-center">{{ invitee.sex ? '女' : '男' }}</td>
+                                        <td style="width:90px" class="hidden-xs ui-center" title="{{ if invitee.address }}{{ invitee.address.province ?  invitee.address.province.name : '' }}{{ invitee.address.city ?  invitee.address.city.name : ''}}{{ invitee.address.county ?  invitee.address.county.name : '' }}{{ invitee.address.town ?  invitee.address.town.name : '' }}{{ fi }}">
+                                        {{ if invitee.address }}
+                                            {{ invitee.address.province ?  invitee.address.province.name : '' }}{{ invitee.address.city ?  invitee.address.city.name : ''}}{{ invitee.address.county ?  invitee.address.county.name : '' }}{{ invitee.address.town ?  invitee.address.town.name : '' }}
+                                        {{ fi }}
+                                        </td>
+                                        <td style="width:50px" class="hidden-xs ui-center">{{ invitee.score }}</td>
+                                        <td style="width:50px" class="hidden-xs ui-center">{{ invitee.registerAgent }}</td>
+                                        
+                                        <td style="width:80px" class="hidden-xs ui-center">
+                                        {{ if invitee.typeVerified && invitee.typeVerified.length > 0 }}
+                                            {{ foreach type in invitee.typeVerified }}{{ if usertypes && usertypes[type] }}{{ usertypes[type] }}{{ fi }}{{ end }}
+                                        {{ else }}
+                                            -
+                                        {{ fi }}
+                                        </td>
+                                        <td style="width:50px" class="hidden-xs ui-center">{{ invitee.datecreated | format('yyyy-MM-dd') }}</td>
+                                        <td style="width:50px" class="hidden-xs ui-center">{{ invitee.dateinvited | format('yyyy-MM-dd') }}</td>
+                                    </tr>
+                                {{ end }}
+                            </tbody>
+                        </table>
+                    {{ else }}
+                        {{ if inviteeList }}
+                            {{ if count }}
+                                <div class="col-md-12 mb10">绑定客户数：{{count}}</div>
+                            {{ fi }}
+                        {{ fi }}
+                    {{ fi }}
+                    </script>
+                </div> -->
+                <div class="tabinfo ui-grid" data-component="template" data-component-path="agentInfo">
+                    <script type="text/html">
+                    {{ if tabType == 'invitee' }}
+                        {{ if tabinfo && tabinfo.length > 0 }}
+                            {{ if count }}
+                                <div class="col-md-12 mb10">绑定客户数：{{count}}</div>
+                            {{ fi }}
+                            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 0;">
+                                <tbody>
+                                    <tr>
+                                        <td style="width:30px" class="silver hidden-xs ui-center active">序号</td>
+                                        <td style="width:50px" class="silver hidden-xs ui-left active">会员ID</td>
+                                        <td style="width:60px" class="silver hidden-xs ui-center active">手机号</td>
+                                        <td style="width:50px" class="silver hidden-xs ui-left active">姓名</td>
+                                        <td style="width:30px" class="silver hidden-xs ui-center active">性别</td>
+                                        <td style="width:90px" class="silver hidden-xs ui-left active">所在地区</td>
+                                        <td style="width:50px" class="silver hidden-xs ui-right active">总积分</td>
+                                        <td style="width:50px" class="silver hidden-xs ui-center active">注册来源</td>
+                                        <td style="width:80px" class="silver hidden-xs ui-left active">认证用户</td>
+                                        <td style="width:50px" class="silver hidden-xs ui-center active">注册时间</td>
+                                        <td style="width:50px" class="silver hidden-xs ui-center active">邀请时间</td>
+                                    </tr>
+                                    {{ foreach invitee in tabinfo }}
+                                        <tr>
+                                            <td style="width:30px" class="hidden-xs ui-center">{{ $index + 1 }}</td>
+                                            <td style="width:50px" class="hidden-xs ui-left" title="{{ invitee.id }}">{{ invitee.id }}</td>
+                                            <td style="width:60px" class="hidden-xs ui-center" title="{{ invitee.account }}">{{ invitee.account }}</td>
+                                            <td style="width:50px" class="hidden-xs ui-left" title="{{ invitee.name }}">{{ invitee.name }}</td>
+                                            <td style="width:30px" class="hidden-xs ui-center">{{ invitee.sex ? '女' : '男' }}</td>
+                                            <td style="width:90px" class="hidden-xs ui-left" title="{{ if invitee.address }}{{ invitee.address.province ?  invitee.address.province.name : '' }}{{ invitee.address.city ?  invitee.address.city.name : ''}}{{ invitee.address.county ?  invitee.address.county.name : '' }}{{ invitee.address.town ?  invitee.address.town.name : '' }}{{ fi }}">
+                                            {{ if invitee.address }}
+                                                {{ invitee.address.province ?  invitee.address.province.name : '' }}{{ invitee.address.city ?  invitee.address.city.name : ''}}{{ invitee.address.county ?  invitee.address.county.name : '' }}{{ invitee.address.town ?  invitee.address.town.name : '' }}
+                                            {{ fi }}
+                                            </td>
+                                            <td style="width:50px" class="hidden-xs ui-right">{{ invitee.score }}</td>
+                                            <td style="width:50px" class="hidden-xs ui-center">{{ invitee.registerAgent }}</td>
+                                            
+                                            <td style="width:80px" class="hidden-xs ui-left" title="{{ if invitee.typeVerified && invitee.typeVerified.length > 0 }}{{ foreach type in invitee.typeVerified }}{{ if usertypes && usertypes[type] }}{{ usertypes[type] }}{{ if ($index+1) != invitee.typeVerified.length && invitee.typeVerified.length != 1 }},&nbsp;&nbsp;{{ fi }}{{ fi }}{{ end }}{{ else }}-{{ fi }}">
+                                            {{ if invitee.typeVerified && invitee.typeVerified.length > 0 }}
+                                                {{ foreach type in invitee.typeVerified }}
+                                                    {{ if usertypes && usertypes[type] }}{{ usertypes[type] }}{{ if ($index+1) != invitee.typeVerified.length && invitee.typeVerified.length != 1 }},&nbsp;&nbsp;{{ fi }}{{ fi }}
+                                                {{ end }}
+                                            {{ else }}
+                                                -
+                                            {{ fi }}
+                                            </td>
+                                            <td style="width:50px" class="hidden-xs ui-center">{{ invitee.datecreated | format('yyyy-MM-dd') }}</td>
+                                            <td style="width:50px" class="hidden-xs ui-center">{{ invitee.dateinvited | format('yyyy-MM-dd') }}</td>
+                                        </tr>
+                                    {{ end }}
+                                </tbody>
+                            </table>
+                        {{ else }}
+                            <div class="col-md-12 mb10">暂无客户</div>
+                        {{ fi }}
+                    {{ else }}
+                        {{ if tabType == 'potentialCustomer' }}
+                            {{ if tabinfo && tabinfo.length > 0 }}
+                                {{ if count }}
+                                    <div class="col-md-12 mb10">潜在客户数：{{count}}</div>
+                                {{ fi }}
+                                <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 0;">
+                                    <tbody>
+                                        <tr>
+                                            <td style="width:30px" class="silver hidden-xs ui-center active">序号</td>
+                                            <td style="width:50px" class="silver hidden-xs ui-left active">姓名</td>
+                                            <td style="width:60px" class="silver hidden-xs ui-center active">手机号</td>
+                                            <td style="width:30px" class="silver hidden-xs ui-center active">性别</td>
+                                            <td style="width:90px" class="silver hidden-xs ui-left active">所在地区</td>
+                                            <td style="width:80px" class="silver hidden-xs ui-left active">关注商品</td>
+                                            <td style="width:80px" class="silver hidden-xs ui-left active">备注</td>
+                                            <td style="width:50px" class="silver hidden-xs ui-center active">登记日期</td>
+                                            <td style="width:50px" class="silver hidden-xs ui-center active">注册时间</td>
+                                        </tr>
+                                        {{ foreach potentialCustomer in tabinfo }}
+                                            <tr>
+                                                <td style="width:30px" class="hidden-xs ui-center">{{ $index + 1 }}</td>
+                                                <td style="width:50px" class="hidden-xs ui-left" title="{{ potentialCustomer.name }}">{{ potentialCustomer.name }}</td>
+                                                <td style="width:60px" class="hidden-xs ui-center" title="{{ potentialCustomer.phone }}">{{ potentialCustomer.phone }}</td>
+                                                <td style="width:30px" class="hidden-xs ui-center">{{ potentialCustomer.sex ? '女' : '男' }}</td>
+                                                <td style="width:90px" class="hidden-xs ui-left" title="{{ if potentialCustomer.address }}{{ potentialCustomer.address.province ?  potentialCustomer.address.province.name : '' }}{{ potentialCustomer.address.city ?  potentialCustomer.address.city.name : ''}}{{ potentialCustomer.address.county ?  potentialCustomer.address.county.name : '' }}{{ potentialCustomer.address.town ?  potentialCustomer.address.town.name : '' }}{{ fi }}">
+                                                {{ if potentialCustomer.address }}
+                                                    {{ potentialCustomer.address.province ?  potentialCustomer.address.province.name : '' }}{{ potentialCustomer.address.city ?  potentialCustomer.address.city.name : ''}}{{ potentialCustomer.address.county ?  potentialCustomer.address.county.name : '' }}{{ potentialCustomer.address.town ?  potentialCustomer.address.town.name : '' }}
+                                                {{ fi }}
+                                                </td>
+                                                <td style="width:80px" class="hidden-xs ui-left" title="{{ if potentialCustomer.buyIntentions && potentialCustomer.buyIntentions.length > 0 }}{{ foreach buyIntention in potentialCustomer.buyIntentions }}{{ buyIntention.name }}{{ if ($index+1) != potentialCustomer.buyIntentions.length && potentialCustomer.buyIntentions.length != 1 }},&nbsp;&nbsp;{{ fi }}{{ end }}{{ fi }}">
+                                                    {{ if potentialCustomer.buyIntentions && potentialCustomer.buyIntentions.length > 0 }}
+                                                        {{ foreach buyIntention in potentialCustomer.buyIntentions }}{{ buyIntention.name }}{{ if ($index+1) != potentialCustomer.buyIntentions.length && potentialCustomer.buyIntentions.length != 1 }},&nbsp;&nbsp;{{ fi }}{{ end }}
+                                                    {{ else }}
+                                                        -
+                                                    {{ fi }}
+                                                </td>
+                                                <td style="width:80px" class="hidden-xs ui-left" title="{{ potentialCustomer.remarks }}">{{ potentialCustomer.remarks }}</td>
+                                                <td style="width:50px" class="hidden-xs ui-center">{{ potentialCustomer.dateTimeAdded | format('yyyy-MM-dd') }}</td>
+                                                <td style="width:50px" class="hidden-xs ui-center">{{ if potentialCustomer.dateTimeRegistered }}{{ potentialCustomer.dateTimeRegistered | format('yyyy-MM-dd') }}{{ else }}-{{ fi }}</td>
+                                            </tr>
+                                        {{ end }}
+                                    </tbody>
+                                </table>
+                            {{ else }}
+                                <div class="col-md-12 mb10">暂无潜在客户</div>
+                            {{ fi }}
+                        {{ else }}
+                            <div class="col-md-12 mb10">暂无数据</div>
+                        {{ fi }}
+                    {{ fi }}
+                    </script>
+                </div>
+                <div class="tabinfo-pages"></div>
+                <div data-component="error" data-component-path="agentInfo.agenttabinforesponse"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var agentInfo = {};
+    agentInfo.agent = {};
+    agentInfo.agentresponse;
+    agentInfo.tabinfo = [];
+    agentInfo.tabType;
+    agentInfo.agenttabinforesponse;
+    agentInfo.usertypes = usertypes;
+    agentInfo.pages;
+    agentInfo.page;
+    agentInfo.count;
+
+    var agent_id = getUrlParam('id');
+    ON('#agentInfo', function(component) {
+        agentInfo_load();
+        $('.tabmenu li').on('click', function(){
+            select_tabmenu($(this));
+        });
+        getInvitees();
+    });
+
+    function agentInfo_load() {
+        if (agent_id) {
+            $.components.GET(managerurl + '/api/agents/' + agent_id, null, function(response) {
+                if (response.code != '1000') {
+                    if (response.error || response.message) {
+                        if (response.message) {
+                            response = [{error: response.message}];
+                        } else {
+                            response = response.error;
+                        }
+                    } else {
+                        response = [{error: '获取经纪人信息失败'}];
+                    }
+
+                    SET('agentInfo.agentresponse', response);
+                    return;
+                }
+
+                agentInfo.agent = response.agent;
+                SET('agentInfo.agent', response.agent);
+            });
+        }
+    }
+
+    function getInvitees(page) {
+        var urlParam = agent_id ? 'agentId=' + agent_id : '';
+        urlParam += page ? (urlParam ? '&' : '') + 'page=' + page : '';
+        var url = '/api/agents/invitees' + (urlParam ? '?' + urlParam : '');
+        agentInfo.tabType = 'invitee';
+        getAgentTabinfo(url);
+    }
+
+    function getPotentialCustomers(page) {
+        var urlParam = agent_id ? 'agentId=' + agent_id : '';
+        urlParam += page ? (urlParam ? '&' : '') + 'page=' + page : '';
+        var url = '/api/agents/potentialCustomers' + (urlParam ? '?' + urlParam : '');
+        agentInfo.tabType = 'potentialCustomer';
+        getAgentTabinfo(url);
+    }
+    
+    function getAgentTabinfo(url) {
+        $.components.GET(managerurl + url, null, function(response) {
+            var key = 'agentInfo';
+            if (response && response.code && response.code==1000) {
+                if (agentInfo.tabType == 'invitee') {
+                    agentInfo.tabinfo = response.invitees;
+                } else {
+                    if (agentInfo.tabType == 'potentialCustomer') {
+                        agentInfo.tabinfo = response.potentialCustomers;
+                    } else {
+                        agentInfo.tabinfo = [];
+                    }
+                }
+                agentInfo.count = response.count;
+                agentInfo.pages = response.pageCount;
+                agentInfo.page = response.page;
+                SET(key, agentInfo);
+                if (agentInfo.pages && agentInfo.count) {
+                    Pagination(agentInfo.count, agentInfo.count/agentInfo.pages, agentInfo.page?agentInfo.page:null);
+                }
+                SET('agentInfo.agenttabinforesponse', null);
+            } else {
+                if (response.error || response.message) {
+                    key = 'agentInfo.agenttabinforesponse';
+                    if (response.message) {
+                        response = [{error: response.message}];
+                    } else {
+                        response = response.error;
+                    }
+                } else {
+                    response = [];
+                }
+                SET(key, response);
+            }
+        });
+    }
+
+    function Pagination(count, pageCount, currentPage, dataType) {
+        $('div.tabinfo-pages').pagination({
+            items: count,
+            itemsOnPage: pageCount,
+            currentPage: currentPage?currentPage:0,
+            prevText: '<',
+            nextText: '>',
+            cssStyle: 'light-theme',
+            onPageClick: function(pageNumber, event) {
+                if (agentInfo.tabType == 'invitee') {
+                    getInvitees(pageNumber);
+                } else {
+                    if (agentInfo.tabType == 'potentialCustomer') {
+                        getPotentialCustomers(pageNumber);
+                    }
+                }
+            }
+        });
+    }
+
+    function select_tabmenu(el){
+        $('.tabmenu li').each(function() {
+            $(this).removeClass('selected');
+        });
+        el.addClass('selected');
+        $('div.tabinfo-pages').html('');
+        switch(el.attr('data-value')) {
+            case 'invitee':
+                getInvitees();
+                break;
+            case 'potentialCustomer':
+                getPotentialCustomers();
+                break;
+        }
+    }
+</script>

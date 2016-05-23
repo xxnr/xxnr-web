@@ -76,7 +76,13 @@
 /manager/api/v2.2/RSC/modify, put, super_admin
 /manager/api/v2.2/RSC/queryByProducts, get, super_admin, customer_op
 
-# area
+#agents
+/manager/api/agents, get, super_admin
+/manager/api/agents/invitees, get, super_admin
+/manager/api/agents/potentialCustomers, get, super_admin
+/manager/api/agents/:_id, get, super_admin
+
+#area
 /manager/api/area/getProvinceList, get, super_admin
 /manager/api/area/getCityList, get, super_admin
 /manager/api/area/getCountyList, get, super_admin

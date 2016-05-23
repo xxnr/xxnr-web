@@ -16,6 +16,7 @@ var AuditlogService = services.auditservice;
 var PayService = services.pay;
 var AreaService = services.area;
 var RSCService = services.RSC;
+var AgentService = services.agent;
 var DashboardService = services.dashboard;
 var PAYMENTSTATUS = require('../common/defs').PAYMENTSTATUS;
 var DELIVERSTATUS = require('../common/defs').DELIVERSTATUS;
@@ -1913,6 +1914,57 @@ exports.json_agent_info_get = function(req,res,next){
 			res.respond({code:1000, agent:{name:user.name, phone: user.account, address:user.address, totalCount:totalCount, registeredCount:registeredCount, registeredAndBindedCount:registeredAndBindedCount}});
 		})
 	})
+};
+
+// ==========================================================================
+// agents
+// ==========================================================================
+exports.json_agents_query = function(req,res,next){
+	var page = U.parseInt(req.data.page, 1) - 1;
+	var max = U.parseInt(req.data.max, 20);
+	AgentService.getAgentList(null, null, null, null, page, max, req.data.search, null, function(err, agents, count, pageCount) {
+		if(err){
+			res.respond({code:1002, message:err});
+			return;
+		}
+
+		res.respond({code:1000, message:'success', agents:agents, count:count, pageCount:pageCount, page:page+1});
+	});
+};
+
+exports.json_agents_get = function(req,res,next){
+	AgentService.getAgent(req.params._id, function(err, agent){
+		if(err || !agent){
+			res.respond({code:1001, message:'获取新农经纪人信息失败'});
+			return;
+		}
+		res.respond({code:1000, message:'success', agent:agent});
+	});
+};
+
+exports.json_agents_invitees_query = function(req,res,next){
+	var page = U.parseInt(req.data.page, 1) - 1;
+	var max = U.parseInt(req.data.max, 20);
+	AgentService.getInviteeList(req.data.agentId, page, max, function(err, invitees, count, pageCount){
+		if(err || !invitees){
+			res.respond({code:1001, message:'获取新农经纪人客户列表失败'});
+			return;
+		}
+		res.respond({code:1000, message:'success', invitees:invitees, count:count, pageCount:pageCount, page:page+1});
+	});
+};
+
+exports.json_agents_potentialCustomers_query = function(req,res,next){
+	var page = U.parseInt(req.data.page, 1) - 1;
+	var max = U.parseInt(req.data.max, 20);
+	PotentialCustomerService.queryPage({_id:req.data.agentId}, page, max, function(err, customers, count, pageCount){
+		if (err || !customers) {
+			res.respond({code:1001, message:'获取潜在客户列表失败'});
+			return;
+		}
+
+		res.respond({code:1000, message:'success', potentialCustomers:customers, count:count, pageCount:pageCount, page:page+1});
+	}, null, true);
 };
 
 // ==========================================================================

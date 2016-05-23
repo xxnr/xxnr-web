@@ -58,3 +58,6 @@ exports.dashboard = require('./dashboard');
 
 // vCode
 exports.vCode = require('./vCode');
+
+// agent
+exports.agent = require('./agent');

@@ -1,0 +1,146 @@
+<script type="text/javascript" async src="/js/simplePagination.js"></script>
+
+<div class="filter" style="padding-bottom:9px">
+	<div class="container">
+		<div class="caption"><span class="fa fa-user-secret mr5"></span>经纪人管理</div>
+		<div class="row">
+            <div class="col-md-3 col-sm-6 m">
+                <div data-component="textbox" data-component-path="agents.filter.search" data-placeholder="" data-control-icon="fa-search">经纪人姓名/电话</div>
+                <div class="help" data-component="template" data-component-path="agents.info"><script type="text/html">{{ count | pluralize('items','item','items','items') }} / {{pages | pluralize('pages', 'page', 'pages', 'pages') }}</script></div>
+            </div>
+        </div>
+	</div>
+</div>
+
+<div class="container">
+	<div data-component="template" data-component-path="agents" class="ui-grid agents" data-max="auto" data-component-id="agents">
+		<script type="text/html">
+		{{ if grid && grid.length > 0 }}
+			<table class="table" width="100%" cellpadding="0" cellspacing="0" border="0">
+				<tbody>
+					<tr>
+						<td style="width:30px" class="silver hidden-xs ui-center active">序号</td>
+						<td style="width:50px" class="silver hidden-xs ui-left active">会员ID</td>
+				    	<td style="width:50px" class="silver hidden-xs ui-left active">经纪人姓名</td>
+				    	<td style="width:60px" class="silver hidden-xs ui-center active">手机号</td>
+				    	<td style="width:90px" class="silver hidden-xs ui-left active">所在区域（三级)</td>
+				    	<td style="width:80px" class="silver hidden-xs ui-center active">注册时间</td>
+				    	<td style="width:80px" class="silver hidden-xs ui-center active">认证时间</td>
+				    	<td style="width:40px" class="silver hidden-xs ui-center active">经纪人详情</td>
+				    </tr>
+				    {{ foreach agent in grid }}
+				    	<tr>
+							<td style="width:30px" class="hidden-xs ui-center">{{ $index + 1 }}</td>
+							<td style="width:50px" class="hidden-xs ui-left" title="{{ agent.id }}">{{ agent.id }}</td>
+					    	<td style="width:50px" class="hidden-xs ui-left" title="{{ agent.name }}">{{ agent.name }}</td>
+					    	<td style="width:60px" class="hidden-xs ui-center" title="{{ agent.account }}">{{ agent.account }}</td>
+					    	<td style="width:90px" class="hidden-xs ui-left" title="{{ if agent.address }}{{ agent.address.province ?  agent.address.province.name : '' }}{{ agent.address.city ?  agent.address.city.name : ''}}{{ agent.address.county ?  agent.address.county.name : '' }}{{ fi }}">
+					    	{{ if agent.address }}
+			                    {{ agent.address.province ?  agent.address.province.name : '' }}{{ agent.address.city ?  agent.address.city.name : ''}}{{ agent.address.county ?  agent.address.county.name : '' }}
+			                {{ fi }}
+			                </td>
+					    	<td style="width:80px" class="hidden-xs ui-center">{{ agent.datecreated | format('yyyy-MM-dd') }}</td>
+					    	<td style="width:80px" class="hidden-xs ui-center">-</td>
+					    	<td style="width:80px" class="hidden-xs ui-center" title="经纪人详情"><a target="_blank" href="agents-detail?id={{agent._id}}"><span class="fa fa-search"></span></a></td>
+					    </tr>
+					{{ end }}
+				</tbody>
+			</table>
+		{{ fi }}
+		</script>
+	</div>
+	<div class="agents-pages">
+	</div>
+	
+	<div data-component="error" data-component-path="agents.agentsresponse"></div>
+</div>
+
+<script>
+
+	var agents = {};
+
+    agents.filter = {};
+    agents.filter.page = 1;
+    agents.grid = [];
+    agents.info = {};
+	agents.agentsresponse;
+	var agents_page = getUrlParam('page');
+	if (agents_page) {
+		agents.filter.page = agents_page;
+	}
+	var agents_search = getUrlParam('search');
+	if (agents_search) {
+		agents.filter.search = agents_search;
+	}
+
+	ON('#agents', function(component){
+        agents.filter.max = component.max;
+        agents_refresh();
+    });
+
+	Delay_Search_WATCH('agents.filter.search', function(path, value) {
+		if (!agents.filter.search && !agents_search)
+            return;
+        if (NOTMODIFIED('agents.filter', agents.filter))
+            return;
+        redirectURL();
+    });
+
+	function agents_refresh() {
+		// agents
+		getAgents();
+	}
+
+	function getAgents() {
+		var urlParam = agents.filter.search ? 'search=' + agents.filter.search : '';
+		urlParam += agents.filter.page ? (urlParam ? '&' : '') + 'page=' + agents.filter.page : '';
+		urlParam += agents.filter.max ? (urlParam ? '&' : '') + 'max=' + agents.filter.max : '';
+		var url = '/api/agents' + (urlParam ? '?' + urlParam : '');
+		$.components.GET(managerurl + url, null, function(response) {
+			var key = 'agents.grid';
+			if (response && response.code && response.code==1000) {
+				agents.grid = response.agents;
+				agents.info.count = response.count;
+            	agents.info.pages = response.pageCount;
+            	agents.info.page = response.page;
+				SET(key, agents.grid);
+				if (agents.info.pages && agents.info.count) {
+					Pagination(agents.info.count, agents.info.count/agents.info.pages, agents.info.page?agents.info.page:null);
+				}
+				UPDATE('agents.info');
+			} else {
+				if (response.error || response.message) {
+					key = 'agents.agentsresponse';
+					if (response.message) {
+						response = [{error: response.message}];
+					} else {
+						response = response.error;
+					}
+				} else {
+					response = [];
+				}
+				SET(key, response);
+			}
+		});
+	}
+
+	function Pagination(count, pageCount, currentPage) {
+		$('div.agents-pages').pagination({
+	        items: count,
+	        itemsOnPage: pageCount,
+	        currentPage: currentPage?currentPage:0,
+			prevText: '<',
+			nextText: '>',
+	        cssStyle: 'light-theme',
+	        onPageClick: function(pageNumber, event) {
+	        	redirectURL(pageNumber);
+	        }
+	    });
+	}
+
+	function redirectURL(page) {
+		var urlParam = (agents.filter.search ? 'search=' + agents.filter.search : '') + (page ? '&page='+page : '');
+    	window.location.href = managerurl + "/agents" + (urlParam ? '?' + urlParam : '');
+	}
+
+</script>

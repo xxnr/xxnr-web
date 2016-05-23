@@ -213,6 +213,26 @@ jRouting.route(managerurl + '/rsc/rsc-order', function(){
 	redirectToHomePage();
 });
 
+jRouting.route(managerurl + '/agents', function(){
+	if(can('agents')) {
+		navClass('agents');
+		SET('common.page', 'agents');
+		return;
+	}
+
+	redirectToHomePage();
+});
+
+jRouting.route(managerurl + '/agents/agents-detail', function(){
+	if(can('agents')) {
+		navClass('agents');
+		SET('common.page', 'agents-detail');
+		return;
+	}
+
+	redirectToHomePage();
+});
+
 // jRouting.on('location', function(url) {
 // 	// var nav = $('nav');
 // 	// nav.find('.selected').removeClass('selected');
