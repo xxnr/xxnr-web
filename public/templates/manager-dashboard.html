@@ -1,175 +1,208 @@
+<link rel="stylesheet" href="/css/pikaday.css"/>
+<script type="text/javascript" async src="/js/pikaday.js"></script>
+<script type="text/javascript" async src="/js/echarts.common.min.js"></script>
 <div class="filter" style="padding-bottom:9px">
 	<div class="container">
-		<div class="caption"><span class="fa fa-dashboard mr5"></span> @(Dashboard)</div>
+		<div class="caption"><span class="fa fa-dashboard mr5"></span> Dashboard</div>
 	</div>
 </div>
 
-<div class="container">
-	<div class="row">
-		<div class="col-md-12">
-			<h2 class="ui-center">@(Today statistics)</h2>
-		</div>
-	</div>
-	<div class="row">
-		<div class="col-md-4 m">
-			<div data-component="template" data-component-path="dashboard.data">
-				<script type="text/html">
-					<br />
-					<table class="table">
-						<tr>
-							<td class="b">@(Today orders)</td>
-							<td class="col-xs-3 ui-right">{{ if webcounter.today.orders }}{{ webcounter.today.orders | format(0) }}{{ else }}0{{ fi }}x</td>
-						</tr>
-						<tr>
-							<td>@(Hits)</td>
-							<td class="col-xs-3 ui-right">{{ webcounter.today.hits | format(0) }}x</td>
-						</tr>
-						<tr>
-							<td>@(Visitors)</td>
-							<td class="col-xs-3 ui-right">{{ webcounter.today.visitors | format(0) }}x</td>
-						</tr>
-						<tr>
-							<td>@(Unique visitors)</td>
-							<td class="col-xs-3 ui-right">{{ webcounter.today.unique | format(0) }}x</td>
-						</tr>
-						<tr>
-							<td>@(Visited pages per user)</td>
-							<td class="col-xs-3 ui-right">{{ webcounter.today.pages | format(0) }}x</td>
-						</tr>
-					</table>
-				</script>
-			</div>
-			<div data-component="template" data-component-path="dashboard.online">
-				<script type="text/html">
-					<div class="fs11 silver ui-center">@(Memory usage) <b>{{ memoryused | format(2) }}</b> @(from) <b>{{ memorytotal | format(2) }} MB</b></div>
-				</script>
-			</div>
-		</div>
-		<div class="col-md-4 m">
-			<hr />
-			<div class="fs11 silver ui-center">@(Online visitors)</div>
-			<div class="dashboard-online-counter">
-				<div data-component="template" data-component-path="dashboard.online">
-					<script type="text/html">
-						<span>{{ visitors }}</span>
-						<div class="ui-center">@(Last visitor:) <b>{{ if last }}{{ last | format('@(yyyy-MM-dd HH:mm)') }}{{ else }}............{{ fi }}</b></div>
-					</script>
-				</div>
-				<br />
-				<canvas id="dashboard-online"></canvas>
-			</div>
-		</div>
-		<div class="col-md-4 m">
-			<div data-component="template" data-component-path="dashboard.online">
-				<script type="text/html">
-					<br />
-					<table class="table">
-						<tr>
-							<td style="border-left:5px solid #61E727">@(Organic search)</td>
-							<td class="col-xs-3 ui-right">{{ today.search | format(0) }}x</td>
-						</tr>
-						<tr>
-							<td style="border-left:5px solid #479AD0">@(Social networks)</td>
-							<td class="col-xs-3 ui-right">{{ today.social | format(0) }}x</td>
-						</tr>
-						<tr>
-							<td style="border-left:5px solid #E22926">@(Direct visitors)</td>
-							<td class="col-xs-3 ui-right">{{ today.direct | format(0) }}x</td>
-						</tr>
-						<tr>
-							<td style="border-left:5px solid #FFEE32">@(Visitors from adverts)</td>
-							<td class="col-xs-3 ui-right">{{ today.advert | format(0) }}x</td>
-						</tr>
-						<tr>
-							<td style="border-left:5px solid #585858">@(Unknown visitors)</td>
-							<td class="col-xs-3 ui-right">{{ today.unknown | format(0) }}x</td>
-						</tr>
-					</table>
-				</script>
-			</div>
-		</div>
-	</div>
-</div>
-
-<br />
-<div class="bg-smoke">
-	<br />
-	<div class="container" data-component="template" data-component-path="dashboard.data.Order">
-		<script type="text/html">
-			<div class="row">
-				<div class="col-md-3 m red">
-					<div class="b">@(Pending orders)</div>
-					<div>{{ pending }}x</div>
-					<hr class="nmb" />
-				</div>
-				<div class="col-md-3 m">
-					<div class="b">@(Completed orders)</div>
-					<div>{{ completed }}x</div>
-					<hr class="nmb" />
-				</div>
-				<div class="col-md-3 m red">
-					<div class="b">@(Pending money)</div>
-					<div>{{ pending_price | price(2) }}</div>
-					<hr class="nmb" />
-				</div>
-				<div class="col-md-3 m">
-					<div class="b">@(Earned money)</div>
-					<div>{{ completed_price | price(2) }}</div>
-					<hr class="nmb" />
-				</div>
-			</div>
-		</script>
-	</div>
-</div>
-<br />
-
-<div class="container">
-	<br />
-	<div class="ui-center b">@(Desktop devices vs. Mobile devices)</div>
-	<br />
-	<div class="dashboard-devices">
-		<div class="dashboard-devices-desktop"><span class="fa fa-desktop"></span>@(Desktop)</div>
-		<div class="dashboard-devices-mobile">@(Mobile)<span class="fa fa-tablet"></span></div>
-		<div class="dashboard-devices-stats"></div>
-	</div>
-</div>
-
-<br />
-<div class="container">
-	<br />
-	<div class="row">
-		<div class="col-md-6 m">
-			<div class="ui-center b">@(Yearly stats of orders)</div>
-			<canvas id="dashboard-monthly-orders" height="200"></canvas>
-		</div>
-		<div class="col-md-1"></div>
-		<div class="col-md-5 m">
-			<div class="ui-center b">@(Yearly stats of views)</div>
-			<canvas id="dashboard-monthly-hits" height="200"></canvas>
-		</div>
-	</div>
-	<br />
-</div>
-<br />
-
-<div class="bg-smoke">
-	<div class="container">
-		<br />
+<div class="container dashboard">
+	<div class="filter col-md-2" style="padding: 25px 15px;">
+		<h3 class="ui-left">经营数据</h3>
+        <ul class="dashboard-sidebar">
+            <li class="selected">- 每日概况</li>
+            <li name="weekly">- 每周业绩</li>
+            <li class="cl"></li>
+        </ul>
+        <br />
+        <h3 class="ui-left">经纪人数据</h3>
+        <ul class="dashboard-sidebar">
+            <li name="agentRank">- 业绩排行</li>
+            <li class="cl"></li>
+        </ul>
+    </div>
+    <div class="col-md-10">
+	<div class="mb50">
 		<div class="row">
 			<div class="col-md-12">
-				<h2 class="ui-center">@(Yearly stats <b>Visitors vs. Unique Visitors</b>)</h2>
+				<h3 class="ui-left">今日实时</h3>
 			</div>
 		</div>
 		<div class="row">
-			<div class="col-md-12 m">
-				<div class="legend">
-					<label><span class="fa fa-square" style="color:#FFCE54"></span><span>@(Visitors)</span></label>
-					<label><span class="fa fa-square" style="color:#FC6E51"></span><span>@(Unique Visitors)</span></label>
+			<div class="col-md-12">
+				<div data-component="template" data-component-path="dashboard">
+					<script type="text/html">
+					{{ if today }}
+						<p>更新时间：{{ today.lastUpdateTime | format('yyyy-MM-dd HH:mm:ss') }}</p>
+						<div class="box">
+							<div class="col-md-3">
+								<div class="mb10">注册用户数</div>
+								<div class="num">{{ today.registeredUserCount | format(0) }}</div>
+							</div>
+							<div class="col-md-3">
+								<div class="mb10">订单数</div>
+								<div class="num">{{ today.orderCount | format(0) }}</div>
+							</div>
+							<div class="col-md-3">
+								<div class="mb10">付款订单数</div>
+								<div class="num">{{ today.paidOrderCount | format(0) }}</div>
+							</div>
+							<div class="col-md-3">
+								<div class="mb10">已支付金额（元）</div>
+								<div class="num">{{ today.paidAmount | price(2) }}</div>
+							</div>
+							<div class="cl"></div>
+						</div>
+						
+					{{ fi }}
+					</script>
 				</div>
-				<canvas id="dashboard-monthly-visitors" height="350"></canvas>
+				<div data-component="error" data-component-path="dashboard.todayresponse"></div>
 			</div>
 		</div>
-		<br />
+	</div>
+
+	<div class="mb50">
+		<div class="row">
+			<div class="col-md-12">
+				<h3 class="ui-left">昨日统计</h3>
+			</div>
+		</div>
+		<div class="row m">
+			<div class="col-md-12">
+				<div data-component="template" data-component-path="dashboard">
+					<script type="text/html">
+					{{ if yesterday }}
+						<p>昨日数据（{{ yesterday.date }}）</p>
+						<div class="box">
+							<div class="col-md-3">
+								<div class="mb10">注册用户数</div>
+								<div class="num">{{ yesterday.registeredUserCount | format(0) }}</div>
+							</div>
+							<div class="col-md-3">
+								<div class="mb10">订单数</div>
+								<div class="num">{{ yesterday.orderCount | format(0) }}</div>
+							</div>
+							<div class="col-md-3">
+								<div class="mb10">付款订单数</div>
+								<div class="num">{{ yesterday.paidOrderCount | format(0) }}</div>
+							</div>
+							<div class="col-md-3">
+								<div class="mb10">已支付金额（元）</div>
+								<div class="num">{{ yesterday.paidAmount | price(2) }}</div>
+							</div>
+							<div class="cl"></div>
+						</div>
+						
+					{{ fi }}
+					</script>
+				</div>
+				<div data-component="error" data-component-path="dashboard.yesterdayresponse"></div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-12">
+				<div data-component="template" data-component-path="dashboard">
+					<script type="text/html">
+					{{ if statistic }}
+						<p>累计数据（{{ statistic.serviceStartTime }} ~ {{ statistic.EndTime }}）</p>
+						<div class="box">
+							<div class="col-md-3">
+								<div class="mb10">总用户数</div>
+								<div class="num">{{ statistic.registeredUserCount | format(0) }}</div>
+							</div>
+							<div class="col-md-3">
+								<div class="mb10">总订单数</div>
+								<div class="num">{{ statistic.orderCount | format(0) }}</div>
+							</div>
+							<div class="col-md-3">
+								<div class="mb10">已完成订单数</div>
+								<div class="num">{{ statistic.completedOrderCount | format(0) }}</div>
+							</div>
+							<div class="col-md-3">
+								<div class="mb10">已支付金额（元）</div>
+								<div class="num">{{ statistic.paidAmount | price(2) }}</div>
+							</div>
+							<div class="cl"></div>
+						</div>
+						
+					{{ fi }}
+					</script>
+				</div>
+				<div data-component="error" data-component-path="dashboard.yesterdayresponse"></div>
+			</div>
+		</div>
+	</div>
+
+	<div class="mb50">
+		<div class="row m">
+			<div class="col-md-12">
+				<h3 class="ui-left">业务趋势</h3>
+			</div>
+			<div class="col-md-12 m">
+				<div class="quick-view dates-select">
+					<span>筛选日期：</span>
+					<input type="text" id="dailiesStartDate">
+					<span>至</span>
+					<input type="text" id="dailiesEndDate">
+					<button data-name="datesselect">确定</button>
+				</div>
+			</div>
+			<div class="col-md-12">
+				<div class="quick-view">
+					<span>快速查看：</span>
+					<div class="selected" data-name="last7days">最近7天</div>
+					<div data-name="last30days">最近30天</div>
+				</div>
+			</div>
+		</div>
+		<div class="row m">
+			<div class="col-md-12 m">
+				<div class="chart-buttons">
+					<span>数据指标：</span>
+					<div class="selected" data-name="users">用户数</div>
+					<div data-name="orders">订单数</div>
+					<div data-name="paidAmount">已付金额</div>
+				</div>
+			</div>
+			<div class="col-md-12" id="chart" style="height:400px;"></div>
+		</div>
+		<div class="row m">
+			<div class="col-md-12">
+				<div data-component="template" data-component-path="dashboard" class="ui-grid">
+					<script type="text/html">
+					{{ if dailies && dailies.length > 0 }}
+						<p>数据报表</p>
+						<table class="table" width="100%" cellpadding="0" cellspacing="0" border="0" style="font-size:14px;">
+							<tbody>
+								<tr>
+									<td style="width:40px" class="silver hidden-xs ui-center active">序号</td>
+							    	<td style="width:60px" class="silver hidden-xs ui-center active">日期</td>
+							    	<td style="width:60px" class="silver hidden-xs ui-center active">注册用户数</td>
+							    	<td style="width:60px" class="silver hidden-xs ui-center active">订单数</td>
+							    	<td style="width:60px" class="silver hidden-xs ui-center active">付款订单数</td>
+							    	<td style="width:90px" class="silver hidden-xs ui-right active">已支付金额（元）</td>
+							    </tr>
+							    {{ foreach daily in dailies }}
+							    	<tr>
+										<td style="width:40px" class="silver hidden-xs ui-center">{{ $index + 1 }}</td>
+								    	<td style="width:60px" class="silver hidden-xs ui-center">{{ daily.day }}</td>
+								    	<td style="width:60px" class="silver hidden-xs ui-center">{{ daily.registeredUserCount | format(0) }}</td>
+								    	<td style="width:60px" class="silver hidden-xs ui-center">{{ daily.orderCount | format(0) }}</td>
+								    	<td style="width:60px" class="silver hidden-xs ui-center">{{ daily.paidOrderCount | format(0) }}</td>
+								    	<td style="width:90px" class="silver hidden-xs ui-right">{{ daily.paidAmount | price(2) }}</td>
+								    </tr>
+								{{ end }}
+							</tbody>
+						</table>
+					{{ fi }}
+					</script>
+				</div>
+				
+				<div data-component="error" data-component-path="dashboard.dailiesresponse"></div>
+			</div>
+		</div>
 	</div>
 </div>
 
@@ -181,96 +214,356 @@
 	dashboard.online = {};
 	dashboard.cache = {};
 
+
+	dashboard.today;
+	dashboard.todayresponse;
+	dashboard.yesterday;
+	dashboard.yesterdayresponse;
+	dashboard.statistic;
+	dashboard.statisticresponse;
+	dashboard.dailies = [];
+	dashboard.dailiesresponse;
+	dashboard.dailiesSelected;
+	dashboard.dailiesChartSelected;
+	dashboard.dailiesChart = {'users':{'legend':['用户数'],'yAxis':'数量','dataKey':['registeredUserCount']},'orders':{'legend':['下单订单数', '已付款订单数'],'yAxis':'数量','dataKey':['orderCount', 'paidOrderCount']},'paidAmount':{'legend':['已付金额'],'yAxis':'销量','dataKey':['paidAmount']}};
+	dashboard.dailiesChartDatas;
+	dashboard.dailiesStartDate;
+	dashboard.dailiesEndDate;
+	dashboard.dailiesUpdateDate;
+	var dailiesstartpicker, dailiesendpicker;
+
 	function dashboard_refresh() {
-		$.components.GET(managerurl + '/api/dashboard/', null, function(response) {
-
-			SET('dashboard.data', response);
-
-			if (dashboard.cache.processed)
-				return;
-
-			dashboard.cache.processed = true;
-
-			var data = [];
-			data.push(dashboard_charts_pie_item(response.webcounter.today.search, 'Organic search', '#61E727'));
-			data.push(dashboard_charts_pie_item(response.webcounter.today.social, 'Social networks', '#479AD0'));
-			data.push(dashboard_charts_pie_item(response.webcounter.today.direct, 'Direct', '#E22926'));
-			data.push(dashboard_charts_pie_item(response.webcounter.today.advert, 'Advert', '#FFEE32'));
-			data.push(dashboard_charts_pie_item(response.webcounter.today.unknown, 'Other', '#585858'));
-			dashboard.cache.online = new Chart($('#dashboard-online').get(0).getContext('2d'));
-			dashboard.cache.online.Doughnut(data, { responsive: true });
-
-			var year = (new Date()).getFullYear();
-
-			data = {};
-			data.labels = months;
-			data.datasets = [{ fillColor: '#FFCE54', data: dashboard_charts_bar_items(response.webcounter.stats, 'count', year) }, { fillColor: '#FC6E51', data: dashboard_charts_bar_items(response.webcounter.stats, 'unique', year) }];
-			dashboard.cache.visitors = new Chart($('#dashboard-monthly-visitors').get(0).getContext('2d'));
-			dashboard.cache.visitors.Bar(data, { responsive: true, maintainAspectRatio: false, animation: true, scaleGridLineColor: '#E6E9ED', barShowStroke: false });
-
-			data = {};
-			data.labels = months;
-			data.datasets = [{ fillColor: '#48CFAD', data: dashboard_charts_bar_items(response.webcounter.stats, 'orders', year) }];
-			dashboard.cache.orders = new Chart($('#dashboard-monthly-orders').get(0).getContext('2d'));
-			dashboard.cache.orders.Bar(data, { responsive: true, maintainAspectRatio: false, animation: true, scaleGridLineColor: '#E6E9ED', barShowStroke: false, barValueSpacing: 2 });
-
-			data = {};
-			data.labels = months;
-			data.datasets = [{ fillColor: '#AC92EC', data: dashboard_charts_bar_items(response.webcounter.stats, 'hits', year) }];
-			dashboard.cache.hits = new Chart($('#dashboard-monthly-hits').get(0).getContext('2d'));
-			dashboard.cache.hits.Bar(data, { responsive: true, maintainAspectRatio: false, animation: true, scaleGridLineColor: '#E6E9ED', barShowStroke: false, barValueSpacing: 2 });
-
-			var stats_mobile = 0;
-			var stats_desktop = 0;
-
-			Object.keys(response.webcounter.stats).forEach(function(key) {
-				var stats = response.webcounter.stats[key];
-				stats_mobile += stats.mobile;
-				stats_desktop += stats.desktop;
-			});
-
-			setTimeout(function() {
-				$('.dashboard-devices-stats').animate({ width: (stats_desktop / ((stats_desktop + stats_mobile) / 100) >> 0) + '%' }, 1000);
-			}, 1500);
+		dashboardInit();
+		// today
+		$.components.GET(managerurl + '/api/dashboard/getDailyReport', null, function(response) {
+			var key = 'dashboard.today';
+			if (response && response.code && response.code==1000) {
+				response = response;
+			} else {
+				if (response.error || response.message) {
+					key = 'dashboard.todayresponse';
+					if (response.message) {
+						response = [{error: response.message}];
+					} else {
+						response = response.error;
+					}
+				} else {
+					response = {};
+				}
+			}
+			SET(key, response);
 		});
-	}
+		// yesterday
+		var yesterday = moment().add(-1, 'days').format('YYYY-MM-DD');
+		$.components.GET(managerurl + '/api/dashboard/getDailyReport?date='+yesterday, null, function(response) {
+			var key = 'dashboard.yesterday';
+			if (response && response.code && response.code==1000) {
+				response = response;
+				response.date = yesterday;
+			} else {
+				if (response.error || response.message) {
+					key = 'dashboard.yesterdayresponse';
+					if (response.message) {
+						response = [{error: response.message}];
+					} else {
+						response = response.error;
+					}
+				} else {
+					response = {};
+				}
+			}
+			SET(key, response);
+		});
+		// statistic
+		$.components.GET(managerurl + '/api/dashboard/lastUpdateTime', null, function(response) {
+			var key = 'dashboard.statistic';
+			if (response && response.code && response.code==1000) {
+				var startTime, endTime;
+				response = response;
+				if (response && response.lastUpdateTime && response.lastUpdateTime.hourly) {
+					endTime = response.lastUpdateTime.hourly;
+					dashboard.dailiesUpdateDate = endTime?moment(endTime).format('YYYY-MM-DD'):moment().format('YYYY-MM-DD');
+				}
+				if (response && response.serviceStartTime) {
+					startTime = response.serviceStartTime;
+				}
+				
+				$.components.GET(managerurl + '/api/dashboard/getStatistic', null, function(response) {
+					if (response && response.code && response.code==1000) {
+						response = response;
+						if (endTime) {
+							var date = moment(endTime).add(-1, 'days').format('YYYY-MM-DD');
+							if (date == yesterday) {
+								response.EndTime = date;
+							} else {
+								response.EndTime = moment(endTime).format('YYYY-MM-DD');
+							}
+						}
+						
+					} else {
+						if (response.error || response.message) {
+							key = 'dashboard.statisticresponse';
+							if (response.message) {
+								response = [{error: response.message}];
+							} else {
+								response = response.error;
+							}
+						} else {
+							response = {};
+						}
+						SET(responsekey, response);
+					}
+					SET(key, response);
+				});
 
-	// Helper method for generating pie chart
-	function dashboard_charts_pie_item(value, label, color) {
-		return { value: value, label: label, color: color };
-	}
+				// dailies
+				var dateStart = moment().add(-6, 'days').format('YYYY-MM-DD');
+				var dateEnd = moment().format('YYYY-MM-DD');
+				dateEnd = dashboard.dailiesUpdateDate && dashboard.dailiesUpdateDate < dateEnd ? dashboard.dailiesUpdateDate : dateEnd;
+				datePickers_init(startTime?startTime:null, endTime?endTime:moment().format('YYYY-MM-DD'), dateStart, dateEnd);
+				getDailies('last7days', dateStart, dateEnd);
+			} else {
+				if (response.error || response.message) {
+					key = 'dashboard.statisticresponse';
+					if (response.message) {
+						response = [{error: response.message}];
+					} else {
+						response = response.error;
+					}
+					SET(key, response);
+				} else {
+					response = {};
+				}
+				SET(key, response);
+			}
+		});
+		// // dailies
+		// var dateStart = moment().add(-6, 'days').format('YYYY-MM-DD');
+		// var dateEnd = moment().format('YYYY-MM-DD');
+		// getDailies('last7days', dateStart, dateEnd);
+		$('.quick-view div').off('click').on('click', function() {
+			var el = $(this);
+			var dataName = el.attr('data-name');
+			if (dataName && dataName !== dashboard.dailiesSelected) {
+				switch (dataName) {
+					case 'last7days':
+						var dateStart = moment().add(-6, 'days').format('YYYY-MM-DD');
+						var dateEnd = moment().format('YYYY-MM-DD');
+						getDailies(dataName, dateStart, dateEnd);
+						break;
+					case 'last30days':
+						var dateStart = moment().add(-30, 'days').format('YYYY-MM-DD');
+						var dateEnd = moment().format('YYYY-MM-DD');
+						getDailies(dataName, dateStart, dateEnd);
+						break;
+					default:
+						dashboard.dailiesSelected = 'others';
+						break;
+				}
+				$(".quick-view").find('.selected').removeClass('selected');
+				el.addClass('selected');
+			}
+        });
 
-	// Helper method for generating bar chart
-	function dashboard_charts_bar_items(obj, name, year) {
-		var stats = [];
+        $('.quick-view button').off('click').on('click', function() {
+        	var el = $(this);
+			var dataName = el.attr('data-name');
+			switch (dataName) {
+				case 'datesselect':
+					var dateStart = $('#dailiesStartDate').val();
+					var dateEnd = $('#dailiesEndDate').val();
+					if (dateStart && dateEnd && dateEnd >= dateStart) {
+						if (dashboard.dailiesStartDate != dateStart || dashboard.dailiesEndDate != dateEnd) {
+							getDailies(dataName, dateStart, dateEnd);
+						}
+					} else {
+						alert('请选择正确的时间段');
+					}
+					break;
+				default:
+					dashboard.dailiesSelected = 'others';
+					break;
+			}
+			$(".quick-view").find('.selected').removeClass('selected');
+			el.addClass('selected');
+		});
 
-		for (var i = 0; i < 12; i++) {
-			var value = obj[(i + 1) + '-' + year];
+		$('.dates-select input').off('click').on('click', function() {
+			$(".dates-select").find('.selected').removeClass('selected');
+		});
+    
+        $('.chart-buttons div').off('click').on('click', function() {
+			var el = $(this);
+			var dataName = el.attr('data-name');
+			if (dataName && dataName !== dashboard.dailiesChartSelected) {
+				switch (dataName) {
+					case 'users':
+					case 'orders':
+					case 'paidAmount':
+						dashboard_charts(dataName, el);
+						break;
+				}
+			}
+        });
+    }
 
-			if (!value || !value[name])
-				stats[i] = 0;
-			else
-				stats[i] = value[name];
+	function getDailies(nameSelected, dateStart, dateEnd) {
+		dashboard.dailiesSelected = nameSelected;
+		dashboard.dailiesStartDate = dateStart;
+		dashboard.dailiesEndDate = dateEnd;
+		if (dailiesstartpicker) {
+			dailiesstartpicker.setMoment(moment(dateStart));
 		}
-		return stats;
-	}
-
-	// Refresh online users
-	setInterval(function() {
-		// Refresh only when is the dashboard shown
-		if (jRouting.url === managerurl + '/')
-			dashboard_refresh_online();
-	}, 5000);
-
-	function dashboard_refresh_online() {
-		$.components.GET(managerurl + '/api/dashboard/online/', null, function(response) {
-			if (NOTMODIFIED('dashboard.online', response))
-				return;
-			SET('dashboard.online', response);
+		if (dailiesendpicker) {
+			dailiesendpicker.setMoment(moment(dateEnd));
+		}
+		$.components.GET(managerurl + '/api/dashboard/queryDailyReport?dateStart='+dateStart+'&dateEnd='+dateEnd, null, function(response) {
+			var errorkey = 'dashboard.dailiesresponse';
+			var errorresponse = [];
+			SET(errorkey, errorresponse);
+			var key = 'dashboard.dailies';
+			if (response && response.code && response.code==1000) {
+				var resultDatas = fixDailyDatas(response.dailyReports);
+				response = response.dailyReports;
+				dashboard.dailies = response;
+				if (resultDatas && resultDatas.dailiesChartDatas) {
+					dashboard.dailiesChartDatas = resultDatas.dailiesChartDatas;
+				}
+		        dashboard_charts('users', $('.chart-buttons').children('div:first'));
+			} else {
+				if (response.error || response.message) {
+					key = 'dashboard.dailiesresponse';
+					if (response.message) {
+						response = [{error: response.message}];
+					} else {
+						response = response.error;
+					}
+				} else {
+					response = {};
+				}
+			}
+			SET(key, response);
 		});
 	}
 
-	dashboard_refresh_online();
+	function fixDailyDatas(dailyReports) {
+		var result = {dailiesChartDatas:{}};
+		if (dailyReports) {
+			var today =  moment().format('YYYY-MM-DD');
+			var len = dailyReports.length;
+			var xAxis = [];
+			var series = {};
+
+			var chartKeys = Object.keys(dashboard.dailiesChart);
+			var seriesDatas = {};
+            while (len--) {
+            	var date = dailyReports[len]['day'];
+            	
+            	// chartKey xAxis
+                xAxis.push(date ? date : date);
+
+        		// chartKey series
+        		for (var i=0; i < chartKeys.length; i++) {
+					var chartKey = chartKeys[i];
+					if (!seriesDatas[chartKey]) {
+						seriesDatas[chartKey] = {};
+					}
+					var defaultOptions = dashboard.dailiesChart[chartKey]?dashboard.dailiesChart[chartKey]:null;
+					var dataKey = defaultOptions && defaultOptions['dataKey']?defaultOptions['dataKey']:[];
+					series[chartKey] = [];
+					for (var j=0; j < dataKey.length; j++) {
+						if (!seriesDatas[chartKey][dataKey[j]]) {
+			        		seriesDatas[chartKey][dataKey[j]] = {
+			        			name:defaultOptions && defaultOptions['legend'] && defaultOptions['legend'].length > j ? defaultOptions['legend'][j] : '',
+			        			type:'bar',
+			        			data: []
+			        		};
+			        	}
+			        	var value = dailyReports[len][dataKey[j]];
+			        	if (value && chartKey == 'paidAmount') {
+			        		value = parseFloat(parseInt(parseFloat(value)*100)/100);
+			        	}
+			        	seriesDatas[chartKey][dataKey[j]].data.push(value?parseFloat(value):0);
+			        	series[chartKey].push(seriesDatas[chartKey][dataKey[j]]);
+		        	}
+		        }
+            }
+            result.dailiesChartDatas = {xAxis:xAxis, series:series};
+		}
+		return result;
+	}
+
+	function dashboard_charts(chartKey, button) {
+		if (button) {
+			$(".chart-buttons").find('.selected').removeClass('selected');
+			button.addClass('selected');
+		}
+		dashboard.dailiesChartSelected = chartKey;
+		var defaultOptions = dashboard.dailiesChart[chartKey]?dashboard.dailiesChart[chartKey]:null;
+		if (dashboard.dailiesChartDatas) {
+			var domChart = document.getElementById('chart');
+			var myChart = echarts.init(domChart);
+
+			// 指定图表的配置项和数据
+			var option = {
+	            title: {},
+	            tooltip: {},
+	            legend: {
+	                data: defaultOptions && defaultOptions['legend'] ? defaultOptions['legend'] : []
+	            },
+	            xAxis: {
+	                data: dashboard.dailiesChartDatas['xAxis'] ? dashboard.dailiesChartDatas['xAxis'] : []
+	            },
+	            yAxis: {
+	            	name: defaultOptions && defaultOptions['yAxis'] ? defaultOptions['yAxis'] : ''
+	            },
+	            series: dashboard.dailiesChartDatas['series'] && dashboard.dailiesChartDatas['series'][chartKey] ? dashboard.dailiesChartDatas['series'][chartKey] : [],
+	            color: ['#C1222A', '#B5C334', '#FDCF10', '#E97C24']
+	        };
+
+	        // 使用刚指定的配置项和数据显示图表。
+	        myChart.setOption(option);
+	    }
+	}
+
+	function datePickers_init(minDate, maxDate, defaultStartDate, defaultEndDate) {
+		// start date
+		dailiesstartpicker = datePicker_init('dailiesStartDate', minDate, maxDate, defaultStartDate);
+		// end date
+		dailiesendpicker = datePicker_init('dailiesEndDate', minDate, maxDate, defaultEndDate);
+	}
+
+	function datePicker_init(pickerId, minDate, maxDate, defaultDate) {
+		var options = {
+			field: $('#'+pickerId)[0],
+			yearRange: [2000,2020],
+			i18n: i18n,
+			bound: true,
+			format: 'YYYY-MM-DD',
+			onSelect: function() {
+			    $('#'+pickerId).val(this.getMoment().format('YYYY-MM-DD'));
+			    var d = this.getMoment().format('YYYY-MM-DD');
+			    $(".dates-select").find('.selected').removeClass('selected');
+			}
+		}
+		if (minDate) {
+			options.minDate = new Date(minDate);
+		}
+		if (maxDate) {
+			options.maxDate = new Date(maxDate);
+		}
+		if (defaultDate) {
+			options.defaultDate = new Date(defaultDate);
+			options.setDefaultDate = true;
+		} 
+		var startpicker = new Pikaday(options);
+
+		if (!defaultDate) {
+			startpicker.setMoment(moment().dayOfYear(366));
+		}
+		return startpicker;
+	}
+
 	dashboard_refresh();
 
 </script>

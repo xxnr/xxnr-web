@@ -1,5 +1,13 @@
 var common = {};
 var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+// pikaday Localize
+var i18n = {
+  previousMonth   : '上个月',
+  nextMonth       : '下个月',
+  months          : ['一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月'],
+  weekdays        : ['周日','周一','周二','周三','周四','周五','周六'],
+  weekdaysShort   : ['日','一','二','三','四','五','六']
+};
 
 // Current page
 common.page = '';
@@ -27,6 +35,7 @@ var redirectToHomePage = function(){
 jRouting.route(managerurl + '/', function() {
 
 	if (can('dashboard')) {
+		navClass('dashboard');
 		SET('common.page', 'dashboard');
 		return;
 	}
@@ -34,9 +43,30 @@ jRouting.route(managerurl + '/', function() {
     redirectToHomePage();
 });
 
+jRouting.route(managerurl + '/dashboard/weekly/', function(){
+	if(can('dashboard')) {
+		navClass('dashboard');
+		SET('common.page', 'dashboard-weekly');
+		return;
+	}
+
+	redirectToHomePage();
+});
+
+jRouting.route(managerurl + '/dashboard/agent-rank/', function(){
+	if(can('dashboard')) {
+		navClass('dashboard');
+		SET('common.page', 'dashboard-agentRank');
+		return;
+	}
+
+	redirectToHomePage();
+});
+
 jRouting.route(managerurl + '/orders/', function() {
 
     if (can('orders')) {
+    	navClass('orders');
         SET('common.page', 'orders');
         return;
     }
@@ -47,6 +77,7 @@ jRouting.route(managerurl + '/orders/', function() {
 jRouting.route(managerurl + '/orders/detail', function() {
 
 	if (can('orders')) {
+		navClass('orders');
 		SET('common.page', 'order-detail');
 		return;
 	}
@@ -57,6 +88,7 @@ jRouting.route(managerurl + '/orders/detail', function() {
 jRouting.route(managerurl + '/products/', function() {
 
     if (can('products')) {
+		navClass('products');
         SET('common.page', 'products');
         return;
     }
@@ -66,6 +98,7 @@ jRouting.route(managerurl + '/products/', function() {
 
 jRouting.route(managerurl + '/users/', function() {
 	if (can('users')) {
+		navClass('users');
 		SET('common.page', 'users');
 		return;
 	}
@@ -75,6 +108,7 @@ jRouting.route(managerurl + '/users/', function() {
 
 jRouting.route(managerurl + '/potentialcustomers/', function() {
 	if (can('users')) {
+		navClass('users');
 		SET('common.page', 'potentialcustomers');
 		return;
 	}
@@ -84,6 +118,7 @@ jRouting.route(managerurl + '/potentialcustomers/', function() {
 
 jRouting.route(managerurl + '/news/', function() {
     if (can('news')) {
+		navClass('news');
         SET('common.page', 'news');
         return;
     }
@@ -93,6 +128,7 @@ jRouting.route(managerurl + '/news/', function() {
 
 jRouting.route(managerurl + '/payrefunds/', function() {
     if (can('payrefunds')) {
+		navClass('payrefunds');
         SET('common.page', 'payrefunds');
         return;
     }
@@ -102,6 +138,7 @@ jRouting.route(managerurl + '/payrefunds/', function() {
 
 jRouting.route(managerurl + '/auditlogs/', function() {
     if (can('auditlogs')) {
+		navClass('auditlogs');
         SET('common.page', 'auditlogs');
         return;
     }
@@ -120,6 +157,7 @@ jRouting.route(managerurl + '/newsletter/', function() {
 
 jRouting.route(managerurl + '/settings/', function() {
     if (can('settings')) {
+		navClass('settings');
         SET('common.page', 'settings');
         return;
     }
@@ -147,6 +185,7 @@ jRouting.route(managerurl + '/system/', function() {
 
 jRouting.route(managerurl + '/rsc/', function(){
 	if(can('rsc')) {
+		navClass('rsc');
 		SET('common.page', 'rsc');
 		return;
 	}
@@ -156,6 +195,7 @@ jRouting.route(managerurl + '/rsc/', function(){
 
 jRouting.route(managerurl + '/rsc/rsc-detail', function(){
 	if(can('rsc')) {
+		navClass('rsc');
 		SET('common.page', 'rsc-detail');
 		return;
 	}
@@ -165,6 +205,7 @@ jRouting.route(managerurl + '/rsc/rsc-detail', function(){
 
 jRouting.route(managerurl + '/rsc/rsc-order', function(){
 	if(can('rsc')) {
+		navClass('rsc');
 		SET('common.page', 'rsc-order');
 		return;
 	}
@@ -172,11 +213,37 @@ jRouting.route(managerurl + '/rsc/rsc-order', function(){
 	redirectToHomePage();
 });
 
-jRouting.on('location', function(url) {
+jRouting.route(managerurl + '/agents', function(){
+	if(can('agents')) {
+		navClass('agents');
+		SET('common.page', 'agents');
+		return;
+	}
+
+	redirectToHomePage();
+});
+
+jRouting.route(managerurl + '/agents/agents-detail', function(){
+	if(can('agents')) {
+		navClass('agents');
+		SET('common.page', 'agents-detail');
+		return;
+	}
+
+	redirectToHomePage();
+});
+
+// jRouting.on('location', function(url) {
+// 	// var nav = $('nav');
+// 	// nav.find('.selected').removeClass('selected');
+// 	// nav.find('a[href="' + url + '"]').addClass('selected');
+// });
+
+function navClass(role) {
 	var nav = $('nav');
 	nav.find('.selected').removeClass('selected');
-	nav.find('a[href="' + url + '"]').addClass('selected');
-});
+	nav.find('a[data-role="'+role+'"]').addClass('selected');
+}
 
 function loading(v, timeout) {
 	setTimeout(function() {
@@ -319,3 +386,26 @@ var app = angular.module('xxnr.manager',['ngCookies'])
 app.controller('ProductController', function($scope){
 		$scope.show_product_edit = false;
 	});
+
+// dashboard init
+function dashboardInit() {
+	$(".dashboard-sidebar li").off('click').on('click', function() {
+    	var url;
+		var el = $(this);
+		var name = el.attr('name');
+		switch (name) {
+			case 'daily':
+				url = '/';
+				break;
+			case 'weekly':
+				url = '/dashboard/weekly/';
+				break;
+			case 'agentRank':
+				url = '/dashboard/agent-rank/';
+				break;
+		}
+		if (url) {
+        	window.location.href = managerurl + url;
+        }
+    });
+}

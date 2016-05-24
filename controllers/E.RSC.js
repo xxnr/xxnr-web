@@ -14,106 +14,105 @@ var DeliveryCodeService = services.deliveryCode;
 
 exports.install = function() {
     // RSC info related
-    F.route('/api/v2.2/RSC/info/get',                   json_RSC_info_get,          ['get'],    ['isLoggedIn']);
-    F.route('/api/v2.2/RSC/info/fill',                  process_RSC_info_fill,      ['post'],   ['isLoggedIn']);
+    //F.route('/api/v2.2/RSC/info/get',                   json_RSC_info_get,          ['get'],    ['isLoggedIn']);
+    //F.route('/api/v2.2/RSC/info/fill',                  process_RSC_info_fill,      ['post'],   ['isLoggedIn']);
 
     // RSC address query related
-    F.route('/api/v2.2/RSC/address/province',           json_RSC_address_province_query,     ['get'],    ['isLoggedIn']);
-    F.route('/api/v2.2/RSC/address/city',               json_RSC_address_city_query,     ['get'],    ['isLoggedIn']);
-    F.route('/api/v2.2/RSC/address/county',             json_RSC_address_county_query,     ['get'],    ['isLoggedIn']);
-    F.route('/api/v2.2/RSC/address/town',               json_RSC_address_town_query,     ['get'],    ['isLoggedIn']);
+    //F.route('/api/v2.2/RSC/address/province',           json_RSC_address_province_query,     ['get'],    ['isLoggedIn']);
+    //F.route('/api/v2.2/RSC/address/city',               json_RSC_address_city_query,     ['get'],    ['isLoggedIn']);
+    //F.route('/api/v2.2/RSC/address/county',             json_RSC_address_county_query,     ['get'],    ['isLoggedIn']);
+    //F.route('/api/v2.2/RSC/address/town',               json_RSC_address_town_query,     ['get'],    ['isLoggedIn']);
 
-    F.route('/api/v2.2/RSC',                            json_RSC_query,                 ['get'],     ['isLoggedIn']);
+    //F.route('/api/v2.2/RSC',                            json_RSC_query,                 ['get'],     ['isLoggedIn']);
 
     // RSC order related
-    F.route('/api/v2.2/RSC/orderDetail',                    json_RSC_order_detail,      ['get'],    ['isLoggedIn', 'isRSC']);
-    F.route('/api/v2.2/RSC/orders',                         json_RSC_orders_get,        ['get'],    ['isLoggedIn', 'isRSC']);
-    F.route('/api/v2.2/RSC/order/deliverStatus/delivering', process_RSC_order_deliverStatus_delivering, ['post'],    ['isLoggedIn', 'isRSC']);
-    F.route('/api/v2.2/RSC/order/selfDelivery',             process_self_delivery,        ['post'], ['isLoggedIn', 'isRSC', 'throttle']);
+    //F.route('/api/v2.2/RSC/orderDetail',                    json_RSC_order_detail,      ['get'],    ['isLoggedIn', 'isRSC']);
+    //F.route('/api/v2.2/RSC/orders',                         json_RSC_orders_get,        ['get'],    ['isLoggedIn', 'isRSC']);
+    //F.route('/api/v2.2/RSC/order/deliverStatus/delivering', process_RSC_order_deliverStatus_delivering, ['post'],    ['isLoggedIn', 'isRSC']);
+    //F.route('/api/v2.2/RSC/order/selfDelivery',             process_self_delivery,        ['post'], ['isLoggedIn', 'isRSC', 'throttle']);
 };
 
 /**
  * fill RSC info. All RSC related info can only be filled once.
  */
-function process_RSC_info_fill(){
-    var self = this;
-    var user = self.user;
+exports.process_RSC_info_fill = function(req, res, next){
+    var user = req.user;
     if(!user){
-        self.respond({code:1001, message:'需要登录'});
+        res.respond({code:1001, message:'需要登录'});
         return;
     }
 
     var options = {};
     UserService.getById(user._id, function(err, user){
         if(!user.RSCInfo || !user.RSCInfo.name){
-            if(!self.data.name) {
-                self.respond({code: 1001, message: '请填写真实姓名'});
+            if(!req.data.name) {
+                res.respond({code: 1001, message: '请填写真实姓名'});
                 return;
             } else{
-                options.RSCInfo = {name:self.data.name};
+                options.RSCInfo = {name:req.data.name};
             }
         }
 
         if(!user.RSCInfo || !user.RSCInfo.IDNo){
-            if(!tools.isValidIdentityNo(self.data.IDNo)){
-                self.respond({code:1001, message:'请填写正确的身份证号'});
+            if(!tools.isValidIdentityNo(req.data.IDNo)){
+                res.respond({code:1001, message:'请填写正确的身份证号'});
                 return;
             } else{
                 if(options.RSCInfo){
-                    options.RSCInfo.IDNo = self.data.IDNo;
+                    options.RSCInfo.IDNo = req.data.IDNo;
                 } else{
-                    options.RSCInfo = {IDNo:self.data.IDNo};
+                    options.RSCInfo = {IDNo:req.data.IDNo};
                 }
             }
         }
 
         if(!user.RSCInfo || !user.RSCInfo.phone){
-            if(!tools.isPhone(self.data.phone)){
-                self.respond({code:1001, message:'请填写正确的手机号'});
+            if(!tools.isPhone(req.data.phone)){
+                res.respond({code:1001, message:'请填写正确的手机号'});
                 return;
             } else{
                 if(options.RSCInfo){
-                    options.RSCInfo.phone = self.data.phone;
+                    options.RSCInfo.phone = req.data.phone;
                 } else{
-                    options.RSCInfo = {phone:self.data.phone};
+                    options.RSCInfo = {phone:req.data.phone};
                 }
             }
         }
 
         if(!user.RSCInfo || !user.RSCInfo.companyName){
-            if(!self.data.companyName){
-                self.respond({code:1001, message:'请填写公司门店名称'});
+            if(!req.data.companyName){
+                res.respond({code:1001, message:'请填写公司门店名称'});
                 return;
             } else {
                 if(options.RSCInfo){
-                    options.RSCInfo.companyName = self.data.companyName;
+                    options.RSCInfo.companyName = req.data.companyName;
                 } else{
-                    options.RSCInfo = {companyName:self.data.companyName};
+                    options.RSCInfo = {companyName:req.data.companyName};
                 }
             }
         }
 
         if(!user.RSCInfo || !user.RSCInfo.companyAddress){
-            if(!self.data.companyAddress){
-                self.respond({code:1001, message:'请填写网点地址'});
+            if(!req.data.companyAddress){
+                res.respond({code:1001, message:'请填写网点地址'});
                 return;
-            } else if(!self.data.companyAddress.province){
-                self.respond({code:1001, message:'请选择省份'});
+            } else if(!req.data.companyAddress.province){
+                res.respond({code:1001, message:'请选择省份'});
                 return;
-            } else if (!self.data.companyAddress.city){
-                self.respond({code:1001, message:'请选择城市'});
+            } else if (!req.data.companyAddress.city){
+                res.respond({code:1001, message:'请选择城市'});
                 return;
             } else{
                 if(options.RSCInfo){
-                    options.RSCInfo.companyAddress = self.data.companyAddress;
+                    options.RSCInfo.companyAddress = req.data.companyAddress;
                 } else{
-                    options.RSCInfo = {companyAddress: self.data.companyAddress};
+                    options.RSCInfo = {companyAddress: req.data.companyAddress};
                 }
             }
         }
 
         if(tools.isEmptyObject(options)){
-            self.respond({code:1001, message:'没有可以更新的内容'});
+            res.respond({code:1001, message:'没有可以更新的内容'});
             return;
         } else{
             options.userid = user.id;
@@ -121,93 +120,90 @@ function process_RSC_info_fill(){
 
         UserService.update(options, function(err){
             if(err){
-                self.respond({code:1001, message:'更新失败'});
+                res.respond({code:1001, message:'更新失败'});
                 return;
             }
 
-            self.respond({code:1000, message:'success'});
+            res.respond({code:1000, message:'success'});
         })
     })
-}
+};
 
-function json_RSC_info_get(){
-    var self = this;
-    if(!self.user){
-        self.respond({code:1001, message:'需要登录'});
+exports.json_RSC_info_get = function(req, res, next){
+    if(!req.user){
+        res.respond({code:1001, message:'需要登录'});
         return;
     }
 
-    UserService.getRSCInfoById(self.user, function(err, user){
+    UserService.getRSCInfoById(req.user, function(err, user){
         if(err){
-            self.respond({code:1001, message:'查询失败'});
+            res.respond({code:1001, message:'查询失败'});
             return;
         }
 
-        self.respond({code:1000, message:'success', RSCInfo:user.RSCInfo});
+        res.respond({code:1000, message:'success', RSCInfo:user.RSCInfo});
     })
-}
+};
 
-function json_RSC_orders_get(){
-    var self = this;
-    var RSC = self.user;
-    var page = U.parseInt(self.data.page, 1) - 1;
-    var max = U.parseInt(self.data.max, 20);
-    var type = U.parseInt(self.data.type);
-    var search = self.data.search;
+exports.json_RSC_orders_get = function(req, res, next){
+    var RSC = req.user;
+    var page = U.parseInt(req.data.page, 1) - 1;
+    var max = U.parseInt(req.data.max, 20);
+    var type = U.parseInt(req.data.type);
+    var search = req.data.search;
     OrderService.getByRSC(RSC, page, max, type, function(err, orders, count, pageCount){
         if(err){
-            self.respond({code:1002, message:'获取订单失败'});
+            res.respond({code:1002, message:'获取订单失败'});
             return;
         }
 
         generate_RSC_order_type(orders);
-        self.respond({code:1000, message:'success', orders:orders, count:count, pageCount:pageCount});
+        res.respond({code:1000, message:'success', orders:orders, count:count, pageCount:pageCount});
     }, search)
-}
+};
 
-function process_RSC_order_deliverStatus_delivering(){
-    var self = this;
-    var user = self.user;
-    var orderId = self.data.orderId;
-    var SKURefs = self.data.SKURefs;
+exports.process_RSC_order_deliverStatus_delivering = function(req, res, next){
+    var user = req.user;
+    var orderId = req.data.orderId;
+    var SKURefs = req.data.SKURefs;
     if(!orderId){
-        self.respond({code:1001, message:'需要订单号'});
+        res.respond({code:1001, message:'需要订单号'});
         return;
     }
 
     if(!SKURefs){
-        self.respond({code:1001, message:'需要SKURefs'});
+        res.respond({code:1001, message:'需要SKURefs'});
         return;
     }
 
     OrderService.get({id:orderId}, function(err, order){
         if(err || !order){
-            self.respond({code:1002, message:'获取订单失败'});
+            res.respond({code:1002, message:'获取订单失败'});
             return;
         }
 
         // check current status to see if the current status is OK for change deliver status
         // check if order belongs to this RSC
         if(!order.RSCInfo || !order.RSCInfo.RSC || user._id.toString() != order.RSCInfo.RSC.toString()){
-            self.respond({code:1002, message:'没有权利修改这个订单'});
+            res.respond({code:1002, message:'没有权利修改这个订单'});
             return;
         }
 
         // check if the order ispaid
         if(order.payStatus != PAYMENTSTATUS.PAID){
-            self.respond({code:1002, message:'该订单尚未完全支付'});
+            res.respond({code:1002, message:'该订单尚未完全支付'});
             return;
         }
 
         // check if order deliver status is deliver to home
         if(order.deliveryType != DELIVERYTYPE.SONGHUO.id){
-            self.respond({code:1002, message:'该订单非送货到家'});
+            res.respond({code:1002, message:'该订单非送货到家'});
             return;
         }
 
         // check if the SKU belongs to this order and if this SKU is delivered to RSC
         if(!tools.isArray(order.SKUs)){
-            self.respond({code:1002, message:'该订单无SKU'});
+            res.respond({code:1002, message:'该订单无SKU'});
             return;
         }
 
@@ -224,153 +220,149 @@ function process_RSC_order_deliverStatus_delivering(){
         }
 
         if(!needUpdate){
-            self.respond({code:1002, message:'没有需要发货的订单'});
+            res.respond({code:1002, message:'没有需要发货的订单'});
             return;
         }
 
         // all check done, start to update status
         OrderService.updateSKUs(options, function(err){
             if(err){
-                self.respond({code:1002, message:'更新订单失败'});
+                res.respond({code:1002, message:'更新订单失败'});
                 return;
             }
 
-            self.respond({code:1000, message:'success'});
+            res.respond({code:1000, message:'success'});
         })
     })
-}
+};
 
-function json_RSC_address_province_query(){
-    var self = this;
+exports.json_RSC_address_province_query = function(req, res, next){
     var options = null;
-    if(typeof self.data.EPOS != 'undefined') {
+    if(typeof req.data.EPOS != 'undefined') {
         options = {EPOS:true};
     }
-    console.log(options);
-    if(!self.data.products && !options){
-        self.respond({code:1001, message:'请先选择商品'});
+    
+    if(!req.data.products && !options){
+        res.respond({code:1001, message:'请先选择商品'});
         return;
     }
 
-    RSCService.getProvinceList(self.data.products?self.data.products.split(','):[], function(err, provinceList){
+    RSCService.getProvinceList(req.data.products?req.data.products.split(','):[], function(err, provinceList){
         if(err || !provinceList){
-            self.respond({code:1002, message:'查询失败'});
+            res.respond({code:1002, message:'查询失败'});
             return;
         }
 
-        self.respond({code:1000, message:'success', provinceList: provinceList});
+        res.respond({code:1000, message:'success', provinceList: provinceList});
     }, options);
-}
+};
 
-function json_RSC_address_city_query(){
-    var self = this;
+exports.json_RSC_address_city_query = function(req, res, next){
     var options = null;
-    if(typeof self.data.EPOS != 'undefined') {
+    if(typeof req.data.EPOS != 'undefined') {
         options = {EPOS:true};
     }
-    if(!self.data.products && !options){
-        self.respond({code:1001, message:'请先选择商品'});
+    if(!req.data.products && !options){
+        res.respond({code:1001, message:'请先选择商品'});
         return;
     }
 
-    if(!self.data.province){
-        self.respond({code:1001, message:'请选择省'});
+    if(!req.data.province){
+        res.respond({code:1001, message:'请选择省'});
         return;
     }
 
-    RSCService.getCityList(self.data.products?self.data.products.split(','):[], self.data.province, function(err, cityList){
+    RSCService.getCityList(req.data.products?req.data.products.split(','):[], req.data.province, function(err, cityList){
         if(err || !cityList){
-            self.respond({code:1002, message:'查询失败'});
+            res.respond({code:1002, message:'查询失败'});
             return;
         }
 
-        self.respond({code:1000, message:'success', cityList: cityList});
+        res.respond({code:1000, message:'success', cityList: cityList});
     }, options);
-}
+};
 
-function json_RSC_address_county_query(){
+exports.json_RSC_address_county_query = function(req, res, next){
     var self = this;
     var options = null;
-    if(typeof self.data.EPOS != 'undefined') {
+    if(typeof req.data.EPOS != 'undefined') {
         options = {EPOS:true};
     }
-    if(!self.data.products && !options){
-        self.respond({code:1001, message:'请先选择商品'});
+    if(!req.data.products && !options){
+        res.respond({code:1001, message:'请先选择商品'});
         return;
     }
 
-    if(!self.data.province){
-        self.respond({code:1001, message:'请选择省'});
+    if(!req.data.province){
+        res.respond({code:1001, message:'请选择省'});
         return;
     }
 
-    if(!self.data.city){
-        self.respond({code:1001, message:'请选择市'});
+    if(!req.data.city){
+        res.respond({code:1001, message:'请选择市'});
         return;
     }
 
-    RSCService.getCountyList(self.data.products?self.data.products.split(','):[], self.data.province, self.data.city, function(err, countyList){
+    RSCService.getCountyList(req.data.products?req.data.products.split(','):[], req.data.province, req.data.city, function(err, countyList){
         if(err || !countyList){
-            self.respond({code:1002, message:'查询失败'});
+            res.respond({code:1002, message:'查询失败'});
             return;
         }
 
-        self.respond({code:1000, message:'success', countyList: countyList});
+        res.respond({code:1000, message:'success', countyList: countyList});
     }, options);
-}
+};
 
-function json_RSC_address_town_query(){
-    var self = this;
+exports.json_RSC_address_town_query = function(req, res, next){
     var options = null;
-    if(typeof self.data.EPOS != 'undefined') {
+    if(typeof req.data.EPOS != 'undefined') {
         options = {EPOS:true};
     }
-    if(!self.data.products && !options){
-        self.respond({code:1001, message:'请先选择商品'});
+    if(!req.data.products && !options){
+        res.respond({code:1001, message:'请先选择商品'});
         return;
     }
 
-    if(!self.data.province){
-        self.respond({code:1001, message:'请选择省'});
+    if(!req.data.province){
+        res.respond({code:1001, message:'请选择省'});
         return;
     }
 
-    if(!self.data.city){
-        self.respond({code:1001, message:'请选择市'});
+    if(!req.data.city){
+        res.respond({code:1001, message:'请选择市'});
         return;
     }
 
-    RSCService.getTownList(self.data.products?self.data.products.split(','):[], self.data.province, self.data.city, self.data.county, function(err, townList){
+    RSCService.getTownList(req.data.products?req.data.products.split(','):[], req.data.province, req.data.city, req.data.county, function(err, townList){
         if(err || !townList){
-            self.respond({code:1002, message:'查询失败'});
+            res.respond({code:1002, message:'查询失败'});
             return;
         }
 
-        self.respond({code:1000, message:'success', townList: townList});
+        res.respond({code:1000, message:'success', townList: townList});
     }, options);
-}
+};
 
-function json_RSC_query(){
-    var self = this;
+exports.json_RSC_query = function(req, res, next){
     var options = null;
-    if(typeof self.data.EPOS != 'undefined') {
+    if(typeof req.data.EPOS != 'undefined') {
         options = {EPOS:true};
     }
-    if(!self.data.products && !options){
-        self.respond({code:1001, message:'请先选择商品'});
+    if(!req.data.products && !options){
+        res.respond({code:1001, message:'请先选择商品'});
         return;
     }
-    var page = U.parseInt(self.data.page, 1) - 1;
-    var max = U.parseInt(self.data.max, 20);
-    RSCService.getRSCList(self.data.products?self.data.products.split(','):[], self.data.province, self.data.city, self.data.county, self.data.town, page, max, function(err, RSCs, count, pageCount){
+    var page = U.parseInt(req.data.page, 1) - 1;
+    var max = U.parseInt(req.data.max, 20);
+    RSCService.getRSCList(req.data.products?req.data.products.split(','):[], req.data.province, req.data.city, req.data.county, req.data.town, page, max, function(err, RSCs, count, pageCount){
         if(err || !RSCs){
-            self.respond({code:1002, message:'查询失败'});
+            res.respond({code:1002, message:'查询失败'});
             return;
         }
 
-        self.respond({code:1000, message:'success', RSCs: RSCs, count:count, pageCount:pageCount});
+        res.respond({code:1000, message:'success', RSCs: RSCs, count:count, pageCount:pageCount});
     }, null, options);
-}
+};
 
 function generate_RSC_order_type(orders){
     orders.forEach(function(order) {
@@ -379,46 +371,45 @@ function generate_RSC_order_type(orders){
     })
 }
 
-function process_self_delivery() {
-    var self = this;
-    var orderId = self.data.orderId;
-    var code = self.data.code;
-    var SKURefs = self.data.SKURefs;
-    var RSC = self.user;
+exports.process_self_delivery = function(req, res, next) {
+    var orderId = req.data.orderId;
+    var code = req.data.code;
+    var SKURefs = req.data.SKURefs;
+    var RSC = req.user;
 
     if (!orderId) {
-        self.respond({code: 1001, message: 'orderId required'});
+        res.respond({code: 1001, message: 'orderId required'});
         return;
     }
 
     if (!code) {
-        self.respond({code: 1001, message: 'code required'});
+        res.respond({code: 1001, message: 'code required'});
         return;
     }
 
     if (!SKURefs) {
-        self.respond({code: 1001, message: 'SKURefs required'});
+        res.respond({code: 1001, message: 'SKURefs required'});
         return;
     }
 
     DeliveryCodeService.checkDeliveryCode(orderId, code, function (err, pass) {
         if (err) {
-            self.respond({code: 1002, message: '验证提货码失败'});
+            res.respond({code: 1002, message: '验证提货码失败'});
             return;
         }
         if (!pass) {
-            self.respond({code: 1002, message: '自提码错误，请重新输入'});
+            res.respond({code: 1002, message: '自提码错误，请重新输入'});
             return;
         }
 
         OrderService.get({id:orderId}, function(err, order){
             if(err || !order){
-                self.respond({code:1002, message:'获取订单失败'});
+                res.respond({code:1002, message:'获取订单失败'});
                 return;
             }
 
             if(!order.RSCInfo || order.RSCInfo.RSC.toString() != RSC._id.toString()){
-                self.respond({code:1002, message:'该订单不属于此网点'});
+                res.respond({code:1002, message:'该订单不属于此网点'});
                 return;
             }
 
@@ -440,41 +431,40 @@ function process_self_delivery() {
 
             OrderService.updateSKUs(deliverStatusOptions, function (err) {
                 if (err) {
-                    self.respond({code: 1002, message: '更新订单失败'});
+                    res.respond({code: 1002, message: '更新订单失败'});
                     return;
                 }
 
                 OrderService.confirm(orderId, needConfirmSKURefs, function (err) {
                     if (err) {
-                        self.respond({code: 1002, message: err});
+                        res.respond({code: 1002, message: err});
                         return;
                     }
 
-                    self.respond({code: 1000, message: 'success'});
+                    res.respond({code: 1000, message: 'success'});
                 })
             })
         })
     })
-}
+};
 
-function json_RSC_order_detail(){
-    var self = this;
-    var orderId = self.data.orderId;
-    var RSC = self.user;
+exports.json_RSC_order_detail = function(req, res, next){
+    var orderId = req.data.orderId;
+    var RSC = req.user;
 
     if(!orderId){
-        self.respond({code:1001, message:'orderId required'});
+        res.respond({code:1001, message:'orderId required'});
         return;
     }
 
     if(!RSC){
-        self.respond({code:1001, message:'need login'});
+        res.respond({code:1001, message:'need login'});
         return;
     }
 
-    OrderService.get({id:orderId, 'RSC':self.user}, function(err, order, returnPayment){
+    OrderService.get({id:orderId, 'RSC':req.user}, function(err, order, returnPayment){
         if(err || !order){
-            self.respond({code:1002, message:'获取订单详情失败'});
+            res.respond({code:1002, message:'获取订单详情失败'});
             return;
         }
 
@@ -537,6 +527,6 @@ function json_RSC_order_detail(){
             })
         }
 
-        self.respond({code:1000, message:'success', order:orderInfo});
+        res.respond({code:1000, message:'success', order:orderInfo});
     })
-}
+};

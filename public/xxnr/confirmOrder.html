@@ -21,6 +21,9 @@
     <!-- endbuild -->
     <!-- build:js -->
     <script src="js/jquery.min.js"></script>
+    <!--[if (gte IE 6)&(lte IE 8)]>
+    <script type="text/javascript" src="js/selectivizr-min.js"></script>
+    <![endif]-->
     <script src="js/angular.min.js"></script>
     <script src="js/angular-cookies.min.js"></script>
     <script src="js/common.js"></script>
@@ -601,7 +604,7 @@
                     ng-class="{true:'companySelcted',false:'companyUnselcted'}[checkSelectingCompanyInPopRSCList()]"
                     ng-click="checkedCompany()">确定
             </button>
-            <button ng-click="showPop = false;showSelectCompanyPop=false;selectingCompanyId=-1">
+            <button ng-click="showPop = false;showSelectCompanyPop=false;selectingCompanyId=-1;isOverflow=false">
                 取消
             </button>
         </div>

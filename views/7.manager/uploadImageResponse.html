@@ -1,8 +1,7 @@
-@{layout('')}
 <script type="text/javascript">
-	@{if model.imageurl && model.imageurl !== ''}
-		window.parent.CKEDITOR.tools.callFunction(@{model.callback},'@{model.imageurl}');
-	@{else}
-		window.parent.CKEDITOR.tools.callFunction(@{model.callback},'','@{model.message}');
-	@{fi}
+	<% if (imageurl && imageurl !== '') { %>
+		window.parent.CKEDITOR.tools.callFunction(<%= callback%>,'<%= imageurl%>');
+	<% } else { %>
+		window.parent.CKEDITOR.tools.callFunction(<%= callback%>,'','<%= message%>');
+	<% } %>
 </script>

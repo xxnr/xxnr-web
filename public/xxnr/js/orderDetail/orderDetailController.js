@@ -125,6 +125,8 @@ app.controller('orderDetailController', function ($scope, remoteApiService, comm
                         .then(function (data) {
                             if (data.code == 1000) {
                                 $scope.pickupDeliveryCode = data.deliveryCode;
+                            }else if(data.code == 1401){
+                                sweetalert('你已被登出，请重新登录', "logon.html");
                             } else {
                                 sweetalert('获取提货码失败');
                             }
@@ -247,6 +249,8 @@ app.controller('orderDetailController', function ($scope, remoteApiService, comm
                     $scope.ConfirmingOrderIds = null;
                     if(data.code == 1000){
                         sweetalert('收货成功',window.location.pathname+"?id="+$scope.id);
+                    }else if(data.code == 1401){
+                        sweetalert('你已被登出，请重新登录', "logon.html");
                     }else{
                         sweetalert('确认收货失败',window.location.pathname+"?id="+$scope.id);
                     }

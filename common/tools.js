@@ -12,6 +12,12 @@ var regexpPhone = new RegExp('^(13[0-9]|15[012356789]|17[678]|18[0-9]|14[57])[0-
 var regexpPrice = new RegExp('^[0-9]*(\.[0-9]{1,2})?$');
 var regexIdentityNo = /^(\d{15}$|^\d{18}$|^\d{17}(\d|X|x))$/;
 var regexpXXNRHost = new RegExp('(.*\.|^)xinxinnongren\.com.*');
+var config = require('../config');
+var Global = require('../global.js');
+var moment = require('moment-timezone');
+var REG_MOBILE = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|Tablet/i;
+var REG_IOS = /ios|iphone|ipad|ipod/i;
+var REG_Andriod = /android/i;
 
 /*
     Phone in china validation
@@ -63,7 +69,7 @@ exports.generateAuthCode = function (length) {
 
 function sendPhoneMessage(phonenumber, content) {
 
-    var options = (F.config.phone_message_options).parseJSON();
+    var options = config.phone_message_options;
     var httpOptions = options.http_request_options;
 
     httpOptions.path = options['url'] + querystring.stringify({
@@ -188,12 +194,12 @@ exports.generate_token = function(userId, appLoginId, webLoginId){
             appLoginId:appLoginId,
             webLoginId:webLoginId
         },
-        F.global.key.exportKey('pkcs8-private-pem'),    //private key
+        Global.key.exportKey('pkcs8-private-pem'),    //private key
         {                                               //options
-            algorithm: F.config.user_token_algorithm,
+            algorithm: config.user_token_algorithm,
             subject:userId,
-            expiresIn: F.config.user_token_expires_in,
-            issuer: F.config.user_token_issuer
+            expiresIn: config.user_token_expires_in,
+            issuer: config.user_token_issuer
         }
     );
     return token;
@@ -201,7 +207,7 @@ exports.generate_token = function(userId, appLoginId, webLoginId){
 
 exports.decrypt_password = function(encryptedPassword){
     try {
-        return F.global.key.decrypt(encryptedPassword, 'utf8');
+        return Global.key.decrypt(encryptedPassword, 'utf8');
     }catch(e){
         console.log(e);
         return null;
@@ -212,10 +218,10 @@ exports.decrypt_password = function(encryptedPassword){
 exports.verify_token = function(token){
     var payload = JWT.verify(
         token,
-        F.global.key.exportKey('pkcs8-public-pem'),
+        Global.key.exportKey('pkcs8-public-pem'),
         {
-            algorithm: F.config.user_token_algorithm,
-            issuer: F.config.user_token_issuer
+            algorithm: config.user_token_algorithm,
+            issuer: config.user_token_issuer
         }
     );
 
@@ -223,13 +229,11 @@ exports.verify_token = function(token){
 };
 
 exports.isXXNRAgent = function(verifiedTypes){
-    const XXNRAgentId = '6';
-    return verifiedTypes && verifiedTypes.indexOf(XXNRAgentId) != -1;
+    return verifiedTypes && verifiedTypes.indexOf(config.XXNRAgentId) != -1;
 };
 
 exports.isRSC = function(verifiedTypes){
-    const RSCId = '5';
-    return verifiedTypes && verifiedTypes.indexOf(RSCId) != -1;
+    return verifiedTypes && verifiedTypes.indexOf(config.RSCId) != -1;
 };
 
 exports.isValidIdentityNo = function(identityNo){
@@ -333,5 +337,48 @@ exports.stringPinyin = function(options) {
         }
     } else {
         return {'error':'no string', 'strPinyin':strPinyin, 'initial':initial, 'initialType':initialType};
+    }
+};
+
+exports.getWeekStartEndTime = function(weekMinus){
+    var currentTime = new Date();
+    var dayOfWeek = currentTime.getDay();
+    if(dayOfWeek == 0){
+        // getDay will return 0 if it is Sunday
+        dayOfWeek = 7;
+    }
+
+    var startTime = new Date(currentTime.add('d', weekMinus*7-dayOfWeek+1).format('yyyy-MM-dd')).add('h', -F.config.currentTimeZoneDiff);
+    var endTime = new Date(currentTime.add('d', (weekMinus+1)*7-dayOfWeek+1).format('yyyy-MM-dd')).add('h', -F.config.currentTimeZoneDiff);
+    if(weekMinus == 0){
+        endTime = new Date(F.config.serviceStartTime).add('h', -F.config.currentTimeZoneDiff);
+    }
+
+    return {startTime: startTime, endTime: endTime};
+};
+
+exports.getWeekStartTimeByDate = function(date){
+     var dayOfWeek = date.getDay();
+    if(dayOfWeek == 0){
+        // getDay will return 0 if it is Sunday
+        dayOfWeek = 7;
+    }
+
+    return new Date(date.add('d', 1-dayOfWeek).format('yyyy-MM-dd')).add('h', -F.config.currentTimeZoneDiff);
+};
+
+exports.isMobile = function(req){
+    return REG_MOBILE.test(req.get('user-agent'));
+};
+
+exports.testUserAgent = function(userAgent){
+    if (REG_IOS.test(userAgent.toLowerCase())) {
+        return 'IOS';
+    } else {
+        if (REG_Andriod.test(userAgent.toLowerCase())) {
+            return 'Android';
+        } else {
+            return null;
+        }
     }
 };

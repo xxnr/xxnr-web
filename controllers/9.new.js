@@ -1,31 +1,31 @@
 var services = require('../services');
 var tools = require('../common/tools');
 var NewsService = services.news;
-
+var path = require('path');
+var moment = require('moment-timezone');
 exports.install = function() {
     // NEWS
-    F.route('/api/v2.0/news/',                           json_news_query);
-    F.route('/api/v2.0/news/{id}/',                      json_news_read);
-    F.route('/api/v2.0/news/categories/',                json_news_categories);
+    //F.route('/api/v2.0/news/',                           json_news_query);
+    //F.route('/api/v2.0/news/{id}/',                      json_news_read);
+    //F.route('/api/v2.0/news/categories/',                json_news_categories);
 
     // NEWS detail view
-    F.route('/news/{id}/',                               view_news_detail);
+    //F.route('/news/{id}/',                               view_news_detail);     //rewrite by CUIDI
     // NEWS detail share view
-    F.route('/sharenews/{id}/',                          view_newsshare_detail);
+    //F.route('/sharenews/{id}/',                          view_newsshare_detail);   //rewrite by CUIDI
 };
 
 // Gets all news
-function json_news_query() {
-    var self = this;
-    self.query.status = '2';
-    NewsService.query(self.query, function (err, result) {
+exports.json_news_query = function(req, res, next) {
+    req.data.status = '2';
+    NewsService.query(req.data, function (err, result) {
         if (err) {
-            self.respond({'code': '1001', 'message': '查询资讯失败'});
+            res.respond({'code': '1001', 'message': '查询资讯失败'});
             return;
         }
 
         if (result && result.count && result.count > 0) {
-            var hosturl = self.req.uri.host;
+            var hosturl = req.hostname;
             if (hosturl) {
                 hosturl = tools.getXXNRHost(hosturl);
             } else {
@@ -53,32 +53,16 @@ function json_news_query() {
             }
             result.items = arr;
         }
-        self.respond({'code': '1000', 'message': 'success', 'datas': result});
+        res.respond({'code': '1000', 'message': 'success', 'datas': result});
     });
-}
+};
 
 // Reads all news categories
-function json_news_categories() {
-    var self = this;
-
-    // if (!F.global.newscategories) {
-    //     F.global.newscategories = [];
-    // }
-
-    // var length = F.global.newscategories.length;
-    // var status = '2';
-    // var categories = [];
-    // for (var i = 0; i < length; i++) {
-    //     var category = F.global.newscategories[i];
-    //     if (category[status] && category[status] > 0) {
-    //         categories.push({ name: category.name, linker: category.name, total: category[status] });
-    //     }
-    // }
-    // self.respond({'code': '1000', 'message': 'success', 'datas': categories});
-    var status = '2'; 
+exports.json_news_categories = function(req, res, next) {
+    var status = '2';
     NewsService.queryCategory({'status':status}, function (err, result) {
         if (err) {
-            self.respond({'code': '1001', 'message': '查询资讯类目失败'});
+            res.respond({'code': '1001', 'message': '查询资讯类目失败'});
             return;
         }
 
@@ -93,59 +77,74 @@ function json_news_categories() {
                     }
                 }
             }
-            self.respond({'code': '1000', 'message': 'success', 'datas': categories});
+            res.respond({'code': '1000', 'message': 'success', 'datas': categories});
         } else {
-            self.respond({'code': '1000', 'message': 'success', 'datas': []});
+            res.respond({'code': '1000', 'message': 'success', 'datas': []});
         }
     });
-}
+};
 
 // Reads a specific new by ID
-function json_news_read(id) {
-    var self = this;
+exports.json_news_read = function(req, res, next) {
+    var id = req.params.id;
     var options = {};
     options.id = id;
     // only get online news
     options.status = '2';
     NewsService.get(options, function (err, result) {
         if (err) {
-            self.respond({'code': '1001', 'message': '查询资讯失败'});
+            res.respond({'code': '1001', 'message': '查询资讯失败'});
             return;
         }
-        self.respond({'code': '1000', 'message': 'success', 'datas': result});
+        res.respond({'code': '1000', 'message': 'success', 'datas': result});
     });
-}
-
+};
 
 // Gets news detail page for app
-function view_news_detail(id) {
-    var self = this;
+exports.view_news_detail = function(req,res,next) {
     var options = {};
+    var id = req.params.id;
     options.id = id;
     // only get online news
     options.status = '2';
     NewsService.get(options, function (err, result) {
         if (err || !result) {
-            self.throw404();
+            res.status(404).send('404: Page not found');
             return;
         }
-        self.view('newsAppDetailTemplate', result);
+
+        var result = result.toObject();
+        var datecreated = JSON.stringify(result.datecreated);
+        result.datecreated = moment(datecreated,"YYYY-MM-DDTHH:mm:ssZ").format('YYYY-MM-DD HH:mm:ss');
+        res.render(path.join(__dirname, '../views/9.new/newsAppDetailTemplate.html'),
+            {
+                result: result
+            }
+        );
     });
-}
+};
 
 // Gets news detail share page for app
-function view_newsshare_detail(id) {
-    var self = this;
+exports.view_newsshare_detail = function(req,res,next) {
     var options = {};
+    var id = req.params.id;
     options.id = id;
     // only get online news
     options.status = '2';
     NewsService.get(options, function (err, result) {
         if (err || !result) {
-            self.throw404();
+            res.status(404).send('404: Page not found');
             return;
         }
-        result['shareurl'] = 'http://' + self.req.uri.host + '/newsshare/' + id;
-        self.view('newsAppDetailTemplate', result);
+
+        var result = result.toObject();
+        var datecreated = JSON.stringify(result.datecreated);
+        result.shareurl = 'http://' + req.hostname + '/newsshare/' + id;
+        result.datecreated = moment(datecreated,"YYYY-MM-DDTHH:mm:ssZ").format('YYYY-MM-DD HH:mm:ss');
+        res.render(path.join(__dirname, '../views/9.new/newsAppDetailTemplate.html'),
+            {
+                result:result
+            }
+        );
     });
-}
+};

@@ -3,4 +3,8 @@ databases-online
 .idea
 tmp
 *.pid
-private_key.pem
+*.pem
+*.ca-bundle
+*.crt
+*.key
+/test/casper_test/*.png

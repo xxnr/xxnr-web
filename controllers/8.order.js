@@ -10,24 +10,24 @@ var CartService = services.cart;
 var DeliveryCodeService = services.deliveryCode;
 
 exports.install = function() {
-	F.route('/api/v2.0/order/getOderList',         getOders, ['post', 'get'], ['isLoggedIn']);
-	F.route('/api/v2.0/order/getAppOrderList',     api10_getOders, ['post', 'get'], ['isLoggedIn']);
-	F.route('/api/v2.0/order/addOrder',            addOrder, ['post', 'get'], ['isLoggedIn', 'throttle']);
-    F.route('/api/v2.0/order/getOrderDetails',     api10_getOrderDetails, ['post', 'get'], ['isLoggedIn']);
-    F.route('/api/v2.0/order/updateOrderPaytype',  updateOrderPaytype, ['post', 'get'], ['isLoggedIn']);
-    F.route('/api/v2.0/order/confirmeOrder',       confirmOrder, ['post', 'get'], ['isLoggedIn']);
+	//F.route('/api/v2.0/order/getOderList',         getOrders, ['post', 'get'], ['isLoggedIn']);
+	//F.route('/api/v2.0/order/getAppOrderList',     api10_getOrders, ['post', 'get'], ['isLoggedIn']);
+	//F.route('/api/v2.0/order/addOrder',            addOrder, ['post', 'get'], ['isLoggedIn', 'throttle']);
+    //F.route('/api/v2.0/order/getOrderDetails',     api10_getOrderDetails, ['post', 'get'], ['isLoggedIn']);
+    //F.route('/api/v2.0/order/updateOrderPaytype',  updateOrderPaytype, ['post', 'get'], ['isLoggedIn']);
+    //F.route('/api/v2.0/order/confirmeOrder',       confirmOrder, ['post', 'get'], ['isLoggedIn']);
 
 	// v1.0
-	F.route('/app/order/getOderList',              api10_getOders, ['post', 'get'], ['isLoggedIn']);
+	//F.route('/app/order/getOderList',              api10_getOrders, ['post', 'get'], ['isLoggedIn']);
 	//fix api// F.route('/app/order/addOrder',                 addOrder, ['post', 'get'], ['isLoggedIn']);
     //fix api// F.route('/app/order/confirmReceipt',           confirmOrder, ['post', 'get'], ['isLoggedIn']);
 
     // v2.1
-    F.route('/api/v2.1/order/addOrder',            addOrderBySKU, ['post'], ['isLoggedIn', 'throttle']);
+    //F.route('/api/v2.1/order/addOrder',            addOrderBySKU, ['post'], ['isLoggedIn', 'throttle']);
 
     // v2.2
-    F.route('/api/v2.2/order/confirmSKUReceived',   process_confirm_SKU_received, ['post'], ['isLoggedIn']);
-    F.route('/api/v2.2/order/getDeliveryCode',      json_get_delivery_code,     ['get'],    ['isLoggedIn']);
+    //F.route('/api/v2.2/order/confirmSKUReceived',   process_confirm_SKU_received, ['post'], ['isLoggedIn']);
+    //F.route('/api/v2.2/order/getDeliveryCode',      json_get_delivery_code,     ['get'],    ['isLoggedIn']);
 };
 
 var converter = require('../common/converter');
@@ -40,13 +40,12 @@ var tools = require('../common/tools');
 var DELIVERYTYPE = require('../common/defs').DELIVERYTYPE;
 var DELIVERYTYPENAME = require('../common/defs').DELIVERYTYPENAME;
 
-function getOdersList(callback) {
-	var self = this;
-	var page = self.data['page'];
-    var max = self.data['max'];
-	var type = self.data['type'] || self.data['typeValue'];//订单类型  所有的订单
-    var userId = self.data['userId'];
-    var locationUserId = self.data['locationUserId'];
+function getOdersList(req, callback) {
+	var page = req.data['page'];
+    var max = req.data['max'];
+	var type = req.data['type'] || req.data['typeValue'];//订单类型  所有的订单
+    var userId = req.data['userId'];
+    var locationUserId = req.data['locationUserId'];
 
     if (!userId) {
         callback();
@@ -70,11 +69,10 @@ function getOdersList(callback) {
 	});
 }
 
-function getOders() {
-    var self = this;
-    var type = self.data['type'] || self.data['typeValue'] || null;
+exports.getOrders = function(req, res, next) {
+    var type = req.data['type'] || req.data['typeValue'] || null;
 
-    getOdersList.call(this, function(data, error) {
+    getOdersList(req, function(data, error) {
         if (data) {
             var items = data.items;
             var length = items.length;
@@ -106,6 +104,7 @@ function getOders() {
                 } else {
                     item.typeValue = typeValue;
                 }
+
                 var orderInfo = OrderService.get_orderInfo(order);
                 item.order = orderInfo;
                 // 创建时间
@@ -128,19 +127,19 @@ function getOders() {
                 }
                 arr[i] = item;
             }
+
             data.items = arr;
-            self.respond(data);
+            res.respond(data);
         } else {
-            self.respond({'code':'1001','message':'没有找到订单'});
+            res.respond({'code':'1001','message':'没有找到订单'});
         }
     });
-}
+};
 
-function api10_getOders() {
-    var self = this;
-    var type = self.data['type'] || self.data['typeValue'] || null;
+exports.api10_getOrders = function(req, res, next) {
+    var type = req.data['type'] || req.data['typeValue'] || null;
 
-    getOdersList.call(this, function(data, error) {
+    getOdersList(req, function(data, error) {
         var result = {};
 
         if (data) {
@@ -154,6 +153,7 @@ function api10_getOders() {
                 if (!typeValue) {
                     typeValue = OrderService.orderType(item);
                 }
+
                 var orderInfo = OrderService.get_orderInfo(item);
                 arr[i] = {
                     'typeValue':typeValue,
@@ -190,14 +190,12 @@ function api10_getOders() {
         } else {
             result = {'code':'1001','message':'没有找到订单'};
         }
-        self.respond(result);
+        res.respond(result);
     });
-}
+};
 
-function addOrder(){
-	var self = this;
-
-	var data = self.data;
+exports.addOrder = function(req, res, next){
+	var data = req.data;
 	var userId = data['userId'];
     var shopCartId = data.shopCartId;
     var addressId = data['addressId'];
@@ -209,35 +207,35 @@ function addOrder(){
     }
 
     if (!shopCartId) {
-        self.respond({"code":1001, "mesage":"请选择购物车"});
+        res.respond({"code":1001, "mesage":"请选择购物车"});
         return;
     }
 
     if (!addressId) {
-        self.respond({"code":1001, "mesage":"请先填写收货地址"});
+        res.respond({"code":1001, "mesage":"请先填写收货地址"});
         return;
     }
 
 	UserService.get({"userid":userId}, function(err, user) {
         if(err || !user){
-            self.respond({code:1001, message:'用户不存在'});
+            res.respond({code:1001, message:'用户不存在'});
             return;
         }
 
 		UseraddressService.get({"id": addressId}, function(err, address) {
             if(err || !address){
-                self.respond({code:1001, message:'收货地址不存在'});
+                res.respond({code:1001, message:'收货地址不存在'});
                 return;
             }
 
             CartService.checkout(shopCartId, products, function(err, cart) {
                 if(err || !cart){
-                    self.respond({code:1001, message:'购物车不存在'});
+                    res.respond({code:1001, message:'购物车不存在'});
                     return;
                 }
 
                 if(cart.items.length==0){
-                    self.respond({code:1001, message:'购物车为空'});
+                    res.respond({code:1001, message:'购物车为空'});
                     return;
                 }
 
@@ -314,7 +312,7 @@ function addOrder(){
                                 if (err || !data) {
                                     if (err) console.error('Order addOrder order1 err:', err);
                                     var response = {"code":1001, "mesage":"保存订单出错"};
-                                    self.respond(response);
+                                    res.respond(response);
                                     return;
                                 }
                                 var resultOrders = [];
@@ -333,7 +331,7 @@ function addOrder(){
                                     OrderService.add(order2, function(err, data, payment) {
                                         if (err || !data) {
                                             if (err) console.error('Order addOrder order2 err:', err);
-                                            self.respond({"code":1001, "mesage":"保存订单出错"});
+                                            res.respond({"code":1001, "mesage":"保存订单出错"});
                                             OrderService.remove({id:orderId}, function(err) {
                                                 if (err) {
                                                     console.error('Order addOrder remove order1 err:', err);
@@ -347,86 +345,48 @@ function addOrder(){
                                         }
                                         resultOrders.push(result);
                                         response['orders'] = resultOrders;
-                                        self.respond(response);
+                                        res.respond(response);
                                         CartService.removeItems(shopCartId, orderProducts, function(){});
                                     });
                                 } else {
                                     response['orders'] = resultOrders;
-                                    self.respond(response);
+                                    res.respond(response);
                                     CartService.removeItems(shopCartId, orderProducts, function(){});
                                 }
                             });
                         } catch (e) {
                             console.error('Order addOrder orders err:', e);
-                            self.respond({"code":1001, "mesage":"保存订单出错"});
+                            res.respond({"code":1001, "mesage":"保存订单出错"});
                             return;
                         }
                     } else {
                         console.error('Order addOrder err: not get the order..');
-                        self.respond({"code":1001, "mesage":"没有要保存的订单"});
+                        res.respond({"code":1001, "mesage":"没有要保存的订单"});
                         return;
                     }
                 } else {
                     console.error('Order addOrder err: no orders info..');
-                    self.respond({"code":1001, "mesage":"获取订单信息出错"});
+                    res.respond({"code":1001, "mesage":"获取订单信息出错"});
                     return;
                 }
 			});
 		});
 	});
-}
+};
 
-function updateOrderPaytype() {
-	var self = this;
-    self.respond({code:'1000', message:'success'});
-    return;
-
-    //var buyer = self.data.userId || null;
-    //var orderid = self.data.orderId || null;
-    //var paytype = self.data.payType || PAYTYPE.ZHIFUBAO;
-    //
-    //OrderService.get({'buyer':buyer,'id':orderid}, function(err, data, payment) {
-    //    if (err || !data) {
-    //        if (err) console.error('Order updateOrderPaytype err:', err);
-    //        self.respond({'code':'1001','message':'未查询到订单'});
-    //        return;
-    //    }
-    //
-    //    var paymentid = null;
-    //    if (payment && payment.id) {
-    //        paymentid = payment.id;
-    //    } else {
-    //        if (!paymentid && data && data.paymentId) {
-    //            paymentid = data.paymentId;
-    //        } else {
-    //            console.error('Order updateOrderPaytype err: paymentid not find.');
-    //            self.respond({'code':'1001','message':'未查询到订单'});
-    //            return;
-    //        }
-    //    }
-    //    OrderService.updatepayType({'paytype':paytype,'orderid':orderid,'paymentid':paymentid}, function(err) {
-    //        if(err) {
-    //            console.error('Order updateOrderPaytype err:', err);
-    //            self.respond({'code':'1001','message':'修改支付方式出错'});
-    //            return;
-    //        }
-    //        self.respond({'code':'1000','message':'success'});
-    //        return;
-    //    });
-    //});
-}
+exports.updateOrderPaytype = function(req, res, next) {
+    res.respond({code:'1000', message:'success'});
+};
 
 // user confirm order
-function confirmOrder() {
-    var self = this;
-    self.respond({code:1009, message:'API retired'});
-}
+exports.confirmOrder = function(req, res, next) {
+    res.respond({code:1009, message:'API retired'});
+};
 
 // get order detail
-function getOrder(callback) {
-    var self = this;
-    var buyer = self.data.userId || null;
-    var orderid = self.data.orderId || null;
+function getOrder(req, callback) {
+    var buyer = req.data.userId || null;
+    var orderid = req.data.orderId || null;
 
     if (!orderid) {
         callback();
@@ -501,11 +461,10 @@ function getOrder(callback) {
     });
 }
 
-function api10_getOrderDetails() {
-    var self = this;
-    var locationUserId = self.data['locationUserId'];
+exports.api10_getOrderDetails = function(req, res, next) {
+    var locationUserId = req.data['locationUserId'];
 
-    getOrder.call(this, function(err, data, payment) {
+    getOrder(req, function(err, data, payment) {
         var result = {};
         if (err) {
             console.error('Order api10_getOrderDetails err:', err);
@@ -634,29 +593,6 @@ function api10_getOrderDetails() {
                 }
             }
 
-            // // 订单中SKU所属商品信息列表
-            // if( SKUsLength > 0 ) {
-            //     productArr = [];
-            //     // contains SKUs, need to convert into products to support old app
-            //     data.SKUs.forEach(function (SKU) {
-            //         var product = {
-            //             'goodsName': SKU.productName,
-            //             'goodsCount': SKU.count,
-            //             'unitPrice': SKU.price.toFixed(2),
-            //             'orderSubType': '',
-            //             'orderSubNo': '',
-            //             'originalPrice': SKU.price.toFixed(2),
-            //             'goodsId': SKU.productId,
-            //             'imgs': SKU.thumbnail,
-            //             'deposit': SKU.deposit.toFixed(2),
-            //             'category': SKU.category,
-            //             'deliverStatus': SKU.deliverStatus
-            //         };
-
-            //         productArr.push(product);
-            //     })
-            // }
-
             // 订单中SKU所属商品信息列表 contains SKUs, need to convert into products to support old app
             order.orderGoodsList  = productArr;
             // 订单中SKU信息列表
@@ -665,13 +601,12 @@ function api10_getOrderDetails() {
         } else {
             result = {'code':'1001','message':'未查询到订单'};
         }
-        self.respond(result);
+        res.respond(result);
     });
-}
+};
 
-function addOrderBySKU(){
-    var self = this;
-    var data = self.data;
+exports.addOrderBySKU = function(req, res, next){
+    var data = req.data;
     var userId = data['userId'];
     var shopCartId = data.shopCartId;
     var addressId = data['addressId'];
@@ -683,54 +618,54 @@ function addOrderBySKU(){
     var consigneeName = data['consigneeName'] || null;
 
     if (!shopCartId) {
-        self.respond({"code":1001, "mesage":"请选择购物车"});
+        res.respond({"code":1001, "mesage":"请选择购物车"});
         return;
     }
 
     if (deliveryType && deliveryType === DELIVERYTYPE['SONGHUO'].id) {
         if (!addressId) {
-            self.respond({"code":1001, "mesage":"请先填写收货地址"});
+            res.respond({"code":1001, "mesage":"请先填写收货地址"});
             return;
         }
     } else if (deliveryType && deliveryType === DELIVERYTYPE['ZITI'].id) {
         if (!RSCId) {
-            self.respond({"code":1001, "mesage":"请先选择自提点"});
+            res.respond({"code":1001, "mesage":"请先选择自提点"});
             return;
         }
         if (!consigneePhone || !tools.isPhone(consigneePhone)) {
-            self.respond({"code":1001, "mesage":"请先填写正确的收货人手机号"});
+            res.respond({"code":1001, "mesage":"请先填写正确的收货人手机号"});
             return;
         }
         if (!consigneeName) {
-            self.respond({"code":1001, "mesage":"请先填写收货人姓名"});
+            res.respond({"code":1001, "mesage":"请先填写收货人姓名"});
             return;
         }
     } else {
-        self.respond({"code":1001, "mesage":"请先选择正确的配送方式"});
+        res.respond({"code":1001, "mesage":"请先选择正确的配送方式"});
         return;
     }
 
     UserService.get({"userid":userId}, function(err, user) {
         if(err || !user){
-            self.respond({code:1001, message:'用户不存在'});
+            res.respond({code:1001, message:'用户不存在'});
             return;
         }
 
         CartService.checkoutSKU(shopCartId, SKUs, function(err, cart) {
             if(err || !cart){
-                self.respond({code:1001, message:'购物车不存在'});
+                res.respond({code:1001, message:'购物车不存在'});
                 return;
             }
 
             if(cart.SKU_items.length==0){
-                self.respond({code:1001, message:'购物车为空'});
+                res.respond({code:1001, message:'购物车为空'});
                 return;
             }
 
             if (deliveryType && deliveryType === DELIVERYTYPE['SONGHUO'].id) {
                 UseraddressService.get({"id": addressId}, function(err, address) {
                     if(err || !address){
-                        self.respond({code:1001, message:'收货地址不存在'});
+                        res.respond({code:1001, message:'收货地址不存在'});
                         return;
                     }
                     var addOrderOptions = {};
@@ -746,10 +681,10 @@ function addOrderBySKU(){
                     };
                     OrderService.splitAndaddOrder(addOrderOptions, function(err, response, orderSKUs) {
                         if(err || !response){
-                            self.respond({code:1001, message:err});
+                            res.respond({code:1001, message:err});
                             return;
                         }
-                        self.respond(response);
+                        res.respond(response);
                         if (orderSKUs) {
                             CartService.removeSKUItems(shopCartId, orderSKUs, function(){});
                         }
@@ -758,7 +693,7 @@ function addOrderBySKU(){
             } else if (deliveryType && deliveryType === DELIVERYTYPE['ZITI'].id) {
                 UserService.getRSCInfoById(RSCId, function(err, RSC) {
                     if(err || !RSC){
-                        self.respond({code:1001, message:'自提点不存在'});
+                        res.respond({code:1001, message:'自提点不存在'});
                         return;
                     }
                     if (!RSC.RSCInfo || !RSC.RSCInfo.companyAddress || !RSC.RSCInfo.companyAddress.province.name || !RSC.RSCInfo.companyAddress.city.name) {
@@ -793,10 +728,10 @@ function addOrderBySKU(){
                     }
                     OrderService.splitAndaddOrder(addOrderOptions, function(err, response, orderSKUs) {
                         if(err || !response){
-                            self.respond({code:1001, message:err});
+                            res.respond({code:1001, message:err});
                             return;
                         }
-                        self.respond(response);
+                        res.respond(response);
                         // remove skus from shopcarts
                         if (orderSKUs) {
                             CartService.removeSKUItems(shopCartId, orderSKUs, function(){});
@@ -809,78 +744,76 @@ function addOrderBySKU(){
                     });
                 });
             } else {
-                self.respond({"code":1001, "mesage":"请先选择配送方式"});
+                res.respond({"code":1001, "mesage":"请先选择配送方式"});
                 return;
             }
         });
     });
-}
+};
 
-function process_confirm_SKU_received(){
-    var self = this;
-    var orderId = self.data.orderId;
-    var SKURefs = self.data.SKURefs;
-    var user = self.user;
+exports.process_confirm_SKU_received = function(req, res, next){
+    var orderId = req.data.orderId;
+    var SKURefs = req.data.SKURefs;
+    var user = req.user;
     if(!orderId){
-        self.respond({code:1001, message:'orderId required'});
+        res.respond({code:1001, message:'orderId required'});
         return;
     }
 
     if(!SKURefs){
-        self.respond({code:1001, message:'SKURef required'});
+        res.respond({code:1001, message:'SKURef required'});
         return;
     }
 
     if(!user){
-        self.respond({code:1001, message:'请先登录'});
+        res.respond({code:1001, message:'请先登录'});
         return;
     }
 
     OrderService.get({id:orderId}, function(err, order) {
         if (err || !order) {
-            self.respond({code: 1002, message: '获取订单失败'});
+            res.respond({code: 1002, message: '获取订单失败'});
             return;
         }
 
         if (order.buyerId != user.id) {
-            self.respond({code: 1002, message: '没有权利修改这个订单'});
+            res.respond({code: 1002, message: '没有权利修改这个订单'});
             return;
         }
 
         OrderService.confirm(orderId, SKURefs, function (err) {
             if (err) {
-                self.respond({code: 1002, message: err});
+                res.respond({code: 1002, message: err});
                 return;
             }
 
-            self.respond({code: 1000, message: 'success'});
+            res.respond({code: 1000, message: 'success'});
         })
     })
-}
+};
 
-function json_get_delivery_code(){
-    var self = this;
-    var user = self.user;
-    var orderId = self.data.orderId;
+exports.json_get_delivery_code = function(req, res, next){
+    var user = req.user;
+    var orderId = req.data.orderId;
     if(!orderId){
-        self.respond({code:1001, message:'orderId required'});
+        res.respond({code:1001, message:'orderId required'});
         return;
     }
 
     OrderService.get({id:orderId}, function(err, order){
         if (err || !order) {
-            self.respond({code: 1002, message: '获取订单失败'});
+            res.respond({code: 1002, message: '获取订单失败'});
             return;
         }
 
         if (order.buyerId != user.id) {
-            self.respond({code: 1002, message: '没有权利修改这个订单'});
+            res.respond({code: 1002, message: '没有权利修改这个订单'});
             return;
         }
 
         DeliveryCodeService.getCodeByOrderId(orderId, function(err, code){
             if(err){
-                self.respond({code:1002, message:err});
+                res.respond({code:1002, message:err});
                 return;
             }
 
@@ -890,20 +823,20 @@ function json_get_delivery_code(){
                     && (order.deliverStatus == DELIVERSTATUS.RSCRECEIVED || order.deliverStatus == DELIVERSTATUS.PARTDELIVERED)){
                     OrderService.generateDeliveryCodeandNotify(order, null, function(err, deliveryCode){
                         if(err){
-                            self.respond({code:1002, message:'该订单无提货码，请联系客服人员'});
+                            res.respond({code:1002, message:'该订单无提货码，请联系客服人员'});
                             return;
                         }
 
-                        self.respond({code:1000, message:'success', deliveryCode:deliveryCode});
+                        res.respond({code:1000, message:'success', deliveryCode:deliveryCode});
                     });
                 } else{
-                    self.respond({code:1002, message:'该订单没有要自提的商品'});
+                    res.respond({code:1002, message:'该订单没有要自提的商品'});
                 }
             } else {
-                self.respond({code: 1000, message: 'success', deliveryCode: code});
+                res.respond({code: 1000, message: 'success', deliveryCode: code});
             }
         })
     })
-}
+};
 
 exports.getOders = getOdersList;

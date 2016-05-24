@@ -4,6 +4,7 @@
 var app = angular.module('shop_cart', ['xxnr_common']);
 app.controller('shoppingCartController', function($scope, $timeout, remoteApiService, commonService, loginService, sideService, shoppingCartService) {
 
+
     var sweetalert = commonService.sweetalert;
     /////////////////////////////////////
 
@@ -60,7 +61,15 @@ app.controller('shoppingCartController', function($scope, $timeout, remoteApiSer
                                         continue;
                                     }
                                 }
+                                //console.log(JSON.parse(location.search.substring(1)));
+                                //console.log(decodeURI(location.search).substring(1));
 
+                                //如果是立即购买的话,会通过url传过来相关商品的信息,下面是解析过程
+                                if(location.search){
+                                    var decodedProducts = decodeURI(decodeURI(location.search));
+                                    var buyNowProducts = JSON.parse('['+decodedProducts.match(/\?products=\[(.+)\]/)[1]+']');
+                                }
+                                //console.log(buyNowProducts);
                                 var item = {};
                                 item.selected = true;
                                 item.SKU_id = itemData._id;
@@ -86,8 +95,12 @@ app.controller('shoppingCartController', function($scope, $timeout, remoteApiSer
                                 item.nowPrice = Number(itemData.price).toFixed(2);
                                 item.point = itemData.point;
                                 // item.buyCount = parseInt(itemData.buyCount ? itemData.buyCount : itemData.goodsCount);
-                                item.buyCount = Number(itemData.count);
-                                // console.log(item.buyCount);
+                                if(buyNowProducts){
+                                    item.buyCount = buyNowProducts.length==1?buyNowProducts[0].count:Number(itemData.count);
+                                }else{
+                                    item.buyCount = Number(itemData.count);
+                                }
+
                                 item.oldBuyCount = item.buyCount;
                                 // item.count = parseInt(itemData.goodsCount);
                                 item.deposit = itemData.deposit;

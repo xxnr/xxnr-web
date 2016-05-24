@@ -425,10 +425,11 @@ app.service('remoteApiService', function(commonService){
         };
         return commonService.ajax(params);
     };
-    this.getInvitee = function(){
+    this.getInvitee = function(page){
         var params = {
             methodname:'api/v2.0/user/getInvitee',
-            'userId':user.userid
+            'userId':user.userid,
+            'page':page
         };
         return commonService.ajax(params);
     };

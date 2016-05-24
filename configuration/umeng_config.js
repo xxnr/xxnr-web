@@ -22,7 +22,7 @@ umengConfig.body[pay] = {
             'activity': "MyOrderDetailActivity",
             'ticker': "您有一笔订单未完成，请尽快支付",
             'title': "有商品到服务站啦！",
-            'text': "您订单中的商品已到服务站，请尽快完成付款",
+            'text': "您订单中有商品已到服务站，请尽快完成付款",
             'IOSpage': userOrderDetail
         }
 };
@@ -32,7 +32,7 @@ umengConfig.body[ziti] = {
         'activity': "MyOrderDetailActivity",
         'ticker': "您的商品可以自提啦！",
         'title': "商品可以自提啦！",
-        'text': "您订单中的商品已到服务站，请到网点自提",
+        'text': "您订单中有商品已到服务站，请到网点自提",
         'IOSpage': userOrderDetail
     },
     'RSC': {
@@ -50,7 +50,7 @@ umengConfig.body[zitiDone] = {
         'activity': "MyOrderDetailActivity",
         'ticker': "您有商品自提成功！",
         'title': "商品自提完成",
-        'text': "您订单中的有商品自提成功，点击查看详情",
+        'text': "您订单中有商品自提成功，点击查看详情",
         'IOSpage': userOrderDetail
     }
 };
@@ -65,6 +65,6 @@ umengConfig.body[delivery] = {
     }
 };
 umengConfig.retryCodes = [2028, 4000, 4001, 4002, 4009, 4021, 4023];
-umengConfig.production_mode = false;
+umengConfig.production_mode = require('../config').environment==='production';
 
 module.exports = umengConfig;
