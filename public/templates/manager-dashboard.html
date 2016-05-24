@@ -352,7 +352,7 @@
 						getDailies(dataName, dateStart, dateEnd);
 						break;
 					case 'last30days':
-						var dateStart = moment().add(-30, 'days').format('YYYY-MM-DD');
+						var dateStart = moment().add(-29, 'days').format('YYYY-MM-DD');
 						var dateEnd = moment().format('YYYY-MM-DD');
 						getDailies(dataName, dateStart, dateEnd);
 						break;
@@ -518,7 +518,7 @@
 	            	name: defaultOptions && defaultOptions['yAxis'] ? defaultOptions['yAxis'] : ''
 	            },
 	            series: dashboard.dailiesChartDatas['series'] && dashboard.dailiesChartDatas['series'][chartKey] ? dashboard.dailiesChartDatas['series'][chartKey] : [],
-	            color: ['#C1222A', '#B5C334', '#FDCF10', '#E97C24']
+	            color: defaultColors
 	        };
 
 	        // 使用刚指定的配置项和数据显示图表。

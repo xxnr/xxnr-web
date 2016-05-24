@@ -8,6 +8,7 @@ var i18n = {
   weekdays        : ['周日','周一','周二','周三','周四','周五','周六'],
   weekdaysShort   : ['日','一','二','三','四','五','六']
 };
+var defaultColors = ['#BFE83E', '#FCAC42', '#6DD2F3', '#3FCCAC'];
 
 // Current page
 common.page = '';
