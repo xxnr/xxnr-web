@@ -72,7 +72,7 @@ app.use(function (req, res, next) {
 	}
 
 	// APP will add extra slash at the beginning of the path improperly, here to remove them
-	req.path.replace(/\/*/, '/');
+	req.url = req.url.replace(/\/*/, '/');
 	return next();
 });
 
