@@ -95,7 +95,7 @@
 		var urlParam = agents.filter.search ? 'search=' + agents.filter.search : '';
 		urlParam += agents.filter.page ? (urlParam ? '&' : '') + 'page=' + agents.filter.page : '';
 		urlParam += agents.filter.max ? (urlParam ? '&' : '') + 'max=' + agents.filter.max : '';
-		var url = '/api/agents' + (urlParam ? '?' + urlParam : '');
+		var url = '/api/agents/' + (urlParam ? '?' + urlParam : '');
 		$.components.GET(managerurl + url, null, function(response) {
 			var key = 'agents.grid';
 			if (response && response.code && response.code==1000) {
@@ -140,7 +140,7 @@
 
 	function redirectURL(page) {
 		var urlParam = (agents.filter.search ? 'search=' + agents.filter.search : '') + (page ? '&page='+page : '');
-    	window.location.href = managerurl + "/agents" + (urlParam ? '?' + urlParam : '');
+    	window.location.href = managerurl + "/agents/" + (urlParam ? '?' + urlParam : '');
 	}
 
 </script>
