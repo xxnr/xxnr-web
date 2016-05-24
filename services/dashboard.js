@@ -40,8 +40,8 @@ DashboardService.prototype.generateHourlyReport = function(hourMinus, callback) 
     var currentTime = new Date();
 
     // startTime and endTime is used for database query, cause we store UTC in database, so we should minus time zone diff here
-    var startTime = new Date(currentTime.add('h', -hourMinus).format('yyyy-MM-dd hh')+':00:00').add('h', -config.currentTimeZoneDiff);
-    var endTime = new Date(currentTime.add('h', -hourMinus + 1).format('yyyy-MM-dd hh')+':00:00').add('h', -config.currentTimeZoneDiff);
+    var startTime = new Date(currentTime.add('h', -hourMinus).format('yyyy-MM-dd hh')+':00:00');
+    var endTime = new Date(currentTime.add('h', -hourMinus + 1).format('yyyy-MM-dd hh')+':00:00');
 
     // this time is used for recording into hourly report table.
     var queryDateInBeijingTime =  startTime;
