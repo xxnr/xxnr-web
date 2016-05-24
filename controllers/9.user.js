@@ -155,7 +155,7 @@ exports.process_login = function(req, res, next) {
         options.password = tools.decrypt_password(decodeURI(req.data.password));
     }
 
-    var keepLogin = !(req.data.keepLogin === 'false');
+    var keepLogin = !(req.data.keepLogin === false || req.data.keepLogin === 'false');
     options.useragent = req.data["user-agent"] || 'web';
     options.ip = req.ip;
     UserService.login(options, function (err, data) {
