@@ -352,7 +352,7 @@
 						getDailies(dataName, dateStart, dateEnd);
 						break;
 					case 'last30days':
-						var dateStart = moment().add(-30, 'days').format('YYYY-MM-DD');
+						var dateStart = moment().add(-29, 'days').format('YYYY-MM-DD');
 						var dateEnd = moment().format('YYYY-MM-DD');
 						getDailies(dataName, dateStart, dateEnd);
 						break;
