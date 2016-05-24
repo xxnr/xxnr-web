@@ -1,13 +1,14 @@
 var app = angular.module('xxnr_common');
 app.directive('header', function(){
     return{
+        replace:true,
         restrict: 'AE',
         templateUrl: function(element, attrs) {
            return attrs.templateUrl || 'header';
         },
         controller: function ($scope) {
-            $(function(){
-                if(window.location.href.indexOf("resources") != -1){
+            $(function () {
+                if (window.location.href.indexOf("resources") != -1) {
                     var login = document.getElementById('header_login');
                     login.href = "../../logon.html";
                     var register = document.getElementById('header_register');
@@ -23,10 +24,11 @@ app.directive('header', function(){
     }
 }).directive('footer', function(){
   return{
+      replace:true,
         restrict: 'AE',
     templateUrl: function(element, attrs) {
-           return attrs.templateUrl || 'footer';
-        },
-    replace:true
+        return attrs.templateUrl || 'footer';
+    },
+      replace:true
   }
 });

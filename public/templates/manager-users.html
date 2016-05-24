@@ -1,28 +1,20 @@
 <div class="filter" style="padding-bottom:9px">
 	<div class="container">
-		<div class="caption"><span class="fa fa-users mr5"></span> @(会员管理)&nbsp;&nbsp;&nbsp;&nbsp;<a href="/$manager/potentialcustomers"><h6 class="nopadding inline">查看潜在用户</h6></a></div>
+		<div class="caption"><span class="fa fa-users mr5"></span> 会员管理&nbsp;&nbsp;&nbsp;&nbsp;<a href="/manager/potentialcustomers"><h6 class="nopadding inline">查看潜在用户</h6></a></div>
 		<div class="row">
 			<div class="col-md-3 col-sm-6 m">
-				<div data-component="textbox" data-component-path="users.filter.search" data-placeholder="@(姓名/昵称/手机号)" data-control-icon="fa-search">@(查询用户)</div>
-				<div class="help" data-component="template" data-component-path="users.info"><script type="text/html">{{ count | pluralize(@('items','item','items','items')) }} / {{ pages | pluralize(@('pages','page','pages','pages')) }}</script></div>
+				<div data-component="textbox" data-component-path="users.filter.search" data-placeholder="姓名/昵称/手机号" data-control-icon="fa-search">查询用户</div>
+				<div class="help" data-component="template" data-component-path="users.info"><script type="text/html">{{ count | pluralize('items','item','items','items') }} / {{ pages | pluralize('pages','page','pages','pages') }}</script></div>
 			</div>
             <div class="col-md-3" col-sm-6 m>
-                <div name="user_verify" data-component="dropdown" data-component-path="users.filter.query" data-options="@(全部)|0;@(申请认证)|3;@(县级经销商)|7;@(新农经纪人)|8">@(认证用户)</div>
+                <div name="user_verify" data-component="dropdown" data-component-path="users.filter.query" data-options="全部|0;申请认证|3;县级经销商|7;新农经纪人|8">认证用户</div>
             </div>
 		</div>
 	</div>
 </div>
 
 <div class="container">
-	<div data-component="grid" data-component-path="users.grid" data-max="auto" data-options-page="@(Page: #)" data-options-button="@(查看更多客户)" data-component-id="users.grid">
-		<!-- <tr>
-			<td>@(会员)</td>
-			<td style="width:220px" class="hidden-xs fs11">@(账号)</td>
-			<td style="width:120px" class="hidden-xs fs11">@(昵称)</td>
-			<td style="width:120px" class="hidden-xs fs11">@(积分)</td>
-			<td style="width:200px" class="ui-right hidden-xs">@(注册时间)</td>
-			<td style="width:80px" class="ui-right">@(操作)</td>
-		</tr> -->
+	<div data-component="grid" data-component-path="users.grid" data-max="auto" data-options-page="Page: #" data-options-button="查看更多客户" data-component-id="users.grid">
 		<script type="text/html">
 		<tr>
 			<td style="width:40px" class="silver hidden-xs">$index</td>
@@ -44,17 +36,17 @@
             <td style="width:100px" class="hidden-xs fs11 ui-center" data-title="新农代表">{{if inviter }} {{ inviter.name }}</br>{{ inviter.account }} {{fi}}</td>
             <td style="width:100px" class="hidden-xs fs11" data-title="认证用户" title="{{ typeNameVerified }}">{{ typeNameVerified }}</td>
             <td style="width:80px" class="ui-right" data-title="会员信息">
-                <button name="edit" title="@(Show)"><span class="fa fa-search"></span></button>
+                <button name="edit" title="Show"><span class="fa fa-search"></span></button>
             </td>
             <td style="width:80px" class="ui-right" data-title="订单信息">
-                <button name="order" title="@(Show)"><span class="fa fa-search"></span></button>
+                <button name="order" title="Show"><span class="fa fa-search"></span></button>
             </td>
 		</tr>
 		</script>
 	</div>
-	<!-- <button name="remove" title="@(Remove)"><span class="fa fa-times"></span></button> -->
+	<!-- <button name="remove" title="Remove"><span class="fa fa-times"></span></button> -->
 </div>
-<div data-component="form" data-title="@(会员信息)" data-component-path="common.form" data-if="value === 'users'" data-width="900px" data-component-id="users.form">
+<div data-component="form" data-title="会员信息" data-component-path="common.form" data-if="value === 'users'" data-width="900px" data-component-id="users.form">
 	<div style="background:#F8F8F8">
 		<div class="multi_form">
 			<div class="form_tab">
@@ -69,32 +61,32 @@
 						<table class="table table-bordered" border="0">
 							<tbody>
 							<tr>
-								<td class="col-xs-4 active">@(# id)</td>
+								<td class="col-xs-4 active"># id</td>
 								<td>{{ form.id }}</td>
 							</tr>
 							<tr>
-								<td class="col-xs-4 active">@(账户)</td>
+								<td class="col-xs-4 active">账户</td>
 								<td>{{ form.account }}</td>
 							</tr>
 							<tr>
-								<td class="col-xs-4 active">@(姓名)</td>
+								<td class="col-xs-4 active">姓名</td>
 								<td>{{ form.name }}</td>
 							</tr>
 							<tr>
-								<td class="col-xs-4 active">@(所在地区)</td>
+								<td class="col-xs-4 active">所在地区</td>
 								<td>{{ form.addressShow }}</td>
 							</tr>
 							<tr>
-								<td class="col-xs-4 active">@(昵称)</td>
+								<td class="col-xs-4 active">昵称</td>
 								<td>{{ form.nickname }}</td>
 							</tr>
 							<tr>
-								<td class="col-xs-4 active">@(用户积分)</td>
+								<td class="col-xs-4 active">用户积分</td>
 								<td>{{ form.score }}</td>
 							</tr>
 							{{ if form.datecreated }}
 							<tr>
-								<td class="col-xs-4 active">@(注册时间)</td>
+								<td class="col-xs-4 active">注册时间</td>
 								<td>
 									{{ if form.datecreated.charAt(form.datecreated.length-1) !== 'Z' }}
 									{{ form.datecreated }}
@@ -105,23 +97,23 @@
 							</tr>
 							{{ fi }}
 							<tr>
-								<td class="col-xs-4 active">@(注册设备)</td>
+								<td class="col-xs-4 active">注册设备</td>
 								{{ if form.registerAgent }}
 								<td>{{ form.registerAgent }}</td>
 								{{ else }}
-								<td>@(无)</td>
+								<td>无</td>
 								{{ fi }}
 							</tr>
 							<tr>
-								<td class="col-xs-4 active">@(性别)</td>
+								<td class="col-xs-4 active">性别</td>
 								{{ if form.sex }}
-									<td>@(女)</td>
+									<td>女</td>
 								{{ else }}
-									<td>@(男)</td>
+									<td>男</td>
 								{{ fi }}
 							</tr>
 							<tr>
-								<td class="col-xs-4 active">@(申请类型)</td>
+								<td class="col-xs-4 active">申请类型</td>
 								<td id="user_types">
 									<if usertypes>
 										<select>
@@ -134,7 +126,7 @@
 								</td>
 							</tr>
 							<tr>
-								<td class="col-xs-4 active">@(已认证类型)</td>
+								<td class="col-xs-4 active">已认证类型</td>
 								<td id="drop_in" ondrop="dropin(event)" ondragover="allowDrop(event)" >
 									{{ foreach verifiedType in form.verifiedTypes}}
 									<div id="{{verifiedType.value}}" class="drag" text="{{ verifiedType.text }}" draggable="true" ondragstart="drag(event)" >{{ verifiedType.text }}</div>
@@ -142,7 +134,7 @@
 								</td>
 							</tr>
 							<tr>
-								<td class="col-xs-4 active">@(未认证类型)</td>
+								<td class="col-xs-4 active">未认证类型</td>
 								<td id="drop_out" ondrop="dropout(event)" ondragover="allowDrop(event)" >
 									{{ foreach notVerifiedType in form.notVerifiedTypes}}
 									<div id="{{notVerifiedType.value}}" class="drag" text="{{ notVerifiedType.text }}" draggable="true" ondragstart="drag(event)">{{ notVerifiedType.text }}</div>
@@ -156,9 +148,9 @@
 				<div data-component="error" data-component-path="users.response"></div>
 				<div class="ui-form-buttons">
 					<div>
-						<button name="submit">@(提交)</button>
+						<button name="submit">提交</button>
 					</div>
-					<button name="cancel">@(取消)</button>
+					<button name="cancel">取消</button>
 				</div>
 			</div>
 			<div id="RSC_info" class="form hidden">
@@ -168,19 +160,19 @@
 						<h3 class="nopadding">县级经销商信息</h3>
 						<table class="table table-bordered" border="0">
 							<tr>
-								<td class="col-xs-4 active">@(真实姓名)</td>
+								<td class="col-xs-4 active">真实姓名</td>
 								<td>{{ form.name }}</td>
 							</tr>
 							<tr>
-								<td class="col-xs-4 active">@(身份证号)</td>
+								<td class="col-xs-4 active">身份证号</td>
 								<td>{{ form.IDNo }}</td>
 							</tr>
 							<tr>
-								<td class="col-xs-4 active">@(网点名称)</td>
+								<td class="col-xs-4 active">网点名称</td>
 								<td>{{ form.companyName }}</td>
 							</tr>
 							<tr>
-								<td class="col-xs-4 active">@(网点地区)</td>
+								<td class="col-xs-4 active">网点地区</td>
 								<td>
 									{{ if form.companyAddress }}
 									{{ (form.companyAddress.province?form.companyAddress.province.name:'') + (form.companyAddress.city?form.companyAddress.city.name:'') + (form.companyAddress.county?form.companyAddress.county.name:'') + (form.companyAddress.town?form.companyAddress.town.name:'') }}
@@ -188,7 +180,7 @@
 								</td>
 							</tr>
 							<tr>
-								<td class="col-xs-4 active">@(网点详细地址)</td>
+								<td class="col-xs-4 active">网点详细地址</td>
 								<td>
 									{{ if form.companyAddress }}
 									{{ form.companyAddress.details}}
@@ -196,7 +188,7 @@
 								</td>
 							</tr>
 							<tr>
-								<td class="col-xs-4 active">@(网点电话)</td>
+								<td class="col-xs-4 active">网点电话</td>
 								<td>{{ form.phone }}</td>
 							</tr>
 						</table>
@@ -215,23 +207,23 @@
 						<table class="table table-bordered" border="0">
 							<tbody>
 							<tr>
-								<td class="col-xs-4 active">@(姓名)</td>
+								<td class="col-xs-4 active">姓名</td>
 								<td>{{ form.name }}</td>
 							</tr>
 							<tr>
-								<td class="col-xs-4 active">@(手机号)</td>
+								<td class="col-xs-4 active">手机号</td>
 								<td>{{ form.phone }}</td>
 							</tr>
 							<tr>
-								<td class="col-xs-4 active">@(身份证号)</td>
+								<td class="col-xs-4 active">身份证号</td>
 								<td>{{ form.identityNo }}</td>
 							</tr>
 							<tr>
-								<td class="col-xs-4 active">@(认证时间)</td>
+								<td class="col-xs-4 active">认证时间</td>
 								<td>{{ form.dateTimeVerified }}</td>
 							</tr>
 							<tr>
-								<td class="col-xs-4 active">@(所在地区)</td>
+								<td class="col-xs-4 active">所在地区</td>
 								<td>
 									{{ if form.address }}
 										{{ (form.address.province?form.address.province.name:'') + (form.address.city?form.address.city.name:'') + (form.address.county?form.address.county.name:'') + (form.address.town?form.address.town.name:'') }}
@@ -254,56 +246,50 @@
 		</div>
 	</div>
 </div>
-<div data-component="form" data-title="@(订单信息)" data-component-path="common.form" data-if="value==='users_orders'" data-width="1000px" data-component-id="users.orders.form">
+<div data-component="form" data-title="订单信息" data-component-path="common.form" data-if="value==='users_orders'" data-width="1000px" data-component-id="users.orders.form">
     <div data-component="template" class="padding" data-component-path="users.orders.form">
         <script type="text/html">
             <table class="table table-bordered" border="0">
                 <tbody>
                     <tr>
-                        <td class="col-xs-4 active">@(# 订单数)</td>
+                        <td class="col-xs-4 active"># 订单数</td>
                         <td>{{ count }}</td>
                     </tr>
                 </tbody>
             </table>
-            <div class="silver"><span class="fa fa-shopping-cart"></span> <strong>@(已支付订单列表)</strong>:</div>
+            <div class="silver"><span class="fa fa-shopping-cart"></span> <strong>已支付订单列表</strong>:</div>
             <table class="table table-bordered checkoutlist" border="0">
                 <tr>
-                    <td class="col-xs-2 hidden-xs ui-right">@(订单编号)</td>
-                    <td class="ui-right col-xs-3 hidden-xs">
+                    <td class="ui-right hidden-xs col-xs-1">订单编号</td>
+                    <td class="hidden-xs col-xs-6">
                         <ul>
-                            <li><div class="product-name">@(订单商品)</div><sapn>@((数量x))</sapn></li>
+                            <li><div class="product-name col-xs-10">订单商品</div><sapn class="col-xs-2">(数量x)</sapn></li>
                         </ul>
                     </td>
-                    <td class="ui-right col-xs-2">@(创建时间)</td>
-                    <td class="ui-right col-xs-2">@(收货人电话)</td>
-                    <td class="ui-right col-xs-2">@(支付金额)</td>
+                    <td class="ui-right col-xs-2">创建时间</td>
+                    <td class="ui-right col-xs-2">收货人电话</td>
+                    <td class="ui-right col-xs-1">支付金额</td>
                 </tr>
                 {{ foreach order in items }}
-                    {{ if order.payStatus=='1'}}
-                        <tr>
-                            <td class="col-xs-2 hidden-xs ui-right">{{ order.id }}</td>
-                            <td class="ui-right col-xs-4 hidden-xs">
-                                <ul>
-									{{ foreach product in order.products }}
-										<li><div class="product-name" title="{{product.name}}">{{ product.name }}</div><sapn>({{ product.count }}x)</sapn></li>
-									{{ end }}
-									{{ foreach SKU in order.SKUs }}
-										<li><div class="product-name" title="{{SKU.name}}">{{SKU.name}}</div><span>({{SKU.count}}x)</span></li>
-									{{ end }}
-                                </ul>
-                            </td>
-                            <td class="ui-right col-xs-3 hidden-xs">{{ order.dateCreated | format('yyyy-MM-dd hh:mm:ss') }}</td>
-                            <td class="ui-right col-xs-2 hidden-xs">{{ order.consigneePhone }}</td>
-                            <td class="ui-right col-xs-2 hidden-xs">{{ order.deposit }}</td>
-                        </tr>
-                    {{ fi }}
+                    <tr>
+                        <td class="ui-right hidden-xs col-xs-1">{{ order.id }}</td>
+                        <td class="hidden-xs col-xs-6">
+                            <ul>
+                            	{{ foreach product in order.products }}<li><div class="product-name hidden-xs col-xs-10" title="{{product.name}}">{{ product.name }}</div><sapn class="col-xs-2">({{ product.count }}x)</sapn></li>{{ end }}
+								{{ foreach SKU in order.SKUs }}<li><div class="product-name hidden-xs col-xs-10" title="{{SKU.name}}">{{SKU.name}}</div><span class="col-xs-2">({{SKU.count}}x)</span></li>{{ end }}
+                            </ul>
+                        </td>
+                        <td class="ui-right hidden-xs col-xs-2">{{ order.dateCreated | format('yyyy-MM-dd hh:mm:ss') }}</td>
+                        <td class="ui-right hidden-xs col-xs-2">{{ order.consigneePhone }}</td>
+                        <td class="ui-right hidden-xs col-xs-1">{{ order.price | price(2) }}</td>
+                    </tr>
                 {{ end }}
             </table>
-            <button name="more-orders" class="ui-grid-more">
-                <span class="fa fa-plus-circle"></span>
-                @(查看更多订单)
-            </button>
         </script>
+        <!-- <button name="more-orders" class="ui-grid-more">
+            <span class="fa fa-plus-circle"></span>
+            查看更多订单
+        </button> -->
     </div>
 </div>
 <script>
@@ -423,15 +409,23 @@
 					break;
 
 				// case 'remove':
-				// 	if (!confirm('@(Do you want to remove selected user?)'))
+				// 	if (!confirm('Do you want to remove selected user?'))
 				// 		return;
 				// 	$.components.DELETE(managerurl + '/api/users', { id: row.id }, function() {
 				// 		users_refresh(true);
 				// 	});
 				// 	break;
                 case 'order':
-                    $.components.GET(managerurl + '/api/orders/?buyer=' + row.id, null, function(response) {
-                        SET('users.orders.form', response);
+                    $.components.GET(managerurl + '/api/orders/?buyer=' + row.id + '&type=2', null, function(response) {
+                    	if (response.code!=1000) {
+                    		var message = "获取订单信息错误";
+                    		if (response.message) {
+                    			message = response.message;
+                    		}
+                            alert(message);
+                            return;
+                        }
+                        SET('users.orders.form', response.datas);
                         SET('common.form','users_orders');
                     });
                     break;
@@ -503,7 +497,7 @@
 		}
 
 		$.components.GET(managerurl + '/api/users/', users.filter, function(response) {
-			if(response.code!=1000) {
+			if(response.code!=1000){
 				alert(response.message);
 			}
 

@@ -21,7 +21,8 @@ var SKUSchema = new mongoose.Schema({
         platform_price: {type: Number, required: true} // platform price
     },
     online:{type:Boolean, default:false},
-    dateCreated:{type:Date, default: Date.now}
+    dateCreated:{type:Date, default: Date.now},
+    attributeKey:{type: String}
 });
 
 var SKUAttributesSchema = new mongoose.Schema({
@@ -42,12 +43,24 @@ var SKUAdditionsSchema = new mongoose.Schema({              // sku additions, li
 
 // indexes
 SKUSchema.index({product:1, dateCreated:1});
-SKUSchema.index({name:1, product:1}, {unique:true});
+SKUSchema.index({name:1, product:1});
+SKUSchema.index({attributeKey:1, product:1}, {unique:1});
 SKUAttributesSchema.index({category:1, brand:1, name:1, value:1}, {unique:true});
 SKUAttributesSchema.index({category:1, brand:1, name:1});
 SKUAdditionsSchema.index({category:1, brand:1, name:1}, {unique:true});
 SKUAdditionsSchema.index({category:1, brand:1});
 
-mongoose.model('SKU', SKUSchema);
+var SKUModel = mongoose.model('SKU', SKUSchema);
 mongoose.model('SKUAttribute', SKUAttributesSchema);
 mongoose.model('SKUAddition', SKUAdditionsSchema);
+
+
+//mongoose.set("debug", true);
+//
+//SKUModel.on("index", function(err){
+//    if(err){
+//        console.error(err);
+//    }else{
+//        console.info()
+//    }
+//})

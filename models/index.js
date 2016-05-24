@@ -2,6 +2,10 @@
  * Created by pepelu on 2015/11/18.
  */
 var mongoose = require('mongoose');
+var config = require('../configuration/mongoose_config');
+
+mongoose.connect(config.db[config.environment],{user:'xxnr',pass:'xxnr001'});
+
 require('./users');
 require('./auth');
 require('./backendusers');
@@ -20,6 +24,9 @@ require('./whitelist');
 require('./auditlogs');
 require('./frontendUserAccess');
 require('./userrelevances');
+require('./hourlyReport');
+require('./user_sign');
+require('./vcodes');
 
 //user
 exports.user = mongoose.model('user');
@@ -78,6 +85,14 @@ exports.auditlog = mongoose.model('auditlog');
 exports.frontendUserAccess = mongoose.model('frontendUserAccess');
 // delivery code
 exports.deliveryCode = mongoose.model('deliveryCode');
+// hourly report
+exports.hourlyReport = mongoose.model('hourlyReport');
+exports.reportUpdateTime = mongoose.model('reportUpdateTime');
+exports.agentReport = mongoose.model('agentReport');
+// user sign
+exports.userSign = mongoose.model('user_sign');
+// vcode
+exports.vcode = mongoose.model('vcode');
 
 exports.getModel = function (name, options) {
     options = options || {};

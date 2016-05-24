@@ -2388,12 +2388,29 @@ body {
     width: 100%;
     height: 100%;
     background: #ddd;
-    opacity: 0.6;
     position: fixed;
     left: 0;
     top: 0;
-    -ms-filter: alpha(opacity=50);
     z-index: 5;
+    /* Theoretically for IE 8 & 9 (more valid) */
+    /* ...but not required as filter works too */
+    /* should come BEFORE filter */
+    -ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=60)";
+
+    /* This works in IE 8 & 9 too */
+    /* ... but also 5, 6, 7 */
+    filter: alpha(opacity=60);
+
+    /* Older than Firefox 0.9 */
+    -moz-opacity:0.6;
+
+    /* Safari 1.x (pre WebKit!) */
+    -khtml-opacity: 0.6;
+
+    /* Modern!
+    /* Firefox 0.9+, Safari 2?, Chrome any?
+    /* Opera 9+, IE 9+ */
+    opacity: 0.6;
 }
 .pop_content {
     z-index: 10;
@@ -3204,12 +3221,12 @@ body {
 }
 .cart_box .cart-tbody .item-item .pay-step-1 .order-price {
     color: #ff6700;
-    min-width: 140px;
+    min-width: 148px;
     display: inline-block;
     text-align: right;
 }
 .cart_box .cart-tbody .item-item .pay-step-2 .balance {
-    min-width: 140px;
+    min-width: 148px;
     display: inline-block;
     text-align: right;
 }
@@ -3946,6 +3963,7 @@ body {
     text-align: left;
     box-sizing: border-box;
 }
+
 .wrap_user_info .orders .orders-main .order-titles li:nth-child(2) {
     width: 120px;
 }
@@ -4418,7 +4436,7 @@ body {
     font-size: 16px;
     color: #323232;
     border-top: 1px solid #e0e0e0;
-    padding-left: 867px;
+    padding-left: 870px;
 }
 .jiesuan .cart-main .cart-tbody .item-item .pay-step-2 {
     line-height: 36px;
@@ -4426,26 +4444,28 @@ body {
     font-size: 16px;
     color: #323232;
     border-top: 1px solid #e0e0e0;
-    padding-left: 867px;
+    padding-left: 870px;
 }
 .jiesuan .cart-main .cart-tbody .item-item .pay-step-1 span.text-info {
-    width: 140px;
+    width: 130px;
     display: inline-block;
     font-size: 14px;
+    text-align: right;
 }
 .jiesuan .cart-main .cart-tbody .item-item .pay-step-2 span.text-info {
-    width: 140px;
+    width: 130px;
     display: inline-block;
     font-size: 14px;
+    text-align: right;
 }
 .jiesuan .cart-main .cart-tbody .item-item .pay-step-1 .order-price {
     color: #ff6700;
-    min-width: 140px;
+    width: 148px;
     display: inline-block;
     text-align: right;
 }
-.cart_box .cart-tbody .item-item .pay-step-2 .balance {
-    min-width: 140px;
+.jiesuan .cart-main .cart_box .cart-tbody .item-item .pay-step-2 .balance {
+    min-width: 148px;
     display: inline-block;
     text-align: right;
 }
@@ -4938,6 +4958,7 @@ body {
     padding-left: 65px;
     padding-top: 40px;
     box-sizing: border-box;
+    padding-bottom: 40px;
 }
 .myClients_forms .clients_info .clients_count {
     color: #323232;
@@ -4955,6 +4976,7 @@ body {
 .myClients_forms .clients_info .clients_form li {
     height: 60px;
     line-height: 60px;
+    box-sizing: border-box;
 }
 .myClients_forms .clients_info .clients_form .client_row:nth-child(odd) {
     background: #f8f8f8;
@@ -5033,6 +5055,9 @@ body {
 .myClients_forms .client_order .orders_clientInfo p .OrdersNum {
     color: #ff6700;
     line-height: 22px;
+}
+.myClients_forms .client_order {
+    padding-bottom: 20px;
 }
 .myClients_forms .inviter_section .inviter_wrap {
     padding-top: 40px;
@@ -5246,7 +5271,8 @@ body {
 }
 .myClients_forms .client_order .invitee_orders_pager #page_buttons {
     display: block;
-    margin: 50px auto;
+    margin: 100px auto;
+    margin-bottom: 0px;
 }
 .myClients_forms .client_order .invitee_orders_pager #page_buttons ul li a {
     background: #FFFFFF;
@@ -5277,6 +5303,49 @@ body {
     height: 26px;
     display: inline-block;
 }
+
+
+.myClients_forms .clients_info .invitees_list_pager {
+    display: block;
+    margin: 0px auto;
+    text-align: center;
+}
+.myClients_forms .clients_info .invitees_list_pager #invitees_page_buttons {
+    display: block;
+    margin: 30px auto;
+    margin-bottom: 0px;
+}
+.myClients_forms .clients_info .invitees_list_pager #invitees_page_buttons ul li a {
+    background: #FFFFFF;
+    height: 26px;
+    width: 26px;
+    border-radius: 50%;
+    border: 1px solid #c7c7c7;
+    line-height: 26px;
+    margin-left: 12px;
+    display: inline-block;
+}
+.myClients_forms .clients_info .invitees_list_pager #invitees_page_buttons ul li a.current {
+    background: #ff6600;
+    color: #FFFFFF;
+    border: 0;
+}
+.myClients_forms .clients_info .invitees_list_pager #invitees_page_buttons .pre_btn a {
+    border: 0;
+    background: url(../images/lefticon02.png) no-repeat 7px;
+    width: 26px;
+    height: 26px;
+    display: inline-block;
+}
+.myClients_forms .clients_info .invitees_list_pager #invitees_page_buttons .next_btn a {
+    border: 0;
+    background: url(../images/righticon01.png) no-repeat 7px;
+    width: 26px;
+    height: 26px;
+    display: inline-block;
+}
+
+
 .myClients_forms .client_order .orders_list .orders .orders-main .single-order .pay-section div {
     float: left;
 }
@@ -5627,6 +5696,7 @@ body {
     width: 150px;
     text-align: right;
 }
+
 .order-detail-section .order .order-body .orders-main .order-titles li:nth-child(4) {
     text-align: right;
     box-sizing: border-box;
@@ -5856,6 +5926,8 @@ body {
 .order-detail-section .order .order-body .pay_table_content .payment_detail .payment_detail_content li:nth-child(5) {
     width: 200px;
 }
+
+
 .payBody {
     padding-top: 20px;
     padding-bottom: 50px;
@@ -7227,6 +7299,7 @@ body {
     background: #FFFFFF;
     padding: 0 20px;
     padding-bottom: 20px;
+    box-sizing: border-box;
 }
 /*order--search component used in rsc_management page*/
 .order--search{
@@ -7291,7 +7364,7 @@ body {
     width: 180px;
 }
 .orderslist--titles li:nth-child(6) {
-    width: 198px;
+    width: 158px;
 }
 .orders--list{
     min-height: 500px;
@@ -7352,7 +7425,7 @@ body {
     border-right: 1px solid #e0e0e0;
 }
 .singleOrder--body .right-section{
-    width: 197px;
+    width: 157px;
     display: inline-block;
     float: left;
     padding-top: 20px;
@@ -7693,6 +7766,7 @@ body {
 .pop--body .consigneeName{
     font-size: 16px;
     color: #FE9B00;
+    margin-bottom: 10px;
 }
 .pop--body .confirmPaymentAmount{
     color: #FE9B00;

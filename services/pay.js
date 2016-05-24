@@ -98,7 +98,7 @@ PayService.prototype.updatePaymentRefund = function(options, callback) {
                 setValues.notifyInfo = options.result_detail;
             }
 		}
-		if (options.status) {
+		if (options.status == 0 || options.status) {
 			setValues.status = options.status;
 		}
         if (options.dateNotify) {

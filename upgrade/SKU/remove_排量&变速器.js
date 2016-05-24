@@ -1,10 +1,7 @@
 /**
  * Created by pepelu on 2016/1/22.
  */
-var config = require('../../configuration/mongoose_config');
-var mongoose = require('mongoose');
 var SKUService = require('../../services/SKU');
-mongoose.connect(config.db[config.environment],{user:'xxnr',pass:'xxnr001'});
 
 SKUService.removeSKUAttributesByName('排量', function(err){
     if(err){

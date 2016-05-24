@@ -50,27 +50,28 @@ app.controller('carController', function($scope, remoteApiService, sideService) 
         remoteApiService.getAttributes($scope.categoryId, $scope.brandsStr)
             .then(function(data) {
                 attributes = data.attributes;
-                // console.log(attributes);
-                if($scope.search_categories.length > 2){
+                if($scope.search_categories && $scope.search_categories.length > 2){
                     var s_c = $scope.search_categories;
                     $scope.search_categories = Array(s_c[0],s_c[s_c.length-1]);
                 }
-                for(var i in attributes){
-                    var attributes_choices = [];
-                    for (var j = 0; j < attributes[i].values.length; j++) {
-                        var choice = {};
-                        choice.name = attributes[i].values[j];
-                        choice.isSelected = false;
-                        attributes_choices.push(choice);
-                    }
+                for(var i in attributes) {
+                    if (attributes.hasOwnProperty(i)) {
+                        var attributes_choices = [];
+                        for (var j = 0; j < attributes[i].values.length; j++) {
+                            var choice = {};
+                            choice.name = attributes[i].values[j];
+                            choice.isSelected = false;
+                            attributes_choices.push(choice);
+                        }
 
-                    $scope.search_categories.splice(-1,-1,
-                        {
-                            name: attributes[i]._id.name,
-                            index: attributes[i]._id.name,
-                            choices: attributes_choices,
-                            current_query: []
-                        });
+                        $scope.search_categories.splice(-1, -1,
+                            {
+                                name: attributes[i]._id.name,
+                                index: attributes[i]._id.name,
+                                choices: attributes_choices,
+                                current_query: []
+                            });
+                    }
                 }
 
             });
@@ -79,11 +80,13 @@ app.controller('carController', function($scope, remoteApiService, sideService) 
     $scope.getSelectedBrands = function(brands,isInitial){
         var result = [];
         for(var i in brands){
-            if(isInitial){
-                result.push(brands[i]._id);
-            }else{
-                if(brands[i].isSelected === true){
+            if(brands.hasOwnProperty(i)) {
+                if (isInitial) {
                     result.push(brands[i]._id);
+                } else {
+                    if (brands[i].isSelected === true) {
+                        result.push(brands[i]._id);
+                    }
                 }
             }
         }
@@ -92,11 +95,14 @@ app.controller('carController', function($scope, remoteApiService, sideService) 
     $scope.stringifyBrands = function(strArray,isPublicAttributes){
         var result = "";
         for(var i in strArray){
-            result = result + strArray[i]+',';
+            if(strArray.hasOwnProperty(i)) {
+                result = result + strArray[i] + ',';
+            }
         }
         if(isPublicAttributes){
             result = result + "0,";
         }
+
         return result;
     };
     $scope.getAttributes(true,true);

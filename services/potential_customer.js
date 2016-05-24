@@ -236,21 +236,22 @@ PotentialCustomerService.prototype.queryPage = function(user, page, max, callbac
             }
 
             var query = PotentialCustomerModel.find(queryOptions)
+                .sort({dateTimeAdded:-1})
                 .skip(page * max)
                 .limit(max);
             if(BESchema){
                 query = query.populate({path:'user', select:'-_id name typeVerified'})
+                    .populate({path:'buyIntentions', select:' -__v -count'})
                     .populate('address.province')
                     .populate('address.city')
                     .populate('address.county')
                     .populate('address.town')
-                    .select('name phone remarks isRegistered sex address dateTimeAdded dateTimeRegistered user');
+                    .select('name phone remarks buyIntentions isRegistered sex address dateTimeAdded dateTimeRegistered user');
             } else{
                 query = query.select('name phone remarks isRegistered sex');
             }
 
-            query.sort({dateTimeAdded:-1})
-                .exec(function (err, customers) {
+            query.exec(function (err, customers) {
                     if (err) {
                         console.error(err);
                         callback(err);
