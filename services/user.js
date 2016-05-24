@@ -81,6 +81,8 @@ UserService.prototype.update = function(options, callback) {
         setValue.dateinvited = options.dateinvited;
     if (options.appLoginId)
         setValue.appLoginId = options.appLoginId;
+    if (options.appLoginAgent)
+        setValue.appLoginAgent = options.appLoginAgent;
     if (options.webLoginId)
         setValue.webLoginId = options.webLoginId;
     if (options.address)
@@ -799,6 +801,26 @@ UserService.prototype.query = function(options, callback) {
                 callback(null, data || []);
             })
     })
+};
+
+UserService.prototype.getTestAccountList = function(callback) {
+    UserModel.find({isTestAccount: true})
+        .select('id')
+        .lean()
+        .exec(function (err, testAccounts) {
+            if (err) {
+                console.error(err);
+                callback(err);
+                return;
+            }
+
+            var testAccountList = [];
+            testAccounts.forEach(function (testAccount) {
+                testAccountList.push(testAccount.id);
+            });
+
+            callback(null, testAccountList);
+        })
 };
 
 module.exports = new UserService();

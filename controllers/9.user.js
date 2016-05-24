@@ -11,73 +11,76 @@ var UseraddressService = services.useraddress;
 var AreaService = services.area;
 var CartService = services.cart;
 var OrderService = services.order;
+var vCodeService = services.vCode;
 var IntentionProductService = services.intention_product;
 var PotentialCustomerService = services.potential_customer;
 var REG_MOBILE = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|Tablet|IOS/i;
+var config = require('../config');
+var Global = require('../global.js');
 
 exports.install = function() {
 	// LOGIN
-	F.route('/api/v2.0/user/login/', 				    process_login, ['get', 'post']);
+	//F.route('/api/v2.0/user/login/', 				    process_login, ['get', 'post']);
 	//F.route('/logout/', 						        process_logout);
 
 	// REGISTER
-	F.route('/api/v2.0/user/register/', 				process_register, ['get', 'post']);
+	//F.route('/api/v2.0/user/register/', 				process_register, ['get', 'post']);
 
 	// USER
-	F.route('/api/v2.0/user/get/',					    json_user_get, ['get', 'post'], ['isLoggedIn']);
-	F.route('/api/v2.0/user/resetpwd/',				    process_resetpwd, ['get', 'post']);
-	F.route('/api/v2.0/user/modifypwd/',				json_user_modifypwd, ['get','post'], ['isLoggedIn']);
-	F.route('/api/v2.0/user/modify/',				    json_user_modify, ['get', 'post'], ['isLoggedIn']);
-	F.route('/api/v2.0/point/findPointList/',		    json_userscore_get, ['get', 'post'], ['isLoggedIn']);
-    F.route('/api/v2.0/user/findAccount/',              json_user_findaccount, ['get', 'post']);
-    F.route('/api/v2.0/user/bindInviter',               process_bind_inviter, ['get','post'], ['isLoggedIn']);
-    F.route('/api/v2.0/user/getInviter',                json_get_inviter, ['get'], ['isLoggedIn'])
+	//F.route('/api/v2.0/user/get/',					    json_user_get, ['get', 'post'], ['isLoggedIn']);
+	//F.route('/api/v2.0/user/resetpwd/',				    process_resetpwd, ['get', 'post']);
+	//F.route('/api/v2.0/user/modifypwd/',				json_user_modifypwd, ['get','post'], ['isLoggedIn']);
+	//F.route('/api/v2.0/user/modify/',				    json_user_modify, ['get', 'post'], ['isLoggedIn']);
+	//F.route('/api/v2.0/point/findPointList/',		    json_userscore_get, ['get', 'post'], ['isLoggedIn']);
+    //F.route('/api/v2.0/user/findAccount/',              json_user_findaccount, ['get', 'post']);
+    //F.route('/api/v2.0/user/bindInviter',               process_bind_inviter, ['get','post'], ['isLoggedIn']);
+    //F.route('/api/v2.0/user/getInviter',                json_get_inviter, ['get'], ['isLoggedIn'])
     // order by name pinyin
-    F.route('/api/v2.0/user/getInviteeOrderbyName',     json_get_inviteeOrderbynamePinyin, ['get'], ['isLoggedIn']);
-    F.route('/api/v2.0/user/getInvitee',                json_get_invitee, ['get', 'post'], ['isLoggedIn']);
-    F.route('/api/v2.0/user/getInviteeOrders',          json_get_invitee_orders, ['get', 'post'], ['isLoggedIn']);
-	F.route('/api/v2.0/usertypes',                      json_usertypes_get, ['get']);
+    //F.route('/api/v2.0/user/getInviteeOrderbyName',     json_get_inviteeOrderbynamePinyin, ['get'], ['isLoggedIn']);
+    //F.route('/api/v2.0/user/getInvitee',                json_get_invitee, ['get', 'post'], ['isLoggedIn']);
+    //F.route('/api/v2.0/user/getInviteeOrders',          json_get_invitee_orders, ['get', 'post'], ['isLoggedIn']);
+    //F.route('/api/v2.0/usertypes',                      json_usertypes_get, ['get']);
 
 	// User Address
-	F.route('/api/v2.0/user/getUserAddressList/',	    json_useraddresslist_query, ['get', 'post'],['isLoggedIn']);
-	F.route('/api/v2.0/user/saveUserAddress/',		    json_useraddress_create, ['get', 'post'],['isLoggedIn']);
-	F.route('/api/v2.0/user/updateUserAddress/',		json_useraddress_update, ['get', 'post'],['isLoggedIn']);
-	F.route('/api/v2.0/user/deleteUserAddress/',		json_useraddress_remove, ['get', 'post'],['isLoggedIn']);
+	//F.route('/api/v2.0/user/getUserAddressList/',	    json_useraddresslist_query, ['get', 'post'],['isLoggedIn']);
+	//F.route('/api/v2.0/user/saveUserAddress/',		    json_useraddress_create, ['get', 'post'],['isLoggedIn']);
+	//F.route('/api/v2.0/user/updateUserAddress/',		json_useraddress_update, ['get', 'post'],['isLoggedIn']);
+	//F.route('/api/v2.0/user/deleteUserAddress/',		json_useraddress_remove, ['get', 'post'],['isLoggedIn']);
 
     // RSA public key
-    F.route('/api/v2.0/user/getpubkey/',                json_public_key, ['get', 'post']);
+    //F.route('/api/v2.0/user/getpubkey/',                json_public_key, ['get', 'post']);
 
     // Use sign
-    F.route('/api/v2.0/user/sign/',                     process_user_sign, ['get','post'], ['isLoggedIn']);
+    //F.route('/api/v2.0/user/sign/',                     process_user_sign, ['get','post'], ['isLoggedIn']);
 
     // upload user photo for app
-    F.route('/api/v2.0/user/uploadPortrait',            uploadPhoto, ['post', 'upload'], 1024*20, ['isLoggedIn']);
+    //F.route('/api/v2.0/user/uploadPortrait',            uploadPhoto, ['post', 'upload'], 1024*20, ['isLoggedIn']);
     // upload user photo for web
-    F.route('/api/v2.0/user/upload',                    userUpload, ['post', 'upload'], 1024*20, ['isLoggedIn']);
+    //F.route('/api/v2.0/user/upload',                    userUpload, ['post', 'upload'], 1024*20, ['isLoggedIn']);
     // confirm user photo for web
-    F.route('/api/v2.0/user/confirmUpload',             confirmUpload, ['get', 'post'], ['isLoggedIn']);
+    //F.route('/api/v2.0/user/confirmUpload',             confirmUpload, ['get', 'post'], ['isLoggedIn']);
 
-    F.route('/api/v2.0/user/isAlive',                   isAlive, ['get'], ['isLoggedIn']);
+    //F.route('/api/v2.0/user/isAlive',                   isAlive, ['get'], ['isLoggedIn']);
 
     // check user in white list
-    F.route('/api/v2.0/user/isInWhiteList',             isInWhiteList, ['get', 'post'], ['isLoggedIn', 'isInWhiteList']);
+    //F.route('/api/v2.0/user/isInWhiteList',             isInWhiteList, ['get', 'post'], ['isLoggedIn', 'isInWhiteList']);
 
     // potential customer/intention products related APIs
-    F.route('/api/v2.1/intentionProducts',              json_intention_products, ['get'], ['isLoggedIn', 'isXXNRAgent']);
-    F.route('/api/v2.1/potentialCustomer/isAvailable',  json_potential_customer_available, ['get'], ['isLoggedIn', 'isXXNRAgent']);
-    F.route('/api/v2.1/potentialCustomer/add',          process_add_potential_customer, ['post'], ['isLoggedIn', 'isXXNRAgent']);
-    F.route('/api/v2.1/potentialCustomer/query',        json_potential_customer, ['get'], ['isLoggedIn', 'isXXNRAgent']);
+    //F.route('/api/v2.1/intentionProducts',              json_intention_products, ['get'], ['isLoggedIn', 'isXXNRAgent']);
+    //F.route('/api/v2.1/potentialCustomer/isAvailable',  json_potential_customer_available, ['get'], ['isLoggedIn', 'isXXNRAgent']);
+    //F.route('/api/v2.1/potentialCustomer/add',          process_add_potential_customer, ['post'], ['isLoggedIn', 'isXXNRAgent']);
+    //F.route('/api/v2.1/potentialCustomer/query',        json_potential_customer, ['get'], ['isLoggedIn', 'isXXNRAgent']);
     // order by name pinyin
-    F.route('/api/v2.1/potentialCustomer/queryAllOrderbyName',     json_potential_customer_orderby_namePinyin, ['get'], ['isLoggedIn', 'isXXNRAgent']);
+    //F.route('/api/v2.1/potentialCustomer/queryAllOrderbyName',     json_potential_customer_orderby_namePinyin, ['get'], ['isLoggedIn', 'isXXNRAgent']);
     // Whether order by name pinyin is latest
-    F.route('/api/v2.1/potentialCustomer/isLatest',     json_potential_customer_islatest, ['get'], ['isLoggedIn', 'isXXNRAgent']);
-    F.route('/api/v2.1/potentialCustomer/get',          json_potential_customer_get, ['get'], ['isLoggedIn', 'isXXNRAgent']);
+    //F.route('/api/v2.1/potentialCustomer/isLatest',     json_potential_customer_islatest, ['get'], ['isLoggedIn', 'isXXNRAgent']);
+    //F.route('/api/v2.1/potentialCustomer/get',          json_potential_customer_get, ['get'], ['isLoggedIn', 'isXXNRAgent']);
 
-    F.route('/api/v2.1/user/getNominatedInviter',       json_nominated_inviter_get, ['get'], ['isLoggedIn']);
+    //F.route('/api/v2.1/user/getNominatedInviter',       json_nominated_inviter_get, ['get'], ['isLoggedIn']);
 
     // user consignees
-    F.route('/api/v2.2/user/queryConsignees',           json_userconsignees_query, ['get'], ['isLoggedIn']);
-    F.route('/api/v2.2/user/saveConsignees',            process_userconsignees_save, ['get', 'post'], ['isLoggedIn']);
+    //F.route('/api/v2.2/user/queryConsignees',           json_userconsignees_query, ['get'], ['isLoggedIn']);
+    //F.route('/api/v2.2/user/saveConsignees',            process_userconsignees_save, ['get', 'post'], ['isLoggedIn']);
 
 	// v1.0
 	// LOGIN
@@ -105,9 +108,9 @@ exports.install = function() {
 
     //fix api// F.route('/app/user/uploadHeadPortrait',             uploadPhoto, ['post', 'upload'], 1024*20, ['isLoggedIn']);
 };
-if(!F.global.key){
+if(!Global.key){
     var key = null;
-    if(F.isDebug){
+    if(config.isDebug){
         // in debug mode we use key in memory
         key = new NodeRSA({b:512});
         key.generateKeyPair();
@@ -122,46 +125,44 @@ if(!F.global.key){
         key = new NodeRSA(private_key_string);
     }
 
-    F.global.key = key;
+    Global.key = key;
 }
 
-F.global.usertypes = JSON.parse(F.config.user_types);
-F.global.default_user_type = JSON.parse(F.config.default_user_type);
+Global.usertypes = config.user_types;
+Global.default_user_type = config.default_user_type;
 
 // ==========================================================================
 // LOGIN
 // ==========================================================================
 
-var files = DB('files', null, require('total.js/database/database').BUILT_IN_DB).binary;
+var files = DB('files', null, require('../modules/database/database').BUILT_IN_DB).binary;
 
 // Login
-function process_login() {
-    var self = this;
+exports.process_login = function(req, res, next) {
     var options = {};
-    if (!self.data.account){
-        self.respond({code:1001,message:'请输入账号'});
+    if (!req.data.account){
+        res.respond({code:1001,message:'请输入账号'});
         return;
     }
 
-    if (!self.data.password){
-        self.respond({code:1001,message:'请输入密码'});
+    if (!req.data.password){
+        res.respond({code:1001,message:'请输入密码'});
         return;
     }
 
-    options.account = self.data.account;
-    if (self.data.password) {
-        options.password = tools.decrypt_password(decodeURI(self.data.password));
+    options.account = req.data.account;
+    if (req.data.password) {
+        options.password = tools.decrypt_password(decodeURI(req.data.password));
     }
 
-    var keepLogin = !(self.data.keepLogin === 'false');
-    options.useragent = self.data["user-agent"] || 'web';
-    options.ip = self.req.ip;
-
+    var keepLogin = !(req.data.keepLogin === 'false');
+    options.useragent = req.data["user-agent"] || 'web';
+    options.ip = req.ip;
     UserService.login(options, function (err, data) {
         // Error
         if (err) {
             console.error('user process_login fail:', err);
-            self.respond({code:1001, message:err});
+            res.respond({code:1001, message:err});
             return;
         }
 
@@ -179,26 +180,28 @@ function process_login() {
         convert_user_type_info(user, data);
         CartService.getOrAdd(user.userid, function(err, cart){
             if(err){
-                self.respond({code:1001, message:'获取购物车id失败'});
+                res.respond({code:1001, message:'获取购物车id失败'});
                 return;
             }
 
             user.cartId = cart.cartId;
-            setCookieAndResponse.call(self, user, keepLogin);
+            setCookieAndResponse(req, res, user, keepLogin);
         }, false);
     });
-}
+};
 
-var setCookieAndResponse = function(user, keepLogin){
-    var self = this;
-
+var setCookieAndResponse = function(req, res, user, keepLogin){
     // Set cookie
-    // self.res.cookie(F.config.usercookie, F.encrypt({ userid: user.userid, ip: self.req.ip }, 'user'), new Date().add('5 minutes'));
     var options = {userid:user.userid};
-    var userAgent = self.data['user-agent'];
+    var userAgent = req.data['user-agent'];
     if(REG_MOBILE.test(userAgent)){
         // is app
         options.appLoginId = U.GUID(10);
+        // app login agent
+        var appLoginAgent = tools.testUserAgent(userAgent);
+        if (appLoginAgent) {
+            options.appLoginAgent = appLoginAgent;
+        }
     }else{
         // is web
         options.webLoginId = U.GUID(10);
@@ -208,7 +211,7 @@ var setCookieAndResponse = function(user, keepLogin){
     UserService.update(options, function(err){
         if(err){
             console.error('setCookieAndResponse err:', err);
-            self.respond({code:1001, message:'登录失败'});
+            res.respond({code:1001, message:'登录失败'});
             return;
         }
 
@@ -217,20 +220,20 @@ var setCookieAndResponse = function(user, keepLogin){
             cookieUserInfo.nickName = encodeURIComponent(user.nickname);
         }
         if(keepLogin){
-            if(F.isDebug){
-                self.res.cookie(F.config.usercookie, JSON.stringify(cookieUserInfo), new Date().add(F.config.usercookie_expires_in));
-                self.res.cookie(F.config.tokencookie, token, new Date().add(F.config.token_cookie_expires_in));
+            if(config.isDebug){
+                res.cookie(config.usercookie, JSON.stringify(cookieUserInfo), {expires: new Date().add(config.usercookie_expires_in)});
+                res.cookie(config.tokencookie, token, {expires: new Date().add(config.token_cookie_expires_in)});
             }else {
-                self.res.cookie(F.config.usercookie, JSON.stringify(cookieUserInfo), new Date().add(F.config.usercookie_expires_in), {domain: F.config.domain});
-                self.res.cookie(F.config.tokencookie, token, new Date().add(F.config.token_cookie_expires_in), {domain: F.config.domain});
+                res.cookie(config.usercookie, JSON.stringify(cookieUserInfo), {expires:new Date().add(config.usercookie_expires_in), domain: config.domain});
+                res.cookie(config.tokencookie, token, {expires:new Date().add(config.token_cookie_expires_in), domain: config.domain});
             }
         }else{
-            if(F.isDebug){
-                self.res.cookie(F.config.usercookie, JSON.stringify(cookieUserInfo));
-                self.res.cookie(F.config.tokencookie, token);
+            if(config.isDebug){
+                res.cookie(config.usercookie, JSON.stringify(cookieUserInfo));
+                res.cookie(config.tokencookie, token);
             }else {
-                self.res.cookie(F.config.usercookie, JSON.stringify(cookieUserInfo), null, {domain: F.config.domain});
-                self.res.cookie(F.config.tokencookie, token, null, {domain: F.config.domain});
+                res.cookie(config.usercookie, JSON.stringify(cookieUserInfo), {domain: config.domain});
+                res.cookie(config.tokencookie, token, {domain: config.domain});
             }
         }
 
@@ -250,28 +253,28 @@ var setCookieAndResponse = function(user, keepLogin){
                 }
             }
 
-            if (F.isDebug) {
-                self.res.cookie(F.config.shopingCartcookie, shoppingCart_count);
+            if (config.isDebug) {
+                res.cookie(config.shopingCartcookie, shoppingCart_count);
             } else {
-                self.res.cookie(F.config.shopingCartcookie, shoppingCart_count, null, {domain: F.config.domain});
+                res.cookie(config.shopingCartcookie, shoppingCart_count, {domain: config.domain});
             }
 
             // Return results
             var result = {'code': '1000', 'message': 'success', 'datas': user, token:token};
-            self.respond(result);
+            res.respond(result);
             return;
         }, true);
 
         // // Return results
         // var result = {'code': '1000', 'message': 'success', 'datas': user, token:token};
-        // self.respond(result);
+        // res.respond(result);
     });
 };
 
 // Logout
 /*function process_logout() {
 	var self = this;
-	self.res.cookie(F.config.usercookie, '', new Date().add('-1 year'));
+	self.res.cookie(config.usercookie, '', new Date().add('-1 year'));
 	self.redirect('/');
 }*/
 
@@ -280,49 +283,48 @@ var setCookieAndResponse = function(user, keepLogin){
 // ==========================================================================
 
 // Register
-function process_register() {
-    var self = this;
+exports.process_register = function(req, res, next) {
     var options = {};
-    var keepLogin = self.data.keepLogin || true; //是否保存登录状态，默认保存
-    if (!self.data.account || !tools.isPhone(self.data.account.toString())) {
-        self.respond({'code': '1001', 'message': '请输入正确的11位手机号'});
+    var keepLogin = req.data.keepLogin || true; //是否保存登录状态，默认保存
+    if (!req.data.account || !tools.isPhone(req.data.account.toString())) {
+        res.respond({'code': '1001', 'message': '请输入正确的11位手机号'});
         return;
     }
-    if (!self.data.smsCode) {
-        self.respond({'code': '1001', 'message': '请输入验证码'});
+    if (!req.data.smsCode) {
+        res.respond({'code': '1001', 'message': '请输入验证码'});
         return;
     }
-    if (!self.data.password) {
-        self.respond({'code': '1001', 'message': '请输入密码'});
+    if (!req.data.password) {
+        res.respond({'code': '1001', 'message': '请输入密码'});
         return;
     }
 
-    var decrypted = tools.decrypt_password(decodeURI(self.data.password));
+    var decrypted = tools.decrypt_password(decodeURI(req.data.password));
     if (decrypted.length < 6) {
-        self.respond({'code': '1001', 'message': '密码长度需不小于6位'});
+        res.respond({'code': '1001', 'message': '密码长度需不小于6位'});
         return;
     }
-    options.account = self.data.account;
-    options.smsCode = self.data.smsCode;
+    options.account = req.data.account;
+    options.smsCode = req.data.smsCode;
     options.password = decrypted;
-    if (self.data.regMethod)
-        options.regMethod = self.data.regMethod;
-    if (self.data.nickname)
-        options.nickname = self.data.nickname;
-    options.ip = self.req.ip;
-    options.useragent = self.data["user-agent"] || 'web';
+    if (req.data.regMethod)
+        options.regMethod = req.data.regMethod;
+    if (req.data.nickname)
+        options.nickname = req.data.nickname;
+    options.ip = req.ip;
+    options.useragent = req.data["user-agent"] || 'web';
 
-    var vcodeoptions = {'target': self.data.account.toString(), 'code_type': 'register', 'code': self.data.smsCode};
-    GETSCHEMA('VCode').workflow('verify', null, vcodeoptions, function (err, result) {
+    var vcodeoptions = {'target': req.data.account.toString(), 'code_type': 'register', 'code': req.data.smsCode};
+    vCodeService.verify(vcodeoptions, function(err, result){
         if (err || !result) {
-            self.respond({'code': '1001', 'message': '验证码验证错误'});
+            res.respond({'code': '1001', 'message': '验证码验证错误'});
             return;
         } else {
             if (result && result.type === 1) {
                 UserService.create(options, function (err, data) {
                     // Error
                     if (err) {
-                        self.respond({'code': '1001', 'message': err});
+                        res.respond({'code': '1001', 'message': err});
                         return;
                     } else {
                         // Return user data
@@ -337,86 +339,84 @@ function process_register() {
                         user.isVerified = false;
                         user.isUserInfoFullFilled = data.isUserInfoFullFilled;
 
-                        setCookieAndResponse.call(self, user, keepLogin);
+                        setCookieAndResponse(req, res, user, keepLogin);
                     }
                 }, true);
             } else {
-                self.respond({'code': '1001', 'message': result.data});
+                res.respond({'code': '1001', 'message': result.data});
                 return;
             }
         }
     }, true);
-}
+};
 
 // ==========================================================================
 // USER
 // ==========================================================================
 
 // Reset password
-function process_resetpwd() {
-    var self = this;
+exports.process_resetpwd = function(req, res, next) {
     var options = {};
 
-    if (!self.data.account || !tools.isPhone(self.data.account.toString())) {
-        self.respond({'code': '1001', 'message': '请输入正确的11位手机号'});
+    if (!req.data.account || !tools.isPhone(req.data.account.toString())) {
+        res.respond({'code': '1001', 'message': '请输入正确的11位手机号'});
         return;
     }
-    if (!self.data.smsCode) {
-        self.respond({'code': '1001', 'message': '请输入验证码'});
+    if (!req.data.smsCode) {
+        res.respond({'code': '1001', 'message': '请输入验证码'});
         return;
     }
-    if (!self.data.newPwd) {
-        self.respond({'code': '1001', 'message': '请输入密码'});
+    if (!req.data.newPwd) {
+        res.respond({'code': '1001', 'message': '请输入密码'});
     }
-    var decrypted = tools.decrypt_password(decodeURI(self.data.newPwd));
+    var decrypted = tools.decrypt_password(decodeURI(req.data.newPwd));
     if (decrypted.length < 6) {
-        self.respond({'code': '1001', 'message': '密码长度需不小于6位'});
+        res.respond({'code': '1001', 'message': '密码长度需不小于6位'});
         return;
     }
-    options.account = self.data.account;
-    options.smsCode = self.data.smsCode;
+    options.account = req.data.account;
+    options.smsCode = req.data.smsCode;
     options.password = decrypted;
-    options.ip = self.req.ip;
+    options.ip = req.ip;
 
-    vcodeoptions = {'target': self.data.account.toString(), 'code_type': 'resetpwd', 'code': self.data.smsCode};
-    GETSCHEMA('VCode').workflow('verify', null, vcodeoptions, function (err, result) {
+    vcodeoptions = {'target': req.data.account.toString(), 'code_type': 'resetpwd', 'code': req.data.smsCode};
+    vCodeService.verify(vcodeoptions, function(err, result){
         if (err || !result) {
-            self.respond({'code': '1001', 'message': '验证码验证错误'});
+            res.respond({'code': '1001', 'message': '验证码验证错误'});
             return;
         } else {
             if (result && result.type === 1) {
                 UserService.update(options, function (err) {
                     // Error
                     if (err) {
-                        self.respond({'code': '1001', 'message': '密码修改失败'});
+                        res.respond({'code': '1001', 'message': '密码修改失败'});
                         return;
                     } else {
                         // Return results
-                        self.respond({'code': '1000', 'message': 'success'});
+                        res.respond({'code': '1000', 'message': 'success'});
                     }
                 });
             } else {
-                self.respond({'code': '1001', 'message': result.data});
+                res.respond({'code': '1001', 'message': result.data});
                 return;
             }
         }
     }, true);
-}
+};
 
 // Get user
-function json_user_get() {
-    var self = this;
-    self.data.id = self.data.userId = (self.data.id || self.data.userId);
+exports.json_user_get = function(req, res, next) {
+    req.data.id = req.data.userId = (req.data.id || req.data.userId);
     var options = {};
 
-    if (self.data.id)
-        options.userid = self.data.id;
-    options.ip = self.req.ip;
+    if (req.data.id)
+        options.userid = req.data.id;
+    options.ip = req.ip;
 
     UserService.get(options, function (err, data) {
         // Error
         if (err) {
-            self.respond({'code': '1001', 'message': err});
+            res.respond({'code': '1001', 'message': err});
             return;
         }
 
@@ -442,9 +442,9 @@ function json_user_get() {
             user.inviterName = data.inviter.name;
         }
 
-        var flags = self.data['flags'];
+        var flags = req.data['flags'];
         var respond = function (user) {
-            self.respond({'code': '1000', 'message': 'success', 'datas': user});
+            res.respond({'code': '1000', 'message': 'success', 'datas': user});
         };
 
         if (!flags) {
@@ -456,7 +456,7 @@ function json_user_get() {
             if (flags.indexOf('score') >= 0) {
                 responds['score'] = (respond);
                 respond = function (user) {
-                    json_userscore_get.call(self, function (score) {
+                    json_userscore_get(req, res, next, function (score) {
                         user.score = score;
                         // console.log('user = ' + JSON.stringify(user));
                         responds['score'](user);
@@ -467,20 +467,10 @@ function json_user_get() {
             if (flags.indexOf('address') >= 0) {
                 responds['address'] = respond;
                 respond = function (user) {
-                    json_useraddresslist_query.call(self, function (addresses) {
+                    json_useraddresslist_query(req, res, next, function (addresses) {
                         user.addresses = addresses;
                         user.defaultAddress = getDefaultAddress(addresses);
                         responds['address'](user);
-                    });
-                };
-            }
-
-            if (flags.indexOf('order') >= 0) {
-                responds['order'] = respond;
-                respond = function (user) {
-                    require("./7.order").getOders.call(self, function (orders) {
-                        user.orders = orders;
-                        responds['order'](user);
                     });
                 };
             }
@@ -488,62 +478,64 @@ function json_user_get() {
 
         respond(user);
     });
-}
+};
 
 // Get user score
-function json_userscore_get(callback) {
-    var self = this;
+var json_userscore_get = function(req, res, next, callback) {
     var options = {};
 
-    if (self.data.userId)
-        options.userid = self.data.userId;
-    options.ip = self.req.ip;
+    if (req.data.userId)
+        options.userid = req.data.userId;
+    options.ip = req.ip;
 
     UserService.get(options, function (err, data) {
         // Error
         if (err) {
-            self.respond({'code': '1001', 'message': err});
+            res.respond({'code': '1001', 'message': err});
             return;
         }
 
         // Return data
         var score = data.score || 0;
-        callback ? callback(score) : self.respond({'code': '1000', 'message': 'success', 'datas': {"total": 0, "userId": data.id, "pointLaterTrade": (score || 0), "score":(score || 0), "rows": []}});
+        callback ? callback(score) : res.respond({'code': '1000', 'message': 'success', 'datas': {"total": 0, "userId": data.id, "pointLaterTrade": (score || 0), "score":(score || 0), "rows": []}});
     });
-}
+};
+
+exports.json_userscore_get = function(req, res, next){
+    json_userscore_get(req, res, next);
+};
 
 // Modify user password
-function json_user_modifypwd() {
-    var self = this;
+exports.json_user_modifypwd = function(req, res, next) {
     var options = {};
 
-    if (self.data.userId)
-        options.userid = self.data.userId;
-    if (!self.data.oldPwd) {
-        self.respond({'code': '1001', 'message': '请输入旧密码'});
+    if (req.data.userId)
+        options.userid = req.data.userId;
+    if (!req.data.oldPwd) {
+        res.respond({'code': '1001', 'message': '请输入旧密码'});
         return;
     }
-    if (!self.data.newPwd) {
-        self.respond({'code': '1001', 'message': '请输入新密码'});
+    if (!req.data.newPwd) {
+        res.respond({'code': '1001', 'message': '请输入新密码'});
     }
-    var decryptedNewPwd = tools.decrypt_password(decodeURI(self.data.newPwd));
-    var decryptedOldPwd = tools.decrypt_password(decodeURI(self.data.oldPwd));
+    var decryptedNewPwd = tools.decrypt_password(decodeURI(req.data.newPwd));
+    var decryptedOldPwd = tools.decrypt_password(decodeURI(req.data.oldPwd));
     if (decryptedNewPwd.length < 6) {
-        self.respond({'code': '1001', 'message': '新密码长度需不小于6位'});
+        res.respond({'code': '1001', 'message': '新密码长度需不小于6位'});
         return;
     }
     if (decryptedNewPwd === decryptedOldPwd) {
-        self.respond({'code': '1001', 'message': '新密码与旧密码不能一致'});
+        res.respond({'code': '1001', 'message': '新密码与旧密码不能一致'});
         return;
     }
 
     options.password = decryptedNewPwd;
-    options.ip = self.req.ip;
+    options.ip = req.ip;
 
     UserService.get(options, function (err, data) {
         // Error
         if (err) {
-            self.respond({'code': '1001', 'message': err});
+            res.respond({'code': '1001', 'message': err});
             return;
         }
 
@@ -567,90 +559,89 @@ function json_user_modifypwd() {
             UserService.update(options, function (err) {
                 // Error
                 if (err) {
-                    self.respond({'code': '1001', 'message': '密码修改失败'});
+                    res.respond({'code': '1001', 'message': '密码修改失败'});
                     return;
                 } else {
                     // Return results
-                    self.respond({'code': '1000', 'message': 'success'});
+                    res.respond({'code': '1000', 'message': 'success'});
                     return;
                 }
             });
         } else {
-            self.respond({'code': '1001', 'message': '旧密码输入错误'});
+            res.respond({'code': '1001', 'message': '旧密码输入错误'});
             return;
         }
     });
-}
+};
 
 // modify user info
-function json_user_modify() {
-    var self = this;
+exports.json_user_modify = function(req, res, next) {
     var options = {};
 
-    if (self.data.userId)
-        options.userid = self.data.userId;
-    if (self.data.userName)
-        options.name = self.data.userName;
-    if (self.data.nickName) {
-        //if(self.data.nickName.length > 6) {
-        if (tools.getStringLen(self.data.nickName, 12)) {
-            self.respond({'code': '1001', 'message': '昵称输入过长'});
+    if (req.data.userId)
+        options.userid = req.data.userId;
+    if (req.data.userName)
+        options.name = req.data.userName;
+    if (req.data.nickName) {
+        //if(req.data.nickName.length > 6) {
+        if (tools.getStringLen(req.data.nickName, 12)) {
+            res.respond({'code': '1001', 'message': '昵称输入过长'});
             return;
         } else {
-            options.nickname = self.data.nickName;
+            options.nickname = req.data.nickName;
         }
     }
-    if (self.data.userPhoto)
-        options.photo = self.data.userPhoto;
-    if (self.data.sex)
-        options.sex = self.data.sex;
-    options.ip = self.req.ip;
-	if (self.data.type) {
-        if(!F.global.usertypes[self.data.type]){
-            self.respond({code:1001, message:'未查询到用户类型'});
+    if (req.data.userPhoto)
+        options.photo = req.data.userPhoto;
+    if (req.data.sex)
+        options.sex = req.data.sex;
+    options.ip = req.ip;
+	if (req.data.type) {
+        if(!Global.usertypes[req.data.type]){
+            res.respond({code:1001, message:'未查询到用户类型'});
             return;
         }
 
-        options.type = self.data.type;
+        options.type = req.data.type;
     }
 
-    UserService.get({userid:self.data.userId}, function(err, old_user_info){
+    UserService.get({userid:req.data.userId}, function(err, old_user_info){
         var callback = function (err) {
             // Error
             if (err) {
-                self.respond({'code': '1001', 'message': err});
+                res.respond({'code': '1001', 'message': err});
                 return;
             }
 
             // Return results
             if(!old_user_info.isUserInfoFullFilled){
-                UserService.get({userid:self.data.userId}, function(err, new_user_info) {
+                UserService.get({userid:req.data.userId}, function(err, new_user_info) {
                     if (new_user_info.name && new_user_info.address && new_user_info.address.province && new_user_info.type) {
-                        UserService.update({userid:self.data.userId, isUserInfoFullFilled: true}, function (err, data) {
-                            UserService.increaseScore({userid: self.data.userId, score: F.config.user_info_full_filled_point_add}, function (err) {
+                        UserService.update({userid:req.data.userId, isUserInfoFullFilled: true}, function (err, data) {
+                            UserService.increaseScore({userid: req.data.userId, score: config.user_info_full_filled_point_add}, function (err) {
                                 var response = {'code': '1000', 'message': 'success'};
                                 if (!err) {
-                                    response.scoreAdded = F.config.user_info_full_filled_point_add;
+                                    response.scoreAdded = config.user_info_full_filled_point_add;
                                 }
 
-                                self.respond(response);
+                                res.respond(response);
                             })
                         });
                     } else {
-                        self.respond({'code': '1000', 'message': 'success'});
+                        res.respond({'code': '1000', 'message': 'success'});
                     }
                 })
             } else{
-                self.respond({'code': '1000', 'message': 'success'});
+                res.respond({'code': '1000', 'message': 'success'});
             }
         };
-        if (self.data.address && self.data.address.provinceId && self.data.address.cityId) {
-            var address = self.data.address;
+        if (req.data.address && req.data.address.provinceId && req.data.address.cityId) {
+            var address = req.data.address;
             options.address = {};
             AreaService.getProvince({id: address.provinceId}, function (err, province) {
                 if (err || !province) {
                     if (err) console.error('get province err:', err);
-                    self.respond({code: 1001, message: '没有查到要修改的省'});
+                    res.respond({code: 1001, message: '没有查到要修改的省'});
                     return;
                 }
 
@@ -658,16 +649,16 @@ function json_user_modify() {
                 AreaService.getCity({id: address.cityId}, function (err, city) {
                     if (err || !city) {
                         if (err) console.error('get city err:', err);
-                        self.respond({code: 1001, message: '没有查到要修改的市'});
+                        res.respond({code: 1001, message: '没有查到要修改的市'});
                         return;
                     }
 
                     options.address.city = city;
-                    if (self.data.address.countyId) {
+                    if (req.data.address.countyId) {
                         AreaService.getCounty({id: address.countyId}, function (err, county) {
                             if (err || !county) {
                                 if (err) console.error('get county err:', err);
-                                self.respond({code: 1001, message: '没有查到要修改的县'});
+                                res.respond({code: 1001, message: '没有查到要修改的县'});
                                 return;
                             }
 
@@ -676,7 +667,7 @@ function json_user_modify() {
                                 AreaService.getTown({id: address.townId}, function (err, town) {
                                     if (err || !town) {
                                         if (err) console.error('get town err:', err);
-                                        self.respond({code: 1001, message: '没有查到要修改的乡镇'});
+                                        res.respond({code: 1001, message: '没有查到要修改的乡镇'});
                                         return;
                                     }
 
@@ -691,7 +682,7 @@ function json_user_modify() {
                         AreaService.getTown({id: address.townId}, function (err, town) {
                             if (err || !town) {
                                 if (err) console.error('get town err:', err);
-                                self.respond({code: 1001, message: '没有查到要修改的乡镇'});
+                                res.respond({code: 1001, message: '没有查到要修改的乡镇'});
                                 return;
                             }
 
@@ -707,54 +698,50 @@ function json_user_modify() {
             UserService.update(options, callback);
         }
     });
-}
+};
 
 // Find Account in users
-function json_user_findaccount() {
-    var self = this;
+exports.json_user_findaccount = function(req, res, next) {
     var options = {};
 
-    if (self.data.account)
-        options.account = self.data.account;
-    options.ip = self.req.ip;
+    if (req.data.account)
+        options.account = req.data.account;
+    options.ip = req.ip;
 
     UserService.get(options, function (err, data) {
         // Error
         if (err) {
-            self.respond({'code': '1001', 'message': err});
+            res.respond({'code': '1001', 'message': err});
             return;
         }
 
-        self.respond({'code': '1000', 'message': 'success'});
+        res.respond({'code': '1000', 'message': 'success'});
     });
-}
+};
 
 // ==========================================================================
 // User Address
 // ==========================================================================
 
-// Query useraddress list
-function json_useraddresslist_query(callback) {
-    var self = this;
-    var callbackName = self.data['callback'] || 'callback';
+var json_useraddresslist_query = function(req, res, next ,callback){
     var options = {};
 
-    if (!self.data.userId) {
-        self.respond({'code': '1001', 'message': '请求参数错误，无效的userId参数'});
+    if (!req.data.userId) {
+        res.respond({'code': '1001', 'message': '请求参数错误，无效的userId参数'});
         return;
     }
-    options.userid = self.data.userId;
-    options.ip = self.req.ip;
+    options.userid = req.data.userId;
+    options.ip = req.ip;
 
     UseraddressService.query(options, function (err, data) {
         // Error
         if (err) {
             console.error('user json_useraddresslist_query UseraddressService query err:', err);
             if (data) {
-                self.respond(data);
+                res.respond(data);
                 return;
             } else {
-                self.respond({'code': '1001', 'message': '未查询到收货地址'});
+                res.respond({'code': '1001', 'message': '未查询到收货地址'});
                 return;
             }
         } else {
@@ -782,118 +769,68 @@ function json_useraddresslist_query(callback) {
                 };
             }
             // Return results
-            callback ? callback(arr) : self.respond({'code': '1000', 'message': 'success', 'datas': {"total": count, "rows": arr}});
+            callback ? callback(arr) : res.respond({'code': '1000', 'message': 'success', 'datas': {"total": count, "rows": arr}});
         }
     });
-}
+};
 
-// Query useraddress list (v1.0 app)
-function json_useraddressslist_query_lagency(){
-    var self = this;
-    var options = {};
-
-    if (!self.data.userId) {
-        self.respond({'code': '1001', 'message': '请求参数错误，无效的userId参数'});
-        return;
-    }
-    options.userid = self.data.userId;
-    options.ip = self.req.ip;
-
-    UseraddressService.query(options, function (err, data) {
-        // Error
-        if (err) {
-            console.error('user json_useraddressslist_query_lagency UseraddressService query err:', err);
-            if (data) {
-                self.respond(data);
-                return;
-            } else {
-                self.respond({'code': '1001', 'message': '未查询到收货地址'});
-                return;
-            }
-        } else {
-            var items = data.items;
-            var count = data.count;
-            var arr = new Array(count);
-
-            for (var i = 0; i < count; i++) {
-                var item = items[i];
-                arr[i] = {"areaName": item.provincename,
-                    "areaId": item.provinceid,
-                    "cityName": item.cityname,
-                    "cityId": item.cityid,
-                    "countyName": item.countyname,
-                    "countyId": item.countyid,
-                    "address": item.cityname + (item.countyname || '') + item.address,
-                    "receiptPhone": item.receiptphone,
-                    "receiptPeople": item.receiptpeople,
-                    "userId": item.userid,
-                    "type": item.type,
-                    "addressId": item.id,
-                    "zipCode": item.zipcode || '',
-                    "townId": item.townid,
-                    "townName": item.townname
-                };
-            }
-            // Return results
-            self.respond({'code': '1000', 'message': 'success', 'datas': {"total": count, "rows": arr}});
-        }
-    });
-}
+// Query useraddress list
+exports.json_useraddresslist_get = function(req, res, next) {
+    json_useraddresslist_query(req, res, next);
+};
 
 // Create useraddress
-function json_useraddress_create() {
-    var self = this;
-    var callbackName = self.data['callback'] || 'callback';
+exports.json_useraddress_create = function(req, res, next) {
     var options = {};
 
-    if (self.data.userId)
-        options.userid = self.data.userId;
+    if (req.data.userId)
+        options.userid = req.data.userId;
     else {
-        self.respond({code: 1001, message: '请求参数错误，无效的userId参数'});
+        res.respond({code: 1001, message: '请求参数错误，无效的userId参数'});
         return;
     }
-    if (self.data.address)
-        options.address = self.data.address;
+    if (req.data.address)
+        options.address = req.data.address;
     else {
-        self.respond({code: 1001, message: '请求参数错误，无效的address参数'});
+        res.respond({code: 1001, message: '请求参数错误，无效的address参数'});
         return;
     }
-    if (self.data.areaId)
-        options.provinceid = self.data.areaId;
+    if (req.data.areaId)
+        options.provinceid = req.data.areaId;
     else {
-        self.respond({code: 1001, message: '请求参数错误，无效的areaId参数'});
+        res.respond({code: 1001, message: '请求参数错误，无效的areaId参数'});
         return;
     }
-    if (self.data.cityId)
-        options.cityid = self.data.cityId;
-    if (self.data.countyId)
-        options.countyid = self.data.countyId;
-    if (self.data.townId)
-        options.townid = self.data.townId;
-    if (self.data.receiptPhone) {
-        if (!tools.isPhone(self.data.receiptPhone.toString())) {
-            self.respond({code: 1001, message: '请输入正确的11位手机号'});
+    if (req.data.cityId)
+        options.cityid = req.data.cityId;
+    if (req.data.countyId)
+        options.countyid = req.data.countyId;
+    if (req.data.townId)
+        options.townid = req.data.townId;
+    if (req.data.receiptPhone) {
+        if (!tools.isPhone(req.data.receiptPhone.toString())) {
+            res.respond({code: 1001, message: '请输入正确的11位手机号'});
             return;
         }
-        options.receiptphone = self.data.receiptPhone;
+        options.receiptphone = req.data.receiptPhone;
     }
     else {
-        self.respond({code: 1001, message: '请求参数错误，无效的receiptPhone参数'});
+        res.respond({code: 1001, message: '请求参数错误，无效的receiptPhone参数'});
         return;
     }
-    if (self.data.receiptPeople)
-        options.receiptpeople = self.data.receiptPeople;
+    if (req.data.receiptPeople)
+        options.receiptpeople = req.data.receiptPeople;
     else {
-        self.respond({code: 1001, message: '请求参数错误，无效的receiptPeople参数'});
+        res.respond({code: 1001, message: '请求参数错误，无效的receiptPeople参数'});
         return;
     }
-    if (self.data.type && U.parseInt(self.data.type) === 1)
+    if (req.data.type && U.parseInt(req.data.type) === 1)
         options.type = 1;
     else
         options.type = 2;
 
-    if (self.data.zipCode)
-        options.zipcode = self.data.zipCode;
+    if (req.data.zipCode)
+        options.zipcode = req.data.zipCode;
 
 
     UseraddressService.create(options, function (err, result) {
@@ -901,17 +838,17 @@ function json_useraddress_create() {
         if (err) {
             console.error('user json_useraddress_create UseraddressService create err:', err);
             if (result) {
-                self.respond(result);
+                res.respond(result);
                 return;
             } else {
-                self.respond({code: 1002, message: '保存收货地址失败'});
+                res.respond({code: 1002, message: '保存收货地址失败'});
                 return;
             }
         } else {
             // Return results
-            self.respond({code: 1000, message: 'success', datas:{addressId: result.id}});
-            if (U.parseInt(self.data.type) === 1) {
-                var Qoptions = {'userid': self.data.userId, 'type': 1};
+            res.respond({code: 1000, message: 'success', datas:{addressId: result.id}});
+            if (U.parseInt(req.data.type) === 1) {
+                var Qoptions = {'userid': req.data.userId, 'type': 1};
 
                 UseraddressService.query(Qoptions, function (err, data) {
                     if (err) {
@@ -936,71 +873,69 @@ function json_useraddress_create() {
             }
         }
     }, true);
-}
+};
 
 // Update useraddress
-function json_useraddress_update() {
-    var self = this;
-    var callbackName = self.data['callback'] || 'callback';
+exports.json_useraddress_update = function(req, res, next) {
     var options = {};
 
-    if (self.data.userId)
-        options.userid = self.data.userId;
+    if (req.data.userId)
+        options.userid = req.data.userId;
     else {
-        self.respond({'code': '1001', 'message': '请求参数错误，无效的userId参数'});
+        res.respond({'code': '1001', 'message': '请求参数错误，无效的userId参数'});
         return;
     }
-    if (self.data.addressId)
-        options.id = self.data.addressId;
+    if (req.data.addressId)
+        options.id = req.data.addressId;
     else {
-        self.respond({'code': '1001', 'message': '请求参数错误，无效的addressId参数'});
+        res.respond({'code': '1001', 'message': '请求参数错误，无效的addressId参数'});
         return;
     }
-    if (self.data.address)
-        options.address = self.data.address;
-    if (self.data.areaId)
-        options.provinceid = self.data.areaId;
-    if (self.data.cityId)
-        options.cityid = self.data.cityId;
-    if (self.data.countyId)
-        options.countyid = self.data.countyId;
-    if (self.data.townId)
-        options.townid = self.data.townId;
-    if (self.data.receiptPhone) {
-        if (!tools.isPhone(self.data.receiptPhone.toString())) {
-            self.respond({'code': '1001', 'message': '请输入正确的11位手机号'});
+    if (req.data.address)
+        options.address = req.data.address;
+    if (req.data.areaId)
+        options.provinceid = req.data.areaId;
+    if (req.data.cityId)
+        options.cityid = req.data.cityId;
+    if (req.data.countyId)
+        options.countyid = req.data.countyId;
+    if (req.data.townId)
+        options.townid = req.data.townId;
+    if (req.data.receiptPhone) {
+        if (!tools.isPhone(req.data.receiptPhone.toString())) {
+            res.respond({'code': '1001', 'message': '请输入正确的11位手机号'});
             return;
         }
-        options.receiptphone = self.data.receiptPhone;
+        options.receiptphone = req.data.receiptPhone;
     }
-    if (self.data.receiptPeople)
-        options.receiptpeople = self.data.receiptPeople;
-    if (self.data.type) {
-        if (U.parseInt(self.data.type) === 1)
+    if (req.data.receiptPeople)
+        options.receiptpeople = req.data.receiptPeople;
+    if (req.data.type) {
+        if (U.parseInt(req.data.type) === 1)
             options.type = 1;
         else
             options.type = 2;
     }
 
-    if (self.data.zipCode)
-        options.zipcode = self.data.zipCode;
+    if (req.data.zipCode)
+        options.zipcode = req.data.zipCode;
 
     UseraddressService.update(options, function (err, data) {
         // Error
         if (err) {
             if (data) {
-                self.respond(data);
+                res.respond(data);
                 return;
             } else {
-                self.respond({'code': '1001', 'message': '更新收货地址失败'});
+                res.respond({'code': '1001', 'message': '更新收货地址失败'});
                 return;
             }
         } else {
             // Return results
-            self.respond({'code': '1000', 'message': 'success'});
-            if (U.parseInt(self.data.type) === 1) {
+            res.respond({'code': '1000', 'message': 'success'});
+            if (U.parseInt(req.data.type) === 1) {
                 var newaddId = options.id;
-                var Qoptions = {'userid': self.data.userId, 'type': 1};
+                var Qoptions = {'userid': req.data.userId, 'type': 1};
                 UseraddressService.query(Qoptions, function (err, data) {
                     var items = data.items;
                     var count = data.count;
@@ -1021,48 +956,45 @@ function json_useraddress_update() {
             }
         }
     }, true);
-}
+};
 
 // Delete useraddress
-function json_useraddress_remove() {
-    var self = this;
-    var callbackName = self.data['callback'] || 'callback';
+exports.json_useraddress_remove = function(req, res, next) {
     var options = {};
 
-    if (self.data.userId)
-        options.userid = self.data.userId;
+    if (req.data.userId)
+        options.userid = req.data.userId;
     else {
-        self.respond({'code': '1001', 'message': '请求参数错误，无效的userId参数'});
+        res.respond({'code': '1001', 'message': '请求参数错误，无效的userId参数'});
         return;
     }
-    if (self.data.addressId)
-        options.id = self.data.addressId;
+    if (req.data.addressId)
+        options.id = req.data.addressId;
     else {
-        self.respond({'code': '1001', 'message': '请求参数错误，无效的addressId参数'});
+        res.respond({'code': '1001', 'message': '请求参数错误，无效的addressId参数'});
         return;
     }
     UseraddressService.remove(options, function (err, data) {
         // Error
         if (err) {
             if (data) {
-                self.respond(data);
+                res.respond(data);
                 return;
             } else {
-                self.respond({'code': '1001', 'message': '删除收货地址失败'});
+                res.respond({'code': '1001', 'message': '删除收货地址失败'});
                 return;
             }
         } else {
             // Return results
-            self.respond({'code': '1000', 'message': 'success'});
+            res.respond({'code': '1000', 'message': 'success'});
         }
     });
-}
+};
 
-function json_public_key(){
-    var self = this;
-    var data = {'public_key': F.global.key.exportKey('pkcs8-public-pem'), 'code':1000};
-    self.respond(data);
-}
+exports.json_public_key = function(req, res, next){
+    var data = {'public_key': Global.key.exportKey('pkcs8-public-pem'), 'code':1000};
+    res.respond(data);
+};
 
 function getDefaultAddress(addresses){
     for(var i=0; i<addresses.length; i++){
@@ -1079,25 +1011,24 @@ function getDefaultAddress(addresses){
 }
 
 // user sign for app
-function process_user_sign(){
-    var self = this;
+exports.process_user_sign = function(req, res, next){
     var options = {};
-    if(!self.data.userId || self.data.userId.trim()===''){
-        self.respond({code:'1001', message:'无效用户ID'});
+    if(!req.data.userId || req.data.userId.trim()===''){
+        res.respond({code:'1001', message:'无效用户ID'});
         return;
     }
-    options.userid = self.data.userId;
+    options.userid = req.data.userId;
     //get user
     UserService.get(options, function(err, data){
         // Error
         if (err) {
-            self.respond({'code': '1001', 'message': err});
+            res.respond({'code': '1001', 'message': err});
             return;
         }
 
         var options = {};
         var beijingTimeNow = moment().tz('Asia/Shanghai');
-        var id_date = self.data.userId + '_' + beijingTimeNow.format('YYYYMMDD');
+        var id_date = req.data.userId + '_' + beijingTimeNow.format('YYYYMMDD');
         options.id_date = id_date;
         options.datetime = beijingTimeNow;
 
@@ -1107,15 +1038,15 @@ function process_user_sign(){
                 // insert fail
                 if(11000 == err.code){
                     // dup key, there is already a record with options.id_date
-                    self.respond({code: '1010', message: '您今日已签到成功，明天再来呦！'});
+                    res.respond({code: '1010', message: '您今日已签到成功，明天再来呦！'});
                 }else{
                     // other errors, don't know how to handle it, log to console.
                     console.error('user process_user_sign UserSignService insert err:', err);
-                    self.respond({code: '1001', message: '签到失败啦，再试一试吧'});
+                    res.respond({code: '1001', message: '签到失败啦，再试一试吧'});
                 }
             } else {
                 // if insert success, update user table to add points
-                UserService.increaseScore({userid:self.data.userId, score: F.config.user_sign_point_add}, function (err) {
+                UserService.increaseScore({userid:req.data.userId, score: config.user_sign_point_add}, function (err) {
                     if (err) {
                         // error happen,
                         // there are 2 cases of error: one is db operation error,
@@ -1127,160 +1058,140 @@ function process_user_sign(){
                                 // rollback fail, don't know how to handle it, log to console
                                 console.error('user_sign document rollback fail, error:', error);
                             }else{
-                                self.respond({code: '1001', message: '签到失败，大侠请重新来过'});
+                                res.respond({code: '1001', message: '签到失败，大侠请重新来过'});
                             }
                         });
                     } else {
-                        self.respond({code: '1000', message: '签到成功', pointAdded:F.config.user_sign_point_add});
+                        res.respond({code: '1000', message: '签到成功', pointAdded:config.user_sign_point_add});
                     }
                 }, true)
             }
         });
     });
-}
+};
 
 // ==========================================================================
 // USER upload(Photo)
 // ==========================================================================
 
 // upload photo for app
-function uploadPhoto() {
-    var self = this;
+exports.uploadPhoto = function(req, res, next) {
     var id = '';
-    var userId = self.query['userId'];
+    var userId = req.user.id;
     var default_extension = '.jpg';
     var type_avail = ['png', 'jpg', "jpeg"];
     if (!userId) {
-        self.respond({code:1001, message:'请填写用户ID'});
+        res.respond({code:1001, message:'请填写用户ID'});
         return;
     }
 
-    self.files.wait(function(file, next) {
-        file.read(function(err, photo) {
+    req.files.forEach(function(file){
+        UserService.get({userid:userId}, function(err, data) {
             if (err) {
-                console.error('uploadPhoto fail:', err);
-                self.respond({code:1001,message:'上传失败'});
+                res.respond({code:1001, message:err});
                 return;
             }
 
-            UserService.get({userid:userId}, function(err, data) {
+            var index = file.originalname.lastIndexOf('.');
+            var extension = file.originalname.substring(index + 1);
+            if (!type_avail.find(extension.toLowerCase())) {
+                res.respond({'code': 1001, 'message': '文件格式不正确（必须为.jpg/.png文件）'});
+                return;
+            }
+
+            if (file.size > 500*1024) {
+                res.respond({code: 1001, message: '文件大小不得大于500K'});
+                return;
+            }
+
+            // Store current file into the HDD
+            id = files.insert(file.originalname, file.mimetype, file.buffer) + default_extension;
+            var imageurl = "/images/original/" + id;
+            var oldPhotoId = null;
+            if (data.photo) {
+                oldPhotoId = data.photo.substring(data.photo.lastIndexOf('/')+1, data.photo.lastIndexOf('.'));
+            }
+            // start to update user info
+            UserService.update({userid:userId, photo:imageurl}, function(err) {
                 if (err) {
-                    self.respond({code:1001, message:err});
+                    console.error('User uploadPhoto fail:', err);
+                    res.respond({code:1001, message:'上传失败'});
                     return;
                 }
 
-                var index = file.filename.lastIndexOf('.');
-                file.extension = file.filename.substring(index + 1);
-                if (!type_avail.find(file.extension.toLowerCase())) {
-                    self.respond({'code': 1001, 'message': '文件格式不正确（必须为.jpg/.png文件）'});
-                    return;
+                res.respond({code:1000, message:'上传成功', imageUrl:imageurl});
+
+                // success, delete old photo
+                if (oldPhotoId) {
+                    files.remove(oldPhotoId, function(err, data) {
+                        if (err) {
+                            console.error('User uploadPhoto fail:', err);
+                        }
+                    });
                 }
-
-                if (file.length > 500*1024) {
-                    self.respond({code: 1001, message: '文件大小不得大于500K'});
-                    return;
-                }
-
-                // Store current file into the HDD
-                id = files.insert(file.filename, file.type, photo) + default_extension;
-                var imageurl = "/images/original/" + id;
-                var oldPhotoId = null;
-                if (data.photo) {
-                    oldPhotoId = data.photo.substring(data.photo.lastIndexOf('/')+1, data.photo.lastIndexOf('.'));
-                }
-                // start to update user info
-                UserService.update({userid:userId, photo:imageurl}, function(err) {
-                    if (err) {
-                        console.error('User uploadPhoto fail:', err);
-                        self.respond({code:1001, message:'上传失败'});
-                        return;
-                    }
-
-                    self.respond({code:1000, message:'上传成功', imageUrl:imageurl});
-
-                    // success, delete old photo
-                    if (oldPhotoId) {
-                        files.remove(oldPhotoId, function(err, data) {
-                            if (err) {
-                                console.error('User uploadPhoto fail:', err);
-                            }
-                        });
-                    }
-                });
             });
         });
     });
-}
+};
 
 // user upload(photo) for web
-function userUpload() {
-    var self = this;
+exports.userUpload = function(req, res, next) {
     var id = '';
-    var userId = self.query['userId'];
+    var userId = req.user.id;
     var default_extension = '.jpg';
     var type_avail = ['png', 'jpg', "jpeg"];
     if (!userId) {
-        self.respond({code:1001, message:'请填写用户ID'});
+        res.respond({code:1001, message:'请填写用户ID'});
         return;
     }
 
-    self.files.wait(function(file, next) {
-        file.read(function(err, photo) {
-            if (err) {
-                console.error('userUpload fail:', err);
-                self.respond({code:1001,message:'上传失败'});
-                return;
-            }
-
+    req.files.forEach(function(file){
             UserService.get({userid:userId}, function(err, data) {
                 if (err) {
                     // maybe user not find
-                    self.respond(data);
+                    res.respond(data);
                     return;
                 }
 
-                var index = file.filename.lastIndexOf('.');
-                file.extension = file.filename.substring(index + 1);
-                if (!type_avail.find(file.extension.toLowerCase())) {
-                    self.respond({'code': 1001, 'message': '文件格式不正确（必须为.jpg/.png文件）'});
+                var index = file.originalname.lastIndexOf('.');
+                var extension = file.originalname.substring(index + 1);
+                if (!type_avail.find(extension.toLowerCase())) {
+                    res.respond({'code': 1001, 'message': '文件格式不正确（必须为.jpg/.png文件）'});
                     return;
                 }
 
-                if (file.length > 2*1024*1024) {
-                    self.respond({code: 1001, message: '文件大小不得大于2MB'});
+                if (file.size > 2*1024*1024) {
+                    res.respond({code: 1001, message: '文件大小不得大于2MB'});
                     return;
                 }
 
                 // Store current file into the HDD
-                id = files.insert(file.filename, file.type, photo) + default_extension;
+                id = files.insert(file.originalname, file.mimetype, file.buffer) + default_extension;
                 var imageurl = "/images/original/" + id;
-                self.respond({code:1000, message:'上传成功', imageUrl:imageurl});
+                res.respond({code:1000, message:'上传成功', imageUrl:imageurl});
             });
-        });
     });
-}
+};
 
 // confirm user upload(photo)
-function confirmUpload() {
-    var self = this;
-    var id = '';
-    var userId = self.data['userId'];
-    var fileName = self.data['newFile'];
+exports.confirmUpload = function(req, res, next) {
+    var userId = req.data['userId'];
+    var fileName = req.data['newFile'];
     var default_extension = '.jpg';
 
     if (!userId) {
-        self.respond({code:1001, message:'缺少userId'});
+        res.respond({code:1001, message:'缺少userId'});
         return;
     }
     if (!fileName) {
-        self.respond({code:1001, message:'缺少newFile'});
+        res.respond({code:1001, message:'缺少newFile'});
         return;
     }
 
     UserService.get({userid:userId}, function(err, data) {
         if (err) {
             // maybe user not find
-            self.respond(data);
+            res.respond(data);
             return;
         }
 
@@ -1295,7 +1206,7 @@ function confirmUpload() {
         files.read(fileId, function(err, stream, header) {
             if (err || !stream) {
                 console.error('User confirmUpload fail:', err);
-                self.respond({code:1001, message:'确认失败'});
+                res.respond({code:1001, message:'确认失败'});
                 return;
             }
 
@@ -1304,10 +1215,10 @@ function confirmUpload() {
             UserService.update({userid:userId, photo:imageurl}, function(err, data) {
                 if (err) {
                     console.error('User confirmUpload fail:', err);
-                    self.respond({code:1001, message:'确认失败'});
+                    res.respond({code:1001, message:'确认失败'});
                     return;
                 }
-                self.respond({code:1000, message:'确认成功', imageUrl:imageurl});
+                res.respond({code:1000, message:'确认成功', imageUrl:imageurl});
 
                 // success, delete old photo
                 if (oldPhotoId) {
@@ -1321,79 +1232,77 @@ function confirmUpload() {
             }, true);
         });
     });
-}
+};
 
 // ==========================================================================
 // USER INVITER
 // ==========================================================================
 
-function process_bind_inviter(){
-    var self = this;
-    if(!self.data.inviter){
-        self.respond({code:1001,message:'请填写邀请人手机号'});
+exports.process_bind_inviter = function(req, res, next){
+    if(!req.data.inviter){
+        res.respond({code:1001,message:'请填写邀请人手机号'});
         return;
     }
 
-    if(!self.data.userId){
-        self.respond({code:1001,message:'请填写用户ID'});
+    if(!req.data.userId){
+        res.respond({code:1001,message:'请填写用户ID'});
         return;
     }
 
     //check if the userId is a valid user
-    UserService.get({userid:self.data.userId}, function(err, data) {
+    UserService.get({userid:req.data.userId}, function(err, data) {
         if (err) {
             // maybe user not find
-            self.respond({code:1001,message:err});
+            res.respond({code:1001,message:err});
             return;
         }
 
         if(data.inviter){
             // already has inviter
-            self.respond({code:1002, message:'已经绑定过邀请人，请勿重复操作'});
+            res.respond({code:1002, message:'已经绑定过邀请人，请勿重复操作'});
             return;
         }
 
         //check if the inviter is a valid user
-        UserService.get({account:self.data.inviter}, function(err, data) {
+        UserService.get({account:req.data.inviter}, function(err, data) {
             if (err) {
                 // maybe user not find
-                self.respond({code:1001,message:'该手机号未注册，请重新输入'});
+                res.respond({code:1001,message:'该手机号未注册，请重新输入'});
                 return;
             }
 
             // update user to add inviter to user
-            UserService.update({userid:self.data.userId, inviter:data._id, dateinvited:new Date()}, function(err){
+            UserService.update({userid:req.data.userId, inviter:data._id, dateinvited:new Date()}, function(err){
                 if(err){
                     console.error('User bind inviter fail:', err);
-                    self.respond({code:1001, message:'添加邀请人失败'});
+                    res.respond({code:1001, message:'添加邀请人失败'});
                     return;
                 }
 
-                self.respond({code:1000, message:'success'});
-                PotentialCustomerService.customerBinded(self.user.account, data._id, function(){})
+                res.respond({code:1000, message:'success'});
+                PotentialCustomerService.customerBinded(req.user.account, data._id, function(){})
             })
         });
     });
-}
+};
 
 // get user inviter info
-function json_get_inviter() {
-    var self = this;
+exports.json_get_inviter = function(req, res, next) {
     var options = {};
 
-    if (self.data.userId)
-        options.userid = self.data.userId;
+    if (req.data.userId)
+        options.userid = req.data.userId;
 
     UserService.get(options, function (err, data) {
         // Error
         if (err) {
-            self.respond({'code': '1001', 'message': err});
+            res.respond({'code': '1001', 'message': err});
             return;
         }
         if (data && data.inviter && data.inviter.id) {
             UserService.get({userid: data.inviter.id}, function (err, inviter) {
                 if (err) {
-                    self.respond({'code': '1001', 'message': err});
+                    res.respond({'code': '1001', 'message': err});
                     return;
                 }
                 if (inviter) {
@@ -1419,28 +1328,27 @@ function json_get_inviter() {
                         });
                     }
                     user.inviterIsVerified = inviter.isVerified;
-                    self.respond({code: '1000', message: 'success', datas: user});
+                    res.respond({code: '1000', message: 'success', datas: user});
                 } else {
-                    self.respond({code: '1001', message: '没有找到新农代表信息'});
+                    res.respond({code: '1001', message: '没有找到新农代表信息'});
                     return; 
                 }
             });
         } else {
-            self.respond({code: '1000', message: '没有找到新农代表信息', datas:{}});
+            res.respond({code: '1000', message: '没有找到新农代表信息', datas:{}});
             return;
         }
     });
-}
+};
 
 // get user invitee order by namePinyin
-function json_get_inviteeOrderbynamePinyin() {
-    var self = this;
+exports.json_get_inviteeOrderbynamePinyin = function(req, res, next) {
     var options = {};
-    options._id = self.user._id;
+    options._id = req.user._id;
     UserService.getInviteeOrderbynamePinyin(options, function(err, result) {
         if (err) {
             console.error('user getInviteeOrderbynamePinyin err:', err);
-            self.respond({code:1001, message:'获取被邀请人列表失败'});
+            res.respond({code:1001, message:'获取被邀请人列表失败'});
             return;
         }
 
@@ -1471,7 +1379,7 @@ function json_get_inviteeOrderbynamePinyin() {
                 UserService.getInviteeOrderNumber(inviteeIds, function (err, inviteeOrderData) {
                     if (err) {
                         console.error('user json_get_invitee getInviteeOrderNumber err:', err);
-                        self.respond({code:1001, message:'获取被邀请人列表失败'});
+                        res.respond({code:1001, message:'获取被邀请人列表失败'});
                         return;
                     }
 
@@ -1488,32 +1396,31 @@ function json_get_inviteeOrderbynamePinyin() {
                             }
                         }
                     }
-                    self.respond({code:1000, message:'success', invitee:invitees, total:result.count});
+                    res.respond({code:1000, message:'success', invitee:invitees, total:result.count});
                 });
             } else {
-                self.respond({code:1000, message:'success', invitee:invitees, total:result.count});
+                res.respond({code:1000, message:'success', invitee:invitees, total:result.count});
             }
         } else {
-            self.respond({code:1000, message:'success', invitee:invitees, total:0});
+            res.respond({code:1000, message:'success', invitee:invitees, total:0});
         }
     });
-}
+};
 
 // get user invitee list by page
-function json_get_invitee() {
-    var self = this;
+exports.json_get_invitee = function(req, res, next) {
     var options = {};
-    if (self.data['page']) {
-        options.page =  self.data['page'];
+    if (req.data['page']) {
+        options.page =  req.data['page'];
     }
-    if (self.data['max']) {
-        options.max = self.data['max'];
+    if (req.data['max']) {
+        options.max = req.data['max'];
     }
-    options._id = self.user._id;
+    options._id = req.user._id;
     UserService.getInvitee(options, function(err, result) {
         if (err) {
             console.error('user json_get_invitee err:', err);
-            self.respond({code:1001, message:'无法获取被邀请人列表'});
+            res.respond({code:1001, message:'无法获取被邀请人列表'});
             return;
         }
 
@@ -1541,7 +1448,7 @@ function json_get_invitee() {
                 UserService.getInviteeOrderNumber(inviteeIds, function (err, inviteeOrderData) {
                     if (err) {
                         console.error('user json_get_invitee getInviteeOrderNumber err:', err);
-                        self.respond({code:1001, message:'获取被邀请人列表错误'});
+                        res.respond({code:1001, message:'获取被邀请人列表错误'});
                         return;
                     }
 
@@ -1558,48 +1465,47 @@ function json_get_invitee() {
                             }
                         }
                     }
-                    self.respond({code:1000, message:'success', invitee:invitees, total:result.count, page:result.page, pages:result.pages});
+                    res.respond({code:1000, message:'success', invitee:invitees, total:result.count, page:result.page, pages:result.pages});
                 });
             }
         } else {
-            self.respond({code:1000, message:'success', invitee:invitees, total:0, page:0, pages:0});
+            res.respond({code:1000, message:'success', invitee:invitees, total:0, page:0, pages:0});
         }
     });
-}
+};
 
 // get the invitee's orders by one inviter
-function json_get_invitee_orders() {
-    var self = this;
-    if(!self.data.inviteeId) {
-        self.respond({code:1001, message:'请填写客户ID'});
+exports.json_get_invitee_orders = function(req, res, next) {
+    if(!req.data.inviteeId) {
+        res.respond({code:1001, message:'请填写客户ID'});
         return;
     }
-    UserService.getOneInvitee({_id:self.user._id, inviteeId:self.data.inviteeId}, function(err, user) {
+    UserService.getOneInvitee({_id:req.user._id, inviteeId:req.data.inviteeId}, function(err, user) {
         if (err) {
             console.error('user json_get_invitee err:', err);
-            self.respond({code:1001, message:'获取客户信息失败'});
+            res.respond({code:1001, message:'获取客户信息失败'});
             return;
         }
 
         if (!user) {
-            self.respond({code:1001, message:'只能获取自己客户的订单'});
+            res.respond({code:1001, message:'只能获取自己客户的订单'});
             return;
         }
 
         var options = {};
         options.buyer = user.id;
         options.type = -1;
-        if (self.data['page']) {
-            options.page =  self.data['page'];
+        if (req.data['page']) {
+            options.page =  req.data['page'];
         }
-        if (self.data['max']) {
-             options.max = self.data['max'];
+        if (req.data['max']) {
+             options.max = req.data['max'];
         }
 
         OrderService.query(options, function(err, data) {
             if (err) {
                 console.error('User json_get_invitee_orders err:', err);
-                self.respond({code:1001, message:'获取客户订单失败'});
+                res.respond({code:1001, message:'获取客户订单失败'});
                 return;
             }
 
@@ -1657,97 +1563,92 @@ function json_get_invitee_orders() {
                             }
                         };
             }
-            self.respond(result);
+            res.respond(result);
             UserService.emptyInviteeOrderNumber({inviteeId:user.id});
         }); 
         
     });
-}
+};
 
-function isAlive() {
-    var self = this;
-    self.respond({code:1000, message:'isAlive'});
-}
+exports.isAlive = function(req, res, next) {
+    res.respond({code:1000, message:'isAlive'});
+};
 
-function isInWhiteList() {
-    var self = this;
-    if (self.user && self.user.inWhiteList) {
-        self.respond({code:1000, message:'true'});
+exports.isInWhiteList = function(req, res, next) {
+    if (req.user && req.user.inWhiteList) {
+        res.respond({code:1000, message:'true'});
         return;
     }
-    self.respond({code:1001, message:'false'});
-}
+    res.respond({code:1001, message:'false'});
+};
 
-function json_usertypes_get() {
-    var self = this;
-    self.respond({code: 1000, data: F.global.usertypes});
-}
+exports.json_usertypes_get = function(req, res, next) {
+    res.respond({code: 1000, data: Global.usertypes});
+};
 
-function process_add_potential_customer(){
-    var self = this;
-    if(!self.data.name){
-        self.respond({code:1001, message:'请输入姓名'});
+exports.process_add_potential_customer = function(req, res, next){
+    if(!req.data.name){
+        res.respond({code:1001, message:'请输入姓名'});
         return;
     }
 
-    if(!self.data.phone || !tools.isPhone(self.data.phone.toString())){
-        self.respond({code:1001, message:'请输入正确的手机号'});
+    if(!req.data.phone || !tools.isPhone(req.data.phone.toString())){
+        res.respond({code:1001, message:'请输入正确的手机号'});
         return;
     }
 
-    if(typeof self.data.sex == 'undefined'){
-        self.respond({code:1001, message:'请输入性别'});
+    if(typeof req.data.sex == 'undefined'){
+        res.respond({code:1001, message:'请输入性别'});
         return;
     }
 
-    if(typeof self.data.sex == 'string'){
-        self.data.sex = (self.data.sex === 'true');
+    if(typeof req.data.sex == 'string'){
+        req.data.sex = (req.data.sex === 'true');
     }
 
-    if(!self.data.address || !self.data.address.province || !self.data.address.city){
-        self.respond({code:1001, message:'请选择省市'});
+    if(!req.data.address || !req.data.address.province || !req.data.address.city){
+        res.respond({code:1001, message:'请选择省市'});
         return;
     }
 
-    if(!self.data.buyIntentions || !self.data.buyIntentions.length < 0){
-        self.respond({code:1001, message:'请选择意向商品'});
+    if(!req.data.buyIntentions || !req.data.buyIntentions.length < 0){
+        res.respond({code:1001, message:'请选择意向商品'});
         return;
     }
 
-    if(self.data.remarks && tools.getStringLen(self.data.remarks.toString(), 60)){
-        self.respond({code:1001, message:'备注字数过长，请输入少于30个字'});
+    if(req.data.remarks && tools.getStringLen(req.data.remarks.toString(), 60)){
+        res.respond({code:1001, message:'备注字数过长，请输入少于30个字'});
         return;
     }
 
-    PotentialCustomerService.add(self.user, self.data.name, self.data.phone, self.data.sex, self.data.address, self.data.buyIntentions, self.data.remarks, function(err){
+    PotentialCustomerService.add(req.user, req.data.name, req.data.phone, req.data.sex, req.data.address, req.data.buyIntentions, req.data.remarks, function(err){
         if(err){
-            self.respond({code:1001, message:err});
+            res.respond({code:1001, message:err});
             return;
         }
 
-        self.respond({code:1000, message:'success'});
+        res.respond({code:1000, message:'success'});
     });
-}
+};
 
-function json_potential_customer(){
-    var self = this;
-    var returnType = self.data.type;
+exports.json_potential_customer = function(req, res, next){
+    var returnType = req.data.type;
     if(!returnType) {
-        var page = U.parseInt(self.data.page, 1) - 1;
-        var max = U.parseInt(self.data.max, 20);
-        PotentialCustomerService.queryPage(self.user, page, max, function (err, potentialCustomers, totalCount, pageCount) {
+        var page = U.parseInt(req.data.page, 1) - 1;
+        var max = U.parseInt(req.data.max, 20);
+        PotentialCustomerService.queryPage(req.user, page, max, function (err, potentialCustomers, totalCount, pageCount) {
             if (err) {
-                self.respond({code: 1001, message: '获取潜在客户列表失败'});
+                res.respond({code: 1001, message: '获取潜在客户列表失败'});
                 return;
             }
 
-            PotentialCustomerService.countLeftToday(self.user, function (err, count) {
+            PotentialCustomerService.countLeftToday(req.user, function (err, count) {
                 if (err) {
-                    self.respond({code: 1001, message: '查询客户列表失败'});
+                    res.respond({code: 1001, message: '查询客户列表失败'});
                     return;
                 }
 
-                self.respond({
+                res.respond({
                     code: 1000,
                     message: 'success',
                     count: totalCount,
@@ -1759,41 +1660,39 @@ function json_potential_customer(){
             });
         });
     }
-}
+};
 
-function json_potential_customer_orderby_namePinyin(){
-    var self = this;
-    PotentialCustomerService.queryOrderbynamePinyin(self.user, function (err, potentialCustomers) {
+exports.json_potential_customer_orderby_namePinyin = function(req, res, next){
+    PotentialCustomerService.queryOrderbynamePinyin(req.user, function (err, potentialCustomers) {
         if (err) {
-            self.respond({code: 1001, message: '获取潜在客户列表失败'});
+            res.respond({code: 1001, message: '获取潜在客户列表失败'});
             return;
         }
 
-        self.respond({
+        res.respond({
             code: 1000,
             message: 'success',
             count: potentialCustomers ? potentialCustomers.length : 0,
             potentialCustomers: potentialCustomers ? potentialCustomers : []
         });
     });
-}
+};
 
-function json_potential_customer_islatest(){
-    var self = this;
-    var count = self.data.count || 0;
-    PotentialCustomerService.queryOrderbynamePinyin(self.user, function (err, potentialCustomers) {
+exports.json_potential_customer_islatest = function(req, res, next){
+    var count = req.data.count || 0;
+    PotentialCustomerService.queryOrderbynamePinyin(req.user, function (err, potentialCustomers) {
         if (err) {
-            self.respond({code: 1001, message: '获取潜在客户列表失败'});
+            res.respond({code: 1001, message: '获取潜在客户列表失败'});
             return;
         }
 
-        PotentialCustomerService.countLeftToday(self.user, function (err, countLeftToday) {
+        PotentialCustomerService.countLeftToday(req.user, function (err, countLeftToday) {
             if (err) {
-                self.respond({code: 1001, message: '查询客户列表失败'});
+                res.respond({code: 1001, message: '查询客户列表失败'});
                 return;
             }
 
-            self.respond({
+            res.respond({
                 code: 1000,
                 message: 'success',
                 count: potentialCustomers ? potentialCustomers.length : 0,
@@ -1802,13 +1701,12 @@ function json_potential_customer_islatest(){
             });
         });
     });
-}
+};
 
-function json_intention_products(){
-    var self = this;
+exports.json_intention_products = function(req, res, next){
     IntentionProductService.query(function(err, products){
         if(err){
-            self.respond({code:1001, message:'获取意向商品列表失败'});
+            res.respond({code:1001, message:'获取意向商品列表失败'});
             return;
         }
 
@@ -1819,43 +1717,41 @@ function json_intention_products(){
                 return -1;
         });
 
-        self.respond({code:1000, message:'success', intentionProducts:products});
+        res.respond({code:1000, message:'success', intentionProducts:products});
     })
-}
+};
 
-function json_potential_customer_available(){
-    var self = this;
-    if(!self.data.phone || !tools.isPhone(self.data.phone.toString())){
-        self.respond({code:1001, message:'请填写正确的手机号'});
+exports.json_potential_customer_available = function(req, res, next){
+    if(!req.data.phone || !tools.isPhone(req.data.phone.toString())){
+        res.respond({code:1001, message:'请填写正确的手机号'});
         return;
     }
 
-    PotentialCustomerService.isAvailable(self.data.phone, function(err, available, message){
+    PotentialCustomerService.isAvailable(req.data.phone, function(err, available, message){
         if(err){
-            self.respond({code:1001, message:'获取失败'});
+            res.respond({code:1001, message:'获取失败'});
             return;
         }
 
-        self.respond({code:1000, available:available, message:message});
+        res.respond({code:1000, available:available, message:message});
     })
-}
+};
 
-function json_potential_customer_get(){
-    var self = this;
-    if(!self.data._id){
-        self.respond({code:1001, message:'请填写_id'});
+exports.json_potential_customer_get = function(req, res, next){
+    if(!req.data._id){
+        res.respond({code:1001, message:'请填写_id'});
         return;
     }
 
-    PotentialCustomerService.getById(self.data._id, function(err, doc){
+    PotentialCustomerService.getById(req.data._id, function(err, doc){
         if(err){
-            self.respond({code:1001, message:'获取客户信息失败'});
+            res.respond({code:1001, message:'获取客户信息失败'});
             return;
         }
 
-        self.respond({code:1000, message:'success', potentialCustomer:doc});
+        res.respond({code:1000, message:'success', potentialCustomer:doc});
     })
-}
+};
 
 function convert_user_type_info(user, data){
     user.isVerified = data.isVerified;
@@ -1864,56 +1760,54 @@ function convert_user_type_info(user, data){
     user.RSCInfoVerifing = data.isRSC ? false : (data.RSCInfo ? (data.RSCInfo.name ? true : false) : false);
 
     // selected user type
-    if(!F.global.usertypes[data.type]){
+    if(!Global.usertypes[data.type]){
         user.isVerified = false;
-        data.type = F.global.default_user_type;
+        data.type = Global.default_user_type;
     }
 
     user.userType = data.type;
-    user.userTypeInName = F.global.usertypes[user.userType] || '其他';
+    user.userTypeInName = Global.usertypes[user.userType] || '其他';
 
     // verified user types
     user.verifiedTypes = data.typeVerified || [];
     if (user.verifiedTypes) {
         user.verifiedTypesInJson = [];
         user.verifiedTypes.forEach(function(type){
-            if(F.global.usertypes[type]){
-                user.verifiedTypesInJson.push({typeId:type, typeName: F.global.usertypes[type] || '其他'});
+            if(Global.usertypes[type]){
+                user.verifiedTypesInJson.push({typeId:type, typeName: Global.usertypes[type] || '其他'});
             }
         });
     }
 }
 
-function json_nominated_inviter_get(){
-    var self = this;
-    var user = self.user;
+exports.json_nominated_inviter_get = function(req, res, next){
+    var user = req.user;
     PotentialCustomerService.getByPhone(user.account, function(err, customer){
         if(err){
-            self.respond({code:1001, message:'查询失败'});
+            res.respond({code:1001, message:'查询失败'});
             return;
         }
 
         if(!customer || !customer || !customer.user || !customer.user){
-            self.respond({code:1404, message:'没有推荐的新农代表'});
+            res.respond({code:1404, message:'没有推荐的新农代表'});
             return;
         }
 
-        self.respond({code:1000, message:'success', nominated_inviter:{phone:customer.user.account, name:customer.user.name}});
+        res.respond({code:1000, message:'success', nominated_inviter:{phone:customer.user.account, name:customer.user.name}});
     })
-}
+};
 
 /**
  * query user consignees for ZITI delivery
  * @return {[object]{code:number message:string datas:object}}
  */
-function json_userconsignees_query() {
-    var self = this;
-    var page = self.data['page'];
-    var max = self.data['max'];
-    var userId = self.data['userId'];
+exports.json_userconsignees_query = function(req, res, next) {
+    var page = req.data['page'];
+    var max = req.data['max'];
+    var userId = req.data['userId'];
 
     if (!userId) {
-        self.respond({code:1001,message:'缺少用户ID'});
+        res.respond({code:1001,message:'缺少用户ID'});
         return;
     }
 
@@ -1925,33 +1819,32 @@ function json_userconsignees_query() {
     UserService.queryUserConsignee(options, function(err, data) {
         if (err || !data) {
             if (err) console.error('User Service json_userconsignees_query queryUserConsignee err:', err);
-            self.respond({code:1002,message:'没有找到收货人列表'});
+            res.respond({code:1002,message:'没有找到收货人列表'});
             return;
         }
 
-        self.respond({code:1000,message:'success',datas:{total:data.count,rows:data.items,page:data.page,pages:data.pages}});
+        res.respond({code:1000,message:'success',datas:{total:data.count,rows:data.items,page:data.page,pages:data.pages}});
     });
-}
+};
 
 /**
  * save user consignees
  * @return {[object]{code:number message:string}}
  */
-function process_userconsignees_save() {
-    var self = this;
-    var consigneeName = self.data['consigneeName'];
-    var consigneePhone = self.data['consigneePhone'];
-    var userId = self.data['userId'];
+exports.process_userconsignees_save = function(req, res, next) {
+    var consigneeName = req.data['consigneeName'];
+    var consigneePhone = req.data['consigneePhone'];
+    var userId = req.data['userId'];
     if (!userId) {
-        self.respond({code:1001,message:'缺少用户ID'});
+        res.respond({code:1001,message:'缺少用户ID'});
         return;
     }
     if (!consigneeName) {
-        self.respond({code:1001,message:'请先填写收货人姓名'});
+        res.respond({code:1001,message:'请先填写收货人姓名'});
         return;
     }
     if (!consigneePhone || !tools.isPhone(consigneePhone)) {
-        self.respond({"code":1001, "mesage":"请先填写正确的收货人手机号"});
+        res.respond({"code":1001, "mesage":"请先填写正确的收货人手机号"});
         return;
     }
 
@@ -1961,13 +1854,13 @@ function process_userconsignees_save() {
         if (err) {
             console.error('User Service process_userconsignees_save saveUserConsignee err:', err);
             if (data) {
-                self.respond({code:1002,message:'收货人信息已经存在'});
+                res.respond({code:1002,message:'收货人信息已经存在'});
                 return;
             }
-            self.respond({code:1002,message:'收货人信息保存失败'});
+            res.respond({code:1002,message:'收货人信息保存失败'});
             return;
         }
-        self.respond({code:1000,message:'success'});
+        res.respond({code:1000,message:'success'});
         return;
     });
-}
+};

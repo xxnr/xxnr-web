@@ -8,30 +8,31 @@ var OrderService = services.order;
 var PayService = services.pay;
 var UserService = services.user;
 var OFFLINEPAYTYPE = require('../common/defs').OFFLINEPAYTYPE;
-var EPOSNotify = MODULE('EPOSNotify');
+var EPOSNotify = require('../modules/EPOSNotify');
+var path = require('path');
 
 exports.install = function() {
     // pay
-    F.route('/alipay', alipayOrder, ['post', 'get'], ['isInWhiteList', 'throttle']);
-    F.route('/unionpay', unionPayOrder, ['post', 'get'], ['isInWhiteList', 'throttle']);
-    F.route('/offlinepay', offlinePay, ['get'], ['isLoggedIn']);
-    F.route('/EPOSpay', EPOSPay, ['get'], ['isInWhiteList']);
+    //F.route('/alipay', alipayOrder, ['post', 'get'], ['isInWhiteList', 'throttle']);
+    //F.route('/unionpay', unionPayOrder, ['post', 'get'], ['isInWhiteList', 'throttle']);
+    //F.route('/offlinepay', offlinePay, ['get'], ['isLoggedIn']);
+    //F.route('/EPOSpay', EPOSPay, ['get']);
     // pay notify
     // old url
-    F.route('/dynamic/alipay/nofity.asp', alipayNotify, ['post','raw']);
-    F.route('/dynamic/alipay/notify.asp', alipayNotify, ['post','raw']);
+    //F.route('/dynamic/alipay/nofity.asp', alipayNotify, ['post','raw']);
+    //F.route('/dynamic/alipay/notify.asp', alipayNotify, ['post','raw']);
     // old url
-    F.route('/unionpay/nofity', unionpayNotify, ['post','raw']);
-    F.route('/unionpay/notify', unionpayNotify, ['post','raw']);
-    F.route('/EPOS/notify', process_EPOSNotify, ['post']);
+    //F.route('/unionpay/nofity', unionpayNotify, ['post','raw']);
+    //F.route('/unionpay/notify', unionpayNotify, ['post','raw']);
+    //F.route('/EPOS/notify', process_EPOSNotify, ['post']);
     // offline pay notify
-    F.route('/api/v2.2/getOfflinePayType',              json_offline_pay_type, ['get']);
-    F.route('/api/v2.2/RSC/confirmOfflinePay',          process_RSC_confirm_OfflinePay, ['get'],    ['isLoggedIn', 'isRSC']);
+    //F.route('/api/v2.2/getOfflinePayType',              json_offline_pay_type, ['get']);
+    //F.route('/api/v2.2/RSC/confirmOfflinePay',          process_RSC_confirm_OfflinePay, ['get'],    ['isLoggedIn', 'isRSC']);
     // pay refund
-    F.route('/dynamic/alipay/refund_fastpay_by_platform_nopwd_notify.asp', alipayRefundNotify, ['post','raw']);
-    F.route('/unionpay/refundnotify', unionpayRefundNotify, ['post','raw']);
+    //F.route('/dynamic/alipay/refund_fastpay_by_platform_nopwd_notify.asp', alipayRefundNotify, ['post','raw']);
+    //F.route('/unionpay/refundnotify', unionpayRefundNotify, ['post','raw']);
     // pay success
-    F.route('/alipay/success', aliPaySuccess);
+    //F.route('/alipay/success', aliPaySuccess);
     // // test alipay refund
     // F.route('/api/alipay/refund/', refundTest, ['get'], ['isLoggedIn']);
   
@@ -48,14 +49,12 @@ var moment = require('moment-timezone');
 // pay order
 
 // common pay function
-function payOrder(payExecutor){
-    var self = this;
-    var callbackName = self.query['callback'];
-    var orderId = self.data['orderId'];
-    var payPrice = self.data['price'];
+function payOrder(req, res, payExecutor){
+    var orderId = req.data['orderId'];
+    var payPrice = req.data['price'];
 
     if (!orderId) {
-        self.respond({code:1001, message:'请提供订单ID'});
+        res.respond({code:1001, message:'请提供订单ID'});
         return;
     }
 
@@ -64,26 +63,26 @@ function payOrder(payExecutor){
     OrderService.get(options, function(err, order, payment) {
         if (err) {
             console.error('pay payOrder OrderService get err:', err);
-            self.respond({code:1001, message:'支付出错'});
+            res.respond({code:1001, message:'支付出错'});
             return;
         }
 
         if (!order) {
-            self.respond({code:1001, message:'未找到订单信息'});
+            res.respond({code:1001, message:'未找到订单信息'});
             return;
         }
 
         if (order.isClosed && order.payStatus === PAYMENTSTATUS.UNPAID) {
-            self.respond({code:1001, message:'订单已关闭'});
+            res.respond({code:1001, message:'订单已关闭'});
             return;
         }
 
         if (!payment || typeof(payment.id) === 'undefined' || typeof(payment.price) === 'undefined') {
             if (order.payStatus === PAYMENTSTATUS.PAID) {
-                self.respond({code:1001, message:'订单已支付'});
+                res.respond({code:1001, message:'订单已支付'});
                 return;
             }
-            self.respond({code:1001, message:'未找到支付信息'});
+            res.respond({code:1001, message:'未找到支付信息'});
             return;
         }
 
@@ -91,7 +90,7 @@ function payOrder(payExecutor){
             
             if (payPrice) {
                 // if user not in white list, the price of one time must more than config minPayPrice
-                if ((self.user && !self.user.inWhiteList) || !self.user) {
+                if ((req.user && !req.user.inWhiteList) || !req.user) {
                     var minPayPrice = F.config.minPayPrice;
                     // one time pay price must more than minPayPrice
                     if (minPayPrice > payment.price) {
@@ -104,36 +103,36 @@ function payOrder(payExecutor){
                 }
             }
             var reqOptions = {};
-            if (self.payType) {
-                reqOptions.payType = self.payType;
+            if (req.payType) {
+                reqOptions.payType = req.payType;
             }
+
             OrderService.getPayOrderPaymentInfo(order, payment, payPrice, reqOptions, function (err, resultPayment, resultPayPrice) {
                 if (err) {
                     console.error('pay payOrder OrderService getPayOrderPaymentInfo err:', err);
-                    self.respond({code:1001, message:'获取支付信息出错'});
+                    res.respond({code:1001, message:'获取支付信息出错'});
                     return;
                 }
-                payExecutor(resultPayment.id, parseFloat(resultPayPrice).toFixed(2), self.ip, order.id, resultPayment);
+                payExecutor(resultPayment.id, parseFloat(resultPayPrice).toFixed(2), req.ip, order.id, resultPayment);
                 return;
             });
         } catch (e) {
             console.error('pay payOrder OrderService getPayOrderPaymentInfo err:', e);
-            self.respond({"code":1001, "mesage":"获取支付信息出错"});
+            res.respond({"code":1001, "mesage":"获取支付信息出错"});
             return;
         }
     });
 }
 
-function alipayOrder(){
-    var self = this;
-    var consumer = self.data['consumer']||'website';
-    self.payType = PAYTYPE.ZHIFUBAO;
+exports.alipayOrder = function(req, res, next){
+    var consumer = req.data['consumer']||'website';
+    req.payType = PAYTYPE.ZHIFUBAO;
 
-    payOrder.call(this, function(paymentId, totalPrice, ip, orderId, payment) {
+    payOrder(req, res, function(paymentId, totalPrice, ip, orderId, payment) {
         switch(consumer) {
             case 'app':
                 var response = {"code":1000, "paymentId":paymentId, "price":totalPrice};
-                self.respond(response);
+                res.respond(response);
                 break;
             case 'website':
                 alipay.alipaySubmitService.query_timestamp(function(encrypt_key) {
@@ -148,21 +147,20 @@ function alipayOrder(){
                     param.notify_url = ((alipay.alipay_config.notify_host || 'http://' + require("node-ip/lib/ip").address('public')) + ":" + alipay.alipay_config.notify_host_port + alipay.alipay_config.create_direct_pay_by_user_notify_url);
                     param.return_url = ((alipay.alipay_config.return_host || 'http://' + require("node-ip/lib/ip").address('public')) + ":" + alipay.alipay_config.return_host_port + alipay.alipay_config.create_direct_pay_by_user_return_url);
                     param.extra_common_param = JSON.stringify({orderId:orderId});
-                    self.view('alipay', alipay.build_direct_pay_by_user_param(param));
+                    res.render(path.join(__dirname, '../views/4.api-v1.0/alipay'), alipay.build_direct_pay_by_user_param(param));
                 });
                 break;
             default:
         }
     });
-}
+};
 
-function unionPayOrder() {
+exports.unionPayOrder = function(req, res, next) {
     // before starting test, we have to enable test account : login http://open.unionpay.com with xxnr 12121312(our test parameters is bound with xxnr)
     //     then go to right top corner => "my test" => "my product" => "not tested" => select one tet type => click "start to test"
-    var self = this;
-    self.payType = PAYTYPE.UNIONPAY;
-    payOrder.call(this, function(paymentId, totalPrice, ip, orderId, payment) {
-        var consumer = self.data['consumer']||'website';
+    req.payType = PAYTYPE.UNIONPAY;
+    payOrder(req, res, function(paymentId, totalPrice, ip, orderId, payment) {
+        var consumer = req.data['consumer']||'website';
         var phpPage = null;
 
         switch(consumer) {
@@ -182,7 +180,7 @@ function unionPayOrder() {
         var commandLine = '\"' + require('path').resolve(__filename + '/../../external/unionPay/upacp_sdk_php/demo/utf8/' + phpPage) + '\"';
         var returnPrice = parseFloat((totalPrice * 100).toFixed(2));
 
-        if (F.isDebug) {
+        if (isDebug) {
             commandLine += ' --test';
         }
 
@@ -216,15 +214,15 @@ function unionPayOrder() {
                         }
                     }
 
-                    if (self.data['option'] === 'raw-tn') {
-                        self.raw(response.tn);
+                    if (req.data['option'] === 'raw-tn') {
+                        res.send(response.tn);
                         break;
                     }
 
-                    self.respond(response);
+                    res.respond(response);
                     break;
                 case 'website':
-                    self.raw(output.substring(index));
+                    res.send(output.substring(index));
                     break;
                 default:
             }
@@ -232,107 +230,30 @@ function unionPayOrder() {
     });
 
     return;
-}
+};
 
-function offlinePay(){
-    var self = this;
-
+exports.offlinePay = function(req, res, next){
     // default offline pay type
-    self.payType = PAYTYPE.CASH;
+    req.payType = PAYTYPE.CASH;
 
     // forbidden multi pay for offline pay, which means offline pay can only pay off
-    self.data.price = null;
-    payOrder.call(this, function(paymentId, totalPrice, ip, orderId, payment) {
+    req.data.price = null;
+    payOrder(req, res, function(paymentId, totalPrice, ip, orderId, payment) {
         OrderService.changeToPendingApprove(orderId, function(err){
             if(err){
-                self.respond({code:1002, message:'更改订单状态失败'});
+                res.respond({code:1002, message:'更改订单状态失败'});
                 return;
             }
 
-            self.respond({code:1000, message:'success', "paymentId":paymentId, "price":totalPrice});
+            res.respond({code:1000, message:'success', "paymentId":paymentId, "price":totalPrice});
         });
     });
-}
-
-// pay notify
-
-// // common pay notify function
-// function payNotify(paymentId, options){
-//     var self = this;
-//     // order paid
-//     OrderService.get({"paymentId": paymentId}, function(err, order) {
-//         // TODO: log err
-//         if (err) {
-//             console.error('api-v1.0 payNotify OrderService get err:', err);
-//             dri.sendDRI('[DRI] Fail to get order in order payNotify: ', 'paymentId:'+paymentId, err);
-//         }
-//         if (order) {
-//             var payment = {paymentId: paymentId};
-//             if (options && options.price) {
-//                 payment.price = parseFloat(parseFloat(options.price).toFixed(2));
-//             }
-//             var result = OrderService.judgePaymentRefund(order, payment);
-//             if (result && result.refund) {
-//                 var paymentOptions = options;
-//                 paymentOptions.paymentId = paymentId;
-//                 if (!paymentOptions.orderId) {
-//                     paymentOptions.orderId = order.id;
-//                 }
-//                 if (result.refundReason) {
-//                     paymentOptions.refundReason = result.refundReason;
-//                 }
-//                 payRefund.call(self, paymentOptions);
-//             } else {
-//                 if ((order.payStatus||PAYMENTSTATUS.UNPAID) == PAYMENTSTATUS.UNPAID || order.payStatus == PAYMENTSTATUS.PARTPAID) {
-//                     OrderService.paid(order.id, paymentId, options, function(err, result) {
-//                         if (err) {
-//                             if (result && result.refund) {
-//                                 // *TODO refund
-//                                 var paymentOptions = options;
-//                                 paymentOptions.paymentId = paymentId;
-//                                 if (!paymentOptions.orderId) {
-//                                     paymentOptions.orderId = order.id;
-//                                 }
-//                                 if (result.refundReason) {
-//                                     paymentOptions.refundReason = result.refundReason;
-//                                 }
-//                                 payRefund.call(self, paymentOptions);
-//                             } else {
-//                                 console.error('api-v1.0 payNotify OrderService paid err:', err);
-//                                 // if err happen
-//                                 // send sms to dri
-//                                 var idsStr = 'orderId:' + order.id + ' paymentId:' + paymentId;
-//                                 dri.sendDRI('[DRI] Fail to update order in order payNotify: ', idsStr, err);
-//                             }
-//                         }
-//                     }); // SchemaBuilderEntity.prototype.save = function(model, helper, callback, skip)
-//                 }
-//             }
-//         } else {
-//             // not find order by paymentId
-//             // *TODO refund or other methods
-//             var paymentOptions = options;
-//             paymentOptions.paymentId = paymentId;
-//             if (!paymentOptions.orderId) {
-//                 paymentOptions.orderId = order.id;
-//             }
-//             paymentOptions.refundReason = 3;
-//             payRefund.call(self, paymentOptions);
-//         }
-//     });
-
-//     // pay success log
-//     var payLog = options;
-//     payLog.paymentId = paymentId;
-//     OrderService.savePaidLog(payLog);
-// }
+};
 
 // alipay notify function
-function alipayNotify() {
-    var self = this;
-    console.log('alipayNotify body:', self.body);
-    var qs = require('querystring');
-    var body = qs.parse(self.body);
+exports.alipayNotify = function(req, res, next) {
+    console.log('alipayNotify body:', req.body);
+    var body = req.body;
     
     AlipayNotify.verifyNotify(body, function(isValid) {
         if (!isValid) {
@@ -365,15 +286,11 @@ function alipayNotify() {
             if (body.notify_time) {
                 options.notify_time = body.notify_time;
             }
+
             OrderService.payNotify(paymentId, options);
-            // payNotify.call(self, paymentId, options);
-            self.content('success');
-            // // alipay success log
-            // var payLog = options;
-            // payLog.paymentId = paymentId;
-            // OrderService.savePaidLog(payLog);
+            res.send('success');
         } else {
-            self.content('success');
+            res.send('success');
         }
         // update the third-party platform payment
         if (status == 'TRADE_SUCCESS' || status == 'WAIT_BUYER_PAY' || status == 'TRADE_FINISHED' || status == 'TRADE_CLOSED') {
@@ -382,19 +299,17 @@ function alipayNotify() {
             console.error('alipayNotify status not find:, status:', status);
         }
     });
-}
+};
 
 // unionpay notify function
-function unionpayNotify() {
-    var self = this;
-
-    console.log('unionpayNotify body:', self.body);
-    if (!self.body) {
+exports.unionpayNotify = function(req, res, next) {
+    console.log('unionpayNotify body:', req.body);
+    if (!req.body) {
         console.error('unionpayNotify cannot get unionpay notification body');
     }
 
     var qs = require('querystring');
-    var body = qs.parse(self.body);
+    var body = req.body;
 
     var php_processor = require("../common/php_processor");
     var commandLine = '\"' + require('path').resolve(__filename + '/../../external/unionPay/upacp_sdk_php/demo/utf8/' + 'Verify.php') + '\"';
@@ -403,12 +318,12 @@ function unionpayNotify() {
         commandLine += ' --test';
     }
 
-    commandLine += ` --data=${new Buffer(self.body).toString('base64')} --json=${new Buffer(JSON.stringify(body)).toString('base64')}`;
+    commandLine += ` --data=${new Buffer(qs.stringify(body)).toString('base64')} --json=${new Buffer(JSON.stringify(body)).toString('base64')}`;
 
     new php_processor(commandLine).execute(function(output, error) {
         if (error) {
             console.error('unionpayNotify verification failure:', error);
-            self.content('verification failure:' + error);
+            res.send('verification failure:' + error);
             return;
         }
 
@@ -436,61 +351,57 @@ function unionpayNotify() {
                 if (body.queryId) {
                     options.queryId = body.queryId;
                 }
+
                 OrderService.payNotify(paymentId, options);
-                // payNotify.call(self, paymentId, options);
-                self.content('success');
+                res.send('success');
+
                 // update the third-party platform payment
                 OrderService.updateThirdpartyPayment(paymentId);
-                // // unionpay success log
-                // var payLog = options;
-                // payLog.paymnetId = paymentId;
-                // OrderService.savePaidLog(payLog);
             } else {
                 console.error('unionpayNotify error : respCode is ', body['respCode'], 'body:', body);
-                self.content('success'); // tell the notifier we successfully handled the notification
+                res.send('success'); // tell the notifier we successfully handled the notification
             }
         } else {
             console.error('unionpayNotify verification failure:', result);
-            self.content('verification failure:' + result);
+            res.send('verification failure:' + result);
         }
     });
-}
+};
 
 // RSC offline pay notify function
-function process_RSC_confirm_OfflinePay(){
-    var self = this;
-    var paymentId = self.data.paymentId;
-    var offlinePayType = self.data.offlinePayType;
-    var RSC = self.user;
+exports.process_RSC_confirm_OfflinePay = function(req, res, next){
+    var paymentId = req.data.paymentId;
+    var offlinePayType = req.data.offlinePayType;
+    var RSC = req.user;
     if(!paymentId){
-        self.respond({code:1001, message:'paymentId required'});
+        res.respond({code:1001, message:'paymentId required'});
         return;
     }
 
     if(!offlinePayType){
-        self.respond({code:1001, message:'offlinePayType required'});
+        res.respond({code:1001, message:'offlinePayType required'});
         return;
     }
 
     OrderService.get({"paymentId": paymentId}, function(err, order) {
         if (err) {
-            self.respond({code:1002, message:'获取订单失败'});
+            res.respond({code:1002, message:'获取订单失败'});
             return;
         }
 
         if(!order.RSCInfo || order.RSCInfo.RSC.toString() != RSC._id.toString()){
-            self.respond({code:1002, message:'该订单未分配到县级网点'});
+            res.respond({code:1002, message:'该订单未分配到县级网点'});
             return;
         }
 
         if(!order.pendingApprove){
-            self.respond({code:1002, message:'该订单没有待审核的线下支付'});
+            res.respond({code:1002, message:'该订单没有待审核的线下支付'});
             return;
         }
 
         var payment = OrderService.getPaymentInOrder(order, paymentId);
         if(!payment){
-            self.respond({code:1002, message:'确认付款失败'});
+            res.respond({code:1002, message:'确认付款失败'});
             return;
         }
 
@@ -500,28 +411,24 @@ function process_RSC_confirm_OfflinePay(){
         }
 
         OrderService.payNotify(paymentId, options);
-        // payNotify.call(self, paymentId, options);
-        self.respond({code:1000, message:'success'});
+        res.respond({code:1000, message:'success'});
     });
-}
+};
 
-function json_offline_pay_type(){
-    var self = this;
-    self.respond({code:1000, message:'success', offlinePayType:OFFLINEPAYTYPE});
-}
+exports.json_offline_pay_type = function(req, res, next){
+    res.respond({code:1000, message:'success', offlinePayType:OFFLINEPAYTYPE});
+};
 
 // pay refund notify
 
 // alipay refund notify
-function alipayRefundNotify() {
-    var self = this;
-    var qs = require('querystring');
-    var body = qs.parse(self.body);
+exports.alipayRefundNotify = function(req, res, next) {
+    var body = req.body;
     
     console.log('alipayRefundNotify info:', body);
     AlipayNotify.verifyNotify(body, function(isValid) {
         if (!isValid) {
-            self.content('fail');
+            res.send('fail');
             return;
         }
         var notify_type = body.notify_type;
@@ -532,7 +439,7 @@ function alipayRefundNotify() {
         options.batch_no = body.batch_no;
         options.dateNotify = new Date();
         // return success to alipay
-        self.content('success');
+        res.send('success');
         var result_details = body.result_details.split('#');
         if (parseInt(body.success_num) === 1 && result_details && result_details.length === 1) {
             var refundOptions = options;
@@ -560,20 +467,18 @@ function alipayRefundNotify() {
             }
         }
     });
-}
+};
 
 // unionpay refund notify
-function unionpayRefundNotify() {
-    var self = this;
-
-    if (!self.body) {
+exports.unionpayRefundNotify = function(req, res, next) {
+    if (!req.body) {
         console.error('unionpayNotify cannot get unionpay notification body');
-        self.content('unionpayNotify cannot get unionpay notification body');
+        res.send('unionpayNotify cannot get unionpay notification body');
         return;
     }
 
     var qs = require('querystring');
-    var body = qs.parse(self.body);
+    var body = req.body;
 
     var php_processor = require("../common/php_processor");
     var commandLine = '\"' + require('path').resolve(__filename + '/../../external/unionPay/upacp_sdk_php/demo/utf8/' + 'Verify.php') + '\"';
@@ -582,12 +487,12 @@ function unionpayRefundNotify() {
         commandLine += ' --test';
     }
 
-    commandLine += ` --data=${new Buffer(self.body).toString('base64')} --json=${new Buffer(JSON.stringify(body)).toString('base64')}`;
+    commandLine += ` --data=${new Buffer(qs.stringify(body)).toString('base64')} --json=${new Buffer(JSON.stringify(body)).toString('base64')}`;
 
     new php_processor(commandLine).execute(function(output, error) {
         if (error) {
             console.error('unionpayNotify verification failure:', error);
-            self.content('verification failure:' + error);
+            res.send('verification failure:' + error);
             return;
         }
 
@@ -602,7 +507,7 @@ function unionpayRefundNotify() {
 
         if (result.substring(0, 'success'.length) === 'success') {
             if (body['respCode'] === 00 || body['respCode'] === '00') {
-                self.content('success');
+                res.send('success');
                 var paymentInfo = JSON.parse(new Buffer(body.reqReserved, 'base64').toString());
                 var refundOptions = {paymentId: body.orderId || paymentInfo.paymentId, notifyPrice: (parseFloat(body.txnAmt)/100).toFixed(2), orderId:paymentInfo.orderId, payType:PAYTYPE.UNIONPAY};
                 refundOptions.notify_time = moment(body.txnTime,"YYYYMMDDHHmmss").format("YYYY-MM-DD HH:mm:ss");
@@ -619,126 +524,37 @@ function unionpayRefundNotify() {
                 });
             } else {
                 console.error('unionpayNotify error : respCode is ', body['respCode'], 'body:', body);
-                self.content('success'); // tell the notifier we successfully handled the notification
+                res.send('success'); // tell the notifier we successfully handled the notification
             }
         } else {
             console.error('unionpayNotify verification failure:', result);
-            self.content('verification failure:' + result);
+            res.send('verification failure:' + result);
         }
     });
-}
-
-// var OrderPaidLog = require('../models').orderpaidlog;
-// var OrderPaymentsRefund = require('../models').orderpaymentsrefund;
-// function refundTest() {
-//     var self = this;
-//     //var paymentId = '9561ec5220';
-//     //var paymentId = '4573828f46';
-//     //var paymentId = 'e546c378ca';
-//     var paymentId = '3b074a1876';
-
-//     OrderPaymentsRefund.findOne({paymentId: paymentId, payType: 2}, function(err, orderPaymentRefund){
-//         if (err) {
-//             self.respond('not find refund');
-//             return;
-//         }
-//         self.respond('refund success');
-//         if (orderPaymentRefund && orderPaymentRefund.refundReason !== 3) {
-//             // TODO refund
-//             // console.log(orderPaymentRefund);
-//             if (orderPaymentRefund.payType === PAYTYPE.ZHIFUBAO) {
-//                 console.log('zhifubao refund:', orderPaymentRefund);
-//                //  var type = 'nopwd';
-//                //  PayService.alipayRefund(type, orderPaymentRefund, function(err, result) {
-//                //     if (err) {
-//                //         console.error('payRefund PayService alipayRefundNopwd err:', err);
-//                //         return;
-//                //     }
-//                //     console.log(result);
-//                // });
-//             } else if (orderPaymentRefund.payType === PAYTYPE.UNIONPAY) {
-//                console.log('unionpay refund:', orderPaymentRefund);
-//                // PayService.unionpayRefund(orderPaymentRefund, function(err, result) {
-//                //      if (err) {
-//                //          console.error('payRefund PayService unionpayRefund err:', err);
-//                //          return;
-//                //      }
-//                //      if (result) {
-//                //          console.log(result);
-//                //      }
-//                //      return;
-//                // });
-//             }
-//         }
-//     });
-// }
-
-// // pay refund
-// function payRefund(options) {
-//     var self = this;
-//     if (options) {
-//         PayService.savePaymentRefund(options, function(err, orderPaymentRefund) {
-//             if (err) {
-//                 console.error('payRefund PayService save err:', err);
-//                 console.error(orderPaymentRefund);
-//             } else {
-//                 console.log(orderPaymentRefund);
-//             }
-//             // if (orderPaymentRefund && orderPaymentRefund.refundReason !== 3) {
-//             //     // TODO refund
-//             //     // console.log(orderPaymentRefund);
-//             //     if (orderPaymentRefund.payType === PAYTYPE.ZHIFUBAO) {
-//             //         console.log('zhifubao refund:', orderPaymentRefund);
-//             //         var type = 'nopwd';
-//             //         PayService.alipayRefund(type, orderPaymentRefund, function(err, result) {
-//             //            if (err) {
-//             //                console.error('payRefund PayService alipayRefundNopwd err:', err);
-//             //                return;
-//             //            }
-//             //            console.log(result);
-//             //        });
-//             //     } else if (orderPaymentRefund.payType === PAYTYPE.UNIONPAY) {
-//             //        // console.log(orderPaymentRefund);
-//             //        PayService.unionpayRefund(orderPaymentRefund, function(err, result) {
-//             //             if (err) {
-//             //                 console.error('payRefund PayService unionpayRefund err:', err);
-//             //                 return;
-//             //             }
-//             //             if (result) {
-//             //                 console.log(result);
-//             //             }
-//             //             return;
-//             //        });
-//             //     }
-//             // }
-//         });
-//     }
-// }
+};
 
 // pay success
 
 // alipay success front page view
-function aliPaySuccess(){
-    this.view('alipaySuccess', null);
-}
+exports.aliPaySuccess = function(req, res, next){
+    res.render(path.join(__dirname, '../views/4.api-v1.0/alipaySuccess'), null);
+};
 
-function EPOSPay(){
-    var self = this;
-    self.payType = PAYTYPE.EPOS;
-    payOrder.call(this, function(paymentId, totalPrice, ip, orderId, payment) {
-        self.respond({code:1000, message:'success', "paymentId":paymentId, "price":totalPrice});
+exports.EPOSPay = function(req, res, next){
+    req.payType = PAYTYPE.EPOS;
+    payOrder(req, res, function(paymentId, totalPrice, ip, orderId, payment) {
+        res.respond({code:1000, message:'success', "paymentId":paymentId, "price":totalPrice});
     });
-}
+};
 
-function process_EPOSNotify(){
-    var self = this;
-    var params = self.data.params;
-    var signature = self.data.signature;
+exports.process_EPOSNotify = function(req, res, next){
+    var params = req.data.params;
+    var signature = req.data.signature;
     var decryptedParams = JSON.parse(EPOSNotify.decryptParams(params));
     if(EPOSNotify.verifySignature(params, signature)){
         var memo = EPOSNotify.buildMemo(decryptedParams.memo);
         if(!memo || !memo['商户订单号'] || !memo['商户支付号']){
-            self.content('bad notify');
+            res.send('bad notify');
             return;
         }
 
@@ -777,8 +593,8 @@ function process_EPOSNotify(){
             // payNotify.call(self, paymentId, options);
         }
 
-        self.respond({orderId:orderId, merchantMsgProcessId:0, merchantMsgProcessTime:currentTime, merchantRecMsgProcessState:1});
+        res.respond({orderId:orderId, merchantMsgProcessId:0, merchantMsgProcessTime:currentTime, merchantRecMsgProcessState:1});
     } else{
         console.info('EPOS notify verification fail');
     }
-}
+};

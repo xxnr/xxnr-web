@@ -136,34 +136,51 @@ queryAttributesAndPrice = function(product, attributes, callback, online) {
 
 SKUService.prototype.queryAttributesAndPrice = queryAttributesAndPrice;
 
-SKUService.prototype.updateSKU = function(id, price, attributes, additions, name, callback){
-    if(!id){
+SKUService.prototype.updateSKU = function(id, price, attributes, additions, callback) {
+    if (!id) {
         callback('id required');
         return;
     }
 
-    if(!price || !price.platform_price){
+    if (!price || !price.platform_price) {
         callback('price.platform_price required');
         return;
     }
 
-    SKUModel.findOneAndUpdate({_id:id}, {$set:{price:price, attributes:attributes, additions:additions, name:name}}, {new:true}, function(err, doc){
-        if(err){
-            console.error(err);
-            callback(err);
-            return;
-        }
-
-        refresh_product_SKUAttributes(doc.product, function(err){
-            if(err){
+    SKUModel.findOne({_id: id})
+        .populate('product')
+        .exec(function (err, SKU) {
+            if (err) {
                 console.error(err);
                 callback(err);
                 return;
             }
 
-            callback();
+            if (!SKU) {
+                callback('no SKU found');
+                return;
+            }
+
+
+            SKUModel.findOneAndUpdate({_id: id}, {
+                $set: {
+                    price: price,
+                    attributes: attributes,
+                    additions: additions,
+                    name: getSKUName(SKU.product.name, attributes),
+                    attributeKey: getSKUAttributesKey(attributes)
+                }
+            }, {new: true}, function (err, doc) {
+                if (err) {
+                    console.error(err);
+                    callback(err);
+                    return;
+                }
+
+                callback();
+                refresh_product_SKUAttributes(doc.product);
+            })
         });
-    })
 };
 
 SKUService.prototype.updateSKUAttributeOrder = function(category, brand, name, order, callback){
@@ -229,40 +246,48 @@ SKUService.prototype.updateSKUAttributeOrder = function(category, brand, name, o
     })
 };
 
-SKUService.prototype.addSKU = function(name, product, attributes, additions, price, callback){
-    if(!name){
-        callback('name required');
-        return;
-    }
-
-    if(!product){
+SKUService.prototype.addSKU = function(product, attributes, additions, price, callback) {
+    if (!product) {
         callback('product required');
         return;
     }
 
-    if(!price || !price.platform_price){
+    if (!price || !price.platform_price) {
         callback('price.platform_price required');
         return;
     }
 
-    var newSKU = new SKUModel({name:name, product:product, attributes:attributes, additions:additions, price:price});
-    newSKU.save(function(err){
-        if(err){
+    ProductModel.findOne({_id: product}, function (err, product) {
+        if (err) {
             console.error(err);
             callback(err);
             return;
         }
 
-        refresh_product_SKUAttributes(product, function(err){
-            if(err){
+        if (!product) {
+            callback('no product find');
+            return;
+        }
+
+        var newSKU = new SKUModel({
+            name: getSKUName(product.name, attributes),
+            product: product,
+            attributes: attributes,
+            additions: additions,
+            price: price,
+            attributeKey: getSKUAttributesKey(attributes)
+        });
+        newSKU.save(function (err) {
+            if (err) {
                 console.error(err);
                 callback(err);
                 return;
             }
 
             callback(null, newSKU);
-        });
-    })
+            refresh_product_SKUAttributes(product);
+        })
+    });
 };
 
 SKUService.prototype.online = function(id, online, callback){
@@ -283,15 +308,8 @@ SKUService.prototype.online = function(id, online, callback){
             return;
         }
 
-        refresh_product_SKUAttributes(doc.product, function(err){
-            if(err){
-                console.error(err);
-                callback(err);
-                return;
-            }
-
-            callback(null, doc);
-        });
+        callback(null, doc);
+        refresh_product_SKUAttributes(doc.product);
     })
 };
 
@@ -406,7 +424,7 @@ SKUService.prototype.removeSKUAttributesByName = function(name, callback){
         });
 
         // refresh product
-        refresh_product_SKUAttributes(null, function(){});
+        refresh_product_SKUAttributes(null);
     })
 };
 
@@ -454,23 +472,24 @@ SKUService.prototype.querySKUByProductId = function(product, callback){
     })
 };
 
-SKUService.prototype.getSKU = function(id, callback){
-    if(!id){
+SKUService.prototype.getSKU = function(id, callback) {
+    if (!id) {
         callback('id required');
         return;
     }
 
-    SKUModel.findOne({_id:id})
+    SKUModel.findOne({_id: id})
         .populate('product')
-        .exec(function(err, SKU){
-        if(err){
-            console.error(err);
-            callback(err);
-            return;
-        }
+        .lean()
+        .exec(function (err, SKU) {
+            if (err) {
+                console.error(err);
+                callback(err);
+                return;
+            }
 
-        callback(null, SKU);
-    })
+            callback(null, SKU);
+        })
 };
 
 SKUService.prototype.querySKUAdditions = function(category, brand, callback){
@@ -542,8 +561,8 @@ SKUService.prototype.idJoinWithCount = function(options, callback){
                         return;
                     }
 
-                    var item = {SKU:doc.toObject()};
                     if (doc) {
+                        var item = {SKU:doc.toObject()};
                         doc.product.populate('brand', function(err, product){
                             if(err){
                                 console.error(err);
@@ -567,87 +586,135 @@ SKUService.prototype.idJoinWithCount = function(options, callback){
     joinSKU(0);
 };
 
+/**
+ * get SKU name joining product name and attributes with '-'
+ * @param productName
+ * @param attributes
+ * @returns {string}
+ */
+var getSKUName = function(productName, attributes){
+    return productName + ' - ' + getSKUAttributesKey(attributes);
+};
+
+SKUService.prototype.getSKUName = getSKUName;
+
+/**
+ * get SKU attributes key divided by '-'
+ * @param attributes given attributes array
+ */
+function getSKUAttributesKey(attributes){
+    var key = '';
+    attributes.sort(function(a, b){
+        if(a.order > b.order){
+            return true;
+        }
+
+        return false;
+    });
+
+    attributes.forEach(function(attribute){
+        key += ' - ' + attribute.value;
+    });
+
+    return key.slice(3);
+}
+
+SKUService.prototype.getSKUAttributesKey = getSKUAttributesKey;
+
 var refresh_product_SKUAttributes = function(product, callback){
-    queryAttributesAndPrice(product, null, function(err, data){
-        if(err){
-            callback(err);
-            return;
-        }
-
-        SKUModel.find({product:product, online:true})
-            .sort({dateCreated:1})
-            .limit(1)
-            .lean()
-            .exec(function(err, docs){
+    var promises = [
+        new Promise(function(resolve, reject){
+            queryAttributesAndPrice(product, null, function(err, data){
                 if(err){
-                    console.error(err);
-                    callback(err);
+                    reject(err);
                     return;
                 }
 
-                var setOption = {SKUPrice:data.price, SKUMarketPrice:data.market_price, SKUAttributes:data.attributes, SKUAdditions:data.additions, price:data.price.min};
-                if(docs && docs.length == 1){
-                    var defaultSKU = docs[0];
-                    defaultSKU.ref = defaultSKU._id;
-                    delete defaultSKU._id;
-                    setOption.defaultSKU = defaultSKU;
-                } else{
-                    setOption.defaultSKU = null;
-                    setOption.online = false;
-                }
+                SKUModel.find({product:product, online:true})
+                    .sort({dateCreated:1})
+                    .limit(1)
+                    .lean()
+                    .exec(function(err, docs){
+                        if(err){
+                            console.error(err);
+                            reject(err);
+                            return;
+                        }
 
-                ProductModel.update({_id:product}, {$set:setOption}, function(err, numAffected){
-                    if(err){
-                        console.error(err);
-                        callback(err);
-                        return;
-                    }
+                        var setOption = {SKUPrice:data.price, SKUMarketPrice:data.market_price, SKUAttributes:data.attributes, SKUAdditions:data.additions, price:data.price.min};
+                        if(docs && docs.length == 1){
+                            var defaultSKU = docs[0];
+                            defaultSKU.ref = defaultSKU._id;
+                            delete defaultSKU._id;
+                            setOption.defaultSKU = defaultSKU;
+                        } else{
+                            setOption.defaultSKU = null;
+                            setOption.online = false;
+                        }
 
-                    if(numAffected.n==0){
-                        callback('product '+product+' not exist');
-                        return;
-                    }
+                        ProductModel.update({_id:product}, {$set:setOption}, function(err, numAffected){
+                            if(err){
+                                console.error(err);
+                                reject(err);
+                                return;
+                            }
 
-                    callback();
-                })
-            });
-    }, true);
+                            if(numAffected.n==0){
+                                reject('product '+product+' not exist');
+                                return;
+                            }
 
-    queryAttributesAndPrice(product, null, function(err, data){
-        if(err){
-            callback(err);
-            return;
-        }
-
-        SKUModel.find({product:product, online:true})
-            .sort({dateCreated:-1})
-            .limit(1)
-            .lean()
-            .exec(function(err, docs){
+                            resolve();
+                        })
+                    });
+            }, true);
+        }),
+        new Promise(function(resolve, reject){
+            queryAttributesAndPrice(product, null, function(err, data){
                 if(err){
-                    console.error(err);
-                    callback(err);
+                    reject(err);
                     return;
                 }
 
-                var setOption = {referencePrice:data.price};
+                SKUModel.find({product:product, online:true})
+                    .sort({dateCreated:-1})
+                    .limit(1)
+                    .lean()
+                    .exec(function(err, docs){
+                        if(err){
+                            console.error(err);
+                            reject(err);
+                            return;
+                        }
 
-                ProductModel.update({_id:product}, {$set:setOption}, function(err, numAffected){
-                    if(err){
-                        console.error(err);
-                        callback(err);
-                        return;
-                    }
+                        var setOption = {referencePrice:data.price};
 
-                    if(numAffected.n==0){
-                        callback('product '+product+' not exist');
-                        return;
-                    }
+                        ProductModel.update({_id:product}, {$set:setOption}, function(err, numAffected){
+                            if(err){
+                                console.error(err);
+                                reject(err);
+                                return;
+                            }
 
-                    callback();
-                })
-            });
-    })
+                            if(numAffected.n==0){
+                                reject('product '+product+' not exist');
+                                return;
+                            }
+
+                            resolve();
+                        })
+                    });
+            })
+        })
+    ];
+
+    Promise.all(promises)
+        .then(function(){
+            callback();
+        })
+        .catch(function(err){
+            callback(err);
+        })
 };
 
 SKUService.prototype.querySKUAttributesAndPrice = function(productId, attributes, callback, online) {

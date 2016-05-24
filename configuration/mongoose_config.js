@@ -8,5 +8,5 @@ module.exports = {
         dev: "mongodb://101.200.194.203:27017/xxnr"
     },
     autoIndex: false,
-    environment: 'production'
+    environment: require('../config').environment
 };

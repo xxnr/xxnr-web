@@ -501,6 +501,7 @@ COMPONENT('textboxtags', function() {
 			builder += template({ name: arr[i] });
 
 		container.append(builder);
+		alert('2');
 	};
 
 	self.state = function(type) {
@@ -743,6 +744,7 @@ COMPONENT('form', function() {
 
 	var hide = self.hide = function() {
 		self.set('');
+		document.documentElement.style.overflow='visible';
 	};
 
 	self.noValid();
@@ -790,6 +792,7 @@ COMPONENT('form', function() {
 		var isHidden = !EVALUATE(self.path, self.condition);
 		self.element.toggleClass('hidden', isHidden);
 		if (!isHidden) {
+			document.documentElement.style.overflow='hidden';
 			var el = self.element.find('input');
 
 			if (el.length === 0)
@@ -912,6 +915,17 @@ COMPONENT('template', function() {
 		var script = self.element.find('script');
 		self.template = Tangular.compile(script.html());
 		script.remove();
+
+		setTimeout(function() {
+			var max = self.attr('data-max');
+			if (max === 'auto')
+				self.max = (Math.floor(($(window).height() - (self.element.offset().top + 208)) / 26));
+			else
+				self.max = parseInt(max);
+
+			if (self.max < 10)
+				self.max = 10;
+		}, 10);
 	};
 
 	self.setter = function(value) {

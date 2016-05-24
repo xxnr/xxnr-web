@@ -19,7 +19,7 @@ var api10 = converter.api10;
 var mongoose = require('mongoose');
 var DeliveryCodeModel = require('../models').deliveryCode;
 var umengConfig = require('../configuration/umeng_config');
-var UMENG = MODULE('umeng');
+var UMENG = require('../modules/umeng');
 var PayService = require('../services/pay');
 var dri = require('../common/dri');
 
@@ -324,7 +324,7 @@ OrderService.prototype.create = function(options, callback) {
 		self.addUserOrderNumber({userId:order.buyerId});
 
 		// Writes stats
-		MODULE('webcounter').increment('orders');
+		//require('../modules/webcounter').increment('orders');
 	});
 };
 
@@ -360,7 +360,7 @@ OrderService.prototype.add = function(options, callback) {
 		self.addUserOrderNumber({userId:order.buyerId});
 
 		// Writes stats
-		MODULE('webcounter').increment('orders');
+		//require('../modules/webcounter').increment('orders');
 	});
 
 };
@@ -2101,22 +2101,30 @@ OrderService.prototype.updateRSCInfo = function(orderId, RSCInfo, callback) {
 
 // umeng 自定义推送
 OrderService.prototype.umengSendCustomizedcast = function(type, userId, userType, options) {
+	var query = null;
 	if (userType == 'user') {
-		UMENG.sendCustomizedcast(type, userId, userType, options);
+		query = {id:userId};
 	} else if (userType == 'RSC') {
-		UserModel.findById(userId, function(err, user){
-	        if(err){
-	            console.error('OrderService umengSendCustomizedcast findById err:', err);
+		query = {_id:userId};
+	}
+	if (query) {
+		UserModel.findOne(query, function(err, user) {
+			if (err) {
+	            console.error('OrderService umengSendCustomizedcast findOne err:', err, 'userType:', userType);
 	            return;
 	        }
-
-	        if(!user) {
-	            console.error('OrderService umengSendCustomizedcast findById not find user...');
+	        if (!user) {
+	            console.error('OrderService umengSendCustomizedcast findOne not find user...', 'userType:', userType);
 	            return;
 	        }
-
-	        UMENG.sendCustomizedcast(type, user.id, userType, options);
-	    });
+	        if (user.appLoginAgent) {
+	        	options.appLoginAgent = user.appLoginAgent;
+	        }
+			UMENG.sendCustomizedcast(type, user.id, userType, options);
+		});
+	} else {
+		console.error('OrderService umengSendCustomizedcast query is null', 'userType:', userType);
+	    return;
 	}
 };
 

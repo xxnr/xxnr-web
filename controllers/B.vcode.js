@@ -1,10 +1,11 @@
 var tools = require('../common/tools');
 var services = require('../services');
 var UserService = services.user;
+var vCodeService = services.vCode;
 
 exports.install = function() {
 	// SMS
-	F.route('/api/v2.0/sms/',					generate_sms, ['get', 'post']);
+	//F.route('/api/v2.0/sms/',					generate_sms, ['get', 'post']);
 
 	// v1.0
 	//fix api// F.route('/app/sms/',						generate_sms, ['get', 'post']);
@@ -15,40 +16,38 @@ exports.install = function() {
 // ==========================================================================
 
 // Generates sms
-function generate_sms() {
-    var self = this;
-    var callbackName = self.data['callback'];
+exports.generate_sms = function(req, res, next) {
     var requestType = '';
     var code_type, target;
     var target_type = 'phone';
     var mobile_code = '86';
-    if (self.data.bizcode)
-        requestType = self.data.bizcode;
+    if (req.data.bizcode)
+        requestType = req.data.bizcode;
 
     if (requestType === 'resetpwd') {
-        if (!self.data.tel || !tools.isPhone(self.data.tel)) {
-            self.respond({'code': '1001', 'message': '请求参数错误，无效的tel参数'});
+        if (!req.data.tel || !tools.isPhone(req.data.tel)) {
+            res.respond({'code': '1001', 'message': '请求参数错误，无效的tel参数'});
             return;
         } else {
             code_type = 'resetpwd';
-            target = self.data.tel;
+            target = req.data.tel;
             var user = {'account': target};
 
             UserService.get(user, function (err, data) {
                 if (!data || err) {
-                    self.respond({'code': '1001', 'message': '您输入的手机号未注册，请核对后重新输入'});
+                    res.respond({'code': '1001', 'message': '您输入的手机号未注册，请核对后重新输入'});
                     return;
                 } else {
                     generate_vcode(code_type, target, target_type, mobile_code, function (err, result) {
                         if (err) {
-                            self.respond({'code': '1001', 'message': '生成vcode错误'});
+                            res.respond({'code': '1001', 'message': '生成vcode错误'});
                             return;
                         } else {
                             if (result && result.renew && result.renew === 2) {
-                                self.respond({'code': '1001', 'message': '稍等片刻再获取'});
+                                res.respond({'code': '1001', 'message': '稍等片刻再获取'});
                                 return;
                             }
-                            self.respond({'code': '1000', 'message': 'success'});
+                            res.respond({'code': '1000', 'message': 'success'});
                             return;
                         }
                     });
@@ -59,43 +58,43 @@ function generate_sms() {
     } else {
         if (requestType === 'register') {
             //if (req.user) {
-            //   self.respond({'code':'1001','message':'用户已登录，请先登出'});
+            //   res.respond({'code':'1001','message':'用户已登录，请先登出'});
             // }
-            if (!self.data.tel || !tools.isPhone(self.data.tel)) {
-                self.respond({'code': '1001', 'message': '请求参数错误，无效的tel参数'});
+            if (!req.data.tel || !tools.isPhone(req.data.tel)) {
+                res.respond({'code': '1001', 'message': '请求参数错误，无效的tel参数'});
                 return;
             } else {
                 code_type = 'register';
-                target = self.data.tel;
+                target = req.data.tel;
                 var user = {'account': target};
 
                 UserService.get(user, function (err, data) {
                     if (!data || err) {
                         generate_vcode(code_type, target, target_type, mobile_code, function (err, result) {
                             if (err) {
-                                self.respond({'code': '1001', 'message': '生成vcode错误'});
+                                res.respond({'code': '1001', 'message': '生成vcode错误'});
                                 return;
                             } else {
                                 if (result && result.renew && result.renew === 2) {
-                                    self.respond({'code': '1001', 'message': '稍等片刻再获取'});
+                                    res.respond({'code': '1001', 'message': '稍等片刻再获取'});
                                     return;
                                 }
-                                self.respond({'code': '1000', 'message': 'success'});
+                                res.respond({'code': '1000', 'message': 'success'});
                                 return;
                             }
                         });
                     } else {
-                        self.respond({'code': '1001', 'message': '该手机号已注册'});
+                        res.respond({'code': '1001', 'message': '该手机号已注册'});
                         return;
                     }
                 });
             }
         } else {
-            self.respond({'code': '1001', 'message': '请求参数错误，无效的bizcode参数'});
+            res.respond({'code': '1001', 'message': '请求参数错误，无效的bizcode参数'});
             return;
         }
     }
-}
+};
 
 // Generates vcode
 function generate_vcode(code_type, target, target_type, mobile_code, callback) {
@@ -110,7 +109,7 @@ function generate_vcode(code_type, target, target_type, mobile_code, callback) {
     options.code_type = code_type;
     options.target_type = target_type;
 
-    GETSCHEMA('VCode').get(options, function(err, vcode) {
+    vCodeService.get(options, function(err, vcode){
         if (err) {
             return callback(err);
         }
@@ -141,7 +140,7 @@ function generate_vcode(code_type, target, target_type, mobile_code, callback) {
                     }
                 }
 
-                GETSCHEMA('VCode').workflow('update', vcode, null, function(err) {
+                vCodeService.update(vcode, function(err){
                     if (err) {
                         return callback(err);
                     }
@@ -150,7 +149,7 @@ function generate_vcode(code_type, target, target_type, mobile_code, callback) {
                 }, true);
             }
         } else {
-            GETSCHEMA('VCode').workflow('create', null, options, function(err, newVCode) {
+            vCodeService.create(options, function(err, newVCode){
                 if (err) {
                     return callback(err);
                 }

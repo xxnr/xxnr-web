@@ -1,0 +1,245 @@
+<script type="text/javascript" async src="/js/simplePagination.js"></script>
+
+<div class="filter" style="padding-bottom:9px">
+	<div class="container">
+		<div class="caption"><span class="fa fa-dashboard mr5"></span> Dashboard</div>
+	</div>
+</div>
+
+<div class="container dashboard">
+	<div class="filter col-md-2" style="padding: 25px 15px;">
+		<h3 class="ui-left">经营数据</h3>
+        <ul class="dashboard-sidebar">
+            <li name="daily">- 每日概况</li>
+            <li name="weekly">- 每周业绩</li>
+            <li class="cl"></li>
+        </ul>
+        <br />
+        <h3 class="ui-left">经纪人数据</h3>
+        <ul class="dashboard-sidebar">
+            <li class="selected">- 业绩排行</li>
+            <li class="cl"></li>
+        </ul>
+    </div>
+    <div class="col-md-10">
+		<div class="mb50">
+		<div class="row m">
+			<div class="col-md-12">
+				<h3 class="ui-left">昨日业绩排行</h3>
+			</div>
+			<div class="col-md-12">
+				<div data-component="template" data-component-path="dashboard">
+					<script type="text/html">
+						{{ if agentRank }}
+							<p>更新时间： {{ agentRank.lastUpdateTime | format('yyyy-MM-dd HH:mm:ss') }}</p>
+						{{ fi }}
+					</script>
+				</div>
+			</div>
+		</div>
+		<div class="row m">
+			<div class="col-md-12">
+				<div data-component="template" data-component-path="dashboard" class="ui-grid agents">
+					<script type="text/html">
+					{{ if agents && agents.length > 0 }}
+						<table class="table" width="100%" cellpadding="0" cellspacing="0" border="0" style="font-size:14px;">
+							<tbody>
+								<tr>
+									<td style="width:30px" class="silver hidden-xs ui-center active">排名</td>
+							    	<td style="width:50px" class="silver hidden-xs ui-center active">经纪人姓名</td>
+							    	<td style="width:60px" class="silver hidden-xs ui-center active">手机号</td>
+							    	<td style="width:80px" class="silver hidden-xs ui-center active">
+							    		<div class="agentstitle">
+								    		<span>昨日新增客户</span>
+								    		<div class="agentsort">
+								    			<div class="fa fa-caret-up" id="NEWINVITEE-ASC"></div>
+								    			<div class="fa fa-caret-down" id="NEWINVITEE-DESC"></div>
+								    		</div>
+							    		</div>
+							    	</td>
+							    	<td style="width:70px" class="silver hidden-xs ui-center active">
+							    		<div class="agentstitle">
+								    		<span>总客户数</span>
+								    		<div class="agentsort">
+								    			<div class="fa fa-caret-up" id="TOTALINVITEE-ASC"></div>
+								    			<div class="fa fa-caret-down" id="TOTALINVITEE-DESC"></div>
+								    		</div>
+							    		</div>
+							    	</td>
+							    	<td style="width:80px" class="silver hidden-xs ui-center active">
+							    		<div class="agentstitle">
+								    		<span>昨日登记客户</span>
+								    		<div class="agentsort">
+								    			<div class="fa fa-caret-up" id="NEWPOTENTIALCUSTOMER-ASC"></div>
+								    			<div class="fa fa-caret-down" id="NEWPOTENTIALCUSTOMER-DESC"></div>
+								    		</div>
+							    		</div>
+							    	</td>
+							    	<td style="width:80px" class="silver hidden-xs ui-center active">
+							    		<div class="agentstitle">
+								    		<span>总登记客户数</span>
+								    		<div class="agentsort">
+								    			<div class="fa fa-caret-up" id="TOTALPOTENTIALCUSTOMER-ASC"></div>
+								    			<div class="fa fa-caret-down" id="TOTALPOTENTIALCUSTOMER-DESC"></div>
+								    		</div>
+							    		</div>
+							    	</td>
+							    	<td style="width:60px" class="silver hidden-xs ui-center active">已完成订单数</td>
+							    	<td style="width:80px" class="silver hidden-xs ui-right active">已完成金额（元）</td>
+							    </tr>
+							    {{ foreach agent in agents }}
+							    	<tr>
+										<td style="width:40px" class="silver hidden-xs ui-center">{{ $index + 1 }}</td>
+								    	<td style="width:60px" class="silver hidden-xs ui-center" title="{{ agent.name }}">{{ agent.name }}</td>
+								    	<td style="width:60px" class="silver hidden-xs ui-center" title="{{ agent.phone }}">{{ agent.phone }}</td>
+								    	<td style="width:60px" class="silver hidden-xs ui-center">{{ agent.newInviteeCount | format(0) }}</td>
+								    	<td style="width:60px" class="silver hidden-xs ui-center">{{ agent.totalInviteeCount | format(0) }}</td>
+								    	<td style="width:60px" class="silver hidden-xs ui-center">{{ agent.newPotentialCustomerCount | format(0) }}</td>
+								    	<td style="width:60px" class="silver hidden-xs ui-center">{{ agent.totalPotentialCustomerCount | format(0) }}</td>
+								    	<td style="width:60px" class="silver hidden-xs ui-center">{{ agent.totalCompletedOrderCount | format(0) }}</td>
+								    	<td style="width:80px" class="silver hidden-xs ui-right" title="{{ agent.totalPaidAmount | format(0) }}">{{ agent.totalPaidAmount | price(2) }}</td>
+								    </tr>
+								{{ end }}
+							</tbody>
+						</table>
+						
+					{{ else }}
+						暂无数据
+					{{ fi }}
+					</script>
+				</div>
+				<div class="dashboard-pages">
+				</div>
+				
+				<div data-component="error" data-component-path="dashboard.agentsresponse"></div>
+			</div>
+		</div>
+		</div>
+	</div>
+</div>
+
+<script>
+
+	var dashboard = {};
+	dashboard.agentsSortList = ['NEWINVITEE-DESC', 'NEWINVITEE-ASC', 'TOTALINVITEE-DESC', 'TOTALINVITEE-ASC', 'NEWPOTENTIALCUSTOMER-DESC', 'NEWPOTENTIALCUSTOMER-ASC', 'TOTALPOTENTIALCUSTOMER-DESC', 'TOTALPOTENTIALCUSTOMER-ASC', 'TOTALCOMPLETEDORDER-DESC', 'TOTALCOMPLETEDORDER-ASC', 'TOTALPAIDAMOUT-DESC', 'TOTALPAIDAMOUT-ASC'];
+
+	dashboard.agents = [];
+	dashboard.agentsSelected;
+	dashboard.agentRank = {};
+	dashboard.agentsresponse;
+	dashboard.pages;
+	dashboard.page;
+	dashboard.count;
+
+	var agents_rankSort = getUrlParam('sort');
+	var agents_sortOrder = getUrlParam('sortOrder');
+	var agents_page = getUrlParam('page');
+	var agents_defaultSort = 'NEWINVITEE-DESC';
+	if (agents_rankSort) {
+		agents_defaultSort = agents_rankSort + '-DESC';
+		if (agents_sortOrder && agents_sortOrder == 1) {
+			agents_defaultSort = agents_rankSort + '-ASC';
+		}
+	}
+
+	function dashboard_refresh() {
+		dashboardInit();
+		// agents
+		getAgents(agents_defaultSort, agents_page?agents_page:null);
+	}
+
+	function getAgents(sortName, page) {
+		dashboard.agentsSelected = sortName;
+		var names = sortName.split('-');
+		if (names.length == 2) {
+			var sortTitle = names[0];
+			var sortOrder = names[1] == 'ASC' ? 1 : -1;
+			var urlParam = (sortTitle ? 'sort=' + sortTitle + (sortOrder ? ('&sortOrder=' + sortOrder) : '') : '') + (page ? '&page='+page : '');
+			var url = '/api/dashboard/queryAgentReportYesterday' + (urlParam ? '?' + urlParam : '');
+			$.components.GET(managerurl + url, null, function(response) {
+				var key = 'dashboard.agents';
+				if (response && response.code && response.code==1000) {
+					if (dashboard.agentRank) {
+						dashboard.agentRank.lastUpdateTime = response.lastUpdateTime;
+					} else {
+						dashboard.agentRank = {lastUpdateTime:response.lastUpdateTime};
+					}
+					dashboard.agents = response.agentReportYesterday;
+			        // SET('dashboard.agentRank', dashboard.agentRank);
+			        // SET('dashboard.agents', dashboard.agents);
+			        if (response.pages) {
+						dashboard.pages = response.pages;
+					}
+					if (response.page) {
+						dashboard.page = response.page;
+					}
+					if (response.count) {
+						dashboard.count = response.count;
+					}
+					SET('dashboard', dashboard);
+			        $(".agentsort").find('.selected').removeClass('selected');
+					$('#'+sortName).addClass('selected');
+					if (dashboard.pages && dashboard.count) {
+						Pagination(dashboard.count, dashboard.count/dashboard.pages, page?page:null);
+					}
+				} else {
+					if (response.error || response.message) {
+						key = 'dashboard.agentsresponse';
+						if (response.message) {
+							response = [{error: response.message}];
+						} else {
+							response = response.error;
+						}
+					} else {
+						response = {};
+					}
+					SET(key, response);
+				}
+				$('.agentsort div').off('click').on('click', function() {
+					var el = $(this);
+					var sortName = el.attr("id")
+					if (sortName && sortName !== dashboard.agentsSelected) {
+						for (var i = 0; i < dashboard.agentsSortList.length; i++) {
+							var sort = dashboard.agentsSortList[i];
+							if (sortName == sort) {
+								// getAgents(sortName);
+								dashboard.agentsSelected = sortName;
+								redirectURL();
+								break;
+							}
+						}
+					}
+		        });
+			});
+		}
+	}
+
+	function Pagination(count, pageCount, currentPage) {
+		$('div.dashboard-pages').pagination({
+	        items: count,
+	        itemsOnPage: pageCount,
+	        currentPage: currentPage?currentPage:0,
+			prevText: '<',
+			nextText: '>',
+	        cssStyle: 'light-theme',
+	        onPageClick: function(pageNumber, event) {
+	        	redirectURL(pageNumber);
+	        }
+	    });
+	}
+
+	function redirectURL(page) {
+		if (dashboard.agentsSelected) {
+    		var names = dashboard.agentsSelected.split('-');
+			if (names.length == 2) {
+	        	var sortTitle = names[0];
+				var sortOrder = names[1] == 'ASC' ? 1 : -1;
+				var urlParam = (sortTitle ? 'sort=' + sortTitle + (sortOrder ? ('&sortOrder=' + sortOrder) : '') : '') + (page ? '&page='+page : '');
+	        	window.location.href = managerurl + "/dashboard/agent-rank/" + (urlParam ? '?' + urlParam : '');
+	        }
+        }
+	}
+
+	dashboard_refresh();
+
+</script>

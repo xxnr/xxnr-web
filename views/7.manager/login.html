@@ -1,22 +1,13 @@
-@{layout('')}
-
 <!DOCTYPE html>
     <html>
         <head>
-            <title>Manager v@{config.version}</title>
-            <meta charset="utf-8" />
-            <meta http-equiv="X-UA-Compatible" content="IE=10" />
-            <meta name="format-detection" content="telephone=no" />
-            <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-            <meta name="robots" content="all,follow" />
-        @{head}
-            <link rel="stylesheet" href="/3rd-party/non-classified/font-awesome/v4.4.0/css/font-awesome.min.css" />
-            <link rel="stylesheet" href="/3rd-party/css/google-font/Source+Sans+Pro-400,200,700.css" />
-        @{import('manager.css', 'favicon.ico')}
+            <title>Manager v<%= version %></title>
+            <% include ../partials/loginstatic %>
             <script>
-            var managerurl="@{!CONFIG('manager-url')}";
-            var currency='@{!config.custom.currency_entity}';
-            var su=JSON.parse('@{json(user)}');
+                var managerurl = '<%= manager_url %>';
+//                var currency='@{!config.custom.currency_entity}';
+//                var su=JSON.parse('@{json(user)}');
+                var su= JSON.parse('<%- JSON.stringify(user) %>');
             </script>
         </head>
         <body>
@@ -24,30 +15,24 @@
         <!--<div id="success"><span class="fa fa-check-circle"></span></div>-->
 
         <div id="body">
-            <div data-component="form" data-title="@(登录)" data-component-path="common.form" data-if="true" data-width="600px" data-component-id="login.form" data-class="login">
+            <div data-component="form" data-title="登录" data-component-path="common.form" data-if="true" data-width="600px" data-component-id="login.form" data-class="login">
                 <div class="padding" style="padding-bottom:0">
                     <div class="row m">
-                        <div data-component="textbox" data-component-path="login.form.account" data-required="true" class="col-md-12">@(用户名)</div>
+                        <div data-component="textbox" data-component-path="login.form.account" data-required="true" class="col-md-12">用户名</div>
                     </div>
                     <div class="row">
-                        <div data-component="textbox" data-component-type="password" data-component-path="login.form.password" data-required="true" class="col-md-12">@(密码)</div>
+                        <div data-component="textbox" data-component-type="password" data-component-path="login.form.password" data-required="true" class="col-md-12" onkeydown="goLogin(event);">密码</div>
                     </div>
                 </div>
                 <br>
                 <div data-component="error" data-component-path="orders.response"></div>
                 <div class="ui-form-buttons">
                     <div data-component="validation" data-component-path="login.form">
-                        <button name="submit">@(登录)</button>
+                        <button id="loginButton" name="submit">登录</button>
                     </div>
                 </div>
             </div>
         </div>
-        <script src="/3rd-party/js/jquery/2.1.3/jquery.min.js"></script>
-        <script src="/3rd-party/js/jsencrypt.js"></script>
-
-        @{js('be_common.js')}
-        @{section('script')}
-
         <script>
             var login = {};
             login.form = {};
@@ -63,7 +48,7 @@
                             // Error handling
                             SET('orders.response', response);
                             if (response.code == 1000) {
-                                window.location.href = "/$manager";
+                                window.location.href = managerurl;
                             }else{
                                 alert(response.message);
                             }
@@ -71,6 +56,15 @@
                     });
                 };
             });
+
+            function goLogin(event) {
+                var theEvent = event || window.event;
+                var code = theEvent.keyCode || theEvent.which || theEvent.charCode;
+                if (code == 13) {
+                    $('#loginButton').click();
+                }
+            }
         </script>
+
     </body>
 </html>

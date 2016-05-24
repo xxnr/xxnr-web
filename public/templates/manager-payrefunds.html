@@ -1,18 +1,18 @@
 <div class="filter">
 	<div class="container">
-		<div class="caption"><span class="fa fa-shopping-cart mr5"></span> @(退款管理)</div>
+		<div class="caption"><span class="fa fa-shopping-cart mr5"></span> 退款管理</div>
 		<div class="row">
 			<div class="col-md-3 col-sm-6 m">
-				<div data-component="dropdown" data-component-path="payrefunds.filter.status" data-options="@(全部)|;@(待退款)|0;@(已退款)|1;@(退款失败)|2" data-empty="true" data-empty-text="@(全部)">@(状态筛选)</div>
+				<div data-component="dropdown" data-component-path="payrefunds.filter.status" data-options="全部|;待退款|0;已退款|1;退款失败|2" data-empty="true" data-empty-text="全部">状态筛选</div>
 			</div>
 			<div class="col-md-3 col-sm-6 m">
-				<div data-component="dropdown" data-component-path="payrefunds.filter.refundreason" data-options="@(全部)|;@(重复支付)|1;@(超额支付)|2;@(未找到订单)|3" data-empty="true" data-empty-text="@(全部)">@(退款原因筛选)</div>
+				<div data-component="dropdown" data-component-path="payrefunds.filter.refundreason" data-options="全部|;重复支付|1;超额支付|2;未找到订单|3" data-empty="true" data-empty-text="全部">退款原因筛选</div>
 			</div>
 		</div>
 	</div>
 </div>
 <div class="container">
-	<div data-component="grid" data-component-path="payrefunds.grid" data-max="auto" data-options-page="@(Page: #)" data-options-button="@(查看更多退款)" data-component-id="payrefunds.grid">
+	<div data-component="grid" data-component-path="payrefunds.grid" data-max="auto" data-options-page="Page: #" data-options-button="查看更多退款" data-component-id="payrefunds.grid">
 		<script type="text/html">
 		<tr>
 	        <td style="width:30px" class="silver hidden-xs" data-title="序号">$index</td>
@@ -35,7 +35,7 @@
 	        </td>
 	        <td style="width:120px" class="silver hidden-xs" data-title="交易流水号" title="{{ queryId }}">{{ queryId }}</td>
 	        <td style="width:50px" class="ui-right" data-title="金额" title="{{price | price(2)}}">{{ price | price(2) }} </td>
-	        <td style="width:80px" class="silver hidden-xs ui-right" data-title="创建时间" title="{{ dateCreated | format('@(yyyy-MM-dd HH:mm:ss)') }}">{{ dateCreated | format('@(yyyy-MM-dd HH:mm:ss)') }}</td>
+	        <td style="width:80px" class="silver hidden-xs ui-right" data-title="创建时间" title="{{ dateCreated | format('yyyy-MM-dd HH:mm:ss') }}">{{ dateCreated | format('yyyy-MM-dd HH:mm:ss') }}</td>
 	        <td style="width:40px" data-title="退款原因">
 	        	{{ if refundReason }}
 		        	{{ if refundReason==1 }}
@@ -71,31 +71,31 @@
 	        	{{ fi }}
 	        </td>
 	        <td style="width:50px" class="ui-right active" data-title="已退金额" {{ if notifyPrice }}title="{{notifyPrice | price(2)}}"{{ fi }}>
-	        	{{ if notifyPrice }}
+	        	{{ if status==1 && notifyPrice }}
 	        		<span class="green">{{ notifyPrice | price(2) }}</span>
 	        	{{ else }}
 	        		-
 	        	{{ fi }}
 	        </td>
-	        <td style="width:80px" class="silver hidden-xs ui-right" data-title="退款日期" {{ if dateNotify }}title="{{ dateNotify | format('@(yyyy-MM-dd HH:mm:ss)') }}" {{ fi }}>
-	        	{{ if dateNotify }}
-	        		{{ dateNotify | format('@(yyyy-MM-dd HH:mm:ss)') }}
+	        <td style="width:80px" class="silver hidden-xs ui-right" data-title="退款日期" {{ if dateNotify }}title="{{ dateNotify | format('yyyy-MM-dd HH:mm:ss') }}" {{ fi }}>
+	        	{{ if status==1 && dateNotify }}
+	        		{{ dateNotify | format('yyyy-MM-dd HH:mm:ss') }}
 	        	{{ else }}
 	        		-
 	        	{{ fi }}
 	        </td>
 	        <td style="width:40px" class="ui-right" data-title="退款详情">
-				<button name="edit" title="@(查看退款)"><span class="fa fa-search"></span></button>
+				<button name="edit" title="查看退款"><span class="fa fa-search"></span></button>
 			</td>
 			<td style="width:40px" class="ui-right" data-title="订单详情">
-				<button name="order" title="@(查看订单信息)"><span class="fa fa-search"></span></button>
+				<button name="order" title="查看订单信息"><span class="fa fa-search"></span></button>
 			</td>
 		</tr>
 		</script>
 	</div>
 </div>
 
-<div data-component="form" data-title="@(退款详情)" data-component-path="common.form" data-if="value === 'payrefunds'" data-width="1000px" data-component-id="payrefunds.form" data-submitbutton="true">
+<div data-component="form" data-title="退款详情" data-component-path="common.form" data-if="value === 'payrefunds'" data-width="1000px" data-component-id="payrefunds.form" data-submitbutton="true">
 	<br />
 	<div class="padding">
 		<div data-component="template" data-component-path="payrefunds.form" class="padding">
@@ -103,15 +103,15 @@
 			<table class="table table-bordered" border="0">
 				<tbody>
 					<tr>
-						<td class="col-xs-5 active">@(# 订单号)</td>
+						<td class="col-xs-5 active"># 订单号</td>
 						<td>{{ orderId }}</td>
 					</tr>
 					<tr>
-						<td class="col-xs-5 active">@(# 支付ID)</td>
+						<td class="col-xs-5 active"># 支付ID</td>
 						<td>{{ paymentId }}</td>
 					</tr>
 					<tr>
-						<td class="col-xs-5 active">@(支付类型)</td>
+						<td class="col-xs-5 active">支付类型</td>
 						<td>
 						{{ if payType }}
 							{{ if payType==1 }}
@@ -129,19 +129,19 @@
 						</td>
 					</tr>
 					<tr>
-						<td class="col-xs-5 active">@(交易流水号)</td>
+						<td class="col-xs-5 active">交易流水号</td>
 						<td>{{ queryId }}</td>
 					</tr>
 					<tr>
-						<td class="col-xs-5 active">@(金额)</td>
+						<td class="col-xs-5 active">金额</td>
 						<td>{{ price | price(2) }}</td>
 					</tr>
 					<tr>
-						<td class="col-xs-5 active">@(创建时间)</td>
-						<td>{{ dateCreated | format('@(yyyy-MM-dd HH:mm:ss)') }}</td>
+						<td class="col-xs-5 active">创建时间</td>
+						<td>{{ dateCreated | format('yyyy-MM-dd HH:mm:ss') }}</td>
 					</tr>			
 	                <tr>
-	                    <td class="col-xs-5 active">@(退款原因)</td>
+	                    <td class="col-xs-5 active">退款原因</td>
 	                    <td>
                     	{{ if refundReason }}
 				        	{{ if refundReason==1 }}
@@ -163,7 +163,7 @@
 	                    </td>
 	                </tr>
 	                <tr>
-	                	<td class="col-xs-5 active">@(状态)</td>
+	                	<td class="col-xs-5 active">状态</td>
 		                <td>
 			        	{{ if status==0 }}
 			        		<span class="mr5 red">待退款</span>
@@ -181,9 +181,9 @@
 				        </td>
 			        </tr>
 			        <tr>
-			        	<td class="col-xs-5 active">@(已退金额)</td>
+			        	<td class="col-xs-5 active">已退金额</td>
 				        <td>
-			        	{{ if notifyPrice }}
+			        	{{ if status==1 && notifyPrice }}
 			        		<span class="green">{{ notifyPrice | price(2) }}</span>
 			        	{{ else }}
 			        		-
@@ -191,10 +191,10 @@
 				        </td>
 				    </tr>
 			        <tr>
-			        	<td class="col-xs-5 active">@(退款日期)</td>
+			        	<td class="col-xs-5 active">退款日期</td>
 					    <td>
-			        	{{ if dateNotify }}
-			        		{{ dateNotify | format('@(yyyy-MM-dd HH:mm:ss)') }}
+			        	{{ if status==1 && dateNotify }}
+			        		{{ dateNotify | format('yyyy-MM-dd HH:mm:ss') }}
 			        	{{ else }}
 			        		-
 			        	{{ fi }}
@@ -202,7 +202,7 @@
 			        </tr>
 			        {{ if backendUser }}
 			        	<tr>
-			        		<td class="col-xs-5 active">@(退款操作的后台用户)</td>
+			        		<td class="col-xs-5 active">退款操作的后台用户</td>
 						    <td>
 				        	{{ if backendUserAccount }}
 				        		<span class="green">{{ backendUserAccount }}</span>
@@ -212,10 +212,10 @@
 				        	</td>
 				        </tr>
 				        <tr>
-				        	<td class="col-xs-5 active">@(最新修改时间)</td>
+				        	<td class="col-xs-5 active">最新修改时间</td>
 						    <td>
 				        	{{ if dateSet }}
-				        		{{ dateSet | format('@(yyyy-MM-dd HH:mm:ss)') }}
+				        		{{ dateSet | format('yyyy-MM-dd HH:mm:ss') }}
 				        	{{ else }}
 				        		-
 				        	{{ fi }}
@@ -223,17 +223,17 @@
 				        </tr>
 				    {{ else }}
 				        <tr>
-				        	<td class="col-xs-5 active">@(退款通知日期)</td>
+				        	<td class="col-xs-5 active">退款通知日期</td>
 				        	<td>
 			        		{{ if notify_time }}
-				        		{{ notify_time | format('@(yyyy-MM-dd HH:mm:ss)') }}
+				        		{{ notify_time | format('yyyy-MM-dd HH:mm:ss') }}
 				        	{{ else }}
 				        		-
 				        	{{ fi }}
 				        	</td>
 				        </tr>
 				        <tr>
-				        	<td class="col-xs-5 active">@(异步通知信息)</td>
+				        	<td class="col-xs-5 active">异步通知信息</td>
 				        	<td>
 				        		{{ if notifyInfo }}
 				        			{{ notifyInfo }}
@@ -243,7 +243,7 @@
 				        	</td>
 				        </tr>
 				        <tr>
-				        	<td class="col-xs-5 active">@(异步通知id)</td>
+				        	<td class="col-xs-5 active">异步通知id</td>
 				        	<td>
 				        		{{ if notify_id }}
 				        			{{ notify_id }}
@@ -264,11 +264,11 @@
 					<table class="table table-bordered" border="0">
 						<tbody>
 							<tr>
-								<td class="ui-center hidden-xs active">@(退款类型)</td>
-								<td class="ui-center hidden-xs active">@(支付ID)</td>
-								<td class="ui-center hidden-xs active">@(交易流水号)</td>
-								<td class="ui-center hidden-xs active">@(退款金额)</td>
-								<td class="ui-center col-xs-2 active">@(退款状态)</td>
+								<td class="ui-center hidden-xs active">退款类型</td>
+								<td class="ui-center hidden-xs active">支付ID</td>
+								<td class="ui-center hidden-xs active">交易流水号</td>
+								<td class="ui-center hidden-xs active">退款金额</td>
+								<td class="ui-center col-xs-2 active">退款状态</td>
 							</tr>
 							<tr>
 								<td class="ui-center hidden-xs">
@@ -305,16 +305,16 @@
 			</div>
 			<div data-component="error" data-component-path="payrefunds.refundsubmitresponse"></div>
 			<div data-component="visible" class="ui-buttons" data-component-path="payrefunds.form" data-if="payrefunds.form">
-				<button name="submit" data-name="refundsubmit" data-warning="你确认提交退款状态的修改吗?">@(确认退款)</button>
+				<button name="submit" data-name="refundsubmit" data-warning="你确认提交退款状态的修改吗?">确认退款</button>
 			</div>
 		</div>
 	</div>
 	<div class="ui-form-buttons">
-		<button name="cancel">@(关闭)</button>
+		<button name="cancel">关闭</button>
 	</div>
 </div>
 
-<div data-component="form" data-title="@(订单详情)" data-component-path="common.form" data-if="value === 'payrefunds_orders'" data-width="1200px" data-component-id="payrefunds.order.form" data-submitbutton="true">
+<div data-component="form" data-title="订单详情" data-component-path="common.form" data-if="value === 'payrefunds_orders'" data-width="1200px" data-component-id="payrefunds.order.form" data-submitbutton="true">
 	<br />
 	<div class="padding">
 		<div data-component="template" data-component-path="payrefunds.order.form" class="padding">
@@ -322,27 +322,27 @@
 			<table class="table table-bordered" border="0">
 				<tbody>
 					<tr>
-						<td class="col-xs-5 active">@(# 订单号)</td>
+						<td class="col-xs-5 active"># 订单号</td>
 						<td>{{ id }}</td>
 					</tr>
 					<tr>
-						<td class="col-xs-5 active">@(下单时间)</td>
-						<td>{{ dateCreated | format('@(yyyy-MM-dd HH:mm:ss)') }}</td>
+						<td class="col-xs-5 active">下单时间</td>
+						<td>{{ dateCreated | format('yyyy-MM-dd HH:mm:ss') }}</td>
 					</tr>
 					<tr>
-						<td class="col-xs-5 active">@(总价)</td>
+						<td class="col-xs-5 active">总价</td>
 						<td>{{ price | price(2) }}</td>
 					</tr>
 	                <tr>
-	                    <td class="col-xs-5 active">@(订金)</td>
+	                    <td class="col-xs-5 active">订金</td>
 	                    <td>{{ deposit | price(2) }}</td>
 	                </tr>
 	                <tr>
-	                    <td class="col-xs-5 active">@(尾款)</td>
+	                    <td class="col-xs-5 active">尾款</td>
 	                    <td>{{ (price-deposit) | toFixed(2) }}</td>
 	                </tr>
 	                <tr>
-	                	<td class="col-xs-5 active">@(状态)</td>
+	                	<td class="col-xs-5 active">状态</td>
 		                <td>
 				        	{{ if payStatus==1 }}
 				        		<span class="mr5 red">未付款</span>
@@ -373,7 +373,7 @@
 				        </td>
 			        </tr>
 			        <tr>
-			        	<td class="col-xs-5 active">@(订单状态类型)</td>
+			        	<td class="col-xs-5 active">订单状态类型</td>
 					    <td>
 			        	{{ if order && order.orderStatus && order.orderStatus.value }}
 			        		{{ if order.orderStatus.type === 0 }}
@@ -388,7 +388,7 @@
 			        	</td>
 			        </tr>
 			        <tr>
-			        	<td class="col-xs-5 active">@(待付金额)</td>
+			        	<td class="col-xs-5 active">待付金额</td>
 			        	<td>
 			        		{{ if duePrice }}
 			        			<span class="green">{{ duePrice | price(2) }}</span>
@@ -405,23 +405,23 @@
 	<hr />
 
 	<div class="padding" style="padding-bottom: 0px;padding-top: 0px;">
-		<div class="silver"><strong>@(支付信息)</strong></div>
+		<div class="silver"><strong>支付信息</strong></div>
 		<br />
-		<div class="silver"><strong>@(子订单信息)</strong></div>
+		<div class="silver"><strong>子订单信息</strong></div>
 		<br />
 		<table class="table table-bordered suborderslist" border="0">
 			<tbody data-component="template" data-component-path="payrefunds.order.form">
 				<script type="text/html">
 					{{ if subOrders && subOrders.length > 0 }}
 						<tr>
-							<td class="ui-center active">@(序号)</td>
-							<td class="ui-center col-xs-2 active">@(支付内容)</td>
-							<td class="ui-center col-xs-1 active">@(支付状态)</td>
-	                        <td class="ui-center col-xs-1 active">@(应支付金额)</td>
-	                        <td class="ui-center col-xs-1 active">@(已支付金额)</td>
-							<td class="ui-center col-xs-1 active">@(未支付金额)</td>
-							<td class="ui-center col-xs-1 active">@(已支付次数)</td>
-							<td class="ui-center col-xs-2 active">@(最后一次支付时间)</td>
+							<td class="ui-center active">序号</td>
+							<td class="ui-center col-xs-2 active">支付内容</td>
+							<td class="ui-center col-xs-1 active">支付状态</td>
+	                        <td class="ui-center col-xs-1 active">应支付金额</td>
+	                        <td class="ui-center col-xs-1 active">已支付金额</td>
+							<td class="ui-center col-xs-1 active">未支付金额</td>
+							<td class="ui-center col-xs-1 active">已支付次数</td>
+							<td class="ui-center col-xs-2 active">最后一次支付时间</td>
 						</tr>
 						{{ foreach s in subOrders }}
 						<tr>
@@ -462,7 +462,7 @@
 							<td class="ui-center col-xs-1">{{ s.paidTimes }}</td>
 							<td class="ui-center col-xs-2">
 								{{ if s.datePaid }}
-									{{ s.datePaid | format('@(yyyy-MM-dd HH:mm:ss)') }}
+									{{ s.datePaid | format('yyyy-MM-dd HH:mm:ss') }}
 								{{ else }}
 									-
 								{{ fi }}
@@ -471,14 +471,14 @@
 						{{ end }}
 					{{ else }}
 						<tr>
-							<td class="ui-center col-xs-1 active">@(订单ID)</td>
-							<td class="ui-center col-xs-1 active">@(支付ID)</td>
-							<td class="ui-center col-xs-1 active">@(支付方式)</td>
-							<td class="ui-center col-xs-1 active">@(支付状态)</td>
-	                        <td class="ui-center col-xs-1 active">@(应支付金额)</td>
-	                        <td class="ui-center col-xs-1 active">@(定金)</td>
-							<td class="ui-center col-xs-1 active">@(尾款)</td>
-							<td class="ui-center col-xs-1 active">@(支付完成时间)</td>
+							<td class="ui-center col-xs-1 active">订单ID</td>
+							<td class="ui-center col-xs-1 active">支付ID</td>
+							<td class="ui-center col-xs-1 active">支付方式</td>
+							<td class="ui-center col-xs-1 active">支付状态</td>
+	                        <td class="ui-center col-xs-1 active">应支付金额</td>
+	                        <td class="ui-center col-xs-1 active">定金</td>
+							<td class="ui-center col-xs-1 active">尾款</td>
+							<td class="ui-center col-xs-1 active">支付完成时间</td>
 						</tr>
 						<tr>
 							<td class="ui-center col-xs-1">{{ id }}</td>
@@ -518,7 +518,7 @@
 							<td class="ui-center col-xs-1">{{ (price - deposit) | toFixed(2) }}</td>
 							<td class="ui-center col-xs-1">
 								{{ if datePaid }}
-									{{ datePaid | format('@(yyyy-MM-dd HH:mm:ss)') }}
+									{{ datePaid | format('yyyy-MM-dd HH:mm:ss') }}
 								{{ else }}
 									-
 								{{ fi }}
@@ -532,19 +532,19 @@
 			<script type="text/html">
 			{{ if form.subOrders && form.subOrders.length > 0 }}
 				<br />
-				<div class="silver"><strong>@(子订单支付详情)</strong></div>
+				<div class="silver"><strong>子订单支付详情</strong></div>
 				<br />
 				<table class="table table-bordered" border="0">
 					<tbody>
 						<tr>
-							<td class="ui-center active">@(支付内容)</td>
-							<td class="ui-center active">@(序号)</td>
-							<td class="ui-center col-xs-1 active">@(支付ID)</td>
-							<td class="ui-center col-xs-1 active">@(笔数)</td>
-	                        <td class="ui-center col-xs-1 active">@(支付金额)</td>
-	                        <td class="ui-center col-xs-1 active">@(支付方式)</td>
-							<td class="ui-center col-xs-1 active">@(支付状态)</td>
-							<td class="ui-center col-xs-2 active">@(支付时间)</td>
+							<td class="ui-center active">支付内容</td>
+							<td class="ui-center active">序号</td>
+							<td class="ui-center col-xs-1 active">支付ID</td>
+							<td class="ui-center col-xs-1 active">笔数</td>
+	                        <td class="ui-center col-xs-1 active">支付金额</td>
+	                        <td class="ui-center col-xs-1 active">支付方式</td>
+							<td class="ui-center col-xs-1 active">支付状态</td>
+							<td class="ui-center col-xs-2 active">支付时间</td>
 						</tr>
 						{{ foreach s in form.subOrders }}
 							{{ foreach p in s.payments }}
@@ -601,7 +601,7 @@
 									</td>
 									<td class="ui-center col-xs-2">
 									{{ if p.datePaid }}
-										{{ p.datePaid | format('@(yyyy-MM-dd HH:mm:ss)') }}
+										{{ p.datePaid | format('yyyy-MM-dd HH:mm:ss') }}
 									{{ else }}
 										-
 									{{ fi }}
@@ -617,7 +617,7 @@
 		</div>
 	</div>
 	<div class="ui-form-buttons">
-		<button name="cancel">@(关闭)</button>
+		<button name="cancel">关闭</button>
 	</div>
 </div>
 
