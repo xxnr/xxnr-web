@@ -22,7 +22,7 @@
 			<nav>
 			<ul>
 				<% if (user && user.role && user.role.view_roles && user.role.view_roles.length > 0) { %>
-					<% if (user.role.view_roles.indexOf('dashboard') !== -1) { %><li><a class="jrouting" href="<%= manager_url %>/" title="统计" data-role="dashboard"><span class="fa fa-dashboard"></span></a></li><% } %>
+					<% if (user.role.view_roles.indexOf('dashboard') !== -1) { %><li><a class="jrouting" href="<%= manager_url %>/" title="数据中心" data-role="dashboard"><span class="fa fa-dashboard"></span></a></li><% } %>
 					<% if (user.role.view_roles.indexOf('orders') !== -1) { %><li><a class="jrouting" href="<%= manager_url %>/orders/" title="订单" data-role="orders"><span class="fa fa-shopping-cart"></span></a></li><% } %>
 					<% if (user.role.view_roles.indexOf('products') !== -1) { %><li><a class="jrouting" href="<%= manager_url %>/products/" title="商品" data-role="products"><span class="fa fa-navicon"></span></a></li><% } %>
 					<% if (user.role.view_roles.indexOf('users') !== -1) { %><li><a class="jrouting" href="<%= manager_url %>/users/" title="用户" data-role="users"><span class="fa fa-users"></span></a></li><% } %>

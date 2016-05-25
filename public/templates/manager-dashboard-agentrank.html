@@ -2,7 +2,7 @@
 
 <div class="filter" style="padding-bottom:9px">
 	<div class="container">
-		<div class="caption"><span class="fa fa-dashboard mr5"></span> Dashboard</div>
+		<div class="caption"><span class="fa fa-dashboard mr5"></span>数据中心</div>
 	</div>
 </div>
 
@@ -48,7 +48,7 @@
 									<td style="width:30px" class="silver hidden-xs ui-center active">排名</td>
 							    	<td style="width:50px" class="silver hidden-xs ui-center active">经纪人姓名</td>
 							    	<td style="width:60px" class="silver hidden-xs ui-center active">手机号</td>
-							    	<td style="width:80px" class="silver hidden-xs ui-center active">
+							    	<td style="width:70px" class="silver hidden-xs ui-center active">
 							    		<div class="agentstitle">
 								    		<span>昨日新增客户</span>
 								    		<div class="agentsort">
@@ -66,7 +66,7 @@
 								    		</div>
 							    		</div>
 							    	</td>
-							    	<td style="width:80px" class="silver hidden-xs ui-center active">
+							    	<td style="width:70px" class="silver hidden-xs ui-center active">
 							    		<div class="agentstitle">
 								    		<span>昨日登记客户</span>
 								    		<div class="agentsort">
@@ -75,7 +75,7 @@
 								    		</div>
 							    		</div>
 							    	</td>
-							    	<td style="width:80px" class="silver hidden-xs ui-center active">
+							    	<td style="width:70px" class="silver hidden-xs ui-center active">
 							    		<div class="agentstitle">
 								    		<span>总登记客户数</span>
 								    		<div class="agentsort">
@@ -84,19 +84,35 @@
 								    		</div>
 							    		</div>
 							    	</td>
-							    	<td style="width:60px" class="silver hidden-xs ui-center active">已完成订单数</td>
-							    	<td style="width:80px" class="silver hidden-xs ui-right active">已完成金额（元）</td>
+							    	<td style="width:70px" class="silver hidden-xs ui-center active">
+							    		<div class="agentstitle">
+								    		<span>已完成订单数</span>
+								    		<div class="agentsort">
+								    			<div class="fa fa-caret-up" id="TOTALCOMPLETEDORDER-DESC"></div>
+								    			<div class="fa fa-caret-down" id="TOTALCOMPLETEDORDER-ASC"></div>
+								    		</div>
+							    		</div>
+							    	</td>
+							    	<td style="width:80px" class="silver hidden-xs ui-right active">
+							    		<div class="agentstitle">
+								    		<span>已完成金额（元）</span>
+								    		<div class="agentsort">
+								    			<div class="fa fa-caret-up" id="TOTALPAIDAMOUT-DESC"></div>
+								    			<div class="fa fa-caret-down" id="TOTALPAIDAMOUT-ASC"></div>
+								    		</div>
+							    		</div>
+							    	</td>
 							    </tr>
 							    {{ foreach agent in agents }}
 							    	<tr>
-										<td style="width:40px" class="silver hidden-xs ui-center">{{ $index + 1 }}</td>
-								    	<td style="width:60px" class="silver hidden-xs ui-center" title="{{ agent.name }}">{{ agent.name }}</td>
+										<td style="width:30px" class="silver hidden-xs ui-center">{{ $index + 1 }}</td>
+								    	<td style="width:50px" class="silver hidden-xs ui-center" title="{{ agent.name }}">{{ agent.name }}</td>
 								    	<td style="width:60px" class="silver hidden-xs ui-center" title="{{ agent.phone }}">{{ agent.phone }}</td>
-								    	<td style="width:60px" class="silver hidden-xs ui-center">{{ agent.newInviteeCount | format(0) }}</td>
-								    	<td style="width:60px" class="silver hidden-xs ui-center">{{ agent.totalInviteeCount | format(0) }}</td>
-								    	<td style="width:60px" class="silver hidden-xs ui-center">{{ agent.newPotentialCustomerCount | format(0) }}</td>
-								    	<td style="width:60px" class="silver hidden-xs ui-center">{{ agent.totalPotentialCustomerCount | format(0) }}</td>
-								    	<td style="width:60px" class="silver hidden-xs ui-center">{{ agent.totalCompletedOrderCount | format(0) }}</td>
+								    	<td style="width:70px" class="silver hidden-xs ui-center">{{ agent.newInviteeCount | format(0) }}</td>
+								    	<td style="width:70px" class="silver hidden-xs ui-center">{{ agent.totalInviteeCount | format(0) }}</td>
+								    	<td style="width:70px" class="silver hidden-xs ui-center">{{ agent.newPotentialCustomerCount | format(0) }}</td>
+								    	<td style="width:70px" class="silver hidden-xs ui-center">{{ agent.totalPotentialCustomerCount | format(0) }}</td>
+								    	<td style="width:70px" class="silver hidden-xs ui-center">{{ agent.totalCompletedOrderCount | format(0) }}</td>
 								    	<td style="width:80px" class="silver hidden-xs ui-right" title="{{ agent.totalPaidAmount | format(0) }}">{{ agent.totalPaidAmount | price(2) }}</td>
 								    </tr>
 								{{ end }}

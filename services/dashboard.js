@@ -478,6 +478,7 @@ DashboardService.prototype.queryAgentReportYesterday = function(callback, sortBy
         case 'TOTALCOMPLETEDORDER':
             sort = {totalCompletedOrderCount:order};
             break;
+        case 'TOTALPAIDAMOUT':
         default :
             sort = {totalPaidAmount:order};
             break;
