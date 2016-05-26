@@ -46,7 +46,7 @@
 							<tbody>
 								<tr>
 									<td style="width:30px" class="silver hidden-xs ui-center active">排名</td>
-							    	<td style="width:50px" class="silver hidden-xs ui-center active">经纪人姓名</td>
+							    	<td style="width:40px" class="silver hidden-xs ui-center active">经纪人</td>
 							    	<td style="width:60px" class="silver hidden-xs ui-center active">手机号</td>
 							    	<td style="width:80px" class="silver hidden-xs ui-center active">
 							    		<div class="agentstitle">
@@ -106,7 +106,7 @@
 							    {{ foreach agent in agents }}
 							    	<tr>
 										<td style="width:30px" class="silver hidden-xs ui-center">{{ $index + 1 }}</td>
-								    	<td style="width:50px" class="silver hidden-xs ui-center" title="{{ agent.name }}">{{ agent.name }}</td>
+								    	<td style="width:40px" class="silver hidden-xs ui-center" title="{{ agent.name }}">{{ agent.name }}</td>
 								    	<td style="width:60px" class="silver hidden-xs ui-center" title="{{ agent.phone }}">{{ agent.phone }}</td>
 								    	<td style="width:80px" class="silver hidden-xs ui-center">{{ agent.newInviteeCount | format(0) }}</td>
 								    	<td style="width:70px" class="silver hidden-xs ui-center">{{ agent.totalInviteeCount | format(0) }}</td>
