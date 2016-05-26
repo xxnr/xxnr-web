@@ -25,10 +25,6 @@
     },
     components:{
     },
-    created(){
-      this.getUserInfo(this.user.userId);
-      this.showBackBtn();
-    },
     route: {
       deactivate (transition) {
         //when back to /home hide the backBtn

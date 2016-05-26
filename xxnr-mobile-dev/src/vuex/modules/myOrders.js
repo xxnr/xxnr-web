@@ -9,9 +9,6 @@ const state = {
 
 // mutations
 const mutations = {
-  [GET_ORDERS_LIST](state,orders){
-    state.ordersList = orders;
-  },
 }
 
 export default {

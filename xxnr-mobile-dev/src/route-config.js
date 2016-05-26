@@ -37,8 +37,24 @@ export function configRouter (router) {
     '/my_orders':{
       name:'myOrders',
       component: require('./components/my_orders/index.vue'),
-      auth: true // 这里 auth 是一个自定义字段
-
+      auth: true, // 这里 auth 是一个自定义字段
+      subRoutes : {
+        '/myAllOrders' : {
+          component : require('./components/my_orders/myAllOrders.vue'),
+        },
+        '/myPayingOrders' : {
+          component : require('./components/my_orders/myNeedPayOrders.vue'),
+        },
+        '/myConfirmingOrders' : {
+          component: require('./components/my_orders/myNeedConfirmOrders.vue'),
+        },
+        '/myDeliveringOrders' : {
+          component: require('./components/my_orders/myNeedDeliverOrders.vue'),
+        },
+        '/myCompletedOrders' : {
+          component: require('./components/my_orders/myCompletedOrders.vue'),
+        }
+      }
     },
     '/my_points': {
       name: 'myPoints',
@@ -68,7 +84,8 @@ export function configRouter (router) {
   });
   //默认/重定向到home页
   router.redirect({
-    '/': "/home"
+    '/': "/home",
+    'my_orders':'my_orders/myAllOrders'
   });
 
 
