@@ -5,17 +5,17 @@
   <div class="product-info">
     <div class="container">
       <div class="product-name">
-        {{productDetail.goodsName}}
+        {{productDetail.name}}
       </div>
       <div class="product-SKUPrice">
-        {{'¥' + productDetail.SKUPrice.min}} - {{'¥' + productDetail.SKUPrice.max}}
+        {{'￥'+productDetail.minPrice}} {{productDetail.maxPrice==productDetail.minPrice?"":"-"}} {{(productDetail.maxPrice==productDetail.minPrice?"":productDetail.maxPrice)}}
       </div>
-      <div class="product-deposit">
+      <div class="product-deposit" v-if="productDetail.deposit">
         订金：<span class="product-deposit-num">{{'¥' + productDetail.deposit}}</span>
       </div>
       <div class="clear"></div>
       <div class="product-SKUMarketPrice">
-        市场价：{{'¥' + productDetail.SKUMarketPrice.min}} - {{'¥' + productDetail.SKUMarketPrice.max}}
+        市场价：{{'￥ '+productDetail.marketMinPrice}} {{productDetail.marketMaxPrice==productDetail.marketMinPrice?"":"-"}} {{(productDetail.marketMaxPrice==productDetail.marketMinPrice?"":productDetail.marketMaxPrice)}}
       </div>
     </div>
   </div>
@@ -27,30 +27,35 @@
   <div class="product-detail-tab">
     <div class="container">
       <ul class="product-detail-tab-ul">
-        <li class="checked">
+        <li :class="{'checked': tabIndex == 0}" @click="productDetailTab(0);">
           <div class="tab-underline">
             商品描述
           </div>
         </li>
-        <li>
+        <li :class="{'checked': tabIndex == 1}" @click="productDetailTab(1);">
           <div class="tab-underline">
             详细参数
           </div>
         </li>
-        <li>
+        <li :class="{'checked': tabIndex == 2}" @click="productDetailTab(2);">
           <div class="tab-underline">
             服务说明
           </div>
         </li>
         <li class="clear"></li>
       </ul>
+      <div class="product-detail-tab-con">
+        <div v-show="tabIndex == 0">{{{productDetail.productDesc}}}</div>
+        <div v-show="tabIndex == 1">{{{productDetail.standard}}}</div>
+        <div v-show="tabIndex == 2">{{{productDetail.support}}}</div>
+      </div>
     </div>
   </div>
-  <div class="bottom-btn">
-    立即购买
+  <div class="bottom-btn" @click="showAttrBox();">
+    {{productDetail.buyActionName}}
   </div>
-  <div class="attr-box">
-    <div class="container">
+  <div class="attr-box" v-show="attrBoxDisplay">
+    <div class="container" style="height:400px;overflow:auto;">
       <div class="attr-product">
         <div class="attr-product-img">
           <img :src="productDetail.imgUrl">
@@ -61,7 +66,7 @@
               {{productDetail.goodsName}}
             </div>
             <div class="attr-product-price">
-              {{'¥' + productDetail.SKUPrice.min}} - {{'¥' + productDetail.SKUPrice.max}}
+              {{'¥'+productDetail.minPrice}} {{productDetail.maxPrice==productDetail.minPrice?"":"-"}} {{(productDetail.maxPrice==productDetail.minPrice?"":productDetail.maxPrice)}}
             </div>
           </div>
         </div>
@@ -70,15 +75,15 @@
       <div class="container">
         <div v-for="sku in productDetail.SKUAttributes" class="sku-block">
           <div class="sku-name">{{sku.name}}</div>
-          <li v-for="item in sku.values" class="sku-item">
+          <li v-for="item in sku.values" :class="{'sku-item': true,'checked':sku.isSelected[$index], 'unselectable': !sku.selectable[$index]}" @click="selectSKU($parent.$index, $index);" >
             {{item}}
           </li>
           <li class="clear"></li>
         </div>
-        <div v-if="productDetail.SKUAdditions">
+        <div v-if="productDetail.SKUAdditions && productDetail.SKUAdditions.length != 0 && isAllSKUSelected">
           <div class="sku-name">附加项目</div>
-          <li v-for="item in productDetail.SKUAdditions" class="sku-item">
-            {{item.name}}
+          <li v-for="item in productDetail.SKUAdditions" :class="{'sku-item': true,'checked':item.isSelected}" @click="selectAddition($index);">
+            {{item.name}} (+{{item.price}})
           </li>
           <div class="clear"></div>
         </div>
@@ -87,47 +92,57 @@
         </div>
         <div class="product-num">
           <div>
-            <input type="button" value="-" class="product-num-btn" @click="changeNumber(-1);">
-            <input type="text" disabled class="product-num-text" value="1">
-            <input type="button" value="+" class="product-num-btn" @click="changeNumber(1);">
+            <input type="button" value="-" class="product-num-btn" @click="changeProductNumber(-1);">
+            <input type="text" disabled class="product-num-text" value="{{productNumber}}" id="product-num">
+            <input type="button" value="+" class="product-num-btn" @click="changeProductNumber(1);">
             <div class="clear"></div>
           </div>
         </div>
       </div>
     </div>
-    <div class="bottom-btn-static">
+    <div class="bottom-btn-static" @click="buyProduct();">
       确定
     </div>
   </div>
-  <div class="mask"></div>
+  <div class="mask" v-show="attrBoxDisplay" @click="hideAttrBox();"></div>
 </template>
 
 <script>
-  import { getProductDetail } from '../../vuex/actions'
+  import { getProductDetail,showAttrBox, hideAttrBox, productDetailTab, changeProductNumber, selectSKU, querySKUs, selectAddition, buyProduct, clearProductDetail } from '../../vuex/actions'
 
   export default {
     vuex: {
       getters: {
-        productDetail: state => state.productDetail.product
+        productDetail: state => state.productDetail.product,
+        attrBoxDisplay: state => state.productDetail.attrBoxDisplay,
+        tabIndex: state => state.productDetail.tabIndex,
+        productNumber: state => state.productDetail.productNumber,
+        isAllSKUSelected: state => state.productDetail.isAllSKUSelected
       },
       actions: {
-        getProductDetail
+        getProductDetail,
+        showAttrBox,
+        hideAttrBox,
+        productDetailTab,
+        changeProductNumber,
+        selectSKU,
+        querySKUs,
+        selectAddition,
+        buyProduct,
+        clearProductDetail
       }
     },
-    created () {
-      var test = window.location.href.match(new RegExp("[\?\&]" + 'id' + "=([^\&]+)", "i"));
-      this.getProductDetail(test[1]);
-    },
-    method: {
-      changeNumber(type) {
-        if(type == 1) {
-          console.log('aaa');
-        }
+    route: {
+      activate (transition) {
+        var test = window.location.href.match(new RegExp("[\?\&]" + 'id' + "=([^\&]+)", "i"));
+        this.getProductDetail(test[1]);
+        transition.next();
+      }//,
+      //deactivate (transition) {
+        //clearProductDetail();
+        //transition.next();
+      //}
 
-        if(type == -1) {
-          console.log('bbb');
-        }
-      }
     }
   }
 </script>
@@ -144,7 +159,8 @@
   .product-name {
     color: #323232;
     font-size: 16px;
-    line-height: 45px;
+    line-height: 20px;
+    padding: 12px 0;
   }
 
   .product-SKUPrice {
@@ -203,8 +219,8 @@
   }
 
   .product-detail-tab-ul li{
-    font-size: 16px;
-    line-height: 16px;
+    font-size: 15px;
+    line-height: 15px;
     margin: 12px 0;
     text-align: center;
     width: 33.33%;
@@ -307,7 +323,7 @@
   .product-num-text {
     border-top: 1px solid #c1c1c1;
     border-bottom: 1px solid #c1c1c1;
-    height: 23px;
+    height: 25px;
     margin: 0;
     width: 46px;
     outline: none;
@@ -328,8 +344,27 @@
     float: left;
   }
 
-  .sku-item.checked{
+  .sku-item.checked {
     background-color: #fe9b00;
     color: #fff;
+  }
+
+  .sku-item.unselectable {
+    background-color: #f0f0f0;
+    color: #c1c1c1;
+  }
+
+  .product-detail-tab-con {
+    padding-bottom: 40px;
+  }
+
+  li.clear {
+    width: 0;
+    height: 0;
+    border: 0;
+    padding: 0;
+    margin: 0;
+    float: none;
+    clear: both;
   }
 </style>

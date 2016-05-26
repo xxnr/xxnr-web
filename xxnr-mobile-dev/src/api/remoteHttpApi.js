@@ -37,6 +37,21 @@ export default {
   },
   bindInviter: function(params,cb,errCb) {
     jsonpGet(API_ROOT + "api/v2.0/user/bindInviter", params, cb, errCb);
+  },
+  querySKUs: function (data, cb, errCb) {
+    jsonpPost(API_ROOT + "api/v2.1/SKU/attributes_and_price/query", data, cb, errCb);
+  },
+  addToCart: function (data, cb, errCb) {
+    jsonpPost(API_ROOT + "api/v2.1/cart/addToCart", data, cb, errCb);
+  },
+  getRSCListByProduct: function (data, cb, errCb) {
+    jsonpGet(API_ROOT + "api/v2.2/RSC", data, cb, errCb);
+  },
+  getShoppingCart: function(cb, errCb) {
+    jsonpGet(API_ROOT + "api/v2.1/cart/getShoppingCart", null, cb, errCb);
+  },
+  addOrder: function(data, cb, errCb) {
+    jsonpPost(API_ROOT + "api/v2.1/order/addOrder", data, cb, errCb);
   }
 }
 

@@ -121,7 +121,7 @@ if(!Global.key){
         // to send encrypted data, the decryption will fail.
         // known issue: we cannot start node in release mode in other environment except prod
         // unless we have a private_key.pem file in root folder.
-        var private_key_string = fs.readFileSync('private_key.pem');
+        var private_key_string = fs.readFileSync('../private_key.pem');
         key = new NodeRSA(private_key_string);
     }
 

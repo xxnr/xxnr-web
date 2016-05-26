@@ -7,6 +7,7 @@ import rowsViewProducts from './modules/rowsViewProducts'
 import auth from './modules/auth'
 import myOrders from './modules/myOrders'
 import productDetail from './modules/productDetail'
+import order from './modules/order'
 import vueSlider from './modules/vueSlider'
 import register from './modules/register'
 import {
@@ -43,9 +44,10 @@ const store = new Vuex.Store({
     rowsViewProducts,
     auth,
     myOrders,
-	  productDetail,
-	  vueSlider,
-    register
+	productDetail,
+	vueSlider,
+    register,
+    order
   },
   strict: debug
 });

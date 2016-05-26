@@ -6,7 +6,7 @@ export const getCategories = ({dispatch,state}) => {
   api.getCategories(response => {
     dispatch(types.GET_CATEGORIES,response.data.categories)
   }, response => {
-    console.log(response);
+    //console.log(response);
     //dispatch(types.GET_CATEGORIES)
   })
 }
@@ -16,7 +16,7 @@ export const getIndexCars = ({dispatch,state}) => {
     response => {
       dispatch(types.GET_INDEXCARS,response.data.products)
     }, response => {
-      console.log(response);
+      //console.log(response);
       //dispatch(types.GET_CATEGORIES)
     })
 }
@@ -26,7 +26,7 @@ export const getIndexHeafei = ({dispatch,state}) => {
     response => {
     dispatch(types.GET_INDEXHUAFEI,response.data.products)
   }, response => {
-    console.log(response);
+    //console.log(response);
     //dispatch(types.GET_CATEGORIES)
   })
 }
@@ -37,7 +37,7 @@ export const getCarsRowsViewCars = ({dispatch,state}) => {
     response => {
     dispatch(types.GET_ROWSVIEWCARS,response.data.datas.rows)
   }, response => {
-    console.log(response);
+    //console.log(response);
     //dispatch(types.GET_CATEGORIES)
   })
 }
@@ -48,7 +48,7 @@ export const getHuafeiRowsViewCars = ({dispatch,state}) => {
     response => {
     dispatch(types.GET_ROWSVIEWHUAFEI,response.data.datas.rows)
 }, response => {
-    console.log(response);
+    //console.log(response);
     //dispatch(types.GET_CATEGORIES)
   })
 }
@@ -100,7 +100,7 @@ export const login = ({dispatch,state},PhoneNumber,password) => {
       }
     })
   }, response => {
-    console.log(response);
+    //console.log(response);
     //dispatch(types.GET_CATEGORIES)
   })
 }
@@ -118,7 +118,7 @@ export const getUserInfo = ({dispatch,state},userId) => {
     response => {
     dispatch(types.GET_USERINFO,response.data.datas);
   }, response => {
-    console.log(response);
+    //console.log(response);
     //dispatch(types.GET_CATEGORIES)
   })
 }
@@ -136,7 +136,7 @@ export const getOrders = ({dispatch,state},typeValue) => {
     response => {
     dispatch(types.GET_ORDERS_LIST,response.data.items);
   }, response => {
-    console.log(response);
+    //console.log(response);
     //dispatch(types.GET_CATEGORIES)
   })
   dispatch(types.LOG_OUT);
@@ -146,20 +146,104 @@ export const getProductDetail = ({dispatch,state}, id) => {
   api.getProductDetail(
     {goodsId: id},
     response => {
-    //console.log(response);
-    dispatch(types.GET_PRODUCTDETAIL, response.data)
+    var productDetail = response.data;
+    //data format
+    productDetail.onSale = (productDetail.unitPrice === null || productDetail.unitPrice === '')? false:productDetail.unitPrice!=productDetail.originalPrice;
+    for(var i in productDetail.SKUAdditions){
+      productDetail.SKUAdditions[i].isSelected = false;
+    }
+    productDetail.minPrice = productDetail.SKUPrice ? productDetail.SKUPrice.min:0;
+    productDetail.maxPrice = productDetail.SKUPrice?productDetail.SKUPrice.max:0;
+    if(productDetail.SKUMarketPrice && productDetail.SKUMarketPrice.max && productDetail.SKUMarketPrice.min){
+      productDetail.marketPriceDisplay = true;
+      productDetail.marketMinPrice = productDetail.SKUMarketPrice.min;
+      productDetail.marketMaxPrice = productDetail.SKUMarketPrice.max;
+    }else{
+      productDetail.marketPriceDisplay = false;
+      productDetail.marketMinPrice = 0;
+      productDetail.marketMaxPrice = 0;
+    }
+
+    for(var i in productDetail.SKUAttributes){
+      if(productDetail.SKUAttributes.hasOwnProperty(i)){
+        productDetail.SKUAttributes[i].isSelected = [];
+        productDetail.SKUAttributes[i].selectable = [];
+        if(productDetail.SKUAttributes[i].values.length==1){
+          productDetail.SKUAttributes[i].isSelected.push(true);
+          productDetail.SKUAttributes[i].selectable.push(true);
+
+        }else{
+          for(var j in productDetail.SKUAttributes[i].values){
+            productDetail.SKUAttributes[i].isSelected.push(false);
+            productDetail.SKUAttributes[i].selectable.push(true);
+          };
+        }
+      }
+    }
+
+    if(productDetail.deposit){
+      productDetail.buyActionName = '立即付定金';
+    }else{
+      productDetail.buyActionName = '立即购买';
+    }
+
+    //console.log(productDetail);
+
+    // is all sku item selected
+    for(let i = 0; i < productDetail.SKUAttributes.length; i++){
+        if(productDetail.SKUAttributes.hasOwnProperty(i)){
+          var _flag = false;
+          for(let j = 0; j < productDetail.SKUAttributes[i].isSelected.length; j++){
+            if(productDetail.SKUAttributes[i].isSelected[j]==true){
+              _flag = true;
+            }
+          }
+          if(_flag==false){
+            //state.productDetail.isAllSKUSelected = false;
+            console.log('请选中一个SKU');
+            //return false;
+          }
+        }
+    }
+    //state.productDetail.isAllSKUSelected = true;
+    // all sku item selected
+    // get skuId
+    var selectedSKUs = [];
+    for(var i in productDetail.SKUAttributes){
+      for(var j in productDetail.SKUAttributes[i].isSelected){
+        if(productDetail.SKUAttributes[i].isSelected[j] == true){
+          selectedSKUs.push({name:productDetail.SKUAttributes[i].name,value:productDetail.SKUAttributes[i].values[j]});
+        }
+      }
+    }
+    api.querySKUs(
+      {attributes: selectedSKUs,
+        product: productDetail._id
+      },
+      response => {
+      if(response.data.data.SKU){
+        productDetail.SKU_id = response.data.data.SKU._id;
+        //state.productDetail.isAllSKUSelected = true;
+      } else {
+        //state.productDetail.isAllSKUSelected = false;
+      }
+
+      dispatch(types.GET_PRODUCTDETAIL, productDetail);
+    }, response => {
+      //console.log(response);
+    })
   },response => {
    // console.log(response);
   })
 }
 
 export const getSliderImages = ({dispatch, state}) => {
+
   api.getSliderImages(
     response => {
     dispatch(types.GET_SLIDERIMAGES, response.data.datas.rows)
     }, response => {
       //console.log(response);
-      console.log('aaa');
     })
 }
 
@@ -171,7 +255,6 @@ export const sendRegisterCode = ({dispatch, state},phoneNum) => {
       dispatch(types.SET_TOASTMSG,response.data.message);
   }, response => {
     //console.log(response);
-    console.log('aaa');
   })
 }
 
@@ -217,3 +300,105 @@ export const bindInviter = ({dispatch,state},inviterPhone) => {
       //dispatch(types.GET_CATEGORIES)
   })
 }
+export const showAttrBox = ({dispatch, state}) => {
+  dispatch(types.SHOW_ATTRBOX);
+}
+
+export const hideAttrBox = ({dispatch, state}) => {
+  dispatch(types.HIDE_ATTRBOX);
+}
+
+export const productDetailTab = ({dispatch, state}, index) => {
+  dispatch(types.TAB_PRODUCTDETAIL, index);
+}
+
+export const changeProductNumber = ({dispatch, state}, type) => {
+  dispatch(types.CHANGE_PRODUCTNUMBER, type)
+}
+
+export const selectSKU = ({dispatch, state}, parentIndex, index) => {
+  dispatch(types.SELECT_SKU, parentIndex, index);
+  api.querySKUs(
+    {attributes: state.productDetail.selectedSKUs,
+      product: state.productDetail.product._id
+    },
+    response => {
+      dispatch(types.QUERY_SKUS, response.data.data)
+  }, response => {
+    //console.log(response);
+  })
+}
+
+export const selectAddition = ({dispatch, state}, index) => {
+  dispatch(types.SELECT_ADDITION, index);
+}
+
+export const buyProduct = ({dispatch, state}) => {
+  if(state.productDetail){
+    for(var i in state.productDetail.SKUAttributes){
+      if(state.productDetail.SKUAttributes.hasOwnProperty(i)){
+        var _flag = false;
+        for(var j in state.productDetail.SKUAttributes[i].isSelected){
+          if(state.productDetail.SKUAttributes[i].isSelected[j]==true){
+            _flag = true;
+          }
+        }
+        if(_flag==false){
+          alert('请选中一个SKU');
+          return;
+        }
+      }
+    }
+    if(state.productDetail.product.SKU_id) {
+      api.addToCart({
+        SKUId: state.productDetail.product.SKU_id,
+        additions: state.productDetail.selectedAdditions,
+        count: state.productDetail.productNumber,
+        update_by_add: true
+      },
+      response => {
+        if(response.data.code != 1000) {
+          alert(response.data.message);
+          return;
+        }
+        window.location.href = '/#!/order?id=' + state.productDetail.product.SKU_id + '&count='+ state.productDetail.productNumber;
+      }, response=> {
+        console.log('error');
+      })
+    } else {
+      alert('请选择一个SKU');
+      return;
+    }
+
+    //return true;
+  }
+}
+
+export const getRSCListByProduct = ({dispatch, state}, id) => {
+  api.getRSCListByProduct({
+    products: id
+  }, response => {
+    dispatch(types.GET_RSCLISTBYPRODUCT, response.data.RSCs);
+  }, response => {
+    console.log('error');
+  })
+}
+
+export const selectRSC = ({dispatch, state}, index) => {
+  dispatch(types.SELECT_RSC, index);
+}
+
+export const RSCConfirm = ({dispatch, state}, index) => {
+  dispatch(types.CONFIRM_RSC, index);
+}
+
+export const getShoppingCart = ({dispatch, state}) => {
+  api.getShoppingCart(response => {
+    console.log(response);
+    dispatch(types.GET_SHOPPINGCART, response.data.datas.rows);
+  },
+  response=> {
+    console.log(response);
+  })
+}
+

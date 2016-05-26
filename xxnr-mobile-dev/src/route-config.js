@@ -21,6 +21,15 @@ export function configRouter (router) {
     },
     '/productDetail': {
         component: require('./components/productDetail/index.vue')
+	},
+	  '/productDetail': {
+      component: require('./components/productDetail/index.vue')
+    },
+    '/order': {
+      component: require('./components/order/index.vue')
+    },
+    '/orderRSC': {
+      component: require('./components/order/RSCList.vue')
     },
     '/register':{
       component: require('./components/register/index.vue')
