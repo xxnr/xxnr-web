@@ -370,7 +370,7 @@
 			var seriesDatas = {};
             while (len--) {
             	var date = weeklyReports[len]['week'];
-            	var week = date ? moment(date,'YYYYMMDD').week() : null;
+            	var week = date ? moment(date,'YYYYMMDD').isoWeek() : null;
 
             	// weeklies
             	var endDate, startDate;
