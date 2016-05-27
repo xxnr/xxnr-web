@@ -184,12 +184,12 @@ function addOrder(){
     }
 
     if (!shopCartId) {
-        self.respond({"code":1001, "message":"请选择购物车"});
+        self.respond({"code":1001, "mesage":"请选择购物车"});
         return;
     }
 
     if (!addressId) {
-        self.respond({"code":1001, "message":"请先填写收货地址"});
+        self.respond({"code":1001, "mesage":"请先填写收货地址"});
         return;
     }
 
@@ -288,7 +288,7 @@ function addOrder(){
                             OrderService.add(order1, function(err, data, payment) {
                                 if (err || !data) {
                                     if (err) console.error('Order addOrder order1 err:', err);
-                                    var response = {"code":1001, "message":"保存订单出错"};
+                                    var response = {"code":1001, "mesage":"保存订单出错"};
                                     self.respond(response);
                                     return;
                                 }
@@ -308,7 +308,7 @@ function addOrder(){
                                     OrderService.add(order2, function(err, data, payment) {
                                         if (err || !data) {
                                             if (err) console.error('Order addOrder order2 err:', err);
-                                            self.respond({"code":1001, "message":"保存订单出错"});
+                                            self.respond({"code":1001, "mesage":"保存订单出错"});
                                             OrderService.remove({id:orderId}, function(err) {
                                                 if (err) {
                                                     console.error('Order addOrder remove order1 err:', err);
@@ -333,17 +333,17 @@ function addOrder(){
                             });
                         } catch (e) {
                             console.error('Order addOrder orders err:', e);
-                            self.respond({"code":1001, "message":"保存订单出错"});
+                            self.respond({"code":1001, "mesage":"保存订单出错"});
                             return;
                         }
                     } else {
                         console.error('Order addOrder err: not get the order..');
-                        self.respond({"code":1001, "message":"没有要保存的订单"});
+                        self.respond({"code":1001, "mesage":"没有要保存的订单"});
                         return;
                     }
                 } else {
                     console.error('Order addOrder err: no orders info..');
-                    self.respond({"code":1001, "message":"获取订单信息出错"});
+                    self.respond({"code":1001, "mesage":"获取订单信息出错"});
                     return;
                 }
 			});
@@ -629,12 +629,12 @@ function addOrderBySKU(){
     var payType = data['payType'] || PAYTYPE.ZHIFUBAO;
 
     if (!shopCartId) {
-        self.respond({"code":1001, "message":"请选择购物车"});
+        self.respond({"code":1001, "mesage":"请选择购物车"});
         return;
     }
 
     if (!addressId) {
-        self.respond({"code":1001, "message":"请先填写收货地址"});
+        self.respond({"code":1001, "mesage":"请先填写收货地址"});
         return;
     }
 
@@ -769,7 +769,7 @@ function addOrderBySKU(){
                             OrderService.add(order1, function(err, data, payment) {
                                 if (err || !data) {
                                     if (err) console.error('Order addOrder order1 err:', err);
-                                    var response = {"code":1001, "message":"保存订单出错"};
+                                    var response = {"code":1001, "mesage":"保存订单出错"};
                                     self.respond(response);
                                     return;
                                 }
@@ -789,7 +789,7 @@ function addOrderBySKU(){
                                     OrderService.add(order2, function(err, data, payment) {
                                         if (err || !data) {
                                             if (err) console.error('Order addOrder order2 err:', err);
-                                            self.respond({"code":1001, "message":"保存订单出错"});
+                                            self.respond({"code":1001, "mesage":"保存订单出错"});
                                             OrderService.remove({id:orderId}, function(err) {
                                                 if (err) {
                                                     console.error('Order addOrder remove order1 err:', err);
@@ -814,17 +814,17 @@ function addOrderBySKU(){
                             });
                         } catch (e) {
                             console.error('Order addOrder orders err:', e);
-                            self.respond({"code":1001, "message":"保存订单出错"});
+                            self.respond({"code":1001, "mesage":"保存订单出错"});
                             return;
                         }
                     } else {
                         console.error('Order addOrder err: not get the order..');
-                        self.respond({"code":1001, "message":"没有要保存的订单"});
+                        self.respond({"code":1001, "mesage":"没有要保存的订单"});
                         return;
                     }
                 } else {
                     console.error('Order addOrder err: no orders info..');
-                    self.respond({"code":1001, "message":"获取订单信息出错"});
+                    self.respond({"code":1001, "mesage":"获取订单信息出错"});
                     return;
                 }
             });
