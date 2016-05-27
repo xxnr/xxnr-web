@@ -1951,7 +1951,7 @@ function process_userconsignees_save() {
         return;
     }
     if (!consigneePhone || !tools.isPhone(consigneePhone)) {
-        self.respond({"code":1001, "mesage":"请先填写正确的收货人手机号"});
+        self.respond({code:1001, message:'请先填写正确的收货人手机号'});
         return;
     }
 
