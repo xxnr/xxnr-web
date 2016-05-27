@@ -118,7 +118,7 @@ function payOrder(payExecutor){
             });
         } catch (e) {
             console.error('pay payOrder OrderService getPayOrderPaymentInfo err:', e);
-            self.respond({"code":1001, "mesage":"获取支付信息出错"});
+            self.respond({"code":1001, "message":"获取支付信息出错"});
             return;
         }
     });
