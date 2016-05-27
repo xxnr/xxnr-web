@@ -60,6 +60,12 @@ export const showBackBtn = ({dispatch,state}) => {
 export const hideBackBtn = ({dispatch,state}) => {
   dispatch(types.HIDE_BACKBUTTON)
 }
+export const hideRightBtn = ({dispatch,state}) => {
+  dispatch(types.HIDE_RIGHTBUTTON)
+}
+export const showRightBtn = ({dispatch,state}) => {
+  dispatch(types.SHOW_RIGHTBUTTON)
+}
 export const closeAppDownload = ({dispatch,state}) => {
   dispatch(types.CLOSE_APPDOWNLOAD)
 }
@@ -78,9 +84,11 @@ export const changeRightBtnMyXXNR = ({dispatch,state}) => {
 }
 export const goBack = ({dispatch,state}) => {
   if(window.location.hash.indexOf('my_orders')!=-1){
-    window.location.href = '#!/my_xxnr';  //对我的订单页面有个特殊的路由处理,在任何一个标签都跳会我的新新农人
+    //window.location.href = '#!/my_xxnr';  //对我的订单页面有个特殊的路由处理,在任何一个标签都跳会我的新新农人
+    router.go('/my_xxnr')
   }else if(window.location.hash.indexOf('my_xxnr')!=-1){
-    window.location.href = '#!/home';
+    //window.location.href = '#!/home';
+    router.go('/home')
   }else {
     window.history.back();
   }

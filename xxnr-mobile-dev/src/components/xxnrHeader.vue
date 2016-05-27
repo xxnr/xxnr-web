@@ -2,7 +2,7 @@
   <div class="mobile-header">
     {{headerTitle}}
     <div class="header-bit header-back" @click="goBack()" v-if="backButtonDisplay"><img src="/assets/images/header_back_arrow.png" alt=""> </div>
-    <div class="header-bit header-right" v-if="rightButton">
+    <div class="header-bit header-right" v-if="rightButtonDisplay">
       <a v-link="{path: '/' + rightButtonGoingPath}">
         <img :src="rightButton" alt="">
       </a>
@@ -18,7 +18,8 @@
         headerTitle: state => state.header.headerTitle,
         rightButton: state => state.header.rightButton,
         backButtonDisplay: state => state.header.backButtonDisplay,
-        rightButtonGoingPath:state => state.header.rightButtonGoingPath
+        rightButtonGoingPath:state => state.header.rightButtonGoingPath,
+        rightButtonDisplay: state => state.header.rightButtonDisplay,
       },
       actions: {
         showBackBtn,goBack

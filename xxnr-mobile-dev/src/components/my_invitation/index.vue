@@ -14,7 +14,7 @@
 </template>
 
 <script>
-  import { bindInviter,getUserInfo,showBackBtn } from '../../vuex/actions'
+  import { bindInviter,getUserInfo,showBackBtn,hideRightBtn } from '../../vuex/actions'
 
   export default {
     vuex:{
@@ -25,26 +25,19 @@
       actions:{
         bindInviter,
         getUserInfo,
-        showBackBtn
+        showBackBtn,
+        hideRightBtn
       }
     },
     components:{
     },
     created () {
       this.getUserInfo(this.user.userId);
-      this.showBackBtn();
     },
     route: {
-      deactivate (transition) {
-        //when back to /home hide the backBtn
-        if (transition.to.path === '/home') {
-          this.changeRightBtnMyXXNR();
-          this.changeRightBtnPathMyxxnr();
-        }
-        transition.next()
-      },
       activate(){
         this.showBackBtn();
+        this.hideRightBtn();
       }
     },
   }

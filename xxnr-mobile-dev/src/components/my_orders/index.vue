@@ -13,7 +13,7 @@
 
 <script>
 
-  import { showBackBtn, changeRightBtnMyXXNR } from '../../vuex/actions'
+  import { showBackBtn, changeRightBtnMyXXNR,hideRightBtn } from '../../vuex/actions'
 
   export default {
     data: function () {
@@ -27,6 +27,7 @@
       getters:{
       },
       actions:{
+        hideRightBtn,
         showBackBtn,
         changeRightBtnMyXXNR
       }
@@ -36,15 +37,8 @@
       this.showBackBtn();
     },
     route: {
-      deactivate (transition) {
-        //when back to /home hide the backBtn
-        if (transition.to.path === '/home') {
-          this.changeRightBtnMyXXNR();
-//          this.changeRightBtnPathMyxxnr();
-        }
-        transition.next()
-      },
       activate(){
+        this.hideRightBtn();
         this.showBackBtn();
         this.selectedTab = 0;
       }
