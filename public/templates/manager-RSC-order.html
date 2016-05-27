@@ -1,0 +1,326 @@
+<div class="filter">
+    <div class="container">
+        <div class="caption"><span class="fa fa-truck mr5"></span> @(服务站管理)</div>
+        <div class="row">
+            <div class="col-md-3 col-sm-6 m">
+                <div class="help" data-component="template" data-component-path="rscOrder.info"><script type="text/html">{{ count | pluralize(@('items','item','items','items')) }} / {{pages | pluralize(@('pages', 'page', 'pages', 'pages')) }}</script></div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container" style="position: relative;">
+    <div class="rsc-sidebar">
+        <ul class="rsc-sidebar-ul">
+            <li id="rsc-info-link">网点管理</li>
+            <li id="rsc-order-link" class="checked">网点订单</a></li>
+        </ul>
+    </div>
+    <div class="rsc-tab">
+        <div class="rsc-tab-ul">
+            <a href="#0">全部</a>
+            <a href="#1">待付款</a>
+            <a href="#2">待审核</a>
+            <a href="#3">待配送</a>
+            <a href="#4">待自提</a>
+            <a href="#5">已完成</a>
+            <a class="clear"></a>
+        </div>
+    </div>
+    <div data-component="grid" data-component-path="rscOrder.grid" data-max="auto" data-options-page="@(Page: #)" data-options-button="@(查看更多订单)" data-component-id="rscOrder.grid" class="rsc-order-box">
+        <script type="text/html">
+            <tr>
+                <td style="width:80px" class="silver hidden-xs" data-title="订单号">{{id}}</td>
+                <td style="width:120px" class=" silver hidden-xs1" data-title="下单时间">{{dateCreated | format('@(yyyy-MM-dd HH:mm:ss)')}}</td>
+                <td style="width:160px" class=" silver hidden-xs1" data-title="商品名称">
+                    {{foreach sku in SKUs}}
+                        {{sku.name}}{{if SKUs && SKUs.length != 1 && $index != 0}},{{fi}}
+                    {{end}}
+                </td>
+                <td style="width:160px" class=" silver hidden-xs1" data-title="收货人信息">{{consigneeName}} {{consigneePhone}}</td>
+                <td style="width:80px" class=" silver hidden-xs1" data-title="配送方式">{{delivery.value}}</td>
+                <td style="width:120px" class=" silver hidden-xs1" data-title="应付总额">{{totalPrice | price(2)}}</td>
+                <td style="width:120px" class=" silver hidden-xs1" data-title="订金金额">{{deposit | price(2)}}</td>
+                <td style="width:120px" class=" silver hidden-xs1 ui-center" data-title="订单状态">{{RSCtypeValue ? RSCtypeValue.value : ''}}</td>
+                <td style="width:40px" class=" silver hidden-xs1 ui-center" data-title="操作"><button name="edit" class="fa fa-search"></button></td>
+            </tr>
+        </script>
+    </div>
+
+</div>
+<div data-component="form" data-component-path="common.form" data-if="value === 'rscOrder'" data-title="@(订单详情)" data-component-id="rscOrder.form" data-width="1000px">
+    <div data-component="template" data-component-path="rscOrder.form">
+        <script type="text/html">
+            <div>
+                <div class="rsc-order-sec-title">
+                    订单信息
+                </div>
+                <div class="rsc-order-info-con">
+                    <div>订单状态：
+                        {{ if payStatuses }}{{payStatuses[payStatus]}}{{ fi }}&nbsp;&nbsp;{{ if deliverStatuses }}{{deliverStatuses[deliverStatus]}}{{ fi }}
+                    </div>
+                    <div>订单号：{{ id }}</div>
+                    <div>下单时间：{{dateCreated | format('@(yyyy-MM-dd HH:mm:ss)')}}</div>
+                    <div>总价：{{totalPrice | price(2)}}</div>
+                    <div>订金：{{deposit | price(2)}}</div>
+                    <div>尾款：{{(totalPrice - deposit) | price(2)}}</div>
+                    <div>待付金额：{{duePrice| price(2)}}</div>
+                    <div>配送方式：
+                        {{if delivery}}
+                            {{delivery.value}}
+                        {{fi}}
+                    </div>
+                    <div>收货人：{{consigneeName}}</div>
+                    <div>电话：{{consigneePhone}}</div>
+                    <div>地址：
+                        {{ if delivery && delivery.type == 1 && RSCInfo }}
+                            {{RSCInfo.RSCAddress}}
+                        {{ else }}
+                            {{ if delivery && delivery.type == 2 && consigneeAddress }}
+                                {{consigneeAddress}}
+                            {{ else }}
+                            -
+                            {{ fi }}
+                        {{ fi }}
+                    </div>
+                </div>
+            </div>
+        </script>
+    </div>
+    <div class="rsc-order-sec-title">
+        商品信息
+    </div>
+    <div class="rsc-order-info-con">
+        <div>
+            <div data-component="template" data-component-path="rscOrder">
+                <script type="text/html">
+                    {{ if form.SKUs && form.SKUs.length > 0 }}
+                    <table class="table table-bordered" border="0" style="border-bottom: 0;margin-bottom: 0;">
+                        <tbody>
+                        <tr>
+                            <td class="ui-center hidden-xs active">@(序号)</td>
+                            <td class="ui-center hidden-xs active">@(商品ID)</td>
+                            <td class="ui-center col-xs-3 hidden-xs active">@(商品名称)</td>
+                            <td class="ui-center col-xs-2 active">@(单价)</td>
+                            <td class="ui-center col-xs-1 active">@(订金)</td>
+                            <td class="ui-center col-xs-1 active">@(数量)</td>
+                            <td class="ui-center col-xs-2 active">@(合计)</td>
+                            <td class="ui-center col-xs-2 active">@(发货状态)</td>
+                        </tr>
+                        {{ foreach s in form.SKUs }}
+                        <tr>
+                            <td class="ui-center hidden-xs active">{{$index + 1}}</td>
+                            <td class="ui-center hidden-xs">{{ s.productId }}</td>
+                            <td class="ui-center col-xs-3 hidden-xs" title="{{ s.name }}">{{ s.name }}</td>
+                            <td class="ui-center col-xs-2">{{ s.price | price(2) }}</td>
+                            <td class="ui-center col-xs-1">{{ s.deposit | price(2) }}</td>
+                            <td class="ui-center col-xs-1">{{ s.count }}</td>
+                            <td class="ui-center col-xs-2 active">{{(s.count * s.price) | price(2)}}</td>
+                            <td class="ui-center col-xs-2 deliver-status-hover" style="position: relative;">
+                                {{ foreach d in deliverStatusesArray }}
+                                    {{ if s.deliverStatus == d.value }}{{ d.name }}{{ fi }}
+                                {{ end }}
+                                <div class="deliver-status-detail" >
+                                    <ul>
+                                        {{if !s.dateRSCReceived && !s.dateDelivered && !s.dateConfirmed}}
+                                            <li>暂无物流信息</li>
+                                        {{else}}
+                                            {{if s.dateRSCReceived}}
+                                                <li>发货到服务站</li>
+                                                <li>{{s.dateRSCReceived | format('@(yyyy-MM-dd HH:mm:ss)')}}</li>
+                                            {{fi}}
+                                            {{if s.dateDelivered && form.delivery && (form.delivery.type == 2 || form.delivery.type == 5)}}
+                                                <li>开始配送</li>
+                                                <li>{{s.dateDelivered | format('@(yyyy-MM-dd HH:mm:ss)')}}</li>
+                                            {{fi}}
+                                            {{if form.delivery && form.delivery.type == 1}}
+                                                <li>商品已自提</li>
+                                            {{else}}
+                                                <li>配送完成</li>
+                                            {{fi}}
+                                            <li>{{s.dateConfirmed | format('@(yyyy-MM-dd HH:mm:ss)')}}</li>
+                                        {{fi}}
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                        {{ end }}
+                        </tbody>
+                    </table>
+                    {{ fi }}
+
+                    {{ if form.products && form.products.length > 0 }}
+                    <table class="table table-bordered" border="0" style="border-bottom: 0;margin-bottom: 0;">
+                        <tbody>
+                        <tr>
+                            <td class="ui-center hidden-xs active">@(序号)</td>
+                            <td class="ui-center hidden-xs active">@(商品ID)</td>
+                            <td class="ui-center col-xs-3 hidden-xs active">@(商品名称)</td>
+                            <td class="ui-center col-xs-2 active">@(单价)</td>
+                            <td class="ui-center col-xs-1 active">@(订金)</td>
+                            <td class="ui-center col-xs-1 active">@(数量)</td>
+                            <td class="ui-center col-xs-2 active">@(合计)</td>
+                            <td class="ui-center col-xs-2 active">@(发货状态)</td>
+                        </tr>
+                        {{ foreach p in form.products }}
+                        <tr>
+                            <td class="ui-center hidden-xs active">{{$index + 1}}</td>
+                            <td class="ui-center hidden-xs">{{ p.productId }}</td>
+                            <td class="ui-center col-xs-3 hidden-xs" title="{{ s.name }}">{{ s.name }}</td>
+                            <td class="ui-center col-xs-2">{{ p.price | price(2) }}</td>
+                            <td class="ui-center col-xs-1">{{ p.deposit | price(2) }}</td>
+                            <td class="ui-center col-xs-1">{{ p.count }}</td>
+                            <td class="ui-center col-xs-2 active">{{(p.count * p.price) | price(2)}}</td>
+                            <td class="ui-center col-xs-2 deliver-status-hover" style="position: relative;">
+                                {{ foreach d in deliverStatusesArray }}
+                                    {{ if p.deliverStatus == d.value }}{{ d.name }}{{ fi }}
+                                {{ end }}
+                                <div class="deliver-status-detail" >
+                                    <ul>
+                                        {{if !p.dateRSCReceived && !p.dateDelivered && !p.dateConfirmed}}
+                                        <li>暂无物流信息</li>
+                                        {{else}}
+                                            {{if p.dateRSCReceived}}
+                                                <li>发货到服务站</li>
+                                                <li>{{p.dateRSCReceived | format('@(yyyy-MM-dd HH:mm:ss)')}}</li>
+                                            {{fi}}
+                                            {{if p.dateDelivered && form.delivery && (form.delivery.type == 2 || form.delivery.type == 5)}}
+                                                <li>开始配送</li>
+                                                <li>{{p.dateDelivered | format('@(yyyy-MM-dd HH:mm:ss)')}}</li>
+                                            {{fi}}
+                                            {{if form.delivery && form.delivery.type == 1}}
+                                                <li>商品已自提</li>
+                                            {{else}}
+                                                <li>配送完成</li>
+                                            {{fi}}
+                                            <li>{{p.dateConfirmed | format('@(yyyy-MM-dd HH:mm:ss)')}}</li>
+                                        {{fi}}
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                        {{ end }}
+                        </tbody>
+                    </table>
+                    {{ fi }}
+                </script>
+            </div>
+        </div>
+    </div>
+    <div class="height-10px"></div>
+</div>
+<script>
+    var rscOrder = {};
+
+    rscOrder.filter = {};
+    rscOrder.filter.page = 1;
+    rscOrder.grid = [];
+    rscOrder.form = {};
+    rscOrder.info = {};
+
+    var rscInfo_id = getUrlParam('id');
+    if(rscInfo_id.indexOf('#') != -1) {
+        rscInfo_id = rscInfo_id.substr(0, rscInfo_id.indexOf('#'));
+    }
+    ON('#rscOrder.grid', function(component){
+        rscOrder.filter.max = component.max;
+        //tab
+        var url = window.location.href;
+        var reg = /#.+/;
+        if (reg.test(url)) {
+            $(".rsc-tab-ul a").removeClass("checked");
+            var href = url.split('#')[1];
+            $(".rsc-tab-ul a[href=#" + href + "]").addClass("checked");
+        } else {
+            href = '0';
+            $(".rsc-tab-ul a").removeClass("checked");
+            $(".rsc-tab-ul a").eq(0).addClass("checked");
+        }
+
+        href = '#' + href;
+
+        rsc_order_refresh_by_href(href);
+
+        component.click = function(index, row, button){
+            switch ($(button).attr('name')){
+                case 'edit':
+                    SET('rscOrder.deliverStatusesArray',[{name:'未发货',value:1},{name:'已发货',value:2},{name:'部分发货',value:3},{name:'已到服务站',value:4},{name:'已收货',value:5}], true);
+                    SET('rscOrder.form', $.extend({}, row), true);
+                    SET('common.form', 'rscOrder');
+                    SET('rscOrder.form.deliverStatuses',{1:'未发货', 2: '已发货', 3: '部分发货', 4: '已到服务站',5: '已收货'}, true);
+                    SET('rscOrder.form.payStatuses',{1:'未付款',2:'已付款',3: '部分付款'}, true);
+                    break;
+            }
+        };
+
+        component.next = function(page) {
+            rscOrder.filter.page = page;
+            var url = window.location.href;
+            var reg = /#.+/;
+            if (reg.test(url)) {
+                rsc_order_refresh(false, getUrlParam('id'),url.split('#')[1]);
+            } else {
+                rsc_order_refresh(false, getUrlParam('id'));
+            }
+
+        };
+    });
+
+    ON("#rscOrder.form",function(component){
+
+    });
+
+
+    function rsc_order_refresh(reset, rscId, type) {
+        if(reset) {
+            rscOrder.filter.page = 1;
+            rscOrder.grid = [];
+        }
+
+        rscOrder.filter.RSCId = rscId;
+
+        if(type) {
+            rscOrder.filter.type = type;
+        } else {
+            delete rscOrder.filter.type;
+        }
+        $.components.GET(managerurl + '/api/v2.2/RSC/orders/', rscOrder.filter, function(response) {
+            if(response.code != '1000') {
+                alert(response.message);
+                return;
+            }
+
+            SET((reset ? '' : '+') + 'rscOrder.grid', response.orders);
+            if (!reset)
+                return;
+            rscOrder.info.count = response.count;
+            rscOrder.info.pages = response.pageCount;
+            UPDATE('rscOrder.info');
+        });
+    }
+
+    $(function(){
+        $(".rsc-tab-ul a").click(function(){
+            var activeTab = $(this).attr('href');
+            $(".rsc-tab-ul a").removeClass('checked');
+            $(this).addClass('checked');
+            rsc_order_refresh_by_href(activeTab);
+        });
+
+        $("#rsc-info-link").click(function(){
+            window.location.href = managerurl + "/rsc/rsc-detail?id=" + rscInfo_id;
+        });
+    });
+
+    function rsc_order_refresh_by_href(id){
+        var rscId = getUrlParam('id');
+        switch (id) {
+            case '#0':rsc_order_refresh(true, rscId);break;
+            case '#1':rsc_order_refresh(true, rscId, 1);break;
+            case '#2':rsc_order_refresh(true, rscId, 2);break;
+            case '#3':rsc_order_refresh(true, rscId, 3);break;
+            case '#4':rsc_order_refresh(true, rscId, 4);break;
+            case '#5':rsc_order_refresh(true, rscId, 5);break;
+            default: console.log('error');
+        }
+    }
+</script>

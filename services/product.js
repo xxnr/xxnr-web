@@ -7,6 +7,7 @@ var SKUModel = require('../models').SKU;
 var ProductAttributeModel = require('../models').productAttribute;
 var sortOptions = {"price-desc":{price:-1},"price-asc":{price:1}};
 var BrandModel = require('../models').brand;
+var tools = require('../common/tools');
 
 // Service
 var ProductService = function(){};
@@ -16,10 +17,8 @@ var ProductService = function(){};
 ProductService.prototype.query = function(options, callback, oldSchema) {
 
     // page max num
-    var pagemax = 50;
-    var max = U.parseInt(options.max, 20);
     options.page = U.parseInt(options.page) - 1;
-    options.max = max > pagemax ? pagemax : max;
+    options.max =  U.parseInt(options.max, 20);
 
     if (options.id && typeof(options.id) === 'string')
         options.ids = options.id.split(',');
@@ -154,6 +153,28 @@ ProductService.prototype.query = function(options, callback, oldSchema) {
     })
 };
 
+function updateSKUName(product) {
+    SKUModel.find({product: product._id}, function (err, SKUs) {
+        if (err) {
+            console.error(err);
+        }
+
+        SKUs.forEach(function (SKU) {
+            SKU.name = product.name;
+            SKU.attributes.forEach(function (attribute) {
+                SKU.name += ' - ' + attribute.value;
+            });
+            SKU.save(function (err) {
+                if (err) {
+                    console.error(err);
+                }
+            })
+        })
+    });
+
+    require('./SKU').refresh_product_SKUAttributes(product._id, function(){});
+}
+
 // Saves the product into the database
 ProductService.prototype.save = function(model, callback) {
     delete model.SKUPrice;
@@ -207,12 +228,11 @@ ProductService.prototype.save = function(model, callback) {
                             }
 
                             callback(null, doc);
-                            //TODO:call add attributes before new product with new attribute
-                            //setTimeout(refresh, 1000);
                         });
                     })
                 });
             } else {
+                updateSKUName(model);
                 callback(null);
                 //setTimeout(refresh, 1000);
             }
@@ -584,6 +604,23 @@ ProductService.prototype.updateStatus = function(_id, online, callback){
     };
 
     onlineProduct(_id, online, updator, callback);
+};
+
+ProductService.prototype.queryProductsById = function(productIds, callback){
+    if(!tools.isArray(productIds)){
+        callback('array input of productIds required');
+        return;
+    }
+
+    ProductModel.find({id:{$in:productIds}}, function(err, products){
+        if(err){
+            console.error(err);
+            callback(err);
+            return;
+        }
+
+        callback(null, products || []);
+    })
 };
 
 function onlineProduct(_id, online, updator, callback){

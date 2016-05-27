@@ -163,14 +163,22 @@ canvas { display: block; }
 
 .multi_form {margin-left:20px;margin-right:20px;margin-bottom:20px;}
 
-.form_tab div {padding: 6px 0 0; position: relative; display: inline-block; min-width: 60px; text-align: center; height: 30px; }
+/*.form_tab div {padding: 6px 0 0; position: relative; display: inline-block; min-width: 60px; text-align: center; height: 30px; }
 .form_tab div:hover { color: #303030; text-decoration: none; cursor: pointer;}
-.form_tab_selected { color: #303030; text-decoration: none; }
+.form_tab_selected { color: #303030; text-decoration: none; }*/
 .form_tab .deeppink {background:hotpink; border:1px solid hotpink}
 .form_tab .cornflowerblue  {background:cornflowerblue; border:1px solid cornflowerblue;}
+.form_tab .orangered  {background:#ff9100; border:1px solid #ff9100;}
+
+.form_tab { border-bottom: 1px solid #E0E0E0; padding: 0; margin: 0; display: block; position: relative; font-size: 12px; }
+.form_tab div{ position: relative; display: inline-block; border: 1px solid #EEEEEE; border-bottom: 0; margin: 0 0 0 10px; padding: 0; border-radius: 3px 3px 0 0; background-color: #F8F8F8; text-align: center; padding: 8px 10px; color: gray; cursor: pointer; min-width: 120px; }
+.form_tab div:first-child { margin-left: 0; }
+.form_tab div:hover { background-color: white; top: 1px; border-color: #E0E0E0; color: black; }
+.form_tab .form_tab_selected { background-color: white; top: 1px; border-color: #E0E0E0; color: black; }
 
 .multi_form .form_cornflowerblue {border:1px solid cornflowerblue; background:white;}
 .multi_form .form_deeppink {border: 1px solid hotpink; background:white;}
+.multi_form .form_orangered {border: 1px solid #ff9100; background:white;}
 
 .button_disabled {background-color: #F5F5F5 !important;
 	border: 1px solid #E0E0E0 !important;

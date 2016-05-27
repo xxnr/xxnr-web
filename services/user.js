@@ -1,6 +1,7 @@
 /**
  * Created by pepelu on 2015/11/18.
  */
+var mongoose = require("mongoose");
 var bcrypt = require('bcrypt-nodejs');
 var tools = require('../common/tools');
 var crypto = require('crypto');
@@ -8,6 +9,8 @@ var UserModel = require('../models').user;
 var UserLogModel = require('../models').userLog;
 var UseOrdersNumberModel = require('../models').userordersnumber;
 var UserWhiteListModel = require('../models').userwhitelist;
+var UserConsigneeModel = require('../models').userconsignee;
+var UserRSCModel = require('../models').userRSC;
 
 // Service
 var UserService = function(){};
@@ -39,6 +42,7 @@ UserService.prototype.update = function(options, callback) {
     // generate query
     var query = options.userid ? {id: options.userid} : options.id ? {id: options.id} : options.account ? {account: options.account} : {};
     if (query == {}) {
+        //TODO:this condition cannot judge whether query is empty!!!!!!!
         // if no userid or account provided, not support.
         callback('need userid or accountid');
         return;
@@ -47,8 +51,20 @@ UserService.prototype.update = function(options, callback) {
     var setValue = {};
     if (options.password)
         setValue.password = bcrypt.hashSync(options.password);
-    if (options.name)
+    if (options.name) {
         setValue.name = options.name;
+        var nameResult = tools.stringPinyin({'str':options.name});
+        if (nameResult) {
+            if (nameResult.error)
+                console.error('UserService update name stringPinyin error:', nameResult.error, options.name);
+            if (nameResult.strPinyin)
+                setValue.namePinyin = nameResult.strPinyin;
+            if (nameResult.initial)
+                setValue.nameInitial = nameResult.initial;
+            if (nameResult.initialType)
+                setValue.nameInitialType = nameResult.initialType;
+        }
+    }
     if (options.regMethod)
         setValue.regmethod = options.regMethod;
     if (options.nickname)
@@ -74,6 +90,29 @@ UserService.prototype.update = function(options, callback) {
     if( typeof options.isUserInfoFullFilled != 'undefined')
         setValue.isUserInfoFullFilled = options.isUserInfoFullFilled;
 
+    // RSC info
+    if(options.RSCInfo){
+        if(options.RSCInfo.name) {
+            setValue['RSCInfo.name'] = options.RSCInfo.name;
+        }
+
+        if(options.RSCInfo.IDNo) {
+            setValue['RSCInfo.IDNo'] = options.RSCInfo.IDNo;
+        }
+
+        if(options.RSCInfo.phone){
+            setValue['RSCInfo.phone'] = options.RSCInfo.phone;
+        }
+
+        if(options.RSCInfo.companyName){
+            setValue['RSCInfo.companyName'] = options.RSCInfo.companyName;
+        }
+
+        if(options.RSCInfo.companyAddress){
+            setValue['RSCInfo.companyAddress'] = options.RSCInfo.companyAddress;
+        }
+    }
+
     UserModel.update(query, {$set: setValue}, {new: true, multi: false}, function (err, numAffected) {
         if (err) {
             console.error('User Service update err:', err);
@@ -82,8 +121,8 @@ UserService.prototype.update = function(options, callback) {
         }
 
         if (numAffected.n == 0) {
-            console.error('User Service update err: user not exists');
-            callback('用户不存在');
+            console.error('User Service update err: update fail');
+            callback('更新失败');
             return;
         }
 
@@ -106,7 +145,7 @@ UserService.prototype.login = function(options, callback) {
         .populate({path:'address.town', select:'-_id -__v'})
         .exec(function(err, user){
         if(err){
-            console.error('user login fail:', err);
+            console.error('User Service user login fail:', err);
             callback('登录失败');
             return;
         }
@@ -137,9 +176,7 @@ UserService.prototype.login = function(options, callback) {
 
         if(password_valid){
             user = user.toObject();
-            user.isVerified = isUserTypeVerified(user);
-            user.isXXNRAgent = tools.isXXNRAgent(user.typeVerified);
-
+            getMoreUserInfo(user);
             callback(null, user);
 
             // Save login log
@@ -170,7 +207,7 @@ UserService.prototype.get = function(options, callback) {
         .populate({path: 'inviter', select: 'id account photo nickname name'})
         .exec(function (err, user) {
             if (err) {
-                console.error('get user error:', err);
+                console.error('User Service get user error:', err);
                 callback('获取用户信息失败');
                 return;
             }
@@ -181,13 +218,22 @@ UserService.prototype.get = function(options, callback) {
             }
 
             user = user.toObject();
-            user.isVerified = isUserTypeVerified(user);
-            user.isXXNRAgent = tools.isXXNRAgent(user.typeVerified);
+            getMoreUserInfo(user);
 
             // Returns response
             return callback(null, user);
         });
 };
+
+function getMoreUserInfo(user){
+    user.isVerified = isUserTypeVerified(user);
+    user.isXXNRAgent = tools.isXXNRAgent(user.typeVerified);
+    user.isRSC = tools.isRSC(user.typeVerified);
+}
+
+function isUserTypeVerified(user){
+    return user.typeVerified && user.typeVerified.indexOf(user.type) != -1 && user.type != '1'
+}
 
 UserService.prototype.increaseScore = function(options, callback){
     if(!options.userid){
@@ -202,7 +248,7 @@ UserService.prototype.increaseScore = function(options, callback){
 
     UserModel.update({id:options.userid}, {$inc:{score: parseInt(options.score)}}, function(err, numAffected){
         if(err){
-            console.error('increaseScore err:', err);
+            console.error('User Service increaseScore err:', err);
             callback('增加积分失败');
             return;
         }
@@ -214,6 +260,41 @@ UserService.prototype.increaseScore = function(options, callback){
 
         callback();
     })
+};
+
+UserService.prototype.getInviteeOrderbynamePinyin = function(options, callback) {
+    if (!options._id) {
+        callback('_id required');
+        return;
+    }
+    var time = new Date();
+
+    // UserModel.find({inviter: options._id})
+    //     .sort({nameInitialType:1, namePinyin:1, dateinvited:-1})
+    //     .lean()
+    //     .exec(function(err, docs) {
+    //         if (err) {
+    //             console.error('User Service getInviteeOrderbynamePinyin error:', err);
+    //             callback('获取新农客户失败');
+    //         }
+
+    //         var data = {};
+    //         data.count = docs?docs.length:docs;
+    //         data.items = docs;
+    //         callback(null, data);
+    //     });
+    UserModel.collection.find({inviter: mongoose.Types.ObjectId(options._id)})
+        .sort({nameInitialType:1, namePinyin:1, dateinvited:-1})
+        .toArray(function(err, docs) {
+            if (err) {
+                console.error('User Service getInviteeOrderbynamePinyin error:', err);
+                callback('获取新农客户失败');
+            }
+            var data = {};
+            data.count = docs?docs.length:docs;
+            data.items = docs;
+            callback(null, data);
+        });
 };
 
 UserService.prototype.getInvitee = function(options, callback) {
@@ -236,7 +317,7 @@ UserService.prototype.getInvitee = function(options, callback) {
     // UserModel.find({$query:{inviter: options._id}, $orderby:{dateinvited: -1}}, function (err, docs) {
     UserModel.count({inviter: options._id}, function(err, count) {
         if(err){
-            console.error('User workflow getInvitee error:', err);
+            console.error('User Service getInvitee error:', err);
             callback(err);
             return;
         }
@@ -247,7 +328,7 @@ UserService.prototype.getInvitee = function(options, callback) {
             .lean()
             .exec(function(err, docs) {
                 if (err) {
-                    console.error('User workflow getInvitee error:', err);
+                    console.error('User Service getInvitee error:', err);
                     callback('获取新农客户失败');
                 }
 
@@ -271,9 +352,14 @@ UserService.prototype.getOneInvitee = function(options, callback) {
         return;
     }
 
-    UserModel.findOne({inviter: options._id, id:options.inviteeId}, function(err, doc) {
+    UserModel.findOne({inviter: options._id, id:options.inviteeId})
+        .populate({path: 'address.province', select: ' -__v'})
+        .populate({path: 'address.city', select: ' -__v'})
+        .populate({path: 'address.county', select: ' -__v'})
+        .populate({path: 'address.town', select: ' -__v'})
+        .exec(function(err, doc) {
         if (err) {
-            console.error('User workflow getOneInvitee error:', err);
+            console.error('User Service getOneInvitee error:', err);
             callback('获取新农客户失败');
         }
 
@@ -289,9 +375,10 @@ UserService.prototype.getInviteeOrderNumber = function(invitees, callback) {
         return;
     }
 
-    UseOrdersNumberModel.find({userId:{$in:invitees}}).sort({dateUpdated:-1}).lean().exec(function (err, docs) {
+    // UseOrdersNumberModel.find({userId:{$in:invitees}}).sort({dateUpdated:-1}).lean().exec(function (err, docs) {
+    UseOrdersNumberModel.collection.find({userId:{$in:invitees}}).sort({dateUpdated:-1}).toArray(function (err, docs) {
         if (err) {
-            console.error('User emptyInviteeOrderNumber findOne err:', err);
+            console.error('User Service emptyInviteeOrderNumber findOne err:', err);
             callback(null, []);
             return;
         }
@@ -303,24 +390,24 @@ UserService.prototype.getInviteeOrderNumber = function(invitees, callback) {
 UserService.prototype.emptyInviteeOrderNumber = function(options, callback) {
 
     if (!options.inviteeId) {
-        console.error('User emptyInviteeOrderNumber err: no inviteeId');
+        console.error('User Service emptyInviteeOrderNumber err: no inviteeId');
         return;
     }
 
     UseOrdersNumberModel.findOne({userId:options.inviteeId}, function (err, doc) {
         if (err) {
-            console.error('User emptyInviteeOrderNumber findOne err:', err);
+            console.error('User Service emptyInviteeOrderNumber findOne err:', err);
             return;
         }
         if (doc) {
             UseOrdersNumberModel.update({userId:doc.userId}, {$set:{numberForInviter:0, dateUpdated: new Date()}}, function(err, count) {
                 // Record not exists
                 if (err) {
-                    console.error('User emptyInviteeOrderNumber update err:', err);
+                    console.error('User Service emptyInviteeOrderNumber update err:', err);
                     return;
                 }
                 if (count.n === 0) {
-                    console.error('User emptyInviteeOrderNumber update not find doc');
+                    console.error('User Service emptyInviteeOrderNumber update not find doc');
                 }
             });
         }
@@ -337,7 +424,7 @@ UserService.prototype.inWhiteList = function(options, callback) {
     var query = {userId: options.userid};
     UserWhiteListModel.findOne(query, function (err, user) {
         if (err) {
-            console.error('get white list user error:', err);
+            console.error('User Service get white list user error:', err);
             callback('获取白名单用户失败');
             return;
         }
@@ -355,7 +442,7 @@ UserService.prototype.isXXNRAgent = function(user, callback){
 
     UserModel.findById(user._id, function(err, user){
         if(err){
-            console.error(err);
+            console.error('User Service isXXNRAgent findById err:', err);
             callback(err);
             return;
         }
@@ -366,6 +453,82 @@ UserService.prototype.isXXNRAgent = function(user, callback){
     })
 };
 
+UserService.prototype.isRSC = function(user, callback){
+    if(!user){
+        callback('user required');
+        return;
+    }
+
+    UserModel.findById(user._id, function(err, user){
+        if(err){
+            console.error('User Service isRSC findById err:', err);
+            callback(err);
+            return;
+        }
+
+        var isXXNRAgent = tools.isRSC(user.typeVerified);
+
+        callback(null, isXXNRAgent);
+    })
+};
+
+UserService.prototype.getRSCInfoById = function(_id, callback){
+    if(!_id){
+        callback('need _id');
+        return;
+    }
+
+    UserModel.findById(_id)
+        .populate({path: 'RSCInfo.companyAddress.province', select: ' -__v'})
+        .populate({path: 'RSCInfo.companyAddress.city', select: ' -__v'})
+        .populate({path: 'RSCInfo.companyAddress.county', select: ' -__v'})
+        .populate({path: 'RSCInfo.companyAddress.town', select: ' -__v'})
+        .populate({path:'RSCInfo.products', select:' _id category brand name'})
+        .select('-_id id account RSCInfo')
+        .exec(function(err, user){
+            if(err){
+                console.error('User Service getRSCInfoById findById err:', err);
+                callback('error find user');
+                return;
+            }
+
+            if(!user){
+                callback('user not find');
+                return;
+            }
+
+            callback(null, user);
+        });
+};
+
+/**
+ * get RSCInfo By RSC's EPOS number
+ * @param  {[String]}   EPOSNo   RSC EPOS number
+ * @param  {Function}  callback return RSC info
+ */
+UserService.prototype.getRSCInfoByEPOSNo = function(EPOSNo, callback){
+    if(!EPOSNo){
+        callback('need EPOSNo');
+        return;
+    }
+    var query = {'RSCInfo.supportEPOS': true, 'RSCInfo.EPOSNo': EPOSNo};
+    UserModel.findOne(query)
+        .select('_id id account RSCInfo')
+        .exec(function(err, rsc){
+            if(err){
+                console.error('User Service getRSCInfoByEPOSNo findOne err:', err);
+                callback('error find RSC');
+                return;
+            }
+            callback(null, rsc);
+        });
+};
+
+/**
+ * get user info by account(phone), with inviter populated by default
+ * @param account
+ * @param callback
+ */
 UserService.prototype.getByAccount = function(account, callback){
     if(!account){
         callback('account required');
@@ -376,7 +539,7 @@ UserService.prototype.getByAccount = function(account, callback){
         .populate({path:'inviter', select: 'id account photo nickname name'})
         .exec(function(err, user){
         if(err){
-            console.error(err);
+            console.error('User Service getByAccount findOne err:', err);
             callback(err);
             return;
         }
@@ -389,6 +552,151 @@ UserService.prototype.getByAccount = function(account, callback){
         callback(null, user);
     })
 };
+
+UserService.prototype.getById = function(_id, callback){
+    if(!_id){
+        callback('need _id');
+        return;
+    }
+
+    UserModel.findById(_id, function(err, user){
+        if(err){
+            console.error('User Service getById findById err:', err);
+            callback('error find user');
+            return;
+        }
+
+        if(!user){
+            callback('user not found');
+            return;
+        }
+
+        callback(null, user.toObject());
+    })
+};
+
+// user consignee info
+// save user consignee (user input new consignee when choose the RSC)
+UserService.prototype.saveUserConsignee = function(options, callback){
+    if (!options || !options.userId || !options.consigneeName || !options.consigneePhone) {
+        callback('参数不足');
+        return;
+    }
+
+    var query = {userId: options.userId, consigneeName: options.consigneeName, consigneePhone: options.consigneePhone};
+    UserConsigneeModel.findOne(query, function(err, data){
+        if(err){
+            console.error('User Service saveUserConsignee findOne err:', err);
+            callback('UserConsigneeModel find err');
+            return;
+        }
+
+        if(data){
+            callback('User consignee had in', data);
+            return;
+        }
+
+        var userConsignee = new UserConsigneeModel(options);
+        userConsignee.save(function(err) {
+            if(err){
+                console.error('User Service saveUserConsignee save err:', err);
+                callback('UserConsigneeModel save err');
+                return;
+            }
+            callback(null, userConsignee); 
+        });
+    });
+};
+
+// query user consignee
+UserService.prototype.queryUserConsignee = function(options, callback){
+    // options.page {String or Number}
+    // options.max {String or Number}
+    // options.userId
+
+    options.page = U.parseInt(options.page) - 1;
+    options.max = U.parseInt(options.max, 20);
+
+    if (options.page < 0)
+        options.page = 0;
+
+    if (options.max > 50)
+        options.max = 50;
+
+
+    var take = U.parseInt(options.max);
+    var skip = U.parseInt(options.page * options.max);
+
+    var mongoOptions = {};
+    
+    // userId
+    if (options.userId) {
+        mongoOptions.userId = options.userId;
+    }
+
+    UserConsigneeModel.count(mongoOptions, function (err, count) {
+        if (err) {
+            callback(err);
+            return;
+        }
+        UserConsigneeModel.find(mongoOptions).sort({dateCreated:-1}).skip(skip).limit(take).lean().select('-_id -__v').exec(function(err, docs) {
+            if (err) {
+                callback(err);
+                return;
+            }
+            count = count || docs.length;
+            var data = {};
+
+            data.count = count;
+            data.items = docs;
+
+            // Gets page count
+            data.pages = Math.floor(count / options.max) + (count % options.max ? 1 : 0);
+
+            if (data.pages === 0)
+                data.pages = 1;
+
+            data.page = options.page + 1;
+
+            // Returns data
+            callback(null, data);
+        });
+    });
+};
+
+// user RSC info
+// save user RSC (user choose a new RSC to delivery)
+UserService.prototype.saveUserRSC = function(options, callback){
+    if (!options || !options.userId || !options.RSCId) {
+        callback('参数不足');
+        return;
+    }
+
+    var userRSCOptions = {userId: options.userId, RSC: options.RSCId};
+    UserRSCModel.findOne(userRSCOptions, function(err, data){
+        if(err){
+            console.error('User Service saveUserRSC findOne err:', err);
+            callback('UserRSCModel find err');
+            return;
+        }
+
+        if(data){
+            callback('User RSC had in', data);
+            return;
+        }
+
+        var userRSC = new UserRSCModel(userRSCOptions);
+        userRSC.save(function(err) {
+            if(err){
+                console.error('User Service saveUserRSC save err:', err);
+                callback('UserRSCModel save err');
+                return;
+            }
+            callback(null, userRSC);
+        });
+    });
+};
+
 
 // ********************  only use for manager system  ********************
 
@@ -494,7 +802,3 @@ UserService.prototype.query = function(options, callback) {
 };
 
 module.exports = new UserService();
-
-function isUserTypeVerified(user){
-    return user.typeVerified && user.typeVerified.indexOf(user.type) != -1 && user.type != '1'
-}

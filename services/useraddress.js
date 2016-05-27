@@ -62,7 +62,7 @@ UseraddressService.prototype.create = function(options, callback) {
 	// Gets a specific document from DB
 	UserModel.findOne({id:options.userid}, function(err, user) {
         if (!user || err) {
-			callback('user-notfind', {'code':'1001','message':'数据没有查到，未查询到用户'});
+			callback('user-notfind', {code:1001, message:'数据没有查到，未查询到用户'});
 			return;
 		} else {
             // Gets province
@@ -97,15 +97,15 @@ UseraddressService.prototype.create = function(options, callback) {
 								town = data;
 
 							if (options.provinceid && !province) {
-								callback('error-args', {'code':'1001','message':'数据没有查到，没有找到请求参数中的省份'});
+								callback('error-args', {code:1001, message:'数据没有查到，没有找到请求参数中的省份'});
 								return;
 							}
 							if (options.cityid && !city) {
-								callback('error-args', {'code':'1001','message':'数据没有查到，没有找到请求参数中的城市'});
+								callback('error-args', {code:1001, message:'数据没有查到，没有找到请求参数中的城市'});
 								return;
 							}
 							if (options.countyid && !county) {
-								callback('error-args', {'code':'1001','message':'数据没有查到，没有找到请求参数中的县区'});
+								callback('error-args', {code:1001, message:'数据没有查到，没有找到请求参数中的县区'});
 								return;
 							}
 
@@ -152,8 +152,12 @@ UseraddressService.prototype.create = function(options, callback) {
 							model.type = options.type || 2;
 							var useraddress = new UseraddressModel(model);
 							useraddress.save(function (err) {
+								if (err) {
+									callback(err);
+									return;
+								}
 				                // Returns response
-								callback(err, model);
+								callback(null, model);
 				            });
 					        // });
 						}); // get town end

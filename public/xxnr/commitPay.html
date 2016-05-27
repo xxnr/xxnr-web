@@ -47,7 +47,7 @@
     </ul>
 </div>
 <div class="payBody ng-cloak ng-hide" ng-show="wholePageShow">
-    <div class="orderInfo ng-cloak" ng-repeat='order in orders' ng-click='orderClicked($index)' ng-class="{true:'selected',false:'unselected'}[$index == orderSelectedNum]">
+    <div class="orderInfo ng-cloak" ng-show="!offlineSubmitted" ng-repeat='order in orders' ng-click='orderClicked($index)' ng-class="{true:'selected',false:'unselected'}[$index == orderSelectedNum && orders.length>1]">
         <div class="big ng-cloak">订单号：
             <span class="ng-cloak">{{order.id}}</span>
             <span class="orderType">{{order.orderType}}</span>
@@ -64,46 +64,86 @@
             <p>商品名称：<span class="ng-cloak">{{order.resultStr}}</span></p>
         </div>
     </div>
-    <div class="wrap clearfix">
+    <div class="wrap clearfix" ng-show="!offlineSubmitted">
         <div class="pay_box">
             <div class="pay_box_title">支付方式</div>
             <div class="pay_times">
-                <div class="full_Pay" ng-click="changePayTimes(0)">
-                    <img src="images/full_Pay.png" alt="" />
-                    <img class="selected" src="images/righticon.png" alt="" ng-show="payTimes == 0" />
+                <div class="full_pay_icon" ng-click="changePayTimes(0)" ng-class="{true:'selected'}[payTimes == 0]">
+                    全额支付
+                    <!--<img class="selected" src="images/pay_type_check.png" alt="" ng-show="payTimes == 0" />-->
                 </div>
                 <div class="multi_pay"  ng-show="more_toggle">
-                    <div class="multi_pay_icon" ng-click="changePayTimes(1)">
-                        <img src="images/multi_pay.png" alt="" />
-                        <img class="selected" src="images/righticon.png" alt="" ng-show="payTimes == 1" />
+                    <div class="multi_pay_icon" ng-click="changePayTimes(1)" ng-class="{true:'selected'}[payTimes == 1]">
+                        分次支付
+                        <!--<img class="selected" src="images/pay_type_check.png" alt="" ng-show="payTimes == 1" />-->
                     </div>
-                    <span class="intro">选择本次支付金额</span>
-                    <div class="buy_btn">
-                        <a class="btn-reduce" href="" ng-click="multi_pay_amount_reduce()" ng-class="{'editable':amount_reduce_editable == true && payTimes == 1}" >-</a>
-                        <a class="btn-add" href="" ng-click="multi_pay_amount_add()" ng-class="{'editable':amount_add_editable == true && payTimes == 1}">+</a>
-                        <input maxlength="4" class="text" id="buy-num" ng-model="multi_pay_amount" ng-change="buyCountChange(buy_count)" ng-readonly="!isInWhiteList">
+                    <div class="multi_pay_option">
+                        <span class="intro">选择本次支付金额</span>
+                        <div class="buy_btn">
+                            <a class="btn-reduce" href="" ng-click="multi_pay_amount_reduce()" ng-class="{'editable':amount_reduce_editable == true && payTimes == 1}" >-</a>
+                            <a class="btn-add" href="" ng-click="multi_pay_amount_add()" ng-class="{'editable':amount_add_editable == true && payTimes == 1}">+</a>
+                            <input maxlength="4" class="text" id="buy-num" ng-model="multi_pay_amount" ng-change="buyCountChange(buy_count)" ng-readonly="!isInWhiteList">
+                        </div>
+                        <a class="xxnr_btn" href="" ng-click="edit_multi_pay_num()" ng-show="isInWhiteList">{{multi_pay_edit_bth}}</a>
+                        <p>点击<span>+ -</span>调节金额，每次幅度<span>500</span>元，最低调至<span>3000</span>元，不足则按实际付款金额</p>
                     </div>
-                    <a class="xxnr_btn" href="" ng-click="edit_multi_pay_num()" ng-show="isInWhiteList">{{multi_pay_edit_bth}}</a>
-                    <p>点击<span>+ -</span>调节金额，每次幅度<span>500</span>元，最低调至<span>3000</span>元，不足则按实际付款金额</p>
                 </div>
                 <div class="more_pay" ng-click="pay_times_toggle()">
                     <span>{{more_text}}</span><img ng-src="images/{{more_imgUrl}}" alt="">
                 </div>
             </div>
             <div class="payMethod ng-cloak">
-                <p class="confirm-tit">
+                <p class="confirm-title">
                     <span class="left">选择您的付款方式</span>
                 </p>
-                <div class="clear checkout-steps">
-                    <p>平台支付</p>
-                    <ul class="pay-style clearfix">
-                        <li ng-repeat="payMethod in payMethods" class="ng-cloak"><a href=""  ng-class="{ 'current': $index == selectedPayMethodIndex }" ng-click="itemClicked($index)"><img ng-src="{{payMethod.imgUrl}}" alt=""></a></li>
-                    </ul>
+                <div class="confirm-contents">
+                    <div class="clear checkout-steps">
+                        <p>平台支付</p>
+                        <ul class="pay-style clearfix">
+                            <li ng-repeat="payMethod in payMethods" class="ng-cloak"><a href=""  ng-class="{ 'current': $index == selectedPayMethodIndex }" ng-click="itemClicked($index)"><img ng-src="{{payMethod.imgUrl}}" alt=""></a></li>
+                        </ul>
+                    </div>
+                    <div class="clear checkout-steps" ng-hide="payTimes==1">
+                        <p>线下支付</p>
+                        <ul class="pay-style clearfix">
+                            <li class="ng-cloak"><a href=""  ng-class="{ 'current': selectedPayMethodIndex == 2 }" ng-click="itemClicked(2)"><img width="188px" height="58px" src="./images/offline_payment_icon1-.png" alt=""></a></li>
+                        </ul>
+                    </div>
+                    <a class="xxnr_btn" href="" ng-click="pay()">立即支付</a>
+                    <p class="pay_price">支付金额：<span>￥{{pay_price}}</span></p>
                 </div>
-                <a class="xxnr_btn" href="" ng-click="pay()">立即支付</a>
-                <p class="pay_price">支付金额：<span>￥{{pay_price}}</span></p>
             </div>
         </div>
+    </div>
+    <div class="offlinePay-submitted-section" ng-show="offlineSubmitted">
+        <p class="section_title">线下支付</p>
+        <div class="successInfo">
+            <img src="./images/offline_payment-.png" alt="">
+            <span class="successText">线下支付提交成功！请到服务网点完成线下支付</span>
+            <span class="needToPay">待付金额：<span class="payNumber">{{orders[orderSelectedNum].duePrice}}</span>元</span>
+        </div>
+        <div class="company_info">
+            <p class="company_title">服务网点</p>
+            <div class="has_offlinePay_company" ng-show="has_offlinePay_company">
+                <p>网点名称：{{orders[orderSelectedNum].RSCInfo.companyName}}</p>
+                <p>网店地址：{{orders[orderSelectedNum].RSCInfo.RSCAddress}}</p>
+                <p>电话：{{orders[orderSelectedNum].RSCInfo.RSCPhone}}</p>
+            </div>
+            <div class="no_offlinePay_company" ng-show="!has_offlinePay_company">
+                <img src="./images/branches.png" alt="">
+                <p>小新正在为您匹配最近的网点,请稍候从我的订单查看</p>
+            </div>
+        </div>
+        <div class="offlinePay">
+            <p>付款方式</p>
+            <div class="offlinePay-method">
+                <img src="./images/cash_icon.png" alt=""><span>现金</span>
+            </div>
+            <div class="offlinePay-method">
+                <img src="./images/pos_icon-.png" alt=""><span>POS机刷卡</span>
+            </div>
+        </div>
+        <a ng-href="orderDetail.html?id={{orders[orderSelectedNum].id}}" class="to_order_detail">查看该订单详情 ></a>
     </div>
 </div>
 </body>

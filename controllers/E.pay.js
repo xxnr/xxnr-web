@@ -6,18 +6,27 @@ var tools = require('../common/tools');
 var services = require('../services');
 var OrderService = services.order;
 var PayService = services.pay;
+var UserService = services.user;
+var OFFLINEPAYTYPE = require('../common/defs').OFFLINEPAYTYPE;
+var EPOSNotify = MODULE('EPOSNotify');
 
 exports.install = function() {
     // pay
     F.route('/alipay', alipayOrder, ['post', 'get'], ['isInWhiteList', 'throttle']);
     F.route('/unionpay', unionPayOrder, ['post', 'get'], ['isInWhiteList', 'throttle']);
+    F.route('/offlinepay', offlinePay, ['get'], ['isLoggedIn']);
+    F.route('/EPOSpay', EPOSPay, ['get'], ['isInWhiteList']);
     // pay notify
-    F.route('/dynamic/alipay/notify.asp', alipayNotify, ['post','raw']);
     // old url
     F.route('/dynamic/alipay/nofity.asp', alipayNotify, ['post','raw']);
-    F.route('/unionpay/notify', unionpayNotify, ['post','raw']);
+    F.route('/dynamic/alipay/notify.asp', alipayNotify, ['post','raw']);
     // old url
     F.route('/unionpay/nofity', unionpayNotify, ['post','raw']);
+    F.route('/unionpay/notify', unionpayNotify, ['post','raw']);
+    F.route('/EPOS/notify', process_EPOSNotify, ['post']);
+    // offline pay notify
+    F.route('/api/v2.2/getOfflinePayType',              json_offline_pay_type, ['get']);
+    F.route('/api/v2.2/RSC/confirmOfflinePay',          process_RSC_confirm_OfflinePay, ['get'],    ['isLoggedIn', 'isRSC']);
     // pay refund
     F.route('/dynamic/alipay/refund_fastpay_by_platform_nopwd_notify.asp', alipayRefundNotify, ['post','raw']);
     F.route('/unionpay/refundnotify', unionpayRefundNotify, ['post','raw']);
@@ -25,6 +34,7 @@ exports.install = function() {
     F.route('/alipay/success', aliPaySuccess);
     // // test alipay refund
     // F.route('/api/alipay/refund/', refundTest, ['get'], ['isLoggedIn']);
+  
 };
 
 var alipay = require('../configuration/alipay_config').alipay;
@@ -35,7 +45,8 @@ var PAYTYPE = require('../common/defs').PAYTYPE;
 var dri = require('../common/dri');
 var moment = require('moment-timezone');
 
-// pay
+// pay order
+
 // common pay function
 function payOrder(payExecutor){
     var self = this;
@@ -52,7 +63,7 @@ function payOrder(payExecutor){
     options.id = orderId;
     OrderService.get(options, function(err, order, payment) {
         if (err) {
-            console.error('api-v1.0 payOrder OrderService get err:', err);
+            console.error('pay payOrder OrderService get err:', err);
             self.respond({code:1001, message:'支付出错'});
             return;
         }
@@ -77,6 +88,7 @@ function payOrder(payExecutor){
         }
 
         try {
+            
             if (payPrice) {
                 // if user not in white list, the price of one time must more than config minPayPrice
                 if ((self.user && !self.user.inWhiteList) || !self.user) {
@@ -97,7 +109,7 @@ function payOrder(payExecutor){
             }
             OrderService.getPayOrderPaymentInfo(order, payment, payPrice, reqOptions, function (err, resultPayment, resultPayPrice) {
                 if (err) {
-                    console.error('api-v1.0 payOrder OrderService getPayOrderPaymentInfo err:', err);
+                    console.error('pay payOrder OrderService getPayOrderPaymentInfo err:', err);
                     self.respond({code:1001, message:'获取支付信息出错'});
                     return;
                 }
@@ -105,7 +117,7 @@ function payOrder(payExecutor){
                 return;
             });
         } catch (e) {
-            console.error('api-v1.0 payOrder OrderService getPayOrderPaymentInfo err:', e);
+            console.error('pay payOrder OrderService getPayOrderPaymentInfo err:', e);
             self.respond({"code":1001, "mesage":"获取支付信息出错"});
             return;
         }
@@ -222,110 +234,139 @@ function unionPayOrder() {
     return;
 }
 
-// pay notify
-
-// common pay notify function
-function payNotify(paymentId, options){
+function offlinePay(){
     var self = this;
-    // pay success log
-    var payLog = options;
-    payLog.paymentId = paymentId;
-    OrderService.savePaidLog(payLog);
-    // order paid
-    OrderService.get({"paymentId": paymentId}, function(err, order) {
-        // TODO: log err
-        if (err) {
-            console.error('api-v1.0 payNotify OrderService get err:', err);
-            dri.sendDRI('[DRI] Fail to get order in order payNotify: ', 'paymentId:'+paymentId, err);
-        }
-        if (order) {
-            var payment = {paymentId: paymentId};
-            if (options && options.price) {
-                payment.price = parseFloat(parseFloat(options.price).toFixed(2));;
+
+    // default offline pay type
+    self.payType = PAYTYPE.CASH;
+
+    // forbidden multi pay for offline pay, which means offline pay can only pay off
+    self.data.price = null;
+    payOrder.call(this, function(paymentId, totalPrice, ip, orderId, payment) {
+        OrderService.changeToPendingApprove(orderId, function(err){
+            if(err){
+                self.respond({code:1002, message:'更改订单状态失败'});
+                return;
             }
-            var result = OrderService.judgePaymentRefund(order, payment);
-            if (result && result.refund) {
-                var paymentOptions = options;
-                paymentOptions.paymentId = paymentId;
-                if (!paymentOptions.orderId) {
-                    paymentOptions.orderId = order.id;
-                }
-                if (result.refundReason) {
-                    paymentOptions.refundReason = result.refundReason;
-                }
-                payRefund.call(self, paymentOptions);
-            } else {
-                if ((order.payStatus||PAYMENTSTATUS.UNPAID) == PAYMENTSTATUS.UNPAID || order.payStatus == PAYMENTSTATUS.PARTPAID) {
-                    OrderService.paid(order.id, paymentId, options, function(err, result) {
-                        if (err) {
-                            if (result && result.refund) {
-                                // *TODO refund
-                                var paymentOptions = options;
-                                paymentOptions.paymentId = paymentId;
-                                if (!paymentOptions.orderId) {
-                                    paymentOptions.orderId = order.id;
-                                }
-                                if (result.refundReason) {
-                                    paymentOptions.refundReason = result.refundReason;
-                                }
-                                payRefund.call(self, paymentOptions);
-                            } else {
-                                console.error('api-v1.0 payNotify OrderService paid err:', err);
-                                // if err happen
-                                // send sms to dri
-                                var idsStr = 'orderId:' + order.id + ' paymentId:' + paymentId;
-                                dri.sendDRI('[DRI] Fail to update order in order payNotify: ', idsStr, err);
-                            }
-                        }
-                    }); // SchemaBuilderEntity.prototype.save = function(model, helper, callback, skip)
-                }
-            }
-        } else {
-            // not find order by paymentId
-            // *TODO refund or other methods
-            var paymentOptions = options;
-            paymentOptions.paymentId = paymentId;
-            if (!paymentOptions.orderId) {
-                paymentOptions.orderId = order.id;
-            }
-            paymentOptions.refundReason = 3;
-            payRefund.call(self, paymentOptions);
-        }
+
+            self.respond({code:1000, message:'success', "paymentId":paymentId, "price":totalPrice});
+        });
     });
 }
+
+// pay notify
+
+// // common pay notify function
+// function payNotify(paymentId, options){
+//     var self = this;
+//     // order paid
+//     OrderService.get({"paymentId": paymentId}, function(err, order) {
+//         // TODO: log err
+//         if (err) {
+//             console.error('api-v1.0 payNotify OrderService get err:', err);
+//             dri.sendDRI('[DRI] Fail to get order in order payNotify: ', 'paymentId:'+paymentId, err);
+//         }
+//         if (order) {
+//             var payment = {paymentId: paymentId};
+//             if (options && options.price) {
+//                 payment.price = parseFloat(parseFloat(options.price).toFixed(2));
+//             }
+//             var result = OrderService.judgePaymentRefund(order, payment);
+//             if (result && result.refund) {
+//                 var paymentOptions = options;
+//                 paymentOptions.paymentId = paymentId;
+//                 if (!paymentOptions.orderId) {
+//                     paymentOptions.orderId = order.id;
+//                 }
+//                 if (result.refundReason) {
+//                     paymentOptions.refundReason = result.refundReason;
+//                 }
+//                 payRefund.call(self, paymentOptions);
+//             } else {
+//                 if ((order.payStatus||PAYMENTSTATUS.UNPAID) == PAYMENTSTATUS.UNPAID || order.payStatus == PAYMENTSTATUS.PARTPAID) {
+//                     OrderService.paid(order.id, paymentId, options, function(err, result) {
+//                         if (err) {
+//                             if (result && result.refund) {
+//                                 // *TODO refund
+//                                 var paymentOptions = options;
+//                                 paymentOptions.paymentId = paymentId;
+//                                 if (!paymentOptions.orderId) {
+//                                     paymentOptions.orderId = order.id;
+//                                 }
+//                                 if (result.refundReason) {
+//                                     paymentOptions.refundReason = result.refundReason;
+//                                 }
+//                                 payRefund.call(self, paymentOptions);
+//                             } else {
+//                                 console.error('api-v1.0 payNotify OrderService paid err:', err);
+//                                 // if err happen
+//                                 // send sms to dri
+//                                 var idsStr = 'orderId:' + order.id + ' paymentId:' + paymentId;
+//                                 dri.sendDRI('[DRI] Fail to update order in order payNotify: ', idsStr, err);
+//                             }
+//                         }
+//                     }); // SchemaBuilderEntity.prototype.save = function(model, helper, callback, skip)
+//                 }
+//             }
+//         } else {
+//             // not find order by paymentId
+//             // *TODO refund or other methods
+//             var paymentOptions = options;
+//             paymentOptions.paymentId = paymentId;
+//             if (!paymentOptions.orderId) {
+//                 paymentOptions.orderId = order.id;
+//             }
+//             paymentOptions.refundReason = 3;
+//             payRefund.call(self, paymentOptions);
+//         }
+//     });
+
+//     // pay success log
+//     var payLog = options;
+//     payLog.paymentId = paymentId;
+//     OrderService.savePaidLog(payLog);
+// }
 
 // alipay notify function
 function alipayNotify() {
     var self = this;
+    console.log('alipayNotify body:', self.body);
     var qs = require('querystring');
     var body = qs.parse(self.body);
     
     AlipayNotify.verifyNotify(body, function(isValid) {
         if (!isValid) {
+            console.error('alipayNotify verification failure:', isValid, ' body:', body);
             return;
         }
 
+        // 支付ID
         var paymentId = body.out_trade_no;
         var status = body.trade_status;
         var price = body.total_fee || null;
         if (status == 'TRADE_SUCCESS') {
+            // 当前接收的时间
             var options = {payType:PAYTYPE.ZHIFUBAO, datePaid: new Date()};
             if (price) {
                 options.price = price;
             }
+            // Alipay 流水号
             if (body.trade_no) {
                 options.queryId = body.trade_no;
             }
+            // 支付ID对应我们的订单号
             if (body.extra_common_param && body.extra_common_param.length > 0) {
                 var extra_common_param = JSON.parse(body.extra_common_param);
                 if (extra_common_param && extra_common_param.orderId) {
                     options.orderId = extra_common_param.orderId;
                 }
             }
+            // Alipay 回调的时间
             if (body.notify_time) {
                 options.notify_time = body.notify_time;
             }
-            payNotify.call(self, paymentId, options);
+            OrderService.payNotify(paymentId, options);
+            // payNotify.call(self, paymentId, options);
             self.content('success');
             // // alipay success log
             // var payLog = options;
@@ -347,6 +388,7 @@ function alipayNotify() {
 function unionpayNotify() {
     var self = this;
 
+    console.log('unionpayNotify body:', self.body);
     if (!self.body) {
         console.error('unionpayNotify cannot get unionpay notification body');
     }
@@ -382,15 +424,20 @@ function unionpayNotify() {
         if (result.substring(0, 'success'.length) === 'success') {
             if (body['respCode'] === 00 || body['respCode'] === '00') {
                 var paymentInfo = JSON.parse(new Buffer(body.reqReserved, 'base64').toString());
+                // 支付ID
                 var paymentId = body.orderId || paymentInfo.paymentId;
+                // 支付ID对应我们的订单号  当前接收的时间
                 var options = {price: (parseFloat(body.txnAmt)/100).toFixed(2), orderId:paymentInfo.orderId, payType:PAYTYPE.UNIONPAY, datePaid: new Date()};
+                // Unionpay 回调的时间
                 if (body.txnTime) {
                     options.notify_time = moment(body.txnTime,"YYYYMMDDHHmmss").format("YYYY-MM-DD HH:mm:ss");
                 }
+                // Unionpay 流水号
                 if (body.queryId) {
                     options.queryId = body.queryId;
                 }
-                payNotify.call(self, paymentId, options);
+                OrderService.payNotify(paymentId, options);
+                // payNotify.call(self, paymentId, options);
                 self.content('success');
                 // update the third-party platform payment
                 OrderService.updateThirdpartyPayment(paymentId);
@@ -409,7 +456,61 @@ function unionpayNotify() {
     });
 }
 
-// pay refund no
+// RSC offline pay notify function
+function process_RSC_confirm_OfflinePay(){
+    var self = this;
+    var paymentId = self.data.paymentId;
+    var offlinePayType = self.data.offlinePayType;
+    var RSC = self.user;
+    if(!paymentId){
+        self.respond({code:1001, message:'paymentId required'});
+        return;
+    }
+
+    if(!offlinePayType){
+        self.respond({code:1001, message:'offlinePayType required'});
+        return;
+    }
+
+    OrderService.get({"paymentId": paymentId}, function(err, order) {
+        if (err) {
+            self.respond({code:1002, message:'获取订单失败'});
+            return;
+        }
+
+        if(!order.RSCInfo || order.RSCInfo.RSC.toString() != RSC._id.toString()){
+            self.respond({code:1002, message:'该订单未分配到县级网点'});
+            return;
+        }
+
+        if(!order.pendingApprove){
+            self.respond({code:1002, message:'该订单没有待审核的线下支付'});
+            return;
+        }
+
+        var payment = OrderService.getPaymentInOrder(order, paymentId);
+        if(!payment){
+            self.respond({code:1002, message:'确认付款失败'});
+            return;
+        }
+
+        var options = {payType:offlinePayType, price:payment.payPrice ? payment.payPrice : payment.price, datePaid:new Date()};
+        if (RSC && RSC.RSCInfo) {
+            options.RSC = {'_id':RSC._id, 'RSCInfo': RSC.RSCInfo};
+        }
+
+        OrderService.payNotify(paymentId, options);
+        // payNotify.call(self, paymentId, options);
+        self.respond({code:1000, message:'success'});
+    });
+}
+
+function json_offline_pay_type(){
+    var self = this;
+    self.respond({code:1000, message:'success', offlinePayType:OFFLINEPAYTYPE});
+}
+
+// pay refund notify
 
 // alipay refund notify
 function alipayRefundNotify() {
@@ -572,51 +673,112 @@ function unionpayRefundNotify() {
 //     });
 // }
 
-// pay refund
-function payRefund(options) {
-    var self = this;
-    if (options) {
-        PayService.savePaymentRefund(options, function(err, orderPaymentRefund) {
-            if (err) {
-                console.error('payRefund PayService save err:', err);
-                console.error(orderPaymentRefund);
-            } else {
-                console.log(orderPaymentRefund);
-            }
-            // if (orderPaymentRefund && orderPaymentRefund.refundReason !== 3) {
-            //     // TODO refund
-            //     // console.log(orderPaymentRefund);
-            //     if (orderPaymentRefund.payType === PAYTYPE.ZHIFUBAO) {
-            //         console.log('zhifubao refund:', orderPaymentRefund);
-            //         var type = 'nopwd';
-            //         PayService.alipayRefund(type, orderPaymentRefund, function(err, result) {
-            //            if (err) {
-            //                console.error('payRefund PayService alipayRefundNopwd err:', err);
-            //                return;
-            //            }
-            //            console.log(result);
-            //        });
-            //     } else if (orderPaymentRefund.payType === PAYTYPE.UNIONPAY) {
-            //        // console.log(orderPaymentRefund);
-            //        PayService.unionpayRefund(orderPaymentRefund, function(err, result) {
-            //             if (err) {
-            //                 console.error('payRefund PayService unionpayRefund err:', err);
-            //                 return;
-            //             }
-            //             if (result) {
-            //                 console.log(result);
-            //             }
-            //             return;
-            //        });
-            //     }
-            // }
-        });
-    }
-}
+// // pay refund
+// function payRefund(options) {
+//     var self = this;
+//     if (options) {
+//         PayService.savePaymentRefund(options, function(err, orderPaymentRefund) {
+//             if (err) {
+//                 console.error('payRefund PayService save err:', err);
+//                 console.error(orderPaymentRefund);
+//             } else {
+//                 console.log(orderPaymentRefund);
+//             }
+//             // if (orderPaymentRefund && orderPaymentRefund.refundReason !== 3) {
+//             //     // TODO refund
+//             //     // console.log(orderPaymentRefund);
+//             //     if (orderPaymentRefund.payType === PAYTYPE.ZHIFUBAO) {
+//             //         console.log('zhifubao refund:', orderPaymentRefund);
+//             //         var type = 'nopwd';
+//             //         PayService.alipayRefund(type, orderPaymentRefund, function(err, result) {
+//             //            if (err) {
+//             //                console.error('payRefund PayService alipayRefundNopwd err:', err);
+//             //                return;
+//             //            }
+//             //            console.log(result);
+//             //        });
+//             //     } else if (orderPaymentRefund.payType === PAYTYPE.UNIONPAY) {
+//             //        // console.log(orderPaymentRefund);
+//             //        PayService.unionpayRefund(orderPaymentRefund, function(err, result) {
+//             //             if (err) {
+//             //                 console.error('payRefund PayService unionpayRefund err:', err);
+//             //                 return;
+//             //             }
+//             //             if (result) {
+//             //                 console.log(result);
+//             //             }
+//             //             return;
+//             //        });
+//             //     }
+//             // }
+//         });
+//     }
+// }
 
 // pay success
 
 // alipay success front page view
 function aliPaySuccess(){
     this.view('alipaySuccess', null);
+}
+
+function EPOSPay(){
+    var self = this;
+    self.payType = PAYTYPE.EPOS;
+    payOrder.call(this, function(paymentId, totalPrice, ip, orderId, payment) {
+        self.respond({code:1000, message:'success', "paymentId":paymentId, "price":totalPrice});
+    });
+}
+
+function process_EPOSNotify(){
+    var self = this;
+    var params = self.data.params;
+    var signature = self.data.signature;
+    var decryptedParams = JSON.parse(EPOSNotify.decryptParams(params));
+    if(EPOSNotify.verifySignature(params, signature)){
+        var memo = EPOSNotify.buildMemo(decryptedParams.memo);
+        if(!memo || !memo['商户订单号'] || !memo['商户支付号']){
+            self.content('bad notify');
+            return;
+        }
+
+        // 支付ID
+        var paymentId = memo['商户支付号'];
+        var status = decryptedParams.dealStatus;
+        var price = (decryptedParams.amount/100) || 0;
+        // 支付ID对应我们的订单号
+        var orderId = memo['商户订单号'];
+        // EPOS 回调的时间(目前是用户受卡时间，暂当做回调时间)
+        var notify_time = new Date(decryptedParams.dealDate + ' ' + decryptedParams.dealTime);
+        // 当前接收的时间
+        var currentTime = new Date();
+        // EPOS 设备号
+        var EPOSNo = decryptedParams.deviceId;
+        // EPOS 流水号
+        var queryId = decryptedParams.orderId;
+
+        if(status == 1) {
+            // paid successfully
+            var options = {payType: PAYTYPE.EPOS, price: price, datePaid: currentTime, orderId: orderId, notify_time:notify_time, queryId: queryId};
+            if (EPOSNo) {
+                options.EPOSNo = EPOSNo;
+                UserService.getRSCInfoByEPOSNo(EPOSNo, function(err, RSC) {
+                    if(err) console.error('pay process_EPOSNotify UserService getRSCInfoByEPOSNo err:', err, 'EPOSNo: '+EPOSNo);
+                    if (!RSC) {
+                        console.error('pay process_EPOSNotify UserService getRSCInfoByEPOSNo not find RSC, EPOSNo:', EPOSNo);
+                    } else {
+                        options.RSC = RSC;
+                    }
+                    OrderService.payNotify(paymentId, options);
+                });
+            } else {
+                OrderService.payNotify(paymentId, options);
+            }
+            // payNotify.call(self, paymentId, options);
+        }
+
+        self.respond({orderId:orderId, merchantMsgProcessId:0, merchantMsgProcessTime:currentTime, merchantRecMsgProcessState:1});
+    } else{
+        console.info('EPOS notify verification fail');
+    }
 }

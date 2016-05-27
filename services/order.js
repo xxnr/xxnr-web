@@ -7,23 +7,70 @@ var DELIVERSTATUS = require('../common/defs').DELIVERSTATUS;
 var PAYTYPE = require('../common/defs').PAYTYPE;
 var SUBORDERTYPE = require('../common/defs').SUBORDERTYPE;
 var SUBORDERTYPEKEYS = require('../common/defs').SUBORDERTYPEKEYS;
+var DELIVERYTYPENAME = require('../common/defs').DELIVERYTYPENAME;
 var OrderModel = require('../models').order;
 var UseOrdersNumberModel = require('../models').userordersnumber;
+var UserModel = require('../models').user;
 var OrderPaidLog = require('../models').orderpaidlog;
 var moment = require('moment-timezone');
+var DELIVERYTYPE = require('../common/defs').DELIVERYTYPE;
+var converter = require('../common/converter');
+var api10 = converter.api10;
+var mongoose = require('mongoose');
+var DeliveryCodeModel = require('../models').deliveryCode;
+var umengConfig = require('../configuration/umeng_config');
+var UMENG = MODULE('umeng');
+var PayService = require('../services/pay');
+var dri = require('../common/dri');
 
 // Service
 var OrderService = function(){};
+
+// get orderInfo object of order
+OrderService.prototype.get_orderInfo = function(order) {
+	var self = this;
+    if (!order) {
+        return null;
+    }
+	var deliveryType = order.deliveryType ? order.deliveryType : DELIVERYTYPE.SONGHUO.id;
+    var orderInfo = {
+        'totalPrice':order.price.toFixed(2)                                                     // 总价
+        , 'deposit':order.deposit.toFixed(2)                                                    // 定金
+        , 'dateCreated':order.dateCreated                                                       // 订单创建时间
+        , 'orderStatus': self.orderStatus(order)                                         		// 订单状态
+        , 'deliveryType':{type:deliveryType, value:DELIVERYTYPENAME[deliveryType]}  // 配送方式
+    };
+    // 支付时间
+    if (order.payStatus == PAYMENTSTATUS.PAID && order.datePaid) {
+        orderInfo.datePaid = order.datePaid;
+    }
+    // 待收货时间
+    if (order.payStatus == PAYMENTSTATUS.PAID && order.deliverStatus !== DELIVERSTATUS.UNDELIVERED && order.datePendingDeliver) {
+        orderInfo.datePendingDeliver = order.datePendingDeliver;
+    }
+    // 全部发货时间
+    if (order.deliverStatus == DELIVERSTATUS.DELIVERED && order.dateDelivered) {
+        orderInfo.dateDelivered = order.dateDelivered;
+    }
+    // 完成时间
+    if (order.deliverStatus == DELIVERSTATUS.RECEIVED && order.dateCompleted) {
+        orderInfo.dateCompleted = order.dateCompleted;
+    }
+    return orderInfo;
+}
 
 // Method
 // order type
 OrderService.prototype.orderType = function (order) {
     if (order.payStatus == PAYMENTSTATUS.PAID) {
-        if (order.deliverStatus == DELIVERSTATUS.DELIVERED) {
-            if (order.confirmed) {
-                return 4;
-            }
+		if (order.deliverStatus == DELIVERSTATUS.RECEIVED){
+			return 4;
+		} else if (order.deliverStatus == DELIVERSTATUS.DELIVERED || order.deliverStatus == DELIVERSTATUS.PARTDELIVERED) {
             return 3;
+        } else {
+        	if (order.deliverStatus == DELIVERSTATUS.RSCRECEIVED && order.deliveryType === DELIVERYTYPE.ZITI.id) {
+        		return 3;
+        	}
         }
         return 2;
     } else if (order.payStatus == PAYMENTSTATUS.PARTPAID) {
@@ -36,28 +83,100 @@ OrderService.prototype.orderType = function (order) {
     }
 };
 
-// order status
+// order status for user
 OrderService.prototype.orderStatus = function (order) {
-    if (order.payStatus == PAYMENTSTATUS.PAID) {
-        if (order.deliverStatus == DELIVERSTATUS.DELIVERED) {
-            if (order.confirmed) {
-                return {type:6, value:"已完成"};
-            }
-            return {type:5, value:"已发货"};
-        } else {
-        	if (order.deliverStatus == DELIVERSTATUS.PARTDELIVERED) {
-        		return {type:4, value:"部分发货"};
-        	}
-        	return {type:3, value:"待发货"};
-        }
-    } else if (order.payStatus == PAYMENTSTATUS.PARTPAID) {
-        return {type:2, value:"部分付款"};
-    } else {
-        if (order.isClosed) {
-            return {type:0, value:"交易关闭"};
-        }
-        return {type:1, value:"待付款"};
-    }
+	/**
+	 * User order types
+	 * 0	:	交易关闭
+	 * 1	:	待付款
+	 * 2	:	部分付款
+	 * 3	:	待发货
+	 * 4	:	配送中
+	 * 5	:	待自提
+	 * 6	:	已完成
+	 * 7	:	付款待审核
+	 */
+	if (order.payStatus === PAYMENTSTATUS.PARTPAID) {
+		if (order.pendingApprove) {
+			return {type:7, value:'付款待审核'};
+		} else {
+			return {type:2, value:'部分付款'};
+		}
+	} else if (order.payStatus === PAYMENTSTATUS.PAID) {
+		if (order.deliverStatus === DELIVERSTATUS.RSCRECEIVED) {
+			if (order.deliveryType === DELIVERYTYPE.ZITI.id) {
+				return {type:5, value:'待自提'};
+			} else {
+				return {type:3, value:'待发货'};
+			}
+		} else if(order.deliverStatus === DELIVERSTATUS.RECEIVED){
+			return {type:6, value:'已完成'};
+		} else if(order.deliverStatus === DELIVERSTATUS.PARTDELIVERED || order.deliverStatus === DELIVERSTATUS.DELIVERED) {
+			if (order.deliveryType === DELIVERYTYPE.ZITI.id) {
+				return {type:5, value:'待自提'};
+			} else {
+				return {type:4, value:'配送中'};
+			}
+		} else {
+			return {type:3, value:'待发货'};
+		}
+	} else {
+		if (order.isClosed) {
+			return {type:0, value:'已关闭'};
+		} else if (order.pendingApprove) {
+			return {type:7, value:'付款待审核'};
+		} else {
+			return {type:1, value:'待付款'};
+		}
+	}
+};
+
+// order status for RSC
+OrderService.prototype.RSCOrderStatus = function(order){
+	/**
+	 * RSC order types
+	 * 0    :   已关闭
+	 * 1    :   待付款
+	 * 2    :   付款待审核
+	 * 3    :   待厂家发货
+	 * 4    :   待配送(有一件商品为已到服务站，且配送方式为送货到家, 订单状态为已到服务站)
+	 * 5    :   待自提(有一件商品为已到服务站，且配送方式为自提, 订单状态为已到服务站或部分发货或已发货)
+	 * 6    :   配送中(有一件商品为已发货(配送中),订单状态为部分发货或者已发货)
+	 * 7    :   已完成(全部商品为确认收货)
+	 */
+	if (order.payStatus === PAYMENTSTATUS.PARTPAID) {
+		if (order.pendingApprove) {
+			return {type:2, value:'付款待审核'};
+		} else {
+			return {type:1, value:'待付款'};
+		}
+	} else if (order.payStatus === PAYMENTSTATUS.PAID) {
+		if (order.deliverStatus === DELIVERSTATUS.RSCRECEIVED) {
+			if (order.deliveryType === DELIVERYTYPE.ZITI.id) {
+				return {type:5, value:'待自提'};
+			} else {
+				return {type:4, value:'待配送'};
+			}
+		} else if (order.deliverStatus === DELIVERSTATUS.RECEIVED){
+			return {type:7, value:'已完成'};
+		} else if (order.deliverStatus === DELIVERSTATUS.PARTDELIVERED || order.deliverStatus === DELIVERSTATUS.DELIVERED) {
+			if (order.deliveryType === DELIVERYTYPE.ZITI.id) {
+				return {type:5, value:'待自提'};
+			} else {
+				return {type:6, value:'配送中'};
+			}
+		} else {
+			return {type:3, value:'待厂家发货'};
+		}
+	} else {
+		if (order.isClosed) {
+			return {type:0, value:'已关闭'};
+		} else if (order.pendingApprove) {
+			return {type:2, value:'付款待审核'};
+		} else {
+			return {type:1, value:'待付款'};
+		}
+	}
 };
 
 // Method
@@ -75,6 +194,8 @@ OrderService.prototype.query = function(options, callback) {
 
 	if (options.page < 0)
 		options.page = 0;
+	if(options.max > 50)
+        options.max = 50;
 
 	var take = U.parseInt(options.max);
 	var skip = U.parseInt(options.page * options.max);
@@ -103,20 +224,36 @@ OrderService.prototype.query = function(options, callback) {
     }
 	// paid and not delivered
 	if (type === 2) {
-		mongoOptions["payStatus"] = { $eq: PAYMENTSTATUS.PAID };
-		mongoOptions["deliverStatus"] = { $eq: DELIVERSTATUS.UNDELIVERED };
+		// old
+		// mongoOptions["payStatus"] = { $eq: PAYMENTSTATUS.PAID };
+		// mongoOptions["deliverStatus"] = { $eq: DELIVERSTATUS.UNDELIVERED };
+		// new
+		mongoOptions["$or"] = [{payStatus: { $eq: PAYMENTSTATUS.PAID }, deliverStatus: { $eq: DELIVERSTATUS.UNDELIVERED }}, 
+								{payStatus: { $eq: PAYMENTSTATUS.PAID }, deliveryType: { $eq: DELIVERYTYPE.SONGHUO.id }, deliverStatus: { $eq: DELIVERSTATUS.RSCRECEIVED }}];
 	}
 	// paid and delivered(including: part delivered)
 	if (type === 3) {
-		mongoOptions["confirmed"] = { $ne: true };
-		mongoOptions["payStatus"] = { $eq: PAYMENTSTATUS.PAID };
-		mongoOptions["deliverStatus"] = { $ne: DELIVERSTATUS.UNDELIVERED };
+		// old
+		// mongoOptions["payStatus"] = { $eq: PAYMENTSTATUS.PAID };
+		// mongoOptions["deliverStatus"] = { $in: [DELIVERSTATUS.PARTDELIVERED, DELIVERSTATUS.DELIVERED, DELIVERSTATUS.RSCRECEIVED] };
+		// new
+		mongoOptions["$or"] = [{payStatus: { $eq: PAYMENTSTATUS.PAID }, deliverStatus: { $in: [DELIVERSTATUS.PARTDELIVERED, DELIVERSTATUS.DELIVERED] }}, 
+								{payStatus: { $eq: PAYMENTSTATUS.PAID }, deliveryType: { $eq: DELIVERYTYPE.ZITI.id }, deliverStatus: { $eq: DELIVERSTATUS.RSCRECEIVED }}];
 	} 
 	// Completed
 	if (type === 4) {
-		mongoOptions["confirmed"] = { $eq: true };
 		mongoOptions["payStatus"] = { $eq: PAYMENTSTATUS.PAID };
-		mongoOptions["deliverStatus"] = { $eq: DELIVERSTATUS.DELIVERED };
+		mongoOptions["deliverStatus"] = { $eq: DELIVERSTATUS.RECEIVED };
+	}
+	// need deliver to RSC
+	if (type === 5) {
+		mongoOptions["$or"] = [{payStatus: { $eq: PAYMENTSTATUS.PARTPAID }, depositPaid: { $eq: true }, SKUs: { $elemMatch: { deliverStatus: { $eq: DELIVERSTATUS.UNDELIVERED } } }}, 
+								{payStatus: { $eq: PAYMENTSTATUS.PAID }, SKUs: { $elemMatch: { deliverStatus: { $eq: DELIVERSTATUS.UNDELIVERED } } }}];
+	}
+	// pendingApprove
+	if (type === 6) {
+		mongoOptions["$or"] = [{isClosed: { $ne: true }, payStatus: { $eq: PAYMENTSTATUS.UNPAID }, pendingApprove: { $eq: true }}, 
+								{payStatus: { $ne: PAYMENTSTATUS.UNPAID }, pendingApprove: { $eq: true }}];
 	}
 
 	if (options.buyer) {
@@ -228,6 +365,232 @@ OrderService.prototype.add = function(options, callback) {
 
 };
 
+// 拆单（定金的商品和全款的商品拆分支付），并提交订单
+/**
+ * split orders because skus have deposit or full price
+ * @param  {object}   options  the skus infos
+ * @param  {Function} callback callback function
+ * @return {null}
+ */
+OrderService.prototype.splitAndaddOrder = function(options, callback) {
+	var self = this;
+    var orders = {};
+    var orderSKUs = [];
+    var payType = options.payType || PAYTYPE.ZHIFUBAO;
+    var addressInfo = null;
+    var RSCInfo = null;
+    if (!options.user) {
+    	callback("用户不存在");
+        return;
+    }
+    if (!options.SKU_items) {
+    	callback("购物车为空");
+        return;
+    }
+    // different deliveryType different address
+    if (options.deliveryType && options.deliveryType === DELIVERYTYPE['SONGHUO'].id) {
+    	if (!options.addressInfo) {
+            callback("请先填写收货地址");
+            return;
+        }
+    } else if (options.deliveryType && options.deliveryType === DELIVERYTYPE['ZITI'].id) {
+    	if (!options.consigneeName) {
+            callback("请先填写收货人姓名");
+            return;
+        }
+        if (!options.consigneePhone) {
+            callback("请先填写收货人手机号");
+            return;
+        }
+        if (!options.RSCInfo || !options.RSCId) {
+            callback("请先选择自提点");
+            return;
+        }
+    } else {
+        callback("请先选择正确的配送方式");
+        return;
+    }
+
+    // push skus to orders
+    for (var i=0; i<options.SKU_items.length; i++) {
+        var SKU = options.SKU_items[i].SKU;
+        var product = options.SKU_items[i].product;
+        if (!product.online) {
+        	callback('无法添加下架商品');
+            return;
+        }
+
+        if (!SKU.online) {
+        	callback('无法添加下架SKU');
+            return;
+        }
+    	
+    	var result = self.pushSKUtoOrders(orders, options.SKU_items[i], options);
+    	if (result && result.length >= 2) {
+	    	orders = result[0];
+	    	var SKU_to_add = result[1];
+	    	// need remove SKUs from shopcart
+	        orderSKUs.push(SKU_to_add);
+	    } else {
+	    	callback('保存SKU失败');
+            return;
+	    }
+    }
+
+    // split orders then save
+    var keys = Object.keys(orders);
+    if (orders && keys.length > 0) {
+        var order1, order2;
+        if (orders['deposit']) {
+            orders['deposit'].duePrice = orders['deposit'].deposit;
+            order1 = orders['deposit'];
+            if (orders['full']) {
+                orders['full'].duePrice = orders['full'].price;
+                order2 = orders['full'];
+            }
+        } else if (orders['full']) {
+            orders['full'].duePrice = orders['full'].price;
+            order1 = orders['full'];
+        }
+        if (order1) {
+            try {
+                self.add(order1, function(err, data, payment) {
+                    if (err || !data) {
+                        if (err) console.error('Order Service splitAndaddOrder order1 add err:', err);
+                        callback('保存订单出错');
+                        return;
+                    }
+                    var resultOrders = [];
+                    var result = {'id': data.id, 'price':data.price.toFixed(2), 'deposit': data.deposit.toFixed(2), 'SKUs':data.SKUs || []};
+                    if (payment) {
+                        result.payment = {'paymentId':payment.id, 'price':payment.price.toFixed(2)};
+                    }
+                    resultOrders.push(result);
+
+                    var orderId = data.id;
+                    var paymentId = payment && payment.id ? payment.id : data.paymentId;
+                    var price = data.price;
+                    var payPrice = payment && typeof(payment.price) != 'undefined' ? payment.price : data.deposit && data.deposit > 0 ? data.deposit : data.price;
+                    var response = {'code':1000, 'id': data.id, 'paymentId':paymentId, 'price':data.price.toFixed(2), 'deposit':payPrice.toFixed(2)};
+                    if (order2) {
+                        self.add(order2, function(err, data, payment) {
+                            if (err || !data) {
+                                if (err) console.error('Order Service splitAndaddOrder order2 add err:', err);
+                                callback('保存订单出错');
+                                self.remove({id:orderId}, function(err) {
+                                    if (err) {
+                                        console.error('Order Service splitAndaddOrder remove order1 err:', err);
+                                    }
+                                });
+                                return;
+                            }
+                            result = {'id': data.id, 'price':data.price.toFixed(2), 'deposit': data.deposit.toFixed(2), 'SKUs':data.SKUs || []};
+                            if (payment) {
+                                result.payment = {'paymentId':payment.id, 'price':payment.price.toFixed(2)};
+                            }
+                            resultOrders.push(result);
+                            response['orders'] = resultOrders;
+                            callback(null, response, orderSKUs);
+                            return;
+                        });
+                    } else {
+                        response['orders'] = resultOrders;
+                        callback(null, response, orderSKUs);
+                        return;
+                    }
+                });
+            } catch (e) {
+                console.error('Order Service splitAndaddOrder orders err:', e);
+                callback('保存订单出错');
+                return;
+            }
+        } else {
+            console.error('Order Service splitAndaddOrder err: not get the order..');
+            callback('没有要保存的订单');
+            return;
+        }
+    } else {
+        console.error('Order Service splitAndaddOrder err: no orders info..');
+        callback('获取订单信息出错');
+        return;
+    }
+};
+
+/**
+ * push SKU info into saving orders
+ * @param  {object} orders   the order info
+ * @param  {object} SKU_item sku item info
+ * @param  {object} options  input datas
+ * @return {array}  return orders and sku info [orders, sku_to_add]
+ */
+OrderService.prototype.pushSKUtoOrders = function (orders, SKU_item, options) {
+	var SKU = SKU_item.SKU;
+	var product = SKU_item.product;
+	var additions = SKU_item.additions;
+    var additionPrice = 0;
+    additions.forEach(function(addition) {
+        additionPrice += addition.price;
+        if (!addition.ref) {
+            addition.ref = addition._id;
+        }
+        
+        delete addition._id;
+    });
+    product = api10.convertProduct(product);
+    var SKU_to_add = {
+    	ref: SKU._id,
+    	productId: product.id,
+        price: SKU.price.platform_price,
+        deposit: product.deposit,
+        productName: product.name,
+        name: SKU.name,
+        thumbnail: product.thumbnail,
+        count: SKU_item.count,
+        category: product.category,
+        attributes: SKU.attributes
+    };
+    if (additions && additions.length > 0) {
+        SKU_to_add.additions = additions;
+    }
+
+    var orderKey = "full";
+    if (SKU_to_add.deposit) {
+    	orderKey = "deposit";
+    }
+    if (!orders[orderKey]) {
+        orders[orderKey] = {
+            "buyerName":options.user.name,
+            "buyerPhone":options.user.account,
+            "buyerId":options.user.id,
+            "price":0,
+            "deposit":0,
+            "SKUs":[],
+            "payType":options.payType || PAYTYPE.ZHIFUBAO,
+            "payStatus":PAYMENTSTATUS.UNPAID,
+            "deliverStatus":DELIVERSTATUS.UNDELIVERED
+        };
+        orders[orderKey].id = U.GUID(10);
+        orders[orderKey].paymentId = U.GUID(10);
+        if (options.deliveryType === DELIVERYTYPE['ZITI'].id) {
+        	orders[orderKey].RSCInfo = options.RSCInfo;
+        	orders[orderKey].consigneeName = options.consigneeName;
+            orders[orderKey].consigneePhone = options.consigneePhone;
+            orders[orderKey].deliveryType = DELIVERYTYPE['ZITI'].id;
+        } else {
+        	orders[orderKey].consigneeName = options.addressInfo.consigneeName;
+            orders[orderKey].consigneePhone = options.addressInfo.consigneePhone;
+            orders[orderKey].consigneeAddress = options.addressInfo.consigneeAddress;
+            orders[orderKey].deliveryType = DELIVERYTYPE['SONGHUO'].id;
+        }
+    }
+    orders[orderKey].price +=  SKU_to_add.count * (SKU_to_add.price+additionPrice);
+    if (SKU_to_add.deposit) {
+    	orders[orderKey].deposit += SKU_to_add.count * SKU_to_add.deposit;
+    }
+    orders[orderKey].SKUs.push(SKU_to_add);
+    return [orders, SKU_to_add];
+}
+
 // Gets a specific order
 OrderService.prototype.get = function(options, callback) {
 	// options.id {String}
@@ -245,6 +608,10 @@ OrderService.prototype.get = function(options, callback) {
 
 	if (options.paymentId) {
 		nor.push({'payments.id':{$ne:options.paymentId}});
+	}
+
+	if(options.RSC){
+		nor.push({'RSCInfo.RSC':{$ne:options.RSC}});
 	}
 
 	var mongoOptions = {};
@@ -302,9 +669,6 @@ OrderService.prototype.updateProducts = function(options, callback) {
 			});
 			// check order deliver status
 			var order = self.checkDeliverStatus(doc);
-			if (parseInt(order.deliverStatus) === DELIVERSTATUS.DELIVERED) {
-				order.dateDelivered = new Date();
-			}
 			order.save(function(err) {
 				if (err) {
 					callback(err);
@@ -324,6 +688,8 @@ OrderService.prototype.updateSKUs = function(options, callback) {
 
 	// check order deliverStatus by all SKUs
 	var self = this;
+	var RSCReceived = false;
+	var newReceivedSKUs = [];
 	OrderModel.findOne({ id: options.id }, function (err, doc) {
 		if (err) {
 			callback(err);
@@ -333,17 +699,26 @@ OrderService.prototype.updateSKUs = function(options, callback) {
 			doc.SKUs.forEach(function (sku) {
 				if (options.SKUs[sku.ref] && sku.deliverStatus !== options.SKUs[sku.ref].deliverStatus) {
 					sku.deliverStatus = options.SKUs[sku.ref].deliverStatus;
-					sku.dateSet = new Date();
 					if (sku.deliverStatus === DELIVERSTATUS.DELIVERED) {
 						sku.dateDelivered = new Date();
+					}
+					if (sku.deliverStatus === DELIVERSTATUS.RSCRECEIVED) {
+						sku.dateRSCReceived = new Date();
+						RSCReceived = true;
+						newReceivedSKUs.push(sku);
+					}
+					if (sku.deliverStatus === DELIVERSTATUS.RECEIVED) {
+						sku.dateConfirmed = new Date();
+					}
+					if (options.backendUser) {
+						sku.dateSet = new Date();
+						sku.backendUser = options.backendUser._id;
+						sku.backendUserAccount = options.backendUser.account;
 					}
 				}
 			});
 			// check order deliver status
 			var order = self.checkDeliverStatus(doc);
-			if (parseInt(order.deliverStatus) === DELIVERSTATUS.DELIVERED) {
-				order.dateDelivered = new Date();
-			}
 			order.save(function(err) {
 				if (err) {
 					callback(err);
@@ -352,10 +727,70 @@ OrderService.prototype.updateSKUs = function(options, callback) {
 
 				callback(null);
 			});
+
+			if (RSCReceived) {
+				if (doc.deliveryType == DELIVERYTYPE.ZITI.id && doc.payStatus == PAYMENTSTATUS.PAID) {
+					self.generateDeliveryCodeandNotify(doc, newReceivedSKUs);
+				} else if (doc.payStatus !== PAYMENTSTATUS.PAID) {
+					// 有商品到服务站，通知用户付款
+					self.umengSendCustomizedcast(umengConfig.types.pay, order.buyerId, 'user', {orderId: order.id});
+				} else {
+					// 已付款的配送到户订单有商品到服务站，通知RSC配送
+					if (doc.deliveryType == DELIVERYTYPE.SONGHUO.id && doc.payStatus == PAYMENTSTATUS.PAID && order.RSCInfo) {
+						self.umengSendCustomizedcast(umengConfig.types.delivery, order.RSCInfo.RSC, 'RSC', {orderId: order.id});
+					}
+				}
+			}
 		} else {
 			callback('未查找到订单');
 		}
 	});
+};
+
+OrderService.prototype.generateDeliveryCodeandNotify = function(order, newArrivedSKUs, callback){
+	var self = this;
+	DeliveryCodeModel.findOne({orderId:order.id}, function(err, deliveryCode){
+		if(!err){
+			var newSKUReceivedProcessor = function(){
+				if(callback){
+					DeliveryCodeModel.findOne({orderId:order.id}, function(err, deliveryCode){
+						if(err){
+							callback(err);
+							return;
+						}
+
+						callback(null, deliveryCode);
+					})
+				}
+
+				if(newArrivedSKUs){
+					// umeng send message to app
+					// 付款完成自提订单有商品到服务站，通知用户自提
+					self.umengSendCustomizedcast(umengConfig.types.ziti, order.buyerId, 'user', {orderId: order.id});
+					// 付款完成自提订单有商品到服务站，通知RSC提前准备自提商品
+					if (order.RSCInfo) {
+						self.umengSendCustomizedcast(umengConfig.types.ziti, order.RSCInfo.RSC, 'RSC', {orderId: order.id});
+					}
+				}
+			};
+
+			if(!deliveryCode || !deliveryCode.code){
+				// generate code and insert
+				var code = tools.generateAuthCode(7);
+				var newDeliveryCode = new DeliveryCodeModel({orderId:order.id, code: code});
+				newDeliveryCode.save(function(err){
+					if(err && 11000 != err.code){
+						// if error is dup key err, it means we already has one record, we don't need to insert
+						console.error(err);
+					}
+
+					newSKUReceivedProcessor();
+				})
+			} else{
+				newSKUReceivedProcessor();
+			}
+		}
+	})
 };
 
 // Updates specific order payments
@@ -381,10 +816,12 @@ OrderService.prototype.updatePayments = function(options, callback) {
 							}
 						}
 						if (payment.payType !== options.payments[payment.id].payType) {
+							needCheck = true;
 							payment.payType = options.payments[payment.id].payType;
 						}
-						payment.dateSet = new Date();
+
 						if (options.backendUser) {
+							payment.dateSet = new Date();
 							payment.backendUser = options.backendUser._id;
 							payment.backendUserAccount = options.backendUser.account;
 						}
@@ -402,6 +839,7 @@ OrderService.prototype.updatePayments = function(options, callback) {
 					self.checkPayStatus({order:doc}, function(err, order, payment) {
 						if (err)
 							console.error('OrderService updatePayments checkPayStatus err: ' + err);
+
 					});
 				}
 			});
@@ -476,12 +914,24 @@ OrderService.prototype.paid = function(id, paymentId, options, callback) {
 
 	// Updates database file
 	// OrderModel.update({id:id}, {$set:{payStatus:PAYMENTSTATUS.PAID, datepaid:new Date()}}, function(err, count) {
-	var values = {'payments.$.payStatus':PAYMENTSTATUS.PAID, 'payments.$.datePaid':new Date()};
+	var values = {'payments.$.payStatus':PAYMENTSTATUS.PAID, 'payments.$.datePaid':new Date(), pendingApprove:false};
 	if (options && options.price) {
 		values['payments.$.price'] = parseFloat(parseFloat(options.price).toFixed(2));
 	}
 	if (options && options.payType) {
 		values['payments.$.payType'] = options.payType;
+	}
+	if (options.backendUser) {
+		values['payments.$.dateSet'] = new Date();
+		values['payments.$.backendUser'] = options.backendUser._id;
+		values['payments.$.backendUserAccount'] = options.backendUser.account;
+	}
+	if (options.RSC && options.RSC._id && options.RSC.RSCInfo) {
+		values['payments.$.RSC'] = options.RSC._id;
+		values['payments.$.RSCCompanyName'] = options.RSC.RSCInfo.companyName;
+	}
+	if (options.EPOSNo) {
+		values['payments.$.EPOSNo'] = options.EPOSNo;
 	}
 	// find and update the payment not PAID
 	var query = { id: id, payments: { $elemMatch: { id: paymentId, payStatus: { $ne: PAYMENTSTATUS.PAID } } } };
@@ -509,27 +959,72 @@ OrderService.prototype.paid = function(id, paymentId, options, callback) {
 
 
 // Sets order to confirmed 
-OrderService.prototype.confirm = function(id, callback) {
+OrderService.prototype.confirm = function(orderId, SKURefs, callback) {
+	var self = this;
+	if(!orderId){
+		callback('orderId required');
+		return;
+	}
 
-	// Updates database file
-	OrderModel.update({id:id}, {$set:{confirmed: true, dateCompleted: new Date()}}, function(err, count) {
-		if (err) {
-            callback(err);
-            return;
-        }
+	if(!SKURefs){
+		callback('SKURefs required');
+		return;
+	}
 
-        if (count.n == 0) {
-            callback('订单不存在');
-            return;
-        }
+	OrderModel.findOne({id:orderId}, function(err, order){
+		if(err){
+			console.error(err);
+			callback('查询订单失败');
+			return;
+		}
 
-        callback(null);
+		if(!order){
+			callback('未找到订单');
+			return;
+		}
+
+		// 是否有商品收货
+		var isConfirmed = false;
+		var allConfirmed = true;
+		order.SKUs.forEach(function (sku) {
+			if (SKURefs.indexOf(sku.ref.toString()) != -1 && sku.deliverStatus == DELIVERSTATUS.DELIVERED) {
+				sku.deliverStatus = DELIVERSTATUS.RECEIVED;
+				sku.dateConfirmed = new Date();
+				isConfirmed = true;
+			}
+
+			if(sku.deliverStatus != DELIVERSTATUS.RECEIVED){
+				allConfirmed = false;
+			}
+		});
+
+		if(allConfirmed){
+			order.deliverStatus = DELIVERSTATUS.RECEIVED;
+			order.dateCompleted = new Date();
+		}
+
+		order.save(function(err) {
+			if (err) {
+				console.error(err);
+				callback('保存订单失败');
+				return;
+			}
+
+			callback(null);
+		});
+		if (isConfirmed) {
+			// 自提订单有商品被自提，通知用户
+			if (order.deliveryType == DELIVERYTYPE.ZITI.id) {
+				self.umengSendCustomizedcast(umengConfig.types.zitiDone, order.buyerId, 'user', {orderId: order.id});
+			}
+		}
 	});
 };
 
 // Update order payType
 OrderService.prototype.updatepayType = function(options, callback) {
-
+	var self = this;
+	
 	if (!options.paytype) {
 		callback('请提交支付方式');
 		return;
@@ -553,12 +1048,16 @@ OrderService.prototype.updatepayType = function(options, callback) {
 			return;
 		}
 		callback(null, count.n);
+
+		// update order paystatus
+		self.checkPayStatus({id:options.orderid}, function(err, order, payment) {});
 	});
 };
 
 OrderService.prototype.closeOrders = function(callback) {
     OrderModel.find({isClosed:false}, function(err, orders) {
         var count = 0;
+		var closedPaymentCount = 0;
         var promises = orders.map(function(order) {
             return new Promise(function(resolve, reject) {
                 if(order.payments && order.payments.length > 0) {
@@ -578,6 +1077,7 @@ OrderService.prototype.closeOrders = function(callback) {
                                         return;
                                     }
 
+									closedPaymentCount++;
                                     resolve();
                                 })
                             } else {
@@ -597,6 +1097,7 @@ OrderService.prototype.closeOrders = function(callback) {
                                         return;
                                     }
 
+									count++;
                                     resolve();
                                 })
                             } else {
@@ -613,13 +1114,13 @@ OrderService.prototype.closeOrders = function(callback) {
                     var dayDiff = UTCNow.diff(dateCreated, 'days');
 
                     if (dayDiff >= 3) {
-                        count++;
                         OrderModel.update({_id: order._id}, {$set: {isClosed: true}}, function (err, numAffected) {
                             if (err) {
                                 reject(err);
                                 return;
                             }
 
+							count++;
                             resolve();
                         })
                     } else {
@@ -631,7 +1132,7 @@ OrderService.prototype.closeOrders = function(callback) {
 
         Promise.all(promises)
             .then(function() {
-                callback(null, count);
+                callback(null, count, closedPaymentCount);
             })
             .catch(function() {
                 callback(err)
@@ -680,16 +1181,18 @@ OrderService.prototype.getPayOrderPaymentInfo = function(order, payment, payPric
     var query = {'id':order.id, 'payments.id':payment.id};
     var setValues = {};
     var newPayment = {};
+    var resultPayPrice;
     // pay price is logical
     if (payPrice && (tools.isPrice(payPrice.toString()) && parseFloat(payPrice) && parseFloat(parseFloat(payPrice).toFixed(2)) >= 0.01 && parseFloat(parseFloat(payPrice).toFixed(2)) < payment.price)) {
     	// this payPrice must equal the payment payPrice, avoiding alipay or unionpay created the payment
     	if (payment.payPrice && parseFloat(parseFloat(payment.payPrice).toFixed(2)) == parseFloat(parseFloat(payPrice).toFixed(2))) {
-    		callback(null, payment, payPrice);
+    		// callback(null, payment, payPrice);
     		if (options && options.payType) {
 	        	if (!payment.payType || payment.payType !== options.payType) {
-		            setValues = {'payments.$.payType': options.payType};
+		            setValues = {'payments.$.payType': options.payType, 'payType': options.payType};
 		        }
 		    }
+		    resultPayPrice = payPrice;
     	} else {
     		setValues = {'payments.$.isClosed':true};
          	var paymentOption = {paymentId: U.GUID(10), slice: payment.slice, price: payment.price, suborderId: payment.suborderId};
@@ -704,12 +1207,13 @@ OrderService.prototype.getPayOrderPaymentInfo = function(order, payment, payPric
     } else {
     	// the payment payPrice is null or must equal the payment price, avoiding alipay or unionpay created the payment
     	if (!payment.payPrice || parseFloat(parseFloat(payment.payPrice).toFixed(2)) == parseFloat(parseFloat(payment.price).toFixed(2))) {
-	    	callback(null, payment, payment.price);
+	    	// callback(null, payment, payment.price);
     		if (options && options.payType) {
 	        	if (!payment.payType || payment.payType !== options.payType) {
-		            setValues = {'payments.$.payType': options.payType};
+		            setValues = {'payments.$.payType': options.payType, 'payType': options.payType};
 		        }
 		    }
+		    resultPayPrice = payment.price;
 	    } else {
     		setValues = {'payments.$.isClosed':true};
 			var paymentOption = {paymentId: U.GUID(10), slice: payment.slice, price: payment.price, suborderId: payment.suborderId};
@@ -755,10 +1259,20 @@ OrderService.prototype.getPayOrderPaymentInfo = function(order, payment, payPric
 			        } else {
 			        	callback(null, newPayment, newPayment.price);
 			        }
+			        // update order paystatus
+					self.checkPayStatus({id:order.id}, function(err, order, payment) {});
 			        return;
 			    });
+			} else {
+				callback(null, payment, resultPayPrice);
+				// update order paystatus
+				self.checkPayStatus({id:order.id}, function(err, order, payment) {});
+				return;
 			}
 	    });
+	} else {
+		callback(null, payment, resultPayPrice);
+		return;
 	}
 };
 
@@ -842,10 +1356,6 @@ OrderService.prototype.createPayments = function(order) {
 				}
 			}
 			if (firstsubOrder && firstsubOrder.id && firstsubOrder.price) {
-				// var payment = {'id': order.paymentId || U.GUID(10), 'slice':1, 'price':firstsubOrder.price, 'suborderId':firstsubOrder.id};
-				// if (order.payType)
-				// 	payment.payType = order.payType;
-				// order.payments.push(payment);
 				var payment = self.createPayment({'paymentId':order.paymentId || U.GUID(10),'price':firstsubOrder.price,'suborderId':firstsubOrder.id,'payType':order.payType});
 				if (payment)
 					order.payments.push(payment);
@@ -884,6 +1394,7 @@ OrderService.prototype.createPayment = function(suborderPayment) {
 // Check order deliver status by all products or SKUs deliver status
 OrderService.prototype.checkDeliverStatus = function(order) {
 	var items = null;
+	var oldStatus = order.deliverStatus;
 	if (order && order.SKUs && order.SKUs.length > 0) {
 		items = order.SKUs;
 	} else {
@@ -901,19 +1412,81 @@ OrderService.prototype.checkDeliverStatus = function(order) {
 				continue
 			}
 
-			if (parseInt(item.deliverStatus) === DELIVERSTATUS.UNDELIVERED) {
-				if (order.deliverStatus && (parseInt(order.deliverStatus) === DELIVERSTATUS.DELIVERED || parseInt(order.deliverStatus) === DELIVERSTATUS.PARTDELIVERED))
+			switch(parseInt(order.deliverStatus)){
+				case DELIVERSTATUS.UNDELIVERED:
+					switch(parseInt(item.deliverStatus)){
+						case DELIVERSTATUS.DELIVERED:
+						case DELIVERSTATUS.RECEIVED:
+							order.deliverStatus = DELIVERSTATUS.PARTDELIVERED;
+							break;
+						case DELIVERSTATUS.RSCRECEIVED:
+						case DELIVERSTATUS.UNDELIVERED:
+							order.deliverStatus = item.deliverStatus;
+							break;
+					}
+					break;
+				case DELIVERSTATUS.RSCRECEIVED:
+					switch(parseInt(item.deliverStatus)){
+						case DELIVERSTATUS.DELIVERED:
+						case DELIVERSTATUS.RECEIVED:
+							order.deliverStatus = DELIVERSTATUS.PARTDELIVERED;
+							break;
+						case DELIVERSTATUS.RSCRECEIVED:
+						case DELIVERSTATUS.UNDELIVERED:
+							order.deliverStatus = DELIVERSTATUS.RSCRECEIVED;
+							break;
+					}
+					break;
+				case DELIVERSTATUS.DELIVERED:
+					switch(parseInt(item.deliverStatus)) {
+						case DELIVERSTATUS.DELIVERED:
+						case DELIVERSTATUS.RECEIVED:
+							order.deliverStatus = DELIVERSTATUS.DELIVERED;
+							break;
+						case DELIVERSTATUS.RSCRECEIVED:
+						case DELIVERSTATUS.UNDELIVERED:
+							order.deliverStatus = DELIVERSTATUS.PARTDELIVERED;
+							break;
+					}
+					break;
+				case DELIVERSTATUS.PARTDELIVERED:
 					order.deliverStatus = DELIVERSTATUS.PARTDELIVERED;
-				else
-					order.deliverStatus = DELIVERSTATUS.UNDELIVERED;
-			} else {
-				if (parseInt(item.deliverStatus) === DELIVERSTATUS.DELIVERED) {
-					if (order.deliverStatus && (parseInt(order.deliverStatus) === DELIVERSTATUS.UNDELIVERED || parseInt(order.deliverStatus) === DELIVERSTATUS.PARTDELIVERED))
-						order.deliverStatus = DELIVERSTATUS.PARTDELIVERED;
-					else
-						order.deliverStatus = DELIVERSTATUS.DELIVERED;
-				}
+					break;
+				case DELIVERSTATUS.RECEIVED:
+					switch(parseInt(item.deliverStatus)) {
+						case DELIVERSTATUS.DELIVERED:
+						case DELIVERSTATUS.RSCRECEIVED:
+						case DELIVERSTATUS.UNDELIVERED:
+							order.deliverStatus = DELIVERSTATUS.PARTDELIVERED;
+							break;
+						case DELIVERSTATUS.RECEIVED:
+							order.deliverStatus = DELIVERSTATUS.RECEIVED;
+							break;
+					}
 			}
+		}
+
+		if (!order.deliverStatus) {
+			order.deliverStatus = DELIVERSTATUS.UNDELIVERED;
+		}
+
+		// 待收货时间
+		// 自提订单的待收货时间
+		if (order.deliveryType === DELIVERYTYPE.ZITI.id && parseInt(order.payStatus) === PAYMENTSTATUS.PAID && parseInt(order.deliverStatus) === DELIVERSTATUS.RSCRECEIVED && order.deliverStatus != oldStatus) {
+			order.datePendingDeliver = new Date();
+		} else {
+			// 送货到户订单的待收货时间
+			if (order.deliveryType === DELIVERYTYPE.SONGHUO.id && parseInt(oldStatus) !== DELIVERSTATUS.PARTDELIVERED && parseInt(oldStatus) !== DELIVERSTATUS.DELIVERED && (parseInt(order.deliverStatus) === DELIVERSTATUS.PARTDELIVERED || parseInt(order.deliverStatus) === DELIVERSTATUS.DELIVERED)) {
+				order.datePendingDeliver = new Date();
+			}
+		}
+
+		if (parseInt(order.deliverStatus) === DELIVERSTATUS.DELIVERED && order.deliverStatus != oldStatus) {
+			order.dateDelivered = new Date();
+		}
+
+		if(parseInt(order.deliverStatus) === DELIVERSTATUS.RECEIVED  && order.deliverStatus != oldStatus){
+			order.dateCompleted = new Date();
 		}
 	}
 	if (!order.deliverStatus) {
@@ -924,15 +1497,27 @@ OrderService.prototype.checkDeliverStatus = function(order) {
 
 // Check order pay status by all sub orders payments' pay status and get order payment
 OrderService.prototype.checkPayStatus = function(options, callback) {
-
 	var self = this;
+	var returnProcessor = function(oldOrder, newOrder, payment){
+		callback(null, newOrder, payment);
+		if(oldOrder.payStatus !== newOrder.payStatus && newOrder.payStatus === PAYMENTSTATUS.PAID && newOrder.deliveryType === DELIVERYTYPE.ZITI.id && newOrder.deliverStatus === DELIVERSTATUS.RSCRECEIVED){
+			var newReceivedSKUs = [];
+			newOrder.SKUs.forEach(function(SKU){
+				if(SKU.deliverStatus == DELIVERSTATUS.RSCRECEIVED){
+					newReceivedSKUs.push(SKU);
+				}
+			});
+			self.generateDeliveryCodeandNotify(newOrder, newReceivedSKUs);
+		}
+	};
+
 	if (options && options.order) {
-		self.checkPayStatusDetail(options.order, function(err, order, payment) {
+		self._checkPayStatus(options.order, function(err, order, payment) {
 			if (err) {
 				callback(err, null, null);
 				return;
 			}
-			callback(null, order, payment);
+			returnProcessor(options.order, order, payment);
 			return;
 		});
 	} else {
@@ -943,12 +1528,12 @@ OrderService.prototype.checkPayStatus = function(options, callback) {
 					return;
 				}
 				if (doc) {
-					self.checkPayStatusDetail(doc, function(err, order, payment) {
+					self._checkPayStatus(doc, function(err, order, payment) {
 						if (err) {
 							callback(err, null, null);
 							return;
 						}
-						callback(null, order, payment);
+						returnProcessor(doc, order, payment);
 						return;
 					});
 				} else {
@@ -963,194 +1548,213 @@ OrderService.prototype.checkPayStatus = function(options, callback) {
 	}
 }
 
-// Check order pay status by all sub orders payments' pay status and get order payment
-OrderService.prototype.checkPayStatusDetail = function(order, callback) {
+/**
+ * Check order pay status by all sub orders payments' pay status and get order payment
+ * @param  {Object}   order    Order info in DB
+ * @param  {Function} callback callback function
+ * @return {null}     the end exec callback
+ */
+OrderService.prototype._checkPayStatus = function(order, callback) {
 	var self = this;
-	if (order) {
-		var setValues = {};							// order need set values
-		var pushValues = {};						// order need push values
-		var orderPayStatus = PAYMENTSTATUS.UNPAID;	// default order paystatus
-		var paidCount = 0;							// suborder paid count
-		// var subOrdersPayments = {};					// suborder all payments
-		var subOrdersInfo = {};						// suborder pay info
-		var Payments = {};							// order payments
-		var orderClosed = false;					// default order closed status is false
-		var orderPayment = null;					// order payment info
-		var closePayments = [];						// need closed payments
-
-		if (order && order.payments && order.payments.length > 0) {
-			// if the order's all payments is closed, the order changes to closed
-			orderClosed = true;
-	       	for (var i = 0; i < order.payments.length; i++) {
-		    	var payment = order.payments[i];
-
-		    	// if the order's one payment is not closed, the order changes to not closed
-		    	if (!payment.isClosed || payment.payStatus === PAYMENTSTATUS.PAID) {
-		    		orderClosed = false;
-		    	}
-
-		    	// if (!subOrdersPayments.hasOwnProperty(payment.suborderId)) {
-		    	// 	subOrdersPayments[payment.suborderId] = [];
-		    	// }
-		    	// subOrdersPayments[payment.suborderId].push(payment);
-		    	if (!subOrdersInfo.hasOwnProperty(payment.suborderId)) {
-		    		subOrdersInfo[payment.suborderId] = {paidPrice: 0, paidTimes: 0, payments:[]};
-		    	}
-		    	if (parseInt(payment.payStatus) === PAYMENTSTATUS.PAID) {
-					if (subOrdersInfo[payment.suborderId].paidPrice) {
-						subOrdersInfo[payment.suborderId].paidPrice += payment.price;
-					} else {
-						subOrdersInfo[payment.suborderId].paidPrice = payment.price;
-					}
-				}
-				if (parseInt(payment.payStatus) !== PAYMENTSTATUS.UNPAID) {
-					if (subOrdersInfo[payment.suborderId].paidTimes) {
-						subOrdersInfo[payment.suborderId].paidTimes += 1;
-					} else {
-						subOrdersInfo[payment.suborderId].paidTimes = 1;
-					}
-				}
-
-				if (payment.isClosed === false && parseInt(payment.payStatus) === PAYMENTSTATUS.UNPAID)
-					subOrdersInfo[payment.suborderId].payments.push(payment);
-	       	}
-	    }
-
-	    // if the order is not closed, fix order paystatus
-	    if (!orderClosed || !order.isClosed) {
-			if (order && order.subOrders) {
-				for (var i=0; i < order.subOrders.length; i++) {
-					var subOrder = order.subOrders[i];
-					var subOrderPayStatus = subOrder.payStatus;
-					// var payments = subOrdersPayments[subOrder.id] || [];
-					var subOrderInfo = subOrdersInfo[subOrder.id] || {};
-					var paidPrice = subOrderInfo.paidPrice || 0;
-					var paidTimes = subOrderInfo.paidTimes || 0;
-					var payPrice = parseFloat((subOrder.price-paidPrice).toFixed(2));
-					var suborderPayment = null;
-
-					// get suborder paystatus
-					if (paidPrice >= parseFloat(parseFloat(subOrder.price).toFixed(2))) {
-						subOrder.payStatus = PAYMENTSTATUS.PAID;
-						// get order paystatus
-						orderPayStatus = PAYMENTSTATUS.PARTPAID;
-						paidCount += 1;
-					} else {
-						subOrder.payStatus = PAYMENTSTATUS.UNPAID;
-						if (paidPrice > 0) {
-							subOrder.payStatus = PAYMENTSTATUS.PARTPAID;
-						}
-						// get order paystatus
-						if (subOrder.payStatus === PAYMENTSTATUS.PARTPAID || orderPayStatus === PAYMENTSTATUS.PAID || orderPayStatus === PAYMENTSTATUS.PARTPAID)
-							orderPayStatus = PAYMENTSTATUS.PARTPAID;
-						else
-							orderPayStatus = PAYMENTSTATUS.UNPAID;
-					}
-					
-					// payment price must eq the subOrder dueprice
-					if (subOrderInfo.payments) {
-						for (var j = 0; j < subOrderInfo.payments.length; j++) {
-						 	var payment = subOrderInfo.payments[j];
-						 	
-							if (!suborderPayment && payPrice == payment.price) {
-								suborderPayment = payment;
-							} else {
-						 		closePayments.push(payment);
-						 	}
-						}
-					}
-					Payments[subOrder.type] = {'payment':suborderPayment,'suborder':subOrder,'payprice':payPrice,'paidtimes':paidTimes};
-					if (subOrder.payStatus !== subOrderPayStatus) {
-						// set suborder paystatus
-						var key = 'subOrders.' + i + '.payStatus';
-						setValues[key] = subOrder.payStatus;
-					}
-				}
-				if (order.subOrders.length > 0 && paidCount === order.subOrders.length) {
-					orderPayStatus = PAYMENTSTATUS.PAID;
-				}
-			}
-
-			// get order payment by suborder types
-			var typekeysSort = SUBORDERTYPEKEYS;
-			for (var i=0; i < typekeysSort.length; i++) {
-				var key = SUBORDERTYPE[typekeysSort[i]];
-				if (Payments[key]) {
-					var subOrder = Payments[key].suborder;
-					var payment = Payments[key].payment;
-					if (subOrder['payStatus'] !== PAYMENTSTATUS.PAID) {
-						// create new payment
-						if (!payment) {
-							payment = self.createPayment({'paymentId':U.GUID(10),'slice':(Payments[key].paidtimes+1),'price':Payments[key].payprice,'suborderId':subOrder.id});
-							pushValues = {'payments':payment};
-						}
-						if (!orderPayment) {
-							if (order.paymentId !== payment.id) {
-								setValues['paymentId'] = payment.id;
-							}
-							if (!payment.payType || order.payType !== payment.payType) {
-								setValues['payType'] = payment.payType || PAYTYPE.ZHIFUBAO;
-							}
-							if (order.duePrice !== payment.price) {
-								setValues['duePrice'] = payment.price;
-							}
-							orderPayment = payment;
-							break
-						}
-					}
-				}
-			}
-			if (orderPayStatus !== order.payStatus) {
-				setValues['payStatus'] = orderPayStatus;
-				if (orderPayStatus === PAYMENTSTATUS.PAID) {
-					setValues['datePaid'] = new Date();
-				}
-			}
-			if (orderPayStatus === PAYMENTSTATUS.PAID) {
-				if (order.duePrice !== 0) {
-					setValues['duePrice'] = 0;
-				}
-				orderPayment = null;
-				pushValues = {};
-			}
-		}
-		// update and return order info
-		var values = {};
-		if (setValues && !U.isEmpty(setValues)) {
-			values['$set'] = setValues;
-		}
-		if (pushValues && !U.isEmpty(pushValues)) {
-			values['$push'] = pushValues;
-		}
-		if (!U.isEmpty(values)) {
-			OrderModel.findOneAndUpdate({id:order.id}, values, {new: true}, function(err, order) {
-				if (err) {
-		            console.error('OrderService checkPayStatus findOneAndUpdate err:', err);
-		            callback(err);
-		            return;
-		        }
-		
-		        callback(null, order.toObject(), orderPayment);
-			});
-		} else {
-			callback(null, order.toObject(), orderPayment);
-		}
-		// close need closed payments
-		if (closePayments && closePayments.length > 0) {
-			for (var i = 0; i < closePayments.length; i++) {
-				var payment = closePayments[i];
-				var query = {'id':order.id, 'payments.id':payment.id};
-				var values = {'payments.$.isClosed':true};
-	        	OrderModel.update(query, {'$set':values}, function(err, count) {
-			    	if (err) {
-			            console.error('OrderService checkPayStatus close payment err:', err);
-			        }
-			    });
-			}
-		}
-	} else {
+	if (!order) {
 		callback(null, order, null);
 	    return;
+	}
+
+	var setValues = {};							// order need set values
+	var pushValues = {};						// order need push values
+	var orderPayStatus = PAYMENTSTATUS.UNPAID;	// default order paystatus
+	var paidCount = 0;							// suborder paid count
+	var subOrdersInfo = {};						// suborder pay info
+	var Payments = {};							// order payments
+	var orderClosed = false;					// default order closed status is false
+	var orderPayment = null;					// order payment info
+	var closePayments = [];						// need closed payments
+
+	// order payments 
+	if (order && order.payments && order.payments.length > 0) {
+		// if the order's all payments is closed, the order changes to closed
+		orderClosed = true;
+       	for (var i = 0; i < order.payments.length; i++) {
+	    	var payment = order.payments[i];
+
+	    	// if the order's one payment is not closed, the order changes to not closed
+	    	if (!payment.isClosed || payment.payStatus === PAYMENTSTATUS.PAID) {
+	    		orderClosed = false;
+	    	}
+
+	    	// subOrdersInfo init
+	    	if (!subOrdersInfo.hasOwnProperty(payment.suborderId)) {
+	    		subOrdersInfo[payment.suborderId] = {paidPrice: 0, paidTimes: 0, payments:[]};
+	    	}
+	    	// subOrdersInfo paidPrice and paidTimes
+	    	if (parseInt(payment.payStatus) === PAYMENTSTATUS.PAID) {
+				subOrdersInfo[payment.suborderId].paidPrice += payment.price;
+				subOrdersInfo[payment.suborderId].paidTimes += 1;
+			}
+
+			// find suborders all unpaid payments
+			if (payment.isClosed === false && parseInt(payment.payStatus) === PAYMENTSTATUS.UNPAID)
+				subOrdersInfo[payment.suborderId].payments.push(payment);
+       	}
+    }
+
+    // if the order is not closed, fix order paystatus
+    if (!orderClosed || !order.isClosed) {
+		if (order && order.subOrders) {
+			// get suborders key/values pay infos
+			for (var i=0; i < order.subOrders.length; i++) {
+				var subOrder = order.subOrders[i];
+				var subOrderPayStatus = subOrder.payStatus;
+				var subOrderInfo = subOrdersInfo[subOrder.id] || {};
+				var paidPrice = parseFloat((subOrderInfo.paidPrice || 0).toFixed(2));
+				var paidTimes = subOrderInfo.paidTimes || 0;
+				var payPrice = parseFloat((subOrder.price-paidPrice).toFixed(2));
+				var suborderPayment = null;
+
+				// suborder paystatus
+				if (paidPrice >= parseFloat(parseFloat(subOrder.price).toFixed(2))) {
+					subOrder.payStatus = PAYMENTSTATUS.PAID;
+					// order paystatus
+					orderPayStatus = PAYMENTSTATUS.PARTPAID;
+					paidCount += 1;
+				} else {
+					subOrder.payStatus = PAYMENTSTATUS.UNPAID;
+					if (paidPrice > 0) {
+						subOrder.payStatus = PAYMENTSTATUS.PARTPAID;
+					}
+					// order paystatus
+					if (subOrder.payStatus === PAYMENTSTATUS.PARTPAID || orderPayStatus === PAYMENTSTATUS.PAID || orderPayStatus === PAYMENTSTATUS.PARTPAID)
+						orderPayStatus = PAYMENTSTATUS.PARTPAID;
+					else
+						orderPayStatus = PAYMENTSTATUS.UNPAID;
+				}
+				
+				// payment price must eq the subOrder dueprice
+				if (subOrderInfo.payments) {
+					for (var j = 0; j < subOrderInfo.payments.length; j++) {
+					 	var payment = subOrderInfo.payments[j];
+					 	
+						if (!suborderPayment && payPrice == payment.price) {
+							suborderPayment = payment;
+						} else {
+					 		closePayments.push(payment);
+					 	}
+					}
+				}
+				// suborders type key/values pay infos
+				Payments[subOrder.type] = {'payment':suborderPayment,'suborder':subOrder,'payprice':payPrice,'paidtimes':paidTimes};
+				// set suborder paystatus
+				if (subOrder.payStatus !== subOrderPayStatus) {
+					var key = 'subOrders.' + i + '.payStatus';
+					setValues[key] = subOrder.payStatus;
+				}
+			}
+			// order paystatus
+			if (order.subOrders.length > 0 && paidCount === order.subOrders.length) {
+				orderPayStatus = PAYMENTSTATUS.PAID;
+			}
+		}
+
+		// get order payment by suborders key/values pay infos
+		var typekeysSort = SUBORDERTYPEKEYS;
+		for (var i=0; i < typekeysSort.length; i++) {
+			var key = SUBORDERTYPE[typekeysSort[i]];
+			if (Payments[key]) {
+				var subOrder = Payments[key].suborder;
+				var payment = Payments[key].payment;
+				if (subOrder['payStatus'] !== PAYMENTSTATUS.PAID) {
+					// create new payment
+					if (!payment) {
+						payment = self.createPayment({'paymentId':U.GUID(10),'slice':(Payments[key].paidtimes+1),'price':Payments[key].payprice,'suborderId':subOrder.id});
+						pushValues = {'payments':payment};
+					}
+					// order info
+					if (!orderPayment) {
+						if (order.paymentId !== payment.id) {
+							setValues['paymentId'] = payment.id;
+						}
+						if (!payment.payType || order.payType !== payment.payType) {
+							setValues['payType'] = payment.payType || PAYTYPE.ZHIFUBAO;
+						}
+						if ((order.duePrice).toFixed(2) !== (payment.price).toFixed(2)) {
+							setValues['duePrice'] = payment.price;
+						}
+						orderPayment = payment;
+						break
+					}
+				} else {
+					if (!order.depositPaid && key === SUBORDERTYPE.DEPOSIT) {
+						setValues['depositPaid'] = true;
+					}
+				}
+			}
+		}
+		// order pay status changed
+		if (orderPayStatus !== order.payStatus) {
+			setValues['payStatus'] = orderPayStatus;
+			if (orderPayStatus === PAYMENTSTATUS.PAID) {
+				// paid date
+				setValues['datePaid'] = new Date();
+				// 待收货时间
+				// 自提订单的待收货时间
+				if (order.deliveryType === DELIVERYTYPE.ZITI.id && parseInt(order.deliverStatus) === DELIVERSTATUS.RSCRECEIVED) {
+					setValues['datePendingDeliver'] = new Date();
+				}
+			}
+		}
+		// order paid
+		if (orderPayStatus === PAYMENTSTATUS.PAID) {
+			if (order.duePrice !== 0) {
+				setValues['duePrice'] = 0;
+			}
+			orderPayment = null;
+			pushValues = {};
+		}
+		// offline pay pending approve
+		setValues['pendingApprove'] = U.parseBoolean(orderPayment && tools.isOfflinePayType(orderPayment.payType), false);
+	}
+	// update and return order info
+	var values = {};
+	if (setValues && !U.isEmpty(setValues)) {
+		values['$set'] = setValues;
+	}
+	if (pushValues && !U.isEmpty(pushValues)) {
+		values['$push'] = pushValues;
+	}
+	if (!U.isEmpty(values)) {
+		OrderModel.findOneAndUpdate({id:order.id}, values, {new: true}, function(err, order) {
+			if (err) {
+	            console.error('OrderService checkPayStatus findOneAndUpdate err:', err);
+	            callback(err);
+	            return;
+	        }
+	
+	        callback(null, order.toObject(), orderPayment);
+		});
+	} else {
+		callback(null, order.toObject(), orderPayment);
+	}
+
+	// close need closed payments
+	if (closePayments && closePayments.length > 0) {
+		for (var i = 0; i < closePayments.length; i++) {
+			var payment = closePayments[i];
+			var query = {'id':order.id, 'payments.id':payment.id};
+			var values = {'payments.$.isClosed':true};
+        	OrderModel.update(query, {'$set':values}, function(err, count) {
+		    	if (err) {
+		            console.error('OrderService checkPayStatus close payment err:', err);
+		        }
+		    });
+		}
+	}
+
+	// 已付款的配送到户订单有商品到服务站，通知RSC配送
+	if (orderPayStatus !== order.payStatus && orderPayStatus === PAYMENTSTATUS.PAID) {
+		if (order.deliveryType === DELIVERYTYPE.SONGHUO.id && parseInt(order.deliverStatus) === DELIVERSTATUS.RSCRECEIVED && order.RSCInfo) {
+			self.umengSendCustomizedcast(umengConfig.types.delivery, order.RSCInfo.RSC, 'RSC', {orderId: order.id});
+		}
 	}
 };
 
@@ -1158,7 +1762,7 @@ OrderService.prototype.checkPayStatusDetail = function(order, callback) {
 OrderService.prototype.savePaidLog = function(paidLog, callback) {
 	try {
 		if (paidLog && !paidLog.orderId) {
-			OrderModel.findOne({'payments.id':{$ne:paidLog.paymentId}}, function(err, doc) {
+			OrderModel.findOne({'payments.id':{$eq:paidLog.paymentId}}, function(err, doc) {
 				if (doc) {
 					paidLog.orderId = doc.id;
 				}
@@ -1182,9 +1786,123 @@ OrderService.prototype.savePaidLog = function(paidLog, callback) {
     }
 };
 
+OrderService.prototype.getByRSC = function(RSC, page, max, type, callback, search){
+	if(!RSC){
+		callback('RSC needed');
+		return;
+	}
+
+	var query = {'RSCInfo.RSC':RSC};
+
+	if(page<0 || !page){
+		page = 0;
+	}
+
+	if(max<0 || !max){
+		max = 20;
+	}
+
+	if(max>50){
+		max = 50;
+	}
+
+	if(type){
+		switch(type){
+			case 1:		//待付款
+				query.payStatus = {$in:[PAYMENTSTATUS.UNPAID, PAYMENTSTATUS.PARTPAID]};
+				query.pendingApprove = {$ne:true};
+				query.isClosed = false;
+				break;
+			case 2:		//待审核
+				// query.pendingApprove = true;
+				query["$or"] = [{isClosed: { $ne: true }, payStatus: { $eq: PAYMENTSTATUS.UNPAID }, pendingApprove: { $eq: true }}, 
+								{payStatus: { $ne: PAYMENTSTATUS.UNPAID }, pendingApprove: { $eq: true }}];
+				break;
+			case 3:		//待配送
+				query.payStatus = PAYMENTSTATUS.PAID;
+				query.deliverStatus = {$in:[DELIVERSTATUS.RSCRECEIVED, DELIVERSTATUS.PARTDELIVERED]};
+				query.deliveryType = DELIVERYTYPE.SONGHUO.id;
+				break;
+			case 4:		//待自提
+				query.payStatus = PAYMENTSTATUS.PAID;
+				query.deliverStatus = {$in:[DELIVERSTATUS.RSCRECEIVED, DELIVERSTATUS.PARTDELIVERED]};
+				query.deliveryType = DELIVERYTYPE.ZITI.id;
+				break;
+			case 5:		//已完成
+				query.payStatus = PAYMENTSTATUS.PAID;
+				query.deliverStatus = DELIVERSTATUS.RECEIVED;
+				break;
+			default:
+				break;
+		}
+	}
+
+	if (search) {
+		if (query && query.$or) {
+			query.$or.concat([
+				{buyerPhone: new RegExp('^'+search)},
+				{consigneePhone: new RegExp('^'+search)},
+				{id: new RegExp('^'+search)}
+			]);
+		} else {
+			query.$or = [{buyerPhone: new RegExp('^'+search)},
+				{consigneePhone: new RegExp('^'+search)},
+				{id: new RegExp('^'+search)}];
+		}
+	}
+
+	OrderModel.count(query, function(err, count){
+		if(err){
+			console.error(err);
+			callback('error query order:', err);
+			return;
+		}
+
+		OrderModel.find(query)
+			.select('-_id -__v -products -buyerId -buyerPhone -buyerName -payments -paymentId -payType -SKUs.backendUser -SKUs.backendUserAccount -SKUs.dateSet -SKUs._id -subOrders._id')
+			.sort({dateCreated:-1})
+			.skip(page * max)
+			.limit(max)
+			.lean()
+			.exec(function (err, orders) {
+				if (err) {
+					console.error(err);
+					callback('error query order');
+					return;
+				}
+
+				var pageCount = Math.floor(count / max) + (count % max ? 1 : 0);
+				callback(null, orders || [], count, pageCount);
+			})
+	});
+};
+
+OrderService.prototype.changeToPendingApprove = function(orderId, callback){
+	if(!orderId){
+		callback('orderId required');
+		return;
+	}
+
+	OrderModel.update({id:orderId}, {$set:{pendingApprove:true}}, function(err, numAffected){
+		if(err){
+			console.error(err);
+			callback('update order error');
+			return;
+		}
+
+		if(numAffected.updated <= 0){
+			callback('no order updated');
+			return;
+		}
+
+		callback();
+	})
+};
+
 // judge whether the order payment need refund
 // params: order: the order of the payment; thePayment: {paymentId:String, price:Number}
 // return: refund Object {refund:Bool, refundReason:Number}
+// refundReason 1:payment已经被支付（重复支付） 2:支付完payment超过了本阶段的总额 3:paymentId未找到订单
 OrderService.prototype.judgePaymentRefund = function(order, thePayment) {
 	var self = this;
 	if (order) {
@@ -1200,6 +1918,9 @@ OrderService.prototype.judgePaymentRefund = function(order, thePayment) {
 	    		if (payment.id == thePayment.paymentId) {
 	    			// the payment in the order is paid
 	    			if (parseInt(payment.payStatus) === PAYMENTSTATUS.PAID) {
+	    				if (payment.payType === thePayment.payType) {
+	    					return {refund: false, repeatNotify: true};
+	    				}
 	    				return {refund: true, refundReason: 1};
 	    			}
 	    			theSubOrderId = payment.suborderId;
@@ -1227,6 +1948,205 @@ OrderService.prototype.judgePaymentRefund = function(order, thePayment) {
 		}
 	}
 	return {refund: false};
+};
+
+// pay notify
+// common pay notify function
+OrderService.prototype.payNotify = function(paymentId, options){
+    var self = this;
+
+    // order paid
+    self.get({"paymentId": paymentId}, function(err, order) {
+        // TODO: log err
+        if (err) {
+            console.error('OrderService payNotify OrderService get err:', err);
+            dri.sendDRI('[DRI] Fail to get order in order payNotify: ', 'paymentId:'+paymentId, err);
+        }
+        if (order) {
+            var payment = {paymentId: paymentId};
+            if (options && options.price) {
+                payment.price = parseFloat(parseFloat(options.price).toFixed(2));
+            }
+            if (options && options.payType) {
+                payment.payType = options.payType;
+            }
+            var result = self.judgePaymentRefund(order, payment);
+            if (result && result.refund) {
+                var paymentOptions = options;
+                paymentOptions.paymentId = paymentId;
+                if (!paymentOptions.orderId) {
+                    paymentOptions.orderId = order.id;
+                }
+                if (result.refundReason) {
+                    paymentOptions.refundReason = result.refundReason;
+                }
+                PayService.payRefund(paymentOptions);
+                self.closedSpecialPayment(order.id, paymentId, options);
+            } else {
+            	if (result && result.repeatNotify) {
+            		console.error('OrderService payNotify repeatNotify:', paymentId, options);
+            	} else {
+	                if ((order.payStatus||PAYMENTSTATUS.UNPAID) == PAYMENTSTATUS.UNPAID || order.payStatus == PAYMENTSTATUS.PARTPAID) {
+	                    self.paid(order.id, paymentId, options, function(err, result) {
+	                        if (err) {
+	                            if (result && result.refund) {
+	                                // *TODO refund
+	                                var paymentOptions = options;
+	                                paymentOptions.paymentId = paymentId;
+	                                if (!paymentOptions.orderId) {
+	                                    paymentOptions.orderId = order.id;
+	                                }
+	                                if (result.refundReason) {
+	                                    paymentOptions.refundReason = result.refundReason;
+	                                }
+	                                PayService.payRefund(paymentOptions);
+	                            } else {
+	                                console.error('OrderService payNotify OrderService paid err:', err);
+	                                // if err happen
+	                                // send sms to dri
+	                                var idsStr = 'orderId:' + order.id + ' paymentId:' + paymentId;
+	                                dri.sendDRI('[DRI] Fail to update order in order payNotify: ', idsStr, err);
+	                            }
+	                        }
+	                    }); // SchemaBuilderEntity.prototype.save = function(model, helper, callback, skip)
+	                }
+	            }
+            }
+        } else {
+            // not find order by paymentId
+            // refund or other methods
+            var paymentOptions = options;
+            paymentOptions.paymentId = paymentId;
+            paymentOptions.refundReason = 3;
+            PayService.payRefund(paymentOptions);
+        }
+    });
+
+    // pay success log
+    var payLog = options;
+    payLog.paymentId = paymentId;
+    self.savePaidLog(payLog);
+};
+
+// Sets the payment status to closed (the special bug, the one payment pay more than the price), payment 一次支付就超额了
+OrderService.prototype.closedSpecialPayment = function(id, paymentId, options) {
+	var self = this;
+
+	// find and update the payment not PAID
+	var query = { id: id, payments: { $elemMatch: { id: paymentId, payStatus: { $eq: PAYMENTSTATUS.UNPAID }, isClosed: false } } };
+	var date = new Date();
+	var values = {'payments.$.isClosed':true, 'payments.$.specialClosed':true, 'payments.$.dateSpecialClosed':date};
+	if (options.backendUser) {
+		values['payments.$.dateSet'] = date;
+		values['payments.$.backendUser'] = options.backendUser._id;
+		values['payments.$.backendUserAccount'] = options.backendUser.account;
+	}
+	if (options.RSC && options.RSC._id && options.RSC.RSCInfo) {
+		values['payments.$.RSC'] = options.RSC._id;
+		values['payments.$.RSCCompanyName'] = options.RSC.RSCInfo.companyName;
+	}
+	
+	OrderModel.update(query, {$set:values}, function(err, count) {
+        if (err) {
+            console.error('OrderService closedSpecialPayment update err:', err, 'paymentId: '+paymentId, options);
+            return;
+        }
+
+        if (count.n > 0) {
+            console.error('OrderService closedSpecialPayment updated:', 'paymentId: '+paymentId, options);
+        }
+        return;
+	});
+};
+
+OrderService.prototype.getPaymentInOrder = function (order, paymentId) {
+	if(tools.isArray(order.payments)) {
+		for (var i = 0; i < order.payments.length; i++) {
+			var payment = order.payments[i];
+			if (payment.id == paymentId) {
+				return payment;
+			}
+		}
+	}
+
+	return null;
+};
+
+OrderService.prototype.updateRSCInfo = function(orderId, RSCInfo, callback) {
+	if(!orderId){
+		callback('orderId required');
+		return;
+	}
+
+	if(!RSCInfo){
+		callback('RSCInfo required');
+		return;
+	}
+
+	OrderModel.update({id:orderId}, {$set:{RSCInfo:RSCInfo}}, function(err, numUpdated) {
+		if(err){
+			console.error(err);
+			callback(err);
+			return;
+		}
+
+		if(!numUpdated || numUpdated.updated == 0){
+			callback('not updated');
+			return;
+		}
+
+		callback();
+	})
+};
+
+// umeng 自定义推送
+OrderService.prototype.umengSendCustomizedcast = function(type, userId, userType, options) {
+	if (userType == 'user') {
+		UMENG.sendCustomizedcast(type, userId, userType, options);
+	} else if (userType == 'RSC') {
+		UserModel.findById(userId, function(err, user){
+	        if(err){
+	            console.error('OrderService umengSendCustomizedcast findById err:', err);
+	            return;
+	        }
+
+	        if(!user) {
+	            console.error('OrderService umengSendCustomizedcast findById not find user...');
+	            return;
+	        }
+
+	        UMENG.sendCustomizedcast(type, user.id, userType, options);
+	    });
+	}
+};
+
+// Get orderInfo by id
+OrderService.prototype.getById = function(id, callback) {
+
+	if(!id) {
+		callback(null, null, null);
+		return;
+	}
+
+	var mongoOptions = {id: id};
+
+	OrderModel.findOne(mongoOptions, function(err, doc) {
+		if (err) {
+			callback(err);
+			return;
+		}
+
+		if (doc) {
+			callback(null, doc.toObject());
+			return;
+		} else {
+			callback(null, null);
+		}
+	});
+};
+
+OrderService.prototype.pendingDeliverToRSC = function(order) {
+    return (order.payStatus == PAYMENTSTATUS.PAID || (order.payStatus == PAYMENTSTATUS.PARTPAID && order.depositPaid)) && order.deliverStatus != DELIVERSTATUS.DELIVERED;
 };
 
 module.exports = new OrderService();

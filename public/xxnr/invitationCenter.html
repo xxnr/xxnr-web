@@ -14,6 +14,7 @@
     <!-- build:css -->
     <link type="text/css" rel="stylesheet" href="css/style.css">
     <link type="text/css" rel="stylesheet" href="css/sweetalert.css">
+    <link type="text/css" rel="stylesheet" href="css/invitationSweetalert.css">
     <!-- endbuild -->
     <!-- build:js -->
     <script src="js/jquery.min.js"></script>
@@ -66,122 +67,121 @@
     <p class="guide">
         <a href="/">首页</a> ／ <a href="my_xxnr.html">我的新农人</a> ／ <a href="invitationCenter.html">新农代表</a>
     </p>
-    <div class="invitation_section">
-        <div class="wrap">
-            <ul class="invitation_tabs row" ng-init="tab = this.tabNum">
-                <li><a class="xxnr_btn" ng-class="{current:tab===1}" href="#" ng-click="tab = 1; showOrders = false" >我的客户</a>
-                <li><a class="xxnr_btn" ng-class="{current:tab===2}" href="#" ng-click="tab = 2" >我的新农代表</a>
-            </ul>
-            <div class="myClients_forms">
-                <div ng-cloak ng-show="tab===1" class="clients_section ng-cloak" ng-cloak>
-                    <div ng-show="invitees.length==0 && !showOrders" class="noClient-info">
-                        <img src="images/represent--icon.png" alt="">
-                        <p>您还没有邀请用户,若您是新新农人的代理商，快去邀请客户吧~</p>
+    <div class="wrap invitation_section">
+        <ul class="invitation_tabs row" ng-init="tab = this.tabNum">
+            <li><a class="xxnr_btn" ng-class="{current:tab===1}" href="#" ng-click="tab = 1; showOrders = false" >我的客户</a>
+            <li><a class="xxnr_btn" ng-class="{current:tab===2}" href="#" ng-click="tab = 2" >我的新农代表</a>
+            <li class="lastSpace"></li>
+        </ul>
+        <div class="myClients_forms">
+            <div ng-cloak ng-show="tab===1" class="clients_section ng-cloak" ng-cloak>
+                <div ng-show="invitees.length==0 && !showOrders" class="noClient-info">
+                    <img src="images/represent--icon.png" alt="">
+                    <p>您还没有邀请用户,若您是新新农人的代理商，快去邀请客户吧~</p>
+                </div>
+                <div class="clients_info" ng-show="invitees.length!==0 && !showOrders">
+                    <p class="clients_count">我已邀请<span>{{invitees.length}}位</span>客户</p>
+                    <ul class="clients_form">
+                        <li class="form_title">
+                            <ul class="row">
+                                <li>序号</li>
+                                <li class="userName">客户姓名</li>
+                                <li>客户手机号</li>
+                                <li>邀请时间</li>
+                                <li>操作</li>
+                            </ul>
+                        </li>
+                        <li class="client_row" ng-repeat="invitee in invitees">
+                            <ul class="row">
+                                <li>{{$index+1}}</li>
+                                <li class="userName" ng-class="{false:'unfilled'}[invitee.name!='']">{{invitee.name?invitee.name:"好友未填姓名"}}</li>
+                                <li>{{invitee.account}}</li>
+                                <li>{{invitee.dateinvited}}</li>
+                                <li><a href="" ng-click="getInviteeOrders(invitee.userId,1)">查看订单</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+                <div class="client_order" ng-show="showOrders">
+                    <div class="orders_clientInfo">
+                        <p class="title">客户订单</p>
+                        <p><span>姓名 ：{{name}}</span><span>手机号 ：{{phone}}</span><span>订单总数 : <span class="OrdersNum">{{ordersNum}}</span></span></p>
                     </div>
-                    <div class="clients_info" ng-show="invitees.length!==0 && !showOrders">
-                        <p class="clients_count">我已邀请<span>{{invitees.length}}位</span>客户</p>
-                        <ul class="clients_form">
-                            <li class="form_title">
-                                <ul class="row">
-                                    <li>序号</li>
-                                    <li class="userName">客户姓名</li>
-                                    <li>客户手机号</li>
-                                    <li>邀请时间</li>
-                                    <li>操作</li>
+                    <div class="orders_list">
+                        <div class="orders">
+                            <div class="orders-main">
+                                <ul class="order-titles">
+                                    <li>商品信息</li>
+                                    <li>商品数量</li>
+                                    <li>订单总额</li>
+                                    <li>订单状态</li>
                                 </ul>
-                            </li>
-                            <li class="client_row" ng-repeat="invitee in invitees">
-                                <ul class="row">
-                                    <li>{{$index+1}}</li>
-                                    <li class="userName" ng-class="{false:'unfilled'}[invitee.name!='']">{{invitee.name?invitee.name:"好友未填姓名"}}</li>
-                                    <li>{{invitee.account}}</li>
-                                    <li>{{invitee.dateinvited}}</li>
-                                    <li><a href="" ng-click="getInviteeOrders(invitee.userId,1)">查看订单</a></li>
-                                </ul>
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="client_order" ng-show="showOrders">
-                        <div class="orders_clientInfo">
-                            <p class="title">客户订单</p>
-                            <p><span>姓名 ：{{name}}</span><span>手机号 ：{{phone}}</span><span>订单总数 : <span class="OrdersNum">{{ordersNum}}</span></span></p>
-                        </div>
-                        <div class="orders_list">
-                            <div class="orders">
-                                <div class="orders-main">
-                                    <ul class="order-titles">
-                                        <li>商品信息</li>
-                                        <li>商品数量</li>
-                                        <li>订单总额</li>
-                                        <li>订单状态</li>
-                                    </ul>
-                                    <div class="order-list" class="ng-cloak">
-                                        <div class="single-order clearfix" ng-repeat="order in orderList | orderBy:'+dateCreated':true">
+                                <div class="order-list" class="ng-cloak">
+                                    <div class="single-order clearfix" ng-repeat="order in orderList | orderBy:'+dateCreated':true">
 
-                                            <div class="order-info">
-                                                <span class="order-time" ng-cloak>下单日期 ：{{order.createTime_local}}</span>
+                                        <div class="order-info">
+                                            <span class="order-time" ng-cloak>下单日期 ：{{order.createTime_local}}</span>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="products-section">
+                                                <ul>
+                                                    <li class="product" ng-repeat="product in order.products">
+
+                                                        <div class="p-name">
+                                                            <a class="ng-cloak" ng-href="productDetail.html?goodsId={{product.id}}" ng-cloak target="_blank">{{product.name}}</a>
+                                                        </div>
+                                                        <div class="p-quantity ng-cloak">
+                                                            <p>{{product.count}}</p>
+                                                        </div>
+
+                                                    </li>
+                                                </ul>
                                             </div>
 
-                                            <div class="row">
-                                                <div class="products-section">
-                                                    <ul>
-                                                        <li class="product" ng-repeat="product in order.products">
-
-                                                            <div class="p-name">
-                                                                <a class="ng-cloak" ng-href="productDetail.html?goodsId={{product.id}}" ng-cloak target="_blank">{{product.name}}</a>
-                                                            </div>
-                                                            <div class="p-quantity ng-cloak">
-                                                                <p>{{product.count}}</p>
-                                                            </div>
-
-                                                        </li>
-                                                    </ul>
+                                            <div class="pay-section">
+                                                <div class="pay-info">
+                                                    <p class="now" ng-cloak>￥{{order.totalPrice}}</p>
                                                 </div>
-
-                                                <div class="pay-section">
-                                                    <div class="pay-info">
-                                                        <p class="now" ng-cloak>￥{{order.totalPrice}}</p>
-                                                    </div>
-                                                    <div class="pay-status">
-                                                        <p class="order-statusName" ng-cloak>{{order.typeName}}</p>
-                                                    </div>
+                                                <div class="pay-status">
+                                                    <p class="order-statusName" ng-cloak>{{order.typeName}}</p>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="invitee_orders_pager">
-                                <div id="page_buttons">
-                                    <ul class="row">
-                                        <li ng-hide="current_page==1" class="pre_btn"><a href="" ng-click="pre_page()"><em class="ban ban_8_0">&nbsp;</em></a></li>
-                                        <li ng-repeat="page in pages"><a href="" ng-click="show_page(page.id)" ng-class="{true:'current', false:''}[page.isSelected]">{{page.id}}</a></li>
-                                        <li ng-hide="current_page==pages_count" class="next_btn"><a href="" ng-click="next_page()"><em class="ban ban_9_0">&nbsp;</em></a></li>
-                                    </ul>
-                                </div>
+                        </div>
+                        <div class="invitee_orders_pager">
+                            <div id="page_buttons">
+                                <ul class="row">
+                                    <li ng-hide="current_page==1" class="pre_btn"><a href="" ng-click="pre_page()"><em class="ban ban_8_0">&nbsp;</em></a></li>
+                                    <li ng-repeat="page in pages"><a href="" ng-click="show_page(page.id)" ng-class="{true:'current', false:''}[page.isSelected]">{{page.id}}</a></li>
+                                    <li ng-hide="current_page==pages_count" class="next_btn"><a href="" ng-click="next_page()"><em class="ban ban_9_0">&nbsp;</em></a></li>
+                                </ul>
                             </div>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <div ng-show="tab===2" class="inviter_section" ng-cloak>
-                    <div ng-show="!inviter" class="noInviter_info" ng-cloak>
-                        <img src="images/represent--icon.png" alt="">
-                        <p>您还没有设置新农代表，可通过输入对方手机号添加，设置后，新农代表将专人跟进您的订单和配送问题~</p>
-                        <div class="add_inviter">
-                            <input type="text" ng-model="inviterNum" /><a href="" class="xxnr_btn" ng-click="bindInviter()" ng-cloak>添加代表人</a>
-                        </div>
+            <div ng-show="tab===2" class="inviter_section" ng-cloak>
+                <div ng-show="!inviter" class="noInviter_info" ng-cloak>
+                    <img src="images/represent--icon.png" alt="">
+                    <p>您还没有设置新农代表，可通过输入对方手机号添加，设置后，新农代表将专人跟进您的订单和配送问题~</p>
+                    <div class="add_inviter">
+                        <input type="text" ng-model="inviterNum" /><a href="" class="xxnr_btn" ng-click="bindInviter()" ng-cloak>添加代表人</a>
                     </div>
-                    <div class="inviter_wrap" ng-cloak>
-                        <div ng-show="inviter" class="inviter_info" ng-show="">
-                            <p class="info_title">我的代表</p>
-                            <div class="inviter_img left">
-                                <img ng-src={{imgUrl}} alt="">
-                            </div>
-                            <div class="inviter_info left">
-                                <p>姓名：<span class="nickname" ng-cloak>{{inviterName?inviterName:"该用户未填姓名"}}</p>
-                                <p>手机：<span class="phoneNumber" ng-cloak>{{ inviter }}</span></p>
-                            </div>
+                </div>
+                <div class="inviter_wrap" ng-cloak>
+                    <div ng-show="inviter" class="inviter_info" ng-show="">
+                        <p class="info_title">我的代表</p>
+                        <div class="inviter_img left">
+                            <img ng-src={{imgUrl}} alt="">
+                        </div>
+                        <div class="inviter_info left">
+                            <p>姓名：<span class="nickname" ng-cloak>{{inviterName?inviterName:"该用户未填姓名"}}</p>
+                            <p>手机：<span class="phoneNumber" ng-cloak>{{ inviter }}</span></p>
                         </div>
                     </div>
                 </div>

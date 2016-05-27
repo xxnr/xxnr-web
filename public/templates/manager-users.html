@@ -58,10 +58,11 @@
 	<div style="background:#F8F8F8">
 		<div class="multi_form">
 			<div class="form_tab">
-				<div id="user_info_button" class="form_tab_selected cornflowerblue">用户详情</div>
-				<div id="agent_info_button" class="hidden deeppink">新农经纪人</div>
+				<div id="user_info_button" class="form_tab_selected">用户详情</div>
+				<div id="RSC_info_button">县级经销商信息</div>
+				<div id="agent_info_button">新农经纪人信息</div>
 			</div>
-			<div id="user_info" class="form form_cornflowerblue">
+			<div id="user_info" class="form">
 				<div data-component="template" data-component-path="users" class="padding" style="padding-bottom:0">
 					<script type="text/html">
 						<h3 class="nopadding">基本信息</h3>
@@ -160,50 +161,95 @@
 					<button name="cancel">@(取消)</button>
 				</div>
 			</div>
-			<div id="agent_info" class="form form_deeppink hidden">
-				<div data-component="template" data-component-path="agent.form" class="padding" style="padding-bottom:0">
+			<div id="RSC_info" class="form hidden">
+				<div data-component="template" data-component-path="RSC" class="padding" style="padding-bottom:0">
 					<script type="text/html">
+					{{ if form }}
+						<h3 class="nopadding">县级经销商信息</h3>
+						<table class="table table-bordered" border="0">
+							<tr>
+								<td class="col-xs-4 active">@(真实姓名)</td>
+								<td>{{ form.name }}</td>
+							</tr>
+							<tr>
+								<td class="col-xs-4 active">@(身份证号)</td>
+								<td>{{ form.IDNo }}</td>
+							</tr>
+							<tr>
+								<td class="col-xs-4 active">@(网点名称)</td>
+								<td>{{ form.companyName }}</td>
+							</tr>
+							<tr>
+								<td class="col-xs-4 active">@(网点地区)</td>
+								<td>
+									{{ if form.companyAddress }}
+									{{ (form.companyAddress.province?form.companyAddress.province.name:'') + (form.companyAddress.city?form.companyAddress.city.name:'') + (form.companyAddress.county?form.companyAddress.county.name:'') + (form.companyAddress.town?form.companyAddress.town.name:'') }}
+									{{ fi }}
+								</td>
+							</tr>
+							<tr>
+								<td class="col-xs-4 active">@(网点详细地址)</td>
+								<td>
+									{{ if form.companyAddress }}
+									{{ form.companyAddress.details}}
+									{{ fi }}
+								</td>
+							</tr>
+							<tr>
+								<td class="col-xs-4 active">@(网点电话)</td>
+								<td>{{ form.phone }}</td>
+							</tr>
+						</table>
+					{{ else }}
+						<h3 class="mb50">暂无县级经销商信息</h3>
+					{{ fi }}
+					</script>
+				</div>
+				<div class="ui-form-buttons"></div>
+			</div>
+			<div id="agent_info" class="form hidden">
+				<div data-component="template" data-component-path="agent" class="padding" style="padding-bottom:0">
+					<script type="text/html">
+					{{ if form }}
 						<h3 class="nopadding">新农经纪人信息</h3>
 						<table class="table table-bordered" border="0">
 							<tbody>
 							<tr>
 								<td class="col-xs-4 active">@(姓名)</td>
-								<td>{{ name }}</td>
+								<td>{{ form.name }}</td>
 							</tr>
 							<tr>
 								<td class="col-xs-4 active">@(手机号)</td>
-								<td>{{ phone }}</td>
+								<td>{{ form.phone }}</td>
 							</tr>
 							<tr>
 								<td class="col-xs-4 active">@(身份证号)</td>
-								<td>{{ identityNo }}</td>
+								<td>{{ form.identityNo }}</td>
 							</tr>
 							<tr>
 								<td class="col-xs-4 active">@(认证时间)</td>
-								<td>{{ dateTimeVerified }}</td>
+								<td>{{ form.dateTimeVerified }}</td>
 							</tr>
 							<tr>
 								<td class="col-xs-4 active">@(所在地区)</td>
 								<td>
-									{{ if address }}
-										{{ (address.province?address.province.name:'') + (address.city?address.city.name:'') + (address.county?address.county.name:'') + (address.town?address.town.name:'') }}
+									{{ if form.address }}
+										{{ (form.address.province?form.address.province.name:'') + (form.address.city?form.address.city.name:'') + (form.address.county?form.address.county.name:'') + (form.address.town?form.address.town.name:'') }}
 									{{ fi }}
 								</td>
 							</tr>
 							</tbody>
 						</table>
 						<h3 class="nopadding">服务客户统计</h3>
-						<p>已登记的潜在用户数：{{ totalCount }}</p>
-						<p>已注册的用户数：{{ registeredCount }}</p>
-						<p>已注册并绑定为新农代表的用户数：{{ registeredAndBindedCount }}</p>
+						<p>已登记的潜在用户数：{{ form.totalCount }}</p>
+						<p>已注册的用户数：{{ form.registeredCount }}</p>
+						<p>已注册并绑定为新农代表的用户数：{{ form.registeredAndBindedCount }}</p>
+					{{ else }}
+						<h3 class="mb50">暂无新农经纪人信息</h3>
+					{{ fi }}
 					</script>
 				</div>
-				<div class="ui-form-buttons">
-					<div>
-						<button name="submit">@(提交)</button>
-					</div>
-					<button name="cancel">@(取消)</button>
-				</div>
+				<div class="ui-form-buttons"></div>
 			</div>
 		</div>
 	</div>
@@ -277,6 +323,9 @@
 	var agent = {};
 	agent.form = {};
 
+	var RSC = {};
+	RSC.form = {};
+
 	ON('#users.grid', function(component) {
 
 		// Max items per page
@@ -293,11 +342,17 @@
                             return;
                         }
 
-						if(response.user.isXXNRAgent){
-							show_form_button($('#agent_info_button'));
-						} else{
-							hide_form_button($('#agent_info_button'));
-						}
+						// if(response.user.isRSC){
+						// 	show_form_button($('#RSC_info_button'));
+						// } else{
+						// 	hide_form_button($('#RSC_info_button'));
+						// }
+
+						// if(response.user.isXXNRAgent){
+						// 	show_form_button($('#agent_info_button'));
+						// } else{
+						// 	hide_form_button($('#agent_info_button'));
+						// }
 
 						response.user.verifiedTypes = [];
 						response.user.notVerifiedTypes = [];
@@ -348,8 +403,22 @@
 							alert(response.message);
 							return;
 						}
-
-						SET('agent.form', $.extend({}, response.agent), true);
+						if (objIsEmpty(response.agent)) {
+							SET('agent.form', null, true);
+						} else {
+							SET('agent.form', $.extend({}, response.agent), true);
+						}
+					});
+					$.components.GET(managerurl+'/api/v2.2/RSCInfo/'+row._id, null, function(response){
+						if(response.code!=1000){
+							alert(response.message);
+							return;
+						}
+						if (objIsEmpty(response.RSCInfo)) {
+							SET('RSC.form', null, true);
+						} else {
+							SET('RSC.form', $.extend({}, response.RSCInfo), true);
+						}
 					});
 					break;
 
@@ -411,6 +480,9 @@
 			case 'agent_info_button':
 				$('#agent_info').removeClass('hidden');
 				break;
+			case 'RSC_info_button':
+				$('#RSC_info').removeClass('hidden');
+				break;
 		}
 	}
 
@@ -431,6 +503,11 @@
 		}
 
 		$.components.GET(managerurl + '/api/users/', users.filter, function(response) {
+			if(response.code!=1000) {
+				alert(response.message);
+			}
+
+			response = response.users;
             response.items.forEach(function(item){
 				if(item.typeVerified){
 					item.typeNameVerified = [];
@@ -496,7 +573,7 @@
 
 		for(var k=0; k<users.form.typeVerified.length; k++){
 			if(users.form.typeVerified[k] == value){
-				users.form.typeVerified.splice(i, 1);
+				users.form.typeVerified.splice(k, 1);
 				break;
 			}
 		}

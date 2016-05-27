@@ -6,6 +6,7 @@ app.controller('invitationController', function($scope, remoteApiService, common
     var _user = commonService.user;
     var sweetalert = commonService.sweetalert;
     var sweetConfirm = commonService.sweetConfirm;
+    var firstLoadPage = true;
     $scope.InviteeOrders = [];
     $scope.confirm = false;
     $scope.tabNum = 1;
@@ -56,9 +57,10 @@ app.controller('invitationController', function($scope, remoteApiService, common
         .then(function (data) {
             $scope.invitees = data.invitee;
             for(var index in $scope.invitees){
-                var d = Date.fromISO($scope.invitees[index].dateinvited);
-                $scope.invitees[index].dateinvited = d.getFullYear().toString()+'-'+ (d.getMonth()+1).toString() +'-'+d.getDate().toString();
-
+                if($scope.invitees.hasOwnProperty(index)){
+                    var d = Date.fromISO($scope.invitees[index].dateinvited);
+                    $scope.invitees[index].dateinvited = d.getFullYear().toString()+'-'+ (d.getMonth()+1).toString() +'-'+d.getDate().toString();
+                }
             }
         });
 
@@ -78,6 +80,65 @@ app.controller('invitationController', function($scope, remoteApiService, common
             $scope.phoneNumberValidated = false;
         }
     });
+
+    $scope.$watch('tab',function(){
+        remoteApiService.getBasicUserInfo()
+            .then(function (data) {
+                $scope.inviter = data.datas.inviter;
+                if($scope.tab == 2 && firstLoadPage && !$scope.inviter){
+                    firstLoadPage = false;
+                    remoteApiService.getNominatedInviter()
+                        .then(function (data) {
+                            var nominated_inviter = data.nominated_inviter;
+                            if(data.code==1000){
+                                if (navigator.appName == "Microsoft Internet Explorer" && navigator.appVersion.match(/8./i) == "8.") {
+                                    var r = confirm("是否要添加该用户为您的代表？\n" + nominated_inviter.name + "   " + nominated_inviter.phone);
+                                    if (r == true) {
+                                        remoteApiService.bindInviter(nominated_inviter.phone)
+                                            .then(function (data) {
+                                                if (data.code == 1000) {
+                                                    var url = window.location.href;
+                                                    window.location.href = url.substr(0,url.length-1)+"?tab=2";
+                                                } else {
+                                                    sweetalert(data.message);
+                                                }
+                                            });
+                                    } else {
+                                        return false;
+                                    }
+                                } else {
+                                    swal({
+                                            title: "是否要添加该用户为您的代表？",
+                                            text: nominated_inviter.name + "   " + nominated_inviter.phone,
+                                            //type: "warning",
+                                            showCancelButton: true,
+                                            confirmButtonColor: '#00913a',
+                                            confirmButtonText: '确定',
+                                            cancelButtonText: "取消",
+                                            closeOnConfirm: false
+                                        },
+                                        function (isConfirm) {
+                                            if (isConfirm) {
+                                                remoteApiService.bindInviter(nominated_inviter.phone)
+                                                    .then(function (data) {
+                                                        if (data.code == 1000) {
+                                                            var url = window.location.href;
+                                                            window.location.href = url.substr(0,url.length-1)+"?tab=2";
+                                                        } else {
+                                                            sweetalert(data.message);
+                                                        }
+                                                    });
+                                            }
+                                        });
+                                }
+                            }
+                        });
+
+                }
+            });
+    });
+
+
 
     $scope.bindInviter = function(){
         $scope.$apply();

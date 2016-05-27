@@ -58,6 +58,9 @@ exports.install = function() {
     // F.route('/api/v2.0/getMinPayPrice/',       getMinPayPrice, ['get'], ['isLoggedIn']);
     F.route('/api/v2.0/getMinPayPrice/',       getMinPayPrice, ['post', 'get'], ['isLoggedIn']);
 
+    // ISO upgrade message
+    F.route('/api/v2.1/ISOupgrade/',       ISOUpgrade, ['post']);
+
 	// v1.0
     //fix api// F.route('/app/shopCart/getShopCartList', getShoppingCart, ['post', 'get']);
     //fix api// F.route('/app/shopCart/changeNum', updateShoppingCart, ['post', 'get'], ['isLoggedIn']);
@@ -66,6 +69,11 @@ exports.install = function() {
 	//fix api// F.route('/app/goods/getGoodsDetails', getGoodsDetails, ['post', 'get']);
 	F.route('/app/goods/getWebGoodsDetails', api10_getProductDetail, ['post', 'get', 'upload'], 8);
     F.route('/app/ad/getAdList', api10_getBanners, ['post', 'get', 'upload'], 8);
+
+    // F.route('/api/v2.2/getOfflinePayType',              json_offline_pay_type, ['get']);
+    // F.route('/offlinepay', offlinePay, ['get', 'isLoggedIn']);
+    // // TODO: not tested and documented apis, add more conditions, need more tests
+    // F.route('/api/v2.2/RSC/confirmOfflinePay',          process_RSC_confirm_OfflinePay, ['get'],    ['isLoggedIn', 'isRSC']);
 };
 
 var converter = require('../common/converter');
@@ -76,6 +84,7 @@ var api10 = converter.api10;
 var calculatePrice = require('../common/calculator').calculatePrice;
 var PAYMENTSTATUS = require('../common/defs').PAYMENTSTATUS;
 var PAYTYPE = require('../common/defs').PAYTYPE;
+var OFFLINEPAYTYPE = require('../common/defs').OFFLINEPAYTYPE;
 var dri = require('../common/dri');
 var moment = require('moment-timezone');
 // console.log('PAYMENTSTATUS=' + JSON.stringify(PAYMENTSTATUS));
@@ -99,6 +108,10 @@ function getProducts() {
 
 	if(max)
 		options.max = max;
+
+    var pagemax = 50;
+    max = U.parseInt(options.max, 20);
+    options.max = max > pagemax ? pagemax : max;
 
     ProductService.query(options, function(err, data) {
         if(err){
@@ -135,6 +148,10 @@ function getGoodsListPage(transformer) {
 
 	if (max)
 		options.max = max;
+
+    var pagemax = 50;
+    max = U.parseInt(options.max, 20);
+    options.max = max > pagemax ? pagemax : max;
 
     if (brandName)
         options.brandName = decodeURI(brandName).split(',');
@@ -524,6 +541,11 @@ function payOrder(payExecutor){
             return;
         }
 
+        if(order.pendingApprove && tools.isOfflinePayType(self.payType)){
+            self.respond({code:1002, message:'线下付款正在审核中，请等待网点付款审核或者更改付款方式'});
+            return;
+        }
+
         if (!payment || typeof(payment.id) === 'undefined' || typeof(payment.price) === 'undefined') {
             if (order.payStatus === PAYMENTSTATUS.PAID) {
                 self.respond({code:1001, message:'订单已支付'});
@@ -776,6 +798,7 @@ function payNotify(paymentId, options){
             console.error('api-v1.0 payNotify OrderService get err:', err);
             dri.sendDRI('[DRI] Fail to get order in order payNotify: ', 'paymentId:'+paymentId, err);
         }
+
         if (order) {
             var payment = {paymentId: paymentId};
             if (options && options.price) {
@@ -1215,5 +1238,88 @@ function getMinPayPrice() {
         self.respond({'code': '1000', 'message': 'success', 'payprice': minPayPrice});
     } else {
         self.respond({'code': '1002', 'message': '未查询到数据'});
+    }
+}
+
+function offlinePay(){
+    var self = this;
+
+    // default offline pay type
+    self.payType = PAYTYPE.CASH;
+
+    payOrder.call(this, function(paymentId, totalPrice, ip, orderId, payment) {
+        OrderService.changeToPendingApprove(orderId, function(err){
+            if(err){
+                self.respond({code:1002, message:'更改订单状态失败'});
+                return;
+            }
+
+            self.respond({code:1000, message:'success', "paymentId":paymentId, "price":totalPrice});
+        });
+    });
+}
+
+function process_RSC_confirm_OfflinePay(){
+    var self = this;
+    var paymentId = self.data.paymentId;
+    var price = self.data.price;
+    var offlinePayType = self.data.offlinePayType;
+    var RSC = self.user;
+    if(!paymentId){
+        self.respond({code:1001, message:'paymentId required'});
+        return;
+    }
+
+    if(!price){
+        self.respond({code:1001, message:'price required'});
+        return;
+    }
+
+    if(!offlinePayType){
+        self.respond({code:1001, message:'offlinePayType required'});
+        return;
+    }
+
+    OrderService.get({"paymentId": paymentId}, function(err, order) {
+        if (err) {
+            self.respond({code:1002, message:'获取订单失败'});
+            return;
+        }
+
+        if(!order.RSCInfo || order.RSCInfo.RSC.toString() == RSC._id.toString()){
+            self.respond({code:1002, message:'该订单未分配到县级网点'});
+            return;
+        }
+
+        if(!order.pendingApprove){
+            self.respond({code:1002, message:'该订单没有待审核的线下支付'});
+            return;
+        }
+
+        var options = {payType:offlinePayType, price:price};
+        payNotify.call(self, paymentId, options);
+        self.respond({code:1000, message:'success'});
+
+        // pay success log
+        var payLog = {paymentId:paymentId, payType:offlinePayType, price:price, datePaid: new Date()};
+        OrderService.savePaidLog(payLog);
+    });
+}
+
+function json_offline_pay_type(){
+    var self = this;
+    self.respond({code:1000, message:'success', offlinePayType:OFFLINEPAYTYPE});
+}
+
+function ISOUpgrade() {
+    var self = this;
+    var postVersion = self.data['version'] || '';
+    var nowVersion = '2.1.5';
+    if (!postVersion || (postVersion != nowVersion && postVersion < nowVersion)) {
+        self.respond({code:1000, message:'版本升级啦，快点去更新吧', version: nowVersion});
+        return;
+    } else {
+        self.respond({code:1200, message:'最新版本', version: nowVersion});
+        return;
     }
 }

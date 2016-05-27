@@ -14,8 +14,13 @@ var CategoryService = services.category;
 var PotentialCustomerService = services.potential_customer;
 var AuditlogService = services.auditservice;
 var PayService = services.pay;
+var AreaService = services.area;
+var RSCService = services.RSC;
 var PAYMENTSTATUS = require('../common/defs').PAYMENTSTATUS;
 var DELIVERSTATUS = require('../common/defs').DELIVERSTATUS;
+var DELIVERYTYPENAME = require('../common/defs').DELIVERYTYPENAME;
+var OFFLINEPAYTYPE = require('../common/defs').OFFLINEPAYTYPE;
+var DELIVERYTYPE =  require('../common/defs').DELIVERYTYPE;
 
 exports.install = function() {
 	// Auto-localize static HTML templates
@@ -25,6 +30,11 @@ exports.install = function() {
 	F.route(CONFIG('manager-url') + '/*', 									'~manager', ['get'], ['backend_auth']);
 	F.route(CONFIG('manager-url') + '/upload/',                  			upload, ['post', 'upload'], 3084, ['backend_auth']); // 3 MB
 	F.route(CONFIG('manager-url') + '/upload/base64/',           			upload_base64, ['post'], 2048, ['backend_auth']); // 2 MB
+	// AREA
+	F.route(CONFIG('manager-url') + '/api/area/getProvinceList/',			json_province_query, ['get', 'post'], ['backend_auth']);
+	F.route(CONFIG('manager-url') + '/api/area/getCityList/',				json_city_query, ['get', 'post'], ['backend_auth']);
+	F.route(CONFIG('manager-url') + '/api/area/getCountyList/',				json_county_query, ['get', 'post'], ['backend_auth']);
+	F.route(CONFIG('manager-url') + '/api/area/getTownList/',				json_town_query, ['get', 'post'], ['backend_auth']);
 
 	// Products UPLOAD IMAGE
 	F.route(CONFIG('manager-url') + '/products/uploadImage/',    			CKEditor_uploadImage, ['post', 'upload'], 20480, ['backend_auth']); // 20 MB
@@ -47,6 +57,11 @@ exports.install = function() {
 	F.route(CONFIG('manager-url') + '/api/orders/subOrders/',              	json_subOrders_payments_update, ['put'], ['backend_auth', 'auditing']);
 	F.route(CONFIG('manager-url') + '/api/orders/products/',              	json_orders_products_update, ['put'], ['backend_auth', 'auditing']);
 	F.route(CONFIG('manager-url') + '/api/orders/SKUs/',              		json_orders_SKUs_update, ['put'], ['backend_auth', 'auditing']);
+	F.route(CONFIG('manager-url') + '/api/orders/SKUsDelivery/',            json_orders_SKUs_delivery, ['put'], ['backend_auth', 'auditing']);
+	F.route(CONFIG('manager-url') + '/api/orders/RSCInfo/',					process_orders_RSCInfo_update, ['put'], ['backend_auth', 'auditing']);
+	F.route(CONFIG('manager-url') + '/api/orders/confirmOfflinePay',    	process_order_confirm_OfflinePay, ['get'], ['backend_auth', 'auditing']);
+	F.route(CONFIG('manager-url') + '/api/order/getOfflinePayType',          json_offline_pay_type, ['get'], ['backend_auth']);
+
 	// F.route(CONFIG('manager-url') + '/api/orders/',              			json_orders_save, ['put'], ['backend_auth']);
 	// F.route(CONFIG('manager-url') + '/api/orders/',              			json_orders_remove, ['delete']);
 	// F.route(CONFIG('manager-url') + '/api/orders/clear/',        			json_orders_clear);
@@ -150,6 +165,14 @@ exports.install = function() {
 	F.route(CONFIG('manager-url') + '/api/v2.1/potentialCustomer/query',	json_potential_customer_query,	['get'], ['backend_auth']);
 	F.route(CONFIG('manager-url') + '/api/v2.1/potentialCustomer/{_id}',	json_potential_customer_get, ['get'], ['backend_auth']);
 	F.route(CONFIG('manager-url') + '/api/v2.1/agentinfo/{_id}',			json_agent_info_get, ['get'], ['backend_auth']);
+
+	// RSC
+	F.route(CONFIG('manager-url') + '/api/v2.2/RSCInfo/{_id}',				json_RSC_info_get, ['get'], ['backend_auth']);
+	F.route(CONFIG('manager-url') + '/api/v2.2/RSCs',						json_RSC_query, ['get'], ['backend_auth']);
+	F.route(CONFIG('manager-url') + '/api/v2.2/RSC/modify',					process_RSC_modify, ['put'], ['backend_auth']);
+	F.route(CONFIG('manager-url') + '/api/v2.2/RSC/queryByProducts',		json_RSC_query_by_products,['get'],['backend_auth']);
+	// RSC orders
+	F.route(CONFIG('manager-url') + '/api/v2.2/RSC/orders/',              	json_RSCorders_query, ['get'], ['backend_auth']);
 
 	// pay refund
 	F.route(CONFIG('manager-url') + '/api/payrefunds/',            			json_payrefund_query, ['get'], ['backend_auth']);
@@ -256,6 +279,94 @@ function upload_base64() {
 	}
 
 	self.json('/download/' + id);
+}
+
+// ==========================================================================
+// AREA
+// ==========================================================================
+// Province
+function json_province_query() {
+	var self = this;
+	var options = {};
+
+	AreaService.queryProvince(options, function(err, data){
+		if(!data || err){
+			if (err)
+				console.log('area json_province_query err:' + err);
+			self.respond({'code':'1001','message':'没有查询到省份'});
+			return;
+		} else{
+			self.respond({'code':'1000','message':'success','datas':{"total":data.count,"rows":data.items}});
+			return;
+		}
+	});
+	
+}
+
+// City
+function json_city_query() {
+	var self = this;
+	var options = {};
+	if (self.data.provinceId)
+		options.provinceid = self.data.provinceId;
+
+	AreaService.queryCity(options, function(err, data){
+		if(!data || err){
+			if (err)
+				console.log('area json_city_query err:' + err);
+			self.respond({'code':'1001','message':'没有查询到城市'});
+			return;
+		} else{
+			self.respond({'code':'1000','message':'success','datas':{"total":data.count,"rows":data.items}});
+			return;
+		}
+	});
+}
+
+// County
+function json_county_query() {
+	var self = this;
+	var options = {};
+	if (self.data.provinceId)
+		options.provinceid = self.data.provinceId;
+	if (self.data.cityId)
+		options.cityid = self.data.cityId;
+
+	AreaService.queryCounty(options, function(err, data){
+		if(!data || err) {
+			if (err)
+				console.log('area json_county_query err:' + err);
+			self.respond({'code':'1001','message':'没有查询到县区'});
+			return;
+		} else {
+			self.respond({'code':'1000','message':'success','datas':{"total":data.count,"rows":data.items}});
+			return;
+		}
+	});
+}
+
+// Town
+function json_town_query() {
+	var self = this;
+	var options = {};
+	if (self.data.provinceId)
+		options.provinceid = self.data.provinceId;
+	if (self.data.cityId)
+		options.cityid = self.data.cityId;
+	if (self.data.countyId)
+		options.countyid = self.data.countyId;
+
+	AreaService.queryTown(options, function(err, data){
+		if(!data || err) {
+			if (err)
+				console.log('area json_town_query err:' + err);
+			self.respond({'code':'1001','message':'没有查询到乡镇'});
+			return;
+		} else {
+			self.respond({'code':'1000','message':'success','datas':{"total":data.count,"rows":data.items}});
+			return;
+		}
+	});
 }
 
 // ==========================================================================
@@ -508,22 +619,61 @@ function json_orders_query() {
         if (orders) {
 	        var items = orders.items;
 	        var length = items.length;
+	        var arr = [];
 	        for (var i = 0; i < length; i++) {
-                var item = items[i];
-                // 订单合成状态
-                item.typeValue = OrderService.orderType(item);
-                var orderInfo = {'totalPrice':item.price.toFixed(2), 'deposit':item.deposit.toFixed(2), 'dateCreated':item.dateCreated, 'orderStatus': OrderService.orderStatus(item)};
-                if (item.payStatus == PAYMENTSTATUS.PAID && item.datePaid) {
-                    orderInfo.datePaid = item.datePaid;
-                }
-                if (item.payStatus == DELIVERSTATUS.DELIVERED && item.dateDelivered) {
-                    orderInfo.dateDelivered = item.dateDelivered;
-                }
-                if (item.confirmed && item.dateCompleted) {
-                    orderInfo.dateCompleted = item.dateCompleted;
-                }
-                item.order = orderInfo;
-            }
+				// var item = items[i];
+				var order = items[i];
+				var item = {
+					'id': order.id,
+					'paymentId': order.paymentId,
+					'price': order.price,
+					'deposit': order.deposit,
+					'consigneeAddress': order.consigneeAddress,
+					'consigneeName': order.consigneeName,
+					'consigneePhone': order.consigneePhone,
+					'buyerName': order.buyerName,
+					'buyerPhone': order.buyerPhone,
+					'payType': order.payType,
+					'products': order.products || [],
+					'SKUs': order.SKUs || [],
+					'duePrice': typeof(order.duePrice) != 'undefined' ? parseFloat(order.duePrice.toFixed(2)) : null,
+					'deliveryType': order.deliveryType,
+					'payStatus': order.payStatus,
+					'deliverStatus': order.deliverStatus,
+					'RSCInfo': order.RSCInfo,
+					'isClosed': order.isClosed
+				};
+				// 订单合成状态
+				item.typeValue = OrderService.orderType(order);
+				// 创建时间
+				item.dateCreated = order.dateCreated;
+				// 支付时间
+				if (order.payStatus == PAYMENTSTATUS.PAID && order.datePaid) {
+					item.datePaid = order.datePaid;
+				}
+				// 待收货时间
+				if (order.payStatus == PAYMENTSTATUS.PAID && order.deliverStatus !== DELIVERSTATUS.UNDELIVERED && order.datePendingDeliver) {
+					item.datePendingDeliver = order.datePendingDeliver;
+				}
+				// 全部发货时间
+				if (order.deliverStatus == DELIVERSTATUS.DELIVERED && order.dateDelivered) {
+					item.dateDelivered = order.dateDelivered;
+				}
+				// 完成时间
+				if (order.deliverStatus == DELIVERSTATUS.RECEIVED && order.dateCompleted) {
+					item.dateCompleted = order.dateCompleted;
+				}
+				var orderInfo = {
+					'totalPrice': order.price.toFixed(2),
+					'deposit': order.deposit.toFixed(2),
+					'dateCreated': order.dateCreated,
+					'orderStatus': OrderService.orderStatus(order),
+					'pendingDeliverToRSC': OrderService.pendingDeliverToRSC(order)
+				};
+				item.order = orderInfo;
+				arr[i] = item;
+			}
+            orders.items = arr;
         }
         self.respond({code:1000, message:'success', datas:orders});
     });
@@ -626,7 +776,11 @@ function json_orders_SKUs_update() {
 	    	}
        	}
     }
-    OrderService.updateSKUs({'id':orderid,'SKUs':updateSKUs}, function(err) {
+	var options = {'id':orderid,'SKUs':updateSKUs};
+	if (self.user) {
+		options.backendUser = self.user;
+	}
+    OrderService.updateSKUs(options, function(err) {
 		if (err) {
 			console.error('manager json_orders_SKUs_update err:', err);
 			self.respond({code:1004, message:'系统错误，更新失败', error:[{'error':'系统错误，更新失败'}]});
@@ -636,23 +790,171 @@ function json_orders_SKUs_update() {
 	});
 }
 
+//  SKUs deliver
+function json_orders_SKUs_delivery() {
+	var self = this;
+	var orderid = self.body && self.body.id ? self.body.id: null;
+	var SKUs = self.body && self.body.SKUs ? self.body.SKUs: null;
+	if (!orderid) {
+		self.respond({code:1001, message:'请求参数错误', error:[{'error':'更新失败，缺少订单ID'}]});
+		return;
+	}
+	if (!SKUs) {
+		self.respond({code:1001, message:'请求参数错误', error:[{'error':'更新失败，缺少商品列表'}]});
+		return;
+	}
+
+	OrderService.getById(orderid, function(err, order) {
+		if (err) {
+			console.error('manager json_orders_read error:', err);
+			self.respond({code:1004, message:'系统错误，没有找到订单信息', error:[{'error':'系统错误，没有找到订单信息'}]});
+			return;
+		}
+
+		var postSKUs = {};
+		if (SKUs && SKUs.length > 0) {
+			for (var i = 0; i < SKUs.length; i++) {
+				var sku = SKUs[i];
+
+				if (!postSKUs.hasOwnProperty(sku.ref)) {
+					postSKUs[sku.ref] = sku;
+				}
+			}
+		}
+
+		var updateSKUs = {};
+		if (order.SKUs && order.SKUs.length > 0) {
+			for(var i = 0; i < order.SKUs.length; i++) {
+				var deliverStatus = order.SKUs[i].deliverStatus;
+				var sku_ref = order.SKUs[i].ref;
+				if(postSKUs[sku_ref] && deliverStatus != postSKUs[sku_ref].deliverStatus) {
+					if(!((deliverStatus == DELIVERSTATUS.UNDELIVERED && postSKUs[sku_ref].deliverStatus == DELIVERSTATUS.RSCRECEIVED)
+						|| (deliverStatus == DELIVERSTATUS.RSCRECEIVED && postSKUs[sku_ref].deliverStatus == DELIVERSTATUS.DELIVERED && order.deliveryType == DELIVERYTYPE.SONGHUO.id))) {
+						self.respond({code:1001, message:'状态不符合', error:[{'error':'状态不符合'}]});
+						return;
+					}
+					updateSKUs[sku_ref] = postSKUs[sku_ref];
+				}
+			}
+
+
+			if (!U.isEmpty(updateSKUs)) {
+				var options = {'id':orderid,'SKUs':updateSKUs};
+				if (self.user) {
+					options.backendUser = self.user;
+				}
+				OrderService.updateSKUs(options, function(err) {
+					if (err) {
+						console.error('manager json_orders_SKUs_update err:', err);
+						self.respond({code:1004, message:'系统错误，更新失败', error:[{'error':'系统错误，更新失败'}]});
+						return;
+					}
+					self.respond({code:1000, message:'success', success: true});
+				});
+			} else {
+				self.respond({code:1001, message:'没有需要修改的SKU', error:[{'error':'没有需要修改的SKUs'}]});
+				return;
+			}
+		} else {
+			self.respond({code:1001, message:'没有查找到SKUs', error:[{'error':'没有查找到SKUs'}]});
+			return;
+		}
+	});
+}
+
+// order offline pay notify function
+function process_order_confirm_OfflinePay(){
+	var self = this;
+	var paymentId = self.data.paymentId;
+	var offlinePayType = self.data.offlinePayType;
+	var RSCId = self.data.RSCId;
+	//var RSC = self.user;
+	if(!paymentId){
+		self.respond({code:1001, message:'paymentId required'});
+		return;
+	}
+
+	if(!offlinePayType){
+		self.respond({code:1001, message:'offlinePayType required'});
+		return;
+	}
+
+	if(!RSCId){
+		self.respond({code:1001, message:'RSCId required'});
+		return;
+	}
+
+	OrderService.get({"paymentId": paymentId}, function(err, order) {
+		if (err) {
+			self.respond({code:1002, message:'获取订单失败'});
+			return;
+		}
+
+		//if(!order.RSCInfo || order.RSCInfo.RSC.toString() != RSC._id.toString()){
+		//	self.respond({code:1002, message:'该订单未分配到县级网点'});
+		//	return;
+		//}
+
+		if(!order.pendingApprove){
+			self.respond({code:1002, message:'该订单没有待审核的线下支付'});
+			return;
+		}
+
+		var payment = OrderService.getPaymentInOrder(order, paymentId);
+		if(!payment){
+			self.respond({code:1002, message:'确认付款失败'});
+			return;
+		}
+
+		UserService.getRSCInfoById(RSCId, function(err, RSC) {
+
+			if(err || !RSC) {
+				if(err) console.error('manager process_order_confirm_OfflinePay UserService getRSCInfoById err:', err);
+				self.respond({code:1002, message:'未查找到RSC'});
+				return;
+			}
+
+			var options = {
+				payType: offlinePayType,
+				price: payment.payPrice ? payment.payPrice : payment.price,
+				datePaid: new Date()
+			};
+
+			if (self.user) {
+				options.backendUser = self.user;
+			}
+
+			RSC._id = RSCId;
+			options.RSC = RSC;
+
+			OrderService.payNotify(paymentId, options);
+			self.respond({code: 1000, message: 'success'});
+		});
+	});
+}
+
+function json_offline_pay_type(){
+	var self = this;
+	self.respond({code:1000, message:'success', offlinePayType:OFFLINEPAYTYPE});
+}
+
 // Reads a specific order by ID
 function json_orders_read(id) {
 	var self = this;
 	var options = {};
 	options.id = id;
 	
-	OrderService.get(options, function(err, order) {
+	OrderService.get(options, function(err, order, payment) {
 		if (err) {
 			console.error('manager json_orders_read error:', err);
 			self.respond({code:1004, message:'系统错误，没有找到订单信息', error:[{'error':'系统错误，没有找到订单信息'}]});
 			return;
 		}
-        self.respond({code:1000, message:'success', datas: convertOrderToShow(order)});
+        self.respond({code:1000, message:'success', datas: convertOrderToShow(order, payment)});
     });
 }
 
-var convertOrderToShow = function(order){
+var convertOrderToShow = function(order, orderpayment){
     var subOrdersPayments = {};					// suborder all payments
 
 	if (order && order.payments) {
@@ -692,11 +994,17 @@ var convertOrderToShow = function(order){
 				}
 				payment.price = parseFloat(payment.price.toFixed(2));
 			}
+			// 本阶段要付金额
 			subOrder.price = parseFloat(subOrder.price.toFixed(2));
+			// 本阶段已付金额
 			subOrder.paidPrice = parseFloat(paidPrice.toFixed(2));
+			// 本阶段已支付次数
 			subOrder.paidTimes = paidTimes;
+			// 本阶段支付已关闭次数
 			subOrder.closedTimes = closedTimes;
+			// 本阶段的所有支付信息列表
 			subOrder.payments = payments;
+			// 本阶段支付时间
 			subOrder.datePaid = datePaid;
 			subOrders.push(subOrder);
 		}
@@ -706,24 +1014,41 @@ var convertOrderToShow = function(order){
 
 	// order status and type
 	if (order) {
+		// 总价
 		order.price = parseFloat(order.price.toFixed(2));
+		// 定金
 		if (order.deposit)
 			order.deposit = parseFloat(order.deposit.toFixed(2));
+		// 待付金额
 		if (order.duePrice)
 			order.duePrice = parseFloat(order.duePrice.toFixed(2));
 		// 订单合成状态
-        order.orderType = OrderService.orderType(order);
-		var orderInfo = {'totalPrice':parseFloat(order.price.toFixed(2)),'deposit':parseFloat(order.deposit.toFixed(2)),'dateCreated':order.dateCreated, 'orderStatus': OrderService.orderStatus(order)};
-        if (order.payStatus == PAYMENTSTATUS.PAID && order.datePaid) {
-            orderInfo.datePaid = order.datePaid;
-        }
-        if (order.payStatus == DELIVERSTATUS.DELIVERED && order.dateDelivered) {
-            orderInfo.dateDelivered = order.dateDelivered;
-        }
-        if (order.confirmed && order.dateCompleted) {
-            orderInfo.dateCompleted = order.dateCompleted;
-        }
-        order.order = orderInfo;
+		order.orderType = OrderService.orderType(order);
+		var orderInfo = {
+			'totalPrice': parseFloat(order.price.toFixed(2)),
+			'deposit': parseFloat(order.deposit.toFixed(2)),
+			'dateCreated': order.dateCreated,
+			'orderStatus': OrderService.orderStatus(order),
+			'pendingDeliverToRSC': OrderService.pendingDeliverToRSC(order)
+		};
+		// 支付时间
+		if (order.payStatus == PAYMENTSTATUS.PAID && order.datePaid) {
+			orderInfo.datePaid = order.datePaid;
+		}
+		// 待收货时间
+		if (order.datePendingDeliver) {
+			orderInfo.datePendingDeliver = order.datePendingDeliver;
+		}
+		// 全部发货时间
+		if (order.deliverStatus == DELIVERSTATUS.DELIVERED && order.dateDelivered) {
+			orderInfo.dateDelivered = order.dateDelivered;
+		}
+		// 完成时间
+		if (order.deliverStatus == DELIVERSTATUS.RECEIVED && order.dateCompleted) {
+			orderInfo.dateCompleted = order.dateCompleted;
+		}
+		orderInfo.payment = orderpayment;
+		order.order = orderInfo;
 	}
 
     return order;
@@ -737,7 +1062,14 @@ var convertOrderToShow = function(order){
 function json_users_query() {
 	var self = this;
 
-	UserService.query(self.query, self.callback());
+	UserService.query(self.query, function(err, data){
+		if(err){
+			self.respond({code:1001, message:err});
+			return;
+		}
+
+		self.respond({code:1000, users:data || []});
+	});
 }
 
 // Saves specific user (user must exist)
@@ -1547,6 +1879,193 @@ function json_agent_info_get(id){
 }
 
 // ==========================================================================
+// RSC
+// ==========================================================================
+
+function json_RSC_info_get(id){
+	var self = this;
+	UserService.getRSCInfoById(id, function(err, user){
+		if(err){
+			self.respond({code:1001, message:'查询失败'});
+			return;
+		}
+
+		var RSCInfo = user.RSCInfo ? user.RSCInfo.toObject() : user.RSCInfo;
+		if (U.isEmpty(RSCInfo)) {
+			RSCInfo = null;
+		} else {
+			if (U.isEmpty(RSCInfo.companyAddress)) {
+				delete RSCInfo.companyAddress;
+			}
+			if (U.isEmpty(RSCInfo.products)) {
+				delete RSCInfo.products;
+			}
+		}
+		self.respond({code:1000, message:'success', RSCInfo:RSCInfo, id:user.id, account:user.account});
+	})
+}
+
+function json_RSC_query(){
+	var self = this;
+	var page = U.parseInt(self.data.page, 1) - 1;
+	var max = U.parseInt(self.data.max, 20);
+	RSCService.getRSCList(null, null, null, null, null, page, max, function(err, RSCs, count, pageCount){
+		if(err){
+			self.respond({code:1002, message:err});
+			return;
+		}
+
+		self.respond({code:1000, message:'success', RSCs:RSCs, count:count, pageCount:pageCount});
+	}, self.data.search)
+}
+
+function process_RSC_modify(){
+	var self = this;
+	if(self.data.IDNo && !tools.isValidIdentityNo(self.data.IDNo)){
+		self.respond({code:1001, message:'请填写正确的身份证号'});
+		return;
+	}
+
+	if(self.data.phone && !tools.isPhone(self.data.phone)){
+		self.respond({code:1001, message:'请填写正确的手机号'});
+		return;
+	}
+
+	if(typeof self.data.EPOSNo != 'undefined' && self.data.EPOSNo) {
+		UserService.getRSCInfoByEPOSNo(self.data.EPOSNo, function(err, RSC) {
+			if(err){
+				console.error('manager process_RSC_modify UserService getRSCInfoByEPOSNo err:', err);
+				self.respond({code:1002, message:err});
+				return;
+			}
+			if (RSC) {
+				self.respond({code:1002, message:"此设备号已经被绑定过了", RSC: RSC});
+				return;
+			} else {
+				RSCService.modifyRSCInfo(self.data.id, self.data, function(err){
+					if(err){
+						self.respond({code:1002, message:err});
+						return;
+					}
+
+					self.respond({code:1000, message:'success'});
+				});
+			}
+		});
+	} else {
+		RSCService.modifyRSCInfo(self.data.id, self.data, function(err){
+			if(err){
+				self.respond({code:1002, message:err});
+				return;
+			}
+
+			self.respond({code:1000, message:'success'});
+		});
+	}
+}
+
+function json_RSCorders_query() {
+    var self = this;
+    if (!self.data.RSCId) {
+    	self.respond({code:1001, message:'获取订单失败，需要RSCId'});
+    	return;
+    }
+    var RSC = self.data.RSCId;
+    var page = U.parseInt(self.data.page, 1) - 1;
+    var max = U.parseInt(self.data.max, 20);
+    var type = U.parseInt(self.data.type);
+    if (page < 0)
+		page = 0;
+	if(max > 50)
+        max = 50;
+    OrderService.getByRSC(RSC, page, max, type, function (err, orders, count, pageCount) {
+        if (err) {
+            self.respond({code:1002, message:'获取订单失败'});
+            return;
+        }
+        
+        if (orders) {
+        	var results = [];
+	        var length = orders.length;
+	        for (var i = 0; i < length; i++) {
+                var order = orders[i];
+                var orderInfo = {
+                	id: order.id,
+                	totalPrice: order.price,
+                	deposit: order.deposit,
+                	duePrice: order.duePrice,
+                	// 下单时间
+                	dateCreated: order.dateCreated,
+                	// 配送方式
+                	delivery: {type:order.deliveryType, value:DELIVERYTYPENAME[order.deliveryType]},
+                	SKUs: order.SKUs,
+                	consigneeName: order.consigneeName,
+					consigneePhone: order.consigneePhone,
+					consigneeAddress: order.consigneeAddress,
+					RSCInfo: order.RSCInfo
+                };
+                // 订单状态
+            	orderInfo.orderStatus 				= OrderService.orderStatus(order);
+                // 订单合成状态
+                orderInfo.typeValue 				= OrderService.orderType(order);
+                // 订单RSC的合成状态
+                orderInfo.RSCtypeValue 				= OrderService.RSCOrderStatus(order);
+                // 支付状态
+	            orderInfo.payStatus         		= order.payStatus;
+	            // 发货状态
+	            orderInfo.deliverStatus     		= order.deliverStatus;
+                // 支付时间
+                if (order.payStatus == PAYMENTSTATUS.PAID && order.datePaid) {
+                    orderInfo.datePaid 				= order.datePaid;
+                }
+                // 待收货时间
+			    if (order.datePendingDeliver) {
+			        orderInfo.datePendingDeliver 	= order.datePendingDeliver;
+			    }
+               	// 全部发货时间
+                if (order.deliverStatus == DELIVERSTATUS.DELIVERED && order.dateDelivered) {
+                    orderInfo.dateDelivered 		= order.dateDelivered;
+                }
+                // 收货时间 完成时间
+                if (order.deliverStatus == DELIVERSTATUS.RECEIVED && order.dateCompleted) {
+                    orderInfo.dateCompleted 		= order.dateCompleted;
+                }
+                results.push(orderInfo);
+            }
+            self.respond({code:1000, message:'success', orders:results, count:count, pageCount:pageCount, page:page+1});
+        } else {
+        	self.respond({code:1000, message:'success', orders:[], count:0, pageCount:1, page:page+1});
+        }
+    });
+}
+
+function json_RSC_query_by_products(){
+	var self = this;
+	var productIds = self.data.productIds.split(',');
+
+	ProductService.queryProductsById(productIds, function(err, products){
+		if(err){
+			self.respond({code: 1002, message: '查询失败' + err});
+			return;
+		}
+
+		var product_ids = [];
+		products.forEach(function(product){
+			product_ids.push(product._id.toString());
+		});
+
+		RSCService.getRSCList(product_ids, null, null, null, null, null, null, function(err, RSCs, count, pageCount){
+			if(err){
+				self.respond({code: 1002, message: '查询失败' + err});
+				return;
+			}
+
+			self.respond({code:1000, message:'success', RSCs:RSCs});
+		});
+	})
+}
+
+// ==========================================================================
 // Pay Refund
 // ==========================================================================
 
@@ -1615,4 +2134,18 @@ function json_payrefund_update() {
 			self.respond({code:1000, message:'success'});
 		});
 	});
+}
+
+function process_orders_RSCInfo_update(){
+	var self = this;
+	var orderId = self.data.id;
+	var RSCInfo = self.data.RSCInfo;
+	OrderService.updateRSCInfo(orderId, RSCInfo, function(err){
+		if(err){
+			self.respond({code:1002, message:err});
+			return;
+		}
+
+		self.respond({code:1000, message:'success'});
+	})
 }

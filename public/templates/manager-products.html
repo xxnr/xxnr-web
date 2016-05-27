@@ -83,33 +83,64 @@
 
                 <div data-component="template" data-component-path="products" class="attribute_list">
                     <script type="text/html">
-                        {{ foreach attribute in form.attributes }}
-                        <div class="col-md-7 m">
-                            <div class="ui-dropdown-label ui-dropdown-label-required">{{attribute.name}}:</div>
-                            <div class="ui-dropdown-values">
-                                <div class="ui-dropdown">
-                                    <span class="fa fa-sort"></span>
-                                    <select data-index="{{ $index }}" required>
-                                        <option selected disabled hidden value=''></option>
-                                        {{ if attributes }}
-                                        {{ foreach value in attributes[attribute.name].values }}
-                                        <option value="{{ value.value }}" ref="{{value.ref}}" name="{{attribute.name}}" {{ if value.ref==attribute.ref}} selected {{ fi }}>{{value.value}}</option>
-                                        {{ end }}
-                                        {{ fi }}
-                                    </select>
+                        <div class="public">
+                            {{ foreach attribute in form.public_attributes }}
+                            <div class="col-md-7 m">
+                                <div class="ui-dropdown-label ui-dropdown-label-required">{{attribute.name}}:</div>
+                                <div class="ui-dropdown-values">
+                                    <div class="ui-dropdown">
+                                        <span class="fa fa-sort"></span>
+                                        <select data-index="{{ $index }}" required>
+                                            <option selected disabled hidden value=''></option>
+                                            {{ if attributes }}
+                                            {{ foreach value in attributes[attribute.name].values }}
+                                            <option value="{{ value.value }}" ref="{{value.ref}}" name="{{attribute.name}}" {{ if value.ref==attribute.ref}} selected {{ fi }}>{{value.value}}</option>
+                                            {{ end }}
+                                            {{ fi }}
+                                        </select>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="col-md-3 m">
-                            <div class="ui-textbox-label">添加{{attribute.name}}:</div>
-                            <div class="ui-textbox-with-button new_attribute">
-                                <input class="col-md-10" type="text"/>
-                                <a class="col-md-2 account" href="javascript:void(0)" onclick="new_attribute('{{attribute.name}}', {{$index}})">
-                                    <span class="fa fa-plus-circle"></span>
-                                </a>
+                            <div class="col-md-3 m">
+                                <div class="ui-textbox-label">添加{{attribute.name}}:</div>
+                                <div class="ui-textbox-with-button new_public_attribute">
+                                    <input class="col-md-10" type="text"/>
+                                    <a class="col-md-2 account" href="javascript:void(0)" onclick="new_public_attribute('{{attribute.name}}', {{$index}})">
+                                        <span class="fa fa-plus-circle"></span>
+                                    </a>
+                                </div>
                             </div>
+                            {{ end }}
                         </div>
-                        {{ end }}
+                        <div class="private">
+                            {{ foreach attribute in form.private_attributes }}
+                            <div class="col-md-7 m">
+                                <div class="ui-dropdown-label ui-dropdown-label-required">{{attribute.name}}:</div>
+                                <div class="ui-dropdown-values">
+                                    <div class="ui-dropdown">
+                                        <span class="fa fa-sort"></span>
+                                        <select data-index="{{ $index }}" required>
+                                            <option selected disabled hidden value=''></option>
+                                            {{ if attributes }}
+                                            {{ foreach value in attributes[attribute.name].values }}
+                                            <option value="{{ value.value }}" ref="{{value.ref}}" name="{{attribute.name}}" {{ if value.ref==attribute.ref}} selected {{ fi }}>{{value.value}}</option>
+                                            {{ end }}
+                                            {{ fi }}
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 m">
+                                <div class="ui-textbox-label">添加{{attribute.name}}:</div>
+                                <div class="ui-textbox-with-button new_private_attribute">
+                                    <input class="col-md-10" type="text"/>
+                                    <a class="col-md-2 account" href="javascript:void(0)" onclick="new_private_attribute('{{attribute.name}}', {{$index}})">
+                                        <span class="fa fa-plus-circle"></span>
+                                    </a>
+                                </div>
+                            </div>
+                            {{ end }}
+                        </div>
                     </script>
                 </div>
             </div>
@@ -374,6 +405,77 @@
         SET('products.expanded', []);
     }
 
+    function product_form_refresh(product_id){
+        clear_SKU_attributes();
+        products.SKUChanged = [];
+        $.components.GET(managerurl + '/api/products/' + product_id, null, function(response, err) {
+            // Error prevention
+            if (response instanceof Array)
+                response = {};
+
+            if (response && response.category) {
+                request_brands(response.linker_category, function() {
+                    request_product_attribute(response.linker_category, 0, function (product_attributes_without_brand) {
+                        request_product_attribute(response.linker_category, response.brand._id, function (product_attributes_with_brand) {
+                            // product_attributes is queried from product attributes
+                            // and should be merged with current product attributes from product form
+                            for(var j=0; j<product_attributes_without_brand.length; j++){
+                                var attribute = product_attributes_without_brand[j];
+                                for(var i=0; i<response.attributes.length; i++){
+                                    if(attribute.name === response.attributes[i].name){
+                                        product_attributes_without_brand.splice(j, 1, response.attributes[i]);
+                                        break;
+                                    }
+                                }
+                            }
+
+                            for(var j=0; j<product_attributes_with_brand.length; j++){
+                                var attribute = product_attributes_with_brand[j];
+                                for(var i=0; i<response.attributes.length; i++){
+                                    if(attribute.name === response.attributes[i].name){
+                                        product_attributes_with_brand.splice(j, 1, response.attributes[i]);
+                                        break;
+                                    }
+                                }
+                            }
+
+                            response.public_attributes = product_attributes_without_brand;
+                            response.private_attributes = product_attributes_with_brand;
+                            bind_brand_change(response.linker_category);
+
+                            var path_id = 'products.form';
+                            SET(path_id, $.extend({$index: index}, response), true);
+                            products_init_ckeditors(response);
+                            SET('common.form', 'products');
+                            formModified = false;
+                            request_SKU_attribute(response.linker_category, response.brand._id, function(SKU_attributes){
+                                SKU_attributes_all = SKU_attributes_all.concat(SKU_attributes);
+                                request_SKU_Addition(response.linker_category, response.brand._id, function(){
+                                    $.components.GET(managerurl + '/api/v2.1/SKU/query?product=' + response._id, null, function (response) {
+                                        if (response.code == 1000) {
+                                            products.SKUExistAttributes=[];
+                                            products.SKUExistAdditions=[];
+                                            response.SKUs.forEach(function (SKU) {
+                                                SKU_refreshed(SKU);
+                                            });
+
+                                            SET('products.SKUExistAttributes', products.SKUExistAttributes);
+                                            SET('products.SKUExistAdditions', products.SKUExistAdditions);
+                                            SET('products.SKUs', response.SKUs);
+                                            SET('products.SKUChanged', products.SKUChanged);
+                                            products_onchange();
+                                        }
+                                    });
+                                })
+                            });
+                        });
+                    });
+                });
+            }
+            SET('products.response', null);
+
+        });
+    }
     ON('#products.grid', function(component) {
         // Max items per page
         products.filter.max = component.max;
@@ -383,65 +485,7 @@
         component.click = function(index, row, button) {
             switch ($(button).attr('name')) {
                 case 'edit':
-                    clear_SKU_attributes();
-                    products.SKUChanged = [];
-                    $.components.GET(managerurl + '/api/products/' + row.id, null, function(response, err) {
-                        // Error prevention
-                        if (response instanceof Array)
-                            response = {};
-
-                        if (response && response.category) {
-                            request_brands(response.linker_category, function() {
-                                request_product_attribute(response.linker_category, 0, function (product_attributes_without_brand) {
-                                    request_product_attribute(response.linker_category, response.brand._id, function (product_attributes_with_brand) {
-                                        // product_attributes is queried from product attributes
-                                        // and should be merged with current product attributes from product form
-                                        var product_attributes_all = [];
-                                        product_attributes_all = product_attributes_without_brand.concat(product_attributes_with_brand);
-                                        response.attributes.forEach(function (attribute) {
-                                            // remove attribute from product_attributes
-                                            for (var i = 0; i < product_attributes_all.length; i++) {
-                                                if (attribute.name === product_attributes_all[i].name) {
-                                                    product_attributes_all.splice(i, 1);
-                                                    return;
-                                                }
-                                            }
-                                        });
-                                        response.attributes = response.attributes.concat(product_attributes_all);
-
-                                        var path_id = 'products.form';
-                                        SET(path_id, $.extend({$index: index}, response), true);
-                                        products_init_ckeditors(response);
-                                        SET('common.form', 'products');
-                                        formModified = false;
-
-                                        request_SKU_attribute(response.linker_category, response.brand._id, function(SKU_attributes){
-                                            SKU_attributes_all = SKU_attributes_all.concat(SKU_attributes);
-                                            request_SKU_Addition(response.linker_category, response.brand._id, function(){
-                                                $.components.GET(managerurl + '/api/v2.1/SKU/query?product=' + response._id, null, function (response) {
-                                                    if (response.code == 1000) {
-                                                        products.SKUExistAttributes=[];
-                                                        products.SKUExistAdditions=[];
-                                                        response.SKUs.forEach(function (SKU) {
-                                                            SKU_refreshed(SKU);
-                                                        });
-
-                                                        SET('products.SKUExistAttributes', products.SKUExistAttributes);
-                                                        SET('products.SKUExistAdditions', products.SKUExistAdditions);
-                                                        SET('products.SKUs', response.SKUs);
-                                                        SET('products.SKUChanged', products.SKUChanged);
-                                                        products_onchange();
-                                                    }
-                                                });
-                                            })
-                                        });
-                                    });
-                                });
-                            });
-                        }
-                        SET('products.response', null);
-
-                    });
+                    product_form_refresh(row.id);
                     break;
                 case 'remove':
                     if (!confirm('@(你确认要删除") ' + row.name + '"？【删除后不能恢复】'))
@@ -523,6 +567,7 @@
         if (!required(requiredlist, products.form))
             return;
 
+        products.form.attributes = products.form.public_attributes.concat(products.form.private_attributes);
         for(var i = 0; i<products.form.attributes.length; i++){
             var attribute = products.form.attributes[i];
             if(!attribute.name){
@@ -635,20 +680,8 @@
 
     function initial_product_new_page(category_id, callback){
         request_product_attribute(category_id, 0, function(product_attributes){
-            SET('products.form.attributes', product_attributes);
-            $('.productinfo .brand select').off('change').on('change', function(){
-                var el = $(this);
-                var brand_id = el.find('option:selected').val();
-                request_product_attribute(category_id, brand_id, function(product_attributes){
-                    SET('+products.form.attributes', product_attributes);
-                    request_SKU_attribute(category_id, brand_id, function(){
-                        request_SKU_Addition(category_id, brand_id, function() {
-                            products_onchange();
-                        });
-                    });
-                });
-            });
-
+            SET('products.form.public_attributes', product_attributes);
+            bind_brand_change(category_id);
             products_onchange();
             callback();
         });
@@ -682,7 +715,6 @@
     }
 
     function request_product_attribute(category_id, brand_id, callback){
-        console.log(brand_id);
         $.components.GET(managerurl + '/api/products/attributes?category=' + category_id+"&brand="+brand_id, null, function(response) {
             if (response.code == 1000) {
                 var attributes = [];
@@ -762,7 +794,6 @@
     }
 
     function products_ckeditor_getdata(id, model) {
-        console.log('wrong place');
         var ckeditor = CKEDITOR.instances[id];
         var value = id.split('product_')[1];
         if (ckeditor) {
@@ -837,7 +868,7 @@
         SKU.attributes.forEach(function(attribute){
             SKU.name += ' - ' + attribute.value;
         });
-        if(!PRICE_REGEX.test(SKU.price.market_price) || parseFloat(SKU.price.market_price) < 0){
+        if(SKU.price.market_price && (!PRICE_REGEX.test(SKU.price.market_price) || parseFloat(SKU.price.market_price) < 0)){
             alert('@(请填写正确的市场价)');
             return;
         }
@@ -912,7 +943,7 @@
         SKU.attributes.forEach(function(attribute){
             SKU.name += ' - ' + attribute.value;
         });
-        if(!PRICE_REGEX.test(SKU.price.market_price) || parseFloat(SKU.price.market_price) < 0){
+        if(SKU.price.market_price && (!PRICE_REGEX.test(SKU.price.market_price) || parseFloat(SKU.price.market_price) < 0)){
             alert('@(请填写正确的市场价)');
             return;
         }
@@ -945,7 +976,7 @@
 
             // add product
             add_product(function(product){
-                products.form = product;
+                product_form_refresh(product.id);
                 SKU.product = product._id;
                 add_SKU_processer();
             });
@@ -954,8 +985,27 @@
         }
     }
 
-    function new_attribute(name, inputIndex){
-        var el=$('.new_attribute input')[inputIndex];
+    function new_public_attribute(name, inputIndex){
+        var el=$('.new_public_attribute input')[inputIndex];
+        var category = products.form.linker_category;
+        var brand = products.attributes[name].brand;
+        var value = el.value;
+        $.components.POST(managerurl+'/api/products/attribute/add', {category:category, brand:brand, name:name, value:value}, function(response){
+            if(response.code==1000){
+                var new_attribute = response.attribute;
+                products.attributes[name].values.push({ref:new_attribute._id, value:new_attribute.value});
+                SET('products.attributes', products.attributes);
+                el.value = "";
+                products_onchange();
+                success();
+            } else{
+                alert(response.message);
+            }
+        });
+    }
+
+    function new_private_attribute(name, inputIndex){
+        var el=$('.new_private_attribute input')[inputIndex];
         var category = products.form.linker_category;
         var brand = products.attributes[name].brand;
         var value = el.value;
@@ -1021,19 +1071,44 @@
         });
     }
 
+    function bind_brand_change(category_id){
+        $('.productinfo .brand select').off('change').on('change', function(){
+            var el = $(this);
+            var brand_id = el.find('option:selected').val();
+            request_product_attribute(category_id, brand_id, function(product_attributes){
+                SET('products.form.private_attributes', product_attributes);
+                request_SKU_attribute(category_id, brand_id, function(){
+                    request_SKU_Addition(category_id, brand_id, function() {
+                        products_onchange();
+                    });
+                });
+            });
+        });
+    }
+
     function products_onchange(){
         product_onchange();
         SKU_onchange();
     }
 
     function product_onchange(){
-        $('.attribute_list select').off('change').on('change', function(){
+        $('.attribute_list .public select').off('change').on('change', function(){
             var el = $(this);
             var index = el.attr('data-index');
             var ref = el.find('option:selected').attr('ref');
             var name = el.find('option:selected').attr('name');
             var value = el.val();
-            products.form.attributes[index] = {ref:ref, name:name,value:value};
+            products.form.public_attributes[index] = {ref:ref, name:name,value:value};
+            formModified = true;
+        });
+
+        $('.attribute_list .private select').off('change').on('change', function(){
+            var el = $(this);
+            var index = el.attr('data-index');
+            var ref = el.find('option:selected').attr('ref');
+            var name = el.find('option:selected').attr('name');
+            var value = el.val();
+            products.form.private_attributes[index] = {ref:ref, name:name,value:value};
             formModified = true;
         });
     }

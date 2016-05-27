@@ -1,6 +1,7 @@
 var mongoose = require('mongoose');
 var PAYMENTSTATUS = require('../common/defs').PAYMENTSTATUS;
 var DELIVERSTATUS = require('../common/defs').DELIVERSTATUS;
+var DELIVERYTYPE = require('../common/defs').DELIVERYTYPE;
 
 // Schema
 var schema = new mongoose.Schema({
@@ -24,7 +25,7 @@ var schema = new mongoose.Schema({
 			'count': {type:Number, required: true},
             'category' : {type:String, required: false},
             'dateDelivered': Date,
-            'dateSet': Date,														// 人为设置的日期
+            'dateSet': Date,														// 后台用户设置的日期
             'deliverStatus': {type:Number, required:true, default: DELIVERSTATUS.UNDELIVERED}
 		}]},
 	'SKUs':[{
@@ -37,8 +38,8 @@ var schema = new mongoose.Schema({
 		'thumbnail':String,
 		'count':{type:Number, required:true},
 		'category':{type:String, required:false},
-		'dateDelivered':Date,
-		'dateSet': Date,
+		'dateDelivered':Date,														// 自提时间，配送时间
+		'dateSet': Date,															// 后台用户设置的日期
 		'deliverStatus':{type:Number, required:true, default:DELIVERSTATUS.UNDELIVERED},
 		'attributes':[{
 			'ref':{type:mongoose.Schema.ObjectId, ref:'SKUAttributes', required:true},
@@ -49,14 +50,18 @@ var schema = new mongoose.Schema({
 			'ref':{type:mongoose.Schema.ObjectId, ref:'SKUAddition', required:true},
 			'name':{type:String, required:true},
 			'price':{type:Number, required:true}
-		}]
+		}],
+		'dateConfirmed':Date,														// 用户确认收货时间
+		'dateRSCReceived':Date,														// 货物已到服务站的时间
+		'backendUser':{type: mongoose.Schema.ObjectId, ref:'backenduser'},			// 设置本条信息的后台用户
+		'backendUserAccount':{type: String}											// 设置本条信息的后台用户账户
 	}],
 	'payStatus': {type:Number, required:true, default: PAYMENTSTATUS.UNPAID},		// 主订单付款状态，从子订单付款状态统计得来 分为未付款、部分付款、已付款三种，只用来做查询
 	'datePaid': Date,
-	'deliverStatus': {type:Number, required:true}, 									// 主订单发货状态，从商品发货状态统计得来 分为无发货、部分发货、已发货三种，只用来做查询
-	'dateDelivered': Date,
-	'confirmed': {type:Boolean, default:false},
-	'dateCompleted': Date,
+	'deliverStatus': {type:Number, required:true}, 									// 主订单发货状态，从商品发货状态统计得来 分为未发货、部分发货、离开服务站、已到服务站、已收货五种，只用来做查询
+	'datePendingDeliver': Date,														// 订单待收货时间，配送订单中RSC配送第一个商品的时间或者已付款的自提订单中第一个商品到RSC的时间
+	'dateDelivered': Date,															// 订单发货时间，订单中商品全部离开RSC的时间
+	'dateCompleted': Date,															// 订单完成时间
 	'paymentId': {type:String, required:true},										// 最新一笔支付的ID
 	'payType': {type:Number, required:true},										// 最新一笔支付的支付方式
     'isClosed': {type:Boolean, required:true, default:false},						// 本订单是否关闭
@@ -70,13 +75,18 @@ var schema = new mongoose.Schema({
         'suborderId': {type: String, index: true, required: true},					// 所属子订单ID
         'dateCreated': {type: Date, default: Date.now},								// 生成日期
 		'datePaid': Date,															// 支付日期
-		'dateSet': Date,															// 人为设置的日期
-		'payStatus': {type:Number, required:true, default: PAYMENTSTATUS.UNPAID},	// 支付状态
+		'dateSet': Date,															// 后台用户设置的日期
+		'payStatus': {type:Number, required:true, default: PAYMENTSTATUS.UNPAID},	// 支付状态 1:未支付 2:已支付
 		'payType': {type:Number, required:true},									// 支付类型
 		'isClosed': {type:Boolean, required:true, default:false},					// 本支付是否关闭
+		'specialClosed': {type:Boolean},											// 本支付是否是特殊方式关闭的（1、一次支付就超额的bug）
+		'dateSpecialClosed': {type: Date},											// 本支付特殊方式关闭的时间
 		'thirdPartyRecorded': {type:Boolean, default:false},						// 本支付是否在第三方支付平台生成
 		'backendUser':{type: mongoose.Schema.ObjectId, ref:'backenduser'},			// 设置本条信息的后台用户
 		'backendUserAccount':{type: String},										// 设置本条信息的后台用户账户
+		'RSC':{type:mongoose.Schema.ObjectId, ref:'user'},							// 支付时的相关RSC
+		'RSCCompanyName':{type: String},											// 支付时的相关RSC公司名
+		'EPOSNo':{type: String}														// EPOS支付时相对应的设备号
 	}],
 	'subOrders': [{
 	    'id': {type: String, index: true, unique: true, required: true},			// 子订单ID
@@ -85,15 +95,24 @@ var schema = new mongoose.Schema({
 	    'payStatus': {type:Number, required:true, default: PAYMENTSTATUS.UNPAID},	// 子订单支付状态，从子订单付款状态统计得来 分为未付款、部分付款、已付款三种，只用来做查询
 	    'stageId': String,															// 分期付款类型ID
 	}],
-	'duePrice': {type:Number}														// 剩余金额
+	'duePrice': {type:Number},														// 剩余金额
+	'deliveryType':{type:Number, default:DELIVERYTYPE.SONGHUO.id},					// 订单的配送方式
+	'RSCInfo':{																		// 订单选择的自提点信息
+		'RSC':{type:mongoose.Schema.ObjectId, ref:'user'},							// 自提点的reference
+		'companyName':{type:String},												// 自提点公司名
+		'RSCAddress': {type:String},												// 自提点地址
+		'RSCPhone': {type:String}													// 自提点联系电话
+	},
+	'depositPaid':{type:Boolean, default: false},									// 订金是否已付
+	'pendingApprove':{type:Boolean, default: false}								// 付款是否待审核
 });
 
 schema.index({dateCreated: -1});
 schema.index({buyerId: 1, dateCreated: -1});
-schema.index({isClosed: 1, payStatus: 1, buyerId: 1, dateCreated: -1});
-schema.index({payStatus: 1, deliverStatus: 1, buyerId: 1, dateCreated: -1});
-schema.index({confirmed: -1, payStatus: 1, deliverStatus: 1, buyerId: 1, dateCreated: -1});
+schema.index({isClosed: 1, payStatus: 1, pendingApprove: 1, buyerId: 1, dateCreated: -1});
+schema.index({payStatus: 1, deliveryType: 1, deliverStatus: 1, depositPaid: 1, "SKUs.deliverStatus": 1, buyerId: 1, dateCreated: -1});
 schema.index({id:"text", buyerId:"text", buyerName:"text", buyerPhone:"text", consigneeName:"text", consigneePhone:"text", paymentId:"text"});
+schema.index({'RSCInfo.RSC': 1, buyerPhone:1, consigneePhone:1, id:1, dateCreated: -1});
 
 // Schema
 var orderPaidLogSchema = new mongoose.Schema({
@@ -128,10 +147,17 @@ var orderPaymentRefundSchema = new mongoose.Schema({
 	'backendUserAccount':{type: String},								// 人工退款的后台用户账户
 	'dateSet': Date														// 人为修改的日期
 });
-            
+
+var deliveryCodeSchema = new mongoose.Schema({
+	'orderId':{type:String, required:true, index:true, unique:true},			// 订单ID
+	'code':{type:String, required:true},			// 提货码
+	'dateCreated':{type:Date, default:Date.now}	// 创建时间
+});
+
 // Model
 mongoose.model('order', schema);
 mongoose.model('order_paid_log', orderPaidLogSchema);
+mongoose.model('deliveryCode', deliveryCodeSchema);
 mongoose.model('order_payments_refund', orderPaymentRefundSchema);
 // var orderModel = mongoose.model('order', schema);
 

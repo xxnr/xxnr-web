@@ -44,5 +44,11 @@ exports.auditservice = require('./audit');
 // throttle
 exports.throttle = require('./throttle');
 
+// RSC
+exports.RSC = require('./RSC');
+
+// delivery code
+exports.deliveryCode = require('./deliveryCode');
+
 // pay
 exports.pay = require('./pay');

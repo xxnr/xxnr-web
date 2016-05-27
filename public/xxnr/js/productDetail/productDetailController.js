@@ -47,8 +47,10 @@ app.controller('productDetailController',function($scope, $timeout, remoteApiSer
             item.thumbnailImgUrls = [];
             for(var i in good.pictures){
                 // console.log(good.pictures[i]);
-                item.imgUrls.push(commonService.baseUrl + good.pictures[i].imgUrl.slice(1));
-                item.thumbnailImgUrls.push(commonService.baseUrl + good.pictures[i].imgUrl.slice(1));
+                if(good.pictures.hasOwnProperty(i)){
+                    item.imgUrls.push(commonService.baseUrl + good.pictures[i].imgUrl.slice(1));
+                    item.thumbnailImgUrls.push(commonService.baseUrl + good.pictures[i].imgUrl.slice(1));
+                }
             }
             item.online = good.online;
             item.brand = good.brandName;
@@ -65,7 +67,7 @@ app.controller('productDetailController',function($scope, $timeout, remoteApiSer
             // item.priceRange = good.SKUPrice;
             item.minPrice = good.SKUPrice?good.SKUPrice.min:0;
             item.maxPrice = good.SKUPrice?good.SKUPrice.max:0;
-            if(good.SKUMarketPrice){
+            if(good.SKUMarketPrice && good.SKUMarketPrice.max && good.SKUMarketPrice.min){
                 item.marketPriceDisplay = true;
                 item.marketMinPrice = good.SKUMarketPrice.min;
                 item.marketMaxPrice = good.SKUMarketPrice.max;
@@ -75,20 +77,21 @@ app.controller('productDetailController',function($scope, $timeout, remoteApiSer
                 item.marketMaxPrice = 0;
             }
             for(var i in item.SKUAttributes){
-                item.SKUAttributes[i].isSelected = [];
-                item.SKUAttributes[i].selectable = [];
-                // console.log(item.SKUAttributes);
-                if(item.SKUAttributes[i].values.length==1){
-                    item.SKUAttributes[i].isSelected.push(true);
-                    item.SKUAttributes[i].selectable.push(true);
-
-                }else{
-                    for(var j in item.SKUAttributes[i].values){
-                        item.SKUAttributes[i].isSelected.push(false);
+                if(item.SKUAttributes.hasOwnProperty(i)){
+                    item.SKUAttributes[i].isSelected = [];
+                    item.SKUAttributes[i].selectable = [];
+                    // console.log(item.SKUAttributes);
+                    if(item.SKUAttributes[i].values.length==1){
+                        item.SKUAttributes[i].isSelected.push(true);
                         item.SKUAttributes[i].selectable.push(true);
-                    };
-                }
 
+                    }else{
+                        for(var j in item.SKUAttributes[i].values){
+                            item.SKUAttributes[i].isSelected.push(false);
+                            item.SKUAttributes[i].selectable.push(true);
+                        };
+                    }
+                }
             }
             item.description = good.description;
             item.deposit = good.deposit;
@@ -193,6 +196,7 @@ app.controller('productDetailController',function($scope, $timeout, remoteApiSer
         addToShoppingCart(success_action,1);
     };
     $scope.addToShoppingCart = function(event){
+        console.log($scope.isAllSKUSelected());
         if($scope.isAllSKUSelected() && commonService.user){
             flyToCart.fly();
         }
@@ -269,7 +273,7 @@ app.controller('productDetailController',function($scope, $timeout, remoteApiSer
                     $scope.item.minPrice = data.data.price.min;
                     $scope.item.maxPrice = data.data.price.max;
                 }
-                if(data.data.market_price){
+                if(data.data.market_price && data.data.market_price.max && data.data.market_price.min){
                     $scope.item.marketPriceDisplay = true;
                     $scope.item.marketMinPrice = data.data.market_price.min;
                     $scope.item.marketMaxPrice = data.data.market_price.max;
@@ -321,14 +325,16 @@ app.controller('productDetailController',function($scope, $timeout, remoteApiSer
     $scope.isAllSKUSelected = function(){
         if($scope.item){
             for(var i in $scope.item.SKUAttributes){
-                var _flag = false;
-                for(var j in $scope.item.SKUAttributes[i].isSelected){
-                    if($scope.item.SKUAttributes[i].isSelected[j]==true){
-                        _flag = true;
+                if($scope.item.SKUAttributes.hasOwnProperty(i)){
+                    var _flag = false;
+                    for(var j in $scope.item.SKUAttributes[i].isSelected){
+                        if($scope.item.SKUAttributes[i].isSelected[j]==true){
+                            _flag = true;
+                        }
                     }
-                }
-                if(_flag==false){
-                    return false;
+                    if(_flag==false){
+                        return false;
+                    }
                 }
             }
             return true;
