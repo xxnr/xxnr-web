@@ -36,31 +36,34 @@ BackEndUserService.prototype.login = function(options, callback) {
     }
 
     // Gets a specific document from DB
-    BackEndUserModel.findOne({account:options.account}, function(err, user){
-        if(err){
-            console.log('user login fail: ' + err);
-            callback('登录失败');
-            return;
-        }
+    BackEndUserModel.findOne({account:options.account})
+        .populate('role')
+        .populate('business')
+        .exec(function(err, user){
+            if(err){
+                console.log('user login fail: ' + err);
+                callback('登录失败');
+                return;
+            }
 
-        if (user === null) {
-            callback('账号不存在');
-            return;
-        }
+            if (user === null) {
+                callback('账号不存在');
+                return;
+            }
 
-        var password_valid = false;
-        try{
-            password_valid = bcrypt.compareSync(options.password, user.password);
-        } catch(e){
-        }
+            var password_valid = false;
+            try{
+                password_valid = bcrypt.compareSync(options.password, user.password);
+            } catch(e){
+            }
 
-        if(password_valid){
-            callback(null, user);
-        }else {
-            // Returns response
-            callback('密码错误');
-        }
-    });
+            if(password_valid){
+                callback(null, user);
+            }else {
+                // Returns response
+                callback('密码错误');
+            }
+        });
 };
 
 // Gets a specific user
@@ -70,7 +73,7 @@ BackEndUserService.prototype.get = function(options, callback) {
         return;
     }
 
-    var query = options.account ;
+    var query = options.account;
 
     // Gets a specific document from DB
     BackEndUserModel.findOne({_id:options._id})
