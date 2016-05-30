@@ -1497,7 +1497,7 @@ exports.process_login = function(req, res, next) {
         if(err){
             // login fail
             console.log('backend user process_login err: ' + err);
-			res.respond({code:1001, message:'用户名密码错误'});
+			res.respond({code:1001, message:'用户名或密码错误'});
             return
         }
 
