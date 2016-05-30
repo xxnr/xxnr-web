@@ -71,7 +71,7 @@
 
 #RSCs
 /manager/api/v2.2/RSCInfo/:_id, get, super_admin, customer_op
-/manager/api/v2.2/RSCs, get, super_admin
+/manager/api/v2.2/RSCs, get, super_admin, customer_op
 /manager/api/v2.2/RSC/orders, get, super_admin
 /manager/api/v2.2/RSC/modify, put, super_admin
 /manager/api/v2.2/RSC/queryByProducts, get, super_admin, customer_op
