@@ -23,6 +23,7 @@ var UserSchema = new mongoose.Schema({
     "dateinvited" : Date,                                                   //邀请时间
     "webLoginId" : String,                                                  // web login id
     "appLoginId" : String,                                                  // app login id
+    "appLoginAgent" : String,                                               // app login Agent
     "registerAgent": String,                                                // 注册时的设备
     "isUserInfoFullFilled":{type: Boolean, default: false},                   // 是否完善用户信息并获取积分
     "address":{                                                               // 用户所在地
@@ -96,8 +97,9 @@ var IntentionProductSchema = new mongoose.Schema({
 UserSchema.index({account:"text", nickname:"text", name:"text"});
 UserSchema.index({type:1});
 UserSchema.index({name:1});
-UserSchema.index({inviter:1, nameInitialType:1, namePinyin:1, dateinvited:-1});
+UserSchema.index({inviter:1, nameInitialType:1, namePinyin:1, dateinvited:-1, datecreated:-1});
 UserSchema.index({RSCInfo:1, typeVerified:1, 'RSCInfo.products':1, 'RSCInfo.supportEPOS':1, 'RSCInfo.EPOSNo':1});
+UserSchema.index({typeVerified:1, type:1, datecreated:-1});
 
 PotentialCustomerSchema.index({"phone":1, unique:true});
 PotentialCustomerSchema.index({"user":1, "dateAdded":1, "nameInitialType":1, "namePinyin":1, "dateTimeAdded":-1});

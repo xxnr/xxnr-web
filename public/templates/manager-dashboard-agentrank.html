@@ -1,8 +1,8 @@
-<script src="/js/simplePagination.js"></script>
+<script type="text/javascript" async src="/js/simplePagination.js"></script>
 
 <div class="filter" style="padding-bottom:9px">
 	<div class="container">
-		<div class="caption"><span class="fa fa-dashboard mr5"></span> Dashboard</div>
+		<div class="caption"><span class="fa fa-dashboard mr5"></span>数据中心</div>
 	</div>
 </div>
 
@@ -22,8 +22,7 @@
         </ul>
     </div>
     <div class="col-md-10">
-
-	<div class="mb50">
+		<div class="mb50">
 		<div class="row m">
 			<div class="col-md-12">
 				<h3 class="ui-left">昨日业绩排行</h3>
@@ -47,7 +46,7 @@
 							<tbody>
 								<tr>
 									<td style="width:30px" class="silver hidden-xs ui-center active">排名</td>
-							    	<td style="width:50px" class="silver hidden-xs ui-center active">经纪人姓名</td>
+							    	<td style="width:40px" class="silver hidden-xs ui-center active">经纪人</td>
 							    	<td style="width:60px" class="silver hidden-xs ui-center active">手机号</td>
 							    	<td style="width:80px" class="silver hidden-xs ui-center active">
 							    		<div class="agentstitle">
@@ -60,7 +59,7 @@
 							    	</td>
 							    	<td style="width:70px" class="silver hidden-xs ui-center active">
 							    		<div class="agentstitle">
-								    		<span>总客户数</span>
+								    		<span>总客户</span>
 								    		<div class="agentsort">
 								    			<div class="fa fa-caret-up" id="TOTALINVITEE-ASC"></div>
 								    			<div class="fa fa-caret-down" id="TOTALINVITEE-DESC"></div>
@@ -76,29 +75,45 @@
 								    		</div>
 							    		</div>
 							    	</td>
-							    	<td style="width:80px" class="silver hidden-xs ui-center active">
+							    	<td style="width:70px" class="silver hidden-xs ui-center active">
 							    		<div class="agentstitle">
-								    		<span>总登记客户数</span>
+								    		<span>总登记客户</span>
 								    		<div class="agentsort">
 								    			<div class="fa fa-caret-up" id="TOTALPOTENTIALCUSTOMER-ASC"></div>
 								    			<div class="fa fa-caret-down" id="TOTALPOTENTIALCUSTOMER-DESC"></div>
 								    		</div>
 							    		</div>
 							    	</td>
-							    	<td style="width:60px" class="silver hidden-xs ui-center active">已完成订单数</td>
-							    	<td style="width:80px" class="silver hidden-xs ui-center active">已完成金额（元）</td>
+							    	<td style="width:70px" class="silver hidden-xs ui-center active">
+							    		<div class="agentstitle">
+								    		<span>已完成订单</span>
+								    		<div class="agentsort">
+								    			<div class="fa fa-caret-up" id="TOTALCOMPLETEDORDER-ASC"></div>
+								    			<div class="fa fa-caret-down" id="TOTALCOMPLETEDORDER-DESC"></div>
+								    		</div>
+							    		</div>
+							    	</td>
+							    	<td style="width:80px" class="silver hidden-xs ui-right active">
+							    		<div class="agentstitle">
+								    		<span>已完成金额</span>
+								    		<div class="agentsort">
+								    			<div class="fa fa-caret-up" id="TOTALPAIDAMOUT-ASC"></div>
+								    			<div class="fa fa-caret-down" id="TOTALPAIDAMOUT-DESC"></div>
+								    		</div>
+							    		</div>
+							    	</td>
 							    </tr>
 							    {{ foreach agent in agents }}
 							    	<tr>
-										<td style="width:40px" class="silver hidden-xs ui-center">{{ $index + 1 }}</td>
-								    	<td style="width:60px" class="silver hidden-xs ui-center" title="{{ agent.name }}">{{ agent.name }}</td>
+										<td style="width:30px" class="silver hidden-xs ui-center">{{ $index + 1 }}</td>
+								    	<td style="width:40px" class="silver hidden-xs ui-center" title="{{ agent.name }}">{{ agent.name }}</td>
 								    	<td style="width:60px" class="silver hidden-xs ui-center" title="{{ agent.phone }}">{{ agent.phone }}</td>
-								    	<td style="width:60px" class="silver hidden-xs ui-center">{{ agent.newInviteeCount | format(0) }}</td>
-								    	<td style="width:60px" class="silver hidden-xs ui-center">{{ agent.totalInviteeCount | format(0) }}</td>
-								    	<td style="width:60px" class="silver hidden-xs ui-center">{{ agent.newPotentialCustomerCount | format(0) }}</td>
-								    	<td style="width:60px" class="silver hidden-xs ui-center">{{ agent.totalPotentialCustomerCount | format(0) }}</td>
-								    	<td style="width:60px" class="silver hidden-xs ui-center">{{ agent.totalCompletedOrderCount | format(0) }}</td>
-								    	<td style="width:80px" class="silver hidden-xs ui-center" title="{{ agent.totalPaidAmount | format(0) }}">{{ agent.totalPaidAmount | price(2) }}</td>
+								    	<td style="width:80px" class="silver hidden-xs ui-center">{{ agent.newInviteeCount | format(0) }}</td>
+								    	<td style="width:70px" class="silver hidden-xs ui-center">{{ agent.totalInviteeCount | format(0) }}</td>
+								    	<td style="width:80px" class="silver hidden-xs ui-center">{{ agent.newPotentialCustomerCount | format(0) }}</td>
+								    	<td style="width:70px" class="silver hidden-xs ui-center">{{ agent.totalPotentialCustomerCount | format(0) }}</td>
+								    	<td style="width:70px" class="silver hidden-xs ui-center">{{ agent.totalCompletedOrderCount | format(0) }}</td>
+								    	<td style="width:80px" class="silver hidden-xs ui-right" title="{{ agent.totalPaidAmount | format(0) }}">{{ agent.totalPaidAmount | price(2) }}</td>
 								    </tr>
 								{{ end }}
 							</tbody>
@@ -114,6 +129,7 @@
 				
 				<div data-component="error" data-component-path="dashboard.agentsresponse"></div>
 			</div>
+		</div>
 		</div>
 	</div>
 </div>
@@ -219,8 +235,8 @@
 	        items: count,
 	        itemsOnPage: pageCount,
 	        currentPage: currentPage?currentPage:0,
-			prevText: '上一页',
-			nextText: '下一页',
+			prevText: '<',
+			nextText: '>',
 	        cssStyle: 'light-theme',
 	        onPageClick: function(pageNumber, event) {
 	        	redirectURL(pageNumber);

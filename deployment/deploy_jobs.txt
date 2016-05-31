@@ -1,6 +1,25 @@
 
 # 123.57.251.173
+#######################################################
+###            auto backup databases                ###
+#######################################################
+0,30 * * * * /bin/sh /root/xxnr/dbbackup/backup.sh
+#######################################################
+###            auto backup mongodb                  ###
+#######################################################
 1,31 * * * * /bin/sh /mnt/mongodb/backup/mongodump/dump.sh > /mnt/mongodb/backup/data/dump/logs/dump_`date +\%Y\%m\%d\%H\%M`.log
+#######################################################
+###            close order per day                  ###
+#######################################################
+0 4 * * * /usr/bin/node /root/xxnr/v2.0/website-git/jobs/close_order.js >> /root/xxnr/v2.0/logs/jobs/close_order/close_order_`date +\%Y\%m`.log
+#######################################################
+###           generate hourly report                ###
+#######################################################
+1 * * * * /usr/bin/node /root/xxnr/v2.0/website-git/jobs/generate_hourly_report.js >> /root/xxnr/v2.0/logs/jobs/generate_hourly_report/generate_hourly_report_`date +\%Y\%m\%d`.log
+#######################################################
+###            generate agent report                ###
+#######################################################
+0 4 * * * /usr/bin/node /root/xxnr/v2.0/website-git/jobs/generate_agent_report.js >> /root/xxnr/v2.0/logs/jobs/generate_agent_report/generate_agent_report_`date +\%Y\%m`.log
 
 
 # 192.168.1.15
@@ -8,5 +27,5 @@
 
 #101.200.194.203
 0 4 * * * node /root/website-git/jobs/close_order.js >> /home/xxnr/web/deployment/jobs/close_order/close_order_`date +\%Y\%m`.log
-1 * * * * node /root/website-git/jobs/generate_hourly_report.js >> /home/xxnr/web/deployment/jobs/generate_hourly_report/generate_hourly_report_`date +\%Y\%m\%D\%H`.log
-0 4 * * * node /root/website-git/jobs/generate_agent_report.js >> /home/xxnr/web/deployment/jobs/generate_hourly_report/generate_agent_report_`date +\%Y\%m\%D`.log
+1 * * * * node /root/website-git/jobs/generate_hourly_report.js >> /home/xxnr/web/deployment/jobs/generate_hourly_report/generate_hourly_report_`date +\%Y\%m\%d`.log
+0 4 * * * node /root/website-git/jobs/generate_agent_report.js >> /home/xxnr/web/deployment/jobs/generate_agent_report/generate_agent_report_`date +\%Y\%m`.log

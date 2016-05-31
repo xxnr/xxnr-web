@@ -16,6 +16,7 @@ var AuditlogService = services.auditservice;
 var PayService = services.pay;
 var AreaService = services.area;
 var RSCService = services.RSC;
+var AgentService = services.agent;
 var DashboardService = services.dashboard;
 var PAYMENTSTATUS = require('../common/defs').PAYMENTSTATUS;
 var DELIVERSTATUS = require('../common/defs').DELIVERSTATUS;
@@ -46,11 +47,11 @@ exports.install = function() {
 	//F.route(CONFIG('manager-url') + '/news/uploadImage/',    				CKEditor_uploadImage, ['post', 'upload'], 20480, ['backend_auth']); // 20 MB
 
 	// FILES
-	F.route(CONFIG('manager-url') + '/api/files/clear/',         			json_files_clear, ['get'], ['backend_auth']);
+	// // F.route(CONFIG('manager-url') + '/api/files/clear/',         			json_files_clear, ['get'], ['backend_auth']);
 
 	// DASHBOARD
-	F.route(CONFIG('manager-url') + '/api/dashboard/',           			json_dashboard, ['get'], ['backend_auth']);
-	//F.route(CONFIG('manager-url') + '/api/dashboard/online/',    			json_dashboard_online, ['get'], ['backend_auth']);
+	// F.route(CONFIG('manager-url') + '/api/dashboard/',           			json_dashboard, ['get'], ['backend_auth']);
+	// F.route(CONFIG('manager-url') + '/api/dashboard/online/',    			json_dashboard_online, ['get'], ['backend_auth']);
 	// F.route(CONFIG('manager-url') + '/api/dashboard/clear/',     			json_dashboard_clear);
 
 	// ORDERS
@@ -62,8 +63,8 @@ exports.install = function() {
 	//F.route(CONFIG('manager-url') + '/api/orders/SKUs/',              		json_orders_SKUs_update, ['put'], ['backend_auth', 'auditing']);
 	//F.route(CONFIG('manager-url') + '/api/orders/SKUsDelivery/',            json_orders_SKUs_delivery, ['put'], ['backend_auth', 'auditing']);
 	//F.route(CONFIG('manager-url') + '/api/orders/RSCInfo/',					process_orders_RSCInfo_update, ['put'], ['backend_auth', 'auditing']);
-	//F.route(CONFIG('manager-url') + '/api/orders/confirmOfflinePay',    	process_order_confirm_OfflinePay, ['get'], ['backend_auth', 'auditing']);
-	//F.route(CONFIG('manager-url') + '/api/order/getOfflinePayType',          json_offline_pay_type, ['get'], ['backend_auth']);
+	//F.route(CONFIG('manager-url') + '/api/orders/confirmOfflinePay',    	process_order_confirm_OfflinePay, ['post'], ['backend_auth', 'auditing']);
+	//F.route(CONFIG('manager-url') + '/api/getOfflinePayType',          json_offline_pay_type, ['get'], ['backend_auth']);
 
 	// F.route(CONFIG('manager-url') + '/api/orders/',              			json_orders_save, ['put'], ['backend_auth']);
 	// F.route(CONFIG('manager-url') + '/api/orders/',              			json_orders_remove, ['delete']);
@@ -85,8 +86,8 @@ exports.install = function() {
 	//F.route(CONFIG('manager-url') + '/api/products/updateStatus',			process_products_updateStatus, ['post'], ['backend_auth', 'auditing']);
 	//F.route(CONFIG('manager-url') + '/api/products/{id}/',       			json_products_read, ['get'], ['backend_auth']);
 	//F.route(CONFIG('manager-url') + '/api/products/',            			json_products_remove, ['delete'], ['backend_auth', 'auditing']);
-	// F.route(CONFIG('manager-url') + '/api/products/clear/',      			json_products_clear);
-	F.route(CONFIG('manager-url') + '/api/products/import/',     			json_products_import, ['upload'], 1024, ['backend_auth']);
+	// // F.route(CONFIG('manager-url') + '/api/products/clear/',      			json_products_clear);
+	// // F.route(CONFIG('manager-url') + '/api/products/import/',     			json_products_import, ['upload'], 1024, ['backend_auth']);
 	//F.route(CONFIG('manager-url') + '/api/products/categories/', 			json_products_categories, ['get'], ['backend_auth']);
 	F.route(CONFIG('manager-url') + '/api/products/category/',   			json_products_category_replace, ['post'] ,['backend_auth', 'auditing']);
 	//F.route(CONFIG('manager-url') + '/api/products/attr/{attributeName}/',	json_products_attribute, ['get'], ['backend_auth']);
@@ -616,6 +617,10 @@ exports.json_products_read = function(req,res,next) {
 			res.respond(err);
 			return;
 		}
+        if (!data) {
+			res.respond({'code':1001,'message':'未查询到商品'});
+			return;
+		}
 		if(data){
 			res.respond(data);
 		}
@@ -911,6 +916,11 @@ exports.process_order_confirm_OfflinePay = function(req, res, next){
 		//	return;
 		//}
 
+        if (!order) {
+			res.respond({'code':1001,'message':'未查询到订单'});
+			return;
+		}
+
 		if(!order.pendingApprove){
 			res.respond({code:1002, message:'该订单没有待审核的线下支付'});
 			return;
@@ -965,11 +975,15 @@ exports.json_orders_read = function(req,res,next) {
 			res.respond({code:1004, message:'系统错误，没有找到订单信息', error:[{'error':'系统错误，没有找到订单信息'}]});
 			return;
 		}
+		if (!order) {
+			res.respond({'code':1001,'message':'未查询到订单'});
+			return;
+		}
         res.respond({code:1000, message:'success', datas: convertOrderToShow(order, payment)});
     });
 };
 
-var convertOrderToShow = function(order, payment){
+var convertOrderToShow = function(order, orderpayment){
     var subOrdersPayments = {};					// suborder all payments
 
 	if (order && order.payments) {
@@ -1062,7 +1076,7 @@ var convertOrderToShow = function(order, payment){
 		if (order.deliverStatus == DELIVERSTATUS.RECEIVED && order.dateCompleted) {
 			orderInfo.dateCompleted = order.dateCompleted;
 		}
-		orderInfo.payment = payment;
+		orderInfo.payment = orderpayment;
 		order.order = orderInfo;
 	}
 
@@ -1132,6 +1146,10 @@ exports.json_users_read = function(req,res,next) {
             res.respond({code: 1004, message: 'get user err:' + err});
             return;
         }
+        if (!user) {
+			res.respond({'code':1001,'message':'未查询到用户'});
+			return;
+		}
 
 		res.respond({code: 1000, user: user});
     });
@@ -1223,6 +1241,15 @@ exports.json_news_read = function(req, res, next) {
 	var options = {};
 	options.id = id;
     NewsService.get(options, function(err, news){
+    	if(err){
+            console.error('manager json_news_read err:', err);
+			res.respond({code:1004, message:'系统错误，没有找到资讯', error:[{'error':'系统错误，没有找到资讯'}]});
+            return;
+        }
+        if (!news) {
+			res.respond({'code':1001,'message':'未查询到资讯'});
+			return;
+		}
 		res.respond(news);
 	});
 };
@@ -1252,6 +1279,10 @@ exports.json_auditlog_read = function(req, res, next) {
 		if (err) {
 			console.error('manager json_auditlog_read err:', err);
 			res.respond({code: 1004, message: 'get audit logs err:' + err});
+			return;
+		}
+        if (!datas) {
+			res.respond({'code':1001,'message':'未查询到audit log'});
 			return;
 		}
 		res.respond({code:1000, message:'success', datas:datas});
@@ -1466,7 +1497,7 @@ exports.process_login = function(req, res, next) {
         if(err){
             // login fail
             console.log('backend user process_login err: ' + err);
-			res.respond({code:1001, message:'用户名密码错误'});
+			res.respond({code:1001, message:'用户名或密码错误'});
             return
         }
 
@@ -1674,7 +1705,7 @@ exports.process_SKU_add = function(req, res, next) {
 		return;
 	}
 
-	SKUService.addSKU(req.data.name, req.data.product, req.data.attributes, req.data.additions, req.data.price, function (err, SKU) {
+	SKUService.addSKU(req.data.product, req.data.attributes, req.data.additions, req.data.price, function (err, SKU) {
 		if (err) {
 			console.error('process_SKU_add error', err);
 			if(11000 == err.code){
@@ -1697,7 +1728,7 @@ exports.process_SKU_update = function(req, res, next){
 		return;
 	}
 
-	SKUService.updateSKU(id, req.data.price, req.data.attributes, req.data.additions, req.data.name, function(err){
+	SKUService.updateSKU(id, req.data.price, req.data.attributes, req.data.additions, function(err){
 		if(err){
 			console.error('updateSKU error', err);
 			if(11000 == err.code){
@@ -1886,11 +1917,62 @@ exports.json_agent_info_get = function(req,res,next){
 };
 
 // ==========================================================================
+// agents
+// ==========================================================================
+exports.json_agents_query = function(req,res,next){
+	var page = U.parseInt(req.data.page, 1) - 1;
+	var max = U.parseInt(req.data.max, 20);
+	AgentService.getAgentList(null, null, null, null, page, max, req.data.search, null, function(err, agents, count, pageCount) {
+		if(err){
+			res.respond({code:1002, message:err});
+			return;
+		}
+
+		res.respond({code:1000, message:'success', agents:agents, count:count, pageCount:pageCount, page:page+1});
+	});
+};
+
+exports.json_agents_get = function(req,res,next){
+	AgentService.getAgent(req.params._id, function(err, agent){
+		if(err || !agent){
+			res.respond({code:1001, message:'获取新农经纪人信息失败'});
+			return;
+		}
+		res.respond({code:1000, message:'success', agent:agent});
+	});
+};
+
+exports.json_agents_invitees_query = function(req,res,next){
+	var page = U.parseInt(req.data.page, 1) - 1;
+	var max = U.parseInt(req.data.max, 20);
+	AgentService.getInviteeList(req.data.agentId, page, max, function(err, invitees, count, pageCount){
+		if(err || !invitees){
+			res.respond({code:1001, message:'获取新农经纪人客户列表失败'});
+			return;
+		}
+		res.respond({code:1000, message:'success', invitees:invitees, count:count, pageCount:pageCount, page:page+1});
+	});
+};
+
+exports.json_agents_potentialCustomers_query = function(req,res,next){
+	var page = U.parseInt(req.data.page, 1) - 1;
+	var max = U.parseInt(req.data.max, 20);
+	PotentialCustomerService.queryPage({_id:req.data.agentId}, page, max, function(err, customers, count, pageCount){
+		if (err || !customers) {
+			res.respond({code:1001, message:'获取潜在客户列表失败'});
+			return;
+		}
+
+		res.respond({code:1000, message:'success', potentialCustomers:customers, count:count, pageCount:pageCount, page:page+1});
+	}, null, true);
+};
+
+// ==========================================================================
 // RSC
 // ==========================================================================
 
 exports.json_RSC_info_get = function(req,res,next){
-	UserService.getRSCInfoById(req.params.id, function(err, user){
+	UserService.getRSCInfoById(req.params._id, function(err, user){
 		if(err){
 			res.respond({code:1001, message:'查询失败'});
 			return;
@@ -1957,6 +2039,7 @@ exports.process_RSC_modify = function(req, res, next){
 			}
 		});
 	} else {
+		console.log(req.data);
 		RSCService.modifyRSCInfo(req.data.id, req.data, function(err){
 			if(err){
 				res.respond({code:1002, message:err});
@@ -2102,12 +2185,12 @@ exports.json_payrefund_read = function(req, res, next) {
 // Update pay refund
 exports.json_payrefund_update = function(req, res, next) {
 	var refundid = req.body && req.body.id ? req.body.id: null;
-	var refundstatus = req.body && req.body.status ? req.body.status: null;
-	if(!refundid){
+	var refundstatus = req.body.status;
+	if(!refundid) {
 		res.respond({code:1001, message:'请填写refund ID', error:[{'error':'请填写refund ID'}]});
 		return;
 	}
-	if(!refundstatus){
+	if(refundstatus !== 0 && !refundstatus) {
 		res.respond({code:1001, message:'请填写退款状态', error:[{'error':'请填写退款状态'}]});
 		return;
 	}

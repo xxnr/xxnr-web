@@ -2,7 +2,7 @@
 
 /*default*/
 /* reset */
-body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,input,button,textarea,p,blockquote,th,td{margin:0;padding:0;}
+body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,input,button,textarea,p,blockquote,th,td,span,a{margin:0;padding:0;}
 img{border:none;}
 em,strong{font-style:normal;font-weight:normal;}
 li{list-style:none;}
@@ -11,11 +11,14 @@ table {border-collapse:collapse;border-spacing:0;}
 
 html,body { margin: 0; height: 100%; position: relative; }
 body { background-color: white; padding: 0; color: gray; font-smoothing: antialiased; overflow-y: scroll; overflow-x: hidden; overflow-scrolling: touch; font-family: "微软雅黑","Microsoft YaHei","Helvetica Neue",Helvetica,Arial,sans-serif;}
-header { background-color: #E0E0E0; height: 40px; margin-bottom: 30px; }
+header { background-color: #E0E0E0; margin-bottom: 30px; }
 
 nav { font-size: 20px; position: relative; display: inline-block; font-smoothing: antialiased; width: 100%; }
-nav a { color: gray; border-right: 1px solid #D0D0D0; padding: 6px 0 0; position: relative; display: inline-block; min-width: 60px; text-align: center; height: 40px; }
-nav a:first-child { border-left: 1px solid #D0D0D0; }
+nav ul {display: inline-table; width: 100%;}
+nav ul li {display: inline-block; border-left: 1px solid #D0D0D0;}
+nav ul li:last-of-type { border-right: 1px solid #D0D0D0; }
+nav a { color: gray; padding: 6px 0 0; position: relative; display: inline-block; min-width: 60px; text-align: center; height: 40px; }
+/*nav a:first-child { border-left: 1px solid #D0D0D0; }*/
 nav a:hover { color: #303030; text-decoration: none; }
 
 nav .selected { background-color: white; color: black; }
@@ -94,13 +97,15 @@ canvas { display: block; }
 .ui-error { margin: 0 20px 20px !important; }
 
 .tabmenu { border-bottom: 1px solid #E0E0E0; padding: 0; margin: 0; display: block; position: relative; font-size: 12px; margin-bottom: 20px; }
-.tabmenu li { position: relative; display: inline-block; border: 1px solid white; border-bottom: 0; margin: 0 0 0 10px; padding: 0; border-radius: 3px 3px 0 0; background-color: #F8F8F8; text-align: center; padding: 8px 10px; color: gray; cursor: pointer; min-width: 120px; }
+.tabmenu li { position: relative; display: inline-block; border: 1px solid #EEEEEE; border-bottom: 0; margin: 0 0 0 10px; padding: 0; border-radius: 3px 3px 0 0; background-color: #F8F8F8; text-align: center; padding: 8px 10px; color: gray; cursor: pointer; min-width: 120px; }
 .tabmenu li:first-child { margin-left: 0; }
 .tabmenu .selected { background-color: white; top: 1px; border-color: #E0E0E0; color: black; }
 .tabmenu .fa { margin-right: 8px; }
+.tabmenu li:hover { background-color: white; top: 1px; border-color: #E0E0E0; color: black; }
+
 
 @media(max-width: 767px) {
-	header { height: 45px; }
+	/*header { height: 45px; }*/
 	nav { font-size: 16px; text-align: center; }
 	nav a { min-width: 42px; height: 45px; padding-top: 12px; }
 	.ui-form-buttons button[name="submit"] { width: 140px; }
@@ -118,9 +123,16 @@ canvas { display: block; }
 .account a {
     border: none;
     margin-left: 15px;
+    border-left: 1px solid #D0D0D0;
 }
-.table-bordered ul li .product-name {width: 75%; height:20px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; float: left;}
-.table-bordered ul li span{float: right;}
+
+.ui-form table {
+    table-layout: fixed;
+    font-size: 12px;
+    margin-bottom: 15px;
+}
+.table-bordered ul li .product-name { height:20px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; float: left; }
+/*.table-bordered ul li span { float: right; }*/
 /*.account a:first-child {border: none;}*/
 
 .multiselect {
@@ -197,8 +209,9 @@ canvas { display: block; }
 	cursor: not-allowed;
 	box-shadow: none;}
 
+.container .col-md-12 h3.ui-left { border-left: 7px solid #FF6F00; padding-left: 10px; }
+
 /* dash board */
-.dashboard .col-md-12 h3.ui-left { border-left: 7px solid #FF6F00; padding-left: 10px; }
 
 .dashboard-sidebar {font-size: 14px;}
 .dashboard-sidebar li { line-height: 25px; cursor: pointer; }
@@ -262,6 +275,11 @@ ul.simple-pagination {
 	margin: 0;
 	float: left;
 }
+
+.simple-pagination li.disabled {
+	display: none;
+}
+
 span.ellipse.clickable {
 	cursor: pointer;
 }
@@ -347,7 +365,7 @@ span.ellipse.clickable {
 	min-width: 14px;
 	padding: 0 7px;
 	margin: 0 5px 0 0;
-	border-radius: 3px;
+	border-radius: 14px;
 	box-shadow: 0 1px 2px rgba(0,0,0,0.2);
 	background: #efefef; /* Old browsers */
 	background: -moz-linear-gradient(top, #ffffff 0%, #efefef 100%); /* FF3.6+ */

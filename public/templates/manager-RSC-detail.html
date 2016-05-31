@@ -480,9 +480,6 @@
                 }
                 brandProductsList.name = brandProductsItems[0].brand.name;
                 brandProductsList.brandId = brandProductsItems[0].brand._id;
-                console.log(brandProductsItems[0]);
-                console.log(brandProductsItems[0].category);
-                console.log(rscProductList);
                 brandProductsList.category = brandProductsItems[0].category;
                 var m;
                 if(rscProductList[brandProductsList.category]) {
@@ -527,10 +524,12 @@
     function brand_delete(id) {
         var putData = {};
         putData.id = $("#recInfoId").text().trim();
-        putData.products = rscProductData.slice(0);
-        for(var i = 0; i < putData.products.length; i++) {
-            if(putData.products[i].brand == id) {
-                putData.products.splice(i,1);
+        // fix bug when putData.products splice the length will change
+        putData.products = [];
+        var products = rscProductData.slice(0);
+        for(var i = 0; i < products.length; i++) {
+            if(products[i].brand !== id) {
+                putData.products.push(products[i]);
             }
         }
         $.components.PUT(managerurl + '/api/v2.2/RSC/modify',putData , function(response){

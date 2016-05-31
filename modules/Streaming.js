@@ -6,6 +6,7 @@ var BOOLEAN = 'boolean';
 var FUNCTION = 'function';
 var Stream = require('stream');
 var ReadStream = require('fs').ReadStream;
+var NUMBER = 'number';
 
 function onFinished(msg, listener) {
     if (isFinished(msg) !== false) {

@@ -40,11 +40,11 @@ DashboardService.prototype.generateHourlyReport = function(hourMinus, callback) 
     var currentTime = new Date();
 
     // startTime and endTime is used for database query, cause we store UTC in database, so we should minus time zone diff here
-    var startTime = new Date(currentTime.add('h', -hourMinus).format('yyyy-MM-dd hh')+':00:00').add('h', -config.currentTimeZoneDiff);
-    var endTime = new Date(currentTime.add('h', -hourMinus + 1).format('yyyy-MM-dd hh')+':00:00').add('h', -config.currentTimeZoneDiff);
+    var startTime = new Date(currentTime.add('h', -hourMinus).format('yyyy-MM-dd hh')+':00:00');
+    var endTime = new Date(currentTime.add('h', -hourMinus + 1).format('yyyy-MM-dd hh')+':00:00');
 
     // this time is used for recording into hourly report table.
-    var queryDateInBeijingTime =  new Date(currentTime.add('h', -hourMinus).format('yyyy-MM-dd hh')+':00:00').add('h', -config.currentTimeZoneDiff);
+    var queryDateInBeijingTime =  startTime;
 
     var registeredUserCount = 0;
     var orderCount = 0;
@@ -295,11 +295,11 @@ DashboardService.prototype.generateAgentReport = function(dateMinus, callback){
     }
 
     var currentTime = new Date();
-    var startTime = new Date(currentTime.add('d', -dateMinus).format('yyyy-MM-dd hh')+':00:00').add('h', -config.currentTimeZoneDiff);
-    var endTime = new Date(currentTime.add('d', -dateMinus + 1).format('yyyy-MM-dd hh')+':00:00').add('h', -config.currentTimeZoneDiff);
+    var startTime = new Date(currentTime.add('d', -dateMinus).format('yyyy-MM-dd')).add('h', -config.currentTimeZoneDiff);
+    var endTime = new Date(currentTime.add('d', -dateMinus + 1).format('yyyy-MM-dd')).add('h', -config.currentTimeZoneDiff);
 
     // this time is used for recording into hourly report table.
-    var queryDateInBeijingTime =  new Date(currentTime.add('d', -dateMinus).format('yyyy-MM-dd hh')+':00:00').add('h', -config.currentTimeZoneDiff);
+    var queryDateInBeijingTime =  startTime;
     var dayOfWeek = queryDateInBeijingTime.getDay();
     if(dayOfWeek == 0){
         // getDay will return 0 if it is Sunday
@@ -422,7 +422,7 @@ DashboardService.prototype.generateAgentReport = function(dateMinus, callback){
                             if(err){
                                 if(11000 == err.code){
                                     // already has record of this hour, need update
-                                    AgentReportModel.findOneAndUpdate({name:agent.name, dayInBeijingTime:dayInBeijingTime}, {$set:agentDailyRecord}, function(err){
+                                    AgentReportModel.findOneAndUpdate({agent:agent._id, dayInBeijingTime:dayInBeijingTime}, {$set:agentDailyRecord}, function(err){
                                         if(err){
                                             console.error(err);
                                             reject(err);
@@ -478,6 +478,7 @@ DashboardService.prototype.queryAgentReportYesterday = function(callback, sortBy
         case 'TOTALCOMPLETEDORDER':
             sort = {totalCompletedOrderCount:order};
             break;
+        case 'TOTALPAIDAMOUT':
         default :
             sort = {totalPaidAmount:order};
             break;

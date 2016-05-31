@@ -145,17 +145,23 @@ exports.backend_auth = function(req, res, next){
 };
 
 function backend_auth_fail(req, res, data){
+    var userAgent = req.data['user-agent'];
+    if (userAgent && tools.isMobileTestUserAgent(userAgent)) {
+        res.respond({code: 1401, message: '请先登录'});
+        return;
+    }
     var isMobile = tools.isMobile(req);
     if(isMobile){
         res.respond({code: 1401, message: '请先登录'});
-    } else {
-        res.render('./7.manager/login.html',
-            {
-                manager_url: F.config['manager-url'],
-                user: data,
-                version: F.config['version']
-            });
+        return;
     }
+
+    res.render('./7.manager/login.html',
+        {
+            manager_url: F.config['manager-url'],
+            user: data,
+            version: F.config['version']
+        });
 }
 
 /**

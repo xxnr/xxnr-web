@@ -21,14 +21,14 @@
                         <div data-component="textbox" data-component-path="login.form.account" data-required="true" class="col-md-12">用户名</div>
                     </div>
                     <div class="row">
-                        <div data-component="textbox" data-component-type="password" data-component-path="login.form.password" data-required="true" class="col-md-12">密码</div>
+                        <div data-component="textbox" data-component-type="password" data-component-path="login.form.password" data-required="true" class="col-md-12" onkeydown="goLogin(event);">密码</div>
                     </div>
                 </div>
                 <br>
-                <div data-component="error" data-component-path="orders.response"></div>
+                <div data-component="error" data-component-path="login.response"></div>
                 <div class="ui-form-buttons">
                     <div data-component="validation" data-component-path="login.form">
-                        <button name="submit">登录</button>
+                        <button id="loginButton" name="submit">登录</button>
                     </div>
                 </div>
             </div>
@@ -46,16 +46,35 @@
                         login.form.password = encrypt.encrypt(login.form.password);
                         $.components.POST(managerurl + '/api/login/', login.form, function (response) {
                             // Error handling
-                            SET('orders.response', response);
+                            // SET('login.response', response);
                             if (response.code == 1000) {
                                 window.location.href = managerurl;
                             }else{
-                                alert(response.message);
+                                // alert(response.message);
+                                if (response.error || response.message) {
+                                    key = 'agents.agentsresponse';
+                                    if (response.message) {
+                                        response = [{error: response.message}];
+                                    } else {
+                                        response = response.error;
+                                    }
+                                    SET('login.response', response);
+                                } else {
+                                    response = [];
+                                }
                             }
                         });
                     });
                 };
             });
+
+            function goLogin(event) {
+                var theEvent = event || window.event;
+                var code = theEvent.keyCode || theEvent.which || theEvent.charCode;
+                if (code == 13) {
+                    $('#loginButton').click();
+                }
+            }
         </script>
 
     </body>

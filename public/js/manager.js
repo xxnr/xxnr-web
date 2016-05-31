@@ -8,6 +8,7 @@ var i18n = {
   weekdays        : ['周日','周一','周二','周三','周四','周五','周六'],
   weekdaysShort   : ['日','一','二','三','四','五','六']
 };
+var defaultColors = ['#BFE83E', '#FCAC42', '#6DD2F3', '#3FCCAC'];
 
 // Current page
 common.page = '';
@@ -213,6 +214,26 @@ jRouting.route(managerurl + '/rsc/rsc-order', function(){
 	redirectToHomePage();
 });
 
+jRouting.route(managerurl + '/agents', function(){
+	if(can('agents')) {
+		navClass('agents');
+		SET('common.page', 'agents');
+		return;
+	}
+
+	redirectToHomePage();
+});
+
+jRouting.route(managerurl + '/agents/agents-detail', function(){
+	if(can('agents')) {
+		navClass('agents');
+		SET('common.page', 'agents-detail');
+		return;
+	}
+
+	redirectToHomePage();
+});
+
 // jRouting.on('location', function(url) {
 // 	// var nav = $('nav');
 // 	// nav.find('.selected').removeClass('selected');
@@ -246,7 +267,6 @@ function success() {
 			el.fadeOut(300);
 		}, 1000);
 	});
-	document.documentElement.style.overflow='visible';
 }
 
 function can(name) {

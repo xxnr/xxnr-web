@@ -5,7 +5,7 @@ app.service('flyToCart',function (commonService) {
         // $(".addcart").click(function(event){
         jQuery(function($) {
             var addcar = $(this);
-            window.scrollTo(0, 0);
+            //window.scrollTo(0, 0);
             var img = $('.product_img_slider img:first-child').attr('src');
             var flyer = $('<img class="u-flyer" src="'+img+'">');
             flyer.fly({

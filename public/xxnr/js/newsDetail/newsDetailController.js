@@ -10,7 +10,9 @@ app.controller('newsDetailController',function($scope, remoteApiService, commonS
         .then(function(data) {
             $scope.categories = data.datas;
             for(var i in $scope.categories){
-                $scope.categories[i].isSelected = false;
+                if($scope.categories.hasOwnProperty(i)) {
+                    $scope.categories[i].isSelected = false;
+                }
             }
             $scope.categories.splice(0, 0, {name:'全部',linker:"全部"});
             $scope.categories[0].isSelected = true;
@@ -39,16 +41,18 @@ app.controller('newsDetailController',function($scope, remoteApiService, commonS
                                     $scope.sideArticles = [];
                                     $scope.pages_count = articleList.datas.pages;
                                     for(var index in articleList.datas.items){
-                                        var article = {};
-                                        article.name = articleList.datas.items[index].title;
-                                        article.name = article.name.length > 35 ? (article.name.substr(0, 35) + '...') : article.name;
-                                        article.id = articleList.datas.items[index].id;
-                                        article.url = "newsDetail.html?id="+article.id;
-                                        article.category = articleList.datas.items[index].category;
-                                        article.categoryId = findCategoryId(article.category);
-                                        var d = new Date(articleList.datas.items[index].datecreated);
-                                        article.createdTime = d.getFullYear()+'-'+ (d.getMonth()+1) +'-'+d.getDate();
-                                        $scope.sideArticles.push(article);
+                                        if(articleList.datas.items.hasOwnProperty(index)) {
+                                            var article = {};
+                                            article.name = articleList.datas.items[index].title;
+                                            article.name = article.name.length > 35 ? (article.name.substr(0, 35) + '...') : article.name;
+                                            article.id = articleList.datas.items[index].id;
+                                            article.url = "newsDetail.html?id=" + article.id;
+                                            article.category = articleList.datas.items[index].category;
+                                            article.categoryId = findCategoryId(article.category);
+                                            var d = new Date(commonService.parseDate(articleList.datas.items[index].datecreated));
+                                            article.createdTime = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
+                                            $scope.sideArticles.push(article);
+                                        }
                                     }
                                 });
                         // });

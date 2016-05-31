@@ -1,7 +1,7 @@
 var app = angular.module('xxnr_common');
 app.directive('header', function(){
     return{
-        replace: true,
+        replace:true,
         restrict: 'AE',
         templateUrl: function(element, attrs) {
            return attrs.templateUrl || 'header';
@@ -19,14 +19,16 @@ app.directive('header', function(){
                     androidLink.href = "../../newFarmer.apk";
                 }
             });
-        }
+        },
+        replace:true
     }
 }).directive('footer', function(){
   return{
-      replace: true,
+        replace:true,
         restrict: 'AE',
-    templateUrl: function(element, attrs) {
-        return attrs.templateUrl || 'footer';
-    }
+        templateUrl: function(element, attrs) {
+            return attrs.templateUrl || 'footer';
+        },
+        replace:true
   }
 });

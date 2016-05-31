@@ -29,9 +29,9 @@
     <div data-component="grid" data-component-path="rscOrder.grid" data-max="auto" data-options-page="Page: #" data-options-button="查看更多订单" data-component-id="rscOrder.grid" class="rsc-order-box">
         <script type="text/html">
             <tr>
-                <td style="width:80px" class="silver hidden-xs" data-title="订单号">{{id}}</td>
-                <td style="width:120px" class=" silver hidden-xs1" data-title="下单时间">{{dateCreated | format('yyyy-MM-dd HH:mm:ss')}}</td>
-                <td style="width:160px" class=" silver hidden-xs1" data-title="商品名称">
+                <td style="width:80px" class="silver hidden-xs" data-title="订单号" title="{{id}}">{{id}}</td>
+                <td style="width:120px" class=" silver hidden-xs1" data-title="下单时间" title="{{dateCreated | format('yyyy-MM-dd HH:mm:ss')}}">{{dateCreated | format('yyyy-MM-dd HH:mm:ss')}}</td>
+                <td style="width:160px" class=" silver hidden-xs1" data-title="商品名称" title=" {{foreach sku in SKUs}}{{sku.name}}{{if SKUs && SKUs.length != 1 && $index != 0}},{{fi}}{{end}}">
                     {{foreach sku in SKUs}}
                         {{sku.name}}{{if SKUs && SKUs.length != 1 && $index != 0}},{{fi}}
                     {{end}}
@@ -41,13 +41,13 @@
                 <td style="width:120px" class=" silver hidden-xs1" data-title="应付总额">{{totalPrice | price(2)}}</td>
                 <td style="width:120px" class=" silver hidden-xs1" data-title="订金金额">{{deposit | price(2)}}</td>
                 <td style="width:120px" class=" silver hidden-xs1 ui-center" data-title="订单状态">{{RSCtypeValue ? RSCtypeValue.value : ''}}</td>
-                <td style="width:40px" class=" silver hidden-xs1 ui-center" data-title="操作"><button name="edit" class="fa fa-search"></button></td>
+                <td style="width:40px" class=" silver hidden-xs1 ui-center" data-title="查看"><button name="edit" class="fa fa-search"></button></td>
             </tr>
         </script>
     </div>
 
 </div>
-<div data-component="form" data-component-path="common.form" data-if="value === 'rscOrder'" data-title="订单详情" data-component-id="rscOrder.form" data-width="1000px">
+<div data-component="form" data-component-path="common.form" data-if="value === 'rscOrder'" data-title="订单详情" data-component-id="rscOrder.form" data-width="1200px">
     <div data-component="template" data-component-path="rscOrder.form">
         <script type="text/html">
             <div>
@@ -86,19 +86,19 @@
             </div>
         </script>
     </div>
-    <div class="rsc-order-sec-title">
+    <div class="rsc-order-sec-title" style="border-bottom: none;">
         商品信息
     </div>
-    <div class="rsc-order-info-con">
-        <div>
+    <!-- <div class="rsc-order-info-con"> -->
+        <div style="padding: 0 20px 50px;">
             <div data-component="template" data-component-path="rscOrder">
                 <script type="text/html">
                     {{ if form.SKUs && form.SKUs.length > 0 }}
-                    <table class="table table-bordered" border="0" style="border-bottom: 0;margin-bottom: 0;">
+                    <table class="table table-bordered" border="0" style="border-top: none;">
                         <tbody>
                         <tr>
-                            <td class="ui-center hidden-xs active">序号</td>
-                            <td class="ui-center hidden-xs active">商品ID</td>
+                            <td class="ui-center col-xs-1 hidden-xs active">序号</td>
+                            <td class="ui-center col-xs-1 hidden-xs active">商品ID</td>
                             <td class="ui-center col-xs-3 hidden-xs active">商品名称</td>
                             <td class="ui-center col-xs-2 active">单价</td>
                             <td class="ui-center col-xs-1 active">订金</td>
@@ -108,8 +108,8 @@
                         </tr>
                         {{ foreach s in form.SKUs }}
                         <tr>
-                            <td class="ui-center hidden-xs active">{{$index + 1}}</td>
-                            <td class="ui-center hidden-xs">{{ s.productId }}</td>
+                            <td class="ui-center col-xs-1 hidden-xs">{{$index + 1}}</td>
+                            <td class="ui-center col-xs-1 hidden-xs" title="{{ s.productId }}">{{ s.productId }}</td>
                             <td class="ui-center col-xs-3 hidden-xs" title="{{ s.name }}">{{ s.name }}</td>
                             <td class="ui-center col-xs-2">{{ s.price | price(2) }}</td>
                             <td class="ui-center col-xs-1">{{ s.deposit | price(2) }}</td>
@@ -121,23 +121,25 @@
                                 {{ end }}
                                 <div class="deliver-status-detail" >
                                     <ul>
-                                        {{if !s.dateRSCReceived && !s.dateDelivered && !s.dateConfirmed}}
+                                        {{if s.deliverStatus === 1 || (!s.dateRSCReceived && !s.dateDelivered && !s.dateConfirmed)}}
                                             <li>暂无物流信息</li>
                                         {{else}}
-                                            {{if s.dateRSCReceived}}
+                                            {{if (s.deliverStatus === 4 || s.deliverStatus === 5 || s.deliverStatus === 2) && s.dateRSCReceived}}
                                                 <li>发货到服务站</li>
                                                 <li>{{s.dateRSCReceived | format('yyyy-MM-dd HH:mm:ss')}}</li>
                                             {{fi}}
-                                            {{if s.dateDelivered && form.delivery && (form.delivery.type == 2 || form.delivery.type == 5)}}
+                                            {{if (s.deliverStatus === 2 || s.deliverStatus === 5) && s.dateDelivered && form.delivery && (form.delivery.type == 2 || form.delivery.type == 5)}}
                                                 <li>开始配送</li>
                                                 <li>{{s.dateDelivered | format('yyyy-MM-dd HH:mm:ss')}}</li>
                                             {{fi}}
-                                            {{if form.delivery && form.delivery.type == 1}}
-                                                <li>商品已自提</li>
-                                            {{else}}
-                                                <li>配送完成</li>
+                                            {{ if s.deliverStatus === 5 && s.dateConfirmed}}
+                                                {{if form.delivery && form.delivery.type == 1}}
+                                                    <li>商品已自提</li>
+                                                {{else}}
+                                                    <li>配送完成</li>
+                                                {{fi}}
+                                                <li>{{s.dateConfirmed | format('yyyy-MM-dd HH:mm:ss')}}</li>
                                             {{fi}}
-                                            <li>{{s.dateConfirmed | format('@(yyyy-MM-dd HH:mm:ss)')}}</li>
                                         {{fi}}
                                     </ul>
                                 </div>
@@ -152,8 +154,8 @@
                     <table class="table table-bordered" border="0" style="border-bottom: 0;margin-bottom: 0;">
                         <tbody>
                         <tr>
-                            <td class="ui-center hidden-xs active">序号</td>
-                            <td class="ui-center hidden-xs active">商品ID</td>
+                            <td class="ui-center col-xs-1 hidden-xs active">序号</td>
+                            <td class="ui-center col-xs-1 hidden-xs active">商品ID</td>
                             <td class="ui-center col-xs-3 hidden-xs active">商品名称</td>
                             <td class="ui-center col-xs-2 active">单价</td>
                             <td class="ui-center col-xs-1 active">订金</td>
@@ -163,8 +165,8 @@
                         </tr>
                         {{ foreach p in form.products }}
                         <tr>
-                            <td class="ui-center hidden-xs active">{{$index + 1}}</td>
-                            <td class="ui-center hidden-xs">{{ p.productId }}</td>
+                            <td class="ui-center col-xs-1 hidden-xs">{{$index + 1}}</td>
+                            <td class="ui-center col-xs-1 hidden-xs" title="{{ p.productId }}">{{ p.productId }}</td>
                             <td class="ui-center col-xs-3 hidden-xs" title="{{ s.name }}">{{ s.name }}</td>
                             <td class="ui-center col-xs-2">{{ p.price | price(2) }}</td>
                             <td class="ui-center col-xs-1">{{ p.deposit | price(2) }}</td>
@@ -181,18 +183,18 @@
                                         {{else}}
                                             {{if p.dateRSCReceived}}
                                                 <li>发货到服务站</li>
-                                                <li>{{p.dateRSCReceived | format('@(yyyy-MM-dd HH:mm:ss)')}}</li>
+                                                <li>{{p.dateRSCReceived | format('yyyy-MM-dd HH:mm:ss')}}</li>
                                             {{fi}}
                                             {{if p.dateDelivered && form.delivery && (form.delivery.type == 2 || form.delivery.type == 5)}}
                                                 <li>开始配送</li>
-                                                <li>{{p.dateDelivered | format('@(yyyy-MM-dd HH:mm:ss)')}}</li>
+                                                <li>{{p.dateDelivered | format('yyyy-MM-dd HH:mm:ss')}}</li>
                                             {{fi}}
                                             {{if form.delivery && form.delivery.type == 1}}
                                                 <li>商品已自提</li>
                                             {{else}}
                                                 <li>配送完成</li>
                                             {{fi}}
-                                            <li>{{p.dateConfirmed | format('@(yyyy-MM-dd HH:mm:ss)')}}</li>
+                                            <li>{{p.dateConfirmed | format('yyyy-MM-dd HH:mm:ss')}}</li>
                                         {{fi}}
                                     </ul>
                                 </div>
@@ -205,8 +207,8 @@
                 </script>
             </div>
         </div>
-    </div>
-    <div class="height-10px"></div>
+    <!-- </div>
+    <div class="height-10px"></div> -->
 </div>
 <script>
     var rscOrder = {};

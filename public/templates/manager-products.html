@@ -864,10 +864,6 @@
 
     function update_SKU(index){
         var SKU = products.SKUs[index];
-        SKU.name=products.form.name;
-        SKU.attributes.forEach(function(attribute){
-            SKU.name += ' - ' + attribute.value;
-        });
         if(SKU.price.market_price && (!PRICE_REGEX.test(SKU.price.market_price) || parseFloat(SKU.price.market_price) < 0)){
             alert('@(请填写正确的市场价)');
             return;
@@ -939,10 +935,6 @@
 
     function add_SKU(index){
         var SKU = products.SKUs[index];
-        SKU.name=products.form.name;
-        SKU.attributes.forEach(function(attribute){
-            SKU.name += ' - ' + attribute.value;
-        });
         if(SKU.price.market_price && (!PRICE_REGEX.test(SKU.price.market_price) || parseFloat(SKU.price.market_price) < 0)){
             alert('@(请填写正确的市场价)');
             return;

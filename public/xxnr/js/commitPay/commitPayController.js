@@ -13,7 +13,7 @@ app.controller('commitPayController', function($scope, remoteApiService, payServ
 
     $scope.has_offlinePay_company = false; //用来表示线下支付点的参数
     $scope.offlineSubmitted = getQueryStringByName('offlinePay') | false;   // 已提交线下订单
-    console.log($scope.offlineSubmitted);
+    //console.log($scope.offlineSubmitted);
     // if not login
     if(!loginService.isLogin) {
         window.location.href = "logon.html";
@@ -259,8 +259,9 @@ app.controller('commitPayController', function($scope, remoteApiService, payServ
                         remoteApiService.offlinepay($scope.orders[$scope.orderSelectedNum].id,$scope.orders[$scope.orderSelectedNum].duePrice)
                             .then(function(data) {
                                 if(data.code==1000){
-                                    window.scrollTo(0,0);
-                                    $scope.offlineSubmitted = true;
+                                    window.location.href= window.location.href + '&offlinePay=1';
+                                }else if(data.code == 1401){
+                                    sweetalert('你已被登出，请重新登录', "logon.html");
                                 }else{
                                     sweetalert('线下支付申请失败,请重试');
                                 }

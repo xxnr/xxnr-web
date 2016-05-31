@@ -15,7 +15,7 @@ var htmlreplace = require('gulp-html-replace');
 
 gulp.task('css_minify', function() {                                //- 创建一个名为 concat 的 task
     var revAll = new RevAll();
-    gulp.src(['./css/addAddress.css', './css/sweetalert.css','./css/uploadify.css','./css/style.css','./css/invitationSweetalert.css'])    //- 需要处理的css文件，放到一个字符串数组里
+    gulp.src(['./css/addAddress.css', './css/sweetalert.css','./css/uploadify.css','./css/style.css'])    //- 需要处理的css文件，放到一个字符串数组里
         .pipe(concat('styleAllInOne.css'))                            //- 合并后的文件名
         .pipe(minifyCss())                                      //- 压缩处理成一行
         .pipe(gulp.dest('./dev/css'))
@@ -28,6 +28,7 @@ gulp.task('css_minify', function() {                                //- 创建�
 gulp.task('framework_js_minify', function() {
     var revAll = new RevAll();
     gulp.src(['./js/jquery.min.js',
+        './js/selectivizr-min.js',
         './js/angular.min.js',
         './js/angular-cookies.min.js',
         './js/common.js',

@@ -7,15 +7,15 @@ var DashboardService = services.dashboard;
 var ReportUpdateTimeModel = require('../models').reportUpdateTime;
 var utils = require('../common/utils');
 const millisecondsInDay = 24*60*60*1000;
-const concurrency = 10000;
+const concurrency = 10;
 
 ReportUpdateTimeModel.findOne({}, function(err, updateTime){
     var lastModifyTime = new Date(config.serviceStartTime).getTime();
     if(updateTime && updateTime.agentReport) {
-        lastModifyTime = new Date(updateTime.agentReport).getTime();
+        lastModifyTime = new Date(updateTime.agentReport).add('h', -config.currentTimeZoneDiff).getTime();
     }
 
-    var currentTime = new Date().getTime();
+    var currentTime = new Date().add('h', -config.currentTimeZoneDiff).getTime();
     var dayDiff = parseInt(currentTime/millisecondsInDay) - parseInt(lastModifyTime/millisecondsInDay);
     var recordedCount = dayDiff;
     var batchGenerateAgentReport = function(i, max) {
@@ -27,6 +27,7 @@ ReportUpdateTimeModel.findOne({}, function(err, updateTime){
                         reject(err);
                         return;
                     }
+
                     resolve();
                 });
             }));

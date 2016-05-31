@@ -100,7 +100,7 @@ app.controller('productDetailController',function($scope, $timeout, remoteApiSer
                 $scope.blockBuying = true;
             }
             if(item.deposit){
-                item.buyActionName = '立即付定金';
+                item.buyActionName = '立即付订金';
             }else{
                 item.buyActionName = '立即购买';
             }

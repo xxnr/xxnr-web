@@ -15,14 +15,6 @@
 
 <div class="container">
 	<div data-component="grid" data-component-path="users.grid" data-max="auto" data-options-page="Page: #" data-options-button="查看更多客户" data-component-id="users.grid">
-		<!-- <tr>
-			<td>会员</td>
-			<td style="width:220px" class="hidden-xs fs11">账号</td>
-			<td style="width:120px" class="hidden-xs fs11">昵称</td>
-			<td style="width:120px" class="hidden-xs fs11">积分</td>
-			<td style="width:200px" class="ui-right hidden-xs">注册时间</td>
-			<td style="width:80px" class="ui-right">操作</td>
-		</tr> -->
 		<script type="text/html">
 		<tr>
 			<td style="width:40px" class="silver hidden-xs">$index</td>
@@ -268,32 +260,28 @@
             <div class="silver"><span class="fa fa-shopping-cart"></span> <strong>已支付订单列表</strong>:</div>
             <table class="table table-bordered checkoutlist" border="0">
                 <tr>
-                    <td class="col-xs-2 hidden-xs ui-right">订单编号</td>
-                    <td class="ui-right col-xs-3 hidden-xs">
+                    <td class="ui-right hidden-xs col-xs-1">订单编号</td>
+                    <td class="hidden-xs col-xs-6">
                         <ul>
-                            <li><div class="product-name">订单商品</div><sapn>(数量x)</sapn></li>
+                            <li><div class="product-name col-xs-10">订单商品</div><sapn class="col-xs-2">(数量x)</sapn></li>
                         </ul>
                     </td>
-                    <td class="ui-right col-xs-3">创建时间</td>
+                    <td class="ui-right col-xs-2">创建时间</td>
                     <td class="ui-right col-xs-2">收货人电话</td>
-                    <td class="ui-right col-xs-2">支付金额</td>
+                    <td class="ui-right col-xs-1">支付金额</td>
                 </tr>
                 {{ foreach order in items }}
                     <tr>
-                        <td class="col-xs-2 hidden-xs ui-right">{{ order.id }}</td>
-                        <td class="ui-right col-xs-3 hidden-xs">
+                        <td class="ui-right hidden-xs col-xs-1">{{ order.id }}</td>
+                        <td class="hidden-xs col-xs-6">
                             <ul>
-								{{ foreach product in order.products }}
-									<li><div class="product-name hidden-xs col-xs-9" title="{{product.name}}">{{ product.name }}</div><sapn class="col-xs-2">({{ product.count }}x)</sapn></li>
-								{{ end }}
-								{{ foreach SKU in order.SKUs }}
-									<li><div class="product-name hidden-xs col-xs-9" title="{{SKU.name}}">{{SKU.name}}</div><span class="col-xs-2">({{SKU.count}}x)</span></li>
-								{{ end }}
+                            	{{ foreach product in order.products }}<li><div class="product-name hidden-xs col-xs-10" title="{{product.name}}">{{ product.name }}</div><sapn class="col-xs-2">({{ product.count }}x)</sapn></li>{{ end }}
+								{{ foreach SKU in order.SKUs }}<li><div class="product-name hidden-xs col-xs-10" title="{{SKU.name}}">{{SKU.name}}</div><span class="col-xs-2">({{SKU.count}}x)</span></li>{{ end }}
                             </ul>
                         </td>
-                        <td class="ui-right col-xs-3 hidden-xs">{{ order.dateCreated | format('yyyy-MM-dd hh:mm:ss') }}</td>
-                        <td class="ui-right col-xs-2 hidden-xs">{{ order.consigneePhone }}</td>
-                        <td class="ui-right col-xs-2 hidden-xs">{{ order.price | price(2) }}</td>
+                        <td class="ui-right hidden-xs col-xs-2">{{ order.dateCreated | format('yyyy-MM-dd hh:mm:ss') }}</td>
+                        <td class="ui-right hidden-xs col-xs-2">{{ order.consigneePhone }}</td>
+                        <td class="ui-right hidden-xs col-xs-1">{{ order.price | price(2) }}</td>
                     </tr>
                 {{ end }}
             </table>

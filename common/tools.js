@@ -16,6 +16,8 @@ var config = require('../config');
 var Global = require('../global.js');
 var moment = require('moment-timezone');
 var REG_MOBILE = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|Tablet/i;
+var REG_IOS = /ios|iphone|ipad|ipod/i;
+var REG_Andriod = /android/i;
 
 /*
     Phone in china validation
@@ -367,4 +369,23 @@ exports.getWeekStartTimeByDate = function(date){
 
 exports.isMobile = function(req){
     return REG_MOBILE.test(req.get('user-agent'));
+};
+
+exports.testUserAgent = function(userAgent){
+    if (REG_IOS.test(userAgent.toLowerCase())) {
+        return 'IOS';
+    } else {
+        if (REG_Andriod.test(userAgent.toLowerCase())) {
+            return 'Android';
+        } else {
+            return null;
+        }
+    }
+};
+
+exports.isMobileTestUserAgent = function(userAgent){
+    if (!userAgent) {
+        return null;
+    }
+    return REG_MOBILE.test(userAgent);
 };
