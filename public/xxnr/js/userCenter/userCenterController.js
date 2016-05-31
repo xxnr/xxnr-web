@@ -54,7 +54,9 @@ app.controller('userCenterController', function($scope, $rootScope,$timeout ,rem
                 .then(function (data) {
                     if (data.code == 1000) {
                         window.location.href = window.location.href;
-                    } else {
+                    } else if(data.code == 1401){
+                        sweetalert('你已被登出，请重新登录', "logon.html");
+                    }else {
                         //sweetalert('上传头像失败',' ');
                     }
                 });
@@ -202,7 +204,9 @@ app.controller('userCenterController', function($scope, $rootScope,$timeout ,rem
                                 loginService.logout();
                                 sweetalert('修改密码成功', "logon.html");
                                 //window.location.href = 'logon.html';
-                            } else {
+                            }else if(data.code == 1401){
+                                sweetalert('你已被登出，请重新登录', "logon.html");
+                            }else {
                                 sweetalert(data.message);
                             }
                         })
@@ -467,8 +471,10 @@ app.controller('userCenterController', function($scope, $rootScope,$timeout ,rem
                                     if (data.code == 1000) {
                                         //$scope.pickupOrderDeliveryCode = data.
                                         $scope.pickupDeliveryCode = data.deliveryCode;
-                                    } else {
-                                        sweetalert('获取提货码失败', 'my_xxnr.html');
+                                    }else if(data.code == 1401){
+                                        sweetalert('你已被登出，请重新登录', "logon.html");
+                                    }else{
+                                        sweetalert('获取自提码失败','my_xxnr.html');
                                     }
                                 })
                         }
@@ -542,10 +548,13 @@ app.controller('userCenterController', function($scope, $rootScope,$timeout ,rem
             remoteApiService.confirmSKU($scope.ConfirmingOrderIds, $scope.ConfirmingSKU_refs)
                 .then(function (data) {
                     $scope.ConfirmingOrderIds = null;
-                    if (data.code == 1000) {
-                        sweetalert('收货成功', 'my_xxnr.html');
-                    } else {
-                        sweetalert('确认收货失败', 'my_xxnr.html');
+                    if(data.code == 1000){
+                        sweetalert('收货成功','my_xxnr.html');
+                    }else if(data.code == 1401){
+                        sweetalert('你已被登出，请重新登录', "logon.html");
+                    }
+                    else{
+                        sweetalert('确认收货失败','my_xxnr.html');
                     }
                 });
             //$scope.ConfirmingOrderIds = null;

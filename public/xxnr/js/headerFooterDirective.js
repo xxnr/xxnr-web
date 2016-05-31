@@ -19,7 +19,8 @@ app.directive('header', function(){
                     androidLink.href = "../../newFarmer.apk";
                 }
             });
-        }
+        },
+        replace:true
     }
 }).directive('footer', function(){
   return{
@@ -27,6 +28,7 @@ app.directive('header', function(){
         restrict: 'AE',
     templateUrl: function(element, attrs) {
         return attrs.templateUrl || 'footer';
-    }
+    },
+      replace:true
   }
 });

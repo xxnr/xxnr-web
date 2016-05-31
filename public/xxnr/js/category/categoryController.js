@@ -177,15 +177,14 @@ app.controller('categoryController', function($scope, remoteApiService, commonSe
     };
     var getPagedGoods = function(page,count_per_page,categoryId,brandsStr, queryAttributesArray ,reservePrice){
         if(!hasAttributes){
-            queryAttributes = [];
+            queryAttributes = null;
         }
         if(!price){
             prive = null;
         }
         if($scope.$parent.brandsStr == 0){
-            $scope.$parent.brandsStr = null;
+            $scope.$parent.brandsStr = "";
         }
-
         remoteApiService.getGoodsListPage(page, count_per_page, categoryId,brandsStr,queryAttributesArray ,reservePrice)
             .then(function(data){
                 all_products = [];

@@ -3,10 +3,11 @@
  */
 
 exports.redirectToHttps = function(req, res, next){
-    if(req.protocol != 'https' && require('../config').secure) {
-        res.redirect('https://' + req.hostname + req.url);
-        return;
-    }
+    // redirect can be used only when app support
+    //if(req.protocol != 'https' && require('../config').secure) {
+    //    res.redirect('https://' + req.hostname + req.url);
+    //    return;
+    //}
 
     next();
 };
