@@ -21,10 +21,7 @@ export function configRouter (router) {
     },
     '/productDetail': {
         component: require('./components/productDetail/index.vue')
-	},
-	  '/productDetail': {
-      component: require('./components/productDetail/index.vue')
-    },
+	  },
     '/order': {
       component: require('./components/order/index.vue')
     },

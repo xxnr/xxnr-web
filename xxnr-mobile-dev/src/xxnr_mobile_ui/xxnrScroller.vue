@@ -117,7 +117,7 @@
     computed: {
       styles () {
         if (!this.height && !this.$el.style.height && this.lockX) {
-          this.height = `${document.documentElement.clientHeight-85}px`
+          this.height = `${document.documentElement.clientHeight-40}px`
           this.reset()
         }
         return {
