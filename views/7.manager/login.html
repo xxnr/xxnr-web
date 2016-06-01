@@ -25,7 +25,7 @@
                     </div>
                 </div>
                 <br>
-                <div data-component="error" data-component-path="orders.response"></div>
+                <div data-component="error" data-component-path="login.response"></div>
                 <div class="ui-form-buttons">
                     <div data-component="validation" data-component-path="login.form">
                         <button id="loginButton" name="submit">登录</button>
@@ -46,11 +46,22 @@
                         login.form.password = encrypt.encrypt(login.form.password);
                         $.components.POST(managerurl + '/api/login/', login.form, function (response) {
                             // Error handling
-                            SET('orders.response', response);
+                            // SET('login.response', response);
                             if (response.code == 1000) {
                                 window.location.href = managerurl;
                             }else{
-                                alert(response.message);
+                                // alert(response.message);
+                                if (response.error || response.message) {
+                                    key = 'agents.agentsresponse';
+                                    if (response.message) {
+                                        response = [{error: response.message}];
+                                    } else {
+                                        response = response.error;
+                                    }
+                                    SET('login.response', response);
+                                } else {
+                                    response = [];
+                                }
                             }
                         });
                     });

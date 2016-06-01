@@ -430,15 +430,18 @@ exports.updateShoppingCart = function(req, res, next) {
 function getBanners(req, callback){
     var fs = require('fs');
     var bannerType = req.data['bannerType'] || 'app';
-    var bannerFolder = `${XXNR_DIR}/images/banners/` + bannerType;
+    // var bannerFolder = `${XXNR_DIR}/images/banners/` + bannerType;
+    var imageFolder = 'images/banners/' + bannerType;
+    var bannerFolder = (F.config.directory_xxnr_public ? F.config.directory_xxnr_public : '/public/'+ XXNR_DIR + '/') + imageFolder;
+    
 
-    var root = require('path').resolve(__filename + `/../../public/` + bannerFolder);
+    var root = require('path').resolve(__filename + `/../..` + bannerFolder);
     // console.log('root = ' + root);
 
     var data = [] , files = fs.readdir(root, function(err, files){
         files.forEach(function(file){
                 if(file.indexOf('.jpg') >=0 || file.indexOf('png') >= 0){
-                    data.push({"imgUrl":`/${bannerFolder}/${file}`, "id":file, "url":""});
+                    data.push({"imgUrl":`/${imageFolder}/${file}`, "id":file, "url":""});
                 }
             });
 
