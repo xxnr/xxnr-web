@@ -207,12 +207,12 @@ exports.addOrder = function(req, res, next){
     }
 
     if (!shopCartId) {
-        res.respond({"code":1001, "mesage":"请选择购物车"});
+        res.respond({"code":1001, "message":"请选择购物车"});
         return;
     }
 
     if (!addressId) {
-        res.respond({"code":1001, "mesage":"请先填写收货地址"});
+        res.respond({"code":1001, "message":"请先填写收货地址"});
         return;
     }
 
@@ -311,7 +311,7 @@ exports.addOrder = function(req, res, next){
                             OrderService.add(order1, function(err, data, payment) {
                                 if (err || !data) {
                                     if (err) console.error('Order addOrder order1 err:', err);
-                                    var response = {"code":1001, "mesage":"保存订单出错"};
+                                    var response = {"code":1001, "message":"保存订单出错"};
                                     res.respond(response);
                                     return;
                                 }
@@ -331,7 +331,7 @@ exports.addOrder = function(req, res, next){
                                     OrderService.add(order2, function(err, data, payment) {
                                         if (err || !data) {
                                             if (err) console.error('Order addOrder order2 err:', err);
-                                            res.respond({"code":1001, "mesage":"保存订单出错"});
+                                            res.respond({"code":1001, "message":"保存订单出错"});
                                             OrderService.remove({id:orderId}, function(err) {
                                                 if (err) {
                                                     console.error('Order addOrder remove order1 err:', err);
@@ -356,17 +356,17 @@ exports.addOrder = function(req, res, next){
                             });
                         } catch (e) {
                             console.error('Order addOrder orders err:', e);
-                            res.respond({"code":1001, "mesage":"保存订单出错"});
+                            res.respond({"code":1001, "message":"保存订单出错"});
                             return;
                         }
                     } else {
                         console.error('Order addOrder err: not get the order..');
-                        res.respond({"code":1001, "mesage":"没有要保存的订单"});
+                        res.respond({"code":1001, "message":"没有要保存的订单"});
                         return;
                     }
                 } else {
                     console.error('Order addOrder err: no orders info..');
-                    res.respond({"code":1001, "mesage":"获取订单信息出错"});
+                    res.respond({"code":1001, "message":"获取订单信息出错"});
                     return;
                 }
 			});
@@ -618,30 +618,30 @@ exports.addOrderBySKU = function(req, res, next){
     var consigneeName = data['consigneeName'] || null;
 
     if (!shopCartId) {
-        res.respond({"code":1001, "mesage":"请选择购物车"});
+        res.respond({"code":1001, "message":"请选择购物车"});
         return;
     }
 
     if (deliveryType && deliveryType === DELIVERYTYPE['SONGHUO'].id) {
         if (!addressId) {
-            res.respond({"code":1001, "mesage":"请先填写收货地址"});
+            res.respond({"code":1001, "message":"请先填写收货地址"});
             return;
         }
     } else if (deliveryType && deliveryType === DELIVERYTYPE['ZITI'].id) {
         if (!RSCId) {
-            res.respond({"code":1001, "mesage":"请先选择自提点"});
+            res.respond({"code":1001, "message":"请先选择自提点"});
             return;
         }
         if (!consigneePhone || !tools.isPhone(consigneePhone)) {
-            res.respond({"code":1001, "mesage":"请先填写正确的收货人手机号"});
+            res.respond({"code":1001, "message":"请先填写正确的收货人手机号"});
             return;
         }
         if (!consigneeName) {
-            res.respond({"code":1001, "mesage":"请先填写收货人姓名"});
+            res.respond({"code":1001, "message":"请先填写收货人姓名"});
             return;
         }
     } else {
-        res.respond({"code":1001, "mesage":"请先选择正确的配送方式"});
+        res.respond({"code":1001, "message":"请先选择正确的配送方式"});
         return;
     }
 
@@ -744,7 +744,7 @@ exports.addOrderBySKU = function(req, res, next){
                     });
                 });
             } else {
-                res.respond({"code":1001, "mesage":"请先选择配送方式"});
+                res.respond({"code":1001, "message":"请先选择配送方式"});
                 return;
             }
         });

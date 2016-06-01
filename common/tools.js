@@ -382,3 +382,10 @@ exports.testUserAgent = function(userAgent){
         }
     }
 };
+
+exports.isMobileTestUserAgent = function(userAgent){
+    if (!userAgent) {
+        return null;
+    }
+    return REG_MOBILE.test(userAgent);
+};

@@ -63,15 +63,15 @@
 /manager/api/users, put, super_admin, customer_op
 
 #agentinfo
-/managerapi/v2.1/agentinfo/:id, get, super_admin, customer_op
+/manager/api/v2.1/agentinfo/:id, get, super_admin, customer_op
 
 #potential customer
-/manager/v2.1/potentialCustomer/query, get, super_admin, customer_op
-/manager/v2.1/potentialCustomer/:_id, get, super_admin, customer_op
+/manager/api/v2.1/potentialCustomer/query, get, super_admin, customer_op
+/manager/api/v2.1/potentialCustomer/:_id, get, super_admin, customer_op
 
 #RSCs
-/manager/v2.2/RSCInfo/:_id, get, super_admin, customer_op
-/manager/v2.2/RSCs, get, super_admin
+/manager/api/v2.2/RSCInfo/:_id, get, super_admin, customer_op
+/manager/api/v2.2/RSCs, get, super_admin, customer_op
 /manager/api/v2.2/RSC/orders, get, super_admin
 /manager/api/v2.2/RSC/modify, put, super_admin
 /manager/api/v2.2/RSC/queryByProducts, get, super_admin, customer_op
@@ -104,10 +104,10 @@
 /manager/api/backend/user/password/modify, post, super_admin
 
 #permission
-/manager/permissions, get, super_admin
+/manager/api/permissions, get, super_admin
 
 #role
-/manager/roles, get, super_admin
+/manager/api/roles, get, super_admin
 
 #businesses
 /manager/api/businesses, get, super_admin
