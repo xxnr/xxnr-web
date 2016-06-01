@@ -36,7 +36,7 @@ describe('User', function () {
         var userLoginValidator = function (res, keepLogin) {
             res.body.should.have.property('code', '1000');
             res.body.should.have.properties('datas', 'token');
-            res.body.token.match(/.+/);
+            res.body.token.should.match(/.+/);
             res.body.datas.should.have.properties('userid', 'nickname', 'loginName', 'name', 'phone', 'sex', 'photo', 'userAddress', 'isUserInfoFullFilled', 'isVerified', 'isXXNRAgent', 'isRSC', 'RSCInfoVerifing', 'userType', 'userTypeInName', 'verifiedTypes', 'verifiedTypesInJson', 'cartId');
             res.body.datas.userAddress.should.have.properties('province', 'city');
             var hasUserCookie = false;
@@ -225,11 +225,11 @@ describe('User', function () {
         })
     });
 
-    describe('Get', function(){
+    describe('Get', function () {
         var api = '/api/v2.0/user/get';
         var token;
-        before(function(done){
-            common.login(function(tk){
+        before(function (done) {
+            common.login(function (tk) {
                 token = tk;
                 done();
             });
@@ -237,28 +237,30 @@ describe('User', function () {
 
         common.testGetAndPost('user get api w/o login')
             .call(api)
-            .end(function(err, res){
+            .end(function (err, res) {
                 res.body.should.have.properties({
-                    code:1401,
-                    message:'请先登录'
+                    code: 1401,
+                    message: '请先登录'
                 })
             });
 
         common.testGetAndPost('user get api w/ login')
-            .token(function(){return token;})
+            .token(function () {
+                return token;
+            })
             .call(api)
-            .end(function(err, res){
+            .end(function (err, res) {
                 res.body.should.containDeep({
-                    code:'1000',
-                    message:'success',
-                    datas:{
-                        phone:config.user.account
+                    code: '1000',
+                    message: 'success',
+                    datas: {
+                        phone: config.user.account
                     }
                 });
-                res.body.datas.should.have.properties('userid', 'nickname', 'loginName', 'name', 'sex', 'pointLaterTrade', 'isUserInfoFullFilled', 'isVerified', 'isXXNRAgent', 'isRSC','RSCInfoVerifing', 'userType', 'userTypeInName', 'verifiedTypes', 'verifiedTypesInJson');
+                res.body.datas.should.have.properties('userid', 'nickname', 'loginName', 'name', 'sex', 'pointLaterTrade', 'isUserInfoFullFilled', 'isVerified', 'isXXNRAgent', 'isRSC', 'RSCInfoVerifing', 'userType', 'userTypeInName', 'verifiedTypes', 'verifiedTypesInJson');
                 res.body.datas.photo.match(/\/.+\..+/);
                 res.body.datas.pointLaterTrade.should.be.type('number');
-                res.body.datas.address.should.have.properties('province','city');
+                res.body.datas.address.should.have.properties('province', 'city');
                 res.body.datas.isUserInfoFullFilled.should.be.type('boolean');
                 res.body.datas.isVerified.should.be.type('boolean');
                 res.body.datas.isXXNRAgent.should.be.type('boolean');

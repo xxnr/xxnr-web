@@ -3,7 +3,7 @@
  */
 
 require('total.js');
-var PotentialCustomerModel = require('../models').potential_customer;
+var PotentialCustomerModel = require('../models/index').potential_customer;
 var pinyin = require('pinyin');
 var tools = require('../common/tools');
 

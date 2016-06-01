@@ -3,7 +3,7 @@
  */
 
 require('total.js');
-var UserModel = require('../models').user;
+var UserModel = require('../models/index').user;
 var pinyin = require('pinyin');
 var tools = require('../common/tools');
 

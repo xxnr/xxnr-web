@@ -3,9 +3,9 @@
  */
 
 require('total.js');
-var CartModel = require('../models').cart;
-var SKUModel = require('../models').SKU;
-var CategoryModel = require('../models').category;
+var CartModel = require('../models/index').cart;
+var SKUModel = require('../models/index').SKU;
+var CategoryModel = require('../models/index').category;
 var update_count = 0;
 var SKU_count = 0;
 var SKU_had = 0;

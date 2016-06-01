@@ -3,7 +3,7 @@
  */
 
 require('total.js');
-var OrderModel = require('../models').order;
+var OrderModel = require('../models/index').order;
 var SUBORDERTYPE = require('../common/defs').SUBORDERTYPE;
 var PAYMENTSTATUS = require('../common/defs').PAYMENTSTATUS;
 var moment = require('moment');
