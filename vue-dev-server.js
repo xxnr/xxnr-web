@@ -1,7 +1,7 @@
 var path = require('path')
 var express = require('express')
 var webpack = require('webpack')
-var config = require('./xxnr-mobile-dev/config')
+var config = require('./public/xxnr-mobile-dev/config')
 var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
 var busboy = require('connect-busboy');
@@ -11,11 +11,10 @@ var http = require('http');
 var proxyMiddleware = require('http-proxy-middleware')
 
 
-
-process.chdir(__dirname+"/xxnr-mobile-dev");
+process.chdir(__dirname+"/public/xxnr-mobile-dev");
 var webpackConfig = process.env.NODE_ENV === 'testing'
-  ? require('./xxnr-mobile-dev/build/webpack.prod.conf')
-  : require('./xxnr-mobile-dev/build/webpack.dev.conf')
+  ? require('./public/xxnr-mobile-dev/build/webpack.prod.conf')
+  : require('./public/xxnr-mobile-dev/build/webpack.dev.conf')
 
 // default port where dev server listens for incoming traffic
 var port = process.env.PORT || config.dev.port
