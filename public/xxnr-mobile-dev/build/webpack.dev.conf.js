@@ -10,6 +10,9 @@ Object.keys(baseWebpackConfig.entry).forEach(function (name) {
 })
 
 module.exports = merge(baseWebpackConfig, {
+  entry: {
+    app: './public/xxnr-mobile-dev/src/main.js'
+  },
   module: {
     loaders: utils.styleLoaders()
   },
