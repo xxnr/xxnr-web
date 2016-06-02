@@ -111,7 +111,7 @@
     <div class="bottom-btn-static" @click="buyProduct();" v-if="!productDetail.presale">
       确定
     </div>
-    <div class="bottom-btn-static presale" v-else">
+    <div class="bottom-btn-static presale" v-else>
       敬请期待
     </div>
   </div>
