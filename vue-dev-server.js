@@ -11,7 +11,7 @@ var http = require('http');
 var proxyMiddleware = require('http-proxy-middleware')
 
 
-process.chdir(__dirname+"/public/xxnr-mobile-dev");
+process.chdir(__dirname);
 var webpackConfig = process.env.NODE_ENV === 'testing'
   ? require('./public/xxnr-mobile-dev/build/webpack.prod.conf')
   : require('./public/xxnr-mobile-dev/build/webpack.dev.conf')
@@ -63,7 +63,7 @@ app.use(hotMiddleware)
 
 // serve pure static assets
 var staticPath = path.posix.join(config.build.assetsPublicPath, config.build.assetsSubDirectory)
-app.use(staticPath, express.static('./static'))
+app.use(staticPath, express.static('./public/xxnr-mobile-dev/static'))
 
 require('./modules/database');
 global.U = require('./common/utils');
