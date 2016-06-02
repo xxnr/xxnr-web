@@ -26,7 +26,7 @@
 </template>
 
 <script>
-  import { login,showBackBtn,changeRightBtnMyXXNR,changeRightBtnPathMyxxnr } from '../../vuex/actions'
+  import { login,showBackBtn,hideRightBtn } from '../../vuex/actions'
   import xxnrToast from '../../xxnr_mobile_ui/xxnrToast.vue'
 
   export default {
@@ -47,26 +47,18 @@
       actions:{
         login,
         showBackBtn,
-        changeRightBtnMyXXNR,
-        changeRightBtnPathMyxxnr
+        hideRightBtn
       },
     },
     components: {
       xxnrToast
     },
     created () {
-      this.showBackBtn()
+//      this.showBackBtn()
     },
     route: {
-      deactivate (transition) {
-        //when back to /home hide the backBtn
-        if (transition.to.path === '/home') {
-          this.changeRightBtnMyXXNR();
-          this.changeRightBtnPathMyxxnr();
-        }
-        transition.next()
-      },
       activate(){
+        this.hideRightBtn();
         this.showBackBtn();
       }
     },

@@ -1,19 +1,37 @@
 <template>
   <div class="ordersProductsRows clearfix">
     <div class="orderRow" v-for="order in orders">
-      <div class="productRow" v-for="SKU in order.SKUs">
-        <div class="orders-product-img">
-          <img :src="SKU.thumbnail">
-        </div>
-        <div class="orders-product-info">
-          <div class="orders-product-name">
-            {{SKU.name}}
+      <template v-if="order.SKUs.length>0">
+        <div class="productRow" v-for="SKU in order.SKUs">
+          <div class="orders-product-img">
+            <img :src="SKU.thumbnail">
           </div>
-          <div class="orders-product-count" v-else>
-            ×{{SKU.count}}
+          <div class="orders-product-info">
+            <div class="orders-product-name">
+              {{SKU.name}}
+            </div>
+            <div class="orders-product-count" v-else>
+              ×{{SKU.count}}
+            </div>
           </div>
         </div>
-      </div>
+      </template>
+      <!--为了兼容没上SKU之前的商品-->
+      <template v-else>
+        <div v-else class="productRow" v-for="SKU in order.products">
+          <div class="orders-product-img">
+            <img :src="SKU.thumbnail">
+          </div>
+          <div class="orders-product-info">
+            <div class="orders-product-name">
+              {{SKU.name}}
+            </div>
+            <div class="orders-product-count" v-else>
+              ×{{SKU.count}}
+            </div>
+          </div>
+        </div>
+      </template>
       <div class="action-box">
         <div class="action-wor" v-if="order.order.orderStatus.type == 3">待发货</div>
         <input type="button" v-if="order.order.orderStatus.type == 1 || order.order.orderStatus.type == 2" class="action-btn" value="去付款" @click="payOrder(order.id);">

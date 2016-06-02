@@ -39,7 +39,7 @@
   import sectionTabs from './SectionTabs.vue'
   import IndexProductsBlockList from './IndexProductsBlockList.vue'
   import appDownloadOverlay from './appDownloadOverlay.vue'
-  import { getIndexCars,getIndexHeafei,showBackBtn,hideBackBtn,changeRightBtnHome,changeRightBtnPathHome,getSliderImages,changeRightBtnPathMyxxnr } from '../../vuex/actions'
+  import { getIndexCars,getIndexHeafei,showBackBtn,hideBackBtn,showRightBtn,getSliderImages,changeRightBtnMyXXNR,changeRightBtnPathMyxxnr } from '../../vuex/actions'
   import vuxSwiper from 'vux/components/swiper'
   export default {
     vuex:{
@@ -53,9 +53,9 @@
         getIndexHeafei,
         showBackBtn,
         hideBackBtn,
-        changeRightBtnHome,
-        changeRightBtnPathHome,
+        showRightBtn,
         getSliderImages,
+        changeRightBtnMyXXNR,
         changeRightBtnPathMyxxnr
       }
     },
@@ -71,20 +71,21 @@
       this.getIndexCars();
       this.getIndexHeafei();
 	    this.getSliderImages();
-      this.changeRightBtnPathMyxxnr();
-      this.hideBackBtn();
     },
     route: {
-      deactivate (transition) {
-        //when back to /my_xxnr hide the backBtn
-        if (transition.to.path === '/my_xxnr') {
-          this.changeRightBtnHome();
-          this.changeRightBtnPathHome();
-        }
-        transition.next()
-      },
+//      deactivate (transition) {
+//        //when back to /home hide the backBtn
+//        if (transition.to.path === '/home') {
+//          this.changeRightBtnMyXXNR();
+//          this.changeRightBtnPathMyxxnr();
+//        }
+//        transition.next()
+//      },
       activate(){
+        this.changeRightBtnMyXXNR();
+        this.changeRightBtnPathMyxxnr();
         this.hideBackBtn();
+        this.showRightBtn();
       }
     }
   }

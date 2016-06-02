@@ -49,9 +49,9 @@
   import {
     hideBackBtn,
     showBackBtn,
+    showRightBtn,
     changeRightBtnHome,
-    changeRightBtnMyXXNR,
-    changeRightBtnPathMyxxnr,
+    changeRightBtnPathHome,
     getCookieUser,
     getUserInfo,
     logout
@@ -66,9 +66,9 @@
       actions:{
         hideBackBtn,
         showBackBtn,
+        showRightBtn,
         changeRightBtnHome,
-        changeRightBtnMyXXNR,
-        changeRightBtnPathMyxxnr,
+        changeRightBtnPathHome,
         getCookieUser,
         getUserInfo,
         logout
@@ -77,24 +77,17 @@
     components: {
     },
     route: {
-      deactivate (transition) {
-        //when back to /home hide the backBtn
-        if (transition.to.path === '/home') {
-          this.changeRightBtnMyXXNR();
-          this.changeRightBtnPathMyxxnr();
-        }
-        transition.next()
-      },
       activate(){
         this.getUserInfo(this.user.userId);
         this.showBackBtn();
+        this.changeRightBtnHome();
+        this.changeRightBtnPathHome();
+        this.showRightBtn();
       }
     },
     created () {
-      this.changeRightBtnHome();
       this.getCookieUser();
       this.getUserInfo(this.user.userId);
-      this.showBackBtn();
     }
   }
 </script>

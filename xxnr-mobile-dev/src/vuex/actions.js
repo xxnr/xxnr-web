@@ -2,6 +2,7 @@ import api from '../api/remoteHttpApi'
 import * as types from './mutation-types'
 import {getCookie,removeCookie} from '../utils/authService'
 let jsencrypt = require('../jsencrypt')
+
 export const getCategories = ({dispatch,state}) => {
   api.getCategories(response => {
     dispatch(types.GET_CATEGORIES,response.data.categories)
@@ -59,6 +60,12 @@ export const showBackBtn = ({dispatch,state}) => {
 export const hideBackBtn = ({dispatch,state}) => {
   dispatch(types.HIDE_BACKBUTTON)
 }
+export const hideRightBtn = ({dispatch,state}) => {
+  dispatch(types.HIDE_RIGHTBUTTON)
+}
+export const showRightBtn = ({dispatch,state}) => {
+  dispatch(types.SHOW_RIGHTBUTTON)
+}
 export const closeAppDownload = ({dispatch,state}) => {
   dispatch(types.CLOSE_APPDOWNLOAD)
 }
@@ -76,7 +83,15 @@ export const changeRightBtnMyXXNR = ({dispatch,state}) => {
   dispatch(types.CHANGE_RIGHTBTN_XXNR)
 }
 export const goBack = ({dispatch,state}) => {
-  window.history.back();
+  if(window.location.hash.indexOf('my_orders')!=-1){
+    //window.location.href = '#!/my_xxnr';  //对我的订单页面有个特殊的路由处理,在任何一个标签都跳会我的新新农人
+    router.go('/my_xxnr')
+  }else if(window.location.hash.indexOf('my_xxnr')!=-1){
+    //window.location.href = '#!/home';
+    router.go('/home')
+  }else {
+    window.history.back();
+  }
 }
 
 export const login = ({dispatch,state},PhoneNumber,password) => {
@@ -130,11 +145,14 @@ export const logout = ({dispatch,state}) => {
   dispatch(types.LOG_OUT);
 }
 
-export const getOrders = ({dispatch,state},typeValue) => {
+export const getOrders = ({dispatch,state},typeValue,pageNum,changedTab) => {
   api.getOrdersList(
-    {'typeValue':typeValue},
+    {'typeValue':typeValue,'page':pageNum},
     response => {
-    dispatch(types.GET_ORDERS_LIST,response.data.items);
+    if(pageNum<=response.data.pages){
+      dispatch(types.GET_ORDERS_LIST,response.data.items,changedTab);
+    }
+
   }, response => {
     //console.log(response);
     //dispatch(types.GET_CATEGORIES)
@@ -400,6 +418,21 @@ export const getShoppingCart = ({dispatch, state}) => {
     console.log(response);
   })
 }
+export const loadNextPageOrders = ({dispatch,state},inviterPhone) => {
+  let userId = state.auth.user.userid;
+  api.bindInviter(
+    {'userId':userId,'inviter':inviterPhone},
+    response => {
+    if (response.data.code == 1000) {
+    //sessionStorage.setItem('user', JSON.stringify(response.data.datas));
+    window.location.href = '/';
+    }else{
+      //TODO
+	}
+	},response=>{
+
+  });
+}
 
 export const getConsigneeList = ({dispatch, state}) => {
   api.getConsignee(response=> {
@@ -501,7 +534,8 @@ export const selfDelivery = ({dispatch, state}) => {
     } else {
 
     }
-  },response=>{
-
-  });
+  }, response => {
+      console.log(response);
+      //dispatch(types.GET_CATEGORIES)
+    })
 }

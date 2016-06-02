@@ -1,23 +1,19 @@
 <template>
   <div class="my_orders--section">
     <div class="orders-tabs">
-      <div class="orders-tab" @click="selectTab(0)"><span :class="{'currentTab': selectedTab == 0 }">全部</span></div>
-      <div class="orders-tab" @click="selectTab(1)"><span :class="{'currentTab': selectedTab == 1 }">待付款</span></div>
-      <div class="orders-tab" @click="selectTab(2)"><span :class="{'currentTab': selectedTab == 2 }">待发货</span></div>
-      <div class="orders-tab" @click="selectTab(3)"><span :class="{'currentTab': selectedTab == 3 }">待收货</span></div>
-      <div class="orders-tab" @click="selectTab(4)"><span :class="{'currentTab': selectedTab == 4 }">已完成</span></div>
+      <div class="orders-tab"  v-link="{ path: '/my_orders/myAllOrders'}" ><span :class="{'currentTab': selectedTab == 0 }">全部</span></div>
+      <div class="orders-tab"  v-link="{ path: '/my_orders/myPayingOrders'}" ><span :class="{'currentTab': selectedTab == 1 }">待付款</span></div>
+      <div class="orders-tab"  v-link="{ path: '/my_orders/myDeliveringOrders'}" ><span :class="{'currentTab': selectedTab == 2 }">待发货</span></div>
+      <div class="orders-tab"  v-link="{ path: '/my_orders/myConfirmingOrders'}" ><span :class="{'currentTab': selectedTab == 3 }">待收货</span></div>
+      <div class="orders-tab"  v-link="{ path: '/my_orders/myCompletedOrders'}" ><span :class="{'currentTab': selectedTab == 4 }">已完成</span></div>
     </div>
-    <div class="orders-list">
-      <orders-list :orders="orders"></orders-list>
-    </div>
-
   </div>
-
+  <router-view></router-view>
 </template>
 
 <script>
-  import ordersList from '../ordersList.vue'
-  import { getOrders,showBackBtn } from '../../vuex/actions'
+
+  import { showBackBtn, changeRightBtnMyXXNR,hideRightBtn } from '../../vuex/actions'
 
   export default {
     data: function () {
@@ -26,44 +22,27 @@
       }
     },
     methods: {
-      selectTab:function(num){
-        if(num==0){
-          this.getOrders();
-        }else{
-          this.getOrders(num);
-        }
-        this.selectedTab=num;
-      }
     },
     vuex:{
       getters:{
-        orders: state => state.myOrders.ordersList
       },
       actions:{
-        getOrders,
-        showBackBtn
+        hideRightBtn,
+        showBackBtn,
+        changeRightBtnMyXXNR
       }
     },
-    components:{
-      ordersList
-    },
+
     created(){
-      this.getOrders(null);
       this.showBackBtn();
     },
     route: {
-      deactivate (transition) {
-        //when back to /home hide the backBtn
-        if (transition.to.path === '/home') {
-          this.changeRightBtnMyXXNR();
-          this.changeRightBtnPathMyxxnr();
-        }
-        transition.next()
-      },
       activate(){
+        this.hideRightBtn();
         this.showBackBtn();
+        this.selectedTab = 0;
       }
-    },
+    }
   }
 </script>
 

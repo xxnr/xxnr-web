@@ -9,7 +9,7 @@
 
 <script>
   import ordersList from '../ordersList.vue'
-  import { getOrders,getUserInfo,showBackBtn } from '../../vuex/actions'
+  import { getOrders,getUserInfo,showBackBtn,hideRightBtn } from '../../vuex/actions'
 
   export default {
     vuex:{
@@ -20,26 +20,16 @@
       actions:{
         getOrders,
         getUserInfo,
-        showBackBtn
+        showBackBtn,
+        hideRightBtn
       }
     },
     components:{
     },
-    created(){
-      this.getUserInfo(this.user.userId);
-      this.showBackBtn();
-    },
     route: {
-      deactivate (transition) {
-        //when back to /home hide the backBtn
-        if (transition.to.path === '/home') {
-          this.changeRightBtnMyXXNR();
-          this.changeRightBtnPathMyxxnr();
-        }
-        transition.next()
-      },
       activate(){
         this.showBackBtn();
+        this.hideRightBtn();
       }
     },
   }
