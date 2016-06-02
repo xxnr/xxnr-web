@@ -52,7 +52,6 @@
         this.getRSCListByProduct('570db646f2c135e878f078e5');
         transition.next();
       }
-      //var test = window.location.href.match(new RegExp("[\?\&]" + 'id' + "=([^\&]+)", "i"));
     }
   }
 </script>

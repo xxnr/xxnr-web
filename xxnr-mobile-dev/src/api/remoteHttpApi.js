@@ -52,6 +52,21 @@ export default {
   },
   addOrder: function(data, cb, errCb) {
     jsonpPost(API_ROOT + "api/v2.1/order/addOrder", data, cb, errCb);
+  },
+  getConsignee: function(cb, errCb) {
+    jsonpGet(API_ROOT + "api/v2.2/user/queryConsignees", null, cb, errCb);
+  },
+  saveConsignee: function (data, cb, errCb) {
+    jsonpGet(API_ROOT + "api/v2.2/user/saveConsignees", data, cb, errCb);
+  },
+  offlinePay: function (data, cb, errCb) {
+    jsonpGet(API_ROOT + "offlinepay", data, cb, errCb);
+  },
+  getOrderDetail: function (data, cb, errCb) {
+    jsonpGet(API_ROOT + "api/v2.0/order/getOrderDetails", data, cb, errCb);
+  },
+  getDeliveryCode: function (data, cb, errCb) {
+    jsonpGet(API_ROOT + "api/v2.2/order/getDeliveryCode", data, cb, errCb);
   }
 }
 

@@ -17,9 +17,11 @@
           <span v-if="!orderRSC.id">订单中的商品将配送至服务站，请选择自提网点</span>
           {{orderRSC.address}}
         </div>
-        <div class="order-consignee">
+        <div class="order-consignee" @click="showConsignee();">
           <div class="order-consignee-bit"></div>
-          <span>请填写收货人信息</span>
+          <span v-if="!orderConsignee.consigneePhone">请填写收货人信息</span>
+          {{orderConsignee.consigneeName}}
+          {{orderConsignee.consigneePhone}}
         </div>
       </div>
     </div>
@@ -35,7 +37,7 @@
             <li v-for="product in item.SKUList">
               <div class="product-con">
                 <div class="product-img">
-                  <img :src="'/assets/images/position.png">
+                  <img :src="product.imgUrl">
                 </div>
                 <div class="product-info">
                   <div class="product-info-con">
@@ -90,7 +92,7 @@
       </ul>
     </div>
   </div>
-  <div class="order-bottom">
+  <div class="order-bottom" @click="commitOrder();">
     <div class="order-bottom-total">
       <div class="order-bottom-total-con">
         合计：<span class="orange">¥{{totalPrice}}</span>
@@ -103,7 +105,7 @@
 </template>
 
 <script>
-  import { getRSCListByProduct, getShoppingCart } from '../../vuex/actions'
+  import { getRSCListByProduct, getShoppingCart, commitOrder } from '../../vuex/actions'
 
   export default {
     vuex: {
@@ -111,17 +113,23 @@
         RSCList: state => state.order.RSCList,
         orderRSC: state => state.order.orderRSC,
         cartList: state => state.order.cartList,
-        totalPrice: state => state.order.totalPrice
+        totalPrice: state => state.order.totalPrice,
+        orderConsignee: state => state.order.orderConsignee
       },
       actions: {
         getRSCListByProduct,
-        getShoppingCart
+        getShoppingCart,
+        commitOrder
       }
     },
     methods: {
       showRSCList() {
         var test = window.location.href.match(new RegExp("[\?\&]" + 'id' + "=([^\&]+)", "i"));
         window.location.href = '/#!/orderRSC?id=' + test[1];
+      },
+      showConsignee() {
+        var test = window.location.href.match(new RegExp("[\?\&]" + 'id' + "=([^\&]+)", "i"));
+        window.location.href = '/#!/orderConsignee?id=' + test[1];
       }
     },
     created() {

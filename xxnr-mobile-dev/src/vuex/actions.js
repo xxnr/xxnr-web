@@ -148,7 +148,6 @@ export const getProductDetail = ({dispatch,state}, id) => {
     response => {
     var productDetail = response.data;
     //data format
-    productDetail.onSale = (productDetail.unitPrice === null || productDetail.unitPrice === '')? false:productDetail.unitPrice!=productDetail.originalPrice;
     for(var i in productDetail.SKUAdditions){
       productDetail.SKUAdditions[i].isSelected = false;
     }
@@ -395,10 +394,114 @@ export const RSCConfirm = ({dispatch, state}, index) => {
 export const getShoppingCart = ({dispatch, state}) => {
   api.getShoppingCart(response => {
     console.log(response);
-    dispatch(types.GET_SHOPPINGCART, response.data.datas.rows);
+    dispatch(types.GET_SHOPPINGCART, response.data.datas.rows, response.data.datas.shopCartId);
   },
   response=> {
     console.log(response);
   })
 }
 
+export const getConsigneeList = ({dispatch, state}) => {
+  api.getConsignee(response=> {
+    dispatch(types.GET_CONSIGNEE, response.data.datas.rows);
+  }, response=>{
+    console.log(response);
+  })
+}
+
+export const saveConsignee = ({dispatch, state}, consigneeName, consigneePhone) => {
+  console.log(consigneeName, consigneePhone);
+  api.saveConsignee({
+    consigneeName: consigneeName,
+    consigneePhone: consigneePhone
+  },response => {
+    console.log(response);
+  },response => {
+    alert(response.message);
+  });
+}
+
+export const selectConsignee = ({dispatch, state}, index) => {
+  dispatch(types.SELECT_CONSIGNEE, index);
+  dispatch(types.CONFIRM_CONSIGNEE, index);
+}
+
+export const confirmConsignee = ({dispatch, state}, index) => {
+}
+
+export const commitOrder = ({dispatch, state}) => {
+  var sku = [];
+  for(let i = 0; i < state.order.cartList.length; i++) {
+    for(let j = 0; j < state.order.cartList[i].SKUList.length; j++) {
+      sku.push({_id: state.order.cartList[i].SKUList[j]._id, count: state.order.cartList[i].SKUList[j].count});
+    }
+  }
+
+  api.addOrder({
+    shopCartId: state.order.shopCartId,
+    SKUs: sku,
+    deliveryType: 1,
+    RSCId: state.order.orderRSC._id,
+    consigneePhone: state.order.orderConsignee.consigneePhone,
+    consigneeName: state.order.orderConsignee.consigneeName
+  },response => {
+    console.log(response);
+    if(response.data.code == '1000') {
+      dispatch(types.COMMIT_ORDER, response.data);
+    } else {
+      alert(response.data.message);
+    }
+  },response => {
+
+  });
+}
+
+export const offlinePay = ({dispatch, state}, id, price) => {
+  var test = window.location.href.match(new RegExp("[\?\&]" + 'id' + "=([^\&]+)", "i"));
+  api.offlinePay({
+      orderId: id,
+      price: price
+    },
+    response => {
+      if(response.data.code == '1000') {
+        window.location.href = '/#!/orderDone?id=' + test[1];
+      } else {
+        alert(response.data.message);
+      }
+  }, response => {
+
+  });
+}
+
+export const getOrderDetail = ({dispatch, state}) => {
+  var test = window.location.href.match(new RegExp("[\?\&]" + 'id' + "=([^\&]+)", "i"));
+  api.getOrderDetail({
+    orderId: test[1]
+  },response => {
+    dispatch(types.GET_ORDERDETAIL, response.data.datas);
+  }, response => {
+
+  });
+}
+
+export const selfDelivery = ({dispatch, state}) => {
+  var test = window.location.href.match(new RegExp("[\?\&]" + 'id' + "=([^\&]+)", "i"));
+  api.getDeliveryCode({
+    orderId: test[1]
+  },response=>{
+    if(response.data.code == '1000') {
+      dispatch(types.SELF_DELIVERY, response.data.deliveryCode);
+      api.getOrderDetail({
+        orderId: test[1]
+      },response => {
+        dispatch(types.GET_ORDERDETAIL, response.data.datas);
+    }, response => {
+
+    });
+    } else {
+
+    }
+  },response=>{
+
+  });
+}

@@ -3,16 +3,29 @@ import {
   SELECT_RSC,
   CONFIRM_RSC,
   GET_SHOPPINGCART,
-  COMMIT_ORDER
+  COMMIT_ORDER,
+  GET_CONSIGNEE,
+  SELECT_CONSIGNEE,
+  CONFIRM_CONSIGNEE,
+  OFFLINE_PAY,
+  GET_ORDERDETAIL,
+  SELF_DELIVERY
 } from '../mutation-types'
 
 
 const state = {
   RSCList: [],
   RSCSelected: [],
-  orderRSC: {id: '', address: ''},
+  orderRSC: {_id: '', address: ''},
   cartList: [],
-  totalPrice: 0
+  shopCartId: '',
+  totalPrice: 0,
+  consigneeList: [],
+  consigneeSelected: [],
+  orderConsignee: {consigneePhone: '', consigneeName: ''},
+  orderOfflinePay: {},
+  orderInfo: {},
+  deliveryCode: ''
 }
 
 const mutations = {
@@ -45,13 +58,14 @@ const mutations = {
     }
     var address = state.RSCList[RSCNum].RSCInfo.companyAddress;
     state.orderRSC.address = address.province.name + address.city.name + address.county.name + address.town.name + address.details;
-    state.orderRSC.id = state.RSCList[RSCNum].id;
+    state.orderRSC._id = state.RSCList[RSCNum]._id;
     var test = window.location.href.match(new RegExp("[\?\&]" + 'id' + "=([^\&]+)", "i"));
     window.location.href = '/#!/order?id=' + test[1];
     //window.history.back();
   },
-  [GET_SHOPPINGCART] (state, data) {
+  [GET_SHOPPINGCART] (state, data, id) {
     state.cartList = data;
+    state.shopCartId = id;
     var totalPrice = 0;
     for(let i = 0; i < data.length; i++) {
       for(let j = 0; j < data[i].SKUList.length; j++) {
@@ -60,21 +74,51 @@ const mutations = {
     }
     state.totalPrice = totalPrice;
   },
-  [COMMIT_ORDER] (state){
-    api.addOrder({
-      //shopCartId:,
-      //addressId: ,
-      //SKUs:,
-      //deliveryType:,
-      //RSCId: ,
-      //consigneePhone: ,
-      //consigneeName:
+  [COMMIT_ORDER] (state, data){
+    window.location.href = '/#!/offlinePay?id=' + data.id;
+  },
+  [GET_CONSIGNEE] (state, data) {
+    state.consigneeList = data;
+    for(let i = 0; i < state.consigneeList.length; i++) {
+      state.consigneeSelected.push(false);
+    }
+  },
+  [SELECT_CONSIGNEE] (state, index) {
+    for(let i = 0; i < state.consigneeSelected.length; i++) {
+      if(state.consigneeSelected[i]) {
+        state.consigneeSelected.$set(i, false);
+        break;
+      }
+    }
+    state.consigneeSelected.$set(index, true);
+  },
+  [CONFIRM_CONSIGNEE] (state, index) {
+      var consigneeNum = -1;
+      for(let i = 0; i < state.consigneeSelected.length; i++) {
+        if(state.consigneeSelected[i]) {
+          consigneeNum = i;
+          break;
+        }
+      }
+      if(consigneeNum == -1) {
+        alert('请选择收货人');
+        return;
+      }
+      state.orderConsignee.consigneePhone = state.consigneeList[consigneeNum].consigneePhone;
+      state.orderConsignee.consigneeName = state.consigneeList[consigneeNum].consigneeName;
+      var test = window.location.href.match(new RegExp("[\?\&]" + 'id' + "=([^\&]+)", "i"));
+      window.location.href = '/#!/order?id=' + test[1];
+      //window.history.back();
+  },
+  [OFFLINE_PAY] (state, data) {
+    state.orderOfflinePay = data;
+  },
+  [GET_ORDERDETAIL] (state, data) {
+    state.orderInfo = data;
+  },
+  [SELF_DELIVERY] (state, data) {
+    state.deliveryCode = data;
 
-    },response => {
-
-    },response => {
-
-  });
   }
 }
 

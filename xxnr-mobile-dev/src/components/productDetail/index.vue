@@ -7,19 +7,24 @@
       <div class="product-name">
         {{productDetail.name}}
       </div>
-      <div class="product-SKUPrice">
-        {{'￥'+productDetail.minPrice}} {{productDetail.maxPrice==productDetail.minPrice?"":"-"}} {{(productDetail.maxPrice==productDetail.minPrice?"":productDetail.maxPrice)}}
+      <div class="" v-if="productDetail.presale">
+        即将上线
       </div>
-      <div class="product-deposit" v-if="productDetail.deposit">
-        订金：<span class="product-deposit-num">{{'¥' + productDetail.deposit}}</span>
-      </div>
-      <div class="clear"></div>
-      <div class="product-SKUMarketPrice">
-        市场价：{{'￥ '+productDetail.marketMinPrice}} {{productDetail.marketMaxPrice==productDetail.marketMinPrice?"":"-"}} {{(productDetail.marketMaxPrice==productDetail.marketMinPrice?"":productDetail.marketMaxPrice)}}
+      <div class="product-price-box" v-if="!productDetail.presale">
+        <div class="product-SKUPrice">
+          {{'￥'+productDetail.minPrice}} {{productDetail.maxPrice==productDetail.minPrice?"":"-"}} {{(productDetail.maxPrice==productDetail.minPrice?"":productDetail.maxPrice)}}
+        </div>
+        <div class="product-deposit" v-if="productDetail.deposit">
+          订金：<span class="product-deposit-num">{{'¥' + productDetail.deposit}}</span>
+        </div>
+        <div class="clear"></div>
+        <div class="product-SKUMarketPrice">
+          市场价：{{'￥ '+productDetail.marketMinPrice}} {{productDetail.marketMaxPrice==productDetail.marketMinPrice?"":"-"}} {{(productDetail.marketMaxPrice==productDetail.marketMinPrice?"":productDetail.marketMaxPrice)}}
+        </div>
       </div>
     </div>
   </div>
-  <div class="product-detail-title">
+  <div class="product-detail-title" @click="showAttrBox();">
     <div class="container">
       请选择商品属性
     </div>
@@ -51,8 +56,11 @@
       </div>
     </div>
   </div>
-  <div class="bottom-btn" @click="showAttrBox();">
+  <div class="bottom-btn" @click="showAttrBox();" v-if="!productDetail.presale">
     {{productDetail.buyActionName}}
+  </div>
+  <div class="bottom-btn presale" v-else>
+    敬请期待
   </div>
   <div class="attr-box" v-show="attrBoxDisplay">
     <div class="container" style="height:400px;overflow:auto;">
@@ -65,7 +73,7 @@
             <div class="attr-product-name">
               {{productDetail.goodsName}}
             </div>
-            <div class="attr-product-price">
+            <div class="attr-product-price" v-if="!productDetail.presale">
               {{'¥'+productDetail.minPrice}} {{productDetail.maxPrice==productDetail.minPrice?"":"-"}} {{(productDetail.maxPrice==productDetail.minPrice?"":productDetail.maxPrice)}}
             </div>
           </div>
@@ -100,8 +108,11 @@
         </div>
       </div>
     </div>
-    <div class="bottom-btn-static" @click="buyProduct();">
+    <div class="bottom-btn-static" @click="buyProduct();" v-if="!productDetail.presale">
       确定
+    </div>
+    <div class="bottom-btn-static presale" v-else">
+      敬请期待
     </div>
   </div>
   <div class="mask" v-show="attrBoxDisplay" @click="hideAttrBox();"></div>
@@ -208,6 +219,11 @@
     z-index: 100;
   }
 
+  .bottom-btn.presale {
+    background-color: #E2E2E2;
+    color: #909090;
+  }
+
   .bottom-btn-static {
     width: 100%;
     background-color: #fe9800;
@@ -216,6 +232,10 @@
     height: 40px;
     font-size: 18px;
     color: #fff;
+  }
+  .bottom-btn-static.presale {
+    background-color: #E2E2E2;
+    color: #909090;
   }
 
   .product-detail-tab-ul li{
