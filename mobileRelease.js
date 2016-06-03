@@ -1,4 +1,4 @@
-process.chdir(__dirname+"/xxnr-mobile-dev/dist");
+process.chdir(__dirname);
 var fs = require("fs");
 var express = require('express');
 var bodyParser = require('body-parser');
@@ -63,8 +63,8 @@ app.use(require('./middlewares/website'));
 
 // set static file path
 //app.use(express.static(path.join(__dirname, F.config.directory_xxnr_public)));
-app.use(express.static(path.join(__dirname, 'public/xxnr_mobile')));
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'public/xxnrMobilePro')));
+app.use(express.static(path.join(__dirname, 'public/xxnr')));
 var routes = require('./routes');
 // routes
 app.use('/', routes.secureFrontendApis);

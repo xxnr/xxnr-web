@@ -1,8 +1,8 @@
 import cookie from 'react-cookie'
-import { CookieDomain } from '../../config.js'
+import { mobileDevDomain } from '../../config.js'
 let cookieConfig = {}
-if(CookieDomain !== ''){
-  cookieConfig = { domain: CookieDomain }
+if(mobileDevDomain !== ''){
+  cookieConfig = { domain: mobileDevDomain }
 }
 
 export function saveCookie(name,value) {
