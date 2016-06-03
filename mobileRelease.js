@@ -62,17 +62,16 @@ app.use(cookieParser());
 app.use(require('./middlewares/website'));
 
 // set static file path
-//app.use(express.static(path.join(__dirname, F.config.directory_xxnr_public)));
-app.use(express.static(path.join(__dirname, 'public/xxnrMobilePro')));
-app.use(express.static(path.join(__dirname, 'public/xxnr')));
+app.use(express.static(path.join(__dirname, F.config.directory_xxnr_mobile_public)));
+
 var routes = require('./routes');
 // routes
 app.use('/', routes.secureFrontendApis);
 app.use('/', routes.frontendApis);
-app.use('/', routes.frontendPages);
-app.use('/', routes.appRelatedPages);
-app.use('/', routes.backendApis);
-app.use('/', routes.backendPages);
+//app.use('/', routes.frontendPages);
+//app.use('/', routes.appRelatedPages);
+//app.use('/', routes.backendApis);
+//app.use('/', routes.backendPages);
 
 app.use(function (err, req, res, next) {
     if(F.config.environment === 'production'){
