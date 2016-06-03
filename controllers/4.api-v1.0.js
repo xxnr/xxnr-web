@@ -58,8 +58,9 @@ exports.install = function() {
     // F.route('/api/v2.0/getMinPayPrice/',       getMinPayPrice, ['get'], ['isLoggedIn']);
     F.route('/api/v2.0/getMinPayPrice/',       getMinPayPrice, ['post', 'get'], ['isLoggedIn']);
 
-    // ISO upgrade message
-    F.route('/api/v2.1/ISOupgrade/',       ISOUpgrade, ['post']);
+    // IOS upgrade message
+    F.route('/api/v2.1/ISOupgrade/',       IOSUpgrade, ['post']);
+    F.route('/api/v2.1/IOSupgrade/',       IOSUpgrade, ['post']);
 
 	// v1.0
     //fix api// F.route('/app/shopCart/getShopCartList', getShoppingCart, ['post', 'get']);
@@ -1311,7 +1312,7 @@ function json_offline_pay_type(){
     self.respond({code:1000, message:'success', offlinePayType:OFFLINEPAYTYPE});
 }
 
-function ISOUpgrade() {
+function IOSUpgrade() {
     var self = this;
     var postVersion = self.data['version'] || '';
     var nowVersion = '2.1.5';
