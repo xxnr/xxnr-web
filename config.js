@@ -25,8 +25,8 @@ var config= {
     tokencookie: "token",
     usercookie: "__user",
     domain: ".xinxinnongren.com",
-    mobileDomain: "m.xinxinnongren.com",
-    mobileDevDomain: "localhost",
+    //mobileDomain: "m.xinxinnongren.com",
+    //mobileDevDomain: "localhost",
     usercookie_expires_in: "30 days",
     shopingCartcookie: "__scart",
 
