@@ -15,7 +15,7 @@
     import xxnrAlert from '../../xxnr_mobile_ui/xxnrAlert.vue'
     import api from '../../api/remoteHttpApi'
     import {scrollerHandler} from "./scrollerHandler"
-
+    import {checkOtherPlaceLogin} from '../../utils/authService'
     export default{
         data(){
             return{
@@ -38,10 +38,8 @@
             api.getOrdersList(
               {'typeValue':this.typeValue,'page':pageNum},
               response => {
-                if(response.data.code==1401){
-                  this.alertShow= true;
-                  this.alertMessage = "你已在其他地方登录,请重新登录"
-                }
+                checkOtherPlaceLogin(response,this);
+
                 if(pageNum<=response.data.pages){
                 //console.log(response);
                   if(pageNum==response.data.pages){
