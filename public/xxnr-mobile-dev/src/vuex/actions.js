@@ -89,6 +89,9 @@ export const goBack = ({dispatch,state}) => {
   }else if(window.location.hash.indexOf('my_xxnr')!=-1){
     //window.location.href = '#!/home';
     router.go('/home')
+  }else if(window.location.hash.indexOf('login')!=-1){
+    //window.location.href = '#!/home';
+    router.go('/my_xxnr')
   }else {
     window.history.back();
   }
