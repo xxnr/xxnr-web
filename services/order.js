@@ -1809,9 +1809,11 @@ OrderService.prototype.getByRSC = function(RSC, page, max, type, callback, searc
 	if(type){
 		switch(type){
 			case 1:		//待付款
-				query.payStatus = {$in:[PAYMENTSTATUS.UNPAID, PAYMENTSTATUS.PARTPAID]};
-				query.pendingApprove = {$ne:true};
-				query.isClosed = false;
+				// query.payStatus = {$in:[PAYMENTSTATUS.UNPAID, PAYMENTSTATUS.PARTPAID]};
+				// query.pendingApprove = {$ne:true};
+				// query.isClosed = false;
+				query["$or"] = [{isClosed: { $ne: true }, payStatus: { $eq: PAYMENTSTATUS.UNPAID }, pendingApprove: { $ne: true }},
+								{payStatus: { $eq: PAYMENTSTATUS.PARTPAID }, pendingApprove: { $ne: true }}];
 				break;
 			case 2:		//待审核
 				// query.pendingApprove = true;
