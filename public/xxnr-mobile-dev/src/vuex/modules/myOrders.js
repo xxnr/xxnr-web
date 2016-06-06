@@ -13,7 +13,8 @@ const state = {
   popBoxDisplay: false,
   checkedSKUList: [],
   orderSKUList: [],
-  confirmOrderId: ''
+  confirmOrderId: '',
+  hasSKUSelected: false
 }
 
 // mutations
@@ -41,11 +42,29 @@ const mutations = {
     //    break;
     //  }
     //}
+    //var SKURefs =[];
+    //for(let i = 0; i < state.myOrders.checkedSKUList.length; i++) {
+    //  if(state.myOrders.checkedSKUList[i]) {
+    //    SKURefs.push(state.myOrders.orderSKUList.SKUList[i].ref);
+    //  }
+    //}
     if(state.checkedSKUList[index]) {
       state.checkedSKUList.$set(index, false);
+      var flag = false;
+      for(let i = 0; i < state.checkedSKUList.length; i++) {
+        if(state.checkedSKUList[i]) {
+          flag = true;
+          state.hasSKUSelected = true;
+          break;
+        }
+      }
+      if(!flag) {
+        state.hasSKUSelected = false;
+      }
       return;
     }
     state.checkedSKUList.$set(index, true);
+    state.hasSKUSelected = true;
   },
   [CONFIRM_ORDER] (state) {
 

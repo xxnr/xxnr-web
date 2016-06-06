@@ -21,7 +21,7 @@
         </div>
       </div>
     </div>
-    <div class="confirm-product-btn" @click="confirmOrder();">
+    <div class="confirm-product-btn" @click="confirmOrder();" :class="{'disabled': !hasSKUSelected}">
       确认
     </div>
   </div>
@@ -36,7 +36,8 @@
         orderSKUList: state => state.myOrders.orderSKUList,
         popBoxDisplay: state => state.myOrders.popBoxDisplay,
         checkedSKUList: state => state.myOrders.checkedSKUList,
-        confirmOrderId: state => state.myOrders.confirmOrderId
+        confirmOrderId: state => state.myOrders.confirmOrderId,
+        hasSKUSelected: state => state.myOrders.hasSKUSelected
         },
       actions: {
         showPopBox,
@@ -132,5 +133,9 @@
     bottom: 10px;
     left: 50%;
     margin-left: -60px;
+  }
+
+  .confirm-product-btn.disabled {
+    background-color: #E2E2E2;
   }
 </style>

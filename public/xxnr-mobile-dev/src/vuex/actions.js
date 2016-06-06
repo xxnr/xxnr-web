@@ -7,8 +7,6 @@ export const getCategories = ({dispatch,state}) => {
   api.getCategories(response => {
     dispatch(types.GET_CATEGORIES,response.data.categories)
   }, response => {
-    //console.log(response);
-    //dispatch(types.GET_CATEGORIES)
   })
 }
 export const getIndexCars = ({dispatch,state}) => {
@@ -17,8 +15,6 @@ export const getIndexCars = ({dispatch,state}) => {
     response => {
       dispatch(types.GET_INDEXCARS,response.data.products)
     }, response => {
-      //console.log(response);
-      //dispatch(types.GET_CATEGORIES)
     })
 }
 export const getIndexHeafei = ({dispatch,state}) => {
@@ -27,8 +23,6 @@ export const getIndexHeafei = ({dispatch,state}) => {
     response => {
     dispatch(types.GET_INDEXHUAFEI,response.data.products)
   }, response => {
-    //console.log(response);
-    //dispatch(types.GET_CATEGORIES)
   })
 }
 
@@ -38,8 +32,6 @@ export const getCarsRowsViewCars = ({dispatch,state}) => {
     response => {
     dispatch(types.GET_ROWSVIEWCARS,response.data.datas.rows)
   }, response => {
-    //console.log(response);
-    //dispatch(types.GET_CATEGORIES)
   })
 }
 
@@ -49,8 +41,6 @@ export const getHuafeiRowsViewCars = ({dispatch,state}) => {
     response => {
     dispatch(types.GET_ROWSVIEWHUAFEI,response.data.datas.rows)
 }, response => {
-    //console.log(response);
-    //dispatch(types.GET_CATEGORIES)
   })
 }
 
@@ -104,22 +94,17 @@ export const login = ({dispatch,state},PhoneNumber,password) => {
     var encrypt = new jsencrypt.default.JSEncryptExports.JSEncrypt();
     encrypt.setPublicKey(public_key);
     var encrypted = encrypt.encrypt(password);
-    //console.log(encrypted)
     api.login(
       {account:PhoneNumber, password:encrypted, keepLogin:true}
       ,response => {
       if (response.data.code == 1000) {
         sessionStorage.setItem('user', JSON.stringify(response.data.datas));
-        //console.log(this.$route);
         router.go('/home');
       }else{
-        //console.log(response);
         dispatch(types.SET_TOASTMSG,response.data.message);
       }
     })
   }, response => {
-    //console.log(response);
-    //dispatch(types.GET_CATEGORIES)
   })
 }
 
@@ -136,8 +121,6 @@ export const getUserInfo = ({dispatch,state},userId) => {
     response => {
     dispatch(types.GET_USERINFO,response.data.datas);
   }, response => {
-    //console.log(response);
-    //dispatch(types.GET_CATEGORIES)
   })
 }
 
@@ -157,8 +140,6 @@ export const getOrders = ({dispatch,state},typeValue,pageNum,changedTab) => {
     }
 
   }, response => {
-    //console.log(response);
-    //dispatch(types.GET_CATEGORIES)
   })
   dispatch(types.LOG_OUT);
 }
@@ -207,8 +188,6 @@ export const getProductDetail = ({dispatch,state}, id) => {
       productDetail.buyActionName = '立即购买';
     }
 
-    //console.log(productDetail);
-
     // is all sku item selected
     for(let i = 0; i < productDetail.SKUAttributes.length; i++){
         if(productDetail.SKUAttributes.hasOwnProperty(i)){
@@ -250,10 +229,8 @@ export const getProductDetail = ({dispatch,state}, id) => {
 
       dispatch(types.GET_PRODUCTDETAIL, productDetail);
     }, response => {
-      //console.log(response);
     })
   },response => {
-   // console.log(response);
   })
 }
 
@@ -263,7 +240,6 @@ export const getSliderImages = ({dispatch, state}) => {
     response => {
     dispatch(types.GET_SLIDERIMAGES, response.data.datas.rows)
     }, response => {
-      //console.log(response);
     })
 }
 
@@ -274,7 +250,6 @@ export const sendRegisterCode = ({dispatch, state},phoneNum) => {
     response => {
       dispatch(types.SET_TOASTMSG,response.data.message);
   }, response => {
-    //console.log(response);
   })
 }
 
@@ -285,7 +260,6 @@ export const register = ({dispatch,state},phoneNumber,password,registerCode) => 
     var encrypt = new jsencrypt.default.JSEncryptExports.JSEncrypt();
     encrypt.setPublicKey(public_key);
     var encrypted = encrypt.encrypt(password);
-    //console.log(encrypted)
     api.register(
       {account:phoneNumber, password:encrypted, smsCode:registerCode}
       ,response => {
@@ -298,8 +272,6 @@ export const register = ({dispatch,state},phoneNumber,password,registerCode) => 
       }
     })
   }, response => {
-    console.log(response);
-    //dispatch(types.GET_CATEGORIES)
   })
 }
 
@@ -316,8 +288,6 @@ export const bindInviter = ({dispatch,state},inviterPhone) => {
 
       }
     }, response => {
-      console.log(response);
-      //dispatch(types.GET_CATEGORIES)
   })
 }
 export const showAttrBox = ({dispatch, state}) => {
@@ -353,7 +323,6 @@ export const selectSKU = ({dispatch, state}, parentIndex, index) => {
     response => {
       dispatch(types.QUERY_SKUS, response.data.data)
   }, response => {
-    //console.log(response);
   })
 }
 
@@ -362,6 +331,9 @@ export const selectAddition = ({dispatch, state}, index) => {
 }
 
 export const buyProduct = ({dispatch, state}) => {
+  if(!state.orderDetail.isAllSKUSelected) {
+    return;
+  }
   if(state.productDetail){
     for(var i in state.productDetail.SKUAttributes){
       if(state.productDetail.SKUAttributes.hasOwnProperty(i)){
@@ -391,7 +363,6 @@ export const buyProduct = ({dispatch, state}) => {
         }
         window.location.href = '/#!/order?id=' + state.productDetail.product.SKU_id + '&count='+ state.productDetail.productNumber;
       }, response=> {
-        console.log('error');
       })
     } else {
       alert('请选择一个SKU');
@@ -408,7 +379,6 @@ export const getRSCListByProduct = ({dispatch, state}, id) => {
   }, response => {
     dispatch(types.GET_RSCLISTBYPRODUCT, response.data.RSCs);
   }, response => {
-    console.log('error');
   })
 }
 
@@ -422,11 +392,9 @@ export const RSCConfirm = ({dispatch, state}, index) => {
 
 export const getShoppingCart = ({dispatch, state}) => {
   api.getShoppingCart(response => {
-    console.log(response);
     dispatch(types.GET_SHOPPINGCART, response.data.datas.rows, response.data.datas.shopCartId);
   },
   response=> {
-    console.log(response);
   })
 }
 export const loadNextPageOrders = ({dispatch,state},inviterPhone) => {
@@ -449,19 +417,15 @@ export const getConsigneeList = ({dispatch, state}) => {
   api.getConsignee(response=> {
     dispatch(types.GET_CONSIGNEE, response.data.datas.rows);
   }, response=>{
-    console.log(response);
   })
 }
 
 export const saveConsignee = ({dispatch, state}, consigneeName, consigneePhone) => {
-  console.log(consigneeName, consigneePhone);
   api.saveConsignee({
     consigneeName: consigneeName,
     consigneePhone: consigneePhone
   },response => {
-    console.log(response);
   },response => {
-    alert(response.message);
   });
 }
 
@@ -489,7 +453,6 @@ export const commitOrder = ({dispatch, state}) => {
     consigneePhone: state.order.orderConsignee.consigneePhone,
     consigneeName: state.order.orderConsignee.consigneeName
   },response => {
-    console.log(response);
     if(response.data.code == '1000') {
       dispatch(types.COMMIT_ORDER, response.data);
     } else {
@@ -546,12 +509,14 @@ export const selfDelivery = ({dispatch, state}) => {
 
     }
   }, response => {
-      console.log(response);
       //dispatch(types.GET_CATEGORIES)
     })
 }
 
 export const confirmOrder = ({dispatch, state}) => {
+  if(!state.myOrders.hasSKUSelected) {
+    return;
+  }
   var SKURefs =[];
   for(let i = 0; i < state.myOrders.checkedSKUList.length; i++) {
     if(state.myOrders.checkedSKUList[i]) {

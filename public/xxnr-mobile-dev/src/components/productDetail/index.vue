@@ -117,7 +117,7 @@
     <div class="bottom-btn-static presale" v-if="!productDetail.online">
       商品已下架
     </div>
-    <div class="bottom-btn-static" @click="buyProduct();" v-if="!productDetail.presale && productDetail.online">
+    <div class="bottom-btn-static" @click="buyProduct();" v-if="!productDetail.presale && productDetail.online" :class="{'disabled': !isAllSKUSelected}">
       确定
     </div>
     <div class="bottom-btn-static presale" v-if="productDetail.presale && productDetail.online">
@@ -171,11 +171,11 @@
         this.getProductDetail(query[1]);
         transition.next();
         this.showBackBtn();
-      }//,
-      //deactivate (transition) {
-        //clearProductDetail();
-        //transition.next();
-      //}
+      },
+      canDeactivate (transition) {
+        this.clearProductDetail();
+        transition.next();
+      }
 
     }
   }
@@ -256,6 +256,11 @@
     font-size: 18px;
     color: #fff;
   }
+
+  .bottom-btn-static.disabled {
+    background-color: #E2E2E2;
+  }
+
   .bottom-btn-static.presale {
     background-color: #E2E2E2;
     color: #909090;
