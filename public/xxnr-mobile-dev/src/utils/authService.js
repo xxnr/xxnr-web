@@ -24,3 +24,10 @@ export function signOut() {
 export function isLogin() {
   return !!cookie.load('token')
 }
+
+export function checkOtherPlaceLogin(res,that){
+  if(res.data.code==1401){
+    that.alertShow= true;
+    that.alertMessage = "你已在其他地方登录,请重新登录"
+  }
+}

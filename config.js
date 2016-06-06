@@ -78,6 +78,7 @@ var config= {
     directory_temp: '/tmp/',
     directory_public: '/public/',
     directory_xxnr_public: '/public/xxnr/',
+    directory_xxnr_mobile_public: '/public/xxnrMobilePro/',
 
     default_request_timeout: 5000,
     default_maximum_file_descriptors: 0,
