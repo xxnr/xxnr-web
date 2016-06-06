@@ -110,7 +110,7 @@ export const login = ({dispatch,state},PhoneNumber,password) => {
         //console.log(this.$route);
         window.location.href = '/';
       }else{
-        console.log(response);
+        //console.log(response);
         dispatch(types.SET_TOASTMSG,response.data.message);
       }
     })
@@ -323,6 +323,14 @@ export const showAttrBox = ({dispatch, state}) => {
 
 export const hideAttrBox = ({dispatch, state}) => {
   dispatch(types.HIDE_ATTRBOX);
+}
+
+export const showPopBox = ({dispatch, state}) => {
+  dispatch(types.SHOW_POPBOX);
+}
+
+export const hidePopBox = ({dispatch, state}) => {
+  dispatch(types.HIDE_POPBOX);
 }
 
 export const productDetailTab = ({dispatch, state}, index) => {
@@ -539,3 +547,42 @@ export const selfDelivery = ({dispatch, state}) => {
       //dispatch(types.GET_CATEGORIES)
     })
 }
+
+export const confirmOrder = ({dispatch, state}) => {
+  var SKURefs =[];
+  for(let i = 0; i < state.myOrders.checkedSKUList.length; i++) {
+    if(state.myOrders.checkedSKUList[i]) {
+      SKURefs.push(state.myOrders.orderSKUList.SKUList[i].ref);
+    }
+  }
+  api.confirmOrder({
+    orderId: state.myOrders.confirmOrderId,
+    SKURefs: SKURefs
+  },response=>{
+    if(response.data.code == '1000') {
+      alert('成功确认收货！');
+      dispatch(types.HIDE_POPBOX);
+      window.location.reload();
+    } else {
+      alert(response.data.message);
+    }
+  },response=>{
+
+  });
+}
+
+export const getOrderDetailById = ({dispatch, state}, id) => {
+  api.getOrderDetail({
+    orderId: id
+    },response => {
+    dispatch(types.CONFIRM_ORDERSKU, response.data.datas.rows);
+    dispatch(types.SHOW_POPBOX, id);
+  }, response => {
+
+  });
+}
+
+export const selectConfirmProduct = ({dispatch, state}, index) => {
+  dispatch(types.SELECT_ORDERSKU, index);
+}
+

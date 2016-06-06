@@ -35,53 +35,33 @@
       <div class="action-box">
         <div class="action-wor" v-if="order.order.orderStatus.type == 3">待发货</div>
         <input type="button" v-if="order.order.orderStatus.type == 1 || order.order.orderStatus.type == 2" class="action-btn" value="去付款" @click="payOrder(order.id);">
-        <input type="button" v-if="order.order.orderStatus.type == 4" class="action-btn" value="确认收货" @click="confirmOrder(order.id);">
-        <input type="button" v-if="order.order.orderStatus.type == 5" class="action-btn" value="去自提" @click="selfDelivery(order.id);">
+        <input type="button" v-if="order.order.orderStatus.type == 4 && order.isShowC" class="action-btn" value="确认收货" @click="getOrderDetailById(order.id);">
+        <input type="button" v-if="order.order.orderStatus.type == 5 && order.isShowD" class="action-btn" value="去自提" @click="selfDelivery(order.id);">
         <input type="button" v-if="order.order.orderStatus.type == 7" class="action-btn" value="查看付款信息" @click="checkPayInfo(order.id);">
         <div class="order-total-price">
           合计：<span class="orange">¥{{order.order.totalPrice}}</span>
         </div>
       </div>
     </div>
-    <!--<div class="confirm-order-box" v-if="productList">-->
-      <!--<div class="confirm-order-title">-->
-        <!--确认收货-->
-        <!--<div class="close-confirm-box">x</div>-->
-      <!--</div>-->
-      <!--<div class="confirm-product">-->
-        <!--<div class="confirm-radio">-->
-
-        <!--</div>-->
-        <!--<div class="confirm-product-name">-->
-
-        <!--</div>-->
-        <!--<div class="confirm-product-sku">-->
-
-        <!--</div>-->
-      <!--</div>-->
-    <!--</div>-->
 </template>
 
 <script>
-  import { getOrderDetail, offlinePay } from '../vuex/actions'
+  import { getOrderDetailById, offlinePay } from '../vuex/actions'
 
   export default {
     props: ['orders'],
     vuex: {
       getters: {
-        //productList: state => state.order.confirmOrderProduct
+
     },
     actions: {
-      getOrderDetail
+      getOrderDetailById
     }
   },
   methods: {
     payOrder: function (id) {
       console.log(id);
       window.location.href = '/#!/offlinePay?id=' + id;
-    },
-    confirmOrder: function (id) {
-      console.log(id);
     },
     selfDelivery: function (id) {
       window.location.href = '/#!/selfDelivery?id=' + id;
@@ -121,7 +101,8 @@
     color:#323232;
   }
   .orders-product-name{
-    height: 50px;
+    height: 40px;
+    line-height: 20px;
     overflow: hidden;
     margin-bottom: 12px;
     padding-right: 10px;
@@ -165,4 +146,6 @@
     padding-left: 2%;
     font-size: 14px;
   }
+
+
 </style>

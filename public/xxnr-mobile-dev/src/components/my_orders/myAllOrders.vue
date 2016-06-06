@@ -47,7 +47,28 @@
                   if(pageNum==response.data.pages){
                     this.end = true;
                   }
-                  this.orders = this.orders.concat(response.data.items);
+                  var orderData = response.data.items;
+                  console.log(orderData);
+                  for(let i = 0; i < orderData.length;i++) {
+                    if(orderData[i].order.orderStatus.type == 4) {
+                      orderData[i].isShowC = false;
+                      for(let j =0; j < orderData[i].SKUs.length; j++) {
+                        if(orderData[i].SKUs[j].deliverStatus == 2) {
+                          orderData[i].isShowC = true;
+                          break;
+                        }
+                      }
+                    } else if(orderData[i].order.orderStatus.type == 5) {
+                      orderData[i].isShowD = false;
+                      for(let j =0; j < orderData[i].SKUs.length; j++) {
+                        if(orderData[i].SKUs[j].deliverStatus == 4) {
+                          orderData[i].isShowD = true;
+                          break;
+                        }
+                      }
+                    }
+                  }
+                  this.orders = this.orders.concat(orderData);
                   this.$broadcast('resetHeightScrollTop',false);
                 }
               }, response => {

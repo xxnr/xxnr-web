@@ -24,7 +24,10 @@
       </div>
     </div>
   </div>
-  <div class="product-detail-title" @click="showAttrBox();">
+  <div class="product-detail-description" v-if="productDetail.description">
+    {{productDetail.description}}
+  </div>
+  <div class="product-detail-title" v-if="productDetail.online" @click="showAttrBox();">
     <div class="container">
       请选择商品属性
     </div>
@@ -56,10 +59,13 @@
       </div>
     </div>
   </div>
-  <div class="bottom-btn" @click="showAttrBox();" v-if="!productDetail.presale">
+  <div class="bottom-btn presale" v-if="!productDetail.online">
+    商品已下架
+  </div>
+  <div class="bottom-btn" @click="showAttrBox();" v-if="!productDetail.presale && productDetail.online">
     {{productDetail.buyActionName}}
   </div>
-  <div class="bottom-btn presale" v-else>
+  <div class="bottom-btn presale" v-if="productDetail.presale && productDetail.online">
     敬请期待
   </div>
   <div class="attr-box" v-show="attrBoxDisplay">
@@ -108,10 +114,13 @@
         </div>
       </div>
     </div>
-    <div class="bottom-btn-static" @click="buyProduct();" v-if="!productDetail.presale">
+    <div class="bottom-btn-static presale" v-if="!productDetail.online">
+      商品已下架
+    </div>
+    <div class="bottom-btn-static" @click="buyProduct();" v-if="!productDetail.presale && productDetail.online">
       确定
     </div>
-    <div class="bottom-btn-static presale" v-else>
+    <div class="bottom-btn-static presale" v-if="productDetail.presale && productDetail.online">
       敬请期待
     </div>
   </div>
@@ -325,17 +334,6 @@
     color: #323232;
   }
 
-  .mask {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: #000;
-    opacity: .6;
-    z-index: 100;
-  }
-
   .attr-product-info-con {
     margin-left: 81px;
   }
@@ -386,5 +384,15 @@
     margin: 0;
     float: none;
     clear: both;
+  }
+
+  .product-detail-description {
+    line-height: 20px;
+    background-color: #F2F2F2;
+    color: #00b38a;
+    text-align: center;
+    margin: 10px 0;
+    font-size: 14px;
+    padding: 10px 2%;
   }
 </style>
