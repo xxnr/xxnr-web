@@ -9,7 +9,8 @@ import {
   CONFIRM_CONSIGNEE,
   OFFLINE_PAY,
   GET_ORDERDETAIL,
-  SELF_DELIVERY
+  SELF_DELIVERY,
+  CONFIRM_ORDERSKU
 } from '../mutation-types'
 
 
@@ -118,7 +119,6 @@ const mutations = {
   },
   [SELF_DELIVERY] (state, data) {
     state.deliveryCode = data;
-
   }
 }
 

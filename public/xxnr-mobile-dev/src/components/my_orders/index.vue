@@ -9,10 +9,11 @@
     </div>
   </div>
   <router-view></router-view>
+  <pop-box></pop-box>
 </template>
 
 <script>
-
+  import popBox from '../popBox.vue'
   import { showBackBtn, changeRightBtnMyXXNR,hideRightBtn } from '../../vuex/actions'
 
   export default {
@@ -21,10 +22,14 @@
         selectedTab:0
       }
     },
+    components: {
+      popBox
+    },
     methods: {
     },
     vuex:{
       getters:{
+
       },
       actions:{
         hideRightBtn,

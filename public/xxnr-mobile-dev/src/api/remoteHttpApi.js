@@ -67,6 +67,9 @@ export default {
   },
   getDeliveryCode: function (data, cb, errCb) {
     jsonpGet(API_ROOT + "api/v2.2/order/getDeliveryCode", data, cb, errCb);
+  },
+  confirmOrder: function (data, cb, errCb) {
+    jsonpPost(API_ROOT + "api/v2.2/order/confirmSKUReceived", data, cb, errCb);
   }
 }
 
