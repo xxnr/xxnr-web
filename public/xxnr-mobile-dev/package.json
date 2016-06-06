@@ -19,7 +19,8 @@
     "vue-toast": "^2.0.2",
     "vuex": "^0.6.3",
     "vux": "0.0.117",
-    "vux-xscroll": "^3.1.4"
+    "vux-xscroll": "^3.1.4",
+    "zepto-webpack": "^1.1.6"
   },
   "devDependencies": {
     "babel-core": "^6.0.0",

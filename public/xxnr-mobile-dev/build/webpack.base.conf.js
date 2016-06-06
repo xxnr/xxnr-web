@@ -72,9 +72,9 @@ module.exports = {
   },
   plugins: [
     new webpack.ProvidePlugin({ // ProvidePlugin的作用是提供全局变量给每个模块,这样就不需要通过require引入了
-      $: 'zepto',
-      Zepto: 'zepto',
-      'window.Zepto': 'zepto'
+      $: 'zepto-webpack',
+      Zepto: 'zepto-webpack',
+      'window.Zepto':  'zepto-webpack'
     })
   ]
 }
