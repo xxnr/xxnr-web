@@ -334,6 +334,7 @@ export const buyProduct = ({dispatch, state}) => {
   if(!state.orderDetail.isAllSKUSelected) {
     return;
   }
+  dispatch(types.RESET_TOASTMSG);
   if(state.productDetail){
     for(var i in state.productDetail.SKUAttributes){
       if(state.productDetail.SKUAttributes.hasOwnProperty(i)){
@@ -344,7 +345,8 @@ export const buyProduct = ({dispatch, state}) => {
           }
         }
         if(_flag==false){
-          alert('请选中一个SKU');
+          //alert('请选中一个SKU');
+          dispatch(types.SET_TOASTMSG,'请选中一个SKU');
           return;
         }
       }
@@ -365,7 +367,8 @@ export const buyProduct = ({dispatch, state}) => {
       }, response=> {
       })
     } else {
-      alert('请选择一个SKU');
+      dispatch(types.SET_TOASTMSG,'请选中一个SKU');
+      //alert('请选择一个SKU');
       return;
     }
 

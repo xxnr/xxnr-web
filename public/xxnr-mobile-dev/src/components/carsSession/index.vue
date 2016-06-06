@@ -1,11 +1,12 @@
 <template>
   <products-rows-list :products="carsRows"></products-rows-list>
+  <xxnr-back-to-top>
 </template>
 
 <script>
   import ProductsRowsList from '../ProductsRowsList.vue'
   import { getCarsRowsViewCars,hideBackBtn,showBackBtn,changeRightBtnMyXXNR,changeRightBtnPathMyxxnr,showRightBtn } from '../../vuex/actions'
-
+  import xxnrBackToTop from '../../xxnr_mobile_ui/xxnrBackToTop.vue'
   export default {
     vuex:{
       getters:{
@@ -16,7 +17,8 @@
       }
     },
     components: {
-      ProductsRowsList
+      ProductsRowsList,
+      xxnrBackToTop
     },
     created () {
       this.getCarsRowsViewCars();
