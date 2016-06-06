@@ -25,8 +25,8 @@
     <div class="container">
       <div class="footer-link">
         <a>移动版</a>
-        <a>电脑版</a>
-        <a>客户端</a>
+        <a @click="setCookie('mobile_use_www','true',(12/24),'xinxinnongren.com')" href="http://www.xinxinnongren.com">电脑版</a>
+        <a href="http://a.app.qq.com/o/simple.jsp?pkgname=com.ksfc.newfarmer">客户端</a>
       </div>
       <div class="footer-tel">客服电话：400-056-0371</div>
       <div class="footer-company">北京新新农人网络科技有限公司</div>
@@ -60,6 +60,17 @@
       }
     },
     methods: {
+      setCookie: function(name, value, days, domain, path) {
+        var expires = '';
+        if (days) {
+          var d = new Date();
+          d.setTime(d.getTime() + (12*60*60*1000)); // 过期时间 12小时
+          expires = '; expires=' + d.toGMTString();
+        }
+        domain = domain ? '; domain=' + domain : '';
+        path = '; path=' + (path ? path : '/');
+        document.cookie = name + '=' + value + expires + path + domain;
+      }
     },
     components: {
       sectionTabs,
