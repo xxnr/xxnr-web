@@ -1,6 +1,7 @@
 var path = require('path')
 var config = require('../config')
 var utils = require('./utils')
+var webpack = require('webpack')
 var projectRoot = path.resolve(__dirname, '../')
 
 module.exports = {
@@ -18,7 +19,8 @@ module.exports = {
     alias: {
       'src': path.resolve(__dirname, '../src'),
       'assets': path.resolve(__dirname, '../static'),
-      'components': path.resolve(__dirname, '../src/components')
+      'components': path.resolve(__dirname, '../src/components'),
+      'zepto': path.resolve(__dirname, '../node_modules/webpack-zepto/index.js')
     }
   },
   resolveLoader: {
@@ -67,5 +69,12 @@ module.exports = {
     html: {
       root: path.resolve(__dirname, '../static')
     }
-  }
+  },
+  plugins: [
+    new webpack.ProvidePlugin({ // ProvidePlugin的作用是提供全局变量给每个模块,这样就不需要通过require引入了
+      $: 'zepto',
+      Zepto: 'zepto',
+      'window.Zepto': 'zepto'
+    })
+  ]
 }

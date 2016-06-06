@@ -8,12 +8,12 @@
     <div class="container">
       <div class="xxnr-title xxnr-title-car">
         汽车精选
-        <div class="title-more"><a v-link="{ path: '/6C7D8F66' }">更多产品&nbsp;></a></div>
+        <div class="title-more"><a v-link="{ path: '/cars' }">更多产品&nbsp;></a></div>
       </div>
       <index-products-block-list :products="indexCars"></index-products-block-list>
       <div class="xxnr-title xxnr-title-huafei">
         化肥精选
-        <div class="title-more"><a v-link="{ path: '/531680A5' }">更多产品&nbsp;></a></div>
+        <div class="title-more"><a v-link="{ path: '/huafei' }">更多产品&nbsp;></a></div>
       </div>
       <index-products-block-list :products="indexHuafei"></index-products-block-list>
     </div>

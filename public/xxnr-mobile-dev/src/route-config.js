@@ -6,10 +6,12 @@ export function configRouter (router) {
     '/home': {
       component: require('./components/home/index.vue')
     },
-    '/6C7D8F66':{
+    '/cars':{
+      name: '6C7D8F66',
       component: require('./components/carsSession/index.vue')
     },
-    '/531680A5':{
+    '/huafei':{
+      name: '531680A5',
       component: require('./components/huafeiSession/index.vue')
     },
     '/my_xxnr':{
@@ -75,6 +77,9 @@ export function configRouter (router) {
       component: require('./components/my_invitation/index.vue'),
       auth: true // 这里 auth 是一个自定义字段
     },
+    '*': {
+      component: require('./components/404/index.vue'),
+    }
   });
   router.beforeEach((transition) => {
     if (transition.to.auth) {

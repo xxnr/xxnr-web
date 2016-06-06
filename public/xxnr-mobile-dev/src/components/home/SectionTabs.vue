@@ -1,7 +1,7 @@
 <template>
   <div class="section-tabs clearfix">
       <div class="section-tab" v-for="category in categories" v-if="$index < 2">
-        <a v-link="{ path: '/'+ category.id}">
+        <a v-link="{ name: category.id}">
           <span v-bind:class="{ 'orange': category.name == '汽车', 'blue': category.name == '化肥' }">
               {{category.name}}专场
           </span>

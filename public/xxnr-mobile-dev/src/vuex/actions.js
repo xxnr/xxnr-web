@@ -111,7 +111,7 @@ export const login = ({dispatch,state},PhoneNumber,password) => {
       if (response.data.code == 1000) {
         sessionStorage.setItem('user', JSON.stringify(response.data.datas));
         //console.log(this.$route);
-        window.location.href = '/';
+        router.go('/home');
       }else{
         //console.log(response);
         dispatch(types.SET_TOASTMSG,response.data.message);
@@ -291,7 +291,7 @@ export const register = ({dispatch,state},phoneNumber,password,registerCode) => 
       ,response => {
       if (response.data.code == 1000) {
       //sessionStorage.setItem('user', JSON.stringify(response.data.datas));
-      window.location.href = '/';
+        router.go('/home');
       }else{
         //TODO
 
@@ -310,7 +310,7 @@ export const bindInviter = ({dispatch,state},inviterPhone) => {
     response => {
       if (response.data.code == 1000) {
       //sessionStorage.setItem('user', JSON.stringify(response.data.datas));
-      window.location.href = '/';
+        router.go('/home');
       }else{
         //TODO
 
@@ -436,7 +436,7 @@ export const loadNextPageOrders = ({dispatch,state},inviterPhone) => {
     response => {
     if (response.data.code == 1000) {
     //sessionStorage.setItem('user', JSON.stringify(response.data.datas));
-    window.location.href = '/';
+      router.go('/home')
     }else{
       //TODO
 	}

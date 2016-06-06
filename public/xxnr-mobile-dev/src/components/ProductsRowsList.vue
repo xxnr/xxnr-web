@@ -1,20 +1,22 @@
 <template>
   <div class="productsRows clearfix">
     <div class="productRow" v-for="product in products">
-      <div class="product-img">
-        <img :src="product.imgUrl">
-      </div>
-      <div class="product-info">
-        <div class="product-name">
-          {{product.goodsName}}
+      <a v-link="{path: '/productDetail?id=' + product.goodsId}">
+        <div class="product-img">
+          <img :src="product.imgUrl">
         </div>
-        <div class="product-presale" v-if="product.presale">
-          即将上线
+        <div class="product-info">
+          <div class="product-name">
+            {{product.goodsName}}
+          </div>
+          <div class="product-presale" v-if="product.presale">
+            即将上线
+          </div>
+          <div class="product-price" v-else>
+            {{product.onSale ? '¥'+ product.unitPrice : '¥'+ product.originalPrice}}
+          </div>
         </div>
-        <div class="product-price" v-else>
-          {{product.onSale ? '¥'+ product.unitPrice : '¥'+ product.originalPrice}}
-        </div>
-      </div>
+      </a>
     </div>
   </div>
 </template>

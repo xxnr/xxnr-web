@@ -128,7 +128,19 @@
 </template>
 
 <script>
-  import { getProductDetail,showAttrBox, hideAttrBox, productDetailTab, changeProductNumber, selectSKU, querySKUs, selectAddition, buyProduct, clearProductDetail } from '../../vuex/actions'
+  import {
+    getProductDetail,
+    showAttrBox,
+    hideAttrBox,
+    productDetailTab,
+    changeProductNumber,
+    selectSKU,
+    querySKUs,
+    selectAddition,
+    buyProduct,
+    clearProductDetail,
+    showBackBtn
+  } from '../../vuex/actions'
 
   export default {
     vuex: {
@@ -149,14 +161,16 @@
         querySKUs,
         selectAddition,
         buyProduct,
-        clearProductDetail
+        clearProductDetail,
+        showBackBtn
       }
     },
     route: {
       activate (transition) {
-        var test = window.location.href.match(new RegExp("[\?\&]" + 'id' + "=([^\&]+)", "i"));
-        this.getProductDetail(test[1]);
+        var query = window.location.href.match(new RegExp("[\?\&]" + 'id' + "=([^\&]+)", "i"));
+        this.getProductDetail(query[1]);
         transition.next();
+        this.showBackBtn();
       }//,
       //deactivate (transition) {
         //clearProductDetail();
@@ -375,7 +389,6 @@
   .product-detail-tab-con {
     padding-bottom: 40px;
   }
-
   li.clear {
     width: 0;
     height: 0;
