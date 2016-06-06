@@ -39,7 +39,7 @@
 <style>
   .xxnr_toast{
     position: fixed;
-    bottom: 20px;
+    bottom: 40px;
     width: 200px;
     left: 50%;
     transform: translateX(-50%);
@@ -49,7 +49,7 @@
     border-radius: 5px;
     text-align: center;
     line-height: 30px;
-
+    z-index: 102;
     -webkit-animation: fadein 1s; /* Safari, Chrome and Opera > 12.1 */
     -moz-animation: fadein 1s; /* Firefox < 16 */
     -ms-animation: fadein 1s; /* Internet Explorer */

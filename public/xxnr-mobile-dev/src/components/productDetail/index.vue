@@ -117,7 +117,7 @@
     <div class="bottom-btn-static presale" v-if="!productDetail.online">
       商品已下架
     </div>
-    <div class="bottom-btn-static" @click="buyProduct();" v-if="!productDetail.presale && productDetail.online">
+    <div class="bottom-btn-static" @click="buyProduct(),showToast();" v-if="!productDetail.presale && productDetail.online">
       确定
     </div>
     <div class="bottom-btn-static presale" v-if="productDetail.presale && productDetail.online">
@@ -125,6 +125,11 @@
     </div>
   </div>
   <div class="mask" v-show="attrBoxDisplay" @click="hideAttrBox();"></div>
+  <div class="toast-container" v-show="toastMsg.length>0">
+    <xxnr-toast :show.sync="toastShow" >
+      <p>{{toastMsg}}</p>
+    </xxnr-toast>
+  </div>
 </template>
 
 <script>
@@ -141,15 +146,27 @@
     clearProductDetail,
     showBackBtn
   } from '../../vuex/actions'
+  import xxnrToast from '../../xxnr_mobile_ui/xxnrToast.vue'
 
   export default {
+    data: function () {
+      return {
+        toastShow:false
+      }
+    },
+    methods: {
+      showToast:function(){
+        this.toastShow=true;
+      }
+    },
     vuex: {
       getters: {
         productDetail: state => state.productDetail.product,
         attrBoxDisplay: state => state.productDetail.attrBoxDisplay,
         tabIndex: state => state.productDetail.tabIndex,
         productNumber: state => state.productDetail.productNumber,
-        isAllSKUSelected: state => state.productDetail.isAllSKUSelected
+        isAllSKUSelected: state => state.productDetail.isAllSKUSelected,
+        toastMsg: state => state.toastMsg
       },
       actions: {
         getProductDetail,
@@ -164,6 +181,9 @@
         clearProductDetail,
         showBackBtn
       }
+    },
+    components: {
+      xxnrToast
     },
     route: {
       activate (transition) {
