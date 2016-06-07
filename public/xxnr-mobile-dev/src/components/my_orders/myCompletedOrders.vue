@@ -60,6 +60,7 @@
         this.end = false,
         this.getOrders(this.currentPage);
         this.$parent.selectedTab = this.typeValue;
+        this.$broadcast('resetHeightScrollTop',true);
       }
     }
   }

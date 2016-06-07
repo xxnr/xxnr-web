@@ -67,7 +67,7 @@
                     }
                   }
                   this.orders = this.orders.concat(orderData);
-                  this.$broadcast('resetHeightScrollTop',false);
+                  this.$broadcast('resetHeightScrollTop');
                 }
               }, response => {
                   console.log(response);
@@ -84,6 +84,7 @@
             this.getOrders(this.currentPage);
 //            this.selectedTab = 0;
             this.$parent.selectedTab = 0;
+            this.$broadcast('resetHeightScrollTop',true);
           }
         }
     }

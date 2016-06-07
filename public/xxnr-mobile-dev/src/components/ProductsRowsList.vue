@@ -22,6 +22,7 @@
 </template>
 
 <script>
+  import vueFilter from '../utils/vueFilter'
   export default {
     props: ['products']
   }
