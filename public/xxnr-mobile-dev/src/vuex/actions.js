@@ -146,9 +146,10 @@ export const getOrders = ({dispatch,state},typeValue,pageNum,changedTab) => {
 
 export const getProductDetail = ({dispatch,state}, id) => {
   api.getProductDetail(
-    {goodsId: id},
+    {productId: id},
     response => {
-    var productDetail = response.data;
+    console.log(response);
+    var productDetail = response.data.datas;
     //data format
     for(var i in productDetail.SKUAdditions){
       productDetail.SKUAdditions[i].isSelected = false;

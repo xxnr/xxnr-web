@@ -27,7 +27,7 @@ export default {
   jsonpGet(API_ROOT + 'api/v2.0/order/getOderList',params,cb,errCb);
   },
   getProductDetail: function(data, cb, errCb) {
-    jsonpGet(API_ROOT + "api/v2.0/product/getProductDetails", data, cb, errCb);
+    jsonpGet(API_ROOT + "api/v2.0/product/getAppProductDetails", data, cb, errCb);
   },
   getSliderImages: function(cb, errCb) {
     jsonpGet(API_ROOT + "api/v2.0/ad/getAdList", null, cb, errCb);

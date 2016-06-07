@@ -53,9 +53,22 @@
         <li class="clear"></li>
       </ul>
       <div class="product-detail-tab-con">
-        <div v-show="tabIndex == 0">{{{productDetail.productDesc}}}</div>
-        <div v-show="tabIndex == 1">{{{productDetail.standard}}}</div>
-        <div v-show="tabIndex == 2">{{{productDetail.support}}}</div>
+        <div v-if="tabIndex == 0">
+          <iframe name="Info1" id="Info1" onload="this.height = Info1.document.body.scrollHeight" width="100%" scrolling="no" frameborder="0" :src="productDetail.app_body_url">
+
+          </iframe>
+          <!--{{{productDetail.productDesc}}}-->
+        </div>
+        <div v-if="tabIndex == 1">
+          <iframe name="Info2" id="Info2" onload="this.height = Info2.document.body.scrollHeight" width="100%" scrolling="no" frameborder="0" :src="productDetail.app_standard_url">
+
+          </iframe>
+        </div>
+        <div v-if="tabIndex == 2">
+          <iframe name="Info3" id="Info3" onload="this.height = Info3.document.body.scrollHeight" width="100%" scrolling="no" frameborder="0" :src="productDetail.app_support_url">
+
+          </iframe>
+        </div>
       </div>
     </div>
   </div>
@@ -413,6 +426,7 @@
 
   .product-detail-tab-con {
     padding-bottom: 40px;
+    background-color: #fff;
   }
   li.clear {
     width: 0;
@@ -422,6 +436,10 @@
     margin: 0;
     float: none;
     clear: both;
+  }
+
+  .product-detail-tab-con img {
+    width: 100%;
   }
 
   .product-detail-description {
