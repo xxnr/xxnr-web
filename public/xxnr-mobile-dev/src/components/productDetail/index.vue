@@ -191,11 +191,11 @@
         this.getProductDetail(query[1]);
         transition.next();
         this.showBackBtn();
-      },
-      canDeactivate (transition) {
-        this.clearProductDetail();
-        transition.next();
-      }
+      }//,
+//      canDeactivate (transition) {
+//        this.clearProductDetail();
+//        transition.next();
+//      }
 
     }
   }

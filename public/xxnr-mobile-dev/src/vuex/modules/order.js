@@ -10,7 +10,8 @@ import {
   OFFLINE_PAY,
   GET_ORDERDETAIL,
   SELF_DELIVERY,
-  CONFIRM_ORDERSKU
+  CONFIRM_ORDERSKU,
+  SAVE_CONSIGNEE
 } from '../mutation-types'
 
 
@@ -92,6 +93,12 @@ const mutations = {
       }
     }
     state.consigneeSelected.$set(index, true);
+  },
+  [SAVE_CONSIGNEE] (state, consigneePhone, consigneeName) {
+    state.orderConsignee.consigneePhone = consigneePhone;
+    state.orderConsignee.consigneeName = consigneeName;
+    var test = window.location.href.match(new RegExp("[\?\&]" + 'id' + "=([^\&]+)", "i"));
+    window.location.href = '/#!/order?id=' + test[1];
   },
   [CONFIRM_CONSIGNEE] (state, index) {
       var consigneeNum = -1;

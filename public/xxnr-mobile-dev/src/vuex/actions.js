@@ -331,7 +331,7 @@ export const selectAddition = ({dispatch, state}, index) => {
 }
 
 export const buyProduct = ({dispatch, state}) => {
-  if(!state.orderDetail.isAllSKUSelected) {
+  if(!state.productDetail.isAllSKUSelected) {
     return;
   }
   dispatch(types.RESET_TOASTMSG);
@@ -428,6 +428,9 @@ export const saveConsignee = ({dispatch, state}, consigneeName, consigneePhone) 
     consigneeName: consigneeName,
     consigneePhone: consigneePhone
   },response => {
+    if(response.data.code == '1000') {
+      dispatch(types.SAVE_CONSIGNEE, consigneePhone, consigneeName);
+    }
   },response => {
   });
 }

@@ -29,11 +29,11 @@ const mutations = {
   },
   [SHOW_ATTRBOX] (state) {
     state.attrBoxDisplay = true;
-    for(var i in state.productDetail.SKUAttributes){
-      if(state.productDetail.SKUAttributes.hasOwnProperty(i)){
+    for(var i in state.product.SKUAttributes){
+      if(state.product.SKUAttributes.hasOwnProperty(i)){
         var _flag = false;
-        for(var j in state.productDetail.SKUAttributes[i].isSelected){
-          if(state.productDetail.SKUAttributes[i].isSelected[j]==true){
+        for(var j in state.product.SKUAttributes[i].isSelected){
+          if(state.product.SKUAttributes[i].isSelected[j]==true){
             _flag = true;
           }
         }

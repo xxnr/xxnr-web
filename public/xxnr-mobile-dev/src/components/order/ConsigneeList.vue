@@ -123,6 +123,7 @@
     border-radius: 5px;
     text-align: center;
     margin-left: 8%;
+    margin-bottom: 10px;
   }
 
   .consignee-confirm.disabled {

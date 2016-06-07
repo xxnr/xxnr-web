@@ -4,9 +4,12 @@
       配送方式
     </div>
     <div>
-      <div>
-        <div class="container">
+      <div class="container">
+        <div class="order-deliver-type">
           网点自提
+          <div class="order-deliver-type-bit">
+            <img src="/assets/images/deliverTypeChecked.png">
+          </div>
         </div>
       </div>
     </div>
@@ -310,5 +313,30 @@
     position: absolute;
     left: 0;
     top: 10px;
+  }
+
+  .order-deliver-type {
+    position: relative;
+    border: 1px solid #fe9b00;
+    width: 84px;
+    text-align: center;
+    height: 26px;
+    line-height: 30px;
+    line-height: 26px;
+    font-size: 14px;
+    margin: 12px 0;
+    border-radius: 5px;
+  }
+
+  .order-deliver-type-bit {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 13px;
+    height: 16px;
+  }
+
+  .order-deliver-type-bit img {
+    width: 100%;
   }
 </style>
