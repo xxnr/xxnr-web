@@ -106,6 +106,10 @@
     height: 10px;
     border-radius: 5px;
   }
+  a,button,input,textarea{
+    -webkit-tap-highlight-color: rgba(0,0,0,0)
+    /*-webkit-user-modify:read-write-plaintext-only;*/
+  }
   .mainContainer{
     padding-top: 30px;
   }

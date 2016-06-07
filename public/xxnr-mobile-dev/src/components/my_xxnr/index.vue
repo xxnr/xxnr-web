@@ -1,16 +1,25 @@
 <template>
   <div v-if="!userInfo" class="profile_section--noUser ">
-    <img class="avatar" src="" alt="">
+    <img class="avatar" src="/assets/images/myXXNR_default_avantar.png" alt="">
     <button  v-link="{ path: '/login'}" class="login_btn">登录</button>
     <button v-link="{ path: '/register'}" class="register_btn">注册</button>
   </div>
   <div v-else class="profile_section--hasUser">
-    <img class="left-avatar" src="" alt="">
+    <div class="profile_section--avantar">
+      <img v-if="userInfo.photo" class="left-avatar" :src="userInfo.photo" alt="">
+      <img v-else class="left-avatar" src="/assets/images/myXXNR_default_avantar.png" alt="">
+    </div>
     <div class="profile_section--TextInfo">
-      <p>{{userInfo.nickname}}</p>
+      <p v-if="userInfo.nickname">{{userInfo.nickname}}</p>
+      <p v-else>您未设置昵称</p>
       <p class="myxxnr--address">所在地区：
-        <span v-for="part in userInfo.address">
+        <span v-if="userInfo.address">
+          <span v-for="part in userInfo.address">
           {{part.name}}
+          </span>
+        </span>
+        <span v-else>
+          未设置
         </span>
       </p>
       <p class="myxxnr--type">
@@ -127,7 +136,7 @@
   .left-avatar{
     float: left;
     padding: 40px 0;
-    padding-left: 20px;
+    margin-left: 20px;
     height: 70px;
     width: 70px;
     border-radius: 50%;

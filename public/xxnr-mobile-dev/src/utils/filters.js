@@ -42,3 +42,8 @@ exports.formatDate =  time => {
   let minutes = tmpDate.getMinutes()
   return year + '.' + mathon + '.' + day + ' ' + hours + ':' + minutes
 }
+
+exports.sessionLongStrTruncater =  input => {
+  let output = input.length > 26 ? (input.substr(0, 23) + '...') : input;
+  return output
+}

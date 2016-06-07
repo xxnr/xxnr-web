@@ -30,6 +30,7 @@
   <div class="product-detail-title" v-if="productDetail.online" @click="showAttrBox();">
     <div class="container">
       请选择商品属性
+      <img class="productDetail-arrow" src="/assets/images/productDetail_arrow.png" alt="">
     </div>
   </div>
   <div class="product-detail-tab">
@@ -247,7 +248,13 @@
     line-height: 40px;
     background-color: #f2f2f2;
   }
-
+  .productDetail-arrow{
+    float: right;
+    width: 10px;
+    height: 17px;
+    padding-top: 12px;
+    padding-right: 5px;
+  }
   .bottom-btn {
     position: fixed;
     left: 0;

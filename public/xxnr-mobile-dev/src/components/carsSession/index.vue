@@ -31,7 +31,7 @@
         this.changeRightBtnMyXXNR();
         this.changeRightBtnPathMyxxnr();
       }
-    },
+    }
   }
 </script>
 
