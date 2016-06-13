@@ -11,6 +11,8 @@ fs.readFile(__dirname + '/testAccount', function (err, content) {
     }
 
     var count = 0;
+    var notFoundCount = 0;
+    var notFound = [];
     var promises = content.toString().split('\r\n').map(function (line) {
         return new Promise(function (resolve, reject) {
             if (line.startsWith('#')) {
@@ -24,7 +26,7 @@ fs.readFile(__dirname + '/testAccount', function (err, content) {
                 return;
             }
 
-            var account = fields[2];
+            var account = fields[2].trim();
             UserModel.update({account: account}, {$set: {isTestAccount: true}}, function (err, numUpdated) {
                 if(err){
                     reject(err);
@@ -34,6 +36,9 @@ fs.readFile(__dirname + '/testAccount', function (err, content) {
                 if(numUpdated.n>0 && numUpdated.ok==1){
                     console.log('set', account, 'to test account');
                     count++;
+                } else{
+                    notFoundCount++;
+                    notFound.push(account);
                 }
 
                 resolve();
@@ -43,7 +48,7 @@ fs.readFile(__dirname + '/testAccount', function (err, content) {
 
     Promise.all(promises)
         .then(function(){
-            console.log('set', count, 'account to test account');
+            console.log('set', count, 'account to test account, ', notFoundCount, 'not found:', notFound);
             process.exit(0);
         })
         .catch(function(err){

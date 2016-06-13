@@ -314,16 +314,21 @@ UserService.prototype.getInvitee = function(options, callback) {
     if (options.page < 0)
         options.page = 0;
 
+    var query = {inviter:options._id};
+    if(options.search){
+        query['$or'] = [{account:options.search}, {name:{$regex:new RegExp(options.search)}}];
+    }
+
     var take = U.parseInt(options.max);
     var skip = U.parseInt(options.page * options.max);
     // UserModel.find({$query:{inviter: options._id}, $orderby:{dateinvited: -1}}, function (err, docs) {
-    UserModel.count({inviter: options._id}, function(err, count) {
+    UserModel.count(query, function(err, count) {
         if(err){
             console.error('User Service getInvitee error:', err);
             callback(err);
             return;
         }
-        UserModel.find({inviter: options._id})
+        UserModel.find(query)
             .sort({dateinvited:-1})
             .skip(skip)
             .limit(take)
