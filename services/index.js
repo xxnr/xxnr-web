@@ -61,3 +61,6 @@ exports.vCode = require('./vCode');
 
 // agent
 exports.agent = require('./agent');
+
+// loyaltypoint
+exports.loyaltypoint = require('./loyaltypoint');

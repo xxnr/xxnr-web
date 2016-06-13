@@ -234,6 +234,37 @@ jRouting.route(managerurl + '/agents/agents-detail', function(){
 	redirectToHomePage();
 });
 
+// rewardshop
+jRouting.route(managerurl + '/rewardshop', function(){
+	if(can('rewardshop')) {
+		navClass('rewardshop');
+		SET('common.page', 'rewardshop-gifts');
+		return;
+	}
+
+	redirectToHomePage();
+});
+
+jRouting.route(managerurl + '/rewardshop/gifts', function(){
+	if(can('rewardshop')) {
+		navClass('rewardshop');
+		SET('common.page', 'rewardshop-gifts');
+		return;
+	}
+
+	redirectToHomePage();
+});
+
+jRouting.route(managerurl + '/rewardshop/gifts-detail', function(){
+	if(can('rewardshop')) {
+		navClass('rewardshop');
+		SET('common.page', 'rewardshop-gifts-detail');
+		return;
+	}
+
+	redirectToHomePage();
+});
+
 // jRouting.on('location', function(url) {
 // 	// var nav = $('nav');
 // 	// nav.find('.selected').removeClass('selected');
@@ -367,7 +398,7 @@ getUrlParam = function(name) {
 	if (result == null || result.length < 1) {
 		return "";
 	}
-	return result[1];
+	return decodeURIComponent(result[1]);
 };
 
 var app = angular.module('xxnr.manager',['ngCookies'])

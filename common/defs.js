@@ -15,6 +15,12 @@ const DELIVERYTYPE = {
         "name":"配送到户"
         }
     };
+const loyaltyPointsType = {
+    "ORGANIZINGINFO": {'type':1, 'name':'完善资料'},
+    "SIGNIN": {'type':2, 'name':'每日签到'},
+    "ORDERCOMPLETED": {'type':3, 'name':'完成订单', 'refName':'order'},
+    "COMPAIGNREWARD": {'type':5, 'name':'活动奖励', 'refName':'compaign'}
+};
 var deliveryTypeSort = {};
 deliveryTypeSort[SONGHUO]=10;
 deliveryTypeSort[ZITI]=20;
@@ -68,4 +74,5 @@ deliveryTypeName[ZITI]=DELIVERYTYPE.ZITI.name;
     exports.DELIVERYTYPE = Object.freeze(DELIVERYTYPE);
     exports.DELIVERYTYPESORT = Object.freeze(deliveryTypeSort);
     exports.DELIVERYTYPENAME = Object.freeze(deliveryTypeName);
+    exports.LOYALTYPOINTSTYPE = Object.freeze(loyaltyPointsType);
 })(typeof exports === 'undefined'? this['defs']={}: exports);

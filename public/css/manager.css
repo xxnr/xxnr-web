@@ -1,4 +1,4 @@
-/*auto*/
+auto*/
 
 /*default*/
 /* reset */
@@ -7,6 +7,8 @@ img{border:none;}
 em,strong{font-style:normal;font-weight:normal;}
 li{list-style:none;}
 table {border-collapse:collapse;border-spacing:0;}
+a:hover {text-decoration: none;}
+a {color: gray;text-decoration: none;}
 /* reset end */
 
 html,body { margin: 0; height: 100%; position: relative; }
@@ -210,6 +212,16 @@ canvas { display: block; }
 	box-shadow: none;}
 
 .container .col-md-12 h3.ui-left { border-left: 7px solid #FF6F00; padding-left: 10px; }
+
+.left-nav div.ui-left { margin-bottom: 10px; }
+.left-nav a { font-size: 18px; line-height: 25px; cursor: pointer; font-family: 'Source Sans Pro';}
+.left-nav a:hover { color: #FF6F00; }
+.left-nav .selected { color: #FF6F00; cursor: auto; }
+/*.left-nav .sidebar a { font-size: 14px; }*/
+.sidebar { font-size: 14px;}
+.sidebar li { line-height: 25px; cursor: pointer; }
+.sidebar li:hover { color: #FF6F00; }
+.sidebar .selected { color: #FF6F00; cursor: auto; }
 
 /* dash board */
 
@@ -447,4 +459,4 @@ span.ellipse.clickable {
 
 
 .pika-single .pika-button { text-align: center; }
-/* dash board end */
+/* dash board end 

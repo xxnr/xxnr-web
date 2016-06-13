@@ -18,6 +18,7 @@ var AreaService = services.area;
 var RSCService = services.RSC;
 var AgentService = services.agent;
 var DashboardService = services.dashboard;
+var LoyaltypointService = services.loyaltypoint;
 var PAYMENTSTATUS = require('../common/defs').PAYMENTSTATUS;
 var DELIVERSTATUS = require('../common/defs').DELIVERSTATUS;
 var DELIVERYTYPENAME = require('../common/defs').DELIVERYTYPENAME;
@@ -186,11 +187,160 @@ exports.install = function() {
 };
 
 var files = DB('files', null, require('../modules/database/database').BUILT_IN_DB).binary;
+var moment = require('moment');
+
+// ==========================================================================
+// rewardshop
+// ==========================================================================
+
+// pages
+exports.rewardshop = function(req, res, next) {
+	res.render(path.join(__dirname, '../views/7.manager/rewardshop/manager-rewardshop'),
+		{}
+	);
+}
+
+exports.rewardshop_gifts = function(req, res, next) {
+	res.render(path.join(__dirname, '../views/7.manager/rewardshop/manager-gifts'),
+		{
+			manager_url:F.config['manager-url'],
+			page:'manager-gifts'
+		}
+	);
+}
+
+exports.rewardshop_gifts_detail = function(req, res, next) {
+	res.render(path.join(__dirname, '../views/7.manager/rewardshop/manager-gifts-detail'),
+		{
+			manager_url:F.config['manager-url'],
+			page:'manager-gifts-detail'
+		}
+	);
+}
+
+
+// apis
+exports.json_rewardshop_categories = function(req, res, next) {
+	LoyaltypointService.queryRewardshopGiftCategories(req.data.search, function(err, categories) {
+		if (err) {
+			res.respond({code:1002, message:'获取礼品类目失败'});
+			return;
+		}
+
+		res.respond({code:1000, message:'success', categories:categories});
+	});
+}
+
+exports.json_rewardshop_category_save = function(req, res, next) {
+	LoyaltypointService.getRewardshopGiftCategory(null, req.data.category, function(err, category) {
+		if (err) {
+			res.respond({code:1002, message:'保存礼品类目失败'});
+			return;
+		}
+		if (category) {
+			res.respond({code:1001, message:'新添加的礼品类目已存在'});
+			return;
+		}
+		LoyaltypointService.createRewardshopGiftCategory(req.data.category, function(err, category) {
+			if (err) {
+				res.respond({code:1002, message:'保存礼品类目失败'});
+				return;
+			}
+
+			res.respond({code:1000, message:'success', category:category});
+		});
+	});
+}
+
+exports.json_rewardshop_gift_save = function(req, res, next) {
+	if (!req.data.name) {
+		res.respond({code:1001, message:'请填写礼品名称'});
+		return;
+	}
+	if (!req.data.category) {
+		res.respond({code:1001, message:'请选择礼品类目'});
+		return;
+	}
+	if (!req.data.points) {
+		res.respond({code:1001, message:'请填写礼品所需积分'});
+		return;
+	}
+
+	LoyaltypointService.getRewardshopGift(null, req.data.name, function(err, gift) {
+		if (err) {
+			res.respond({code:1002, message:'获取礼品详情失败'});
+			return;
+		}
+		if (gift) {
+			res.respond({code:1001, message:'新添加的礼品已存在'});
+			return;
+		}
+		LoyaltypointService.createRewardshopGift(req.data, function(err, gift) {
+			if (err) {
+				res.respond({code:1002, message:'保存礼品失败'});
+				return;
+			}
+
+			res.respond({code:1000, message:'success', gift:gift});
+		});
+	});
+}
+
+exports.json_rewardshop_gift_update = function(req, res, next) {
+	if (!req.data._id) {
+		res.respond({code:1001, message:'请填写礼品ID'});
+		return;
+	}
+
+	LoyaltypointService.getRewardshopGift(req.data._id, null, function(err, gift) {
+		if (err || !gift) {
+			res.respond({code:1002, message:'获取礼品详情失败'});
+			return;
+		}
+		LoyaltypointService.updateRewardshopGift(req.data, function(err, gift) {
+			if (err) {
+				res.respond({code:1002, message:'更新礼品失败'});
+				return;
+			}
+
+			res.respond({code:1000, message:'success', gift:gift});
+		});
+	});
+}
+
+exports.json_rewardshop_gifts = function(req, res, next) {
+	var page = U.parseInt(req.data.page, 1) - 1;
+	var max = U.parseInt(req.data.max, 20);
+	LoyaltypointService.queryRewardshopGifts(page, max, req.data.type, req.data.category, req.data.search, function(err, gifts, count, pageCount) {
+		if (err) {
+			res.respond({code:1002, message:'获取礼品列表失败'});
+			return;
+		}
+
+		res.respond({code:1000, message:'success', gifts:gifts, count:count, pageCount:pageCount, page:page+1});
+	});
+}
+
+exports.json_rewardshop_gift_get = function(req, res, next) {
+	LoyaltypointService.getRewardshopGift(req.params._id, null, function(err, gift) {
+		if (err || !gift) {
+			res.respond({code:1002, message:'获取礼品详情失败'});
+			return;
+		}
+
+		var result = gift;
+		if (result) {
+			if (result.category)
+				result.category = result.category.ref;
+		}
+		res.respond({code:1000, message:'success', gift:result});
+	});
+}
+
 
 // ==========================================================================
 // COMMON
 // ==========================================================================
-var moment = require('moment');
 
 // admin manager page render
 exports.manager = function(req, res, next){

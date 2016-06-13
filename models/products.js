@@ -75,7 +75,8 @@ var productSchema = new mongoose.Schema({
 	referencePrice:{											// 参考价格区间
 		min:{type:Number},
 		max:{type:Number}
-	}
+	},
+	rewardPoints:{type:Number}									// 完成商品所得积分
 });
 
 var productAttributeSchema = new mongoose.Schema({

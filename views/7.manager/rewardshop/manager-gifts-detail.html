@@ -1,0 +1,238 @@
+<% include manager-rewardshop.html %>
+
+<div class="col-md-10 mb50">
+	<div class="filter">
+	    <div class="container">
+	        <div class="caption">礼品管理</div>
+	    </div>
+	</div>
+	<div style="position: relative;" id="gift">
+	    <div class="row m">
+	        <div class="col-md-12 m">
+	            <h3 class="ui-left">基本信息</h3>
+	        </div>
+	        <div class="col-md-12">
+                <div class="col-md-8" data-component="dropdown" data-component-path="gift.info.category" data-source="gift.categories" data-source-value="_id" data-source-text="name" data-required="true">礼品类目</div>
+                <div class="col-md-4 m">
+                    <div class="ui-textbox-label">新增类目</div>
+                    <div class="ui-textbox-with-button">
+                        <input class="col-md-10" type="text"/>
+                        <a class="col-md-2 account" href="javascript:void(0)" onclick="add_gift_category(this)">
+                            <span class="fa fa-plus-circle"></span>
+                        </a>
+                    </div>
+                </div>
+    	        <div class="col-md-8">
+    	        	<div class="mb10" data-component="textbox" data-component-path="gift.info.name" data-required="true">礼品名称</div>
+    	        	<div class="mb10" data-component="textbox" data-component-path="gift.info.marketPrice">市场价格</div>
+    	        	<div class="mb10" data-component="textbox" data-component-path="gift.info.points" data-required="true">所需积分</div>
+             		<div class="mb10" data-component="fileupload" data-component-path="gift.info.pictures" data-placeholder="添加图片" data-accept="image/png,image/jpeg" data-multiple="true" data-icon="fa-camera" data-extension="false">商品主图</div>
+                    <div class="mb10" data-component="pictures" data-component-path="gift.info.pictures"></div>
+                </div>
+                <div class="col-md-8">
+                    <div data-component="checkbox" data-component-path="gift.info.istop" style="margin-top:10px" class="red"><b>置顶</b></div>
+                    <div data-component="checkbox" data-component-path="gift.info.soldout" style="margin-top:10px" class="red"><b>已售罄</b></div>
+                </div>
+            </div>
+        </div>
+	    <hr>
+	    <div class="row">
+	        <div class="col-md-12 m">
+	            <h3 class="ui-left">礼品详情</h3>
+	        </div>
+	    </div>
+        <div class="col-md-12">
+            <div class="m" data-component="textarea" data-component-path="gift.info.appbody" data-height="100px" data-name="gift_appbody"s></div>
+        </div>
+	    <hr>
+	    <div data-component="error" data-component-path="gift.giftresponse"></div>
+	    <div class="ui-buttons">
+            <button name="submit" data-component="template" data-component-path="gift">
+                <script type="text/html">{{ if _id }}更新{{ else }}添加{{ fi }}</script>
+            </button>
+	    </div>
+	</div>
+</div>
+</div>
+
+<script>
+    var PRICE_REGEX = /^[0-9]*(\.[0-9]{1,2})?$/;
+    var INT_REGEX = /^[0-9]+$/;
+    var gift_ckeditors = ['gift_appbody'];
+	var gift = {};
+	gift._id;
+    gift.info = {};
+    gift.giftresponse;
+    gift.categories = [];
+
+    gift._id = getUrlParam('id');
+    gift_refresh();
+
+    function gift_load() {
+        if (gift._id) {
+            $.components.GET(managerurl + '/api/rewardshop/gift/' + gift._id, null, function(response) {
+                if (response.code != '1000') {
+                    if (response.error || response.message) {
+                        if (response.message) {
+                            response = [{error: response.message}];
+                        } else {
+                            response = response.error;
+                        }
+                    } else {
+                        response = [{error: '获取礼品信息失败'}];
+                    }
+
+                    SET('gift.giftresponse', response);
+                    return;
+                }
+
+                SET('gift._id', gift._id, true);
+                gift.info = response.gift;
+                SET('gift.info', gift.info, true);
+                SET('gift.giftresponse', null);
+                gift_init_ckeditors(gift.info);
+                $('#gift button').on('click', function(){
+                    var el = $(this);
+                    switch(el.attr('name')) {
+                        case 'submit':
+                            add_or_update_gift(false);
+                            break;
+                    }
+                });
+            });
+        } else {
+            SET('gift._id', gift._id, true);
+            SET('gift.info', gift.info, true);
+            SET('gift.giftresponse', null, true);
+            setTimeout(function() {gift_init_ckeditors();}, 100);
+            $('#gift button').on('click', function(){
+                var el = $(this);
+                switch(el.attr('name')) {
+                    case 'submit':
+                        add_or_update_gift(true);
+                        break;
+                }
+            });
+        }
+    }
+
+    // Method refreshes categories
+    function gift_refresh_categories() {
+        $.components.GET(managerurl + '/api/rewardshop/categories', null, function(response) {
+            if (response && response.categories) {
+                gift.categories = response.categories;
+                SET('gift.categories', gift.categories);
+            }
+        });
+    }
+
+    function gift_refresh() {
+    	gift_refresh_categories();
+    	gift_load();  
+    }
+
+    function add_gift_category(el) {
+        var inputEl = $(el).parent().children('input')[0];
+    	var value = inputEl.value;
+        if (value) {
+            if (!confirm('你确认要添加礼品类目"' + value + '"？'))
+                return;
+            $.components.POST(managerurl+'/api/rewardshop/category/add', {category:value}, function(response) {
+                if (response.code==1000) {
+                    gift_refresh_categories();
+                    success();
+                } else {
+                    if (response.message) {
+                        alert(response.message);
+                    } else {
+                        alert('添加类目失败');
+                    }
+                }
+            });
+        } else {
+            alert('请先填写类目名称');
+        }
+    }
+
+    function add_or_update_gift(add) {
+        if (gift.info.marketPrice && (!PRICE_REGEX.test(gift.info.marketPrice) || parseFloat(gift.info.marketPrice) < 0)) {
+            alert('请填写正确的市场价');
+            return;
+        }
+        if (!gift.info.category) {
+            alert('请填写礼品类目');
+            return;
+        }
+        if (!gift.info.name) {
+            alert('请填写礼品名称');
+            return;
+        }
+        if (!gift.info.points || (!INT_REGEX.test(gift.info.points) || parseInt(gift.info.points) <= 0)) {
+            alert('请填写正确的兑换所需积分');
+            return;
+        }
+        var confirmInfo = '你确认要添加礼品"' + gift.info.name + '"？';
+        var apiURL = managerurl+'/api/rewardshop/gift/add';
+        if (!add) {
+            confirmInfo = '你确认要更新礼品"' + gift.info.name + '"？';
+            apiURL = managerurl+'/api/rewardshop/gift/update';
+        }
+        if (!confirm(confirmInfo))
+            return;
+        gift_get_ckeditors(gift.info);
+        $.components.POST(apiURL, gift.info, function(response) {
+            if (response.code==1000) {
+                success();
+                var gift_id;
+                if (response.gift && response.gift._id) {
+                    gift_id = response.gift._id;
+                } else if (gift.info._id) {
+                    gift_id = gift.info._id;
+                }
+                if (gift_id) {
+                    window.location.href = managerurl + "/rewardshop/gifts-detail?id=" + gift_id;
+                }
+            } else {
+                if (response.error || response.message) {
+                    if (response.message) {
+                        response = [{error: response.message}];
+                    } else {
+                        response = response.error;
+                    }
+                } else {
+                    response = [{error: '获取礼品信息失败'}];
+                }
+
+                SET('gift.giftresponse', response);
+                return;
+            }
+        });
+    }
+
+    function gift_init_ckeditors(model) {
+        var ckeditors = gift_ckeditors;
+        for (var i = 0, length = ckeditors.length; i < length; i++) {
+            gift_ckeditor_add(ckeditors[i], model);
+        }
+    }
+    function gift_ckeditor_add(id, model) {
+        var ckeditor = CKEDITOR.instances[id];
+        if (ckeditor) ckeditor.destroy(true); //销毁编辑器 ,然后新增一个
+        ckeditor = CKEDITOR.replace(id);
+    }
+
+    function gift_get_ckeditors(model) {
+        var ckeditors = gift_ckeditors;
+        for (var i = 0, length = ckeditors.length; i < length; i++) {
+            gift_ckeditor_getdata(ckeditors[i], model);
+        }
+    }
+
+    function gift_ckeditor_getdata(id, model) {
+        var ckeditor = CKEDITOR.instances[id];
+        var value = id.split('gift_')[1];
+        if (ckeditor) {
+            model[value] = ckeditor.getData();
+        }
+    }
+</script>
