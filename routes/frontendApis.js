@@ -154,7 +154,7 @@ router.post('/api/v2.2/user/saveConsignees', middleware.isLoggedIn_middleware, c
 router.get('/api/v2.2/getOfflinePayType', controllers.Pay.json_offline_pay_type);
 
 // potential customer/intention products related APIs
-router.get('/api/v2.1/intentionProducts', middleware.isLoggedIn_middleware, middleware.isXXNRAgent_middleware, controllers.User.json_intention_products);
+router.get('/api/v2.1/intentionProducts', controllers.User.json_intention_products);
 router.get('/api/v2.1/potentialCustomer/isAvailable', middleware.isLoggedIn_middleware, middleware.isXXNRAgent_middleware, controllers.User.json_potential_customer_available);
 router.post('/api/v2.1/potentialCustomer/add', middleware.isLoggedIn_middleware, middleware.isXXNRAgent_middleware, controllers.User.process_add_potential_customer);
 router.get('/api/v2.1/potentialCustomer/query', middleware.isLoggedIn_middleware, middleware.isXXNRAgent_middleware, controllers.User.json_potential_customer);

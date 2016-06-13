@@ -29,3 +29,5 @@ exports.deploy_SKU = function(callback) {
             callback();
         });
 };
+
+exports.deploy_intention_product = require('./deploy_intention_product');

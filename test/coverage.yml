@@ -4,7 +4,7 @@ instrumentation:
     extensions:
         - .js
     default-excludes: true
-    excludes: []
+    excludes: ['**/node_modules/**']
     embed-source: false
     variable: __coverage__
     compact: true
@@ -12,7 +12,7 @@ instrumentation:
     complete-copy: false
     save-baseline: false
     baseline-file: ./coverage/coverage-baseline.json
-    include-all-sources: false
+    include-all-sources: true
     include-pid: false
     es-modules: false
 reporting:

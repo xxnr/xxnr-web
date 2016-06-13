@@ -14,12 +14,13 @@ var other = {};
 var towns = {};
 var all_towns = 0;
 var pKey = Object.keys(p);
+var models = require('../../models');
 
-var totaljs = require("../node_modules/total.js");
-var ProvinceModel = require('../models').province;
-var CityModel = require('../models').city;
-var CountyModel = require('../models').county;
-var TownModel = require('../models').town;
+//var totaljs = require("../node_modules/total.js");
+var ProvinceModel = models.province;
+var CityModel = models.city;
+var CountyModel = models.county;
+var TownModel = models.town;
 
 // province
 for (var i = 0; i < pKey.length; i++) {
@@ -82,44 +83,44 @@ console.log('ALL Cities NUM:' + city_num);
 var cityKeys = Object.keys(cities);
 console.log('ALL Cities keys:' + cityKeys.length);
 
-// var otherc = tools.otherc;
-// for (var i = 0; i < otherc.length; i++) {
-// 	var city = otherc[i];
-// 	var cid = city[0];
-// 	var cname = city[1];
-// 	var cpid = city[2];
-// 	var type = city[3];
-// 	var t = false;
+ var otherc = tools.otherc;
+ for (var i = 0; i < otherc.length; i++) {
+ 	var city = otherc[i];
+ 	var cid = city[0];
+ 	var cname = city[1];
+ 	var cpid = city[2];
+ 	var type = city[3];
+ 	var t = false;
 
-// 	if (cid.search(',') > 0) {
-// 		other[cid] = {'name':cname[0],'nameS':cname[1]};
-// 		continue
-// 	}
-// 	if (!t) {
-// 		var cityKeys = Object.keys(cities);
-// 		for (var x = 0; x < cityKeys.length; x++) {
-// 			var _k = cityKeys[x];
-// 			if (cpid === _k) {
-// 				var city = cities[cpid];
-// 				if (city.countyNUM) {
-// 					city.countyNUM += 1;
-// 				} else {
-// 					city.countyNUM = 1;
-// 				}
-// 				counties[cid + '-' + i] = {'name':cname[0],'nameS':cname[1],'tid':cid,
-// 								'tcityid':city['tid'],'city':city['name'],
-// 								'tprovinceid':city['tprovinceid'],'province':city['province']
-// 							};
-// 				t = true;
-// 				county_num += 1;
-// 			}
-// 		}
-// 	}
+ 	if (cid.search(',') > 0) {
+ 		other[cid] = {'name':cname[0],'nameS':cname[1]};
+ 		continue
+ 	}
+ 	if (!t) {
+ 		var cityKeys = Object.keys(cities);
+ 		for (var x = 0; x < cityKeys.length; x++) {
+ 			var _k = cityKeys[x];
+ 			if (cpid === _k) {
+ 				var city = cities[cpid];
+ 				if (city.countyNUM) {
+ 					city.countyNUM += 1;
+ 				} else {
+ 					city.countyNUM = 1;
+ 				}
+ 				counties[cid + '-' + i] = {'name':cname[0],'nameS':cname[1],'tid':cid,
+ 								'tcityid':city['tid'],'city':city['name'],
+ 								'tprovinceid':city['tprovinceid'],'province':city['province']
+ 							};
+ 				t = true;
+ 				county_num += 1;
+ 			}
+ 		}
+ 	}
 	
-// 	if (!t) {
-// 		other[cid] = {'name':cname[0],'nameS':cname[1]};
-// 	}
-// }
+ 	if (!t) {
+ 		other[cid] = {'name':cname[0],'nameS':cname[1]};
+ 	}
+ }
 // console.log('Other NUM:' + i);
 console.log('ALL Counties NUM:' + county_num);
 var countyKeys = Object.keys(counties);
@@ -131,7 +132,9 @@ if (otherKeys.length > 0 && otherKeys.length < 100) {
 }
 console.log('---------------------------------------------------------------------------');
 
-// insert_counties(0);
+//insert_provinces(0);
+//insert_cities(0);
+//insert_counties(0);
 function insert_provinces(i) {
 	var proKeys = Object.keys(provinces);
 	if (i >= proKeys.length) {
@@ -148,7 +151,7 @@ function insert_provinces(i) {
 					);
 				}
 			} else {
-				var p = new ProvinceModel({id:U.GUID(10),tid:Pro.tid,name:Pro.name,uppername:Pro.nameS,shortname:Pro.shortName});
+				var p = new ProvinceModel({id:require('../../common/utils').GUID(10),tid:Pro.tid,name:Pro.name,uppername:Pro.nameS,shortname:Pro.shortName});
 				p.save();
 			}
 			insert_provinces(i+1);
@@ -180,7 +183,7 @@ function insert_cities(i) {
 							);
 						}
 					} else {
-						var c = new CityModel({id:U.GUID(10),tid:City.tid,name:City.name,uppername:City.nameS,provinceid:province.id});
+						var c = new CityModel({id:require('../../common/utils').GUID(10),tid:City.tid,name:City.name,uppername:City.nameS,provinceid:province.id});
 						c.save();
 					}
 					insert_cities(i+1);
@@ -225,8 +228,8 @@ function insert_counties(i) {
 								}
 							} else {
 								console.log(i);
-								// var c = new CountyModel({id:U.GUID(10),tid:County.tid,name:County.name,uppername:County.nameS,cityid:city.id,provinceid:province.id});
-								// c.save();
+								 var c = new CountyModel({id:require('../../common/utils').GUID(10),tid:County.tid,name:County.name,uppername:County.nameS,cityid:city.id,provinceid:province.id});
+								 c.save();
 							}
 							insert_counties(i+1);
 						});
@@ -245,9 +248,9 @@ function insert_counties(i) {
 
 
 // ************************* Town ****************************
-// var town_list = [];
-// get_towndata(0, counties);
-// get_towndata(0, cities);
+ var town_list = [];
+ get_towndata(0, counties);
+ get_towndata(0, cities);
 
 function get_towndata(i, DATAS) {
 	var Keys = Object.keys(DATAS);
@@ -276,7 +279,8 @@ function get_towndata(i, DATAS) {
 		    var result = null;
 		    //?l1=410000&l2=411400&l3=411426&lang=zh-S&_ksTS=1449549840716_7542&callback=jsonp7543;
 		    // if (county['tprovinceid'] === "410000" && county['tcityid'] === "411400" && county['tid'] === '411481') {
-		    if (data['tprovinceid'] !== "410000") {
+		    if (data['tprovinceid'] == "410000") {
+			//if(true){
 		    	// console.log(provinceName+' - '+cityName+' - '+countyName);
 		        var url = town_url + '?l1=' + data['tprovinceid'] + '&l2=' + l2 + '&l3=' + l3 + '&lang=zh-S&_ksTS=1449549840716_7542';
 				httpHelper.get(url,30000,function(err,data){    
@@ -301,7 +305,7 @@ function get_towndata(i, DATAS) {
 				    		'tprovinceid':data['tprovinceid'],'tcityid':l2,'tcountyid':l3});	
 				    }
 				    console.log(town_list.length);
-					setTimeout(function() {get_towndata(i+1, DATAS);}, 2000);
+					setTimeout(function() {get_towndata(i+1, DATAS);}, 1000);
 			    },'UTF-8');
 			} else {
 				get_towndata(i+1, DATAS);
@@ -394,7 +398,7 @@ function townSAVE(town, queryoptions, i) {
 			// console.log(i);
 			all_towns += 1;
 			var t = {};
-			t.id = U.GUID(10);
+			t.id = require('../../common/utils').GUID(10);
 			t.tid = town.tid;
 			t.name = town.name;
 			t.chinesepinyin = town.nameCP;

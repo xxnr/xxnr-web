@@ -29,12 +29,12 @@ UseraddressService.prototype.query = function(options, callback) {
 
 	// only get the special province
 	SpecialprovinceModel.find({}, function(err, docs) {
-		var ProvinceIds = [];
+		var ProvinceNames = [];
 		for (var i = 0; i < docs.length; i++) {
-			ProvinceIds[i] = docs[i].id;
+			ProvinceNames[i] = docs[i].name;
 		}
-		if (ProvinceIds && ProvinceIds.length > 0) {
-			queryoptions.provinceid = {'$in': ProvinceIds};
+		if (ProvinceNames && ProvinceNames.length > 0) {
+			queryoptions.provincename = {'$in': ProvinceNames};
 		}
 		UseraddressModel.find(queryoptions).sort(orderbyoptions).exec(
 			function(err, docs) {

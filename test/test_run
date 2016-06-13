@@ -2,4 +2,4 @@
 # linux
 istanbul cover _mocha website_behaviour --config coverage.yml
 # windows
-istanbul cover %npm_global%\node_modules\mocha\bin\_mocha website_behaviour --config coverage.yml
+istanbul cover %npm_global%\node_modules\mocha\bin\_mocha website_behaviour_test --config coverage.yml

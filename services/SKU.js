@@ -285,7 +285,7 @@ SKUService.prototype.addSKU = function(product, attributes, additions, price, ca
             }
 
             callback(null, newSKU);
-            refresh_product_SKUAttributes(product);
+            refresh_product_SKUAttributes(product._id);
         })
     });
 };
