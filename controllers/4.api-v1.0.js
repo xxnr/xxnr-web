@@ -59,8 +59,9 @@ exports.install = function() {
     // F.route('/api/v2.0/getMinPayPrice/',       getMinPayPrice, ['get'], ['isLoggedIn']);
     //F.route('/api/v2.0/getMinPayPrice/',       getMinPayPrice, ['post', 'get'], ['isLoggedIn']);
 
-    // ISO upgrade message
-    //F.route('/api/v2.1/ISOupgrade/',       ISOUpgrade, ['post']);
+    // IOS upgrade message
+    // F.route('/api/v2.1/ISOupgrade/',       IOSUpgrade, ['post']);
+    // F.route('/api/v2.1/IOSupgrade/',       IOSUpgrade, ['post']);
 
 	// v1.0
     //fix api// F.route('/app/shopCart/getShopCartList', getShoppingCart, ['post', 'get']);
@@ -566,7 +567,7 @@ exports.getMinPayPrice = function(req, res, next) {
     }
 };
 
-exports.ISOUpgrade = function(req, res, next) {
+exports.IOSUpgrade = function(req, res, next) {
     var postVersion = req.data['version'] || '';
     var nowVersion = '2.1.5';
     if (!postVersion || (postVersion != nowVersion && postVersion < nowVersion)) {
