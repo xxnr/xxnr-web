@@ -54,7 +54,7 @@ router.post('/api/v2.0/product/getAppProductDetails', controllers.Api_v1_0.getAp
 router.get('/api/v2.0/getMinPayPrice', middleware.isLoggedIn_middleware, controllers.Api_v1_0.getMinPayPrice);
 router.post('/api/v2.0/getMinPayPrice', middleware.isLoggedIn_middleware, controllers.Api_v1_0.getMinPayPrice);
 router.post('/api/v2.1/ISOupgrade', controllers.Api_v1_0.IOSUpgrade);
-router.post('/api/v2.1/IOSupgrade', controllers.Api_v1_0.IOSUpgrade);
+router.post('/api/v2.1/AppUpgrade', controllers.Api_v1_0.AppUpgrade);
 
 // order APIs
 router.get('/api/v2.0/order/getOderList', middleware.isLoggedIn_middleware, controllers.Order.getOrders);
