@@ -268,7 +268,7 @@ LoyaltyPointsService.prototype.queryRewardshopGifts = function(page, max, type, 
 	        .sort({istop:1, datecreated:-1})
 	        .skip(skip)
 	        .limit(take)
-	        .populate('category.ref')
+	        .populate({path:'category.ref', select:'name'})
 	        .select('-__v')
 	        .lean()
 	        .exec(function(err, docs) {
@@ -392,9 +392,7 @@ LoyaltyPointsService.prototype.queryLogsbyUser = function(user_id, page, max, ca
         return;
     }
     var self = this;
-    var query = {};
-    query.user = user_id;
-    self.queryLogs(query, page, max, function(err, logs, count, pageCount) {
+    self.queryLogs(user_id, null, null, page, max, function(err, logs, count, pageCount) {
     	if (err) {
 			console.error('LoyaltyPointsService queryLogsbyUser queryLogs err:', err);
 			callback('LoyaltyPointsService queryLogsbyUser queryLogs err');
@@ -405,12 +403,31 @@ LoyaltyPointsService.prototype.queryLogsbyUser = function(user_id, page, max, ca
 };
 
 // query loyaltypoints logs
-LoyaltyPointsService.prototype.queryLogs = function(query, page, max, callback) {
-	if (!query) {
-        callback('query required');
-        return;
-    }
+LoyaltyPointsService.prototype.queryLogs = function(user_id, type, times, page, max, callback) {
     var query = {};
+    if (user_id)
+    	query.user = user_id;
+    if (type) {
+    	switch(parseInt(type)) {
+    		case 1:
+    			query.points = {$gt:0};
+    			break;
+    		case 2:
+    			query.points = {$lt:0};
+    			break;
+    		default:
+    			break;
+
+    	}
+    }
+    if (times && times.length > 0) {
+    	if (times.length == 1) {
+    		query.date = {$gt:times[0]};
+    	} else {
+    		query.date = {$gt:times[0], $lt:times[1]};
+    	}
+    }
+
 	if (page<0 || !page) {
 		page = 0;
 	}
@@ -429,11 +446,13 @@ LoyaltyPointsService.prototype.queryLogs = function(query, page, max, callback) 
 			return;
 		}
 		LoyaltyPointsLogsModel.find(query)
-			.select('-_id -__v')
+			.select('-_id -__v -event._id')
 			.sort({date:-1})
 			.skip(page * max)
 			.limit(max)
 			.lean()
+			.populate({path:'user', select:'-_id account name score'})
+			.populate({path:'event.gift', select:'-_id name'})
 			.exec(function (err, logs) {
 				if (err) {
 					console.error('LoyaltyPointsService queryLogs find err:', err);

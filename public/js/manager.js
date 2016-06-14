@@ -265,6 +265,16 @@ jRouting.route(managerurl + '/rewardshop/gifts-detail', function(){
 	redirectToHomePage();
 });
 
+jRouting.route(managerurl + '/rewardshop/points-logs', function(){
+	if(can('rewardshop')) {
+		navClass('rewardshop');
+		SET('common.page', 'rewardshop-points-logs');
+		return;
+	}
+
+	redirectToHomePage();
+});
+
 // jRouting.on('location', function(url) {
 // 	// var nav = $('nav');
 // 	// nav.find('.selected').removeClass('selected');
@@ -366,10 +376,11 @@ Delay_Search_WATCH = function(field, callback, latency_in_millisecond){
 			if (timer) {
 				clearTimeout(timer);
 			}
-
-			timer = setTimeout(function (path, value) {
-				callback(path, value);
-			}, latency_in_millisecond);
+			if (value.search) {
+				timer = setTimeout(function (path, value) {
+					callback(path, value);
+				}, latency_in_millisecond);
+			}
 		} else{
 			callback(path, value);
 		}
@@ -438,6 +449,21 @@ function dashboardInit() {
 		}
 		if (url) {
         	window.location.href = managerurl + url;
+        }
+    });
+}
+
+// Pagination
+function Pagination(el, count, pageCount, currentPage, callback) {
+	el.pagination({
+        items: count,
+        itemsOnPage: pageCount,
+        currentPage: currentPage?currentPage:0,
+		prevText: '<',
+		nextText: '>',
+        cssStyle: 'light-theme',
+        onPageClick: function(pageNumber, event) {
+        	callback(pageNumber);
         }
     });
 }

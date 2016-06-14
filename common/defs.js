@@ -19,6 +19,7 @@ const loyaltyPointsType = {
     "ORGANIZINGINFO": {'type':1, 'name':'完善资料'},
     "SIGNIN": {'type':2, 'name':'每日签到'},
     "ORDERCOMPLETED": {'type':3, 'name':'完成订单', 'refName':'order'},
+    "EXCHANGE": {'type':4, 'name':'积分兑换', 'refName':'rewardshopgift'},
     "COMPAIGNREWARD": {'type':5, 'name':'活动奖励', 'refName':'compaign'}
 };
 var deliveryTypeSort = {};

@@ -1,0 +1,193 @@
+<% include manager-rewardshop.html %>
+
+<div class="col-md-10">
+	<div class="filter col-md-12" style="padding-bottom:9px">
+        <div class="col-md-3 col-sm-6 m">
+            <div data-component="textbox" data-component-path="pointslogs.filter.search" data-placeholder="姓名/注册手机" data-control-icon="fa-search">客户查询</div>
+            <div class="help" data-component="template" data-component-path="pointslogs.info"><script type="text/html">{{ count | pluralize('items','item','items','items') }} / {{ pages | pluralize('pages','page','pages','pages') }}</script></div>
+        </div>
+        <div class="col-md-3 col-sm-6 m">
+			<div data-component="dropdown" data-component-path="pointslogs.filter.type" data-options="全部积分|;获取积分|1;使用积分|2" data-empty="true" data-empty-text="全部积分">状态筛选</div>
+		</div>
+		<div class="ui-buttons col-md-3 col-sm-6 m" style="padding-top: 21px">
+			<button name="search" title="查询" style="height: 26px;">查询<span class="fa fa-search"></span></button>
+		</div>
+    </div>
+
+    <div class="row col-md-12">
+		<div data-component="template" data-component-path="pointslogs" class="ui-grid" data-max="auto" data-component-id="pointslogs.griduser">
+			<script type="text/html">
+			{{ if griduser }}
+				<h3 class="ui-left">用户信息</h3>
+				<div class="col-md-6">
+					<table class="table table-bordered" border="0">
+						<tbody>
+							<tr>
+								<td class="col-xs-5 active">客户姓名</td>
+								<td>{{ griduser.name }}</td>
+							</tr>
+							<tr>
+								<td class="col-xs-5 active">手机号码</td>
+								<td>{{ griduser.account }}</td>
+							</tr>
+							<tr>
+								<td class="col-xs-5 active">当前积分</td>
+								<td>{{ griduser.score }}</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			{{ fi }}
+		 	</script>
+	    </div>
+	</div>
+
+	<div class="row col-md-12">
+		<div data-component="template" data-component-path="pointslogs" class="ui-grid pointslogs" data-max="auto" data-component-id="pointslogs.grid">
+			<script type="text/html">
+			{{ if grid && grid.length > 0 }}
+				<table class="table" width="100%" cellpadding="0" cellspacing="0" border="0">
+					<tbody>
+						<tr>
+							<td style="width:30px" class="silver hidden-xs ui-center active">序号</td>
+							<td style="width:80px" class="silver hidden-xs ui-right active">发生时间</td>
+					    	<td style="width:60px" class="silver hidden-xs ui-center active">项目</td>
+					    	<td style="width:60px" class="silver hidden-xs ui-center active">事件归类</td>
+					    	<td style="width:150px" class="silver hidden-xs ui-left active">事件详情</td>
+					    	<td style="width:60px" class="silver hidden-xs ui-right active">积分数值</td>
+					    	<td style="width:100px" class="silver hidden-xs ui-center active">用户信息</td>
+					    </tr>
+					{{ foreach pointslog in grid }}
+			            <tr data-index="{{ $index }}">
+			                <td style="width:30px" class="hidden-xs ui-center">{{ $index + 1 }}</td>
+			                <td style="width:80px" class="hidden-xs ui-right">{{ pointslog.date | format('yyyy-MM-dd HH:mm:ss') }}</td>
+			                <td style="width:60px" class="hidden-xs ui-center">{{ if pointslog.points > 0 }}获得积分{{ else }}{{ if pointslog.points < 0}}使用积分{{ else }}其他{{ fi }}{{ fi }}</td>
+			                <td style="width:60px" class="hidden-xs ui-center">{{pointslog.event.name}}</td>
+			                <td style="width:150px" class="hidden-xs ui-left">{{ pointslog.description }}</td>
+			                <td style="width:60px" class="hidden-xs ui-right">{{ pointslog.points }}</td>
+			                <td style="width:100px" class="hidden-xs ui-center">{{ if pointslog.user }}{{ pointslog.user.name }}</br>{{ pointslog.user.account }}</br>积分:{{ pointslog.user.score }}{{ else }}-{{ fi }}</td>
+			            </tr>
+			        {{ end }}
+					</tbody>
+				</table>
+			{{ else }}
+				{{ if !pointslogsresponse }}
+					暂无数据
+				{{ fi }}
+			{{ fi }}
+	        </script>
+	    </div>
+
+	    <div class="pointslogs-pages">
+		</div>
+	</div>
+	
+	<div data-component="error" data-component-path="pointslogs.pointslogsresponse"></div>
+</div>
+</div>
+
+<script>
+
+	var pointslogs = {};
+
+    pointslogs.filter = {};
+    pointslogs.filter.page = 1;
+    pointslogs.grid = [];
+    pointslogs.griduser;
+    pointslogs.info = {};
+	pointslogs.pointslogsresponse;
+
+	var pointslogs_page = getUrlParam('page');
+	if (pointslogs_page) {
+		pointslogs.filter.page = pointslogs_page;
+	}
+	var pointslogs_search = getUrlParam('search');
+	if (pointslogs_search) {
+		pointslogs.filter.search = pointslogs_search;
+	}
+	var pointslogs_type = getUrlParam('type');
+	if (pointslogs_type) {
+		pointslogs.filter.type = pointslogs_type;
+	}
+
+	// $('.filter').find('button').each(function() {
+	// 	switch ($(this).attr('name')) {
+	// 		case 'search':
+	// 			var el = $(this);
+	// 			el.prop({ disabled: true });
+	// 			break;
+	// 	}
+	// });
+
+	$('.filter .ui-buttons button').off('click').on('click', function() {
+        switch ($(this).attr('name')) {
+            case 'search':
+    			redirectPointslogsURL();
+                break;
+        }
+    });
+
+	// Delay_Search_WATCH('pointslogs.filter.*', function(path, value) {
+ //        if (NOTMODIFIED('pointslogs.filter', pointslogs.filter)) {
+ //            return;
+ //        }
+ //        $('.filter').find('button').each(function() {
+	// 		switch ($(this).attr('name')) {
+	// 			case 'search':
+	// 				var el = $(this);
+	// 				el.prop({ disabled: false });
+	// 				break;
+	// 		}
+	// 	});
+ //    });
+
+    ON('#pointslogs.grid', function(component){
+        pointslogs.filter.max = component.max;
+        getPointslogs();
+    });
+
+	function getPointslogs() {
+		var urlParam = pointslogs.filter.search ? 'search=' + pointslogs.filter.search : '';
+		urlParam += pointslogs.filter.page ? (urlParam ? '&' : '') + 'page=' + pointslogs.filter.page : '';
+		urlParam += pointslogs.filter.max ? (urlParam ? '&' : '') + 'max=' + pointslogs.filter.max : '';
+		urlParam += pointslogs.filter.type ? (urlParam ? '&' : '') + 'type=' + pointslogs.filter.type : '';
+		var url = '/api/rewardshop/pointslogs' + (urlParam ? '?' + urlParam : '');
+		$.components.GET(managerurl + url, null, function(response) {
+			if (response && response.code && response.code==1000) {
+				pointslogs.grid = response.pointslogs;
+				pointslogs.info.count = response.count;
+            	pointslogs.info.pages = response.pageCount;
+            	pointslogs.info.page = response.page;
+            	if (response.user) {
+            		pointslogs.griduser = response.user;
+            	}
+            	SET('pointslogs.griduser', pointslogs.griduser);
+				SET('pointslogs.grid', pointslogs.grid);
+				if (pointslogs.info.pages && pointslogs.info.count) {
+					// Pagination(pointslogs.info.count, pointslogs.info.count/pointslogs.info.pages, pointslogs.info.page?pointslogs.info.page:null);
+					Pagination($('div.pointslogs-pages'), pointslogs.info.count, pointslogs.info.count/pointslogs.info.pages, pointslogs.info.page?pointslogs.info.page:null, function(pageNumber){redirectPointslogsURL(pageNumber)});
+				}
+				UPDATE('pointslogs.info');
+			} else {
+				if (response.error || response.message) {
+					if (response.message) {
+						response = [{error: response.message}];
+					} else {
+						response = response.error;
+					}
+				} else {
+					response = null;
+				}
+				SET('pointslogs.pointslogsresponse', response);
+			}
+		});
+	}
+
+	function redirectPointslogsURL(page) {
+		var urlParam = pointslogs.filter.search ? 'search=' + pointslogs.filter.search : '';
+		urlParam += page ? (urlParam ? '&' : '') + 'page=' + page : '';
+		urlParam += pointslogs.filter.max ? (urlParam ? '&' : '') + 'max=' + pointslogs.filter.max : '';
+		urlParam += pointslogs.filter.type ? (urlParam ? '&' : '') + 'type=' + pointslogs.filter.type : '';
+		window.location.href = managerurl + "/rewardshop/points-logs" + (urlParam ? '?' + urlParam : '');
+	}
+</script>

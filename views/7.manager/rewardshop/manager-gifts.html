@@ -60,7 +60,9 @@
 				</tbody>
 			</table>
 		{{ else }}
-			暂无数据
+			{{ if !giftsresponse }}
+				暂无数据
+			{{ fi }}
 		{{ fi }}
         </script>
     </div>
@@ -120,15 +122,15 @@
 		urlParam += gifts.filter.type ? (urlParam ? '&' : '') + 'type=' + gifts.filter.type : '';
 		var url = '/api/rewardshop/gifts' + (urlParam ? '?' + urlParam : '');
 		$.components.GET(managerurl + url, null, function(response) {
-			var key = 'gifts.grid';
 			if (response && response.code && response.code==1000) {
 				gifts.grid = response.gifts;
 				gifts.info.count = response.count;
             	gifts.info.pages = response.pageCount;
             	gifts.info.page = response.page;
-				SET(key, gifts.grid);
+				SET('gifts.grid', gifts.grid);
 				if (gifts.info.pages && gifts.info.count) {
-					Pagination(gifts.info.count, gifts.info.count/gifts.info.pages, gifts.info.page?gifts.info.page:null);
+					// Pagination(gifts.info.count, gifts.info.count/gifts.info.pages, gifts.info.page?gifts.info.page:null);
+					Pagination($('div.gifts-pages'), gifts.info.count, gifts.info.count/gifts.info.pages, gifts.info.page?gifts.info.page:null, function(pageNumber){redirectGiftsURL(pageNumber)});
 				}
 				UPDATE('gifts.info');
 				$('.gifts tr td button').off('click').on('click', function() {
@@ -168,16 +170,15 @@
 		        });
 			} else {
 				if (response.error || response.message) {
-					key = 'gifts.giftsresponse';
 					if (response.message) {
 						response = [{error: response.message}];
 					} else {
 						response = response.error;
 					}
 				} else {
-					response = [];
+					response = null;
 				}
-				SET(key, response);
+				SET('gifts.giftsresponse', response);
 			}
 		});
 	}
@@ -190,19 +191,19 @@
         });
     }
 
-	function Pagination(count, pageCount, currentPage) {
-		$('div.gifts-pages').pagination({
-	        items: count,
-	        itemsOnPage: pageCount,
-	        currentPage: currentPage?currentPage:0,
-			prevText: '<',
-			nextText: '>',
-	        cssStyle: 'light-theme',
-	        onPageClick: function(pageNumber, event) {
-	        	redirectGiftsURL(pageNumber);
-	        }
-	    });
-	}
+	// function Pagination(count, pageCount, currentPage) {
+	// 	$('div.gifts-pages').pagination({
+	//         items: count,
+	//         itemsOnPage: pageCount,
+	//         currentPage: currentPage?currentPage:0,
+	// 		prevText: '<',
+	// 		nextText: '>',
+	//         cssStyle: 'light-theme',
+	//         onPageClick: function(pageNumber, event) {
+	//         	redirectGiftsURL(pageNumber);
+	//         }
+	//     });
+	// }
 
 	function new_gift(_id) {
 		window.location.href = managerurl + "/rewardshop/gifts-detail" + (typeof _id != 'undefined' ? ('?id=' + _id) : '');

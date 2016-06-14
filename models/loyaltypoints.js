@@ -9,13 +9,16 @@ var LoyaltyPointsLogsSchema = new mongoose.Schema({
     "event": {																// 事件
         "name": {type:String},												// 事件名
         "type": {type:Number}, 												// 事件类型
-        "order": {type: mongoose.Schema.ObjectId, ref: 'order'}				// 积分兑换的相关订单
+        "order": {type: mongoose.Schema.ObjectId, ref: 'order'},			// 获取积分的相关订单
+        "gift": {type: mongoose.Schema.ObjectId, ref: 'rewardshopgift'}		// 积分兑换的礼品
     },
     "description": {type:String}											// 描述
 });
 
 LoyaltyPointsLogsSchema.index({"date":-1});
 LoyaltyPointsLogsSchema.index({"event.type":1, "date":-1});
+LoyaltyPointsLogsSchema.index({"user":1, "points":1, "date":-1});
+LoyaltyPointsLogsSchema.index({"points":1, "date":-1});
 
 mongoose.model("loyalty_points_logs", LoyaltyPointsLogsSchema);
 

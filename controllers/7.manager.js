@@ -218,6 +218,15 @@ exports.rewardshop_gifts_detail = function(req, res, next) {
 	);
 }
 
+exports.rewardshop_points_logs = function(req, res, next) {
+	res.render(path.join(__dirname, '../views/7.manager/rewardshop/manager-points-logs'),
+		{
+			manager_url:F.config['manager-url'],
+			page:'manager-points-logs'
+		}
+	);
+}
+
 
 // apis
 exports.json_rewardshop_categories = function(req, res, next) {
@@ -335,6 +344,66 @@ exports.json_rewardshop_gift_get = function(req, res, next) {
 		}
 		res.respond({code:1000, message:'success', gift:result});
 	});
+}
+
+exports.json_rewardshop_pointslogs = function(req, res, next) {
+	var self = this;
+	var page = U.parseInt(req.data.page, 1) - 1;
+	var max = U.parseInt(req.data.max, 20);
+	if (req.data.search) {
+		UserService.getUserBySearch(req.data.search, req.data.search, function(err, user) {
+			if (err) {
+				res.respond({code:1002, message:'查询客户出错'});
+				return;
+			}
+			if (!user) {
+				res.respond({code:1002, message:'没有查询到客户'});
+				return;
+			}
+			LoyaltypointService.queryLogs(user._id, req.data.type, req.data.times, page, max, function(err, pointslogs, count, pageCount) {
+				if (err) {
+					res.respond({code:1002, message:'获取积分历史列表失败'});
+					return;
+				}
+
+				var userInfo = {'account':user.account, 'name':user.name, 'score':user.score};
+				res.respond({code:1000, message:'success', pointslogs:pointslogs, count:count, pageCount:pageCount, page:page+1, user:userInfo});
+			});
+		});
+	} else {
+		LoyaltypointService.queryLogs(null, req.data.type, req.data.times, page, max, function(err, pointslogs, count, pageCount) {
+			if (err) {
+				res.respond({code:1002, message:'获取积分历史列表失败'});
+				return;
+			}
+
+			res.respond({code:1000, message:'success', pointslogs:pointslogs, count:count, pageCount:pageCount, page:page+1});
+		});
+	}
+}
+
+function fixPointslogs(pointslogs) {
+	if (pointslogs && pointslogs.length > 0) {
+		var results = [];
+		pointslogs.forEach(function(pointslog) {
+			var log = {
+				'user': {'name': pointslog.user.name, 'account': pointslog.user.account, 'score': pointslog.user.score},
+				'date': pointslog.date,
+				'points': pointslog.points,
+				'event': {'name': pointslog.event.name},
+				'description': pointslog.description
+			};
+			if (pointslog.event.gift) {
+				log.event.gift = {
+					'name': pointslog.event.gift.name
+				};
+			}
+			results.push(log);
+		});
+		return results;
+	} else {
+		return pointslogs;
+	}
 }
 
 
