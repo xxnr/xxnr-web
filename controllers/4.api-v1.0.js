@@ -625,7 +625,7 @@ exports.AppUpgrade = function (req, res, next) {
         if (!postVersion || AppupgradeService.compareVersion(nowAndroidVersion, postVersion)) {
             res.respond({
                 code: 1000,
-                message: '版本升级啦，快点去更新吧',
+                message: '1.签到规则全新升级，更多积分等你来拿!\n2.积分商城全面上线，精美礼品汽车服务都能兑换哦，快去看看吧!',
                 version: nowAndroidVersion,
                 android_update_url: android_update_url
             });
@@ -634,7 +634,7 @@ exports.AppUpgrade = function (req, res, next) {
         }
     } else if (userAgent.indexOf('ios') >= 0) {
         if (!postVersion || AppupgradeService.compareVersion(nowIosVersion, postVersion)) {
-            res.respond({code: 1000, message: '版本升级啦，快点去更新吧', version: nowIosVersion});
+            res.respond({code: 1000, message: '1.新增配送方式，购车可自选网点提车\n2.网点支持付现金或POS机刷卡，支付更安心\n3.自提订单凭自提码至网点，提车有保障', version: nowIosVersion});
         } else {
             res.respond({code: 1200, message: '最新版本', version: nowIosVersion});
         }
