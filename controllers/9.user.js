@@ -1423,6 +1423,7 @@ exports.json_get_invitee = function(req, res, next) {
         options.max = req.data['max'];
     }
     options._id = req.user._id;
+    options.search = req.data.search;
     UserService.getInvitee(options, function(err, result) {
         if (err) {
             console.error('user json_get_invitee err:', err);
