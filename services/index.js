@@ -64,3 +64,6 @@ exports.agent = require('./agent');
 
 // loyaltypoint
 exports.loyaltypoint = require('./loyaltypoint');
+
+// appUpgrade
+exports.Appupgrade= require('./appupgrade');

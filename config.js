@@ -1,13 +1,13 @@
-var config= {
+var config = {
     isDebug: false,
     name: "E-shop",
     version: "2.1.0",
     author: "xxnr",
     'etag-version': '',
-    serviceStartTime:'2015-11-17',
-    currentTimeZoneDiff:8,
-    environment:'dev',
-    secure:false,
+    serviceStartTime: '2015-11-17',
+    currentTimeZoneDiff: 8,
+    environment: 'dev',
+    secure: false,
 
 //ArelativeURLaddressintotheeshopmanagement
     "manager-url": "/manager",
@@ -60,8 +60,8 @@ var config= {
 //usertypeidmustbeincreasingprogressively
     user_types: {"1": "普通用户", "5": "县级经销商", "6": "新农经纪人"},
     default_user_type: 1,
-    XXNRAgentId:'6',
-    RSCId:'5',
+    XXNRAgentId: '6',
+    RSCId: '5',
 
 //userminpayprice
     minPayPrice: 3000,
@@ -80,7 +80,12 @@ var config= {
     default_request_timeout: 5000,
     default_maximum_file_descriptors: 0,
     //
-    currency_entity:"￥"
+    currency_entity: "￥",
+
+    //Android IOS app版本号
+    nowIosVersion: '2.1.5',
+    nowAndroidVersion: '2.2.5'
+
 };
 
-module.exports=config;
+module.exports = config;
