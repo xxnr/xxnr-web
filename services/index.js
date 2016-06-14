@@ -61,3 +61,6 @@ exports.vCode = require('./vCode');
 
 // agent
 exports.agent = require('./agent');
+
+// appUpgrade
+exports.Appupgrade= require('./appupgrade');
