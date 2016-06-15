@@ -14,7 +14,7 @@ var OrderService = services.order;
 var vCodeService = services.vCode;
 var IntentionProductService = services.intention_product;
 var PotentialCustomerService = services.potential_customer;
-var LoyaltyPointService = services.loyaltypoint;
+var LoyaltypointService = services.loyaltypoint;
 var REG_MOBILE = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|Tablet|IOS/i;
 var config = require('../config');
 var Global = require('../global.js');
@@ -621,7 +621,7 @@ exports.json_user_modify = function(req, res, next) {
                         UserService.update({userid:req.data.userId, isUserInfoFullFilled: true}, function (err, data) {
                             // UserService.increaseScore({userid: req.data.userId, score: config.user_info_full_filled_point_add}, function (err) {
                             var points = config.user_info_full_filled_point_add;
-                            LoyaltyPointService.increase(old_user_info._id, points, 'ORGANIZINGINFO', null, null, function (err) {
+                            LoyaltypointService.increase(old_user_info._id, points, 'ORGANIZINGINFO', null, null, function (err) {
                                 var response = {'code': '1000', 'message': 'success'};
                                 if (!err) {
                                     response.scoreAdded = points;
@@ -1052,7 +1052,7 @@ exports.process_user_sign = function(req, res, next){
                 // UserService.increaseScore({userid:req.data.userId, score: config.user_sign_point_add}, function (err) {
                 var points = config.user_sign_point_add;
                 var description = beijingTimeNow.format('YYYY-MM-DD') + '签到';
-                LoyaltyPointService.increase(user._id, points, 'SIGNIN', description, null, function (err) {
+                LoyaltypointService.increase(user._id, points, 'SIGNIN', description, null, function (err) {
                     if (err) {
                         // error happen,
                         // there are 2 cases of error: one is db operation error,

@@ -83,6 +83,7 @@ LoyaltyPointsService.prototype.queryRewardshopGiftCategories = function(search, 
     }
     RewardshopGiftCategoryModel.find(query)
         .sort({datecreated:-1})
+        .select('-__v')
         .lean()
         .exec(function(err, docs) {
         if (err) {
@@ -286,10 +287,17 @@ LoyaltyPointsService.prototype.queryRewardshopGifts = function(page, max, type, 
 };
 
 // get rewardshop gift
-LoyaltyPointsService.prototype.getRewardshopGift = function(_id, name, callback) {
+LoyaltyPointsService.prototype.getRewardshopGift = function(id, _id, name, callback) {
 	var query = null;
+	if (id) {
+		query = {id:id};
+	}
     if (_id) {
-        query = {_id:_id};
+    	if (query) {
+        	query._id = _id;
+        } else {
+    		query = {_id:_id};
+    	}
     }
     if (name) {
     	if (query) {
@@ -301,6 +309,7 @@ LoyaltyPointsService.prototype.getRewardshopGift = function(_id, name, callback)
     if (query) {
         RewardshopGiftModel.findOne(query)
         	.select('-__v')
+        	.populate({path:'category.ref', select:'name deliveries'})
         	.lean()
             .exec(function (err, gift) {
                 if (err) {

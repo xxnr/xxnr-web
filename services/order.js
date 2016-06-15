@@ -21,7 +21,7 @@ var DeliveryCodeModel = require('../models').deliveryCode;
 var umengConfig = require('../configuration/umeng_config');
 var UMENG = require('../modules/umeng');
 var PayService = require('../services/pay');
-var LoyaltyPointService = require('../services/loyaltypoint');
+var LoyaltypointService = require('../services/loyaltypoint');
 var dri = require('../common/dri');
 
 // Service
@@ -2204,9 +2204,9 @@ OrderService.prototype.increaseLoyaltyPointsbyOrder = function(order, type) {
 		        	}
 				});
 			}
-			LoyaltyPointService.increase(user._id, points, type, null, order._id, function (err) {
+			LoyaltypointService.increase(user._id, points, type, null, order._id, function (err) {
 				if (err) {
-					console.error('OrderService increaseLoyaltyPointsbyOrder LoyaltyPointService increase err:', err, 'orderId:', order.id);
+					console.error('OrderService increaseLoyaltyPointsbyOrder LoyaltypointService increase err:', err, 'orderId:', order.id);
 					return;
 				}
 				OrderModel.update({id: order.id}, {$set:{isRewardPoint: true}}, function(err) {

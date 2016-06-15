@@ -275,7 +275,7 @@ exports.json_rewardshop_gift_save = function(req, res, next) {
 		return;
 	}
 
-	LoyaltypointService.getRewardshopGift(null, req.data.name, function(err, gift) {
+	LoyaltypointService.getRewardshopGift(null, null, req.data.name, function(err, gift) {
 		if (err) {
 			res.respond({code:1002, message:'获取礼品详情失败'});
 			return;
@@ -301,7 +301,7 @@ exports.json_rewardshop_gift_update = function(req, res, next) {
 		return;
 	}
 
-	LoyaltypointService.getRewardshopGift(req.data._id, null, function(err, gift) {
+	LoyaltypointService.getRewardshopGift(null, req.data._id, null, function(err, gift) {
 		if (err || !gift) {
 			res.respond({code:1002, message:'获取礼品详情失败'});
 			return;
@@ -331,7 +331,7 @@ exports.json_rewardshop_gifts = function(req, res, next) {
 }
 
 exports.json_rewardshop_gift_get = function(req, res, next) {
-	LoyaltypointService.getRewardshopGift(req.params._id, null, function(err, gift) {
+	LoyaltypointService.getRewardshopGift(null, req.params._id, null, function(err, gift) {
 		if (err || !gift) {
 			res.respond({code:1002, message:'获取礼品详情失败'});
 			return;
@@ -340,7 +340,7 @@ exports.json_rewardshop_gift_get = function(req, res, next) {
 		var result = gift;
 		if (result) {
 			if (result.category)
-				result.category = result.category.ref;
+				result.category = result.category.ref._id;
 		}
 		res.respond({code:1000, message:'success', gift:result});
 	});
@@ -382,6 +382,7 @@ exports.json_rewardshop_pointslogs = function(req, res, next) {
 	}
 }
 
+// not use
 function fixPointslogs(pointslogs) {
 	if (pointslogs && pointslogs.length > 0) {
 		var results = [];
