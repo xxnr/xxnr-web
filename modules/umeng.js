@@ -54,7 +54,7 @@ Umeng.prototype.umengSend = function (params, appMasterSecret, callback) {
     };
     tools.httpRequest({httpOptions: httpOptions, postData: JSON.stringify(params)}, function (err, result) {
         if (err) {
-            console.error('Umeng umengSend httpRequest err:', err);
+            console.error('Umeng umengSend httpRequest err:', err, 'result:',result);
             callback(err, result);
             return;
         }
