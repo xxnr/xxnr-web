@@ -8,7 +8,7 @@ var querystring = require('querystring');
 var JWT = require('jsonwebtoken');
 var pinyin = require("pinyin");
 
-var regexpPhone = new RegExp('^(13[0-9]|15[012356789]|17[678]|18[0-9]|14[57])[0-9]{8}$');
+var regexpPhone = new RegExp('^(13[0-9]|15[012356789]|17[013678]|18[0-9]|14[57])[0-9]{8}$');
 var regexpPrice = new RegExp('^[0-9]*(\.[0-9]{1,2})?$');
 var regexIdentityNo = /^(\d{15}$|^\d{18}$|^\d{17}(\d|X|x))$/;
 var regexpXXNRHost = new RegExp('(.*\.|^)xinxinnongren\.com.*');
