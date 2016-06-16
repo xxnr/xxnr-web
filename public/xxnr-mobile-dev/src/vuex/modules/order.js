@@ -2,7 +2,7 @@ import {
   GET_RSCLISTBYPRODUCT,
   SELECT_RSC,
   CONFIRM_RSC,
-  GET_SHOPPINGCART,
+  GET_SHOPPINGCARTBYSKU,
   COMMIT_ORDER,
   GET_CONSIGNEE,
   SELECT_CONSIGNEE,
@@ -65,16 +65,29 @@ const mutations = {
     window.location.href = '/#!/order?id=' + test[1];
     //window.history.back();
   },
-  [GET_SHOPPINGCART] (state, data, id) {
-    state.cartList = data;
-    state.shopCartId = id;
+  [GET_SHOPPINGCARTBYSKU] (state, data, id) {
+    var sku_id = window.location.href.match(new RegExp("[\?\&]" + 'id' + "=([^\&]+)", "i"));
+    sku_id = sku_id[1];
+    console.log(sku_id);
+    var cartData = data;
     var totalPrice = 0;
-    for(let i = 0; i < data.length; i++) {
-      for(let j = 0; j < data[i].SKUList.length; j++) {
-        totalPrice += data[i].SKUList[j].price * data[i].SKUList[j].count;
+    var flag_i = false;
+    for(let i = 0; i < cartData.length; i++) {
+      if(flag_i) {
+        break;
+      }
+      for(let j = 0; j < cartData[i].SKUList.length; j++) {
+        if(cartData[i].SKUList[j]._id == sku_id) {
+          state.cartList = cartData[i].SKUList[j];
+          state.cartList.brandName = cartData[i].brandName;
+          state.totalPrice = cartData[i].SKUList[j].price * cartData[i].SKUList[j].count;
+          flag_i = true;
+          break;
+        }
       }
     }
-    state.totalPrice = totalPrice;
+    //state.cartList = data;
+    state.shopCartId = id;
   },
   [COMMIT_ORDER] (state, data){
     window.location.href = '/#!/offlinePay?id=' + data.id;

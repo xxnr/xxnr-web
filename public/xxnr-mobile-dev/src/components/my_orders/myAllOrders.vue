@@ -46,7 +46,6 @@
                     this.end = true;
                   }
                   var orderData = response.data.items;
-                  console.log(orderData);
                   for(let i = 0; i < orderData.length;i++) {
                     if(orderData[i].order.orderStatus.type == 4) {
                       orderData[i].isShowC = false;

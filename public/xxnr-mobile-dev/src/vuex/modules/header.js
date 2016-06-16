@@ -7,6 +7,8 @@ import {
   CHANGE_RIGHTBTN_XXNR,
   CHANGE_RIGHTBTNPATH_HOME,
   CHANGE_RIGHTBTNPATH_MYXXNR,
+  EDIT_TITLE,
+  SET_RIGHTBUTTONTEXT
 } from '../mutation-types'
 
 // initial state
@@ -15,7 +17,8 @@ const state = {
   rightButton: './static/assets/images/header_my_xxnr.png',
   backButtonDisplay:false,
   rightButtonDisplay:false,
-  rightButtonGoingPath: 'home'
+  rightButtonGoingPath: 'home',
+  rightButtonText: ''
 }
 
 // mutations
@@ -44,6 +47,13 @@ const mutations = {
   [CHANGE_RIGHTBTNPATH_MYXXNR](state){
     state.rightButtonGoingPath = 'my_xxnr';
   },
+  [EDIT_TITLE](state, data) {
+    state.headerTitle = data;
+  },
+  [SET_RIGHTBUTTONTEXT] (state, data, path) {
+    state.rightButtonText = data;
+    state.rightButtonGoingPath = path;
+  }
 }
 
 export default {

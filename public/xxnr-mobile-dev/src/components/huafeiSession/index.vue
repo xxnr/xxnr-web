@@ -7,7 +7,7 @@
 
 <script>
   import ProductsRowsList from '../ProductsRowsList.vue'
-  import { getHuafeiRowsViewCars,hideBackBtn,showBackBtn,changeRightBtnMyXXNR,changeRightBtnPathMyxxnr,showRightBtn } from '../../vuex/actions'
+  import { getHuafeiRowsViewCars,hideBackBtn,showBackBtn,changeRightBtnMyXXNR,changeRightBtnPathMyxxnr,showRightBtn,editTitle } from '../../vuex/actions'
   import xxnrBackToTop from '../../xxnr_mobile_ui/xxnrBackToTop.vue'
 
   export default {
@@ -16,7 +16,7 @@
         huafeiRows:state => state.rowsViewProducts.rowsViewHuafei
       },
       actions:{
-        getHuafeiRowsViewCars,hideBackBtn,showBackBtn,changeRightBtnMyXXNR,changeRightBtnPathMyxxnr,showRightBtn
+        getHuafeiRowsViewCars,hideBackBtn,showBackBtn,changeRightBtnMyXXNR,changeRightBtnPathMyxxnr,showRightBtn,editTitle
       }
     },
     components: {
@@ -29,6 +29,7 @@
         this.changeRightBtnPathMyxxnr();
         this.showBackBtn();
         this.showRightBtn();
+        this.editTitle('化肥专场');
       }
     },
     created () {

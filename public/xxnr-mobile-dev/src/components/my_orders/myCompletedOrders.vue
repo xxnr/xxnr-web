@@ -9,60 +9,80 @@
 <script>
   import ordersList from '../ordersList.vue'
   import Scroller from '../../xxnr_mobile_ui/xxnrScroller.vue'
+  import xxnrAlert from '../../xxnr_mobile_ui/xxnrAlert.vue'
   import api from '../../api/remoteHttpApi'
   import {scrollerHandler} from "./scrollerHandler"
-  import xxnrAlert from '../../xxnr_mobile_ui/xxnrAlert.vue'
+  import {checkOtherPlaceLogin} from '../../utils/authService'
 
   export default{
     data(){
-      return{
-        typeValue:4,
-        currentPage:1,
-        orders:[],
-        end:false,
-      }
-    },
-    components:{
-      ordersList,
+    return{
+      typeValue:4,
+      currentPage:1,
+      orders:[],
+      end:false,
+    }
+  },
+  components:{
+    ordersList,
       Scroller,
       xxnrAlert
-    },
-    methods:{
-      loadMoreOrders:scrollerHandler,
+  },
+  methods:{
+    loadMoreOrders:scrollerHandler,
       getOrders:function(pageNum){
-        api.getOrdersList(
-          {'typeValue':this.typeValue,'page':pageNum},
-          response => {
-          if(response.data.code==1401){
-            this.alertShow= true;
-            this.alertMessage = "你已在其他地方登录,请重新登录"
-          }
-          if(pageNum<=response.data.pages){
-          //              console.log(response);
-          if(pageNum==response.data.pages){
-            this.end = true;
-          }
-          this.orders = this.orders.concat(response.data.items);
-          this.$broadcast('resetHeightScrollTop',false);
+      console.log('order');
+      api.getOrdersList(
+        {'typeValue':this.typeValue,'page':pageNum},
+        response => {
+        checkOtherPlaceLogin(response,this);
+
+      if(pageNum<=response.data.pages){
+        //console.log(response);
+        if(pageNum==response.data.pages){
+          this.end = true;
         }
-      }, response => {
-          console.log(response);
-        })
-      },
-    },
-    created(){
-//      this.getOrders(this.currentPage);
-    },
-    route: {
-      activate(){
-        this.currentPage = 1,
+        var orderData = response.data.items;
+        for(let i = 0; i < orderData.length;i++) {
+          if(orderData[i].order.orderStatus.type == 4) {
+            orderData[i].isShowC = false;
+            for(let j =0; j < orderData[i].SKUs.length; j++) {
+              if(orderData[i].SKUs[j].deliverStatus == 2) {
+                orderData[i].isShowC = true;
+                break;
+              }
+            }
+          } else if(orderData[i].order.orderStatus.type == 5) {
+            orderData[i].isShowD = false;
+            for(let j =0; j < orderData[i].SKUs.length; j++) {
+              if(orderData[i].SKUs[j].deliverStatus == 4) {
+                orderData[i].isShowD = true;
+                break;
+              }
+            }
+          }
+        }
+        this.orders = this.orders.concat(orderData);
+        this.$broadcast('resetHeightScrollTop');
+      }
+    }, response => {
+      console.log(response);
+    })
+  }
+  },
+  created(){
+  },
+  route: {
+    activate(){
+      this.currentPage = 1,
         this.orders = [],
         this.end = false,
         this.getOrders(this.currentPage);
-        this.$parent.selectedTab = this.typeValue;
-        this.$broadcast('resetHeightScrollTop',true);
-      }
+      console.log(this.typeValue);
+      this.$parent.selectedTab = this.typeValue;
+      this.$broadcast('resetHeightScrollTop',true);
     }
+  }
   }
 </script>
 

@@ -6,9 +6,9 @@
     </div>
     <div class="register-input code-input">
       <img src="/assets/images/my_xxnr_sms.png" alt="">
-      <input v-model="code" type="text" placeholder="请输入验证码">
+      <input v-model="code" type="text" placeholder="请输入验证码" style="width: 170px;">
       <button :disabled="forbidSendCode" @click="sendRegisterCode(phoneNum),showToast()"  class="send-code">
-        获取验证码
+        发送验证码
       </button>
     </div>
     <div class="register-input pass-input">
@@ -20,11 +20,15 @@
       <input v-model="confirmPassword" type="password" placeholder="请输入您的确认密码">
     </div>
     <div class="user-agreement clearfix">
-      <input v-model="policyChecked" type="checkbox"><span>我已阅读并同意《新新农人用户协议》</span>
+      <input v-model="policyChecked" type="checkbox">
+      <div class="register-checkbox" :class="{checked:policyChecked}"></div>我已阅读并同意<span class="register-green"><a href="" v-link="{ path: '/userAgreement'}">《新新农人用户协议》</a></span>
     </div>
-    <button class="register-btn" @click="register(phoneNum,password,code)">
+    <button class="register-btn" @click="register(phoneNum,password,code,confirmPassword,policyChecked)">
       注册
     </button>
+  </div>
+  <div class="reg-section">
+    已有账号？<a href="" v-link="{ path: '/login'}" class="reg-section-green">登录</a>
   </div>
   <div v-show="toastMsg.length>0">
     <xxnr-toast :show.sync="toastShow" >
@@ -77,23 +81,50 @@
 </script>
 
 <style scoped>
+  .register-checkbox {
+    position: absolute;
+    left: 0;
+    top: 3px;
+    width: 12px;
+    height: 12px;
+    background: url('../../../static/assets/images/register_checkbox.png') 0 0 no-repeat;
+  }
+
+  .register-checkbox.checked {
+    background-position: 0 -12px;
+  }
+
+  .user-agreement input[type=checkbox] {
+    position: absolute;
+    opacity: 0;
+    left: 0;
+    top: 3px;
+  }
+
   .register-section{
-    padding: 80px 40px;
+    width: 250px;
+    margin: 0 auto;
+    margin-top: 50px;
   }
   .register-input{
     height: 40px;
     line-height: 40px;
-    border-bottom: 1px solid #c0c0c0;
     margin-bottom: 10px;
+    position: relative;
   }
   .register-input input{
-    padding-left: 25px;
+    padding-left: 30px;
     font-size: 14px;
+    border-bottom: 1px solid #c0c0c0;
+    width: 100%;
+    line-height: 14px;
+    padding-bottom: 6px;
+    box-sizing: border-box;
   }
   .register-input img{
-    height: 22px;
-    width: 20px;
-    margin-top: 10px;
+    width: 18px;
+    position: absolute;
+    bottom: 8px;
   }
   .register-btn{
     margin-top: 50px;
@@ -109,14 +140,8 @@
   }
   .user-agreement{
     font-size: 12px;
-  }
-  .user-agreement input{
-    float: left;
-    margin-top: 5px;
-  }
-  .user-agreement span{
-    float: left;
-    margin-top: 2px;
+    position: relative;
+    padding-left: 15px;
   }
   .code-input{
     position: relative;
@@ -131,6 +156,12 @@
     position: absolute;
     right: 0px;
     top:12px;
-    padding: 0 3px;
+    padding: 3px;
+    outline: none;
+    font-family: "微软雅黑";
+  }
+
+  .register-green a{
+    color: #00b38a;
   }
 </style>

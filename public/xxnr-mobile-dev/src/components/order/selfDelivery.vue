@@ -51,12 +51,15 @@
           {{item.productName}}
         </div>
         <div class="self-delivery-product-sku">
-      <span v-if="item.attributes" v-for="attribute in item.attributes">
-        {{attribute.name}}：{{attribute.value}}；
-      </span>
-      <span v-if="item.additions" v-for="addition in item.additions">
-        附加项目：{{addition.name}}：{{addition.value}}；
-      </span>
+          <span v-if="item.attributes" v-for="attribute in item.attributes">
+            {{attribute.name}}：{{attribute.value}}；
+          </span>
+        </div>
+        <div class="self-delivery-product-sku" v-if="item.additions">
+          附加项目：
+          <span v-for="addition in item.additions">
+            {{addition.name}};
+          </span>
         </div>
         <div class="self-delivery-product-count">x{{item.count}}</div>
       </div>
@@ -64,7 +67,7 @@
   </div>
 </template>
 <script>
-  import { selfDelivery } from '../../vuex/actions'
+  import { selfDelivery,editTitle,showBackBtn } from '../../vuex/actions'
 
   export default {
     vuex: {
@@ -74,12 +77,14 @@
         RSCInfo: state => state.order.orderInfo.rows.RSCInfo
       },
       actions: {
-        selfDelivery
+        selfDelivery,editTitle,showBackBtn
       }
     },
     route: {
       activate(transition) {
         this.selfDelivery();
+        this.editTitle('网点自提');
+        this.showBackBtn();
         transition.next();
       }
     }

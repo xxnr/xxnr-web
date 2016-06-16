@@ -15,7 +15,7 @@
       确认登录
     </button>
     <div class="reg-section">
-      还没有帐号？<a href="" v-link="{ path: '/register'}" >立即注册</a>
+      还没有帐号？<a href="" v-link="{ path: '/register'}" class="reg-section-green">立即注册</a>
     </div>
   </div>
   <div v-show="toastMsg.length>0">
@@ -102,5 +102,9 @@
   .reg-section{
     margin-top: 30px;
     text-align: center;
+  }
+
+  .reg-section-green {
+    color: #00B38A;
   }
 </style>

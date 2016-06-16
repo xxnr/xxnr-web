@@ -14,7 +14,7 @@
 
 <script>
   import popBox from '../popBox.vue'
-  import { showBackBtn, changeRightBtnMyXXNR,hideRightBtn } from '../../vuex/actions'
+  import { showBackBtn, changeRightBtnMyXXNR,hideRightBtn,editTitle } from '../../vuex/actions'
 
   export default {
     data: function () {
@@ -34,7 +34,8 @@
       actions:{
         hideRightBtn,
         showBackBtn,
-        changeRightBtnMyXXNR
+        changeRightBtnMyXXNR,
+        editTitle
       }
     },
 
@@ -46,6 +47,7 @@
         this.hideRightBtn();
         this.showBackBtn();
         this.selectedTab = 0;
+        this.editTitle('我的订单');
       }
     }
   }

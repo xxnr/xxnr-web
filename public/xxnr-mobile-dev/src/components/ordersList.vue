@@ -34,6 +34,8 @@
       </template>
       <div class="action-box">
         <div class="action-wor" v-if="order.order.orderStatus.type == 3">待发货</div>
+        <div class="action-wor" v-if="order.order.orderStatus.type == 0">已关闭</div>
+        <div class="action-wor" v-if="order.order.orderStatus.type == 6">已完成</div>
         <input type="button" v-if="order.order.orderStatus.type == 1 || order.order.orderStatus.type == 2" class="action-btn" value="去付款" @click="payOrder(order.id);">
         <input type="button" v-if="order.order.orderStatus.type == 4 && order.isShowC" class="action-btn" value="确认收货" @click="getOrderDetailById(order.id);">
         <input type="button" v-if="order.order.orderStatus.type == 5 && order.isShowD" class="action-btn" value="去自提" @click="selfDelivery(order.id);">
@@ -60,7 +62,6 @@
   },
   methods: {
     payOrder: function (id) {
-      console.log(id);
       window.location.href = '/#!/offlinePay?id=' + id;
     },
     selfDelivery: function (id) {

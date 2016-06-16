@@ -63,7 +63,8 @@
     changeRightBtnPathHome,
     getCookieUser,
     getUserInfo,
-    logout
+    logout,
+    editTitle
   } from '../../vuex/actions'
 
   export default {
@@ -80,7 +81,8 @@
         changeRightBtnPathHome,
         getCookieUser,
         getUserInfo,
-        logout
+        logout,
+        editTitle
       }
     },
     components: {
@@ -92,6 +94,7 @@
         this.changeRightBtnHome();
         this.changeRightBtnPathHome();
         this.showRightBtn();
+        this.editTitle('我的新农人');
       }
     },
     created () {

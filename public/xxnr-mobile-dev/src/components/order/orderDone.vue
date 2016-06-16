@@ -11,32 +11,42 @@
   <div class="order-done-block gray">
     服务网点
   </div>
-  <div class="order-done-line">
-    <div class="order-done-attr">
-      网点名称
+  <div v-if="orderInfo.rows.RSCInfo">
+    <div class="order-done-line">
+      <div class="order-done-attr">
+        网点名称
+      </div>
+      <div class="order-done-value">
+        {{orderInfo.rows.RSCInfo.companyName}}
+      </div>
+      <div class="clear"></div>
     </div>
-    <div class="order-done-value">
-      {{orderInfo.rows.RSCInfo.companyName}}
+    <div class="order-done-line">
+      <div class="order-done-attr">
+        地址
+      </div>
+      <div class="order-done-value">
+        {{orderInfo.rows.RSCInfo.RSCAddress}}
+      </div>
+      <div class="clear"></div>
     </div>
-    <div class="clear"></div>
+    <div class="order-done-line">
+      <div class="order-done-attr">
+        电话
+      </div>
+      <div class="order-done-value">
+        {{orderInfo.rows.RSCInfo.RSCPhone}}
+      </div>
+      <div class="clear"></div>
+    </div>
   </div>
-  <div class="order-done-line">
-    <div class="order-done-attr">
-      地址
+  <div v-else>
+    <div class="no-rsc-img">
+      <img src="../../../static/assets/images/no_RSC.png">
     </div>
-    <div class="order-done-value">
-      {{orderInfo.rows.RSCInfo.RSCAddress}}
+    <div class="no-rsc-wor">
+      小新正在为您匹配最近的网点，请稍后从我的订单查看
     </div>
-    <div class="clear"></div>
-  </div>
-  <div class="order-done-line">
-    <div class="order-done-attr">
-      电话
-    </div>
-    <div class="order-done-value">
-      {{orderInfo.rows.RSCInfo.RSCPhone}}
-    </div>
-    <div class="clear"></div>
   </div>
   <div class="order-done-block gray margin-top-10">付款方式</div>
   <div class="order-done-block">现金</div>
@@ -44,7 +54,7 @@
 </template>
 
 <script>
-  import { getOrderDetail } from '../../vuex/actions'
+  import { getOrderDetail, editTitle, showBackBtn, setRightButtonText, showRightBtn, hideRightBtn } from '../../vuex/actions'
 
   export default {
     vuex: {
@@ -52,12 +62,25 @@
         orderInfo: state => state.order.orderInfo
     },
     actions: {
-      getOrderDetail
+      getOrderDetail,
+      editTitle,
+      showBackBtn,
+      setRightButtonText,
+      showRightBtn,
+      hideRightBtn
     }
+  },
+  detached(){
+    this.hideRightBtn();
+    this.setRightButtonText('','');
   },
   route: {
     activate(transition) {
       this.getOrderDetail();
+      this.showBackBtn();
+      this.setRightButtonText('查看订单', 'my_orders/myAllOrders');
+      this.showRightBtn();
+      this.editTitle('线下支付');
       transition.next();
     }
   }
@@ -143,5 +166,23 @@
     top: 20px;
   }
 
+  .no-rsc-wor {
+    font-size: 12px;
+    text-align: center;
+    color: #909090;
+    background-color: #fff;
+    padding-bottom: 23px;
+    border-bottom: 1px solid #e7e7e7;
+  }
+
+  .no-rsc-img {
+    background-color: #fff;
+    text-align: center;
+  }
+
+  .no-rsc-img img {
+    width: 63px;
+    padding: 28px 0 29px;
+  }
 
 </style>
