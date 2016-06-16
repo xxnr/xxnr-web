@@ -151,7 +151,6 @@ router.get('/api/v2.1/user/getNominatedInviter', middleware.isLoggedIn_middlewar
 router.get('/api/v2.2/user/queryConsignees', middleware.isLoggedIn_middleware, controllers.User.json_userconsignees_query);
 router.get('/api/v2.2/user/saveConsignees', middleware.isLoggedIn_middleware, controllers.User.process_userconsignees_save);
 router.post('/api/v2.2/user/saveConsignees', middleware.isLoggedIn_middleware, controllers.User.process_userconsignees_save);
-
 router.get('/api/v2.2/getOfflinePayType', controllers.Pay.json_offline_pay_type);
 
 // potential customer/intention products related APIs

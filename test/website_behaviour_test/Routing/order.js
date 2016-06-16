@@ -14,3 +14,33 @@ exports.add_order = function(cartId, addressId, SKUs, token, done){
             done(res.body);
         })
 };
+
+exports.web_query_order = function(token, type, done){
+    request(app)
+        .get('/api/v2.0/order/getOderList')
+        .query({token:token, type:type})
+        .end(function(err, res){
+            should.not.exist(err);
+            done(res.body);
+        })
+};
+
+exports.app_query_order = function(token, type, done){
+    request(app)
+        .get('/api/v2.0/order/getAppOrderList')
+        .query({token:token, type:type})
+        .end(function(err, res){
+            should.not.exist(err);
+            done(res.body);
+        })
+};
+
+exports.get_order_detail = function(token, orderId, done){
+    request(app)
+        .get('/api/v2.0/order/getOrderDetails')
+        .query({token:token, orderId:orderId})
+        .end(function(err, res){
+            should.not.exist(err);
+            done(res.body);
+        })
+};

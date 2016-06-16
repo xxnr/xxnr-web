@@ -30,7 +30,7 @@ module.exports = function(done) {
                         return;
                     }
 
-                    console.log(name, 'saved');
+                    //console.log(name, 'saved');
                     resolve();
                 });
             });

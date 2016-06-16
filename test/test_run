@@ -1,5 +1,6 @@
 # require mocha and istanbul installed in global
 # linux
-istanbul cover _mocha website_behaviour --config coverage.yml
+istanbul cover --root ../ _mocha website_behaviour_test -x **/common/utils** -x **/modules/database/**
 # windows
-istanbul cover %npm_global%\node_modules\mocha\bin\_mocha website_behaviour_test --config coverage.yml
+istanbul cover --root ../ %npm_global%\node_modules\moch\bin\_mocha website_behaviour_test -x **/common/utils** -x **/modules/database/**
+

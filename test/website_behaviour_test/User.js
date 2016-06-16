@@ -299,7 +299,7 @@ describe('User', function() {
         })
     });
 
-    describe('agent', function() {
+    describe('XXNR agent', function() {
         var XXNRAgent_token;
         var XXNRAgent_img;
         var potential_customer = test_data.potential_customer;
@@ -344,7 +344,7 @@ describe('User', function() {
         before('create product and SKU', function(done){
             ProductModel.findOne({id:test_data.test_product.id}).remove(function(err) {
                 should.not.exist(err);
-                Routing.Product.query_brands(backend_admin_token, function(body){
+                Routing.Product.query_brands(test_data.test_SKU.category, backend_admin_token, function(body){
                     var brand_id = body.brands[0]._id;
                     Routing.Product.save_product(utils.extend(test_data.test_product, {brand:brand_id}), backend_admin_token, function (body) {
                         body.should.have.property('code', 1000);
@@ -369,14 +369,10 @@ describe('User', function() {
             })
         });
 
-        after('delete product', function(done){
-            ProductModel.findOne({id:test_data.test_product.id}).remove(done);
-        });
-
-        beforeEach('delete potential customer', function (done) {
-            PotentialCustomerModel.findOne({phone: potential_customer.phone}).remove(function (err) {
+        after('delete product and SKU', function(done){
+            ProductModel.findOne({id:test_data.test_product.id}).remove(function(err){
                 should.not.exist(err);
-                UserModel.findOne({account: potential_customer.phone}).remove(done);
+                SKUModel.findOne({}).remove(done);
             });
         });
 
@@ -385,6 +381,13 @@ describe('User', function() {
         });
 
         after('delete potential customer', function (done) {
+            PotentialCustomerModel.findOne({phone: potential_customer.phone}).remove(function (err) {
+                should.not.exist(err);
+                UserModel.findOne({account: potential_customer.phone}).remove(done);
+            });
+        });
+
+        beforeEach('delete potential customer', function (done) {
             PotentialCustomerModel.findOne({phone: potential_customer.phone}).remove(function (err) {
                 should.not.exist(err);
                 UserModel.findOne({account: potential_customer.phone}).remove(done);
@@ -460,6 +463,38 @@ describe('User', function() {
         });
 
         it('potential customer registered and binded', function (done) {
+            var expected_nominated_inviter = {
+                code: 1000,
+                nominated_inviter: {
+                    phone: test_user.account,
+                    name: test_user.name
+                }
+            };
+            var expected_potential_customer_after_registered = {
+                code:1000,
+                potentialCustomer:{
+                    isRegistered:true
+                }
+            };
+            var expected_inviter_after_binded = {
+                code:'1000',
+                datas: {
+                    inviterPhone: test_user.account,
+                    inviterName: test_user.name,
+                    inviterPhoto: XXNRAgent_img
+                }
+            };
+            var expected_invitee_list_after_binded = {
+                code: 1000,
+                invitee: [{
+                    account: potential_customer.phone,
+                    name:potential_customer.name,
+                    newOrdersNumber: 0
+                }],
+                total: 1,
+                page: 1,
+                pages: 1
+            };
             Routing.User.add_potential_customer(utils.extend(potential_customer, {
                 address: {
                     province: test_address.province._id,
@@ -476,39 +511,16 @@ describe('User', function() {
                             Routing.User.query_potential_customers(XXNRAgent_token, function (body) {
                                 var potential_customer_id = body.potentialCustomers[0]._id;
                                 Routing.User.get_potential_customer(XXNRAgent_token, potential_customer_id, function (body) {
-                                    body.potentialCustomer.should.have.property('isRegistered', true);
+                                    body.should.containDeep(expected_potential_customer_after_registered);
                                     body.potentialCustomer.should.have.property('dateTimeRegistered');
                                     Routing.User.get_nominated_inviter(potential_customer_token, function (body) {
-                                        body.should.have.properties({
-                                            code: 1000,
-                                            nominated_inviter: {
-                                                phone: test_user.account,
-                                                name: test_user.name
-                                            }
-                                        });
+                                        body.should.have.properties(expected_nominated_inviter);
                                         Routing.User.bind_inviter(potential_customer_token, test_user.account, function (body) {
                                             body.should.have.property('code', 1000);
                                             Routing.User.get_inviter(potential_customer_token, function (body) {
-                                                body.should.containDeep({
-                                                    code: '1000',
-                                                    datas: {
-                                                        inviterPhone: test_user.account,
-                                                        inviterName: test_user.name,
-                                                        inviterPhoto: XXNRAgent_img
-                                                    }
-                                                });
+                                                body.should.containDeep(expected_inviter_after_binded);
                                                 Routing.User.query_invitee(XXNRAgent_token, function (body) {
-                                                    body.should.containDeep({
-                                                        code: 1000,
-                                                        invitee: [{
-                                                            account: potential_customer.phone,
-                                                            name:potential_customer.name,
-                                                            newOrdersNumber: 0
-                                                        }],
-                                                        total: 1,
-                                                        page: 1,
-                                                        pages: 1
-                                                    });
+                                                    body.should.containDeep(expected_invitee_list_after_binded);
                                                     done();
                                                 })
                                             })

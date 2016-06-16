@@ -339,7 +339,7 @@ SKUService.prototype.addSKUAttribute = function(category, brand, name, value, or
         var newSKUAttribute = new SKUAttributeModel(model);
         newSKUAttribute.save(function (err) {
             if (err) {
-                console.error(err);
+                //console.error(err);
                 callback(err);
                 return;
             }

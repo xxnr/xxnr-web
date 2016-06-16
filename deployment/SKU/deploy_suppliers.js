@@ -28,7 +28,7 @@ module.exports = function(callback) {
                 newSupplier.save(function(err){
                     if(err){
                         if(11000 == err.code){
-                            console.log('supplier', supplierName, 'already exist');
+                            //console.log('supplier', supplierName, 'already exist');
                             resolve();
                             return;
                         } else {
@@ -38,7 +38,7 @@ module.exports = function(callback) {
                         }
                     }
 
-                    console.log('supplier', supplierName, 'added');
+                    //console.log('supplier', supplierName, 'added');
                     resolve();
                 });
             });
@@ -46,7 +46,7 @@ module.exports = function(callback) {
 
         Promise.all(promises)
             .then(function(){
-                console.log('Deploy suppliers success!!!!!!!!!!!');
+                //console.log('Deploy suppliers success!!!!!!!!!!!');
                 callback();
             })
             .catch(function(err){

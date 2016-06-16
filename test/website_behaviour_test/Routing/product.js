@@ -41,10 +41,10 @@ exports.create_SKU = function(SKU, token, done){
         })
 };
 
-exports.query_brands = function(token, done){
+exports.query_brands = function(category, token, done){
     request(app)
         .get(config.manager_url + '/api/brands')
-        .query({token:token})
+        .query({category:category, token:token})
         .end(function(err, res){
             should.not.exist(err);
             done(res.body);
@@ -81,10 +81,11 @@ exports.online_product = function(product_id, online, token, done){
         })
 };
 
-exports.query_products = function(classId, brand, reservePrice, sort, attributes, done){
+exports.query_products = function(classId, brands, reservePrice, sort, attributes, done){
+    var brandStr = build_brand_string(brands);
     request(app)
-        .get('/api/v2.1/product/getProductsListPage')
-        .query({classId:classId, brand:brand, reservePrice:reservePrice, sort:sort, attributes:attributes})
+        .post('/api/v2.1/product/getProductsListPage')
+        .send({classId:classId, brand:brandStr, reservePrice:reservePrice, sort:sort, attributes:attributes})
         .end(function(err, res){
             should.not.exist(err);
             done(res.body);
@@ -112,3 +113,66 @@ exports.app_get_product = function(id, done){
             done(res.body);
         })
 };
+
+exports.query_category_list = function(done){
+    request(app)
+        .get('/api/v2.0/products/categories')
+        .end(function(err, res){
+            should.not.exist(err);
+            done(res.body);
+        })
+};
+
+exports.query_product_attributes = function(category, brands, name, done){
+    var brandStr = build_brand_string(brands);
+    request(app)
+        .get('/api/v2.1/products/attributes')
+        .query({category:category, brand:brandStr, name:name})
+        .end(function(err, res){
+            should.not.exist(err);
+            done(res.body);
+        })
+};
+
+exports.backend_query_product_attributes = function(category, brands, name, token, done){
+    var brandStr = build_brand_string(brands);
+    request(app)
+        .get(config.manager_url + '/api/products/attributes')
+        .query({category:category, brand:brandStr, name:name, token:token})
+        .end(function(err, res){
+            should.not.exist(err);
+            done(res.body);
+        })
+};
+
+exports.query_old_banner = function(done){
+    request(app)
+        .get('/app/ad/getAdList')
+        .end(function(err, res){
+            should.not.exist(err);
+            done(res.body);
+        })
+};
+
+exports.query_SKU_attributes_and_price = function(product_id, attributes, done){
+    request(app)
+        .post('/api/v2.1/SKU/attributes_and_price/query')
+        .send({product:product_id, attributes:attributes})
+        .end(function(err, res){
+            should.not.exist(err);
+            done(res.body);
+        })
+};
+
+function build_brand_string(brands){
+    if(!brands){
+        return null;
+    }
+
+    var brandStr = '';
+    brands.forEach(function(brand){
+        brandStr += ',' + brand;
+    });
+
+    return brandStr.substr(1, brandStr.length-1);
+}

@@ -19,7 +19,46 @@ module.exports = {
         price:999999999,
         deposit:1,
         description:'测试商品描述',
-        body:'<p>&nbsp;测试商品详情。</p>'
+        body:'<p>&nbsp;测试商品详情。<img src="test.jpg"></p>',
+        standard:'<p>test standard</p>',
+        support:'<p>test support</p>',
+        app_body:'<p>&nbsp;测试app商品详情。<img src="test.jpg"></p>',
+        app_standard:'<p>test app standard</p>',
+        app_support:'<p>test app support</p>'
+    },
+    huafei : function(index){
+        return {
+            id:'testproductwithoutavalidid'+ index,
+            category:'化肥',
+            name:'测试商品'+ index,
+            istop:true,
+            price:999999999,
+            deposit:1,
+            description:'测试商品描述'+ index,
+            body:'<p>&nbsp;测试商品详情。<img src="test.jpg"></p>',
+            standard:'<p>test standard</p>',
+            support:'<p>test support</p>',
+            app_body:'<p>&nbsp;测试app商品详情。<img src="test.jpg"></p>',
+            app_standard:'<p>test app standard</p>',
+            app_support:'<p>test app support</p>'
+        }
+    },
+    car : function(index){
+        return {
+            id:'testproductwithoutavalidid'+ index,
+            category:'汽车',
+            name:'测试商品'+ index,
+            istop:true,
+            price:999999999,
+            deposit:1,
+            description:'测试商品描述'+ index,
+            body:'<p>&nbsp;测试商品详情。<img src="test.jpg"></p>',
+            standard:'<p>test standard</p>',
+            support:'<p>test support</p>',
+            app_body:'<p>&nbsp;测试app商品详情。<img src="test.jpg"></p>',
+            app_standard:'<p>test app standard</p>',
+            app_support:'<p>test app support</p>'
+        }
     },
     test_SKU:{
         name:'test_sku',
@@ -84,5 +123,13 @@ module.exports = {
             receiptPhone:'13811111111',
             receiptPeople:'test_potential_customer_receipt_name'
         }
+    },
+    test_news:{
+        id:'testnewsid',
+        picture:'testimg',
+        category:'测试资讯分类',
+        title:'测试资讯标题',
+        newsbody:'<p>abcdefg测试资讯body</p>',
+        abstract:'测试资讯摘要'
     }
 };

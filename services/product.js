@@ -471,7 +471,7 @@ ProductService.prototype.addAttribute = function(category, brand, name, value, o
         var productAttribute = new ProductAttributeModel(model);
         productAttribute.save(function(err){
             if(err){
-                console.error(err);
+                //console.error(err);
                 callback(err);
                 return;
             }

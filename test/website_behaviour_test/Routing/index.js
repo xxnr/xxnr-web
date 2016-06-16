@@ -6,11 +6,18 @@ var request = require('supertest');
 var app = require('../../../release');
 var should = require('should');
 
+if(config.environment != 'sandbox'){
+    console.error('Must run in sand box, because these tests will clear current database');
+    process.exit(1);
+}
+
 exports.User = require('./user');
 exports.Address = require('./address');
 exports.Product = require('./product');
 exports.Cart = require('./cart');
 exports.Order = require('./order');
+exports.News = require('./news');
+exports.RSC = require('./RSC');
 
 exports.backend_upload_photo = function(token, imgPath, done){
     request(app)

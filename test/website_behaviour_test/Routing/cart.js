@@ -14,3 +14,14 @@ exports.add_to_cart = function(SKU_id, count, token, update_by_add, done){
             done(res.body);
         })
 };
+
+exports.get_cart = function(token, done){
+    request(app)
+        .get('/api/v2.1/cart/getShoppingCart')
+        .query({token:token})
+        .end(function(err, res){
+            should.not.exist(err);
+            done(res.body);
+        })
+};
+
