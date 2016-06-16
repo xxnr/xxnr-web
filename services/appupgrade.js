@@ -93,14 +93,18 @@ AppUpgradeService.prototype.isNeedPush = function (callback) {
 // saveAndUpdate DeviceTokenVersion
 AppUpgradeService.prototype.saveAndUpdate = function (options, callback) {
 
-    AppUpgrade.findOne({device_token: options.device_token}, function (err, doc) {
+    AppUpgrade.findOne({device_id: options.device_id}, function (err, doc) {
         if (err) {
             callback(err);
             return
         }
         if (doc) {
-            var query = {device_token: options.device_token};
-            AppUpgrade.update(query, {version: options.version, date_update: new Date()}, options, function (err) {
+            var query = {device_id: options.device_id};
+            AppUpgrade.update(query, {
+                device_token: options.device_token,
+                version: options.version,
+                date_update: new Date()
+            }, options, function (err) {
                 if (err) {
                     callback(err);
                 }
