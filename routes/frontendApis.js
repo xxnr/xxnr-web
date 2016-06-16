@@ -5,28 +5,7 @@ var express = require('express');
 var router = express.Router();
 var controllers = require('../controllers');
 var path = require('path');
-
 var middleware = require('../middlewares/authentication');
-
-// front end page
-router.get('/', function(req, res){
-    res.sendFile(path.join(__dirname, './public/xxnr/index.html'));
-});
-router.get('/home', function(req, res){
-    res.redirect('/');
-});
-router.get('/header', function(req, res){res.sendFile(path.join(__dirname, './public/xxnr/header.html'));});
-router.get('/footer', function(req, res){res.sendFile(path.join(__dirname, './public/xxnr/footer.html'));});
-router.get('/images/:type(small|large|original|thumbnail)/:filename.jpg', controllers.Default.file_image);
-router.get('/images/:type(small|large|original|thumbnail)/:category/:filename.jpg', controllers.Default.file_image);
-
-// view render pages
-
-
-//// app related pages
-router.get('/product/:productInfo/:productId/',controllers.Api_v1_0.view_product_info);
-router.get('/news/:id/',controllers.News.view_news_detail);
-router.get('/sharenews/:id/',controllers.News.view_newsshare_detail);
 
 // area address APIs
 router.get('/api/v2.0/area/getAreaList', controllers.Area.json_province_query);
