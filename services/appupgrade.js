@@ -38,13 +38,16 @@ AppUpgradeService.prototype.isNeedPush = function (callback) {
                     if (result && JSON.parse(result).ret == 'SUCCESS') {
                         if (device_tokens) {
                             var device_token_List = device_tokens.split(',');
-                            AppUpgrade.update({'device_token': {$in: device_token_List}}, {'date_update': new Date()}, function (err) {
-                                if (err) {
-                                    callback(err);
-                                    console.error("AppUpgradeService isNeedPush update_callback update err:", err);
-                                }
-                                callback(null, result);
-                            })
+                            AppUpgrade.update({'device_token': {$in: device_token_List}}
+                                , {$set: {'date_update': new Date()}}
+                                , {multi: true}
+                                , function (err) {
+                                    if (err) {
+                                        callback(err);
+                                        console.error("AppUpgradeService isNeedPush update_callback update err:", err);
+                                    }
+                                    callback(null, result);
+                                })
                         }
                     }
                 } catch (e) {
