@@ -8,6 +8,7 @@ var UserModel = require('../models').user;
 var LoyaltyPointsLogsModel = require('../models').loyaltypointslogs;
 var RewardshopGiftCategoryModel = require('../models').rewardshopgiftcategory;
 var RewardshopGiftModel = require('../models').rewardshopgift;
+var moment = require('moment-timezone');
 
 // Service
 LoyaltyPointsService = function() {};
@@ -336,7 +337,7 @@ LoyaltyPointsService.prototype.getRewardshopGift = function(id, _id, name, callb
  * @param  {Function} callback    the callback function
  * @return
  */
-LoyaltyPointsService.prototype.increase = function(user_id, points, type, description, ref_id, callback) {
+LoyaltyPointsService.prototype.increase = function(user_id, points, type, description, ref_id, callback, user) {
 	var self = this;
 	if (!user_id) {
         callback('user required');
@@ -348,7 +349,32 @@ LoyaltyPointsService.prototype.increase = function(user_id, points, type, descri
         return;
     }
 
-    UserModel.update({_id:user_id}, {$inc:{score: parseInt(points)}}, function(err, numAffected) {
+    var values = {};
+    // user sign points logic
+    if (type && type =='SIGN') {
+    	var beijingTimeNow = moment().tz('Asia/Shanghai');
+    	var consecutiveTimes = 1;
+    	var maxTimes = 5;
+    	var sign = {date:beijingTimeNow.format('YYYY-MM-DD HH:mm:ss')};
+    	if (user && user.sign && user.sign.date) {
+			var nowDate = moment(beijingTimeNow).add(-1, 'd').format('YYYY-MM-DD');
+			if (nowDate == moment(user.sign.date).format('YYYY-MM-DD') && user.sign.consecutiveTimes) {
+				consecutiveTimes = user.sign.consecutiveTimes + 1;
+			}
+    	}
+    	sign.consecutiveTimes = consecutiveTimes;
+    	if (consecutiveTimes > 0) {
+    		if (consecutiveTimes < maxTimes) {
+				points = points * consecutiveTimes;
+			} else {
+				points = points * maxTimes;
+			}
+		}
+		values.$set = {sign:sign};
+    }
+    values.$inc = {score: parseInt(points)};
+
+    UserModel.update({_id:user_id}, values, function(err, numAffected) {
         if (err) {
             console.error('LoyaltyPointsService increase UserModel update err:', err);
             callback('points increase error');
@@ -360,7 +386,7 @@ LoyaltyPointsService.prototype.increase = function(user_id, points, type, descri
             return;
         }
 
-        callback();
+        callback(null, points);
         self.saveLog(user_id, points, type, description, ref_id);
     });
 };

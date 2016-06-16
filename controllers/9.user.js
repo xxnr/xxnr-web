@@ -1052,7 +1052,7 @@ exports.process_user_sign = function(req, res, next){
                 // UserService.increaseScore({userid:req.data.userId, score: config.user_sign_point_add}, function (err) {
                 var points = config.user_sign_point_add;
                 var description = beijingTimeNow.format('YYYY-MM-DD') + '签到';
-                LoyaltypointService.increase(user._id, points, 'SIGNIN', description, null, function (err) {
+                LoyaltypointService.increase(user._id, points, 'SIGN', description, null, function (err, points) {
                     if (err) {
                         // error happen,
                         // there are 2 cases of error: one is db operation error,
@@ -1068,9 +1068,9 @@ exports.process_user_sign = function(req, res, next){
                             }
                         });
                     } else {
-                        res.respond({code: '1000', message: '签到成功', pointAdded:config.user_sign_point_add});
+                        res.respond({code: '1000', message: '签到成功', pointAdded:points});
                     }
-                }, true)
+                }, user);
             }
         });
     });
