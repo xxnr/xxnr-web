@@ -1,6 +1,7 @@
 /**
  * Created by zhouxin on 2016/06/15.
  */
+var path = require('path');
 var tools = require('../common/tools');
 var moment = require('moment-timezone');
 var services = require('../services');
@@ -103,6 +104,7 @@ exports.json_rewardshop_gifts = function(req, res, next) {
 
 		var resultGifts = [];
 		gifts.forEach(function(gift){
+			delete gift.appbody;
 			resultGifts.push(convertGift(gift));
 		});
 		res.respond({code:1000, message:'success', datas:{gifts:resultGifts, total:count, pages:pageCount, page:page}});
@@ -111,17 +113,21 @@ exports.json_rewardshop_gifts = function(req, res, next) {
 
 // get online gift detail
 exports.json_rewardshop_giftDetail = function(req, res, next) {
+	var host = req.hostname;
+    var prevurl = 'http://' + host + '/gift/';
 	LoyaltypointService.getRewardshopGift(req.data.id, null, null, function(err, gift) {
 		if (err || !gift) {
 			res.respond({code:1002, message:'获取礼品详情失败'});
 			return;
 		}
 
-		var result = gift;
-		if (result) {
-			if (result.category)
-				result.category = result.category.ref;
+		if (gift.appbody && gift.appbody !== '') {
+            gift.appbody_url = prevurl + 'appbody/' + gift.id;
+            delete gift.appbody;
+		} else {
+            gift.appbody_url = '';
 		}
+        
 		res.respond({code:1000, message:'success', gift: convertGift(gift)});
 	});
 }
@@ -149,3 +155,31 @@ function convertGift(gift) {
 	}
 	return gift;
 }
+
+
+// get gift info page
+exports.view_gift_info = function (req, res, next) {
+    var giftInfo = req.params.giftInfo;
+    LoyaltypointService.getRewardshopGift(req.params.giftId, null, null, function(err, gift) {
+        if (err || !gift) {
+            res.status(404).send('404: Page not found');
+            return;
+        }
+        var result = {};
+        if (giftInfo && gift[giftInfo]) {
+            if (giftInfo === "appbody") {
+                result.title = '商品详情' + (gift.name ? (' - ' + gift.name) : '');
+            }
+            result.productInfo = gift[giftInfo];
+        } else {
+            res.status(404).send('404: Page not found');
+            return;
+        }
+
+        res.render(path.join(__dirname, '../views/4.api-v1.0/productInfoAppTemplate'),
+            {
+                result: result
+            }
+        );
+    });
+};
