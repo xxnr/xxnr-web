@@ -99,6 +99,7 @@ exports.vcode = mongoose.model('vcode');
 exports.rewardshopgiftcategory = mongoose.model('rewardshopgiftcategory');
 exports.rewardshopgift = mongoose.model('rewardshopgift');
 exports.loyaltypointslogs = mongoose.model('loyalty_points_logs');
+exports.rewardshopgiftorder = mongoose.model('rewardshopgiftorder');
 // app upgrade
 exports.app_Device_Version = mongoose.model('app_Device_Version');
 

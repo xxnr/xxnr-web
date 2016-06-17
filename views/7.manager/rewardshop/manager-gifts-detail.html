@@ -12,7 +12,7 @@
 	            <h3 class="ui-left">基本信息</h3>
 	        </div>
 	        <div class="col-md-12">
-                <div class="col-md-8" data-component="dropdown" data-component-path="gift.info.category" data-source="gift.categories" data-source-value="_id" data-source-text="name" data-required="true">礼品类目</div>
+                <div class="col-md-8" data-component="dropdown" data-component-path="gift.info.category" data-source="gift.categories" data-source-value="_id" data-source-text="name" data-empty-text="请先选择类目" data-empty="true" data-required="true">礼品类目</div>
                 <div class="col-md-4 m">
                     <div class="ui-textbox-label">新增类目</div>
                     <div class="ui-textbox-with-button">
@@ -140,6 +140,7 @@
             $.components.POST(managerurl+'/api/rewardshop/category/add', {category:value}, function(response) {
                 if (response.code==1000) {
                     gift_refresh_categories();
+                    inputEl.value = '';
                     success();
                 } else {
                     if (response.message) {

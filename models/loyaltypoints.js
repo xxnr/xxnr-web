@@ -1,6 +1,8 @@
 // 用户积分
 var mongoose = require("mongoose");
 var tools = require("../common/tools");
+var DELIVERSTATUS = require('../common/defs').DELIVERSTATUS;
+var DELIVERYTYPE = require('../common/defs').DELIVERYTYPE;
 
 var LoyaltyPointsLogsSchema = new mongoose.Schema({
 	"user": {type: mongoose.Schema.ObjectId, ref: 'user', required: true},	// 用户
@@ -59,3 +61,45 @@ RewardshopGiftSchema.index({'name':1, 'istop':1, 'datecreated':-1});
 RewardshopGiftSchema.index({'istop':1, 'datecreated':-1});
 
 mongoose.model('rewardshopgift', RewardshopGiftSchema);
+
+var RewardshopGiftOrderSchema = new mongoose.Schema({
+	'id': {type: String, required: true, index: true, unique: true},
+	'buyerId': {type: String, required: false},
+	'buyerName': {type: String},
+	'buyerPhone': {type: String, required: false},
+	'consigneeName': {type: String, required: false},
+	'consigneePhone': {type: String, required: false},
+	'consigneeAddress': {type: String, required: false},
+	'deliveryType': {type: Number, default: DELIVERYTYPE.SONGHUO.id},				// 订单的配送方式
+	'RSCInfo': {																	// 订单选择的自提点信息
+		'RSC': {type: mongoose.Schema.ObjectId, ref: 'user'},						// 自提点的reference
+		'companyName': {type: String},												// 自提点公司名
+		'RSCAddress': {type: String},												// 自提点地址
+		'RSCPhone': {type: String}													// 自提点联系电话
+	},
+	'dateCreated': {type: Date, default: Date.now},
+	'gift': {
+		'ref': {type: mongoose.Schema.ObjectId, ref: 'rewardshopgift', required: true},
+		'id': {type: String, required: true, index: true},
+		'name': {type: String, required: true},
+		'category': {type: String, required: false},
+		'thumbnail': {type: String},
+		'points': {type: Number},
+		'marketPrice': {type: Number},
+		'online': {type: Number},
+		'soldout': {type: Number},
+        'dateSet': {type: Date}														// 后台用户设置的日期
+	},
+	'points': {type: Number},
+	'deliverStatus': {type: Number, required: true}, 								// 发货状态 分为未发货、离开服务站、已收货
+	'dateDelivered': {type: Date},													// 订单发货时间，订单中商品全部离开RSC的时间
+	'dateCompleted': {type: Date},													// 订单完成时间
+	'deliveryCode': {type: String}													// 提货码	
+});
+
+RewardshopGiftOrderSchema.index({dateCreated: -1});
+RewardshopGiftOrderSchema.index({buyerId: 1, dateCreated: -1});
+RewardshopGiftOrderSchema.index({deliverStatus: 1, buyerId: 1, dateCreated: -1});
+// RewardshopGiftOrderSchema.index({'RSCInfo.RSC': 1, buyerPhone: 1, consigneePhone: 1, id: 1, dateCreated: -1});
+
+mongoose.model('rewardshopgiftorder', RewardshopGiftOrderSchema);

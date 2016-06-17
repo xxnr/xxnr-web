@@ -8,6 +8,7 @@ var UserModel = require('../models').user;
 var LoyaltyPointsLogsModel = require('../models').loyaltypointslogs;
 var RewardshopGiftCategoryModel = require('../models').rewardshopgiftcategory;
 var RewardshopGiftModel = require('../models').rewardshopgift;
+var RewardshopGiftOrderModel = require('../models').rewardshopgiftorder;
 var moment = require('moment-timezone');
 
 // Service
@@ -83,7 +84,7 @@ LoyaltyPointsService.prototype.queryRewardshopGiftCategories = function(search, 
         query.$or = [{'name':new RegExp(search)}];
     }
     RewardshopGiftCategoryModel.find(query)
-        .sort({datecreated:-1})
+        .sort({datecreated: -1})
         .select('-__v')
         .lean()
         .exec(function(err, docs) {
@@ -128,13 +129,13 @@ LoyaltyPointsService.prototype.createRewardshopGift = function(giftInfo, callbac
 	if (giftInfo.marketPrice) {
 		gift.marketPrice = giftInfo.marketPrice;
 	}
-	if (typeof giftInfo.istop != 'undefinded') {
+	if (typeof giftInfo.istop != 'undefined') {
 		gift.istop = giftInfo.istop;
 	}
-	if (typeof giftInfo.online != 'undefinded') {
+	if (typeof giftInfo.online != 'undefined') {
 		gift.online = giftInfo.online;
 	}
-	if (typeof giftInfo.soldout != 'undefinded') {
+	if (typeof giftInfo.soldout != 'undefined') {
 		gift.soldout = giftInfo.soldout;
 	}
 	if (giftInfo.points) {
@@ -174,50 +175,52 @@ LoyaltyPointsService.prototype.updateRewardshopGift = function(giftInfo, callbac
 		callback('请填写礼品ID');
 		return;
 	}
-	var options = {};
+	var values = {};
 	if (giftInfo.category) {
-		options['category.ref'] = giftInfo.category;
+		values['category.ref'] = giftInfo.category;
 	}
 	if (giftInfo.name) {
-		options.name = giftInfo.name;
+		values.name = giftInfo.name;
 	}
 	if (giftInfo.pictures) {
-		options.pictures = giftInfo.pictures;
+		values.pictures = giftInfo.pictures;
 	}
 	if (giftInfo.appbody) {
-		options.appbody = giftInfo.appbody;
+		values.appbody = giftInfo.appbody;
 	}
 	if (giftInfo.appexchangeProcess) {
-		options.appexchangeProcess = giftInfo.appexchangeProcess;
+		values.appexchangeProcess = giftInfo.appexchangeProcess;
 	}
 	if (giftInfo.appintroduction) {
-		options.appintroduction = giftInfo.appintroduction;
+		values.appintroduction = giftInfo.appintroduction;
 	}
 	if (giftInfo.marketPrice) {
-		options.marketPrice = giftInfo.marketPrice;
+		values.marketPrice = giftInfo.marketPrice;
 	}
-	if (typeof giftInfo.istop != 'undefinded') {
-		options.istop = giftInfo.istop;
+	if (typeof giftInfo.istop != 'undefined') {
+		values.istop = giftInfo.istop;
 	}
-	if (typeof giftInfo.online != 'undefinded') {
-		options.online = giftInfo.online;
+	if (typeof giftInfo.online != 'undefined') {
+		values.online = giftInfo.online;
 	}
-	if (typeof giftInfo.soldout != 'undefinded') {
-		options.soldout = giftInfo.soldout;
+	if (typeof giftInfo.soldout != 'undefined') {
+		values.soldout = giftInfo.soldout;
 	}
 	if (giftInfo.points) {
-		options.points = giftInfo.points;
+		values.points = giftInfo.points;
 	}
 	
-	RewardshopGiftModel.update({_id:giftInfo._id}, {$set: options}, function(err, numAffected) {
-        if (err) {
-        	console.error('LoyaltyPointsService updateRewardshopGift update err:', err, 'options:', options);
-        	callback('LoyaltyPointsService updateRewardshopGift update err');
-        	return;
-        }
-        callback(null, giftInfo);
-        return;
-    });
+    if (!U.isEmpty(values)) {
+    	RewardshopGiftModel.update({_id:giftInfo._id}, {$set: values}, function(err, numAffected) {
+            if (err) {
+            	console.error('LoyaltyPointsService updateRewardshopGift update err:', err, 'values:', options);
+            	callback('LoyaltyPointsService updateRewardshopGift update err');
+            	return;
+            }
+            callback(null, giftInfo);
+            return;
+        });
+    }
 };
 
 // query rewardsshop gifts
@@ -326,6 +329,118 @@ LoyaltyPointsService.prototype.getRewardshopGift = function(id, _id, name, callb
     }
 };
 
+// add gift order
+LoyaltyPointsService.prototype.addGiftOrder = function(addGiftOptions, callback) {
+	var self = this;
+    var orders = {};
+    var addressInfo = null;
+    var RSCInfo = null;
+    var gift = addGiftOptions.gift;
+    if (!addGiftOptions.user) {
+    	callback("用户不存在");
+        return;
+    }
+
+    if (!gift) {
+    	callback("礼品不存在");
+        return;
+    }
+
+    if (!gift.online) {
+    	callback('无法兑换下架礼品');
+        return;
+    }
+
+    if (gift.soldout) {
+    	callback('无法兑换售罄礼品');
+        return;
+    }
+
+    if (!addGiftOptions.user.score || (addGiftOptions.user.score < gift.points)) {
+    	callback('积分不足');
+        return;
+    }
+    // different deliveryType different address
+    if (addGiftOptions.deliveryType && addGiftOptions.deliveryType === DELIVERYTYPE['SONGHUO'].id) {
+    	if (!addGiftOptions.addressInfo) {
+            callback("请先填写收货地址");
+            return;
+        }
+    } else if (addGiftOptions.deliveryType && addGiftOptions.deliveryType === DELIVERYTYPE['ZITI'].id) {
+    	if (!addGiftOptions.consigneeName) {
+            callback("请先填写收货人姓名");
+            return;
+        }
+        if (!addGiftOptions.consigneePhone) {
+            callback("请先填写收货人手机号");
+            return;
+        }
+        if (!addGiftOptions.RSCInfo || !addGiftOptions.RSCId) {
+            callback("请先选择自提点");
+            return;
+        }
+    } else {
+        callback("请先选择正确的配送方式");
+        return;
+    }
+
+    var giftOrder = {
+    	"id":U.GUID(10),
+		"buyerName":addGiftOptions.user.name,
+        "buyerPhone":addGiftOptions.user.account,
+        "buyerId":addGiftOptions.user.id,
+        "deliverStatus":DELIVERSTATUS.UNDELIVERED,
+        "deliveryCode":tools.generateAuthCode(7)
+    };
+    if (addGiftOptions.deliveryType === DELIVERYTYPE['ZITI'].id) {
+    	giftOrder.RSCInfo = addGiftOptions.RSCInfo;
+    	giftOrder.consigneeName = addGiftOptions.consigneeName;
+        giftOrder.consigneePhone = addGiftOptions.consigneePhone;
+        giftOrder.deliveryType = DELIVERYTYPE['ZITI'].id;
+    } else {
+    	giftOrder.consigneeName = addGiftOptions.addressInfo.consigneeName;
+        giftOrder.consigneePhone = addGiftOptions.addressInfo.consigneePhone;
+        giftOrder.consigneeAddress = addGiftOptions.addressInfo.consigneeAddress;
+        giftOrder.deliveryType = DELIVERYTYPE['SONGHUO'].id;
+    }
+    var giftInfo = self.convertGift(gift);
+    giftOrder.gift = {
+    	'ref': giftInfo._id,
+    	'id': giftInfo.id,
+    	'name': giftInfo.name,
+    	'category': giftInfo.category.name,
+    	'thumbnail': giftInfo.thumbnail,
+    	'points': giftInfo.points,
+    	'marketPrice': giftInfo.marketPrice,
+		'online': giftInfo.online,
+		'soldout': giftInfo.soldout
+    };
+    giftOrder.points = giftInfo.points;
+    // save and increase points
+    var giftOrderObj = new RewardshopGiftOrderModel(giftOrder);
+    giftOrderObj.save(function(err) {
+        if (err) {
+            console.error('LoyaltyPointsService addGiftOrder save err:', err, 'giftOrderObj:', giftOrderObj);
+            callback('LoyaltyPointsService addGiftOrder save err');
+            return;
+        }
+        self.increase(addGiftOptions.user._id, -giftInfo.points, 'EXCHANGE', giftInfo.name, giftOrderObj._id, function(err, points) {
+            if (err) {
+                console.error('LoyaltyPointsService addGiftOrder increase err:', err);
+                callback('LoyaltyPointsService addGiftOrder increase err');
+                RewardshopGiftOrderModel.findOne({_id:giftOrderObj._id}).remove(function(err) {
+                    if (err) {
+                        // rollback fail, don't know how to handle it, log to console
+                        console.error('LoyaltyPointsService RewardshopGiftOrderModel document rollback fail, err:', err, 'giftOrderObj:', giftOrderObj);
+                    }
+                });
+                return;
+            }
+            callback(null, giftOrderObj);
+        });
+    });
+}
+
 // increase
 /**
  * LoyaltyPoints increase function
@@ -335,9 +450,10 @@ LoyaltyPointsService.prototype.getRewardshopGift = function(id, _id, name, callb
  * @param  {String}   description description of loyalty points increase
  * @param  {String}   ref_id 	  the ref _id (compaign _id, order _id and so on)
  * @param  {Function} callback    the callback function
+ * @param  {Object}   obj         the point increase object (user and so on)
  * @return
  */
-LoyaltyPointsService.prototype.increase = function(user_id, points, type, description, ref_id, callback, user) {
+LoyaltyPointsService.prototype.increase = function(user_id, points, type, description, ref_id, callback, obj) {
 	var self = this;
 	if (!user_id) {
         callback('user required');
@@ -356,6 +472,7 @@ LoyaltyPointsService.prototype.increase = function(user_id, points, type, descri
     	var consecutiveTimes = 1;
     	var maxTimes = 5;
     	var sign = {date:beijingTimeNow.format('YYYY-MM-DD HH:mm:ss')};
+        var user = obj;
     	if (user && user.sign && user.sign.date) {
 			var nowDate = moment(beijingTimeNow).add(-1, 'd').format('YYYY-MM-DD');
 			if (nowDate == moment(user.sign.date).format('YYYY-MM-DD') && user.sign.consecutiveTimes) {
@@ -498,6 +615,30 @@ LoyaltyPointsService.prototype.queryLogs = function(user_id, type, times, page, 
 				callback(null, logs||[], count, pageCount);
 		});
 	});
+}
+
+LoyaltyPointsService.prototype.convertGift = function(gift) {
+	if (gift) {
+		if (gift.category && gift.category.ref)
+			gift.category = gift.category.ref;
+	}
+	
+	if (gift.pictures) {
+		var pictures = [];
+	    gift.pictures.forEach(function(pic){
+	        var picture = {};
+	        picture.largeUrl = '/images/large/' + pic + '.jpg';
+	        picture.thumbnail = '/images/thumbnail/' + pic + '.jpg';
+	        picture.originalUrl = '/images/original/' + pic + '.jpg';
+	        pictures.push(picture);
+	    });
+
+	    gift.largeUrl = pictures[0] ? pictures[0].largeUrl : '';
+	    gift.thumbnail = pictures[0] ? pictures[0].thumbnail : '';
+	    gift.originalUrl = pictures[0] ? pictures[0].originalUrl : '';
+	    gift.pictures = pictures;
+	}
+	return gift;
 }
 
 module.exports = new LoyaltyPointsService();
