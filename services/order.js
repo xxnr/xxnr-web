@@ -21,6 +21,7 @@ var DeliveryCodeModel = require('../models').deliveryCode;
 var umengConfig = require('../configuration/umeng_config');
 var UMENG = require('../modules/umeng');
 var PayService = require('../services/pay');
+var LoyaltypointService = require('../services/loyaltypoint');
 var dri = require('../common/dri');
 
 // Service
@@ -549,6 +550,10 @@ OrderService.prototype.pushSKUtoOrders = function (orders, SKU_item, options) {
         category: product.category,
         attributes: SKU.attributes
     };
+    // 积分
+    if (product.rewardPoints) {
+    	SKU_to_add.rewardPoints = product.rewardPoints;
+    }
     if (additions && additions.length > 0) {
         SKU_to_add.additions = additions;
     }
@@ -586,6 +591,14 @@ OrderService.prototype.pushSKUtoOrders = function (orders, SKU_item, options) {
     orders[orderKey].price +=  SKU_to_add.count * (SKU_to_add.price+additionPrice);
     if (SKU_to_add.deposit) {
     	orders[orderKey].deposit += SKU_to_add.count * SKU_to_add.deposit;
+    }
+    // 积分
+    if (SKU_to_add.rewardPoints) {
+    	if (orders[orderKey].rewardPoints) {
+    		orders[orderKey].rewardPoints += SKU_to_add.rewardPoints;
+    	} else {
+    		orders[orderKey].rewardPoints = SKU_to_add.rewardPoints;
+    	}
     }
     orders[orderKey].SKUs.push(SKU_to_add);
     return [orders, SKU_to_add];
@@ -718,6 +731,7 @@ OrderService.prototype.updateSKUs = function(options, callback) {
 				}
 			});
 			// check order deliver status
+			var order_oldDeliverStatus = doc.deliverStatus;
 			var order = self.checkDeliverStatus(doc);
 			order.save(function(err) {
 				if (err) {
@@ -726,21 +740,25 @@ OrderService.prototype.updateSKUs = function(options, callback) {
 				}
 
 				callback(null);
-			});
 
-			if (RSCReceived) {
-				if (doc.deliveryType == DELIVERYTYPE.ZITI.id && doc.payStatus == PAYMENTSTATUS.PAID) {
-					self.generateDeliveryCodeandNotify(doc, newReceivedSKUs);
-				} else if (doc.payStatus !== PAYMENTSTATUS.PAID) {
-					// 有商品到服务站，通知用户付款
-					self.umengSendCustomizedcast(umengConfig.types.pay, order.buyerId, 'user', {orderId: order.id});
-				} else {
-					// 已付款的配送到户订单有商品到服务站，通知RSC配送
-					if (doc.deliveryType == DELIVERYTYPE.SONGHUO.id && doc.payStatus == PAYMENTSTATUS.PAID && order.RSCInfo) {
-						self.umengSendCustomizedcast(umengConfig.types.delivery, order.RSCInfo.RSC, 'RSC', {orderId: order.id});
+				if (RSCReceived) {
+					if (order.deliveryType == DELIVERYTYPE.ZITI.id && order.payStatus == PAYMENTSTATUS.PAID) {
+						self.generateDeliveryCodeandNotify(order, newReceivedSKUs);
+					} else if (order.payStatus !== PAYMENTSTATUS.PAID) {
+						// 有商品到服务站，通知用户付款
+						self.umengSendCustomizedcast(umengConfig.types.pay, order.buyerId, 'user', {orderId: order.id});
+					} else {
+						// 已付款的配送到户订单有商品到服务站，通知RSC配送
+						if (order.deliveryType == DELIVERYTYPE.SONGHUO.id && order.payStatus == PAYMENTSTATUS.PAID && order.RSCInfo) {
+							self.umengSendCustomizedcast(umengConfig.types.delivery, order.RSCInfo.RSC, 'RSC', {orderId: order.id});
+						}
 					}
 				}
-			}
+				// 订单完成 加积分
+				if (parseInt(order.deliverStatus) === DELIVERSTATUS.RECEIVED && order.deliverStatus != order_oldDeliverStatus && !order.isRewardPoint) {
+					self.increaseLoyaltyPointsbyOrder(order, 'ORDERCOMPLETED');
+				}
+			});
 		} else {
 			callback('未查找到订单');
 		}
@@ -998,7 +1016,7 @@ OrderService.prototype.confirm = function(orderId, SKURefs, callback) {
 			}
 		});
 
-		if(allConfirmed){
+		if (allConfirmed) {
 			order.deliverStatus = DELIVERSTATUS.RECEIVED;
 			order.dateCompleted = new Date();
 		}
@@ -1011,13 +1029,18 @@ OrderService.prototype.confirm = function(orderId, SKURefs, callback) {
 			}
 
 			callback(null);
-		});
-		if (isConfirmed) {
-			// 自提订单有商品被自提，通知用户
-			if (order.deliveryType == DELIVERYTYPE.ZITI.id) {
-				self.umengSendCustomizedcast(umengConfig.types.zitiDone, order.buyerId, 'user', {orderId: order.id});
+
+			if (isConfirmed) {
+				// 自提订单有商品被自提，通知用户
+				if (order.deliveryType == DELIVERYTYPE.ZITI.id) {
+					self.umengSendCustomizedcast(umengConfig.types.zitiDone, order.buyerId, 'user', {orderId: order.id});
+				}
 			}
-		}
+			// 订单完成 加积分
+			if (allConfirmed && !order.isRewardPoint) {
+				self.increaseLoyaltyPointsbyOrder(order, 'ORDERCOMPLETED');
+			}
+		});
 	});
 };
 
@@ -1731,6 +1754,13 @@ OrderService.prototype._checkPayStatus = function(order, callback) {
 	        }
 	
 	        callback(null, order.toObject(), orderPayment);
+
+	        // 已付款的配送到户订单有商品到服务站，通知RSC配送
+			if (orderPayStatus !== order.payStatus && orderPayStatus === PAYMENTSTATUS.PAID) {
+				if (order.deliveryType === DELIVERYTYPE.SONGHUO.id && parseInt(order.deliverStatus) === DELIVERSTATUS.RSCRECEIVED && order.RSCInfo) {
+					self.umengSendCustomizedcast(umengConfig.types.delivery, order.RSCInfo.RSC, 'RSC', {orderId: order.id});
+				}
+			}
 		});
 	} else {
 		callback(null, order.toObject(), orderPayment);
@@ -1747,13 +1777,6 @@ OrderService.prototype._checkPayStatus = function(order, callback) {
 		            console.error('OrderService checkPayStatus close payment err:', err);
 		        }
 		    });
-		}
-	}
-
-	// 已付款的配送到户订单有商品到服务站，通知RSC配送
-	if (orderPayStatus !== order.payStatus && orderPayStatus === PAYMENTSTATUS.PAID) {
-		if (order.deliveryType === DELIVERYTYPE.SONGHUO.id && parseInt(order.deliverStatus) === DELIVERSTATUS.RSCRECEIVED && order.RSCInfo) {
-			self.umengSendCustomizedcast(umengConfig.types.delivery, order.RSCInfo.RSC, 'RSC', {orderId: order.id});
 		}
 	}
 };
@@ -2157,6 +2180,47 @@ OrderService.prototype.getById = function(id, callback) {
 
 OrderService.prototype.pendingDeliverToRSC = function(order) {
     return (order.payStatus == PAYMENTSTATUS.PAID || (order.payStatus == PAYMENTSTATUS.PARTPAID && order.depositPaid)) && order.deliverStatus != DELIVERSTATUS.DELIVERED;
+};
+
+OrderService.prototype.increaseLoyaltyPointsbyOrder = function(order, type) {
+	if (order) {
+		var query = {id: order.buyerId};
+		UserModel.findOne(query, function(err, user) {
+			if (err) {
+	            console.error('OrderService increaseLoyaltyPointsbyOrder UserModel findOne err:', err, 'orderId:', order.id);
+	            return;
+	        }
+	        if (!user) {
+	            console.error('OrderService increaseLoyaltyPointsbyOrder UserModel findOne not find user...', 'orderId:', order.id);
+	            return;
+	        }
+	        var points = 0;
+	        if (order.rewardPoints) {
+	        	points = order.rewardPoints;
+	        } else {
+		        order.SKUs.forEach(function (sku) {
+		        	if (sku.rewardPoints) {
+		        		points += sku.rewardPoints;
+		        	}
+				});
+			}
+			LoyaltypointService.increase(user._id, points, type, null, order._id, function (err) {
+				if (err) {
+					console.error('OrderService increaseLoyaltyPointsbyOrder LoyaltypointService increase err:', err, 'orderId:', order.id);
+					return;
+				}
+				OrderModel.update({id: order.id}, {$set:{isRewardPoint: true}}, function(err) {
+					if (err) {
+						console.error('OrderService increaseLoyaltyPointsbyOrder OrderModel update err:', err, 'orderId:', order.id);
+						return;
+					}
+				});
+			});
+		});
+	} else {
+		console.error('OrderService increaseLoyaltyPointsbyOrder order is null', 'type:', type);
+	    return;
+	}
 };
 
 module.exports = new OrderService();

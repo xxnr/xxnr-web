@@ -828,4 +828,30 @@ UserService.prototype.getTestAccountList = function(callback) {
         })
 };
 
+UserService.prototype.getUserBySearch = function(account, name, callback) {
+    if (!account && !name) {
+        callback('need search info');
+        return;
+    }
+    var query = {};
+    query['$or'] = [];
+    if (account) {
+        query['$or'].push({account:{$regex:new RegExp(account)}});
+    }
+    if (name) {
+        query['$or'].push({name:{$regex:new RegExp(name)}});
+    }
+
+    UserModel.findOne(query)
+        .exec(function (err, user) {
+            if (err) {
+                console.error('UserService getUserBySearch findOne err:', err);
+                callback(err);
+                return;
+            }
+
+            callback(null, user);
+        });
+};
+
 module.exports = new UserService();

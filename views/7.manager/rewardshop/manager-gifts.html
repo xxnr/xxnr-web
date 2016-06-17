@@ -1,0 +1,220 @@
+<% include manager-rewardshop.html %>
+
+<div class="col-md-10">
+	<div class="filter col-md-12" style="padding-bottom:9px">
+        <div class="col-md-3 col-sm-6 m">
+            <div data-component="textbox" data-component-path="gifts.filter.search" data-placeholder="礼品名称" data-control-icon="fa-search">查找礼品</div>
+            <div class="help" data-component="template" data-component-path="gifts.info"><script type="text/html">{{ count | pluralize('items','item','items','items') }} / {{ pages | pluralize('pages','page','pages','pages') }}</script></div>
+        </div>
+        <div class="col-md-3 col-sm-6 m">
+            <div data-component="dropdown" data-component-path="gifts.filter.category" data-source="gifts.categories" data-empty="true" data-empty-text="全部商品" data-source-value="_id">礼品品类</div>
+        </div>
+        <div class="col-md-3 col-sm-6 m">
+			<div data-component="dropdown" data-component-path="gifts.filter.type" data-options="全部订单|;已上线|1;已下线|2;已售罄|3" data-empty="true" data-empty-text="全部订单">状态筛选</div>
+		</div>
+        <div class="col-md-6 m">
+            <div class="row">
+                <div class="col-xs-3"><a href="javascript:void(0)" data-component="click" class="linkbutton" data-component-path="new_gift"><span class="fa fa-plus-circle"></span>新增礼品</a></div>
+                <!-- <div class="col-xs-3"><a href="javascript:void(0)" data-component="click" class="linkbutton" data-component-path="gifts_category"><span class="fa fa-folder"></span>更新分类</a></div> -->
+            </div>
+        </div>
+    </div>
+
+	<div data-component="template" data-component-path="gifts" class="ui-grid gifts" data-max="auto" data-component-id="gifts.grid">
+		<script type="text/html">
+		{{ if grid && grid.length > 0 }}
+			<table class="table" width="100%" cellpadding="0" cellspacing="0" border="0">
+				<tbody>
+					<tr>
+						<td style="width:30px" class="silver hidden-xs ui-center active">序号</td>
+						<td style="width:80px" class="silver hidden-xs ui-left active">礼品id</td>
+				    	<td style="width:60px" class="silver hidden-xs ui-left active">主图</td>
+				    	<td style="width:200px" class="silver hidden-xs ui-left active">礼品</td>
+				    	<td style="width:50px" class="silver hidden-xs ui-left active">类目</td>
+				    	<td style="width:80px" class="silver hidden-xs ui-right active">市场价</td>
+				    	<td style="width:80px" class="silver hidden-xs ui-right active">兑换积分</td>
+				    	<td style="width:100px" class="silver hidden-xs ui-right active">创建时间</td>
+				    	<td style="width:80px" class="silver hidden-xs ui-center active">操作</td>
+				    </tr>
+				{{ foreach gift in grid }}
+		            <tr data-index="{{ $index }}">
+		                <td style="width:30px" class="hidden-xs ui-center">{{ $index + 1 }}</td>
+		                <td style="width:80px" class="hidden-xs ui-left" data-title="礼品id">{{ gift.id }}</td>
+		                <td style="width:60px" class="hidden-xs ui-left" data-title="主图">{{ if gift.pictures && gift.pictures.length }}<img width="100%" src="/images/thumbnail/{{ gift.pictures[0] }}.jpg"></img>{{ fi }}</td>
+		                <td style="width:200px" class="hidden-xs ui-left" data-title="礼品">{{ if gift.online }}<b class="mr5 fs11 green">Online</b>{{ fi }}{{ if gift.istop }}<b class="mr5 fs11 red">TOP</b>{{ fi }}{{ gift.name }}</td>
+		                <td style="width:50px" class="hidden-xs ui-left" data-title="类目"> {{ if gift.category && gift.category.ref }}{{gift.category.ref.name}}{{ fi }}</td>
+		                <td style="width:80px" class="hidden-xs ui-right" data-title="市场价">{{ gift.marketPrice | price(2) }}</td>
+		                <td style="width:80px" class="hidden-xs ui-right" data-title="兑换积分">{{ gift.points }}</td>
+		                <td style="width:100px" class="hidden-xs ui-right" data-title="创建时间">{{ gift.datecreated | format('yyyy-MM-dd HH:mm:ss') }}</td>
+		                <td style="width:80px" class="ui-center">
+		                    <button name="edit" title="编辑"><span class="fa fa-pencil"></span></button>
+		                    {{ if gift.online }}
+		                    <button name="offline" title="下线"><span class="fa fa-stop"></span></button>
+		                    {{ else }}
+		                    <button name="online" title="上线"><span class="fa fa-play"></span></button>
+		                    {{ fi }}
+		                    <button name="remove" title="删除"><span class="fa fa-times"></span></button>
+		                </td>
+		            </tr>
+		        {{ end }}
+				</tbody>
+			</table>
+		{{ else }}
+			{{ if !giftsresponse }}
+				暂无数据
+			{{ fi }}
+		{{ fi }}
+        </script>
+    </div>
+
+    <div class="gifts-pages">
+	</div>
+	
+	<div data-component="error" data-component-path="gifts.giftsresponse"></div>
+</div>
+</div>
+
+<script>
+
+	var gifts = {};
+
+    gifts.filter = {};
+    gifts.filter.page = 1;
+    gifts.grid = [];
+    gifts.info = {};
+    gifts.categories = [];
+	gifts.giftsresponse;
+
+	var gifts_page = getUrlParam('page');
+	if (gifts_page) {
+		gifts.filter.page = gifts_page;
+	}
+	var gifts_search = getUrlParam('search');
+	if (gifts_search) {
+		gifts.filter.search = gifts_search;
+	}
+	var gifts_category = getUrlParam('category');
+	if (gifts_category) {
+		gifts.filter.category = gifts_category;
+	}
+	var gifts_type = getUrlParam('type');
+	if (gifts_type) {
+		gifts.filter.type = gifts_type;
+	}
+
+	ON('#gifts.grid', function(component){
+        gifts.filter.max = component.max;
+        gifts_refresh_categories();
+        getGifts();
+    });
+
+	Delay_Search_WATCH('gifts.filter.*', function(path, value) {
+        if (NOTMODIFIED('gifts.filter', gifts.filter))
+            return;
+        redirectGiftsURL();
+    }, 1500);
+
+	function getGifts() {
+		var urlParam = gifts.filter.search ? 'search=' + gifts.filter.search : '';
+		urlParam += gifts.filter.page ? (urlParam ? '&' : '') + 'page=' + gifts.filter.page : '';
+		urlParam += gifts.filter.max ? (urlParam ? '&' : '') + 'max=' + gifts.filter.max : '';
+		urlParam += gifts.filter.category ? (urlParam ? '&' : '') + 'category=' + gifts.filter.category : '';
+		urlParam += gifts.filter.type ? (urlParam ? '&' : '') + 'type=' + gifts.filter.type : '';
+		var url = '/api/rewardshop/gifts' + (urlParam ? '?' + urlParam : '');
+		$.components.GET(managerurl + url, null, function(response) {
+			if (response && response.code && response.code==1000) {
+				gifts.grid = response.gifts;
+				gifts.info.count = response.count;
+            	gifts.info.pages = response.pageCount;
+            	gifts.info.page = response.page;
+				SET('gifts.grid', gifts.grid);
+				if (gifts.info.pages && gifts.info.count) {
+					// Pagination(gifts.info.count, gifts.info.count/gifts.info.pages, gifts.info.page?gifts.info.page:null);
+					Pagination($('div.gifts-pages'), gifts.info.count, gifts.info.count/gifts.info.pages, gifts.info.page?gifts.info.page:null, function(pageNumber){redirectGiftsURL(pageNumber)});
+				}
+				UPDATE('gifts.info');
+				$('.gifts tr td button').off('click').on('click', function() {
+					var index = parseInt($(this).parent().parent().attr('data-index'));
+					var row = typeof index != 'undefined' && gifts.grid && index < gifts.grid.length ? gifts.grid[index] : null;
+					if (row) {
+			            switch ($(this).attr('name')) {
+			                case 'edit':
+			                    new_gift(row._id);
+			                    break;
+			                case 'online':
+			                    if (!confirm('你确定要上线你选择的礼品吗?'))
+			                        return;
+			                    $.components.POST(managerurl + '/api/rewardshop/gift/update', { _id: row._id, online:true }, function(response) {
+			                        if(response.code == 1000) {
+			                        	success();
+			                            redirectGiftsURL(gifts.filter.page);
+			                        } else{
+			                            alert(response.message);
+			                        }
+			                    });
+			                    break;
+			                case 'offline':
+			                    if (!confirm('你确定要下线你选择的礼品吗?'))
+			                        return;
+			                    $.components.POST(managerurl + '/api/rewardshop/gift/update', { _id:row._id, online:false }, function(response) {
+			                        if(response.code == 1000) {
+			                        	success();
+			                            redirectGiftsURL(gifts.filter.page);
+			                        } else{
+			                            alert(response.message);
+			                        }
+			                    });
+			                    break;
+		            	}
+		            }
+		        });
+			} else {
+				if (response.error || response.message) {
+					if (response.message) {
+						response = [{error: response.message}];
+					} else {
+						response = response.error;
+					}
+				} else {
+					response = null;
+				}
+				SET('gifts.giftsresponse', response);
+			}
+		});
+	}
+
+	// Method refreshes categories
+    function gifts_refresh_categories() {
+        $.components.GET(managerurl + '/api/rewardshop/categories', null, function(response) {
+            gifts.categories = response.categories;
+            SET('gifts.categories', gifts.categories);
+        });
+    }
+
+	// function Pagination(count, pageCount, currentPage) {
+	// 	$('div.gifts-pages').pagination({
+	//         items: count,
+	//         itemsOnPage: pageCount,
+	//         currentPage: currentPage?currentPage:0,
+	// 		prevText: '<',
+	// 		nextText: '>',
+	//         cssStyle: 'light-theme',
+	//         onPageClick: function(pageNumber, event) {
+	//         	redirectGiftsURL(pageNumber);
+	//         }
+	//     });
+	// }
+
+	function new_gift(_id) {
+		window.location.href = managerurl + "/rewardshop/gifts-detail" + (typeof _id != 'undefined' ? ('?id=' + _id) : '');
+    }
+
+	function redirectGiftsURL(page) {
+		var urlParam = gifts.filter.search ? 'search=' + gifts.filter.search : '';
+		urlParam += page ? (urlParam ? '&' : '') + 'page=' + page : '';
+		urlParam += gifts.filter.max ? (urlParam ? '&' : '') + 'max=' + gifts.filter.max : '';
+		urlParam += gifts.filter.category ? (urlParam ? '&' : '') + 'category=' + gifts.filter.category : '';
+		urlParam += gifts.filter.type ? (urlParam ? '&' : '') + 'type=' + gifts.filter.type : '';
+		window.location.href = managerurl + "/rewardshop/gifts" + (urlParam ? '?' + urlParam : '');
+	}
+</script>

@@ -156,6 +156,7 @@
                 <div class="col-md-8">
                     <div class="mb10" data-component="textbox" data-component-path="products.form.name" data-required="true">商品名称</div>
                     <div class="mb10" data-component="textbox" data-component-path="products.form.deposit" data-component-type="currency" data-increment="true" data-icon="fa-jpy">定金</div>
+                    <div class="mb10" data-component="textbox" data-component-path="products.form.rewardPoints">交易可获积分</div>
                     <!--<div class="mb10" data-component="textbox" data-component-path="products.form.originprice">市场价格</div>
                     <div class="mb10" data-component="textbox" data-component-path="products.form.stock">库存数量</div>
                     <div class="mb10" data-component="textbox" data-component-path="products.form.reference">商品货号</div>-->
@@ -563,7 +564,8 @@
 //				{'key':'model','name':'车系'},{'key':'engine','name':'排量'},{'key':'gearbox','name':'变速器'},{'key':'level','name':'车型'},
             {'key':'name','name':'商品名称'},
 //				{'key':'price','name':'平台价格','re':/^[0-9]*(\.[0-9]{1,2})?$/},
-            {'key':'deposit','name':'定金','re':/^[0-9]*(\.[0-9]{1,2})?$/}];
+            {'key':'deposit','name':'定金','re':/^[0-9]*(\.[0-9]{1,2})?$/},
+            {'key':'rewardPoints','name':'交易可获积分','re':/^[0-9]*?$/}];
         if (!required(requiredlist, products.form))
             return;
 
