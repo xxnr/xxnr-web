@@ -130,10 +130,12 @@ var compareVersion = function (nowVersion, version) {
         if (parseInt(splitNow[i]) > parseInt(split[i])) {
             return true;
         }
+        if (parseInt(splitNow[i]) < parseInt(split[i])) {
+            return false;
+        }
     }
     return false;
 };
-
 
 AppUpgradeService.prototype.compareVersion = compareVersion;
 module.exports = new AppUpgradeService();
