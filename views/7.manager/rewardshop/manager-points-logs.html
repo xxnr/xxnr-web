@@ -51,20 +51,20 @@
 						<tr>
 							<td style="width:30px" class="silver hidden-xs ui-center active">序号</td>
 							<td style="width:80px" class="silver hidden-xs ui-right active">发生时间</td>
-					    	<td style="width:60px" class="silver hidden-xs ui-center active">项目</td>
+					    	<td style="width:50px" class="silver hidden-xs ui-center active">项目</td>
 					    	<td style="width:60px" class="silver hidden-xs ui-center active">事件归类</td>
 					    	<td style="width:150px" class="silver hidden-xs ui-left active">事件详情</td>
-					    	<td style="width:60px" class="silver hidden-xs ui-right active">积分数值</td>
+					    	<td style="width:50px" class="silver hidden-xs ui-right active">积分数值</td>
 					    	<td style="width:100px" class="silver hidden-xs ui-center active">用户信息</td>
 					    </tr>
 					{{ foreach pointslog in grid }}
 			            <tr data-index="{{ $index }}">
 			                <td style="width:30px" class="hidden-xs ui-center">{{ $index + 1 }}</td>
-			                <td style="width:80px" class="hidden-xs ui-right">{{ pointslog.date | format('yyyy-MM-dd HH:mm:ss') }}</td>
-			                <td style="width:60px" class="hidden-xs ui-center">{{ if pointslog.points > 0 }}获得积分{{ else }}{{ if pointslog.points < 0}}使用积分{{ else }}其他{{ fi }}{{ fi }}</td>
+			                <td style="width:80px" class="hidden-xs ui-right" title="{{ pointslog.date | format('yyyy-MM-dd HH:mm:ss') }}">{{ pointslog.date | format('yyyy-MM-dd HH:mm:ss') }}</td>
+			                <td style="width:50px" class="hidden-xs ui-center">{{ if pointslog.points > 0 }}获得积分{{ else }}{{ if pointslog.points < 0}}使用积分{{ else }}其他{{ fi }}{{ fi }}</td>
 			                <td style="width:60px" class="hidden-xs ui-center">{{pointslog.event.name}}</td>
 			                <td style="width:150px" class="hidden-xs ui-left">{{ pointslog.description }}</td>
-			                <td style="width:60px" class="hidden-xs ui-right">{{ pointslog.points }}</td>
+			                <td style="width:50px" class="hidden-xs ui-right">{{ pointslog.points }}</td>
 			                <td style="width:100px" class="hidden-xs ui-center">{{ if pointslog.user }}{{ pointslog.user.name }}</br>{{ pointslog.user.account }}</br>积分:{{ pointslog.user.score }}{{ else }}-{{ fi }}</td>
 			            </tr>
 			        {{ end }}
