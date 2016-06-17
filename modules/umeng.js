@@ -348,7 +348,7 @@ Umeng.prototype.sendIOSListCast = function (device_tokens, callback) {
     sendIOSListCast.payload = {
         // 必填 严格按照APNs定义来填写
         aps: {
-            alert: umengConfig.body[type][device_type].ticker
+            alert: umengConfig.body[type][device_type].text
         },
         title: umengConfig.body[type][device_type].title,
         text: umengConfig.body[type][device_type].text
