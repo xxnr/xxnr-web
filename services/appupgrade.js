@@ -38,13 +38,16 @@ AppUpgradeService.prototype.isNeedPush = function (callback) {
                     if (result && JSON.parse(result).ret == 'SUCCESS') {
                         if (device_tokens) {
                             var device_token_List = device_tokens.split(',');
-                            AppUpgrade.update({'device_token': {$in: device_token_List}}, {'date_update': new Date()}, function (err) {
-                                if (err) {
-                                    callback(err);
-                                    console.error("AppUpgradeService isNeedPush update_callback update err:", err);
-                                }
-                                callback(null, result);
-                            })
+                            AppUpgrade.update({'device_token': {$in: device_token_List}}
+                                , {$set: {'date_update': new Date()}}
+                                , {multi: true}
+                                , function (err) {
+                                    if (err) {
+                                        callback(err);
+                                        console.error("AppUpgradeService isNeedPush update_callback update err:", err);
+                                    }
+                                    callback(null, result);
+                                })
                         }
                     }
                 } catch (e) {
@@ -90,14 +93,18 @@ AppUpgradeService.prototype.isNeedPush = function (callback) {
 // saveAndUpdate DeviceTokenVersion
 AppUpgradeService.prototype.saveAndUpdate = function (options, callback) {
 
-    AppUpgrade.findOne({device_token: options.device_token}, function (err, doc) {
+    AppUpgrade.findOne({device_id: options.device_id}, function (err, doc) {
         if (err) {
             callback(err);
             return
         }
         if (doc) {
-            var query = {device_token: options.device_token};
-            AppUpgrade.update(query, {version: options.version, date_update: new Date()}, options, function (err) {
+            var query = {device_id: options.device_id};
+            AppUpgrade.update(query, {
+                device_token: options.device_token,
+                version: options.version,
+                date_update: new Date()
+            }, options, function (err) {
                 if (err) {
                     callback(err);
                 }

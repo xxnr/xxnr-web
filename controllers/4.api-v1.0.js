@@ -454,12 +454,13 @@ function getBanners(req, callback) {
         files.forEach(function (file) {
             if (file.indexOf('.jpg') >= 0 || file.indexOf('png') >= 0) {
                 data.push({"imgUrl":`/${imageFolder}/${file}`,"id":file, "url":""});
-            }
-        });
-
-        callback(data, null);
+        }
     });
+
+    callback(data, null);
+});
 }
+
 
 exports.api10_getBanners = function (req, res, next) {
     getBanners(req, function (data, err) {
@@ -613,6 +614,7 @@ exports.AppUpgrade = function (req, res, next) {
     var postVersion = req.data['version'] || '';
     var device_token = req.data['device_token'] || '';
     var userAgent = (req.data['user_agent'] || '').toLowerCase();
+    var device_id = req.data['device_id'] || '';
 
     var host = req.hostname;
     var android_update_url = 'http://' + host + '/resources/newFarmer.apk';
@@ -624,9 +626,10 @@ exports.AppUpgrade = function (req, res, next) {
 
     options.device_token = device_token;
     options.version = postVersion;
+    options.device_id = device_id;
 
     //返回给前台
-    if (userAgent.indexOf('android') >= 0) {
+    if (userAgent.indexOf('android') !=-1) {
         options.user_agent = 'android';
         if (!postVersion || AppupgradeService.compareVersion(nowAndroidVersion, postVersion)) {
             res.respond({
@@ -639,10 +642,14 @@ exports.AppUpgrade = function (req, res, next) {
         } else {
             res.respond({code: 1200, message: '最新版本', version: nowAndroidVersion});
         }
-    } else if (userAgent.indexOf('ios')!=-1) {
+    } else if (userAgent.indexOf('ios') != -1) {
         options.user_agent = 'ios';
         if (!postVersion || AppupgradeService.compareVersion(nowIosVersion, postVersion)) {
-            res.respond({code: 1000, message: '1.新增配送方式，购车可自选网点提车\n2.网点支持付现金或POS机刷卡，支付更安心\n3.自提订单凭自提码至网点，提车有保障', version: nowIosVersion});
+            res.respond({
+                code: 1000,
+                message: '1.新增配送方式，购车可自选网点提车\n2.网点支持付现金或POS机刷卡，支付更安心\n3.自提订单凭自提码至网点，提车有保障',
+                version: nowIosVersion
+            });
         } else {
             res.respond({code: 1200, message: '最新版本', version: nowIosVersion});
         }
@@ -650,11 +657,13 @@ exports.AppUpgrade = function (req, res, next) {
         res.respond({code: 1001, message: '请提供正确的参数'});
         return;
     }
+    if(device_token){
+        //存储用户的更新信息
+        AppupgradeService.saveAndUpdate(options, function (err) {
+            if (err) {
+                console.error('save device version', err);
+            }
+        });
+    }
 
-    //存储用户的更新信息
-    AppupgradeService.saveAndUpdate(options, function (err) {
-        if (err) {
-            console.error('save device version', err);
-        }
-    });
 };
