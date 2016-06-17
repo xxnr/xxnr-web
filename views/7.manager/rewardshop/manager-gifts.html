@@ -7,10 +7,10 @@
             <div class="help" data-component="template" data-component-path="gifts.info"><script type="text/html">{{ count | pluralize('items','item','items','items') }} / {{ pages | pluralize('pages','page','pages','pages') }}</script></div>
         </div>
         <div class="col-md-3 col-sm-6 m">
-            <div data-component="dropdown" data-component-path="gifts.filter.category" data-source="gifts.categories" data-empty="true" data-empty-text="全部商品" data-source-value="_id">礼品品类</div>
+            <div data-component="dropdown" data-component-path="gifts.filter.category" data-source="gifts.categories" data-empty="true" data-empty-text="全部礼品" data-source-value="_id">礼品品类</div>
         </div>
         <div class="col-md-3 col-sm-6 m">
-			<div data-component="dropdown" data-component-path="gifts.filter.type" data-options="全部礼品|;已上线|1;已下线|2;已售罄|3" data-empty="true" data-empty-text="全部订单">状态筛选</div>
+			<div data-component="dropdown" data-component-path="gifts.filter.type" data-options="全部|;已上线|1;已下线|2;已售罄|3" data-empty="true" data-empty-text="全部">状态筛选</div>
 		</div>
         <div class="col-md-6 m">
             <div class="row">
