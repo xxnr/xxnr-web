@@ -69,14 +69,14 @@ umengConfig.body[update] = {
     'IOS': {
         'ticker': "您有一个app需要更新",
         'title': "新新农人升级啦",
-        'text': "新新农人升级啦"
+        'text': "新新农人已升级版本，快去更新应用吧~"
     },
 
     'Android': {
         'after_open': "go_app",
         'ticker': "您有一个app需要更新",
         'title': "新新农人升级啦",
-        'text': "新新农人升级啦"
+        'text': "新新农人已升级版本，快去更新应用吧~"
     }
 
 };
