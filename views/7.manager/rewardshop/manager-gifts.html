@@ -27,25 +27,25 @@
 				<tbody>
 					<tr>
 						<td style="width:30px" class="silver hidden-xs ui-center active">序号</td>
-						<td style="width:80px" class="silver hidden-xs ui-left active">礼品id</td>
-				    	<td style="width:60px" class="silver hidden-xs ui-left active">主图</td>
+						<td style="width:70px" class="silver hidden-xs ui-left active">礼品id</td>
+				    	<td style="width:40px" class="silver hidden-xs ui-left active">主图</td>
 				    	<td style="width:200px" class="silver hidden-xs ui-left active">礼品</td>
 				    	<td style="width:50px" class="silver hidden-xs ui-left active">类目</td>
-				    	<td style="width:80px" class="silver hidden-xs ui-right active">市场价</td>
-				    	<td style="width:80px" class="silver hidden-xs ui-right active">兑换积分</td>
+				    	<td style="width:70px" class="silver hidden-xs ui-right active">市场价</td>
+				    	<td style="width:60px" class="silver hidden-xs ui-right active">兑换积分</td>
 				    	<td style="width:100px" class="silver hidden-xs ui-right active">创建时间</td>
 				    	<td style="width:80px" class="silver hidden-xs ui-center active">操作</td>
 				    </tr>
 				{{ foreach gift in grid }}
 		            <tr data-index="{{ $index }}">
 		                <td style="width:30px" class="hidden-xs ui-center">{{ $index + 1 }}</td>
-		                <td style="width:80px" class="hidden-xs ui-left" data-title="礼品id">{{ gift.id }}</td>
-		                <td style="width:60px" class="hidden-xs ui-left" data-title="主图">{{ if gift.pictures && gift.pictures.length }}<img width="100%" src="/images/thumbnail/{{ gift.pictures[0] }}.jpg"></img>{{ fi }}</td>
-		                <td style="width:200px" class="hidden-xs ui-left" data-title="礼品">{{ if gift.online }}<b class="mr5 fs11 green">Online</b>{{ fi }}{{ if gift.istop }}<b class="mr5 fs11 red">TOP</b>{{ fi }}{{ gift.name }}</td>
-		                <td style="width:50px" class="hidden-xs ui-left" data-title="类目"> {{ if gift.category && gift.category.ref }}{{gift.category.ref.name}}{{ fi }}</td>
-		                <td style="width:80px" class="hidden-xs ui-right" data-title="市场价">{{ gift.marketPrice | price(2) }}</td>
-		                <td style="width:80px" class="hidden-xs ui-right" data-title="兑换积分">{{ gift.points }}</td>
-		                <td style="width:100px" class="hidden-xs ui-right" data-title="创建时间">{{ gift.datecreated | format('yyyy-MM-dd HH:mm:ss') }}</td>
+		                <td style="width:70px" class="hidden-xs ui-left">{{ gift.id }}</td>
+		                <td style="width:40px" class="hidden-xs ui-left">{{if gift.pictures && gift.pictures.length}}<img width="100%" src="/images/thumbnail/{{ gift.pictures[0] }}.jpg"></img>{{fi}}</td>
+		                <td style="width:200px" class="hidden-xs ui-left" title="{{ gift.name }}">{{if gift.online}}<b class="mr5 fs11 green">Online</b>{{fi}}{{if gift.istop}}<b class="mr5 fs11 red">TOP</b>{{fi}}{{if gift.soldout}}<b class="mr5 fs11 red">SOLDOUT</b>{{fi}}{{ gift.name }}</td>
+		                <td style="width:50px" class="hidden-xs ui-left" title="{{if gift.category && gift.category.ref}}{{gift.category.ref.name}}{{fi}}">{{if gift.category && gift.category.ref}}{{gift.category.ref.name}}{{fi}}</td>
+		                <td style="width:70px" class="hidden-xs ui-right">{{ gift.marketPrice | price(2) }}</td>
+		                <td style="width:60px" class="hidden-xs ui-right">{{ gift.points }}</td>
+		                <td style="width:100px" class="hidden-xs ui-right" title="{{ gift.datecreated | format('yyyy-MM-dd HH:mm:ss') }}">{{ gift.datecreated | format('yyyy-MM-dd HH:mm:ss') }}</td>
 		                <td style="width:80px" class="ui-center">
 		                    <button name="edit" title="编辑"><span class="fa fa-pencil"></span></button>
 		                    {{ if gift.online }}
