@@ -133,41 +133,43 @@
 					Pagination($('div.gifts-pages'), gifts.info.count, gifts.info.count/gifts.info.pages, gifts.info.page?gifts.info.page:null, function(pageNumber){redirectGiftsURL(pageNumber)});
 				}
 				UPDATE('gifts.info');
-				$('.gifts tr td button').off('click').on('click', function() {
-					var index = parseInt($(this).parent().parent().attr('data-index'));
-					var row = typeof index != 'undefined' && gifts.grid && index < gifts.grid.length ? gifts.grid[index] : null;
-					if (row) {
-			            switch ($(this).attr('name')) {
-			                case 'edit':
-			                    new_gift(row._id);
-			                    break;
-			                case 'online':
-			                    if (!confirm('你确定要上线你选择的礼品吗?'))
-			                        return;
-			                    $.components.POST(managerurl + '/api/rewardshop/gift/update', { _id: row._id, online:true }, function(response) {
-			                        if(response.code == 1000) {
-			                        	success();
-			                            redirectGiftsURL(gifts.filter.page);
-			                        } else{
-			                            alert(response.message);
-			                        }
-			                    });
-			                    break;
-			                case 'offline':
-			                    if (!confirm('你确定要下线你选择的礼品吗?'))
-			                        return;
-			                    $.components.POST(managerurl + '/api/rewardshop/gift/update', { _id:row._id, online:false }, function(response) {
-			                        if(response.code == 1000) {
-			                        	success();
-			                            redirectGiftsURL(gifts.filter.page);
-			                        } else{
-			                            alert(response.message);
-			                        }
-			                    });
-			                    break;
-		            	}
-		            }
-		        });
+				setTimeout(function() {
+					$('.gifts tr td button').off('click').on('click', function() {
+						var index = parseInt($(this).parent().parent().attr('data-index'));
+						var row = typeof index != 'undefined' && gifts.grid && index < gifts.grid.length ? gifts.grid[index] : null;
+						if (row) {
+				            switch ($(this).attr('name')) {
+				                case 'edit':
+				                    new_gift(row._id);
+				                    break;
+				                case 'online':
+				                    if (!confirm('你确定要上线你选择的礼品吗?'))
+				                        return;
+				                    $.components.POST(managerurl + '/api/rewardshop/gift/update', { _id: row._id, online:true }, function(response) {
+				                        if(response.code == 1000) {
+				                        	success();
+				                            redirectGiftsURL(gifts.filter.page);
+				                        } else{
+				                            alert(response.message);
+				                        }
+				                    });
+				                    break;
+				                case 'offline':
+				                    if (!confirm('你确定要下线你选择的礼品吗?'))
+				                        return;
+				                    $.components.POST(managerurl + '/api/rewardshop/gift/update', { _id:row._id, online:false }, function(response) {
+				                        if(response.code == 1000) {
+				                        	success();
+				                            redirectGiftsURL(gifts.filter.page);
+				                        } else{
+				                            alert(response.message);
+				                        }
+				                    });
+				                    break;
+			            	}
+			            }
+			        });
+				}, 200);
 			} else {
 				if (response.error || response.message) {
 					if (response.message) {
