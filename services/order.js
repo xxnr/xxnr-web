@@ -595,9 +595,9 @@ OrderService.prototype.pushSKUtoOrders = function (orders, SKU_item, options) {
     // 积分
     if (SKU_to_add.rewardPoints) {
     	if (orders[orderKey].rewardPoints) {
-    		orders[orderKey].rewardPoints += SKU_to_add.rewardPoints;
+    		orders[orderKey].rewardPoints += SKU_to_add.count * SKU_to_add.rewardPoints;
     	} else {
-    		orders[orderKey].rewardPoints = SKU_to_add.rewardPoints;
+    		orders[orderKey].rewardPoints = SKU_to_add.count * SKU_to_add.rewardPoints;
     	}
     }
     orders[orderKey].SKUs.push(SKU_to_add);
@@ -2200,7 +2200,7 @@ OrderService.prototype.increaseLoyaltyPointsbyOrder = function(order, type) {
 	        } else {
 		        order.SKUs.forEach(function (sku) {
 		        	if (sku.rewardPoints) {
-		        		points += sku.rewardPoints;
+		        		points += sku.rewardPoints * (sku.count ? sku.count : 1);
 		        	}
 				});
 			}
