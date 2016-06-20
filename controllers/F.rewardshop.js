@@ -7,6 +7,7 @@ var moment = require('moment-timezone');
 var services = require('../services');
 var UserService = services.user;
 var LoyaltypointService = services.loyaltypoint;
+var DELIVERYTYPE =  require('../common/defs').DELIVERYTYPE;
 
 // ==========================================================================
 // pionts
@@ -75,6 +76,148 @@ exports.json_rewardshop_pointslogs = function(req, res, next) {
 	});
 }
 
+exports.add_gift_order = function(req, res, next){
+    var data = req.data;
+    var userId = data['userId'];
+    var addressId = data['addressId'];
+    var giftId = data['giftId'] || [];
+    var deliveryType = data['deliveryType'] || DELIVERYTYPE['SONGHUO'].id;
+    var RSCId = data['RSCId'] || null;
+    var consigneePhone = data['consigneePhone'] || null;
+    var consigneeName = data['consigneeName'] || null;
+
+    if (deliveryType && deliveryType === DELIVERYTYPE['SONGHUO'].id) {
+        if (!addressId) {
+            res.respond({"code":1001, "message":"请先填写收货地址"});
+            return;
+        }
+    } else if (deliveryType && deliveryType === DELIVERYTYPE['ZITI'].id) {
+        if (!RSCId) {
+            res.respond({"code":1001, "message":"请先选择自提点"});
+            return;
+        }
+        if (!consigneePhone || !tools.isPhone(consigneePhone)) {
+            res.respond({"code":1001, "message":"请先填写正确的收货人手机号"});
+            return;
+        }
+        if (!consigneeName) {
+            res.respond({"code":1001, "message":"请先填写收货人姓名"});
+            return;
+        }
+    } else {
+        res.respond({"code":1001, "message":"请先选择正确的配送方式"});
+        return;
+    }
+
+    console.log(userId);
+    UserService.get({"userid":userId}, function(err, user) {
+        if (err || !user) {
+            res.respond({code:1001, message:'用户不存在'});
+            return;
+        }
+
+        LoyaltypointService.getRewardshopGift(giftId, null, null, function(err, gift) {
+            if (err || !gift) {
+                res.respond({code:1001, message:'礼品不存在'});
+                return;
+            }
+
+            if (!gift.online) {
+            	res.respond({code:1001, message:'无法兑换下架礼品'});
+                return;
+            }
+
+            if (gift.soldout) {
+            	res.respond({code:1001, message:'无法兑换售罄礼品'});
+                return;
+            }
+
+            if (!user.score || (user.score < gift.points)) {
+            	res.respond({code:1001, message:'积分不足'});
+                return;
+            }
+
+            if (deliveryType && deliveryType === DELIVERYTYPE['SONGHUO'].id) {
+                UseraddressService.get({"id": addressId}, function(err, address) {
+                    if(err || !address){
+                        res.respond({code:1001, message:'收货地址不存在'});
+                        return;
+                    }
+                    var addOrderOptions = {};
+                    addOrderOptions.user = user;
+                    addOrderOptions.gift = gift;
+                    addOrderOptions.deliveryType = deliveryType;
+                    // addOrderOptions.address = address;
+
+                    addOrderOptions.addressInfo = {
+                        "consigneeName": address.receiptpeople,
+                        "consigneePhone": address.receiptphone,
+                        "consigneeAddress": address.provincename + address.cityname + (address.countyname || '') + (address.townname || '') + address.address
+                    };
+                    LoyaltypointService.addGiftOrder(addOrderOptions, function(err, response) {
+                        if(err || !response){
+                            res.respond({code:1001, message:err});
+                            return;
+                        }
+                        res.respond(response);
+                    });
+                });
+            } else if (deliveryType && deliveryType === DELIVERYTYPE['ZITI'].id) {
+                UserService.getRSCInfoById(RSCId, function(err, RSC) {
+                    if(err || !RSC){
+                        res.respond({code:1001, message:'自提点不存在'});
+                        return;
+                    }
+                    if (!RSC.RSCInfo || !RSC.RSCInfo.companyAddress || !RSC.RSCInfo.companyAddress.province.name || !RSC.RSCInfo.companyAddress.city.name) {
+                        callback("自提点地址不完整");
+                        return;
+                    }
+                    var addOrderOptions = {};
+                    addOrderOptions.user = user;
+                    addOrderOptions.gift = gift;
+                    addOrderOptions.deliveryType = deliveryType;
+                    addOrderOptions.RSCId = RSCId;
+                    addOrderOptions.consigneeName = consigneeName;
+                    addOrderOptions.consigneePhone = consigneePhone;
+
+                    addOrderOptions.RSCInfo = {RSC: RSCId};
+                    addOrderOptions.RSCInfo.RSCAddress = RSC.RSCInfo.companyAddress.province.name + RSC.RSCInfo.companyAddress.city.name;
+                    if (RSC.RSCInfo.companyAddress.county && RSC.RSCInfo.companyAddress.county.name) {
+                        addOrderOptions.RSCInfo.RSCAddress += RSC.RSCInfo.companyAddress.county.name;
+                    }
+                    if (RSC.RSCInfo.companyAddress.town && RSC.RSCInfo.companyAddress.town.name) {
+                        addOrderOptions.RSCInfo.RSCAddress += RSC.RSCInfo.companyAddress.town.name;
+                    }
+                    if (RSC.RSCInfo.companyAddress.details) {
+                        addOrderOptions.RSCInfo.RSCAddress += RSC.RSCInfo.companyAddress.details;
+                    }
+                    if (RSC.RSCInfo.companyName) {
+                        addOrderOptions.RSCInfo.companyName = RSC.RSCInfo.companyName;
+                    }
+                    if (RSC.RSCInfo.phone) {
+                        addOrderOptions.RSCInfo.RSCPhone = RSC.RSCInfo.phone;
+                    }
+                    LoyaltypointService.addGiftOrder(addOrderOptions, function(err, response) {
+                        if(err || !response){
+                            res.respond({code:1001, message:'兑换礼品失败'});
+                            return;
+                        }
+                        res.respond({code:1000, message:'success', giftOrder:response});
+                        // save user input consignee and chose RSC
+                        var userConsignee = {userId: user.id, consigneeName: consigneeName, consigneePhone: consigneePhone};
+                        UserService.saveUserConsignee(userConsignee, function(err){});
+                        var userRSC = {userId: user.id, RSCId: RSCId};
+                        UserService.saveUserRSC(userRSC, function(err){});
+                    });
+                });
+            } else {
+                res.respond({"code":1001, "message":"请先选择配送方式"});
+                return;
+            }
+        });
+    });
+};
+
 // ==========================================================================
 // rewardshop gift
 // ==========================================================================
@@ -104,8 +247,9 @@ exports.json_rewardshop_gifts = function(req, res, next) {
 
 		var resultGifts = [];
 		gifts.forEach(function(gift){
+			delete gift._id;
 			delete gift.appbody;
-			resultGifts.push(convertGift(gift));
+			resultGifts.push(LoyaltypointService.convertGift(gift));
 		});
 		res.respond({code:1000, message:'success', datas:{gifts:resultGifts, total:count, pages:pageCount, page:page}});
 	});
@@ -128,34 +272,13 @@ exports.json_rewardshop_giftDetail = function(req, res, next) {
             gift.appbody_url = '';
 		}
         
-		res.respond({code:1000, message:'success', gift: convertGift(gift)});
+		res.respond({code:1000, message:'success', gift: LoyaltypointService.convertGift(gift)});
 	});
 }
 
-function convertGift(gift) {
-	if (gift) {
-		if (gift.category && gift.category.ref)
-			gift.category = gift.category.ref;
-	}
-	
-	if (gift.pictures) {
-		var pictures = [];
-	    gift.pictures.forEach(function(pic){
-	        var picture = {};
-	        picture.largeUrl = '/images/large/' + pic + '.jpg';
-	        picture.thumbnail = '/images/thumbnail/' + pic + '.jpg';
-	        picture.originalUrl = '/images/original/' + pic + '.jpg';
-	        pictures.push(picture);
-	    });
-
-	    gift.largeUrl = pictures[0] ? pictures[0].largeUrl : '';
-	    gift.thumbnail = pictures[0] ? pictures[0].thumbnail : '';
-	    gift.originalUrl = pictures[0] ? pictures[0].originalUrl : '';
-	    gift.pictures = pictures;
-	}
-	return gift;
-}
-
+// ==========================================================================
+// rewardshop views
+// ==========================================================================
 
 // get gift info page
 exports.view_gift_info = function (req, res, next) {

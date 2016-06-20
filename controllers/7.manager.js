@@ -2209,8 +2209,37 @@ exports.json_RSC_info_get = function(req,res,next){
 				delete RSCInfo.products;
 			}
 		}
-		res.respond({code:1000, message:'success', RSCInfo:RSCInfo, id:user.id, account:user.account});
-	})
+		if (RSCInfo.rewardshopGifts && RSCInfo.rewardshopGifts.length > 0) {
+			LoyaltypointService.queryRewardshopGiftCategories(null, function(err, categories) {
+				if (err) {
+					res.respond({code:1000, message:'success', RSCInfo:RSCInfo, id:user.id, account:user.account});
+					return;
+				}
+				
+				if (categories && categories.length > 0) {
+					var giftsCategories = {};
+					categories.forEach(function(category){
+						giftsCategories[category._id] = category;
+					});
+					var gifts = [];
+					RSCInfo.rewardshopGifts.forEach(function(gift) {
+						var g = gift.toObject();
+						if (gift && gift.category && giftsCategories[gift.category.ref]) {
+							g.category = {
+								name: giftsCategories[gift.category.ref].name,
+								ref: gift.category.ref
+							};
+						}
+						gifts.push(g);
+					});
+					RSCInfo.rewardshopGifts = gifts;
+				}
+				res.respond({code:1000, message:'success', RSCInfo:RSCInfo, id:user.id, account:user.account});
+			});
+		} else {
+			res.respond({code:1000, message:'success', RSCInfo:RSCInfo, id:user.id, account:user.account});
+		}
+	});
 };
 
 exports.json_RSC_query = function(req, res, next){
@@ -2259,7 +2288,6 @@ exports.process_RSC_modify = function(req, res, next){
 			}
 		});
 	} else {
-		console.log(req.data);
 		RSCService.modifyRSCInfo(req.data.id, req.data, function(err){
 			if(err){
 				res.respond({code:1002, message:err});

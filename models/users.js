@@ -58,6 +58,7 @@ var UserSchema = new mongoose.Schema({
             details:String
         },
         "products":[{type:mongoose.Schema.ObjectId, ref:"product"}],        // products RSC served
+        "rewardshopGifts":[{type:mongoose.Schema.ObjectId, ref:"rewardshopgift"}],  // rewardshopgift RSC served
         "supportEPOS":{type: Boolean},                                      // support EPOS, true: yes  false:no
         "EPOSNo":{type:String}                                              // RPOS No
     },

@@ -2,6 +2,12 @@ select {
     outline: none;
 }
 
+.rsc-tab-block {
+    display: none;
+    border: 1px solid #ddd;
+    padding: 10px;
+}
+
 .rsc-base-td {
     position: relative;
     cursor: pointer;
@@ -46,7 +52,12 @@ select {
     margin-right: 10%;
 }
 
-#products-edit-box {
+.gifts-edit-btn {
+    cursor: pointer;
+    margin-right: 10%;
+}
+
+#products-edit-box, #gifts-edit-box {
     width: 50%;
     background-color: #fff;
     border: 1px solid #ccc;
@@ -107,6 +118,7 @@ select {
     padding: 0 10%;
     cursor: pointer;
     position: relative;
+    height: 20px;
 }
 
 .products-edit-left .products-edit-list-ul > li:hover {
@@ -136,15 +148,12 @@ select {
     margin-left: -50px;
 }
 
-.products-edit-btn {
-    cursor: pointer;
-}
-
 .products-edit-right .products-edit-list-ul li .fa-times-circle {
     color: #777;
     display: none;
     position: absolute;
     right: 0;
+    line-height: 20px;
 }
 
 .products-edit-right .products-edit-list-ul li:hover .fa-times-circle {
@@ -159,7 +168,7 @@ select {
     cursor: pointer;
 }
 
-#add-brand-box {
+#add-brand-box, #add-gifts-box {
     position: fixed;
     width: 50%;
     left: 25%;
@@ -174,7 +183,7 @@ select {
     z-index: 100;
 }
 
-#add-brand-box .brands-bit {
+#add-brand-box .brands-bit, #add-gifts-box .giftcategory-bit {
     cursor: pointer;
     height: 30px;
     background-color: #ddd;
@@ -185,12 +194,12 @@ select {
     margin-left: 20px;
 }
 
-#add-brand-box .brands-bit:hover {
+#add-brand-box .brands-bit:hover, #add-gifts-box .giftcategory-bit:hover {
     color: #ddd;
     background-color: #B5B5B5;
 }
 
-#add-brand-box .brands-bit:first-child {
+#add-brand-box .brands-bit:first-child, #add-gifts-box .giftcategory-bit:first-child {
     margin-left: 0;
 }
 
@@ -458,4 +467,3 @@ select {
     }
 
 }
-
