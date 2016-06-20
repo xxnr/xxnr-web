@@ -3,6 +3,8 @@
  */
 var mongoose = require("mongoose");
 var tools = require('../common/tools');
+var DELIVERYTYPE =  require('../common/defs').DELIVERYTYPE;
+var DELIVERSTATUS = require('../common/defs').DELIVERSTATUS;
 var LOYALTYPOINTSTYPE = require('../common/defs').LOYALTYPOINTSTYPE;
 var UserModel = require('../models').user;
 var LoyaltyPointsLogsModel = require('../models').loyaltypointslogs;

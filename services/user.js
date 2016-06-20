@@ -491,6 +491,7 @@ UserService.prototype.getRSCInfoById = function(_id, callback){
         .populate({path: 'RSCInfo.companyAddress.county', select: ' -__v'})
         .populate({path: 'RSCInfo.companyAddress.town', select: ' -__v'})
         .populate({path:'RSCInfo.products', select:' _id category brand name'})
+        .populate({path:'RSCInfo.rewardshopGifts', select:' _id category name online'})
         .select('-_id id account RSCInfo')
         .exec(function(err, user){
             if(err){

@@ -15,40 +15,41 @@
         <div class="rsc-tab-ul">
             <a href="#1">基础信息</a>
             <a href="#2">服务范围</a>
+            <a href="#3">礼品管理</a>
             <a class="clear"></a>
         </div>
     </div>
-    <div data-component="template" data-component-path="rscInfo" data-component-id="rscInfo">
+    <div class="rsc-tab-block col-md-12" data-component="template" data-component-path="rscInfo" data-component-id="rscInfo">
         <script type="text/html">
-            <div class="rsc-tab-block" style="display: none;">
+            <div class="col-md-12">
                 {{if base}}
                 <table class="table table-bordered" border="0">
                     <tr>
-                        <td class="col-xs-4 active">网点ID</td>
-                        <td id="recInfoId">{{base.id}}</td>
+                        <td class="col-xs-2 active">网点ID</td>
+                        <td id="rscInfoId">{{base.id}}</td>
                     </tr>
                     <tr>
-                        <td class="col-xs-4 active">网点编号</td>
-                        <td id="recInfoId">{{base.IDNo}}</td>
+                        <td class="col-xs-2 active">网点编号</td>
+                        <td>{{base.IDNo}}</td>
                     </tr>
                     <tr>
-                        <td class="col-xs-4 active">网点名称</td>
+                        <td class="col-xs-2 active">网点名称</td>
                         <td class="rsc-base-td"><input type="text" value="{{base.companyName}}"  class="border-none" attrName="companyName" attrTitle = "网点名称" readonly><div class="edit-btn"><span class="fa fa-pencil"></span></div><div class="confirm-btn">确定</div></td>
                     </tr>
                     <tr>
-                        <td class="col-xs-4 active">负责人姓名</td>
+                        <td class="col-xs-2 active">负责人姓名</td>
                         <td class="rsc-base-td"><input type="text" value="{{base.name}}"  class="border-none" attrName="name" attrTitle="负责人姓名" readonly><div class="edit-btn"><span class="fa fa-pencil"></span></div><div class="confirm-btn">确定</div></td>
                     </tr>
                     <tr>
-                        <td class="col-xs-4 active">身份证号码</td>
+                        <td class="col-xs-2 active">身份证号码</td>
                         <td class="rsc-base-td"><input type="text" value="{{base.IDNo}}" class="border-none" attrName="IDNo" attrTitle="身份证号码" readonly><div class="edit-btn"><span class="fa fa-pencil"></span></div><div class="confirm-btn">确定</div></td>
                     </tr>
                     <tr>
-                        <td class="col-xs-4 active">负责人手机</td>
+                        <td class="col-xs-2 active">负责人手机</td>
                         <td class="rsc-base-td"><input type="text" value="{{base.phone}}"  class="border-none" attrName="phone" attrTitle="负责人手机" readonly><div class="edit-btn"><span class="fa fa-pencil"></span></div><div class="confirm-btn">确定</div></td>
                     </tr>
                     <tr>
-                        <td class="col-xs-4 active">所属地区</td>
+                        <td class="col-xs-2 active">所属地区</td>
                         <td>
                             <select id="provinceList" class="rsc-select">
                                 {{if provinceList}}
@@ -86,7 +87,7 @@
                         </td>
                     </tr>
                     <tr>
-                        <td class="col-xs-4 active">详细地址</td>
+                        <td class="col-xs-2 active">详细地址</td>
                         <td class="rsc-base-td">
                             {{if base.companyAddress}}
                             <input type="text" value="{{base.companyAddress ? base.companyAddress.details : ''}}"  class="border-none" attrName="detailAddress" attrTitle="详细地址" readonly><div class="edit-btn">
@@ -95,7 +96,7 @@
                         </td>
                     </tr>
                     <tr>
-                        <td class="col-xs-4 active">用户名</td>
+                        <td class="col-xs-2 active">用户名</td>
                         <td>{{base.account}}</td>
                     </tr>
                     <!--<tr>-->
@@ -105,67 +106,93 @@
                 </table>
                 {{fi}}
             </div>
-            <div class="rsc-tab-block" style="display: none;border:1px solid #ddd;padding: 5px 10px;">
-                {{if base}}
-                <br>
-                服务站服务内容：
-                <br>
-                <div>支付方式：<label><input type="checkbox" name="payType" checked selected disabled>支持线下支付</label>&nbsp;&nbsp;&nbsp;<label><input type="checkbox" name="payType" id="EPOSSupport" maxlength="20" {{if base.supportEPOS}}checked{{fi}}>支持EPOS</label>&nbsp;&nbsp;&nbsp;
-                    <input type="text" id="EPOSNo" placeholder="填写绑定EPOS设备号" {{if !base.supportEPOS}}disabled{{fi}}  style="padding-left: 10px;width:180px;" value="{{if base.EPOSNo}}{{if base.supportEPOS}}{{base.EPOSNo}}{{fi}}{{fi}}" maxlength="20">
-                    <button id="EPOS_save" disabled>保存</button>
-                </div>
+        </script>
+    </div>
+    <div class="rsc-tab-block" data-component="template" data-component-path="rscInfo">
+        <script type="text/html">
+            {{if base}}
+            <h5>服务站服务内容：</h5>
+            <div class="mb10">支付方式：<label><input type="checkbox" name="payType" checked selected disabled>支持线下支付</label>&nbsp;&nbsp;&nbsp;<label><input type="checkbox" name="payType" id="EPOSSupport" maxlength="20" {{if base.supportEPOS}}checked{{fi}}>支持EPOS</label>&nbsp;&nbsp;&nbsp;
+                <input type="text" id="EPOSNo" placeholder="填写绑定EPOS设备号" {{if !base.supportEPOS}}disabled{{fi}}  style="padding-left: 10px;width:180px;" value="{{if base.EPOSNo}}{{if base.supportEPOS}}{{base.EPOSNo}}{{fi}}{{fi}}" maxlength="20">
+                <button id="EPOS_save" disabled>保存</button>
+            </div>
+            {{fi}}
+            <h5>服务站经营商品范围：</h5>
+            <table class="table table-bordered" border="0">
+                <tr>
+                    <td class="col-xs-1 hidden-xs ui-left">序号</td>
+                    <td class="ui-left col-xs-1">品牌</td>
+                    <td class="ui-left col-xs-4">商品</td>
+                    <td class="ui-left col-xs-2">操作</td>
+                </tr>
+                {{if products && products['汽车']}}
+                {{foreach brand in products['汽车']}}
+                <tr>
+                    <td class="ui-left col-xs-1">{{$index + 1}}</td>
+                    <td class="ui-left col-xs-1">{{brand.name}}</td>
+                    <td class="ui-left col-xs-4">
+                        {{if brand.products}}
+                            {{foreach product in brand.products}}
+                            <span>{{if $index != 0 && brand.products.length != 1}}&nbsp;&nbsp;|&nbsp;&nbsp;{{fi}}{{product.name}}</span>
+                            {{end}}
+                        {{fi}}
+                    </td>
+                    <td class="ui-center col-xs-2"><span class="fa fa-pencil products-edit-btn" brand="{{brand.brand_id}}">编辑</span><span class="fa fa-trash products-delete-btn" brand="{{brand.brand_id}}" brand_name="{{brand.name}}">删除</span></td>
+                </tr>
+                {{end}}
                 {{fi}}
-                <br>
-                <div>服务站经营商品范围：</div>
-                <table class="table table-bordered" border="0">
+
+                {{if products && products['化肥']}}
+                    {{foreach brand in products['化肥']}}
                     <tr>
-                        <td class="col-xs-1 hidden-xs ui-left">序号</td>
-                        <td class="ui-left col-xs-1">品牌</td>
-                        <td class="ui-left col-xs-4">商品</td>
-                        <td class="ui-left col-xs-2">操作</td>
-                    </tr>
-                    {{if products && products['汽车']}}
-                    {{foreach brand in products['汽车']}}
-                    <tr>
-                        <td class="ui-left col-xs-1">{{$index + 1}}</td>
+                        <td class="ui-left col-xs-1">{{if products['汽车']}}{{products['汽车'].length + $index + 1}}{{else}}{{$index + 1}}{{fi}}</td>
                         <td class="ui-left col-xs-1">{{brand.name}}</td>
                         <td class="ui-left col-xs-4">
                             {{if brand.products}}
                                 {{foreach product in brand.products}}
-                                <span>{{if $index != 0 && brand.products.length != 1}}&nbsp;&nbsp;|&nbsp;&nbsp;{{fi}}{{product.name}}</span>
+                                {{if $index != 0 && brand.products.length != 1}}&nbsp;&nbsp;|&nbsp;&nbsp;{{fi}}{{product.name}}
                                 {{end}}
                             {{fi}}
                         </td>
-                        <td class="ui-center col-xs-2"><span class="fa fa-pencil products-edit-btn" brand="{{brand.brand_id}}">编辑</span><span class="fa fa-trash products-delete-btn" brand="{{brand.brand_id}}" brand_name="{{brand.name}}">删除</span></td>
+                        <td class="ui-center col-xs-2"><span  class="fa fa-pencil products-edit-btn" brand="{{brand.brand_id}}">编辑</span><span class="fa fa-trash products-delete-btn" brand="{{brand.brand_id}}" brand_name="{{brand.name}}">删除</span></td>
+                    </tr>
+                    {{end}}
+                {{fi}}
+            </table>
+            <div class="ui-buttons"><button id="add-brand" style="width:70px;height:30px;">新增</button></div>
+        </script>
+    </div>
+    <div class="rsc-tab-block">
+        <h5>服务站礼品管理：</h5>
+        <div data-component="template" data-component-path="rscInfo">
+            <script type="text/html">
+                <table class="table table-bordered" class="ui-grid" border="0">
+                    {{if gifts && gifts.length > 0 }}
+                    <tr>
+                        <td class="hidden-xs ui-left col-xs-1">序号</td>
+                        <td class="hidden-xs ui-left col-xs-2">类目</td>
+                        <td class="hidden-xs ui-left col-xs-4">礼品</td>
+                        <td class="hidden-xs ui-center col-xs-2">操作</td>
+                    </tr>
+                    {{foreach categoryGifts in gifts}}
+                    <tr>
+                        <td class="ui-left col-xs-1">{{$index + 1}}</td>
+                        <td class="ui-left col-xs-2">{{categoryGifts.name}}</td>
+                        <td class="ui-left col-xs-4">
+                            {{if categoryGifts.gifts}}
+                                {{foreach gift in categoryGifts.gifts}}
+                                {{if $index != 0 && categoryGifts.gifts.length != 1}}&nbsp;&nbsp;|&nbsp;&nbsp;{{fi}}{{gift.name}}
+                                {{end}}
+                            {{fi}}
+                        </td>
+                        <td class="ui-center col-xs-2"><span class="fa fa-pencil gifts-edit-btn" category_id="{{categoryGifts._id}}" category_name="{{categoryGifts.name}}">编辑</span></td>
                     </tr>
                     {{end}}
                     {{fi}}
-
-                    {{if products && products['化肥']}}
-                        {{foreach brand in products['化肥']}}
-                        <tr>
-                            <td class="ui-left col-xs-1">{{if products['汽车']}}{{products['汽车'].length + $index + 1}}{{else}}{{$index + 1}}{{fi}}</td>
-                            <td class="ui-left col-xs-1">{{brand.name}}</td>
-                            <td class="ui-left col-xs-4">
-                                {{if brand.products}}
-                                    {{foreach product in brand.products}}
-                                    {{if $index != 0 && brand.products.length != 1}}&nbsp;&nbsp;|&nbsp;&nbsp;{{fi}}{{product.name}}
-                                    {{end}}
-                                {{fi}}
-                            </td>
-                            <td class="ui-center col-xs-2"><span  class="fa fa-pencil products-edit-btn" brand="{{brand.brand_id}}">编辑</span><span class="fa fa-trash products-delete-btn" brand="{{brand.brand_id}}" brand_name="{{brand.name}}">删除</span></td>
-                        </tr>
-                        {{end}}
-                    {{fi}}
-                    <tr>
-                        <td class="col-xs-1 hidden-xs" id="add-brand">新增</td>
-                        <td class="ui-left col-xs-1"></td>
-                        <td class="ui-left col-xs-4"></td>
-                        <td class="ui-center col-xs-2"></td>
-                    </tr>
                 </table>
-            </div>
-        </script>
+            </script>
+        </div>
+        <div class="ui-buttons"><button id="add-gifts" style="width:70px;height:30px;">新增</button></div>
     </div>
     <div id="add-brand-box" data-component="template" data-component-path="rscAddBrand" data-component-id="rscAddBrand">
         <script type="text/html">
@@ -219,6 +246,62 @@
         </div>
         </script>
     </div>
+    <div id="add-gifts-box">
+        <span class="fa fa-times-circle add-brand-close" id="add-gifts-close"></span>   
+        <div data-component="template" data-component-path="rscAddGiftsCategories" data-component-id="rscAddGiftsCategories">
+            <script type="text/html">
+                <div class="padding">
+                {{if categories && categories.length > 0 }}
+                    {{foreach category in categories}}
+                    <span category_id="{{category._id}}" category_name="{{category.name}}" class="giftcategory-bit">{{category.name}}</span>
+                    {{end}}
+                {{fi}}
+                </div>
+            </script>
+        </div>
+    </div>
+    <div id="gifts-edit-box" data-component="template" data-component-path="rscCategoryGifts" data-component-id="rscCategoryGifts">
+        <div class="products-edit-title">选择经营礼品</div>
+        <script type="text/html">
+        <div class="products-edit-con">
+            <div class="products-edit-left">
+                <div class="products-edit-list">
+                    <div class="products-edit-sec-title">可选类目礼品</div>
+                    <ul class="products-edit-list-ul">
+                        {{if categoryId}}
+                            {{categoryName}}
+                            {{foreach gift in gifts}}
+                            <li gift_id="{{gift._id}}" gift_name="{{gift.name}}" gift_online="{{if gift.online}}true{{else}}false{{fi}}">{{if gift.online}}<b class="mr5 fs11 green">Online</b>{{fi}}{{gift.name}}</li>
+                            {{end}}
+                        {{fi}}
+                    </ul>
+                </div>
+            </div>
+            <button class="products-edit-center" id="rsc-add-gift">添加</button>
+            <div class="products-edit-right">
+                <div class="products-edit-list">
+                    <div class="products-edit-sec-title">已选类目礼品</div>
+                    <ul class="products-edit-list-ul" class="fa fa-minus">
+                        {{if categoryId}}
+                            {{categoryName}}
+                            {{if giftsExisted}}
+                                {{foreach gift in giftsExisted}}
+                                <li gift_id="{{gift._id}}" gift_name="{{gift.name}}" gift_online="{{if gift.online}}true{{else}}false{{fi}}">
+                                    {{if gift.online}}<b class="mr5 fs11 green">Online</b>{{fi}}{{gift.name}}<span class="fa fa-times-circle gift-delete"></span>
+                                </li>
+                                {{end}}
+                            {{fi}}
+                        {{fi}}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="products-edit-btn-box">
+            <button id="gifts-edit-confirm" class="products-confirm-btn">确定</button>
+            <button id="gifts-edit-cancel" class="products-cancle-btn">取消</button>
+        </div>
+        </script>
+    </div>
 </div>
 <div id="rsc-mask"></div>
 <script>
@@ -231,6 +314,7 @@
     rscInfo.countyList = [];
     rscInfo.townList = [];
     rscInfo.addressSelected = {};
+    rscInfo.gifts;
 
     var rscProduct;
     var rscProductList = {};
@@ -248,15 +332,19 @@
     var brandProductExisted = {};
     brandProductExisted.products = [];
     var brandProductRest = [];
+    // rsc gifts categories
+    var rscGiftsData;
+    var rscAddGiftsCategories = {};
+    rscAddGiftsCategories.categories = [];
 
     var regexIdentityNo = /^(\d{15}$|^\d{18}$|^\d{17}(\d|X|x))$/;
     var regexIdentityPhone = /^(((13[0-9]{1})|(15[0-9]{1})|(18[0-9]{1}))+\d{8})$/;
     var regexIdentityEPOSNo = /^\d{20}$/;
 
     ON('#rscInfo', function(component){
-        rscInfo_load();
-
+        // rscInfo_load();
     });
+    rscInfo_load();
 
     ON('#rscBrandInfo', function (component){
         onAddProductsRefresh();
@@ -265,7 +353,7 @@
     function rscInfo_load() {
 
         $.components.GET(managerurl + '/api/brands/', null, function(response){
-            if(response.code != '1000') {
+            if(response && response.code != '1000') {
                 alert(response.message);
                 return;
             }
@@ -273,7 +361,7 @@
             SET('rscAddBrand.brandsList', response.brands);
 
             $.components.GET(managerurl + '/api/v2.2/RSCInfo/' + rscInfo_id, null, function(response) {
-                if(response.code != '1000') {
+                if(response && response.code != '1000') {
                     alert(response.message);
                     return;
                 }
@@ -331,7 +419,27 @@
                     }
                 }
                 SET('rscInfo.products',rscProductList);
+                rscGiftsData = response.RSCInfo.rewardshopGifts ? response.RSCInfo.rewardshopGifts : [];
+                var rscGifts = {};
+                for (var i = 0; i < rscGiftsData.length; i++) {
+                    var gift = rscGiftsData[i];
+                    if (gift && gift.category && gift.category.ref) {
+                        if (!rscGifts[gift.category.ref]) {
+                            rscGifts[gift.category.ref] = {_id:gift.category.ref, gifts:[]};
+                            if (gift.category.name) {
+                                rscGifts[gift.category.ref].name = gift.category.name;
+                            }
+                        }
+                        rscGifts[gift.category.ref].gifts.push(gift);
+                    }
+                }
+                rscInfo.gifts = [];
+                for (var categoryId in rscGifts) {
+                    rscInfo.gifts.push(rscGifts[categoryId]);
+                }
+                SET('rscInfo.gifts', rscInfo.gifts);
                 getProvinceList();
+                setTimeout(function(){rscDetailTabOnload();}, 100);
                 $(".products-edit-btn").off('click').on('click', function () {
                     var brandId = $(this).attr('brand');
                     brands_load(brandId);
@@ -358,12 +466,12 @@
                     }
 
                     var EPOSData = {};
-                    EPOSData.id = $("#recInfoId").text().trim();
+                    EPOSData.id = $("#rscInfoId").text().trim();
                     EPOSData.supportEPOS = document.getElementById('EPOSSupport').checked;
                     EPOSData.EPOSNo = document.getElementById('EPOSSupport').checked ? $("#EPOSNo").val() : '';
 
                     $.components.PUT(managerurl + '/api/v2.2/RSC/modify',EPOSData , function(response){
-                        if(response.code == '1000') {
+                        if(response && response.code == '1000') {
                             alert('修改成功！');
                             SET('rscInfo.base.supportEPOS',EPOSData.supportEPOS);
                             SET('rscInfo.base.EPOSNo', EPOSData.EPOSNo);
@@ -390,14 +498,14 @@
 
                 $("#save-address").off('click').on('click',function(){
                     var addressData = {
-                        id: $("#recInfoId").text().trim(),
+                        id: $("#rscInfoId").text().trim(),
                         province: $("#provinceList").val() ? $("#provinceList").val() : '',
                         city: $("#cityList").val() ? $("#cityList").val() : '',
                         county: $("#countyList").val() ? $("#countyList").val() : '',
                         town: $("#townList").val() ? $("#townList").val() : ''
                     };
                     $.components.PUT(managerurl + '/api/v2.2/RSC/modify',addressData , function(response){
-                        if(response.code == '1000') {
+                        if(response && response.code == '1000') {
                             alert('保存成功！');
                             window.location.reload();
                         } else {
@@ -411,7 +519,7 @@
                     var attrName = $(this).prev().attr('attrName');
                     var attrTitle = $(this).prev().attr('attrTitle');
                     var putData = {};
-                    putData.id = $("#recInfoId").text().trim();
+                    putData.id = $("#rscInfoId").text().trim();
                     putData[attrName]= b_value;
 
                     if(b_value.trim() == '') {
@@ -429,7 +537,7 @@
                     }
 
                     $.components.PUT(managerurl + '/api/v2.2/RSC/modify',putData , function(response){
-                        if(response.code == '1000') {
+                        if(response && response.code == '1000') {
                             alert('修改成功！');
                             window.location.reload();
                         } else {
@@ -523,7 +631,7 @@
     //删除品牌
     function brand_delete(id) {
         var putData = {};
-        putData.id = $("#recInfoId").text().trim();
+        putData.id = $("#rscInfoId").text().trim();
         // fix bug when putData.products splice the length will change
         putData.products = [];
         var products = rscProductData.slice(0);
@@ -533,7 +641,7 @@
             }
         }
         $.components.PUT(managerurl + '/api/v2.2/RSC/modify',putData , function(response){
-            if(response.code == '1000') {
+            if(response && response.code == '1000') {
                 alert('删除成功！');
                 window.location.reload();
             } else {
@@ -584,10 +692,10 @@
 
         $("#products-edit-confirm").off('click').on('click',function(){
             var putData = {};
-            putData.id = $("#recInfoId").text().trim();
+            putData.id = $("#rscInfoId").text().trim();
             putData.products = rscProductData.slice(0);
             $.components.PUT(managerurl + '/api/v2.2/RSC/modify',putData , function(response){
-                if(response.code == '1000') {
+                if(response && response.code == '1000') {
                     alert('修改成功');
                     $("#products-edit-box").hide();
                     $("#rsc-mask").hide();
@@ -624,7 +732,6 @@
             UPDATE('rscBrandInfo.brandProductRest');
             onAddProductsRefresh();
         });
-
     }
 
     //修改地址时的事件绑定
@@ -686,12 +793,12 @@
             }
 
             var EPOSData = {};
-            EPOSData.id = $("#recInfoId").text().trim();
+            EPOSData.id = $("#rscInfoId").text().trim();
             EPOSData.supportEPOS = document.getElementById('EPOSSupport').checked;
             EPOSData.EPOSNo = document.getElementById('EPOSSupport').checked ? $("#EPOSNo").val() : '';
 
             $.components.PUT(managerurl + '/api/v2.2/RSC/modify',EPOSData , function(response){
-                if(response.code == '1000') {
+                if(response && response.code == '1000') {
                     alert('修改成功！');
                     SET('rscInfo.base.supportEPOS',EPOSData.supportEPOS);
                     SET('rscInfo.base.EPOSNo', EPOSData.EPOSNo);
@@ -724,13 +831,13 @@
 
         $("#save-address").off('click').on('click',function(){
             var addressData = {};
-            addressData.id = $("#recInfoId").text().trim();
+            addressData.id = $("#rscInfoId").text().trim();
             addressData.province = $("#provinceList").val() ? $("#provinceList").val() : '';
             addressData.city = $("#cityList").val() ? $("#cityList").val() : '';
             addressData.county = $("#countyList").val() ? $("#countyList").val() : '';
             addressData.town = $("#townList").val() ? $("#townList").val() : '';
             $.components.PUT(managerurl + '/api/v2.2/RSC/modify',addressData , function(response){
-                if(response.code == '1000') {
+                if(response && response.code == '1000') {
                     alert('保存成功！');
                     window.location.reload();
                 } else {
@@ -751,7 +858,7 @@
             var attrName = $(this).prev().attr('attrName');
             var attrTitle = $(this).prev().attr('attrTitle');
             var putData = {};
-            putData.id = $("#recInfoId").text().trim();
+            putData.id = $("#rscInfoId").text().trim();
             putData[attrName]= b_value;
 
             if(b_value.trim() == '') {
@@ -764,7 +871,7 @@
             }
 
             $.components.PUT(managerurl + '/api/v2.2/RSC/modify',putData , function(response){
-                if(response.code == '1000') {
+                if(response && response.code == '1000') {
                     alert('修改成功！');
                     window.location.reload();
                 } else {
@@ -782,6 +889,7 @@
             $(this).parents('.rsc-base-td').find('input[type=text]').addClass('border-none');
             $(this).parents('.rsc-base-td').find('input[type=text]').attr('readonly',true);
         });
+        rscGiftsInit();
     }
 
 
@@ -799,7 +907,7 @@
 
     function getProvinceList() {
         $.components.GET(managerurl + '/api/area/getProvinceList/', null, function(response){
-            if(response.code != '1000') {
+            if(response && response.code != '1000') {
                 alert(response.message);
                 return;
             }
@@ -811,6 +919,9 @@
             } else {
                 p_id = $("#provinceList option").eq(0).attr('province_id');
             }
+            if (!p_id) {
+                p_id = rscInfo.addressSelected.province;
+            }
             getCityList(p_id);
         });
     }
@@ -818,7 +929,7 @@
     function getCityList(id) {
         rscInfo.addressSelected.province = id;
         $.components.GET(managerurl + '/api/area/getCityList/?provinceId=' + id, null, function(response){
-            if(response.code != '1000') {
+            if(response && response.code != '1000') {
                 alert(response.message);
                 return;
             }
@@ -831,6 +942,9 @@
             } else {
                 p_id = $("#cityList option").eq(0).attr('city_id');
             }
+            if (!p_id) {
+                p_id = rscInfo.addressSelected.city;
+            }
             getCountyList(p_id);
         });
     }
@@ -838,7 +952,7 @@
     function getCountyList(id) {
         rscInfo.addressSelected.city= id;
         $.components.GET(managerurl + '/api/area/getCountyList/?cityId=' + id, null, function(response){
-            if(response.code != '1000') {
+            if(response && response.code != '1000') {
                 alert(response.message);
                 return;
             }
@@ -851,7 +965,9 @@
             } else {
                 p_id = $("#countyList option").eq(0).attr('county_id');
             }
-
+            if (!p_id) {
+                p_id = rscInfo.addressSelected.county;
+            }
             getTownList(p_id);
         });
     }
@@ -869,14 +985,14 @@
             c_data.cityId = p_id;
         }
         $.components.GET(managerurl + '/api/area/getTownList/', c_data, function(response){
-            if(response.code != '1000') {
+            if(response && response.code != '1000') {
                 alert(response.message);
                 return;
             }
 
             SET('rscInfo.townList', response.datas.rows);
             onAddressChangeRefresh();
-            rscDetailTabOnload();
+            // rscDetailTabOnload();
         });
     }
 
@@ -890,12 +1006,27 @@
             $(".rsc-tab-ul a[href=#" + href + "]").addClass("checked");
             $(".rsc-tab-block").hide();
             $(".rsc-tab-block").eq($(".rsc-tab-ul a[href=#" + href + "]").index()).show();
+            if (href == 3) {
+                rscGiftsInit();
+                gifts_refresh_categories();
+            }
         } else {
             $(".rsc-tab-ul a").removeClass("checked");
             $(".rsc-tab-ul a").eq(0).addClass("checked");
             $(".rsc-tab-block").hide();
             $(".rsc-tab-block").eq(0).show();
         }
+        $(".rsc-tab-ul a").off('click').on('click', function(){
+            var i = $(this).index();
+            $(".rsc-tab-ul a").removeClass('checked');
+            $(this).addClass('checked');
+            $(".rsc-tab-block").hide();
+            $(".rsc-tab-block").eq(i).show();
+            if (i == 2) {
+                rscGiftsInit();
+                gifts_refresh_categories();
+            }
+        });
     }
 
     function EPOSisChanged() {
@@ -906,17 +1037,177 @@
         document.getElementById('EPOS_save').disabled = true;
     }
 
+    function rscGiftsInit() {
+        $("#add-gifts").off('click').on('click',function(){
+            $("#add-gifts-box").show();
+            $("#rsc-mask").show();
+            $("#add-gifts-close").click(function(){
+                $("#add-gifts-box").hide();
+                $("#rsc-mask").hide();
+            });
+        });
+        $(".gifts-edit-btn").off('click').on('click', function () {
+            gifts_load_by_category($(this).attr('category_id'), $(this).attr('category_name'));
+        });
+    }
+
+    // Method refreshes gifts categories
+    function gifts_refresh_categories() {
+        $.components.GET(managerurl + '/api/rewardshop/categories', null, function(response) {
+            if (response && response.code == 1000) {
+                rscAddGiftsCategories.categories = response.categories;
+            }
+            SET('rscAddGiftsCategories', rscAddGiftsCategories);
+            setTimeout(function(){
+                $("#add-gifts-box .giftcategory-bit").off('click').on('click',function(){
+                    gifts_load_by_category($(this).attr('category_id'), $(this).attr('category_name'));
+                });
+            }, 100);
+        });
+    }
+
+    function gifts_load_by_category(category_id, category_name) {
+        if (category_id) {
+            $.components.GET(managerurl + '/api/rewardshop/gifts?max=10000&category='+category_id, null, function(response) {
+                rscCategoryGifts = {categoryId: category_id, categoryName: category_name, gifts:[]};
+                var giftsExistedIds = {};
+                if (rscInfo.gifts) {
+                    for (var i = 0; i < rscInfo.gifts.length; i++) {
+                        if (rscInfo.gifts[i]._id == category_id) {
+                            rscCategoryGifts.giftsExisted = rscInfo.gifts[i].gifts;
+                            if (rscCategoryGifts.giftsExisted) {
+                                for (var j = 0; j < rscCategoryGifts.giftsExisted.length; j++) {
+                                    var gift = rscCategoryGifts.giftsExisted[j];
+                                    giftsExistedIds[gift._id] = gift.name;
+                                }
+                            }
+                            break;
+                        }
+                    }
+                }
+                if (!rscCategoryGifts.giftsExisted) {
+                    rscCategoryGifts.giftsExisted = [];
+                }
+                var gifts;
+                if (response && response.code == 1000) {
+                    gifts = response.gifts;
+                    if (gifts) {
+                        for (var i = 0; i < gifts.length; i++) {
+                            if (!giftsExistedIds[gifts[i]._id]) {
+                                rscCategoryGifts.gifts.push(gifts[i]);
+                            }
+                        }
+                    }
+                }
+                SET('rscCategoryGifts', rscCategoryGifts);
+                $("#rsc-mask").hide();
+                $("#add-gifts-box").hide();
+                $("#gifts-edit-box").show();
+                $("#rsc-mask").show();
+                onAddGiftsRefresh();
+            });
+        } else {
+            alert('礼品类目信息错误');
+        }
+    }
+
+    //添加商品弹框中的事件绑定
+    function onAddGiftsRefresh() {
+        $(".products-edit-left .products-edit-list-ul > li").off('click').on('click',function () {
+            $(".products-edit-left .products-edit-list-ul > li").removeClass('checked');
+            $(this).addClass('checked');
+        });
+        $("#rsc-add-gift").off('click').on('click', function () {
+            if ($(".products-edit-list-ul > li.checked").length != 0) {
+                var g_id = $(".products-edit-list-ul > li.checked").attr('gift_id');
+                var g_name = $(".products-edit-list-ul > li.checked").attr('gift_name');
+                var g_online = $(".products-edit-list-ul > li.checked").attr('gift_online');
+
+                rscCategoryGifts.giftsExisted.push({
+                    _id: g_id,
+                    name: g_name,
+                    online: g_online
+                });
+
+                rscGiftsData.push({
+                    _id: g_id,
+                    name: g_name
+                });
+
+                for(var i = 0 ; i < rscCategoryGifts.gifts.length; i++) {
+                    if(rscCategoryGifts.gifts[i]._id == g_id) {
+                        rscCategoryGifts.gifts.splice(i,1);
+                        break;
+                    }
+                }
+                UPDATE('rscCategoryGifts');
+                onAddGiftsRefresh();
+            }
+        });
+
+        $("#gifts-edit-cancel").off('click').on('click',function(){
+            $("#gifts-edit-box").hide();
+            $("#rsc-mask").hide();
+        });
+
+        $("#gifts-edit-confirm").off('click').on('click',function(){
+            var putData = {};
+            putData.id = $("#rscInfoId").text().trim();
+            putData.gifts = rscGiftsData.slice(0);
+            if (!confirm('你确认要提交礼品的修改？'))
+                return;
+            $.components.PUT(managerurl + '/api/v2.2/RSC/modify', putData, function(response){
+                if(response && response.code == '1000') {
+                    success();
+                    $("#gifts-edit-box").hide();
+                    $("#rsc-mask").hide();
+                    window.location.reload();
+                } else {
+                    alert(response.message);
+                }
+            });
+        });
+
+        $(".gift-delete").off('click').on('click',function () {
+            var g_id = $(this).parents('li').attr('gift_id');
+            var g_name = $(this).parents('li').attr('gift_name');
+            var g_online = $(this).parents('li').attr('gift_online');
+            rscCategoryGifts.gifts.push({
+                _id: g_id,
+                name: g_name,
+                online: g_online
+            });
+
+            for(var i = 0 ; i < rscCategoryGifts.giftsExisted.length; i++) {
+                if(rscCategoryGifts.giftsExisted[i]._id == g_id) {
+                    rscCategoryGifts.giftsExisted.splice(i,1);
+                    break;
+                }
+            }
+
+            for(var i = 0; i < rscGiftsData.length; i++) {
+                if(rscGiftsData[i]._id == g_id) {
+                    rscGiftsData.splice(i,1);
+                    break;
+                }
+            }
+
+            UPDATE('rscCategoryGifts');
+            onAddGiftsRefresh();
+        });
+    }
+
     $(function(){
 
-        rscDetailTabOnload();
+        // rscDetailTabOnload();
 
-        $(".rsc-tab-ul a").click(function(){
-            var i = $(this).index();
-            $(".rsc-tab-ul a").removeClass('checked');
-            $(this).addClass('checked');
-            $(".rsc-tab-block").hide();
-            $(".rsc-tab-block").eq(i).show();
-        });
+        // $(".rsc-tab-ul a").click(function(){
+        //     var i = $(this).index();
+        //     $(".rsc-tab-ul a").removeClass('checked');
+        //     $(this).addClass('checked');
+        //     $(".rsc-tab-block").hide();
+        //     $(".rsc-tab-block").eq(i).show();
+        // });
 
         $("#rsc-order-link").click(function(){
             window.location.href = managerurl + "/rsc/rsc-order?id=" + rscInfo_id;
