@@ -35,7 +35,10 @@ exports.json_rewardshop_get = function(req, res, next) {
         // sign info
         var result = {};
         result.score = user.score;
-        result.sign = user.sign;
+        result.sign = {};
+        if (user.sign) {
+            result.sign = user.sign;
+        }
         result.sign.signed = 0;
         result.sign.consecutiveTimes = user.sign && user.sign.consecutiveTimes ? user.sign.consecutiveTimes: 0;
         if (user.sign && user.sign.date) {
