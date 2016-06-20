@@ -467,6 +467,7 @@ LoyaltyPointsService.prototype.increase = function(user_id, points, type, descri
         return;
     }
 
+    var returnOptions = {};
     var values = {};
     // user sign points logic
     if (type && type =='SIGN') {
@@ -482,6 +483,7 @@ LoyaltyPointsService.prototype.increase = function(user_id, points, type, descri
 			}
     	}
     	sign.consecutiveTimes = consecutiveTimes;
+        returnOptions.consecutiveTimes = consecutiveTimes;
     	if (consecutiveTimes > 0) {
     		if (consecutiveTimes < maxTimes) {
 				points = points * consecutiveTimes;
@@ -505,7 +507,7 @@ LoyaltyPointsService.prototype.increase = function(user_id, points, type, descri
             return;
         }
 
-        callback(null, points);
+        callback(null, points, returnOptions);
         self.saveLog(user_id, points, type, description, ref_id);
     });
 };
