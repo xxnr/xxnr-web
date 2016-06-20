@@ -32,9 +32,52 @@ exports.json_rewardshop_get = function(req, res, next) {
 			res.respond({code: 1002, message: '获取用户积分失败'});
             return;
         }
+        // sign info
         var result = {};
         result.score = user.score;
         result.sign = user.sign;
+        result.sign.signed = 0;
+        result.sign.consecutiveTimes = user.sign && user.sign.consecutiveTimes ? user.sign.consecutiveTimes: 0;
+        if (user.sign && user.sign.date) {
+            var beijingTimeNow = moment().tz('Asia/Shanghai');
+            var nowDate = moment(beijingTimeNow).format('YYYY-MM-DD');
+            var signDate = moment(user.sign.date).format('YYYY-MM-DD');
+            var yesterday = moment(beijingTimeNow).add(-1, 'd').format('YYYY-MM-DD');
+            if (nowDate == signDate) {
+                result.sign.signed = 1;
+            } else {
+                if (yesterday !== signDate) {
+                    result.sign.consecutiveTimes = 0;
+                }
+            }
+        } else {
+            result.sign.consecutiveTimes = 0;
+        }
+        // sign img url
+        result.sign.small_imgUrl = '/images/rewardshop/sign/small/default.png';
+        result.sign.large_imgUrl = '/images/rewardshop/sign/large/default.png';
+        if (result.sign.consecutiveTimes) {
+            var filename = 'default.png';
+            switch(true) {
+                case parseInt(result.sign.consecutiveTimes) == 1:
+                    filename = 'one.png';
+                    break;
+                case parseInt(result.sign.consecutiveTimes) == 2:
+                    filename = 'two.png';
+                    break;
+                case parseInt(result.sign.consecutiveTimes) == 3:
+                    filename = 'three.png';
+                    break;
+                case parseInt(result.sign.consecutiveTimes) == 4:
+                    filename = 'four.png';
+                    break;
+                case parseInt(result.sign.consecutiveTimes) >= 5:
+                    filename = 'five.png';
+                    break;
+            }
+            result.sign.small_imgUrl = '/images/rewardshop/sign/small/' + filename;
+            result.sign.large_imgUrl = '/images/rewardshop/sign/large/' + filename;
+        }
         res.respond({code: 1000, message: 'success', datas: result});
     });
 }
