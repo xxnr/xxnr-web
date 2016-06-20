@@ -14,6 +14,7 @@
     <!-- build:css -->
     <link type="text/css" rel="stylesheet" href="css/style.css">
     <link type="text/css" rel="stylesheet" href="css/sweetalert.css">
+    <link type="text/css" rel="stylesheet" href="css/angular-flash.css">
     <!-- endbuild -->
     <link type="text/css" rel="stylesheet" href="css/invitationSweetalert.css">
     <!-- build:js -->
@@ -37,9 +38,12 @@
     <script src="js/sweetalert.min.js"></script>
     <script src="js/invitation/invitationController.js"></script>
     <script src="js/sideService.js"></script>
+    <script src="js/myPlaceholderDirective.js"></script>
+    <script src="js/angular-flash.js"></script>
     <!-- endbuild -->
 </head>
 <body ng-controller="invitationController">
+<flash-message></flash-message>
 <header ng-controller="headerController"></header>
 
 <div class="wrap nav" ng-controller="shoppingCartController">
@@ -83,6 +87,17 @@
                     <p>您还没有邀请用户,若您是新新农人的代理商，快去邀请客户吧~</p>
                 </div>
                 <div class="clients_info" ng-show="invitees.length!==0 && !showOrders">
+                    <form class="invitees_search--Form" name="searchForm" novalidate ng-submit="" >
+                        <div class="form-group clearfix">
+                            <label>
+                            </label>
+                            <input  ng-model="inviteeSearch" name="inviteeSearch"
+                                    my-placeholder="姓名/手机号"
+                                    placeholder="姓名/手机号"
+                                    />
+                            <button class="search_btn" type="submit" ng-click="search_invitees()" >搜索</button>
+                        </div>
+                    </form>
                     <p class="clients_count">我已邀请<span>{{inviteesCount}}位</span>客户</p>
                     <ul class="clients_form">
                         <li class="form_title">
@@ -115,9 +130,17 @@
                     </div>
                 </div>
                 <div class="client_order" ng-show="showOrders">
+                    <p ng-click="backToInviteesList()" class="backToClients"><span>返回我的客户</span></p>
                     <div class="orders_clientInfo">
                         <p class="title">客户订单</p>
-                        <p><span>姓名 ：{{name}}</span><span>手机号 ：{{phone}}</span><span>订单总数 : <span class="OrdersNum">{{ordersNum}}</span></span></p>
+                        <p ng-cloak>
+                            <span>姓名 ：{{name}}</span>
+                            <span>手机号 ：{{phone}}</span>
+                            <span>所在地区：<span class="orders_clientInfo--address" ng-repeat="address in addresses">{{address.name}}</span></span>
+                            <span>订单总数 :
+                                <span class="OrdersNum">{{ordersNum}}</span>
+                            </span>
+                        </p>
                     </div>
                     <div class="orders_list">
                         <div class="orders">
@@ -187,13 +210,23 @@
                 </div>
                 <div class="inviter_wrap" ng-cloak>
                     <div ng-show="inviter" class="inviter_info" ng-show="">
-                        <p class="info_title">我的代表</p>
                         <div class="inviter_img left">
                             <img ng-src={{imgUrl}} alt="">
                         </div>
-                        <div class="inviter_info left">
-                            <p>姓名：<span class="nickname" ng-cloak>{{inviterName?inviterName:"该用户未填姓名"}}</p>
-                            <p>手机：<span class="phoneNumber" ng-cloak>{{ inviter }}</span></p>
+                        <div class="inviter_text_info left">
+                            <p class="inviter_name">姓名：
+                                <span ng-cloak>{{inviterName?inviterName:"该用户未填姓名"}}</span>
+                                <img ng-if="!inviterSex" src="images/boy-img.png" alt="">
+                                <img ng-if="inviterSex" src="images/girl-img.png" alt="">
+                            </p>
+                            <p class="inviter_type">用户类型：
+                                <span ng-cloak>{{inviterType}}</span>
+                                <a ng-if="inviterIsVerified">
+                                    <img class="huizhang"  src="images/huiyuan.png" alt="" />
+                                </a>
+                            </p>
+                            <p>所在地区：<span class="inviter_info-address" ng-repeat="inviterAddress in inviterAddresses" ng-cloak>{{inviterAddress.name}}</span></p>
+                            <p>电话号码：<span class="phoneNumber" ng-cloak>{{ inviterPhone }}</span></p>
                         </div>
                     </div>
                 </div>
