@@ -2,13 +2,13 @@
  * Created by xxnr-cd on 16/4/5.
  */
 
-var app = angular.module('rsc_management', ['xxnr_common', 'shop_cart']);
+var app = angular.module('rsc_management', ['xxnr_common', 'shop_cart',"ngFlash"]);
 app.filter('fixedTwo', function () {
     return function(input) {
         return input = input.toFixed(2);
     };
 });
-app.controller('rscManagementController', function($scope, $rootScope,remoteApiService, loginService, commonService, sideService) {
+app.controller('rscManagementController', function($scope, $rootScope,remoteApiService, loginService, commonService, sideService, Flash, $timeout) {
     $scope.showTypes = [{
         name: '所有订单',
         isSelected: true
@@ -48,6 +48,7 @@ app.controller('rscManagementController', function($scope, $rootScope,remoteApiS
     $scope.pickingUp_step = 1;
     $scope.pickUpCode = null;
     $scope.orderSearchInput = '';
+    $scope.searchOrder = false;   //点击搜索订单
 
     var reset_RSC_ConfirmPayment_pop = function(){
         $scope.RSC_ConfirmPayment_payMethod = 3;
@@ -134,6 +135,7 @@ app.controller('rscManagementController', function($scope, $rootScope,remoteApiS
         }
     };
 
+
     $scope.pre_page = function() {
         if ($scope.current_page > 1) {
             $scope.current_page--;
@@ -172,6 +174,7 @@ app.controller('rscManagementController', function($scope, $rootScope,remoteApiS
                                 $scope.closePop();
                             }
                         });
+
                 }
             });
 
@@ -186,13 +189,17 @@ app.controller('rscManagementController', function($scope, $rootScope,remoteApiS
         };
         if(tabIndex != 0){   //当点击非 "所有订单"tab的时候隐藏 搜索输入框并且清空
             $scope.orderSearchInput = '';
+            $scope.searchOrder = false;
             orderQueryStr = $scope.orderSearchInput;
         }
         remoteApiService.rscGetOrders(showTypeId,page?page:$scope.current_page,null,orderQueryStr)
             .then(function(data) {
 
-                if(tabIndex != 0){   //当点击非 "所有订单"tab的时候隐藏 搜索输入框并且清空
-                    $scope.orderSearchInput = '';
+                //if(tabIndex != 0){   //当点击非 "所有订单"tab的时候隐藏 搜索输入框并且清空
+                //    $scope.orderSearchInput = '';
+                //}
+                if($scope.orderSearchInput){
+                    $scope.searchOrder = true;
                 }
                 $scope.orderList = [];
                 $scope.pageCount = data.pageCount;
@@ -252,7 +259,16 @@ app.controller('rscManagementController', function($scope, $rootScope,remoteApiS
                                 remoteApiService.getOrderDetail(order.id)
                                     .then(function(data) {
                                         if(data.code == 1000) {
-                                            $scope.RSC_ConfirmPayment_duePrice = data.datas.rows.payment.price;
+                                            if(data.datas.rows.order.orderStatus && data.datas.rows.order.orderStatus.type != 7){
+                                                var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">订单已审核';
+                                                var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, true);
+                                                $timeout(function(){
+                                                    window.location.href = window.location.href;
+                                                    return false
+                                                },3000);
+                                            }else{
+                                                $scope.RSC_ConfirmPayment_duePrice = data.datas.rows.payment.price;
+                                            }
                                         }
                                     });
                                 $scope.RSC_ConfirmPayment_consignee = order.consigneeName;

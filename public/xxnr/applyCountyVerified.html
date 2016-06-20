@@ -34,6 +34,7 @@
     <script src="js/sideService.js"></script>
     <script src="js/shoppingCart/shoppingCartService.js"></script>
     <script src="js/shoppingCart/shoppingCartController.js"></script>
+    <script src="js/angular-flash.js"></script>
     <!-- endbuild -->
 </head>
 <body>
@@ -71,7 +72,7 @@
                 <div class="form-group">
                     <label>姓名</label>
                     <input type="text" name="name" ng-model="name" ng-readonly="hasAppliedCounty" ng-class="{true:'inputReadonly'}[hasAppliedCounty]" placeholder="请填写真实姓名" ng-focus="focusShowValidate(1)" ng-blur="blurShowValidate()" under12 />
-                    <span class="focus_info ng-cloak" ng-show="fouceFormGroupNum == 1 && !applyCountyForm.name.$error.under12 && !hasAppliedCounty">
+                    <span class="focus_info ng-cloak" ng-show="focusFormGroupNum == 1 && !applyCountyForm.name.$error.under12 && !hasAppliedCounty">
                         <div class="arrow-left"></div>
                         请填写真实姓名
                     </span>
@@ -86,7 +87,7 @@
                 <div class="form-group">
                     <label>身份证号</label>
                     <input name="ID_Num" ng-model="ID_Num" ng-readonly="hasAppliedCounty" ng-class="{true:'inputReadonly'}[hasAppliedCounty]" placeholder="请填写身份证号，用于验证身份" ng-focus="focusShowValidate(2)" ng-blur="blurShowValidate()" idverfied/>
-                    <span class="focus_info ng-cloak" ng-show="fouceFormGroupNum == 2 && !applyCountyForm.ID_Num.$error.idverfied && !hasAppliedCounty">
+                    <span class="focus_info ng-cloak" ng-show="focusFormGroupNum == 2 && !applyCountyForm.ID_Num.$error.idverfied && !hasAppliedCounty">
                         <div class="arrow-left"></div>
                         请填写身份证号，用于验证身份
                     </span>
@@ -101,7 +102,7 @@
                 <div class="form-group">
                     <label>门店名称</label>
                     <input name="companyName" maxlength="20" type="text" required ng-model="companyName" ng-readonly="hasAppliedCounty" ng-class="{true:'inputReadonly'}[hasAppliedCounty]" placeholder="请填写门店名称" ng-focus="focusShowValidate(3)" ng-blur="blurShowValidate()">
-                    <span class="focus_info ng-cloak" ng-show="fouceFormGroupNum == 3 && !applyCountyForm.companyName.$error.required && !hasAppliedCounty">
+                    <span class="focus_info ng-cloak" ng-show="focusFormGroupNum == 3 && !applyCountyForm.companyName.$error.required && !hasAppliedCounty">
                         <div class="arrow-left"></div>
                         请填写门店名称（门店名称限20个汉字）
                     </span>
@@ -116,7 +117,7 @@
                 <div class="form-group">
                     <label>联系电话</label>
                     <input name="phoneNum" type="tel" phoneverfied ng-model="phoneNum" ng-readonly="hasAppliedCounty" ng-class="{true:'inputReadonly'}[hasAppliedCounty]" placeholder="请填写常用手机号" ng-focus="focusShowValidate(4)" ng-blur="blurShowValidate()">
-                    <span class="focus_info ng-cloak" ng-show="fouceFormGroupNum == 4 && !applyCountyForm.phoneNum.$error.phoneverfied && !hasAppliedCounty">
+                    <span class="focus_info ng-cloak" ng-show="focusFormGroupNum == 4 && !applyCountyForm.phoneNum.$error.phoneverfied && !hasAppliedCounty">
                         <div class="arrow-left"></div>
                         请填写常用手机号
                     </span>
@@ -142,7 +143,7 @@
                 <div class="form-group">
                     <label>详细地址</label>
                     <input name="detailAddress" type="text" maxlength="30" required ng-model="detailAddress" ng-readonly="hasAppliedCounty" ng-class="{true:'inputReadonly'}[hasAppliedCounty]" placeholder="请填写门店详细地址" ng-focus="focusShowValidate(5)" ng-blur="blurShowValidate()">
-                    <span class="focus_info ng-cloak" ng-show="fouceFormGroupNum == 5 && !applyCountyForm.detailAddress.$error.required && !hasAppliedCounty">
+                    <span class="focus_info ng-cloak" ng-show="focusFormGroupNum == 5 && !applyCountyForm.detailAddress.$error.required && !hasAppliedCounty">
                         <div class="arrow-left"></div>
                         请填写门店详细地址（限30个汉字）
                     </span>

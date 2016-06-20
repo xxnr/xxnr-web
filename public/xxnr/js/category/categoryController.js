@@ -36,7 +36,7 @@ app.controller('categoryController', function($scope, remoteApiService, commonSe
             $scope.$parent.brandsStr = null;
         }
         current_page = 1;
-        $scope.$parent.current_items = [];
+        //$scope.$parent.current_items = [];
         queryAttributes = [];
         hasAttributes = false;
 
@@ -208,7 +208,6 @@ app.controller('categoryController', function($scope, remoteApiService, commonSe
 
 
                 }
-
                 $scope.$parent.current_items = angular.copy(all_products);
                 generate_page();
 

@@ -14,6 +14,7 @@
     <!-- build:css -->
     <link type="text/css" rel="stylesheet" href="css/style.css">
     <link type="text/css" rel="stylesheet" href="css/sweetalert.css">
+    <link type="text/css" rel="stylesheet" href="css/angular-flash.css">
     <!-- endbuild -->
     <!-- build:js -->
     <script src="js/jquery.min.js"></script>
@@ -34,11 +35,13 @@
     <script src="js/sweetalert.min.js"></script>
     <script src="js/adaptiveOptBoxDirective.js"></script>
     <script src="js/sideService.js"></script>
+    <script src="js/angular-flash.js"></script>
     <!-- <script src="js/angular-ui-router.min.js"></script> -->
     <!-- endbuild -->
 
 </head>
 <body ng-controller="shoppingCartController">
+<flash-message></flash-message>
 <header ng-controller="headerController"></header>
 <div class="wrap nav" ng-controller="shoppingCartController">
     <h1 class="left logo"><a href="/">新新农人</a></h1>
@@ -70,6 +73,7 @@
     </div>
 
 </div>
+<a href="#" id="back-to-top" title="Back to top"><img src="images/backToTop.png" alt=""/></a>
 <div class="clear channel3 cart_box">
     <div class="wrap">
     <div class="buy" ng-show="shoppingCartCount>0">
@@ -195,9 +199,15 @@
     </div>
     <!-- <div ui-view></div> -->
     <div class="wrap options-box ng-hide" ng-show="shoppingCartCount>0">
-        <div class="submit-btn right"><a href="" ng-click="checkout('confirmOrder.html')">去结算</a></div>
+        <div class="cart-checkbox left">
+            <input type="checkbox" checked="checked" class="checkbox" ng-change="selectAll()" ng-model="allSelected" ng-hide="onlyHasOfflineShop()">
+        </div>
+        <div class="cart-all-text left">
+            全选
+        </div>
+        <div class="submit-btn right"><a ng-class="{false:'no-item-selected'}[totalCount>0]" href="" ng-click="checkout('confirmOrder.html')">去结算</a></div>
         <div class="price-total right">
-            <p><label>已选择商品<span class="ng-cloak">{{totalCount}}</span>件</label></p>
+            <p><label>商品数量<span class="ng-cloak">{{totalCount}}</span></label></p>
             <p><label>合计：</label><span class="total ng-cloak">¥ {{totalPrice}}</span></p>
             <!--<p><label>已节省：</label><span ng-cloak>{{totalSaving}}元</span></p>-->
         </div>
