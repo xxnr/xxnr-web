@@ -8,12 +8,12 @@
     <div class="container">
       <div class="xxnr-title xxnr-title-car">
         汽车精选
-        <div class="title-more"><a v-link="{ path: '/cars' }">更多产品&nbsp;></a></div>
+        <div class="title-more"><a v-link="{ path: '/cars' }">更多商品&nbsp;></a></div>
       </div>
       <index-products-block-list :products="indexCars"></index-products-block-list>
       <div class="xxnr-title xxnr-title-huafei">
         化肥精选
-        <div class="title-more"><a v-link="{ path: '/huafei' }">更多产品&nbsp;></a></div>
+        <div class="title-more"><a v-link="{ path: '/huafei' }">更多商品&nbsp;></a></div>
       </div>
       <index-products-block-list :products="indexHuafei"></index-products-block-list>
     </div>
@@ -39,7 +39,7 @@
   import sectionTabs from './SectionTabs.vue'
   import IndexProductsBlockList from './IndexProductsBlockList.vue'
   import appDownloadOverlay from './appDownloadOverlay.vue'
-  import { getIndexCars,getIndexHeafei,showBackBtn,hideBackBtn,showRightBtn,getSliderImages,changeRightBtnMyXXNR,changeRightBtnPathMyxxnr } from '../../vuex/actions'
+  import { getIndexCars,getIndexHeafei,showBackBtn,hideBackBtn,showRightBtn,getSliderImages,changeRightBtnMyXXNR,changeRightBtnPathMyxxnr,editTitle } from '../../vuex/actions'
   import vuxSwiper from 'vux/components/swiper'
   export default {
     vuex:{
@@ -56,7 +56,8 @@
         showRightBtn,
         getSliderImages,
         changeRightBtnMyXXNR,
-        changeRightBtnPathMyxxnr
+        changeRightBtnPathMyxxnr,
+        editTitle
       }
     },
     methods: {
@@ -97,6 +98,7 @@
         this.changeRightBtnPathMyxxnr();
         this.hideBackBtn();
         this.showRightBtn();
+        this.editTitle('新新农人');
       }
     }
   }

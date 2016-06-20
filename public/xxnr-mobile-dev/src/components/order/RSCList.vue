@@ -1,6 +1,6 @@
 <template>
   <ul class="rsc-list">
-    <li v-for="rsc in RSCList">
+    <li v-for="rsc in RSCList" @click="selectRSC($index);">
       <div class="container">
         <div class="rsc-list-name">
           {{rsc.RSCInfo.companyName}}
@@ -16,7 +16,7 @@
         <div class="rsc-list-info">
           电话：{{rsc.RSCInfo.phone}}
         </div>
-        <div class="rsc-list-radio" :class="{'checked ': RSCSelected[$index]}" @click="selectRSC($index);">
+        <div class="rsc-list-radio" :class="{'checked ': RSCSelected[$index]}">
 
         </div>
       </div>
@@ -31,7 +31,7 @@
 </template>
 
 <script>
-  import { getRSCListByProduct, selectRSC, RSCConfirm } from '../../vuex/actions'
+  import { getRSCListByProduct, selectRSC, RSCConfirm, editTitle, showBackBtn } from '../../vuex/actions'
 
   export default {
     vuex: {
@@ -42,14 +42,17 @@
       actions: {
         getRSCListByProduct,
         selectRSC,
-        RSCConfirm
+        RSCConfirm,
+        editTitle,
+        showBackBtn
       }
     },
     route: {
       activate(transition) {
         var test = window.location.href.match(new RegExp("[\?\&]" + 'id' + "=([^\&]+)", "i"));
-        //this.getRSCListByProduct(test[1]);
         this.getRSCListByProduct('570db646f2c135e878f078e5');
+        this.editTitle('选择自提网点');
+        this.showBackBtn();
         transition.next();
       }
     }

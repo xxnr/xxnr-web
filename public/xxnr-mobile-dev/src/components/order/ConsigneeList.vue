@@ -25,16 +25,17 @@
       <div class="clear"></div>
     </div>
   </div>
+  <div class="consignee-confirm" @click="saveConsignee(consigneeName, consigneePhone),showToast()">
+    确定
+  </div>
   <div class="consignee-list" v-if="consigneeList">
-    <div class="container">
-      <div class="consignee-title">
-        <img src="/assets/images/history.png">
-        &nbsp;&nbsp;&nbsp;历史收货人
-      </div>
+    <div class="consignee-title">
+      <img src="/assets/images/history.png">
+      &nbsp;&nbsp;&nbsp;历史收货人
     </div>
     <ul class="consignee-list-ul">
-      <li v-for="consignee in consigneeList">
-        <div class="consignee-checked" :class="{'checked ': consigneeSelected[$index]}" @click="selectConsignee($index);"></div>
+      <li v-for="consignee in consigneeList" @click="selectConsignee($index);">
+        <div class="consignee-checked" :class="{'checked ': consigneeSelected[$index]}"></div>
         <div class="consignee-info">
           {{consignee.consigneeName}}
           {{consignee.consigneePhone}}
@@ -42,30 +43,50 @@
       </li>
     </ul>
   </div>
-  <div class="consignee-confirm" @click="saveConsignee(consigneeName, consigneePhone);">
-    确定
+  <div class="toast-container" v-show="toastMsg.length>0">
+    <xxnr-toast :show.sync="toastShow" >
+      <p>{{toastMsg}}</p>
+    </xxnr-toast>
   </div>
 </template>
 
 <script>
-  import { getConsigneeList, saveConsignee, selectConsignee, confirmConsignee } from '../../vuex/actions'
+  import { getConsigneeList, saveConsignee, selectConsignee, confirmConsignee, showBackBtn, editTitle } from '../../vuex/actions'
+  import xxnrToast from '../../xxnr_mobile_ui/xxnrToast.vue'
 
   export default {
+    data: function () {
+      return {
+        toastShow:false
+      }
+    },
+    methods: {
+      showToast:function(){
+        this.toastShow=true;
+      }
+    },
     vuex: {
       getters: {
         consigneeList: state => state.order.consigneeList,
-        consigneeSelected: state => state.order.consigneeSelected
+        consigneeSelected: state => state.order.consigneeSelected,
+        toastMsg: state => state.toastMsg
     },
     actions: {
       getConsigneeList,
       saveConsignee,
       selectConsignee,
-      confirmConsignee
+      confirmConsignee,
+      showBackBtn,
+      editTitle
     }
+  },components: {
+    xxnrToast
   },
   route: {
     activate(transition) {
       this.getConsigneeList();
+      this.showBackBtn();
+      this.editTitle('选择收货人');
       transition.next();
     }
   }
@@ -123,7 +144,7 @@
     border-radius: 5px;
     text-align: center;
     margin-left: 8%;
-    margin-bottom: 10px;
+    margin-bottom: 50px;
   }
 
   .consignee-confirm.disabled {
@@ -164,6 +185,8 @@
     line-height: 49px;
     color: #323232;
     font-size: 16px;
+    padding: 0 2%;
+    background-color: #f0f0f0;
   }
 
   .consignee-title img {
@@ -174,4 +197,9 @@
   .consignee-checked.checked {
     background-position: 0 -19px;
   }
+
+  .consignee-list {
+    padding-bottom: 10px;
+  }
+
 </style>

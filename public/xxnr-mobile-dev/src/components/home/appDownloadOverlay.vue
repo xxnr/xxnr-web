@@ -3,9 +3,11 @@
     <img @click="closeAppDownload()" class="shut_down" src="/assets/images/download_shut_down.png" alt="">
     <img class="xxnr_logo" src="/assets/images/xxnr_logo.png" alt="">
     <p class="overlay-wording">下载客户端，注册享好礼! </p>
-    <div class="downloadBtn">
-      立即下载
-    </div>
+    <a href="http://a.app.qq.com/o/simple.jsp?pkgname=com.ksfc.newfarmer">
+      <div class="downloadBtn">
+        立即下载
+      </div>
+    </a>
   </div>
   <div v-show="showAppDownload" class="appDownload-overlay">
   </div>

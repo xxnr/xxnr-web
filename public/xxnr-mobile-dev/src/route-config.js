@@ -25,7 +25,8 @@ export function configRouter (router) {
         component: require('./components/productDetail/index.vue')
 	  },
     '/order': {
-      component: require('./components/order/index.vue')
+      component: require('./components/order/index.vue'),
+      auth: true
     },
     '/orderRSC': {
       component: require('./components/order/RSCList.vue')
@@ -44,6 +45,9 @@ export function configRouter (router) {
     },
     '/register':{
       component: require('./components/register/index.vue')
+    },
+    '/userAgreement':{
+      component: require('./components/register/userAgreement.vue')
     },
     '/my_orders':{
       name:'myOrders',

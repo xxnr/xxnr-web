@@ -11,7 +11,7 @@ export const getCategories = ({dispatch,state}) => {
 }
 export const getIndexCars = ({dispatch,state}) => {
   api.getIndexProducts(
-    {category:'6C7D8F66',page:1,max:4},
+    {category:'6C7D8F66',page:1,max:6},
     response => {
       dispatch(types.GET_INDEXCARS,response.data.products)
     }, response => {
@@ -19,7 +19,7 @@ export const getIndexCars = ({dispatch,state}) => {
 }
 export const getIndexHeafei = ({dispatch,state}) => {
   api.getIndexProducts(
-    {category:'531680A5',page:1,max:4},
+    {category:'531680A5',page:1,max:6},
     response => {
     dispatch(types.GET_INDEXHUAFEI,response.data.products)
   }, response => {
@@ -50,6 +50,11 @@ export const showBackBtn = ({dispatch,state}) => {
 export const hideBackBtn = ({dispatch,state}) => {
   dispatch(types.HIDE_BACKBUTTON)
 }
+
+export const editTitle = ({dispatch, state}, title) => {
+  dispatch(types.EDIT_TITLE, title);
+}
+
 export const hideRightBtn = ({dispatch,state}) => {
   dispatch(types.HIDE_RIGHTBUTTON)
 }
@@ -72,6 +77,11 @@ export const changeRightBtnPathMyxxnr = ({dispatch,state}) => {
 export const changeRightBtnMyXXNR = ({dispatch,state}) => {
   dispatch(types.CHANGE_RIGHTBTN_XXNR)
 }
+
+export const setRightButtonText = ({dispatch, state}, data, path) => {
+  dispatch(types.SET_RIGHTBUTTONTEXT, data, path);
+}
+
 export const goBack = ({dispatch,state}) => {
   if(window.location.hash.indexOf('my_orders')!=-1){
     //window.location.href = '#!/my_xxnr';  //对我的订单页面有个特殊的路由处理,在任何一个标签都跳会我的新新农人
@@ -148,7 +158,6 @@ export const getProductDetail = ({dispatch,state}, id) => {
   api.getProductDetail(
     {productId: id},
     response => {
-    console.log(response);
     var productDetail = response.data.datas;
     //data format
     for(var i in productDetail.SKUAdditions){
@@ -200,7 +209,7 @@ export const getProductDetail = ({dispatch,state}, id) => {
           }
           if(_flag==false){
             //state.productDetail.isAllSKUSelected = false;
-            console.log('请选中一个SKU');
+            //console.log('请选中一个SKU');
             //return false;
           }
         }
@@ -235,6 +244,10 @@ export const getProductDetail = ({dispatch,state}, id) => {
   })
 }
 
+export const clearProductDetail = ({dispatch, state}) => {
+  dispatch(types.CLEAR_PRODUCTDETAIL);
+}
+
 export const getSliderImages = ({dispatch, state}) => {
 
   api.getSliderImages(
@@ -255,7 +268,23 @@ export const sendRegisterCode = ({dispatch, state},phoneNum) => {
 }
 
 
-export const register = ({dispatch,state},phoneNumber,password,registerCode) => {
+export const register = ({dispatch,state},phoneNumber,password,registerCode,confirmPassword,policyChecked) => {
+  if(!phoneNumber){
+    alert("请输入手机号");
+    return;
+  }
+  if(!registerCode){
+    alert("请输入验证码");
+    return;
+  }
+  if(!password){
+    alert("请输入密码");
+    return;
+  }
+  if(!confirmPassword){
+    alert("请输入确认密码");
+    return;
+  }
   api.getPublicKey(response => {
     var public_key = response.data.public_key;
     var encrypt = new jsencrypt.default.JSEncryptExports.JSEncrypt();
@@ -361,8 +390,12 @@ export const buyProduct = ({dispatch, state}) => {
       },
       response => {
         if(response.data.code != 1000) {
-          alert(response.data.message);
-          return;
+          if(response.data.code == 1401) {
+            router.go('/login');
+          } else {
+            dispatch(types.SET_TOASTMSG,response.data.message);
+            return;
+          }
         }
         window.location.href = '/#!/order?id=' + state.productDetail.product.SKU_id + '&count='+ state.productDetail.productNumber;
       }, response=> {
@@ -396,11 +429,12 @@ export const RSCConfirm = ({dispatch, state}, index) => {
 
 export const getShoppingCart = ({dispatch, state}) => {
   api.getShoppingCart(response => {
-    dispatch(types.GET_SHOPPINGCART, response.data.datas.rows, response.data.datas.shopCartId);
+    dispatch(types.GET_SHOPPINGCARTBYSKU, response.data.datas.rows, response.data.datas.shopCartId);
   },
   response=> {
   })
 }
+
 export const loadNextPageOrders = ({dispatch,state},inviterPhone) => {
   let userId = state.auth.user.userid;
   api.bindInviter(
@@ -425,12 +459,15 @@ export const getConsigneeList = ({dispatch, state}) => {
 }
 
 export const saveConsignee = ({dispatch, state}, consigneeName, consigneePhone) => {
+  dispatch(types.RESET_TOASTMSG);
   api.saveConsignee({
     consigneeName: consigneeName,
     consigneePhone: consigneePhone
   },response => {
     if(response.data.code == '1000') {
       dispatch(types.SAVE_CONSIGNEE, consigneePhone, consigneeName);
+    } else {
+      dispatch(types.SET_TOASTMSG,response.data.message);
     }
   },response => {
   });
@@ -446,11 +483,7 @@ export const confirmConsignee = ({dispatch, state}, index) => {
 
 export const commitOrder = ({dispatch, state}) => {
   var sku = [];
-  for(let i = 0; i < state.order.cartList.length; i++) {
-    for(let j = 0; j < state.order.cartList[i].SKUList.length; j++) {
-      sku.push({_id: state.order.cartList[i].SKUList[j]._id, count: state.order.cartList[i].SKUList[j].count});
-    }
-  }
+  sku.push({_id: state.order.cartList._id, count: state.order.cartList.count});
 
   api.addOrder({
     shopCartId: state.order.shopCartId,
@@ -535,7 +568,7 @@ export const confirmOrder = ({dispatch, state}) => {
     SKURefs: SKURefs
   },response=>{
     if(response.data.code == '1000') {
-      alert('成功确认收货！');
+      alert('确认收货成功！');
       dispatch(types.HIDE_POPBOX);
       window.location.reload();
     } else {

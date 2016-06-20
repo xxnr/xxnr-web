@@ -9,7 +9,7 @@
 
 <script>
   import ordersList from '../ordersList.vue'
-  import { getOrders,getUserInfo,showBackBtn,hideRightBtn } from '../../vuex/actions'
+  import { getOrders,getUserInfo,showBackBtn,hideRightBtn,editTitle } from '../../vuex/actions'
 
   export default {
     vuex:{
@@ -21,7 +21,8 @@
         getOrders,
         getUserInfo,
         showBackBtn,
-        hideRightBtn
+        hideRightBtn,
+        editTitle
       }
     },
     components:{
@@ -30,6 +31,7 @@
       activate(){
         this.showBackBtn();
         this.hideRightBtn();
+        this.editTitle('我的积分');
       }
     },
   }

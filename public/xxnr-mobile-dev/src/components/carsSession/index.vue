@@ -5,7 +5,7 @@
 
 <script>
   import ProductsRowsList from '../ProductsRowsList.vue'
-  import { getCarsRowsViewCars,hideBackBtn,showBackBtn,changeRightBtnMyXXNR,changeRightBtnPathMyxxnr,showRightBtn } from '../../vuex/actions'
+  import { getCarsRowsViewCars,hideBackBtn,showBackBtn,changeRightBtnMyXXNR,changeRightBtnPathMyxxnr,showRightBtn,editTitle } from '../../vuex/actions'
   import xxnrBackToTop from '../../xxnr_mobile_ui/xxnrBackToTop.vue'
   export default {
     vuex:{
@@ -13,7 +13,7 @@
         carsRows:state => state.rowsViewProducts.rowsViewCars
       },
       actions:{
-        getCarsRowsViewCars,hideBackBtn,showBackBtn,changeRightBtnMyXXNR,changeRightBtnPathMyxxnr,showRightBtn
+        getCarsRowsViewCars,hideBackBtn,showBackBtn,changeRightBtnMyXXNR,changeRightBtnPathMyxxnr,showRightBtn,editTitle
       }
     },
     components: {
@@ -30,6 +30,7 @@
         this.showRightBtn();
         this.changeRightBtnMyXXNR();
         this.changeRightBtnPathMyxxnr();
+        this.editTitle('汽车专场');
       }
     }
   }

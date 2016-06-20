@@ -4,7 +4,8 @@
     <div class="header-bit header-back" @click="goBack()" v-if="backButtonDisplay"><img src="/assets/images/header_back_arrow.png" alt=""> </div>
     <div class="header-bit header-right" v-if="rightButtonDisplay">
       <a v-link="{path: '/' + rightButtonGoingPath}">
-        <img :src="rightButton" alt="">
+        <img :src="rightButton" alt="" v-if="!rightButtonText">
+        <span v-if="rightButtonText">{{rightButtonText}}</span>
       </a>
     </div>
   </div>
@@ -20,6 +21,7 @@
         backButtonDisplay: state => state.header.backButtonDisplay,
         rightButtonGoingPath:state => state.header.rightButtonGoingPath,
         rightButtonDisplay: state => state.header.rightButtonDisplay,
+        rightButtonText: state => state.header.rightButtonText
       },
       actions: {
         showBackBtn,goBack
@@ -31,8 +33,8 @@
 <style>
   .mobile-header {
     background-color: #00CC99;
-    height: 30px;
-    line-height: 30px;
+    height: 44px;
+    line-height: 44px;
     text-align: center;
     color: #fff;
     /*font-weight: bold;*/
@@ -43,22 +45,25 @@
   .header-bit {
     position: absolute;
     top: 0;
-    height: 30px;
-    line-height: 30px;
+    height: 44px;
+    line-height: 44px;
   }
   .header-back {
     left: 2%;
   }
   .header-back img{
     height: 20px;
-    padding-top: 6px;
+    margin-top: 12px;
   }
   .header-right {
     right: 2%;
   }
   .header-right img{
-    width: 16px;
-    height: 18px;
-    margin-top: 6px;
+    width: 18px;
+    margin-top: 13px;
+  }
+
+  .header-right a {
+    color: #fff;
   }
 </style>

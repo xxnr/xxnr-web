@@ -7,8 +7,8 @@
         <img src="../../static/assets/images/close-box.png">
       </div>
     </div>
-    <div class="confirm-product" v-for="item in orderSKUList.SKUList" v-if="item.deliverStatus == 2">
-      <div class="confirm-radio" :class="{'checked ': checkedSKUList[$index]}" @click="selectConfirmProduct($index);">
+    <div class="confirm-product" v-for="item in orderSKUList.SKUList" v-if="item.deliverStatus == 2"  @click="selectConfirmProduct($index);">
+      <div class="confirm-radio" :class="{'checked ': checkedSKUList[$index]}">
 
       </div>
       <div class="container">
@@ -98,8 +98,9 @@
     background: url('/static/assets/images/rsc_radio.png') 0 -18px no-repeat;
     width: 18px;
     height: 18px;
-    top: 37px;
+    top: 50%;
     left: 12px;
+    margin-top: -9px;
   }
 
   .confirm-radio.checked {

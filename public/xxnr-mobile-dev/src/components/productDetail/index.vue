@@ -18,7 +18,7 @@
           订金：<span class="product-deposit-num">{{'¥' + productDetail.deposit}}</span>
         </div>
         <div class="clear"></div>
-        <div class="product-SKUMarketPrice">
+        <div class="product-SKUMarketPrice" v-if="productDetail.marketMinPrice != 0">
           市场价：{{'￥ '+productDetail.marketMinPrice}} {{productDetail.marketMaxPrice==productDetail.marketMinPrice?"":"-"}} {{(productDetail.marketMaxPrice==productDetail.marketMinPrice?"":productDetail.marketMaxPrice)}}
         </div>
       </div>
@@ -29,8 +29,11 @@
   </div>
   <div class="product-detail-title" v-if="productDetail.online" @click="showAttrBox();">
     <div class="container">
-      请选择商品属性
-      <img class="productDetail-arrow" src="/assets/images/productDetail_arrow.png" alt="">
+      <div class="product-skulist">
+        <div v-if="SKUList.length == 0">请选择商品属性</div>
+        <div v-else class="product-skulist-con">已选择:<span v-for="item in SKUList">"{{item}}"</span></div>
+        <img class="productDetail-arrow" src="/assets/images/productDetail_arrow.png" alt="">
+      </div>
     </div>
   </div>
   <div class="product-detail-tab">
@@ -79,10 +82,13 @@
   <div class="bottom-btn" @click="showAttrBox();" v-if="!productDetail.presale && productDetail.online">
     {{productDetail.buyActionName}}
   </div>
-  <div class="bottom-btn presale" v-if="productDetail.presale && productDetail.online">
+  <div class="bottom-btn presale" v-if="productDetail.presale && productDetail.online" @click="showAttrBox();">
     敬请期待
   </div>
   <div class="attr-box" v-show="attrBoxDisplay">
+    <div class="close-attr-box" @click="hideAttrBox();">
+      <img src="../../../static/assets/images/close-box.png">
+    </div>
     <div class="container" style="height:400px;overflow:auto;">
       <div class="attr-product">
         <div class="attr-product-img">
@@ -91,10 +97,13 @@
         <div class="attr-product-info">
           <div class="attr-product-info-con">
             <div class="attr-product-name">
-              {{productDetail.goodsName}}
+              {{productDetail.name}}
             </div>
             <div class="attr-product-price" v-if="!productDetail.presale">
               {{'¥'+productDetail.minPrice}} {{productDetail.maxPrice==productDetail.minPrice?"":"-"}} {{(productDetail.maxPrice==productDetail.minPrice?"":productDetail.maxPrice)}}
+            </div>
+            <div v-if="productDetail.presale" style="color: #909090;">
+              即将上线
             </div>
           </div>
         </div>
@@ -115,10 +124,10 @@
           </li>
           <div class="clear"></div>
         </div>
-        <div class="sku-name">
+        <div class="sku-name" v-if="!productDetail.presale">
           数量
         </div>
-        <div class="product-num">
+        <div class="product-num" v-if="!productDetail.presale">
           <div>
             <input type="button" value="-" class="product-num-btn" @click="changeProductNumber(-1);">
             <input type="text" disabled class="product-num-text" value="{{productNumber}}" id="product-num">
@@ -158,7 +167,8 @@
     selectAddition,
     buyProduct,
     clearProductDetail,
-    showBackBtn
+    showBackBtn,
+    editTitle
   } from '../../vuex/actions'
   import xxnrToast from '../../xxnr_mobile_ui/xxnrToast.vue'
 
@@ -180,7 +190,8 @@
         tabIndex: state => state.productDetail.tabIndex,
         productNumber: state => state.productDetail.productNumber,
         isAllSKUSelected: state => state.productDetail.isAllSKUSelected,
-        toastMsg: state => state.toastMsg
+        toastMsg: state => state.toastMsg,
+        SKUList: state => state.productDetail.SKUList
       },
       actions: {
         getProductDetail,
@@ -193,18 +204,23 @@
         selectAddition,
         buyProduct,
         clearProductDetail,
-        showBackBtn
+        showBackBtn,
+        editTitle
       }
     },
     components: {
       xxnrToast
     },
+    detached() {
+      this.clearProductDetail();
+    },
     route: {
       activate (transition) {
         var query = window.location.href.match(new RegExp("[\?\&]" + 'id' + "=([^\&]+)", "i"));
         this.getProductDetail(query[1]);
-        transition.next();
         this.showBackBtn();
+        this.editTitle('商品详情');
+        transition.next();
       }//,
 //      canDeactivate (transition) {
 //        this.clearProductDetail();
@@ -221,7 +237,7 @@
   }
   .product-img img {
     width: 100%;
-    height: 200px;
+    /*height: 200px;*/
   }
 
   .product-name {
@@ -259,14 +275,16 @@
     color: #323232;
     font-size: 16px;
     line-height: 40px;
+    min-height: 40px;
     background-color: #f2f2f2;
+    position: relative;
   }
   .productDetail-arrow{
-    float: right;
+    position: absolute;
     width: 10px;
     height: 17px;
-    padding-top: 12px;
-    padding-right: 5px;
+    top: 12px;
+    right: 5px;
   }
   .bottom-btn {
     position: fixed;
@@ -385,6 +403,11 @@
     border-radius: 5px;
     padding: 0 6px;
     margin-bottom: 8px;
+    white-space: nowrap;
+    word-break: break-all;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    max-width: 98%;
   }
 
   .sku-name {
@@ -395,6 +418,7 @@
 
   .attr-product-info-con {
     margin-left: 81px;
+    padding-right: 15px;
   }
 
   .product-num-text {
@@ -457,5 +481,36 @@
     margin: 10px 0;
     font-size: 14px;
     padding: 10px 2%;
+  }
+
+  .close-attr-box {
+    position: absolute;
+    right: 2%;
+    top: 15px;
+    width: 13px;
+    height: 13px;
+    padding: 5px;
+    margin-top: -5px;
+    margin-right: -5px;
+    z-index: 10;
+  }
+
+  .close-attr-box img {
+    width: 100%;
+  }
+
+  .product-skulist {
+    font-size: 14px;
+    white-space: nowrap;
+    word-break: break-all;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    width: 90%;
+  }
+
+  .product-skulist-con{
+    font-size: 14px;
+    text-overflow: ellipsis;
+    overflow: hidden;
   }
 </style>

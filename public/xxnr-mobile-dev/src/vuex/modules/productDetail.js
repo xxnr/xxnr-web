@@ -19,13 +19,14 @@ const state= {
   productNumber: 1,
   selectedAdditions: [],
   selectedSKUs: [],
-  isAllSKUSelected: false
-
+  isAllSKUSelected: false,
+  SKUList: []
 }
 
 const mutations = {
   [GET_PRODUCTDETAIL] (state, product) {
     state.product = product;
+    document.getElementsByTagName('body')[0].scrollTop = 0;
   },
   [SHOW_ATTRBOX] (state) {
     state.attrBoxDisplay = true;
@@ -34,6 +35,7 @@ const mutations = {
         var _flag = false;
         for(var j in state.product.SKUAttributes[i].isSelected){
           if(state.product.SKUAttributes[i].isSelected[j]==true){
+            state.SKUList.push(state.product.SKUAttributes[i].name);
             _flag = true;
           }
         }
@@ -82,8 +84,17 @@ const mutations = {
     if(SKUs.SKU){
       state.product.SKU_id = SKUs.SKU._id;
       state.isAllSKUSelected = true;
+      for(var i in state.product.SKUAttributes){
+        for(var j in state.product.SKUAttributes[i].isSelected){
+          if(state.product.SKUAttributes[i].isSelected[j] == true){
+            console.log(state.product.SKUAttributes[i]);
+            state.SKUList.push(state.product.SKUAttributes[i].values[j]);
+          }
+        }
+      }
     } else {
       state.isAllSKUSelected = false;
+      state.SKUList = [];
     }
     if(SKUs.price){
       state.product.minPrice = SKUs.price.min;
@@ -117,23 +128,24 @@ const mutations = {
         state.product.SKUAdditions[i].isSelected = false;
       }
     }
+
   },
   [SELECT_ADDITION] (state, index) {
     state.selectedAdditions = [];
     if(state.product.SKUAdditions[index].isSelected){
-      state.product.minPrice = Number(state.product.minPrice) - Number(state.product.SKUAdditions[index].price);
-      state.product.maxPrice = Number(state.product.maxPrice) - Number(state.product.SKUAdditions[index].price);
+      state.product.minPrice = (Number(state.product.minPrice) - Number(state.product.SKUAdditions[index].price)).toFixed(2);
+      state.product.maxPrice = (Number(state.product.maxPrice) - Number(state.product.SKUAdditions[index].price)).toFixed(2);
     }else{
-      state.product.minPrice = Number(state.product.minPrice) + Number(state.product.SKUAdditions[index].price);
-      state.product.maxPrice = Number(state.product.maxPrice) + Number(state.product.SKUAdditions[index].price);
+      state.product.minPrice = (Number(state.product.minPrice) + Number(state.product.SKUAdditions[index].price)).toFixed(2);
+      state.product.maxPrice = (Number(state.product.maxPrice) + Number(state.product.SKUAdditions[index].price)).toFixed(2);
     }
     if(state.product.marketMinPrice != 0 && state.product.marketMaxPrice !=0){
       if(state.product.SKUAdditions[index].isSelected){
-        state.product.marketMinPrice = Number(state.product.marketMinPrice) - Number(state.product.SKUAdditions[index].price);
-        state.product.marketMaxPrice = Number(state.product.marketMaxPrice) - Number(state.product.SKUAdditions[index].price);
+        state.product.marketMinPrice = (Number(state.product.marketMinPrice) - Number(state.product.SKUAdditions[index].price)).toFixed(2);
+        state.product.marketMaxPrice = (Number(state.product.marketMaxPrice) - Number(state.product.SKUAdditions[index].price)).toFixed(2);
       }else{
-        state.product.marketMinPrice = Number(state.product.marketMinPrice) + Number(state.product.SKUAdditions[index].price);
-        state.product.marketMaxPrice = Number(state.product.marketMaxPrice) + Number(state.product.SKUAdditions[index].price);
+        state.product.marketMinPrice = (Number(state.product.marketMinPrice) + Number(state.product.SKUAdditions[index].price)).toFixed(2);
+        state.product.marketMaxPrice = (Number(state.product.marketMaxPrice) + Number(state.product.SKUAdditions[index].price)).toFixed(2);
       }
     }
     //state.product.SKUAdditions[index].$set(isSelected, !state.product.SKUAdditions[index].isSelected);
@@ -146,6 +158,11 @@ const mutations = {
     for(var i in state.product.SKUAdditions){
       if(state.product.SKUAdditions[i].isSelected == true){
         state.selectedAdditions.push(state.product.SKUAdditions[i].ref);
+        if(state.isAllSKUSelected == true){
+          state.SKUList.push(state.product.SKUAdditions[i].name);
+        } else {
+          state.SKUList = [];
+        }
       }
     }
   },

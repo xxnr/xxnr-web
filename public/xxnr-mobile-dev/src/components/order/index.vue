@@ -17,7 +17,7 @@
       <div class="container">
         <div class="order-rsc" @click="showRSCList();">
           <div class="order-rsc-bit"></div>
-          <span v-if="!orderRSC.id">订单中的商品将配送至服务站，请选择自提网点</span>
+          <span v-if="!orderRSC.address">订单中的商品将配送至服务站，请选择自提网点</span>
           {{orderRSC.address}}
         </div>
         <div class="order-consignee" @click="showConsignee();">
@@ -30,14 +30,14 @@
     </div>
     <div>
       <ul>
-        <li v-for="item in cartList">
+        <li>
           <div class="brand-name">
             <div class="container">
-              {{item.brandName}}
+              {{cartList.brandName}}
             </div>
           </div>
           <ul>
-            <li v-for="product in item.SKUList">
+            <li>
               <div class="product-con">
                 <div class="product-img">
                   <img :src="product.imgUrl">
@@ -45,7 +45,7 @@
                 <div class="product-info">
                   <div class="product-info-con">
                     <div class="product-name">
-                      {{product.productName}}
+                      {{cartList.productName}}
                     </div>
                     <div class="product-sku">
                       <span v-if="product.attributes" v-for="attribute in product.attributes">
@@ -57,16 +57,16 @@
               </div>
               <div class="product-pay-line">
                 <div class="product-pay-attr">
-                  x {{product.count}}
+                  x {{cartList.count}}
                 </div>
                 <div class="product-pay-value orange">
-                  ¥{{product.price}}
+                  ¥{{cartList.price}}
                 </div>
               </div>
               <div class="product-addtions">
                 <div class="container">
                   <ul>
-                    <li class="product-addtions-line" v-if="product.additions" v-for="addition in product.additions">
+                    <li class="product-addtions-line" v-if="product.additions" v-for="addition in cartList.additions">
                       <div class="product-addtions-attr">{{addition.name}}</div>
                       <div class="product-addtions-value">{{addition.price}}</div>
                     </li>
@@ -78,7 +78,7 @@
                   阶段一：订金
                 </div>
                 <div class="product-pay-value orange">
-                  ¥{{product.deposit}}
+                  ¥{{cartList.deposit}}
                 </div>
               </div>
               <div class="product-pay-line">
@@ -86,7 +86,7 @@
                   阶段二：尾款
                 </div>
                 <div class="product-pay-value">
-                  ¥{{product.price * product.count - product.deposit}}
+                  ¥{{cartList.price * cartList.count - cartList.deposit}}
                 </div>
               </div>
             </li>
@@ -108,7 +108,7 @@
 </template>
 
 <script>
-  import { getRSCListByProduct, getShoppingCart, commitOrder } from '../../vuex/actions'
+  import { getRSCListByProduct, getShoppingCart, commitOrder, editTitle, showBackBtn } from '../../vuex/actions'
 
   export default {
     vuex: {
@@ -122,7 +122,9 @@
       actions: {
         getRSCListByProduct,
         getShoppingCart,
-        commitOrder
+        commitOrder,
+        editTitle,
+        showBackBtn
       }
     },
     methods: {
@@ -137,6 +139,13 @@
     },
     created() {
       this.getShoppingCart();
+    },
+    route: {
+      activate(){
+        this.editTitle('提交订单');
+        this.showBackBtn();
+        document.getElementsByTagName('body')[0].scrollTop = 0;
+      }
     }
   }
 

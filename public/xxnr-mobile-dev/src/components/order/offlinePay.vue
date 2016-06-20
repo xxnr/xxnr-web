@@ -42,7 +42,7 @@
 </template>
 
 <script>
-  import { offlinePay, getOrderDetail } from '../../vuex/actions'
+  import { offlinePay, getOrderDetail, editTitle, showBackBtn, hideRightBtn } from '../../vuex/actions'
 
   export default {
     vuex: {
@@ -51,12 +51,16 @@
     },
     actions: {
       offlinePay,
-      getOrderDetail
+      getOrderDetail,
+      editTitle,
+      showBackBtn
     }
   },
   route: {
     activate(transition) {
       this.getOrderDetail();
+      this.showBackBtn();
+      this.editTitle('选择支付方式');
       transition.next();
     }
   }

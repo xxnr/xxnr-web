@@ -38,7 +38,14 @@
     outline: none;
     background: none;
     font-family: "Microsoft YaHei";
+    border-radius: 0;
+    opacity: 1;
   }
+
+  input[type=button] {
+    -webkit-appearance: none;
+  }
+
   em {
     font-style: normal;
   }
@@ -111,7 +118,7 @@
     /*-webkit-user-modify:read-write-plaintext-only;*/
   }
   .mainContainer{
-    padding-top: 30px;
+    padding-top: 44px;
   }
   @keyframes fadein {
      from { opacity: 0; }
