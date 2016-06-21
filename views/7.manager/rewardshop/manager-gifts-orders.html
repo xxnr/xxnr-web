@@ -40,7 +40,7 @@
 			                <td style="width:30px" class="hidden-xs ui-center">{{ $index + 1 }}</td>
 			                <td style="width:80px" class="hidden-xs ui-right" title="{{order.dateCreated | format('yyyy-MM-dd HH:mm:ss')}}">{{ order.dateCreated | format('yyyy-MM-dd HH:mm:ss') }}</td>
 			                <td style="width:70px" class="hidden-xs ui-center" title="{{if order.buyerName}}{{order.buyerName}}{{else}}{{if order.buyerPhone}}{{order.buyerPhone}}{{fi}}{{fi}}">{{ order.buyerName }}</br>{{ order.buyerPhone }}</td>
-			                <td style="width:75px" class="hidden-xs ui-left" title="{{order.gift.name}}">{{if order.gift.thumbnail}}<img src="{{ order.gift.thumbnail }}"></img>{{fi}}{{ order.gift.name }}</td>
+			                <td style="width:75px" class="hidden-xs ui-left" title="{{order.gift.name}}">{{if order.gift.thumbnail}}<img width="30%" src="{{ order.gift.thumbnail }}"></img>{{fi}}{{ order.gift.name }}</td>
 			                <td style="width:70px" class="hidden-xs ui-center" title="{{if order.consigneeName}}{{order.consigneeName}}{{else}}{{if order.consigneePhone}}{{order.consigneePhone}}{{fi}}{{fi}}">{{ order.consigneeName }}</br>{{ order.consigneePhone }}</td>
 			                <td style="width:40px" class="hidden-xs ui-center" title="{{if order.deliveryType==1}}自提{{else}}配送到户{{fi}}">{{ if order.deliveryType==1 }}自提{{ else }}配送到户{{ fi }}</td>
 			                <td style="width:45px" class="hidden-xs ui-center" title="{{order.deliveryCode}}">{{ order.deliveryCode }}</td>
