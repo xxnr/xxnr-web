@@ -622,12 +622,12 @@ exports.addOrderBySKU = function(req, res, next){
         return;
     }
 
-    if (deliveryType && deliveryType === DELIVERYTYPE['SONGHUO'].id) {
+    if (deliveryType && parseInt(deliveryType) === DELIVERYTYPE['SONGHUO'].id) {
         if (!addressId) {
             res.respond({"code":1001, "message":"请先填写收货地址"});
             return;
         }
-    } else if (deliveryType && deliveryType === DELIVERYTYPE['ZITI'].id) {
+    } else if (deliveryType && parseInt(deliveryType) === DELIVERYTYPE['ZITI'].id) {
         if (!RSCId) {
             res.respond({"code":1001, "message":"请先选择自提点"});
             return;

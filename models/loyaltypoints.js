@@ -87,14 +87,16 @@ var RewardshopGiftOrderSchema = new mongoose.Schema({
 		'points': {type: Number},
 		'marketPrice': {type: Number},
 		'online': {type: Number},
-		'soldout': {type: Number},
-        'dateSet': {type: Date}														// 后台用户设置的日期
+		'soldout': {type: Number}
 	},
 	'points': {type: Number},
 	'deliverStatus': {type: Number, required: true}, 								// 发货状态 分为未发货、离开服务站、已收货
 	'dateDelivered': {type: Date},													// 订单发货时间，订单中商品全部离开RSC的时间
 	'dateCompleted': {type: Date},													// 订单完成时间
-	'deliveryCode': {type: String}													// 提货码	
+	'deliveryCode': {type: String},													// 提货码
+	'dateSet': {type: Date},														// 后台用户设置的日期
+	'backendUser':{type: mongoose.Schema.ObjectId, ref:'backenduser'},				// 设置本条信息的后台用户
+	'backendUserAccount':{type: String}												// 设置本条信息的后台用户账户
 });
 
 RewardshopGiftOrderSchema.index({dateCreated: -1});

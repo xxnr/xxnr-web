@@ -194,9 +194,12 @@ var moment = require('moment');
 // ==========================================================================
 
 // pages
-exports.rewardshop = function(req, res, next) {
-	res.render(path.join(__dirname, '../views/7.manager/rewardshop/manager-rewardshop'),
-		{}
+exports.rewardshop_gifts_orders = function(req, res, next) {
+	res.render(path.join(__dirname, '../views/7.manager/rewardshop/manager-gifts-orders'),
+		{
+			manager_url:F.config['manager-url'],
+			page:'manager-gifts-orders'
+		}
 	);
 }
 
@@ -347,7 +350,6 @@ exports.json_rewardshop_gift_get = function(req, res, next) {
 }
 
 exports.json_rewardshop_pointslogs = function(req, res, next) {
-	var self = this;
 	var page = U.parseInt(req.data.page, 1) - 1;
 	var max = U.parseInt(req.data.max, 20);
 	if (req.data.search) {
@@ -407,6 +409,61 @@ function fixPointslogs(pointslogs) {
 	}
 }
 
+exports.json_rewardshop_giftorders = function(req, res, next) {
+	var page = U.parseInt(req.data.page, 1) - 1;
+	var max = U.parseInt(req.data.max, 20);
+	LoyaltypointService.queryGiftOrders(null, req.data.type, req.data.times, req.data.search, page, max, function(err, giftorders, count, pageCount) {
+		if (err) {
+			res.respond({code:1002, message:'获取积分兑换记录失败'});
+			return;
+		}
+		var results = [];
+		giftorders.forEach(function(giftorder) {
+			giftorder.orderStatus = LoyaltypointService.giftOrderStatus(giftorder);
+			results.push(giftorder);
+		});
+		res.respond({code:1000, message:'success', giftorders:results, count:count, pageCount:pageCount, page:page+1});
+	});
+}
+
+exports.json_rewardshop_giftorders_update = function(req, res, next) {
+	if (!req.data.id) {
+		res.respond({code:1001, message:'请填写订单ID'});
+		return;
+	}
+
+	LoyaltypointService.getGiftOrder(req.data.id, null, function(err, giftOrder) {
+		if (err) {
+			res.respond({code:1002, message:'获取积分兑换记录失败'});
+			return;
+		}
+		if (!giftOrder) {
+			res.respond({code:1001, message:'没有找到相应的积分兑换记录'});
+			return;
+		}
+		if (req.data.deliverStatus) {
+			if (!req.data.deliveryCode) {
+				res.respond({code:1001, message:'修改发货状态前请先输入配送码'});
+				return;
+			}
+			if (req.data.deliveryCode.trim() != giftOrder.deliveryCode) {
+				res.respond({code:1001, message:'配送码错误'});
+				return;
+			}
+		}
+		var options = {};
+		if (req.user) {
+	    	options.backendUser = req.user;
+	    }
+		LoyaltypointService.updateGiftOrder(req.data.id, null, req.data.deliverStatus, options, function(err, giftOrder) {
+			if (err) {
+				res.respond({code:1002, message:'修改积分兑换记录失败'});
+				return;
+			}
+			res.respond({code:1000, message:'success'});
+		});
+	});
+}
 
 // ==========================================================================
 // COMMON
@@ -512,7 +569,7 @@ exports.json_province_query = function(req, res, next) {
 	AreaService.queryProvince(options, function(err, data){
 		if(!data || err){
 			if (err)
-				console.log('area json_province_query err:' + err);
+				console.error('area json_province_query err:' + err);
 			res.respond({'code':'1001','message':'没有查询到省份'});
 			return;
 		} else{
@@ -531,7 +588,7 @@ exports.json_city_query = function(req, res, next) {
 	AreaService.queryCity(options, function(err, data){
 		if(!data || err){
 			if (err)
-				console.log('area json_city_query err:' + err);
+				console.error('area json_city_query err:' + err);
 			res.respond({'code':'1001','message':'没有查询到城市'});
 			return;
 		} else{
@@ -552,7 +609,7 @@ exports.json_county_query = function(req, res, next) {
 	AreaService.queryCounty(options, function(err, data){
 		if(!data || err) {
 			if (err)
-				console.log('area json_county_query err:' + err);
+				console.error('area json_county_query err:' + err);
 			res.respond({'code':'1001','message':'没有查询到县区'});
 			return;
 		} else {
@@ -575,7 +632,7 @@ exports.json_town_query = function(req, res, next) {
 	AreaService.queryTown(options, function(err, data){
 		if(!data || err) {
 			if (err)
-				console.log('area json_town_query err:' + err);
+				console.error('area json_town_query err:' + err);
 			res.respond({'code':'1001','message':'没有查询到乡镇'});
 			return;
 		} else {
@@ -1716,7 +1773,7 @@ exports.process_login = function(req, res, next) {
     BackEndUserService.login(options, function(err, user){
         if(err){
             // login fail
-            console.log('backend user process_login err: ' + err);
+            console.error('backend user process_login err: ' + err);
 			res.respond({code:1001, message:'用户名或密码错误'});
             return
         }
@@ -1779,8 +1836,7 @@ var setCookieAndResponse = function(req, res, user, keepLogin){
     var token = tools.generate_token(user._id, options.appLoginId, options.webLoginId);
     BackEndUserService.update(options, function(err){
         if(err){
-
-            console.log('setCookieAndResponse err: ' + err);
+            console.error('setCookieAndResponse err: ' + err);
             res.respond({code:1004, message:'登录失败'});
             return;
         }

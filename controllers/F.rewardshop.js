@@ -122,6 +122,7 @@ exports.json_rewardshop_pointslogs = function(req, res, next) {
 	});
 }
 
+// add gift order
 exports.add_gift_order = function(req, res, next){
     var data = req.data;
     var userId = data['userId'];
@@ -132,12 +133,12 @@ exports.add_gift_order = function(req, res, next){
     var consigneePhone = data['consigneePhone'] || null;
     var consigneeName = data['consigneeName'] || null;
 
-    if (deliveryType && deliveryType === DELIVERYTYPE['SONGHUO'].id) {
+    if (deliveryType && parseInt(deliveryType) === DELIVERYTYPE['SONGHUO'].id) {
         if (!addressId) {
             res.respond({"code":1001, "message":"请先填写收货地址"});
             return;
         }
-    } else if (deliveryType && deliveryType === DELIVERYTYPE['ZITI'].id) {
+    } else if (deliveryType && parseInt(deliveryType) === DELIVERYTYPE['ZITI'].id) {
         if (!RSCId) {
             res.respond({"code":1001, "message":"请先选择自提点"});
             return;
@@ -155,7 +156,6 @@ exports.add_gift_order = function(req, res, next){
         return;
     }
 
-    console.log(userId);
     UserService.get({"userid":userId}, function(err, user) {
         if (err || !user) {
             res.respond({code:1001, message:'用户不存在'});
@@ -263,6 +263,41 @@ exports.add_gift_order = function(req, res, next){
         });
     });
 };
+
+// gift orders query
+exports.json_gift_order_query = function(req, res, next) {
+    var self = this;
+    var page = U.parseInt(req.data.page, 1) - 1;
+    var max = U.parseInt(req.data.max, 20);
+    var options = {};
+    if (req.data.userId)
+        options.userid = req.data.userId;
+
+    UserService.get(options, function (err, user) {
+        // Error
+        if (err) {
+            console.error('F.rewardshop json_gift_order_query UserService get err:', err);
+            res.respond({code: 1004, message: '获取积分兑换记录失败'});
+            return;
+        }
+        if (!user) {
+            res.respond({code: 1002, message: '没有查找到用户，获取积分兑换记录失败'});
+            return;
+        }
+        LoyaltypointService.queryGiftOrders(user.id, req.data.type, null, null, page, max, function(err, giftorders, count, pageCount) {
+            if (err) {
+                res.respond({code:1002, message:'获取积分兑换记录失败'});
+                return;
+            }
+            var results = [];
+            giftorders.forEach(function(giftorder) {
+                giftorder.orderStatus = LoyaltypointService.giftOrderStatus(giftorder);
+                results.push(giftorder);
+            });
+            res.respond({code:1000, message:'success', datas:{giftorders:giftorders, total:count, pages:pageCount, page:page}});
+        });
+    });
+}
 
 // ==========================================================================
 // rewardshop gift

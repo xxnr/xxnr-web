@@ -42,7 +42,7 @@
 		                <td style="width:70px" class="hidden-xs ui-left">{{ gift.id }}</td>
 		                <td style="width:40px" class="hidden-xs ui-left">{{if gift.pictures && gift.pictures.length}}<img width="100%" src="/images/thumbnail/{{ gift.pictures[0] }}.jpg"></img>{{fi}}</td>
 		                <td style="width:200px" class="hidden-xs ui-left" title="{{ gift.name }}">{{if gift.online}}<b class="mr5 fs11 green">Online</b>{{fi}}{{if gift.istop}}<b class="mr5 fs11 red">TOP</b>{{fi}}{{if gift.soldout}}<b class="mr5 fs11 red">SOLDOUT</b>{{fi}}{{ gift.name }}</td>
-		                <td style="width:50px" class="hidden-xs ui-left" title="{{if gift.category && gift.category.ref}}{{gift.category.ref.name}}{{fi}}">{{if gift.category && gift.category.ref}}{{gift.category.ref.name}}{{fi}}</td>
+		                <td style="width:50px" class="hidden-xs ui-left" title="{{if gift.category && gift.category.ref}}{{ gift.category.ref.name }}{{fi}}">{{if gift.category && gift.category.ref}}{{ gift.category.ref.name }}{{fi}}</td>
 		                <td style="width:70px" class="hidden-xs ui-right">{{ gift.marketPrice | price(2) }}</td>
 		                <td style="width:60px" class="hidden-xs ui-right">{{ gift.points }}</td>
 		                <td style="width:100px" class="hidden-xs ui-right" title="{{ gift.datecreated | format('yyyy-MM-dd HH:mm:ss') }}">{{ gift.datecreated | format('yyyy-MM-dd HH:mm:ss') }}</td>

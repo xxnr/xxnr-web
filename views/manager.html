@@ -68,7 +68,7 @@
 		<div data-component="page" data-component-path="common.page" data-if="news" data-template="/templates/manager-news.html"></div>
 		<% } %>
 		<% if (user.role.view_roles.indexOf('rewardshop') !== -1) { %>
-		<div data-component="page" data-component-path="common.page" data-if="rewardshop" data-template="<%= manager_url %>/rewardshop/rewardshop-orders"></div>
+		<div data-component="page" data-component-path="common.page" data-if="rewardshop" data-template="<%= manager_url %>/rewardshop/rewardshop-gifts-orders"></div>
 		<div data-component="page" data-component-path="common.page" data-if="rewardshop-gifts" data-template="<%= manager_url %>/rewardshop/rewardshop-gifts"></div>
 		<div data-component="page" data-component-path="common.page" data-if="rewardshop-gifts-detail" data-template="<%= manager_url %>/rewardshop/rewardshop-gifts-detail"></div>
 		<div data-component="page" data-component-path="common.page" data-if="rewardshop-points-logs" data-template="<%= manager_url %>/rewardshop/rewardshop-points-logs"></div>

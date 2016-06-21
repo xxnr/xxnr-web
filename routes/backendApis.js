@@ -100,6 +100,8 @@ router.post(F.config['manager-url']+'/api/rewardshop/gift/add', middleware.backe
 router.post(F.config['manager-url']+'/api/rewardshop/gift/update', middleware.backend_auth, middleware.auditing_middleware, controllers.Manager.json_rewardshop_gift_update);
 router.get(F.config['manager-url']+'/api/rewardshop/gift/:_id', middleware.backend_auth, controllers.Manager.json_rewardshop_gift_get);
 router.get(F.config['manager-url']+'/api/rewardshop/pointslogs', middleware.backend_auth, controllers.Manager.json_rewardshop_pointslogs);
+router.get(F.config['manager-url']+'/api/rewardshop/giftorders', middleware.backend_auth, controllers.Manager.json_rewardshop_giftorders);
+router.post(F.config['manager-url']+'/api/rewardshop/giftorders/update', middleware.backend_auth, controllers.Manager.json_rewardshop_giftorders_update);
 
 // area
 router.get(F.config['manager-url']+'/api/area/getProvinceList', middleware.backend_auth, controllers.Manager.json_province_query);
