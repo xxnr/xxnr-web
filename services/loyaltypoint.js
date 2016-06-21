@@ -443,6 +443,70 @@ LoyaltyPointsService.prototype.addGiftOrder = function(addGiftOptions, callback)
     });
 }
 
+// get gift order
+LoyaltyPointsService.prototype.getGiftOrder = function(id, userId, callback) {
+    var self = this;
+    var query = {id: id};
+    if (userId) {
+        query.buyerId = userId;
+    }
+    RewardshopGiftOrderModel.findOne(query, function (err, giftOrder) {
+        if (err) {
+            console.error('LoyaltyPointsService getGiftOrder findOne err:', err);
+            callback('LoyaltyPointsService getGiftOrder findOne err');
+            return;
+        }
+        callback(null, giftOrder);
+    });
+};
+
+// update gift order
+LoyaltyPointsService.prototype.updateGiftOrder = function(id, userId, deliverStatus, options, callback) {
+    var self = this;
+    var query = {id: id};
+    if (userId) {
+        query.buyerId = userId;
+    }
+    RewardshopGiftOrderModel.findOne(query, function (err, giftOrder) {
+        if (err) {
+            console.error('LoyaltyPointsService updateGiftOrder findOne err:', err);
+            callback('LoyaltyPointsService updateGiftOrder findOne err');
+            return;
+        }
+        if (giftOrder) {
+            if (deliverStatus && giftOrder.deliverStatus !== deliverStatus) {
+                giftOrder.deliverStatus = deliverStatus;
+                if (giftOrder.deliverStatus === DELIVERSTATUS.DELIVERED) {
+                    giftOrder.dateDelivered = new Date();
+                }
+                if (giftOrder.deliverStatus === DELIVERSTATUS.RECEIVED) {
+                    if (giftOrder.deliveryType === DELIVERYTYPE['ZITI'].id) {
+                        giftOrder.dateDelivered = new Date();
+                    }
+                    giftOrder.dateCompleted = new Date();
+                }
+                if (options.backendUser) {
+                    giftOrder.dateSet = new Date();
+                    giftOrder.backendUser = options.backendUser._id;
+                    giftOrder.backendUserAccount = options.backendUser.account;
+                }
+            }
+            // save
+            giftOrder.save(function(err) {
+                if (err) {
+                    console.error('LoyaltyPointsService updateGiftOrder save err:', err);
+                    callback('LoyaltyPointsService updateGiftOrder save err');
+                    return;
+                }
+
+                callback(null, giftOrder);
+            });
+        } else {
+            callback('not find giftOrder');
+        }
+    });
+}
+
 // increase
 /**
  * LoyaltyPoints increase function
@@ -606,9 +670,9 @@ LoyaltyPointsService.prototype.queryLogs = function(user_id, type, times, page, 
 			.sort({date:-1})
 			.skip(page * max)
 			.limit(max)
+            .populate({path:'user', select:'-_id account name score'})
+            .populate({path:'event.gift', select:'-_id name'})
 			.lean()
-			.populate({path:'user', select:'-_id account name score'})
-			.populate({path:'event.gift', select:'-_id name'})
 			.exec(function (err, logs) {
 				if (err) {
 					console.error('LoyaltyPointsService queryLogs find err:', err);
@@ -619,6 +683,98 @@ LoyaltyPointsService.prototype.queryLogs = function(user_id, type, times, page, 
 				callback(null, logs||[], count, pageCount);
 		});
 	});
+}
+
+// gift order status
+LoyaltyPointsService.prototype.giftOrderStatus = function (order) {
+    /**
+     * User order types
+     * 1    :   待发货
+     * 2    :   配送中
+     * 3    :   待自提
+     * 4    :   已完成
+     */
+    if (order.deliverStatus === DELIVERSTATUS.RECEIVED) {
+        return {type:4, value:'已完成'};
+    } else if(order.deliverStatus === DELIVERSTATUS.DELIVERED) {
+        return {type:2, value:'配送中'};
+    } else {
+        if (order.deliveryType === DELIVERYTYPE.ZITI.id) {
+            return {type:3, value:'待自提'};
+        } else {
+            return {type:1, value:'待发货'};
+        }
+    }
+};
+
+// query gift orders logs
+LoyaltyPointsService.prototype.queryGiftOrders = function(buyerId, type, times, search, page, max, callback) {
+    var query = {};
+    
+    if (type) {
+        switch(parseInt(type)) {
+            case 1:
+                query.deliverStatus = { $ne: DELIVERSTATUS.RECEIVED };
+                break;
+            case 2:
+                query.deliverStatus = { $eq: DELIVERSTATUS.RECEIVED };
+                break;
+            default:
+                break;
+        }
+    }
+    if (times && times.length > 0) {
+        if (times.length == 1) {
+            query.dateCreated = {$gt:times[0]};
+        } else {
+            query.dateCreated = {$gt:times[0], $lt:times[1]};
+        }
+    }
+    if (search) {
+        query.$or = [
+            {buyerName: new RegExp('^'+search)},
+            {buyerPhone: new RegExp('^'+search)},
+            {consigneeName: new RegExp('^'+search)},
+            {consigneePhone: new RegExp('^'+search)}
+        ];
+    }
+
+    if (page<0 || !page) {
+        page = 0;
+    }
+
+    if (max<0 || !max) {
+        max = 20;
+    }
+
+    if (max>50) {
+        max = 50;
+    }
+
+    if (buyerId)
+        query.buyerId = buyerId;
+    RewardshopGiftOrderModel.count(query, function(err, count) {
+        if (err) {
+            console.error('LoyaltyPointsService queryGiftOrders count err:', err);
+            callback('LoyaltyPointsService queryGiftOrders count err');
+            return;
+        }
+        RewardshopGiftOrderModel.find(query)
+            .sort({dateCreated:-1})
+            .skip(page * max)
+            .limit(max)
+            .select('-_id -__v')
+            .lean()
+            .exec(function (err, logs) {
+                if (err) {
+                    console.error('LoyaltyPointsService queryGiftOrders find err:', err);
+                    callback('LoyaltyPointsService queryGiftOrders find err');
+                    return;
+                }
+                var pageCount = Math.floor(count / max) + (count % max ? 1 : 0);
+                callback(null, logs||[], count, pageCount);
+        });
+    });
 }
 
 LoyaltyPointsService.prototype.convertGift = function(gift) {

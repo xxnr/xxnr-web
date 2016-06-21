@@ -238,7 +238,7 @@ jRouting.route(managerurl + '/agents/agents-detail', function(){
 jRouting.route(managerurl + '/rewardshop', function(){
 	if(can('rewardshop')) {
 		navClass('rewardshop');
-		SET('common.page', 'rewardshop-gifts');
+		SET('common.page', 'rewardshop');
 		return;
 	}
 
