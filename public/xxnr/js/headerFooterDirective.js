@@ -24,11 +24,11 @@ app.directive('header', function(){
     }
 }).directive('footer', function(){
   return{
-      replace:true,
+        replace:true,
         restrict: 'AE',
-    templateUrl: function(element, attrs) {
-        return attrs.templateUrl || 'footer';
-    },
-      replace:true
+        templateUrl: function(element, attrs) {
+            return attrs.templateUrl || 'footer';
+        },
+        replace:true
   }
 });

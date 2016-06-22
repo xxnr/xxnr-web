@@ -19,6 +19,12 @@
                 </a>
             </li>
         </ul>
+        <div class="good_list--noGoods" ng-show="current_items.length == 0">
+            <div class="good_list--noGoods--img">
+                <img src="images/goods_list--noGoods.png" alt="">
+            </div>
+            <p class="good_list--noGoods--wording">抱歉，找不到合适的商品，调整筛选条件试试吧~</p>
+        </div>
     </div>
     <div class="pager">
         <ul>
