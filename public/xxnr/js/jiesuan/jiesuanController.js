@@ -30,6 +30,12 @@ app.controller('jiesuanController', function ($scope, remoteApiService, payServi
     $scope.selectingCompanyId =-1;
     $scope.selectedConsigneeNum = -1;
 
+    $scope.helpWoring = {
+        deliveryMethod_help:{
+            pickup:'商品配送至新新农人的服务站，需收到自提码后自行至服务站提取商品',
+            deliveryHome:'商品发至服务站后,由服务站配送至指定收货地址'
+        }
+    }
     $scope.selectedAddressIndex = 0;
     $scope.everClickOneOfMoreContacts = false;
     $scope.isOverflow = false;
@@ -43,7 +49,6 @@ app.controller('jiesuanController', function ($scope, remoteApiService, payServi
         id: 0
     }];
     $scope.selectOfCountyCompanies = $scope.countyListCompanies[0];
-
     remoteApiService.getAddressList()
         .then(function (data) {
             var addressList = data.datas.rows;
@@ -238,7 +243,7 @@ app.controller('jiesuanController', function ($scope, remoteApiService, payServi
             sweetalert("请填写电话");
             return;
         }
-        if (!/^(((13[0-9]{1})|(15[0-9]{1})|(18[0-9]{1}))+\d{8})$/.test($scope.modifyAddress.phone)) {
+        if (!/^1\d{10}$/.test($scope.modifyAddress.phone)) {
             sweetalert("请填写正确的电话");
             return;
         }
@@ -307,7 +312,7 @@ app.controller('jiesuanController', function ($scope, remoteApiService, payServi
             sweetalert("请填写电话");
             return;
         }
-        if (!/^(((13[0-9]{1})|(15[0-9]{1})|(18[0-9]{1}))+\d{8})$/.test($scope.modifyAddress.phone)) {
+        if (!/^1\d{10}$/.test($scope.modifyAddress.phone)) {
             sweetalert("请填写正确的电话");
             return;
         }

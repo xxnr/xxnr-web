@@ -535,6 +535,13 @@ exports.api10_getOrderDetails = function(req, res, next) {
             if (payment) {
                 order.payment       = {'paymentId':payment.id, 'price':payment.price.toFixed(2), 'suborderId':payment.suborderId};
             }
+            // 积分相关
+            if (data.isRewardPoint) {
+                order.isRewardPoint = data.isRewardPoint;
+                order.rewardPoints = data.rewardPoints;
+            } else {
+                order.isRewardPoint = false;
+            }
             // 订单中商品信息列表（旧的订单才会存在）
             for (var i=0; i < productslength; i++) {
                 var product = data.products[i];

@@ -5,7 +5,7 @@
     <meta name="renderer" content="webkit">
     <meta name="force-rendering" content="webkit">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
-    <title>登录</title>
+    <title></title>
     <!--[if lte IE 7]><script>alert('为了更好的购物体验，请升级您的浏览器版本');window.location.href='http://cdn.dmeng.net/upgrade-your-browser.html?referrer='+location.href;</script><![endif]-->
     <link rel='icon' href='images/title_logo.png' type='image/png' />
     <meta http-equiv="pragma" content="no-cache">
@@ -31,6 +31,7 @@
     <script src="js/headerController.js"></script>
     <script src="js/sweetalert.min.js"></script>
     <script src="js/myPlaceholderDirective.js"></script>
+    <script src="js/angular-flash.js"></script>
     <!-- endbuild -->
 </head>
 <body>
@@ -49,84 +50,202 @@
         <div class="user_section right">
             <div class="user_wrap">
                 <!--<ul class="user_tabs" ng-init="tab = 1">-->
-                <ul class="user_tabs" ng-init="tab = this.tabNum">
-                    <li ng-class="{current:tab===1}"><a href="#" ng-click="tab = 1" >登&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;录</a></li>
-                    <li ng-class="{current:tab===2}"><a href="#" ng-click="tab = 2" >注&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;册</a></li>
-                </ul>
+                <!--<ul class="user_tabs" ng-init="tab = this.tabNum">-->
+                    <!--<li ng-class="{current:tab===1}"><a href="#" ng-click="tab = 1" >登&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;录</a></li>-->
+                    <!--<li ng-class="{current:tab===2}"><a href="#" ng-click="tab = 2" >注&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;册</a></li>-->
+                <!--</ul>-->
                 <div class="ueser_forms">
                     <div ng-show="tab===1" class="login_form">
-                        <ul>
-                            <li class="input_li" >
-                                <div class="input_icon">
-                                    <img src="images/login_input_icon1.png" alt=""/>
-                                </div>
-                                <input id="login_account" my-placeholder="请输入您的手机号" placeholder="请输入您的手机号" type="text" ng-model="phoneNumber">
+                        <p class="login_form--title">登录</p>
+                        <form name="loginForm" novalidate ng-submit="" >
+                            <div class="form-group"
+                                 ng-class="{'focused_input--green':focusInputGroupNum == formInputsKeyValue.loginPhone,'error_input--red': loginResMsg.length > 0 && ( errorInputGroupNum ==formInputsKeyValue.loginPhone && loginForm.phoneNumber.$error.required)}"
+                                 ng-click="focusShowValidate(formInputsKeyValue.loginPhone)">
+                                <label>
+                                    <img src="images/login_user.png" alt=""/>
+                                </label>
+                                <input  ng-model="phoneNumber" name="phoneNumber"
+                                        ng-blur="blurShowValidate()" my-placeholder="请输入您的手机号"
+                                        placeholder="请输入您的手机号"
+                                        required />
                                 <div class="checked_icon" ng-class="{validated:phoneNumberValidated===true}">
                                     <img src="images/checked.png" alt=""/>
                                 </div>
-                            </li>
-                            <li class="input_li">
-                                <div class="input_icon">
-                                    <img src="images/login_input_icon2.png" alt=""/>
-                                </div>
-                                <input id="login_password" my-placeholder="请输入您的密码" placeholder="请输入您的密码" type="password" ng-model="password" ng-keydown="password_keydown($event)">
-                            </li>
-                            <li>
-                                <div class="remenberHint">
-                                    <img src="images/remenberLogo.png" alt=""/><span>公共场所不建议自动登录，以防帐号丢失</span>
-                                </div>
-                            </li>
-
-                            <li class="get_pass clearfix">
+                            </div>
+                            <div class="form-group"
+                                 ng-class="{'focused_input--green':focusInputGroupNum == formInputsKeyValue.loginPassword,'error_input--red': loginResMsg.length > 0 && ( errorInputGroupNum ==formInputsKeyValue.loginPassword && loginForm.password.$error.required) }"
+                                 ng-click="focusShowValidate(formInputsKeyValue.loginPassword)">
+                                <label>
+                                    <img src="images/login_password.png" alt=""/>
+                                </label>
+                                <input type="password" name="password"
+                                       ng-blur="blurShowValidate()" ng-model="password"
+                                       my-placeholder="请输入您的密码" placeholder="请输入您的密码"
+                                       required />
+                            </div>
+                            <div class="login_error ng-cloak" ng-show="loginResMsg">
+                                <img src="../xxnr/images/login_fault.png" alt="" />
+                                <span>{{loginResMsg}}</span>
+                            </div>
+                            <div class="remenberHint">
+                                <img src="images/remenberLogo.png" alt=""/><span>公共场所不建议自动登录，以防帐号丢失</span>
+                            </div>
+                            <div>
                                 <input type="checkbox" name="remenberUser" ng-model="keepLoginChecked"/> <span>自动登录</span>
-                                <a href="" ng-click='forgetPassword()' class="right">忘记密码?</a>
-                            </li>
-                            <li class="login_btn">
-                                <a ng-click="login()" href="">登录</a>
-                            </li>
-                            <li class="register_message clearfix" >
-                                <span class="right">还不是新新农人用户？<a href="#" ng-click="tab = 2">立即注册</a></span>
-                            </li>
-                        </ul>
+                                <a href="" ng-click='forgetPassword()' class="right forgetPassword">忘记密码?</a>
+                            </div>
+                            <button class="login_btn" type="submit" ng-click="login()" >登录</button>
+                            <div class="register_message clearfix" >
+                                <span class="right">还没有账号？<a href="logon.html?type=register" >立即注册</a></span>
+                            </div>
+                        </form>
+                        <!--<ul>-->
+                            <!--<li class="input_li" >-->
+                                <!--<div class="input_icon">-->
+                                    <!--<img src="images/login_input_icon1.png" alt=""/>-->
+                                <!--</div>-->
+                                <!--<input id="login_account" my-placeholder="请输入您的手机号" placeholder="请输入您的手机号" type="text" ng-model="phoneNumber">-->
+                                <!--<div class="checked_icon" ng-class="{validated:phoneNumberValidated===true}">-->
+                                    <!--<img src="images/checked.png" alt=""/>-->
+                                <!--</div>-->
+                            <!--</li>-->
+                            <!--<li class="input_li">-->
+                                <!--<div class="input_icon">-->
+                                    <!--<img src="images/login_input_icon2.png" alt=""/>-->
+                                <!--</div>-->
+                                <!--<input id="login_password" my-placeholder="请输入您的密码" placeholder="请输入您的密码" type="password" ng-model="password" ng-keydown="password_keydown($event)">-->
+                            <!--</li>-->
+                            <!--<li>-->
+                                <!--<div class="remenberHint">-->
+                                    <!--<img src="images/remenberLogo.png" alt=""/><span>公共场所不建议自动登录，以防帐号丢失</span>-->
+                                <!--</div>-->
+                            <!--</li>-->
+
+                            <!--<li class="get_pass clearfix">-->
+                                <!--<input type="checkbox" name="remenberUser" ng-model="keepLoginChecked"/> <span>自动登录</span>-->
+                                <!--<a href="" ng-click='forgetPassword()' class="right">忘记密码?</a>-->
+                            <!--</li>-->
+                            <!--<li class="login_btn">-->
+                                <!--<a ng-click="login()" href="">登录</a>-->
+                            <!--</li>-->
+                            <!--<li class="register_message clearfix" >-->
+                                <!--<span class="right">还不是新新农人用户？<a href="logon.html?type=register" >立即注册</a></span>-->
+                            <!--</li>-->
+                        <!--</ul>-->
                     </div>
                     <div ng-show="tab===2" class="register_form">
-                        <ul>
-                            <li class="input_li">
-                                <div class="input_icon">
-                                    <img src="images/phone.png" alt=""/>
-                                </div>
-                                <input type="text" id="regist_phone_num" my-placeholder="请输入您的手机号" placeholder="请输入您的手机号" ng-model="phoneNumber">
-                            </li>
-                            <!-- <li class="error">错误提示</li> -->
-                            <li class="reg_code">
-                                <div class="left">
-                                    <input type="text" id="dynamic_code" my-placeholder="短信验证码" placeholder="短信验证码" ng-model="code">
-                                </div>
-                                <div class="right reg_get_code"><a href="" ng-click="sendRegistCode($event)">{{regCountDown}}</a></div>
-                            </li>
-                            <li class="input_li">
-                                <input type="password" id="password" my-placeholder="请输入您的密码" placeholder="请输入您的密码" ng-model="newPassword">
-                            </li>
-                            <li class="input_li">
-                                <input type="password" id="password_cf" my-placeholder="请输入您的确认密码" placeholder="请输入您的确认密码" ng-model="confirm_newPassword" ng-keydown="regist_keydown($event)">
-                            </li>
-                            <li class="policy">
-                                <input type="checkbox" checked="true" name="readPolicy" ng-model="policyChecked" /> <span>我已阅读并同意<a href="" ng-click="showPolicy()">《新新农人网站使用协议》</a></span>
-                            </li>
-                            <li class="reg_btn">
-                                <a href="" ng-click="regist()">立即注册</a>
-                            </li>
-                            <div class="pop_mask" ng-show="showPolicyPop"></div>
-                            <div class="pop_content_policy ng-hide" ng-show="showPolicyPop">
-                                <div class="pop_head">
-                                    <span class="left">新新农人网站使用协议</span>
-                                    <a href="" ng-click="hidePolicy()" class="right close"></a>
-                                </div>
-                                <div class="pop_content_policy_body">
-                                    <iframe src="resources/privacyPolicy.html" frameborder="false" scrolling="auto" style="border:none;" width="100%" height="90%" allowtransparency="true"></iframe>
-                                </div>
+                        <p class="register_form--title">注册</p>
+                        <form name="registerForm" class="registerForm" novalidate ng-submit="" >
+                            <div class="form-group"
+                                 ng-class="{'focused_input--green':focusInputGroupNum == formInputsKeyValue.registerPhone,'error_input--red': registerResMsg.length > 0 && errorInputGroupNum ==formInputsKeyValue.registerPhone && (registerForm.phoneNumber.$error.required || registerForm.phoneNumber.$error.phoneverfied)}"
+                                 ng-click="focusShowValidate(formInputsKeyValue.registerPhone)">
+                                <label>
+                                    <img src="images/login_user.png" alt=""/>
+                                </label>
+                                <input type="text" ng-model="phoneNumber"
+                                       my-placeholder="请输入您的手机号" placeholder="请输入您的手机号"
+                                       name="phoneNumber"
+                                       ng-blur="blurShowValidate()"
+                                       required phoneverfied/>
                             </div>
-                        </ul>
+                            <div class="form-group register_code"
+                                 ng-class="{'focused_input--green':focusInputGroupNum == formInputsKeyValue.registerCode, 'error_input--red': registerResMsg.length > 0 &&  errorInputGroupNum ==formInputsKeyValue.registerCode && registerForm.code.$error.required}"
+                                 ng-click="focusShowValidate(formInputsKeyValue.registerCode)">
+                                <input type="text"
+                                       my-placeholder="短信验证码" placeholder="短信验证码"
+                                       ng-model="code" name="code"
+                                       ng-blur="blurShowValidate()"
+                                       required />
+
+                            </div>
+                            <div class="right reg_get_code_btn"><a href="" ng-click="sendRegistCode($event)">{{regCountDown}}</a></div>
+                            <div class="form-group"
+                                 ng-class="{'focused_input--green':focusInputGroupNum == formInputsKeyValue.registerPassword,'error_input--red': registerResMsg.length > 0 && ( errorInputGroupNum ==  formInputsKeyValue.registerPassword || errorInputGroupNum == formInputsKeyValue.registerConfirmPasswordsMismatch ) }"
+                                 ng-click="focusShowValidate(formInputsKeyValue.registerPassword)">
+                                <label>
+                                    <img src="images/login_password.png" alt=""/>
+                                </label>
+                                <input type="password"
+                                       my-placeholder="请输入您的密码" placeholder="请输入您的密码"
+                                       ng-model="newPassword" name="newPassword"
+                                       ng-blur="blurShowValidate()"
+                                       required />
+                            </div>
+                            <div class="form-group"
+                                 ng-class="{'focused_input--green':focusInputGroupNum == formInputsKeyValue.registerPasswordConfirm,'error_input--red': registerResMsg.length > 0 && ( errorInputGroupNum ==  formInputsKeyValue.registerPasswordConfirm ||  errorInputGroupNum == formInputsKeyValue.registerConfirmPasswordsMismatch)}"
+                                 ng-click="focusShowValidate(formInputsKeyValue.registerPasswordConfirm)">
+                                <label>
+                                    <img src="images/login_password.png" alt=""/>
+                                </label>
+                                <input type="password"
+                                       my-placeholder="请输入您的确认密码" placeholder="请输入您的确认密码"
+                                       ng-model="confirm_newPassword" name="confirm_newPassword"
+                                       ng-keydown="regist_keydown($event)"
+                                       ng-blur="blurShowValidate()"
+                                       required />
+                            </div>
+                            <div class="policy">
+                                <input type="checkbox" checked="true" name="readPolicy" ng-model="policyChecked" /> <span>我已阅读并同意<a href="" ng-click="showPolicy()">《新新农人网站使用协议》</a></span>
+
+                            </div>
+                            <div class="register_error ng-cloak" ng-show="registerResMsg && errorInputGroupNum >= 3">
+                                <img src="../xxnr/images/login_fault.png" alt="" />
+                                <span>{{registerResMsg}}</span>
+                            </div>
+                            <div class="register_succeed ng-cloak" ng-show="registerSucceedResMsg">
+                                <img src="../xxnr/images/correct_prompt1.png" alt="" />
+                                <span>{{registerSucceedResMsg}}</span>
+                            </div>
+                            <button class="register_btn" type="submit" ng-click="regist()" >注册</button>
+                            <div class="login_link right">已有账号? <a href="/logon.html">立即登录</a></div>
+                        </form>
+                        <!--<ul>-->
+                            <!--<li class="input_li">-->
+                                <!--<div class="input_icon">-->
+                                    <!--<img src="images/phone.png" alt=""/>-->
+                                <!--</div>-->
+                                <!--<input type="text" id="regist_phone_num" my-placeholder="请输入您的手机号" placeholder="请输入您的手机号" ng-model="phoneNumber">-->
+                            <!--</li>-->
+                            <!--&lt;!&ndash; <li class="error">错误提示</li> &ndash;&gt;-->
+                            <!--<li class="reg_code">-->
+                                <!--<div class="left">-->
+                                    <!--<input type="text" id="dynamic_code" my-placeholder="短信验证码" placeholder="短信验证码" ng-model="code">-->
+                                <!--</div>-->
+                                <!--<div class="right reg_get_code"><a href="" ng-click="sendRegistCode($event)">{{regCountDown}}</a></div>-->
+                            <!--</li>-->
+                            <!--<li class="input_li">-->
+                                <!--<input type="password" id="password" my-placeholder="请输入您的密码" placeholder="请输入您的密码" ng-model="newPassword">-->
+                            <!--</li>-->
+                            <!--<li class="input_li">-->
+                                <!--<input type="password" id="password_cf" my-placeholder="请输入您的确认密码" placeholder="请输入您的确认密码" ng-model="confirm_newPassword" ng-keydown="regist_keydown($event)">-->
+                            <!--</li>-->
+                            <!--<li class="policy">-->
+                                <!--<input type="checkbox" checked="true" name="readPolicy" ng-model="policyChecked" /> <span>我已阅读并同意<a href="" ng-click="showPolicy()">《新新农人网站使用协议》</a></span>-->
+                            <!--</li>-->
+                            <!--<li class="reg_btn">-->
+                                <!--<a href="" ng-click="regist()">立即注册</a>-->
+                            <!--</li>-->
+                            <!--<div class="pop_mask" ng-show="showPolicyPop"></div>-->
+                            <!--<div class="pop_content_policy ng-hide" ng-show="showPolicyPop">-->
+                                <!--<div class="pop_head">-->
+                                    <!--<span class="left">新新农人网站使用协议</span>-->
+                                    <!--<a href="" ng-click="hidePolicy()" class="right close"></a>-->
+                                <!--</div>-->
+                                <!--<div class="pop_content_policy_body">-->
+                                    <!--<iframe src="resources/privacyPolicy.html" frameborder="false" scrolling="auto" style="border:none;" width="100%" height="90%" allowtransparency="true"></iframe>-->
+                                <!--</div>-->
+                            <!--</div>-->
+                        <!--</ul>-->
+                    </div>
+                </div>
+                <div class="pop_mask" ng-show="showPolicyPop"></div>
+                <div class="pop_content_policy ng-hide" ng-show="showPolicyPop">
+                    <div class="pop_head">
+                        <span class="left">新新农人网站使用协议</span>
+                        <a href="" ng-click="hidePolicy()" class="right close"></a>
+                    </div>
+                    <div class="pop_content_policy_body">
+                        <iframe src="resources/privacyPolicy.html" frameborder="false" scrolling="auto" style="border:none;" width="100%" height="90%" allowtransparency="true"></iframe>
                     </div>
                 </div>
             </div>
@@ -171,6 +290,10 @@
                         <a href="" class="btn" ng-click="findPassword_submit()">确 认</a>
                     </div>
                 </li>
+                <div class="reset_password_err ng-cloak" ng-show="resetPasswordMsg">
+                    <img src="../xxnr/images/login_fault.png" alt="" />
+                    <span>{{resetPasswordMsg}}</span>
+                </div>
             </ul>
         </div>
     </div>

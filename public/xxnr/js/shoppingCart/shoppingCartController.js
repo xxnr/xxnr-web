@@ -1,8 +1,8 @@
 /**
  * Created by pepelu on 9/14/2015.
  */
-var app = angular.module('shop_cart', ['xxnr_common']);
-app.controller('shoppingCartController', function($scope, $timeout, remoteApiService, commonService, loginService, sideService, shoppingCartService) {
+var app = angular.module('shop_cart', ['xxnr_common',"ngFlash"]);
+app.controller('shoppingCartController', function($scope, $timeout, remoteApiService, commonService, loginService, sideService, shoppingCartService, Flash) {
 
 
     var sweetalert = commonService.sweetalert;
@@ -143,9 +143,13 @@ app.controller('shoppingCartController', function($scope, $timeout, remoteApiSer
                             }
                         }
                     }
+                    if(window.location.href.indexOf("confirmOrder") != -1 && $scope.shops.length == 0){
+                        window.location.href="cart.html";
+                    }
                     if(window.location.href.indexOf("confirmOrder") != -1){
                         $scope.$parent.checkHasAvailableCompany();
                     }
+
                     // set shoppingCartCount
                     shoppingCartService.setSCart($scope.shoppingCartCount);
                     remoteApiService.getDeliveries($scope.$parent.SKUs)
@@ -302,6 +306,8 @@ app.controller('shoppingCartController', function($scope, $timeout, remoteApiSer
                 if (data && data.code == 1000) {
                     // set shoppingCartCount
                     shoppingCartService.setSCart($scope.shoppingCartCount);
+                } else {
+                    window.location.href = window.location.href;
                 }
             });
     };
@@ -325,13 +331,47 @@ app.controller('shoppingCartController', function($scope, $timeout, remoteApiSer
     };
     $scope.submitChange = submitChange;
     $scope.deleteItem = function(shopIndex, itemIndex) {
-        $scope.shoppingCartCount -= $scope.shops[shopIndex].items[itemIndex].buyCount;
-        submitChange($scope.shops[shopIndex].items[itemIndex].SKU_id, 0);
-        $scope.shops[shopIndex].items.splice(itemIndex, 1);
-        if ($scope.shops[shopIndex].items.length == 0) {
-            $scope.shops.splice(shopIndex, 1);
+        if (navigator.appName == "Microsoft Internet Explorer" && navigator.appVersion.match(/8./i) == "8.") {
+            var r = confirm("您确定要删除吗?");
+            if (r == true) {
+                $scope.shoppingCartCount -= $scope.shops[shopIndex].items[itemIndex].buyCount;
+                submitChange($scope.shops[shopIndex].items[itemIndex].SKU_id, 0);
+                $scope.shops[shopIndex].items.splice(itemIndex, 1);
+                if ($scope.shops[shopIndex].items.length == 0) {
+                    $scope.shops.splice(shopIndex, 1);
+                }
+                calculateTotal();
+                var message = '<img class="xxnr--flash--icon" src="images/correct_prompt.png" alt="">删除商品成功';
+                var id = Flash.create('success', message, 3000, {class: 'xxnr-success-flash', id: 'xxnr-success-flash'}, true);
+            } else {
+                return false;
+            }
+        } else {
+            swal({
+                    title: " ",
+                    text: "\n\n您确定要删除吗?\n\n",
+                    //type: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: '#00913a',
+                    confirmButtonText: '确定',
+                    cancelButtonText: "取消",
+                    closeOnConfirm: true
+                },
+                function (isConfirm) {
+                    if (isConfirm) {
+                        $scope.shoppingCartCount -= $scope.shops[shopIndex].items[itemIndex].buyCount;
+                        submitChange($scope.shops[shopIndex].items[itemIndex].SKU_id, 0);
+                        $scope.shops[shopIndex].items.splice(itemIndex, 1);
+                        if ($scope.shops[shopIndex].items.length == 0) {
+                            $scope.shops.splice(shopIndex, 1);
+                        }
+                        calculateTotal();
+                        var message = '<img class="xxnr--flash--icon" src="images/correct_prompt.png" alt="">删除商品成功';
+                        var id = Flash.create('success', message, 3000, {class: 'xxnr-success-flash', id: 'xxnr-success-flash'}, true);
+                    }
+                });
         }
-        calculateTotal();
+
     };
     $scope.accessShoppingCart = function() {
         commonService.accessShoppingCart();

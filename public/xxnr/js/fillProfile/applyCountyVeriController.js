@@ -3,7 +3,7 @@
  */
 var app = angular.module('applyCountyVeri', ['xxnr_common', 'shop_cart']);
 app.controller('applyCountyController', function($scope, remoteApiService, commonService) {
-    $scope.fouceFormGroupNum = 0;
+    $scope.focusFormGroupNum = 0;
     $scope.hasAppliedCounty = false;
 
     $scope.provinces = [{
@@ -28,10 +28,10 @@ app.controller('applyCountyController', function($scope, remoteApiService, commo
     $scope.profileTown = $scope.towns[0];
     var sweetalert = commonService.sweetalert;
     $scope.focusShowValidate = function(formGroupNum) {
-        $scope.fouceFormGroupNum = formGroupNum;
+        $scope.focusFormGroupNum = formGroupNum;
     };
     $scope.blurShowValidate = function() {
-        $scope.fouceFormGroupNum = 0;
+        $scope.focusFormGroupNum = 0;
     };
 
     var getProvinceList = function(provinceId, cityId, countyId, townId) {
