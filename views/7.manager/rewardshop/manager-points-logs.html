@@ -1,7 +1,7 @@
 <% include manager-rewardshop.html %>
 
 <div class="col-md-10">
-	<div class="filter col-md-12" style="padding-bottom:9px">
+	<div class="filter col-md-12 col-sm-12" style="padding-bottom:9px">
         <div class="col-md-3 col-sm-6 m">
             <div data-component="textbox" data-component-path="pointslogs.filter.search" data-placeholder="姓名/注册手机" data-control-icon="fa-search">客户查询</div>
             <div class="help" data-component="template" data-component-path="pointslogs.info"><script type="text/html">{{ count | pluralize('items','item','items','items') }} / {{ pages | pluralize('pages','page','pages','pages') }}</script></div>
@@ -14,80 +14,82 @@
 		</div>
     </div>
 
-    <div class="row col-md-12">
-		<div data-component="template" data-component-path="pointslogs" class="ui-grid" data-max="auto" data-component-id="pointslogs.griduser">
-			<script type="text/html">
-			{{ if griduser }}
-				<h3 class="ui-left">用户信息</h3>
-				<div class="col-md-6">
-					<table class="table table-bordered" border="0">
+    <div style="width:100%;float:left;">
+	    <div class="row col-md-12">
+			<div data-component="template" data-component-path="pointslogs" class="ui-grid" data-max="auto" data-component-id="pointslogs.griduser">
+				<script type="text/html">
+				{{ if griduser }}
+					<h3 class="ui-left">用户信息</h3>
+					<div class="col-md-6">
+						<table class="table table-bordered" border="0">
+							<tbody>
+								<tr>
+									<td class="col-xs-5 active">客户姓名</td>
+									<td>{{ griduser.name }}</td>
+								</tr>
+								<tr>
+									<td class="col-xs-5 active">手机号码</td>
+									<td>{{ griduser.account }}</td>
+								</tr>
+								<tr>
+									<td class="col-xs-5 active">当前积分</td>
+									<td>{{ griduser.score }}</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				{{ fi }}
+			 	</script>
+		    </div>
+		</div>
+
+		<div class="row col-md-12">
+			<ul class="tabmenu">
+				<li data-type="0">全部积分</li>
+	            <li data-type="1">获取积分</li>
+	            <li data-type="2">使用积分</li>
+	        </ul>
+			<div data-component="template" data-component-path="pointslogs" class="ui-grid pointslogs" data-max="auto" data-component-id="pointslogs.grid">
+				<script type="text/html">
+				{{ if grid && grid.length > 0 }}
+					<table class="table" width="100%" cellpadding="0" cellspacing="0" border="0">
 						<tbody>
 							<tr>
-								<td class="col-xs-5 active">客户姓名</td>
-								<td>{{ griduser.name }}</td>
-							</tr>
-							<tr>
-								<td class="col-xs-5 active">手机号码</td>
-								<td>{{ griduser.account }}</td>
-							</tr>
-							<tr>
-								<td class="col-xs-5 active">当前积分</td>
-								<td>{{ griduser.score }}</td>
-							</tr>
+								<td style="width:30px" class="silver hidden-xs ui-center active">序号</td>
+								<td style="width:80px" class="silver hidden-xs ui-right active">发生时间</td>
+						    	<td style="width:50px" class="silver hidden-xs ui-center active">项目</td>
+						    	<td style="width:60px" class="silver hidden-xs ui-center active">事件归类</td>
+						    	<td style="width:150px" class="silver hidden-xs ui-left active">事件详情</td>
+						    	<td style="width:50px" class="silver hidden-xs ui-right active">积分数值</td>
+						    	<td style="width:100px" class="silver hidden-xs ui-center active">用户信息</td>
+						    </tr>
+						{{ foreach pointslog in grid }}
+				            <tr data-index="{{ $index }}">
+				                <td style="width:30px" class="hidden-xs ui-center">{{ $index + 1 }}</td>
+				                <td style="width:80px" class="hidden-xs ui-right" title="{{ pointslog.date | format('yyyy-MM-dd HH:mm:ss') }}">{{ pointslog.date | format('yyyy-MM-dd HH:mm:ss') }}</td>
+				                <td style="width:50px" class="hidden-xs ui-center">{{ if pointslog.points > 0 }}获得积分{{ else }}{{ if pointslog.points < 0}}使用积分{{ else }}其他{{ fi }}{{ fi }}</td>
+				                <td style="width:60px" class="hidden-xs ui-center">{{pointslog.event.name}}</td>
+				                <td style="width:150px" class="hidden-xs ui-left">{{ pointslog.description }}</td>
+				                <td style="width:50px" class="hidden-xs ui-right">{{ pointslog.points }}</td>
+				                <td style="width:100px" class="hidden-xs ui-center">{{ if pointslog.user }}{{ pointslog.user.name }}</br>{{ pointslog.user.account }}</br>积分:{{ pointslog.user.score }}{{ else }}-{{ fi }}</td>
+				            </tr>
+				        {{ end }}
 						</tbody>
 					</table>
-				</div>
-			{{ fi }}
-		 	</script>
-	    </div>
-	</div>
-
-	<div class="row col-md-12">
-		<ul class="tabmenu">
-			<li data-type="0">全部积分</li>
-            <li data-type="1">获取积分</li>
-            <li data-type="2">使用积分</li>
-        </ul>
-		<div data-component="template" data-component-path="pointslogs" class="ui-grid pointslogs" data-max="auto" data-component-id="pointslogs.grid">
-			<script type="text/html">
-			{{ if grid && grid.length > 0 }}
-				<table class="table" width="100%" cellpadding="0" cellspacing="0" border="0">
-					<tbody>
-						<tr>
-							<td style="width:30px" class="silver hidden-xs ui-center active">序号</td>
-							<td style="width:80px" class="silver hidden-xs ui-right active">发生时间</td>
-					    	<td style="width:50px" class="silver hidden-xs ui-center active">项目</td>
-					    	<td style="width:60px" class="silver hidden-xs ui-center active">事件归类</td>
-					    	<td style="width:150px" class="silver hidden-xs ui-left active">事件详情</td>
-					    	<td style="width:50px" class="silver hidden-xs ui-right active">积分数值</td>
-					    	<td style="width:100px" class="silver hidden-xs ui-center active">用户信息</td>
-					    </tr>
-					{{ foreach pointslog in grid }}
-			            <tr data-index="{{ $index }}">
-			                <td style="width:30px" class="hidden-xs ui-center">{{ $index + 1 }}</td>
-			                <td style="width:80px" class="hidden-xs ui-right" title="{{ pointslog.date | format('yyyy-MM-dd HH:mm:ss') }}">{{ pointslog.date | format('yyyy-MM-dd HH:mm:ss') }}</td>
-			                <td style="width:50px" class="hidden-xs ui-center">{{ if pointslog.points > 0 }}获得积分{{ else }}{{ if pointslog.points < 0}}使用积分{{ else }}其他{{ fi }}{{ fi }}</td>
-			                <td style="width:60px" class="hidden-xs ui-center">{{pointslog.event.name}}</td>
-			                <td style="width:150px" class="hidden-xs ui-left">{{ pointslog.description }}</td>
-			                <td style="width:50px" class="hidden-xs ui-right">{{ pointslog.points }}</td>
-			                <td style="width:100px" class="hidden-xs ui-center">{{ if pointslog.user }}{{ pointslog.user.name }}</br>{{ pointslog.user.account }}</br>积分:{{ pointslog.user.score }}{{ else }}-{{ fi }}</td>
-			            </tr>
-			        {{ end }}
-					</tbody>
-				</table>
-			{{ else }}
-				{{ if !pointslogsresponse }}
-					暂无数据
+				{{ else }}
+					{{ if !pointslogsresponse }}
+						暂无数据
+					{{ fi }}
 				{{ fi }}
-			{{ fi }}
-	        </script>
-	    </div>
+		        </script>
+		    </div>
 
-	    <div class="pointslogs-pages">
+		    <div class="pointslogs-pages">
+			</div>
 		</div>
+		
+		<div data-component="error" data-component-path="pointslogs.pointslogsresponse"></div>
 	</div>
-	
-	<div data-component="error" data-component-path="pointslogs.pointslogsresponse"></div>
 </div>
 </div>
 
@@ -111,10 +113,17 @@
 		pointslogs.filter.search = pointslogs_search;
 	}
 	var pointslogs_type = getUrlParam('type');
+	var typeSelected = false;
 	if (pointslogs_type) {
 		pointslogs.filter.type = pointslogs_type;
-		$('.tabmenu li').eq(parseInt(pointslogs.filter.type)).addClass('selected');
-	} else {
+		$('.tabmenu li').each(function() {
+			if (parseInt(pointslogs.filter.type) == $(this).attr('data-type')) {
+	        	$(this).addClass('selected');
+	        	typeSelected = true;
+	        }
+	    });
+	}
+	if (!typeSelected) {
 		$('.tabmenu li').eq(0).addClass('selected');
 	}
 
@@ -208,18 +217,8 @@
             $(this).removeClass('selected');
         });
         el.addClass('selected');
-        $('div.pointslogs-pages').html('');
-        var type;
-        switch(el.attr('data-type')) {
-            case '1':
-            	type = 1;
-                break;
-            case '2':
-                type = 2;
-                break;
-        }
-        if (pointslogs.filter.type !== type) {
-        	pointslogs.filter.type = type;
+        if (el.attr('data-type') && pointslogs.filter.type != el.attr('data-type')) {
+        	pointslogs.filter.type = parseInt(el.attr('data-type'));
         	redirectPointslogsURL();
         }
     }

@@ -1,7 +1,7 @@
 <% include manager-rewardshop.html %>
 
 <div class="col-md-10">
-	<div class="filter col-md-12" style="padding-bottom:9px">
+	<div class="filter col-md-12 col-sm-12" style="padding-bottom:9px">
         <div class="col-md-3 col-sm-6 m">
             <div data-component="textbox" data-component-path="giftorders.filter.search" data-placeholder="姓名/电话" data-control-icon="fa-search">订单查询</div>
             <div class="help" data-component="template" data-component-path="giftorders.info"><script type="text/html">{{ count | pluralize('items','item','items','items') }} / {{ pages | pluralize('pages','page','pages','pages') }}</script></div>
@@ -63,9 +63,8 @@
 
 	    <div class="giftorders-pages">
 		</div>
+		<div data-component="error" data-component-path="giftorders.giftordersresponse"></div>
 	</div>
-	
-	<div data-component="error" data-component-path="giftorders.giftordersresponse"></div>
 </div>
 
 <div data-component="form" data-title="订单详情" data-component-path="common.form" data-if="value === 'giftordersForm'" data-width="1200px" data-class="col-md-12" data-component-id="giftordersForm.form" data-submitbutton="true">
@@ -235,10 +234,17 @@
 		giftorders.filter.search = giftorders_search;
 	}
 	var giftorders_type = getUrlParam('type');
+	var typeSelected = false;
 	if (giftorders_type) {
 		giftorders.filter.type = giftorders_type;
-		$('.tabmenu li').eq(parseInt(giftorders.filter.type)).addClass('selected');
-	} else {
+		$('.tabmenu li').each(function() {
+			if (parseInt(giftorders.filter.type) == $(this).attr('data-type')) {
+	        	$(this).addClass('selected');
+	        	typeSelected = true;
+	        }
+	    });
+	}
+	if (!typeSelected) {
 		$('.tabmenu li').eq(0).addClass('selected');
 	}
 
@@ -404,18 +410,8 @@
             $(this).removeClass('selected');
         });
         el.addClass('selected');
-        $('div.giftorders-pages').html('');
-        var type;
-        switch(el.attr('data-type')) {
-            case '1':
-            	type = 1;
-                break;
-            case '2':
-                type = 2;
-                break;
-        }
-        if (giftorders.filter.type !== type) {
-        	giftorders.filter.type = type;
+        if (el.attr('data-type') && giftorders.filter.type != el.attr('data-type')) {
+        	giftorders.filter.type = parseInt(el.attr('data-type'));
         	redirectGiftordersURL();
         }
     }

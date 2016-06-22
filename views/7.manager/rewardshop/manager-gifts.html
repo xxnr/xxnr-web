@@ -1,76 +1,85 @@
 <% include manager-rewardshop.html %>
 
 <div class="col-md-10">
-	<div class="filter col-md-12" style="padding-bottom:9px">
-        <div class="col-md-3 col-sm-6 m">
+	<div class="filter col-md-12 col-sm-12" style="padding-bottom:9px">
+		<div class="row col-md-12">
+            <div class="col-md-2 col-sm-3"><a href="javascript:void(0)" data-component="click" class="linkbutton" data-component-path="new_gift"><span class="fa fa-plus-circle"></span>新增礼品</a></div>
+            <!-- <div class="col-md-2 col-sm-3"><a href="javascript:void(0)" data-component="click" class="linkbutton" data-component-path="gifts_category"><span class="fa fa-folder"></span>更新分类</a></div> -->
+        </div>
+        <div class="col-md-3 col-sm-4 m">
             <div data-component="textbox" data-component-path="gifts.filter.search" data-placeholder="礼品名称" data-control-icon="fa-search">查找礼品</div>
             <div class="help" data-component="template" data-component-path="gifts.info"><script type="text/html">{{ count | pluralize('items','item','items','items') }} / {{ pages | pluralize('pages','page','pages','pages') }}</script></div>
         </div>
-        <div class="col-md-3 col-sm-6 m">
+        <div class="col-md-3 col-sm-4 m">
             <div data-component="dropdown" data-component-path="gifts.filter.category" data-source="gifts.categories" data-empty="true" data-empty-text="全部礼品" data-source-value="_id">礼品品类</div>
         </div>
-        <div class="col-md-3 col-sm-6 m">
+        <!-- <div class="col-md-3 col-sm-6 m">
 			<div data-component="dropdown" data-component-path="gifts.filter.type" data-options="全部|;已上线|1;已下线|2;已售罄|3" data-empty="true" data-empty-text="全部">状态筛选</div>
+		</div> -->
+		<div class="ui-buttons col-md-3 col-sm-4 m" style="padding-top: 21px">
+			<button name="search" title="查询" style="height: 26px;">查询<span class="fa fa-search"></span></button>
 		</div>
-        <div class="col-md-6 m">
-            <div class="row">
-                <div class="col-xs-3"><a href="javascript:void(0)" data-component="click" class="linkbutton" data-component-path="new_gift"><span class="fa fa-plus-circle"></span>新增礼品</a></div>
-                <!-- <div class="col-xs-3"><a href="javascript:void(0)" data-component="click" class="linkbutton" data-component-path="gifts_category"><span class="fa fa-folder"></span>更新分类</a></div> -->
-            </div>
-        </div>
     </div>
 
-	<div data-component="template" data-component-path="gifts" class="ui-grid gifts" data-max="auto" data-component-id="gifts.grid">
-		<script type="text/html">
-		{{ if grid && grid.length > 0 }}
-			<table class="table" width="100%" cellpadding="0" cellspacing="0" border="0">
-				<tbody>
-					<tr>
-						<td style="width:30px" class="silver hidden-xs ui-center active">序号</td>
-						<td style="width:70px" class="silver hidden-xs ui-left active">礼品id</td>
-				    	<td style="width:40px" class="silver hidden-xs ui-left active">主图</td>
-				    	<td style="width:200px" class="silver hidden-xs ui-left active">礼品</td>
-				    	<td style="width:50px" class="silver hidden-xs ui-left active">类目</td>
-				    	<td style="width:70px" class="silver hidden-xs ui-right active">市场价</td>
-				    	<td style="width:60px" class="silver hidden-xs ui-right active">兑换积分</td>
-				    	<td style="width:100px" class="silver hidden-xs ui-right active">创建时间</td>
-				    	<td style="width:80px" class="silver hidden-xs ui-center active">操作</td>
-				    </tr>
-				{{ foreach gift in grid }}
-		            <tr data-index="{{ $index }}">
-		                <td style="width:30px" class="hidden-xs ui-center">{{ $index + 1 }}</td>
-		                <td style="width:70px" class="hidden-xs ui-left">{{ gift.id }}</td>
-		                <td style="width:40px" class="hidden-xs ui-left">{{if gift.pictures && gift.pictures.length}}<img width="100%" src="/images/thumbnail/{{ gift.pictures[0] }}.jpg"></img>{{fi}}</td>
-		                <td style="width:200px" class="hidden-xs ui-left" title="{{ gift.name }}">{{if gift.online}}<b class="mr5 fs11 green">Online</b>{{fi}}{{if gift.istop}}<b class="mr5 fs11 red">TOP</b>{{fi}}{{if gift.soldout}}<b class="mr5 fs11 red">SOLDOUT</b>{{fi}}{{ gift.name }}</td>
-		                <td style="width:50px" class="hidden-xs ui-left" title="{{if gift.category && gift.category.ref}}{{ gift.category.ref.name }}{{fi}}">{{if gift.category && gift.category.ref}}{{ gift.category.ref.name }}{{fi}}</td>
-		                <td style="width:70px" class="hidden-xs ui-right">{{ gift.marketPrice | price(2) }}</td>
-		                <td style="width:60px" class="hidden-xs ui-right">{{ gift.points }}</td>
-		                <td style="width:100px" class="hidden-xs ui-right" title="{{ gift.datecreated | format('yyyy-MM-dd HH:mm:ss') }}">{{ gift.datecreated | format('yyyy-MM-dd HH:mm:ss') }}</td>
-		                <td style="width:80px" class="ui-center">
-		                    <button name="edit" title="编辑"><span class="fa fa-pencil"></span></button>
-		                    {{ if gift.online }}
-		                    <button name="offline" title="下线"><span class="fa fa-stop"></span></button>
-		                    {{ else }}
-		                    <button name="online" title="上线"><span class="fa fa-play"></span></button>
-		                    {{ fi }}
-		                    <button name="remove" title="删除"><span class="fa fa-times"></span></button>
-		                </td>
-		            </tr>
-		        {{ end }}
-				</tbody>
-			</table>
-		{{ else }}
-			{{ if !giftsresponse }}
-				暂无数据
+    <div style="width:100%;float:left;">
+    	<ul class="tabmenu">
+			<li data-type="0">全部</li>
+            <li data-type="1">已上线</li>
+            <li data-type="2">已下线</li>
+            <li data-type="3">已售罄</li>
+        </ul>
+		<div data-component="template" data-component-path="gifts" class="ui-grid gifts" data-max="auto" data-component-id="gifts.grid">
+			<script type="text/html">
+			{{ if grid && grid.length > 0 }}
+				<table class="table" width="100%" cellpadding="0" cellspacing="0" border="0">
+					<tbody>
+						<tr>
+							<td style="width:30px" class="silver hidden-xs ui-center active">序号</td>
+							<td style="width:70px" class="silver hidden-xs ui-left active">礼品id</td>
+					    	<td style="width:40px" class="silver hidden-xs ui-left active">主图</td>
+					    	<td style="width:200px" class="silver hidden-xs ui-left active">礼品</td>
+					    	<td style="width:50px" class="silver hidden-xs ui-left active">类目</td>
+					    	<td style="width:70px" class="silver hidden-xs ui-right active">市场价</td>
+					    	<td style="width:60px" class="silver hidden-xs ui-right active">兑换积分</td>
+					    	<td style="width:100px" class="silver hidden-xs ui-right active">创建时间</td>
+					    	<td style="width:80px" class="silver hidden-xs ui-center active">操作</td>
+					    </tr>
+					{{ foreach gift in grid }}
+			            <tr data-index="{{ $index }}">
+			                <td style="width:30px" class="hidden-xs ui-center">{{ $index + 1 }}</td>
+			                <td style="width:70px" class="hidden-xs ui-left">{{ gift.id }}</td>
+			                <td style="width:40px" class="hidden-xs ui-left">{{if gift.pictures && gift.pictures.length}}<img width="100%" src="/images/thumbnail/{{ gift.pictures[0] }}.jpg"></img>{{fi}}</td>
+			                <td style="width:200px" class="hidden-xs ui-left" title="{{ gift.name }}">{{if gift.online}}<b class="mr5 fs11 green">Online</b>{{fi}}{{if gift.istop}}<b class="mr5 fs11 red">TOP</b>{{fi}}{{if gift.soldout}}<b class="mr5 fs11 red">SOLDOUT</b>{{fi}}{{ gift.name }}</td>
+			                <td style="width:50px" class="hidden-xs ui-left" title="{{if gift.category && gift.category.ref}}{{ gift.category.ref.name }}{{fi}}">{{if gift.category && gift.category.ref}}{{ gift.category.ref.name }}{{fi}}</td>
+			                <td style="width:70px" class="hidden-xs ui-right">{{ gift.marketPrice | price(2) }}</td>
+			                <td style="width:60px" class="hidden-xs ui-right">{{ gift.points }}</td>
+			                <td style="width:100px" class="hidden-xs ui-right" title="{{ gift.datecreated | format('yyyy-MM-dd HH:mm:ss') }}">{{ gift.datecreated | format('yyyy-MM-dd HH:mm:ss') }}</td>
+			                <td style="width:80px" class="ui-center">
+			                    <button name="edit" title="编辑"><span class="fa fa-pencil"></span></button>
+			                    {{ if gift.online }}
+			                    <button name="offline" title="下线"><span class="fa fa-stop"></span></button>
+			                    {{ else }}
+			                    <button name="online" title="上线"><span class="fa fa-play"></span></button>
+			                    {{ fi }}
+			                </td>
+			            </tr>
+			        {{ end }}
+					</tbody>
+				</table>
+			{{ else }}
+				{{ if !giftsresponse }}
+					暂无数据
+				{{ fi }}
 			{{ fi }}
-		{{ fi }}
-        </script>
-    </div>
+	        </script>
+	        <!-- <button name="remove" title="删除"><span class="fa fa-times"></span></button> -->
+	    </div>
 
-    <div class="gifts-pages">
+	    <div class="gifts-pages">
+		</div>
+		
+		<div data-component="error" data-component-path="gifts.giftsresponse"></div>
 	</div>
-	
-	<div data-component="error" data-component-path="gifts.giftsresponse"></div>
 </div>
 </div>
 
@@ -98,21 +107,44 @@
 		gifts.filter.category = gifts_category;
 	}
 	var gifts_type = getUrlParam('type');
+	var typeSelected = false;
 	if (gifts_type) {
 		gifts.filter.type = gifts_type;
+		$('.tabmenu li').each(function() {
+			if (parseInt(gifts.filter.type) == $(this).attr('data-type')) {
+	        	$(this).addClass('selected');
+	        	typeSelected = true;
+	        }
+	    });
 	}
+	if (!typeSelected) {
+		$('.tabmenu li').eq(0).addClass('selected');
+	}
+
+	$('.filter .ui-buttons button').off('click').on('click', function() {
+        switch ($(this).attr('name')) {
+            case 'search':
+    			redirectGiftsURL();
+                break;
+        }
+    });
+
+    $('.tabmenu li').on('click', function(){
+        select_tabmenu($(this));
+    });
 
 	ON('#gifts.grid', function(component){
         gifts.filter.max = component.max;
+        console.log('#gifts.grid');
         gifts_refresh_categories();
         getGifts();
     });
 
-	Delay_Search_WATCH('gifts.filter.*', function(path, value) {
-        if (NOTMODIFIED('gifts.filter', gifts.filter))
-            return;
-        redirectGiftsURL();
-    }, 1500);
+	// Delay_Search_WATCH('gifts.filter.*', function(path, value) {
+ //        if (NOTMODIFIED('gifts.filter', gifts.filter))
+ //            return;
+ //        redirectGiftsURL();
+ //    }, 1500);
 
 	function getGifts() {
 		var urlParam = gifts.filter.search ? 'search=' + gifts.filter.search : '';
@@ -219,4 +251,15 @@
 		urlParam += gifts.filter.type ? (urlParam ? '&' : '') + 'type=' + gifts.filter.type : '';
 		window.location.href = managerurl + "/rewardshop/gifts" + (urlParam ? '?' + urlParam : '');
 	}
+
+	function select_tabmenu(el){
+        $('.tabmenu li').each(function() {
+            $(this).removeClass('selected');
+        });
+        el.addClass('selected');
+        if (el.attr('data-type') && gifts.filter.type != el.attr('data-type')) {
+        	gifts.filter.type = parseInt(el.attr('data-type'));
+        	redirectGiftsURL();
+        }
+    }
 </script>
