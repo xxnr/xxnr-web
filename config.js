@@ -83,7 +83,7 @@ var config = {
     currency_entity: "￥",
 
     //Android IOS app版本号
-    nowIosVersion: '2.1.5',
+    nowIosVersion: '2.2.1',
     nowAndroidVersion: '2.2.5'
 
 };
