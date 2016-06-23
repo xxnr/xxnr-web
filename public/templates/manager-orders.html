@@ -3,7 +3,7 @@
 		<div class="caption"><span class="fa fa-shopping-cart mr5"></span> 订单管理</div>
 		<div class="row">
 			<div class="col-md-3 col-sm-6 m">
-				<div data-component="textbox" data-component-path="orders.filter.search" data-placeholder="查找订单 ..." data-control-icon="fa-search">查询订单</div>
+				<div data-component="textbox" data-component-path="orders.filter.search" data-placeholder="姓名/电话/订单号" data-control-icon="fa-search">查询订单</div>
 				<div class="help" data-component="template" data-component-path="orders.info"><script type="text/html">{{ count | pluralize('items','item','items','items') }} / {{ pages | pluralize('pages','page','pages','pages') }}</script></div>
 			</div>
 			<div class="col-md-3 col-sm-6 m">
@@ -717,6 +717,7 @@
 
 	orders.filter = {};
 	orders.filter.page = 1;
+	orders.filter.search = '';
 
 	orders.grid = [];
 	orders.form = {};

@@ -441,6 +441,10 @@ exports.json_rewardshop_giftorders_update = function(req, res, next) {
 			res.respond({code:1001, message:'没有找到相应的积分兑换记录'});
 			return;
 		}
+		var options = {};
+		if (req.user) {
+	    	options.backendUser = req.user;
+	    }
 		if (req.data.deliverStatus) {
 			if (!req.data.deliveryCode) {
 				res.respond({code:1001, message:'修改发货状态前请先输入配送码'});
@@ -451,17 +455,49 @@ exports.json_rewardshop_giftorders_update = function(req, res, next) {
 				return;
 			}
 		}
-		var options = {};
-		if (req.user) {
-	    	options.backendUser = req.user;
-	    }
-		LoyaltypointService.updateGiftOrder(req.data.id, null, req.data.deliverStatus, options, function(err, giftOrder) {
-			if (err) {
-				res.respond({code:1002, message:'修改积分兑换记录失败'});
-				return;
-			}
-			res.respond({code:1000, message:'success'});
-		});
+		
+	    if (req.data.RSCInfo) {
+	    	UserService.getRSCInfoById(req.data.RSCInfo.RSC, function(err, RSC) {
+				if (err || !RSC) {
+					if (err) console.error('manager json_rewardshop_giftorders_update UserService getRSCInfoById err:', err);
+					res.respond({code:1002, message:'未查找到RSC'});
+					return;
+				}
+				var RSCInfo = {};
+				RSCInfo.RSC = req.data.RSCInfo.RSC;
+                RSCInfo.RSCAddress = RSC.RSCInfo.companyAddress.province.name + RSC.RSCInfo.companyAddress.city.name;
+                if (RSC.RSCInfo.companyAddress.county && RSC.RSCInfo.companyAddress.county.name) {
+                    RSCInfo.RSCAddress += RSC.RSCInfo.companyAddress.county.name;
+                }
+                if (RSC.RSCInfo.companyAddress.town && RSC.RSCInfo.companyAddress.town.name) {
+                    RSCInfo.RSCAddress += RSC.RSCInfo.companyAddress.town.name;
+                }
+                if (RSC.RSCInfo.companyAddress.details) {
+                    RSCInfo.RSCAddress += RSC.RSCInfo.companyAddress.details;
+                }
+                if (RSC.RSCInfo.companyName) {
+                    RSCInfo.companyName = RSC.RSCInfo.companyName;
+                }
+                if (RSC.RSCInfo.phone) {
+                    RSCInfo.RSCPhone = RSC.RSCInfo.phone;
+                }
+				LoyaltypointService.updateGiftOrder(req.data.id, null, req.data.deliverStatus, RSCInfo, options, function(err, giftOrder) {
+					if (err) {
+						res.respond({code:1002, message:'修改积分兑换记录失败'});
+						return;
+					}
+					res.respond({code:1000, message:'success'});
+				});
+			});
+	    } else { 
+			LoyaltypointService.updateGiftOrder(req.data.id, null, req.data.deliverStatus, null, options, function(err, giftOrder) {
+				if (err) {
+					res.respond({code:1002, message:'修改积分兑换记录失败'});
+					return;
+				}
+				res.respond({code:1000, message:'success'});
+			});
+		}
 	});
 }
 
@@ -2452,6 +2488,24 @@ exports.json_RSC_query_by_products = function(req,res,next){
 			res.respond({code:1000, message:'success', RSCs:RSCs});
 		});
 	})
+};
+
+exports.json_RSC_query_by_gift = function(req,res,next){
+	if (!req.data.gift) {
+		res.respond({code: 1002, message: '请提供礼品信息'});
+		return;
+	}
+	var options = {};
+	options.gift = req.data.gift;
+
+	RSCService.getRSCList(null, null, null, null, null, null, null, function(err, RSCs, count, pageCount) {
+		if (err) {
+			res.respond({code: 1002, message: '查找服务站失败'});
+			return;
+		}
+
+		res.respond({code:1000, message:'success', RSCs:RSCs});
+	}, null, options);
 };
 
 // ==========================================================================

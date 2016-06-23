@@ -3,7 +3,7 @@
 <div class="col-md-10">
 	<div class="filter col-md-12 col-sm-12" style="padding-bottom:9px">
         <div class="col-md-3 col-sm-6 m">
-            <div data-component="textbox" data-component-path="giftorders.filter.search" data-placeholder="姓名/电话" data-control-icon="fa-search">订单查询</div>
+            <div data-component="textbox" data-component-path="giftorders.filter.search" data-placeholder="姓名/电话" data-control-icon="fa-search">查询兑换订单</div>
             <div class="help" data-component="template" data-component-path="giftorders.info"><script type="text/html">{{ count | pluralize('items','item','items','items') }} / {{ pages | pluralize('pages','page','pages','pages') }}</script></div>
         </div>
 		<div class="ui-buttons col-md-3 col-sm-6 m" style="padding-top: 21px">
@@ -45,7 +45,7 @@
 			                <td style="width:40px" class="hidden-xs ui-center" title="{{if order.deliveryType==1}}自提{{else}}配送到户{{fi}}">{{ if order.deliveryType==1 }}自提{{ else }}配送到户{{ fi }}</td>
 			                <td style="width:45px" class="hidden-xs ui-center" title="{{order.deliveryCode}}">{{ order.deliveryCode }}</td>
 			                <td style="width:40px" class="hidden-xs ui-right" title="{{order.points}}">{{ order.points }}</td>
-			                <td style="width:110px" class="hidden-xs ui-left" title="{{if order.RSCInfo}}{{order.RSCInfo.companyName}}{{fi}}">{{ if order.RSCInfo }}{{ order.RSCInfo.companyName }}</br>{{ order.RSCInfo.RSCAddress }}{{ fi }}</td>
+			                <td style="width:110px" class="hidden-xs ui-left" title="{{if order.RSCInfo}}{{order.RSCInfo.companyName}}{{fi}}">{{ if order.RSCInfo }}{{ order.RSCInfo.companyName }}{{ fi }}</td>
 			                <td style="width:80px" class="hidden-xs ui-center" title="">{{ if order && order.orderStatus && order.orderStatus.value }}{{ if order.orderStatus.type == 4 }}<span class="green">{{else}}<span class="red">{{fi}}{{order.orderStatus.value}}</span>{{ else }}-{{ fi }}</td>
 			                <td style="width:25px" class="hidden-xs ui-center"><button name="edit" title="编辑"><span class="fa fa-pencil"></span></button></td>
 			            </tr>
@@ -114,54 +114,90 @@
 			<div class="padding col-md-12">
 				<div class="silver"><strong>收货人信息</strong></div>
 				<br />
-				<div data-component="template" data-component-path="giftordersForm.form">
-					<script type="text/html">
-						<table class="table table-bordered" border="0">
-							<tbody>
-							<tr>
-								<td class="col-xs-5 active">收货人</td>
-								<td>{{ consigneeName }}</td>
-							</tr>
-							<tr>
-								<td class="col-xs-5 active">电话</td>
-								<td>{{ consigneePhone }}</td>
-							</tr>
-							<tr>
-								<td class="col-xs-5 active">收货地址</td>
-								<td>{{ consigneeAddress }}</td>
-							</tr>
-							</tbody>
-						</table>
-					</script>
+				<div class="col-md-12">
+					<div data-component="template" data-component-path="giftordersForm.form" class="col-md-12">
+						<script type="text/html">
+							<table class="table table-bordered" border="0">
+								<tbody>
+								<tr>
+									<td class="col-xs-3 active">收货人</td>
+									<td>{{ consigneeName }}</td>
+								</tr>
+								<tr>
+									<td class="col-xs-3 active">电话</td>
+									<td>{{ consigneePhone }}</td>
+								</tr>
+								<tr>
+									<td class="col-xs-3 active">收货地址</td>
+									<td>{{ consigneeAddress }}</td>
+								</tr>
+								</tbody>
+							</table>
+						</script>
+					</div>
 				</div>
 				<div class="silver"><strong>配送信息</strong></div>
 				<br />
-				<div data-component="template" data-component-path="giftordersForm.form">
-					<script type="text/html">
-						<table class="table table-bordered" border="0">
-							<tbody>
-							<tr>
-								<td class="col-xs-5 active">配送方式</td>
-								<td>
-									{{ if deliveryType==1 }}
-										自提
-									{{ else }}
-										配送到户
-									{{ fi }}
-								</td>
-							</tr>
-							<tr>
-								<td class="col-xs-5 active">服务站信息</td>
-								<td>
-									{{ if RSCInfo }}
-										<p>服务站地址:{{ RSCInfo.RSCAddress}}</p>
-										<p>联系电话:{{ RSCInfo.RSCPhone }}</p>
-									{{ fi }}
-								</td>
-							</tr>
-							</tbody>
-						</table>
-					</script>
+				<div class="col-md-12 m">
+					<div data-component="template" data-component-path="giftordersForm" class="col-md-12">
+						<script type="text/html">
+							<table class="table table-bordered" border="0">
+								<tbody>
+								<tr>
+									<td class="col-xs-3 active">配送方式</td>
+									<td>
+										{{ if form && form.deliveryType==1 }}
+											自提
+										{{ else }}
+											配送到户
+										{{ fi }}
+									</td>
+								</tr>
+								<tr>
+									<td class="col-xs-3 active">服务站信息</td>
+									<td>
+										<p id="RSCList">服务站:
+											<select data-name="RSCInfo">
+												<option selected disabled hidden value=''>请选择服务站</option>
+												{{ foreach RSC in RSCList }}
+													<option RSC="{{ RSC._id }}" companyName="{{RSC.RSCInfo.companyName}}" name="{{RSC.RSCInfo.name}}" phone="{{ RSC.RSCInfo.phone}}"
+															{{if RSC.RSCInfo.companyAddress}}
+																{{ if RSC.RSCInfo.companyAddress.province}}
+																	province="{{RSC.RSCInfo.companyAddress.province.name}}"
+																{{ fi }}
+																{{ if RSC.RSCInfo.companyAddress.city}}
+																	city="{{RSC.RSCInfo.companyAddress.city.name}}"
+																{{ fi }}
+																{{ if RSC.RSCInfo.companyAddress.county}}
+																	county="{{RSC.RSCInfo.companyAddress.county.name}}"
+																{{ fi }}
+																{{ if RSC.RSCInfo.companyAddress.town}}
+																	town="{{RSC.RSCInfo.companyAddress.town.name}}"
+																{{ fi }}
+																details="{{RSC.RSCInfo.companyAddress.details}}"
+															{{ fi }}
+															{{  if form.RSCInfo && RSC._id == form.RSCInfo.RSC }}selected{{ fi }}>
+														{{ RSC.RSCInfo.companyName }}
+													</option>
+												{{ end }}
+											</select>
+										</p>
+										{{ if form && form.RSCInfo }}
+											<p>服务站地址:{{ form.RSCInfo.RSCAddress}}</p>
+											<p>联系电话:{{ form.RSCInfo.RSCPhone }}</p>
+										{{ fi }}
+									</td>
+								</tr>
+								</tbody>
+							</table>
+						</script>
+					</div>
+					<div class="col-md-12">
+						<div data-component="error" data-component-path="giftordersForm.RSCInforesponse"></div>
+						<div data-component="visible" class="ui-buttons" data-component-path="giftordersForm.form.RSCInfo" data-if="giftordersForm.form">
+							<button id="RSCInfoModifyButton" name="submit" data-name="RSCInfo" data-warning="你确认提交服务站信息的修改吗?">提交修改</button>
+						</div>
+					</div>
 				</div>
 				<div class="silver"><strong>修改发货状态</strong></div>
 				<br />
@@ -216,6 +252,7 @@
 	// giftorders.form = {};
     giftorders.filter = {};
     giftorders.filter.page = 1;
+    giftorders.filter.search = '';
     giftorders.grid = [];
     giftorders.info = {};
 	giftorders.giftordersresponse;
@@ -224,6 +261,8 @@
 	var giftordersForm = {};
 	giftordersForm.form = {};
 	giftordersForm.deliverStatusresponse;
+	giftordersForm.RSCList = [];
+	giftordersForm.RSCInforesponse;
 
 	var giftorders_page = getUrlParam('page');
 	if (giftorders_page) {
@@ -291,6 +330,7 @@
 						}
 						postdata['deliveryCode'] = input_deliveryCode;
 					}
+
 					postdata['id'] = giftordersForm.form.id;
 					postdata[dataname] = giftordersForm.form[dataname];
 					if (!confirm(datawarning))
@@ -332,7 +372,6 @@
 					break;
 			}
 		});
-
 
 		component.changedisabled_botton = function (name) {
 			component.element.find('button').each(function() {
@@ -376,7 +415,27 @@
 				                    SET('giftordersForm.deliverStatuses', [{name:'未发货',value:1},{name:'服务站已发货',value:2},{name:'已收货',value:5}], true);
 				                    SET('giftordersForm.deliverStatusresponse', null);
 				                    $('.giftordersDeliverStatus #deliveryCode').val('');
-				                    SET('common.form', 'giftordersForm');
+				                    $.components.GET(managerurl + '/api/v2.2/RSC/queryByGift', {gift:row.gift.ref}, function(RSCresponse){
+										if (RSCresponse.code != 1000) {
+											alert(RSCresponse.message);
+											if (RSCresponse.error || RSCresponse.message) {
+												if (RSCresponse.message) {
+													RSCresponse = [{error: RSCresponse.message}];
+												} else {
+													RSCresponse = RSCresponse.error;
+												}
+											} else {
+												RSCresponse = [{error: '请求服务站列表失败'}];
+											}
+											SET('giftordersForm.RSCInforesponse', RSCresponse);
+										} else {
+											giftordersForm.RSCList = RSCresponse.RSCs;
+											SET('giftordersForm.RSCList', giftordersForm.RSCList);
+											onRSCListRefreshed();
+											SET('common.form', 'giftordersForm');
+										}
+									});
+									// SET('common.form', 'giftordersForm');
 				                    break;
 			            	}
 			            }
@@ -393,6 +452,32 @@
 					response = null;
 				}
 				SET('giftorders.giftordersresponse', response);
+			}
+		});
+	}
+
+	function onRSCListRefreshed() {
+		$('#RSCList').on('change', 'select', function () {
+			var el = $(this);
+			var data_name = el.attr('data-name');
+			var RSC = el.find('option:selected').attr('RSC');
+			var companyName = el.find('option:selected').attr('companyName');
+			var name = el.find('option:selected').attr('name');
+			var phone = el.find('option:selected').attr('phone');
+			var province = el.find('option:selected').attr('province');
+			var city = el.find('option:selected').attr('city');
+			var county = el.find('option:selected').attr('county');
+			var town = el.find('option:selected').attr('town');
+			var details = el.find('option:selected').attr('details');
+
+			switch (data_name) {
+				case 'RSCInfo':
+					var RSCInfo = {RSC: RSC, companyName: companyName, RSCPhone:phone, RSCAddress:province+city+county+town+details};
+					giftordersForm.form.RSCInfo = RSCInfo;
+					$('#RSCInfoModifyButton').prop({ disabled: false });
+					UPDATE('giftordersForm.form');
+					onRSCListRefreshed();
+					break;
 			}
 		});
 	}

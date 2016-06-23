@@ -75,7 +75,10 @@ var RewardshopGiftOrderSchema = new mongoose.Schema({
 		'RSC': {type: mongoose.Schema.ObjectId, ref: 'user'},						// 自提点的reference
 		'companyName': {type: String},												// 自提点公司名
 		'RSCAddress': {type: String},												// 自提点地址
-		'RSCPhone': {type: String}													// 自提点联系电话
+		'RSCPhone': {type: String},													// 自提点联系电话
+		'dateSet': {type: Date},													// 后台用户设置的日期
+		'backendUser':{type: mongoose.Schema.ObjectId, ref:'backenduser'},			// 设置本条信息的后台用户
+		'backendUserAccount':{type: String}											// 设置本条信息的后台用户账户
 	},
 	'dateCreated': {type: Date, default: Date.now},
 	'gift': {
