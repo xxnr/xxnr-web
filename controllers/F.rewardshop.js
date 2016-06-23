@@ -6,6 +6,7 @@ var tools = require('../common/tools');
 var moment = require('moment-timezone');
 var services = require('../services');
 var UserService = services.user;
+var UseraddressService = services.useraddress;
 var LoyaltypointService = services.loyaltypoint;
 var DELIVERYTYPE =  require('../common/defs').DELIVERYTYPE;
 
