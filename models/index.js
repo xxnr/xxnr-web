@@ -4,7 +4,7 @@
 var mongoose = require('mongoose');
 var config = require('../configuration/mongoose_config');
 
-mongoose.connect(config.db[config.environment],{user:'xxnr',pass:'xxnr001'});
+mongoose.connect(config.db[config.environment],{user:'xxnr',pass:'txht001'});
 
 require('./users');
 require('./auth');
