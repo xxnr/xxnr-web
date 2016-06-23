@@ -26,12 +26,11 @@
 							<td style="width:30px" class="silver hidden-xs ui-center active">序号</td>
 							<td style="width:80px" class="silver hidden-xs ui-right active">兑换时间</td>
 					    	<td style="width:70px" class="silver hidden-xs ui-center active">兑换人</td>
-					    	<td style="width:75px" class="silver hidden-xs ui-left active">礼品</td>
+					    	<td style="width:120px" class="silver hidden-xs ui-left active">礼品</td>
 					    	<td style="width:70px" class="silver hidden-xs ui-center active">收货人信息</td>
 					    	<td style="width:40px" class="silver hidden-xs ui-center active">配送方式</td>
 					    	<td style="width:45px" class="silver hidden-xs ui-center active">配送码</td>
 					    	<td style="width:40px" class="silver hidden-xs ui-right active">所用积分</td>
-					    	<td style="width:110px" class="silver hidden-xs ui-left active">自提点</td>
 					    	<td style="width:40px" class="silver hidden-xs ui-center active">订单状态</td>
 					    	<td style="width:25px" class="silver hidden-xs ui-center active">操作</td>
 					    </tr>
@@ -40,12 +39,11 @@
 			                <td style="width:30px" class="hidden-xs ui-center">{{ $index + 1 }}</td>
 			                <td style="width:80px" class="hidden-xs ui-right" title="{{order.dateCreated | format('yyyy-MM-dd HH:mm:ss')}}">{{ order.dateCreated | format('yyyy-MM-dd HH:mm:ss') }}</td>
 			                <td style="width:70px" class="hidden-xs ui-center" title="{{if order.buyerName}}{{order.buyerName}}{{else}}{{if order.buyerPhone}}{{order.buyerPhone}}{{fi}}{{fi}}">{{ order.buyerName }}</br>{{ order.buyerPhone }}</td>
-			                <td style="width:75px" class="hidden-xs ui-left" title="{{order.gift.name}}">{{if order.gift.thumbnail}}<img width="30%" src="{{ order.gift.thumbnail }}"></img>{{fi}}{{ order.gift.name }}</td>
+			                <td style="width:120px" class="hidden-xs ui-left" title="{{order.gift.name}}">{{if order.gift.thumbnail}}<img style="width:30px" src="{{ order.gift.thumbnail }}"></img>{{fi}}<span style="padding-left:3px;">{{ order.gift.name }}</span></td>
 			                <td style="width:70px" class="hidden-xs ui-center" title="{{if order.consigneeName}}{{order.consigneeName}}{{else}}{{if order.consigneePhone}}{{order.consigneePhone}}{{fi}}{{fi}}">{{ order.consigneeName }}</br>{{ order.consigneePhone }}</td>
 			                <td style="width:40px" class="hidden-xs ui-center" title="{{if order.deliveryType==1}}自提{{else}}配送到户{{fi}}">{{ if order.deliveryType==1 }}自提{{ else }}配送到户{{ fi }}</td>
 			                <td style="width:45px" class="hidden-xs ui-center" title="{{order.deliveryCode}}">{{ order.deliveryCode }}</td>
 			                <td style="width:40px" class="hidden-xs ui-right" title="{{order.points}}">{{ order.points }}</td>
-			                <td style="width:110px" class="hidden-xs ui-left" title="{{if order.RSCInfo}}{{order.RSCInfo.companyName}}{{fi}}">{{ if order.RSCInfo }}{{ order.RSCInfo.companyName }}{{ fi }}</td>
 			                <td style="width:80px" class="hidden-xs ui-center" title="">{{ if order && order.orderStatus && order.orderStatus.value }}{{ if order.orderStatus.type == 4 }}<span class="green">{{else}}<span class="red">{{fi}}{{order.orderStatus.value}}</span>{{ else }}-{{ fi }}</td>
 			                <td style="width:25px" class="hidden-xs ui-center"><button name="edit" title="编辑"><span class="fa fa-pencil"></span></button></td>
 			            </tr>
@@ -58,6 +56,7 @@
 				{{ fi }}
 			{{ fi }}
 	        </script>
+	        <!-- <td style="width:110px" class="hidden-xs ui-left" title="{{if order.RSCInfo}}{{order.RSCInfo.companyName}}{{fi}}">{{ if order.RSCInfo }}{{ order.RSCInfo.companyName }}{{ fi }}</td> -->
 	        <!-- <td style="width:25px" class="hidden-xs ui-center">{{ if order && order.orderStatus.type && order.orderStatus.type != 4 }}<button name="edit" title="编辑"><span class="fa fa-pencil"></span></button>{{ fi }}</td> -->
 	    </div>
 

@@ -272,7 +272,7 @@ LoyaltyPointsService.prototype.queryRewardshopGifts = function(page, max, type, 
             return;
         }
         RewardshopGiftModel.find(query)
-	        .sort({istop:1, datecreated:-1})
+	        .sort({istop:-1, datecreated:-1})
 	        .skip(skip)
 	        .limit(take)
 	        .populate({path:'category.ref', select:'name'})
