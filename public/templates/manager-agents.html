@@ -5,7 +5,7 @@
 		<div class="caption"><span class="fa fa-user-secret mr5"></span>经纪人管理</div>
 		<div class="row">
             <div class="col-md-3 col-sm-6 m">
-                <div data-component="textbox" data-component-path="agents.filter.search" data-placeholder="" data-control-icon="fa-search">经纪人姓名/电话</div>
+                <div data-component="textbox" data-component-path="agents.filter.search" data-placeholder="经纪人姓名/电话" data-control-icon="fa-search">查询经纪人</div>
                 <div class="help" data-component="template" data-component-path="agents.info"><script type="text/html">{{ count | pluralize('items','item','items','items') }} / {{pages | pluralize('pages', 'page', 'pages', 'pages') }}</script></div>
             </div>
         </div>
@@ -65,6 +65,8 @@
 
     agents.filter = {};
     agents.filter.page = 1;
+    agents.filter.search = '';
+
     agents.grid = [];
     agents.info = {};
 	agents.agentsresponse;

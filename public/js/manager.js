@@ -376,11 +376,9 @@ Delay_Search_WATCH = function(field, callback, latency_in_millisecond){
 			if (timer) {
 				clearTimeout(timer);
 			}
-			if (value.search) {
-				timer = setTimeout(function (path, value) {
-					callback(path, value);
-				}, latency_in_millisecond);
-			}
+			timer = setTimeout(function (path, value) {
+				callback(path, value);
+			}, latency_in_millisecond);
 		} else{
 			callback(path, value);
 		}

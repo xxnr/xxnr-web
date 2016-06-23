@@ -3,7 +3,7 @@
 <div class="col-md-10">
 	<div class="filter col-md-12 col-sm-12" style="padding-bottom:9px">
         <div class="col-md-3 col-sm-6 m">
-            <div data-component="textbox" data-component-path="pointslogs.filter.search" data-placeholder="姓名/注册手机" data-control-icon="fa-search">客户查询</div>
+            <div data-component="textbox" data-component-path="pointslogs.filter.search" data-placeholder="姓名/注册手机" data-control-icon="fa-search">查询客户</div>
             <div class="help" data-component="template" data-component-path="pointslogs.info"><script type="text/html">{{ count | pluralize('items','item','items','items') }} / {{ pages | pluralize('pages','page','pages','pages') }}</script></div>
         </div>
         <!-- <div class="col-md-3 col-sm-6 m">
@@ -99,6 +99,7 @@
 
     pointslogs.filter = {};
     pointslogs.filter.page = 1;
+    pointslogs.filter.search = '';
     pointslogs.grid = [];
     pointslogs.griduser;
     pointslogs.info = {};

@@ -7,7 +7,7 @@
             <!-- <div class="col-md-2 col-sm-3"><a href="javascript:void(0)" data-component="click" class="linkbutton" data-component-path="gifts_category"><span class="fa fa-folder"></span>更新分类</a></div> -->
         </div>
         <div class="col-md-3 col-sm-4 m">
-            <div data-component="textbox" data-component-path="gifts.filter.search" data-placeholder="礼品名称" data-control-icon="fa-search">查找礼品</div>
+            <div data-component="textbox" data-component-path="gifts.filter.search" data-placeholder="礼品名称" data-control-icon="fa-search">查询礼品</div>
             <div class="help" data-component="template" data-component-path="gifts.info"><script type="text/html">{{ count | pluralize('items','item','items','items') }} / {{ pages | pluralize('pages','page','pages','pages') }}</script></div>
         </div>
         <div class="col-md-3 col-sm-4 m">
@@ -89,6 +89,7 @@
 
     gifts.filter = {};
     gifts.filter.page = 1;
+    gifts.filter.search = '';
     gifts.grid = [];
     gifts.info = {};
     gifts.categories = [];

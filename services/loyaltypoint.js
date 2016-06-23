@@ -196,7 +196,7 @@ LoyaltyPointsService.prototype.updateRewardshopGift = function(giftInfo, callbac
 	if (giftInfo.appintroduction) {
 		values.appintroduction = giftInfo.appintroduction;
 	}
-	if (giftInfo.marketPrice) {
+	if (typeof giftInfo.marketPrice != 'undefined') {
 		values.marketPrice = giftInfo.marketPrice;
 	}
 	if (typeof giftInfo.istop != 'undefined') {
@@ -461,7 +461,7 @@ LoyaltyPointsService.prototype.getGiftOrder = function(id, userId, callback) {
 };
 
 // update gift order
-LoyaltyPointsService.prototype.updateGiftOrder = function(id, userId, deliverStatus, options, callback) {
+LoyaltyPointsService.prototype.updateGiftOrder = function(id, userId, deliverStatus, RSCInfo, options, callback) {
     var self = this;
     var query = {id: id};
     if (userId) {
@@ -489,6 +489,17 @@ LoyaltyPointsService.prototype.updateGiftOrder = function(id, userId, deliverSta
                     giftOrder.dateSet = new Date();
                     giftOrder.backendUser = options.backendUser._id;
                     giftOrder.backendUserAccount = options.backendUser.account;
+                }
+            }
+            if (RSCInfo) {
+                giftOrder.RSCInfo.RSC = RSCInfo.RSC;
+                giftOrder.RSCInfo.RSCAddress = RSCInfo.RSCAddress ? RSCInfo.RSCAddress : '';
+                giftOrder.RSCInfo.companyName = RSCInfo.companyName ? RSCInfo.companyName : '';
+                giftOrder.RSCInfo.RSCPhone = RSCInfo.RSCPhone ? RSCInfo.companyName : '';
+                if (options.backendUser) {
+                    giftOrder.RSCInfo.dateSet = new Date();
+                    giftOrder.RSCInfo.backendUser = options.backendUser._id;
+                    giftOrder.RSCInfo.backendUserAccount = options.backendUser.account;
                 }
             }
             // save
@@ -556,6 +567,7 @@ LoyaltyPointsService.prototype.increase = function(user_id, points, type, descri
 			}
 		}
 		values.$set = {sign:sign};
+        description = '连续签到' + consecutiveTimes + '天';
     }
     values.$inc = {score: parseInt(points)};
 
