@@ -1,8 +1,8 @@
 /**
  * Created by cuidi on 15/11/16.
  */
-var app = angular.module('commit_pay', ['xxnr_common', 'shop_cart']);
-app.controller('commitPayController', function($scope, remoteApiService, payService, commonService, loginService){
+var app = angular.module('commit_pay', ['xxnr_common', 'shop_cart',"ngFlash"]);
+app.controller('commitPayController', function($scope, remoteApiService, payService, commonService, loginService, Flash){
     function getQueryStringByName(name) {
         var result = location.search.match(new RegExp("[\?\&]" + name + "=([^\&]+)", "i"));
         if (result == null || result.length < 1) {
@@ -13,6 +13,7 @@ app.controller('commitPayController', function($scope, remoteApiService, payServ
 
     $scope.has_offlinePay_company = false; //用来表示线下支付点的参数
     $scope.offlineSubmitted = getQueryStringByName('offlinePay') | false;   // 已提交线下订单
+    $scope.auditingOrder = getQueryStringByName('auditingOrder') | false;   // 订单正在审核中
     //console.log($scope.offlineSubmitted);
     // if not login
     if(!loginService.isLogin) {
@@ -186,9 +187,7 @@ app.controller('commitPayController', function($scope, remoteApiService, payServ
                             else {
                                 if(data.datas.rows.payStatus == 2){
                                     $scope.orderHasPayed = true;
-                                }
-                                //$scope.orderHasPayed = true;
-                                if(data.datas.rows.order.orderStatus &&  data.datas.rows.order.orderStatus.type == 7) {
+                                } else if(data.datas.rows.order.orderStatus &&  data.datas.rows.order.orderStatus.type != 7 && $scope.auditingOrder) {
                                     $scope.offlineHasAudited = true;
                                     $scope.wholePageShow = true;
                                 }else{
@@ -316,6 +315,9 @@ app.controller('commitPayController', function($scope, remoteApiService, payServ
                         $scope.isOverflow = true;
                     }
 
+                }else if(data.code == 1001){
+                    var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">订单已支付';
+                    var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);
                 }
             });
     };

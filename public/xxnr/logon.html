@@ -137,7 +137,7 @@
                         <p class="register_form--title">注册</p>
                         <form name="registerForm" class="registerForm" novalidate ng-submit="" >
                             <div class="form-group"
-                                 ng-class="{'focused_input--green':focusInputGroupNum == formInputsKeyValue.registerPhone,'error_input--red': registerResMsg.length > 0 && errorInputGroupNum ==formInputsKeyValue.registerPhone && (registerForm.phoneNumber.$error.required || registerForm.phoneNumber.$error.phoneverfied)}"
+                                 ng-class="{'focused_input--green':focusInputGroupNum == formInputsKeyValue.registerPhone,'error_input--red': registerResMsg.length > 0 && errorInputGroupNum ==formInputsKeyValue.registerPhone }"
                                  ng-click="focusShowValidate(formInputsKeyValue.registerPhone)">
                                 <label>
                                     <img src="images/login_user.png" alt=""/>
@@ -262,26 +262,34 @@
                 <li>
                     <label for="" class="left label">用户名：</label>
                     <div class="left">
-                        <input id="tel" type="text" class="input" value="" ng-model="phoneNumber">
+                        <input id="tel" type="text" class="input" value="" ng-model="phoneNumber"
+                               ng-class="{'focused_input--green':focusInputGroupNum == formInputsKeyValue.resetPasswordPhone,'error_input--red': resetPasswordMsg.length > 0 && errorInputGroupNum ==formInputsKeyValue.resetPasswordPhone }"
+                               ng-click="focusShowValidate(formInputsKeyValue.resetPasswordPhone)">
                     </div>
                 </li>
                 <li>
                     <label for="" class="left label">验证码：</label>
                     <div class="left">
-                        <input type="text" id="dynamic_code" class="input_reg_code" value="" ng-model="code">
+                        <input type="text" id="dynamic_code" class="input_reg_code" value="" ng-model="code"
+                               ng-class="{'focused_input--green':focusInputGroupNum == formInputsKeyValue.resetPasswordCode,'error_input--red': resetPasswordMsg.length > 0 && errorInputGroupNum ==formInputsKeyValue.resetPasswordCode }"
+                               ng-click="focusShowValidate(formInputsKeyValue.resetPasswordCode)">
                     </div>
                     <div class="right reg_get_code"><a href="" ng-click="sendResetCode($event)">{{resetCountDown}}</a></div>
                 </li>
                 <li>
                     <label for="" class="left label">新密码：</label>
                     <div class="left">
-                        <input type="password" id="pop_password" class="input" value="" ng-model="newPassword">
+                        <input type="password" id="pop_password" class="input" value="" ng-model="newPassword"
+                               ng-class="{'focused_input--green':focusInputGroupNum == formInputsKeyValue.resetPassword,'error_input--red': resetPasswordMsg.length > 0 && ( errorInputGroupNum ==  formInputsKeyValue.resetPassword ||  errorInputGroupNum == formInputsKeyValue.resetConfirmPasswordsMismatch) }"
+                               ng-click="focusShowValidate(formInputsKeyValue.resetPassword)">
                     </div>
                 </li>
                 <li>
                     <label for="" class="left label">确认密码：</label>
                     <div class="left">
-                        <input type="password" id="pop_password_cf" class="input" value="" ng-model="confirm_newPassword" ng-keydown="confirm_newPassword_keydown($event)">
+                        <input type="password" id="pop_password_cf" class="input" value="" ng-model="confirm_newPassword" ng-keydown="confirm_newPassword_keydown($event)"
+                               ng-class="{'focused_input--green':focusInputGroupNum == formInputsKeyValue.resetPasswordConfirm,'error_input--red': resetPasswordMsg.length > 0 && ( errorInputGroupNum ==  formInputsKeyValue.resetPasswordConfirm ||  errorInputGroupNum == formInputsKeyValue.resetConfirmPasswordsMismatch) }"
+                               ng-click="focusShowValidate(formInputsKeyValue.resetPasswordConfirm)">
                     </div>
                 </li>
                 <li>
@@ -293,6 +301,10 @@
                 <div class="reset_password_err ng-cloak" ng-show="resetPasswordMsg">
                     <img src="../xxnr/images/login_fault.png" alt="" />
                     <span>{{resetPasswordMsg}}</span>
+                </div>
+                <div class="reset_password_succeed ng-cloak" ng-show="resetPasswordSucceedMsg">
+                    <img src="../xxnr/images/correct_prompt1.png" alt="" />
+                    <span>{{resetPasswordSucceedMsg}}</span>
                 </div>
             </ul>
         </div>

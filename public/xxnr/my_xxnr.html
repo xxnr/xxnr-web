@@ -16,6 +16,7 @@
     <link rel="stylesheet" type="text/css" href="css/uploadify.css" />
     <link type="text/css" rel="stylesheet" href="css/style.css">
     <link type="text/css" rel="stylesheet" href="css/sweetalert.css">
+    <link type="text/css" rel="stylesheet" href="css/angular-flash.css">
     <!-- endbuild -->
     <!-- build:js -->
     <script src="js/jquery.min.js"></script>
@@ -45,10 +46,8 @@
 </head>
 
 <body ng-controller="userCenterController" ng-class="{true:'overflow_body', false:'not_overflow_body'}[isOverflow]">
+    <flash-message></flash-message>
     <header ng-controller="headerController"></header>
-
-
-
     <div class="wrap nav" ng-controller="shoppingCartController">
         <h1 class="left logo"><a href="/">新新农人</a></h1>
         <ul class="left">
@@ -280,7 +279,7 @@
                             </a>
                         </li>
                     </div> -->
-                <div id="page_buttons">
+                <div id="page_buttons" ng-hide="orderList.length === 0">
                     <ul class="row">
                         <li ng-hide="current_page==1" class="pre_btn"><a href="" ng-click="pre_page()"><em class="ban ban_8_0">&nbsp;</em></a></li>
                         <li ng-repeat="page in pages"><a href="" ng-click="show_page(page.id)" ng-class="{true:'current', false:''}[page.isSelected]">{{page.id}}</a></li>
@@ -314,29 +313,36 @@
             <a href="" ng-click='closePop()' class="right close"></a>
         </div>
         <div class="pop_body">
+            <div class="my_xxnr_password_err ng-cloak" ng-show="my_xxnr_password_err_msg">
+                <img src="../xxnr/images/login_fault.png" alt="" />
+                <span>{{my_xxnr_password_err_msg}}</span>
+            </div>
             <ul class="pop_login">
                 <li>
                     <label for="" class="left label">旧密码：</label>
                     <div class="left">
-                        <input type="password" id="password" class="input" value="" ng-model="oldPassword">
+                        <input type="password" id="password" class="input" value="" ng-model="oldPassword"
+                            ng-focus="focusShowValidate()">
                     </div>
                 </li>
                 <li>
                     <label for="" class="left label">新密码：</label>
                     <div class="left">
-                        <input type="password" id="new_password" class="input" value="" ng-model="newPassword">
+                        <input type="password" id="new_password" class="input" value="" ng-model="newPassword"
+                               ng-focus="focusShowValidate()">
                     </div>
                 </li>
                 <li>
                     <label for="" class="left label">确认密码：</label>
                     <div class="left">
-                        <input type="password" id="new_password_cf" class="input" value="" ng-model="confirm_newPassword" ng-keydown="confirm_newPassword_keydown($event)">
+                        <input type="password" id="new_password_cf" class="input" value="" ng-model="confirm_newPassword"
+                               ng-focus="focusShowValidate()">
                     </div>
                 </li>
                 <li>
                     <label for="" class="left label">&nbsp;</label>
                     <div class="left">
-                        <a href="" class="btn" ng-click="modifyPwd()">确 认</a>
+                        <a href="" class="btn" ng-click="modifyPwd()">确定</a>
                     </div>
                 </li>
             </ul>

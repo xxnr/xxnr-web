@@ -140,7 +140,7 @@ app.controller('orderDetailController', function ($scope, remoteApiService, comm
                         window.location.href = "commitPay.html?id=" + $scope.order.id + "&offlinePay=1";
                     };
                     $scope.order.modifyPay = function () {
-                        window.location.href = "commitPay.html?id=" + $scope.order.id;
+                        window.location.href = "commitPay.html?id=" + $scope.order.id + "&auditingOrder=1";
                     }
                 }
 
