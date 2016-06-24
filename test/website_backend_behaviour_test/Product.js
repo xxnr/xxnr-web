@@ -13,6 +13,8 @@ var deployment = require('../../deployment');
 var utils = require('../../common/utils');
 var ProductModel = models.product;
 var SKUModel = models.SKU;
+var Components = require('./utilities/components');
+var SKUAttributesModel = models.SKUAttributes;
 
 describe('Product', function(){
     var imgUrl = '';
@@ -23,6 +25,9 @@ describe('Product', function(){
     var test_brand;
     var test_SKU_attributes;
     var SKU_attributes;
+    before('delete SKU attributes', function(done){
+        SKUAttributesModel.find({}).remove(done);
+    });
     before('deploy supplier, brands, product_attributes, SKU_attributes', function(done){
         deployment.deploy_SKU(done);
     });
@@ -69,7 +74,13 @@ describe('Product', function(){
             SKUModel.find({}).remove(done);
         });
     });
+    before('prepare 3 SKU attributes for brand A, category huafei', function(done){
+        Components.prepare_SKU_attributes('化肥', 0, 0, 3, backend_admin_token, done);
+    });
 
+    before('prepare 3 SKU attributes for brand A, category huafei', function(done){
+        Components.prepare_SKU_attributes('化肥', 0, 1, 3, backend_admin_token, done);
+    });
     beforeEach('create product with SKUs', function(done) {
         Routing.Product.query_brands(test_data.category_id[test_data.test_product.category], backend_admin_token, function (body) {
             test_brand = body.brands[0];
@@ -386,8 +397,99 @@ describe('Product', function(){
                 })
             })
         });
-        it('paging');
-        it('sorting');
+        describe('paging and sorting', function(){
+            var product_A, product_B, product_C;
+            beforeEach('create product A, B, C in order', function(done){
+                Components.prepare_SKU(backend_admin_token, 0, '化肥', 0, test_data.test_SKU, 0, function(brand, product, SKU, test_SKU_attributes){
+                    product_A = product;
+                    Components.prepare_SKU(backend_admin_token, 0, '化肥', 1, test_data.test_SKU, 0, function(brand, product, SKU, test_SKU_attributes){
+                        product_B = product;
+                        Components.prepare_SKU(backend_admin_token, 0, '化肥', 2, test_data.test_SKU, 0, function(brand, product, SKU, test_SKU_attributes){
+                            product_C = product;
+                            done();
+                        })
+                    })
+                })
+            });
+            it('paging', function(done){
+                var expected_page_1_list = {
+                    code: '1000',
+                    datas: {
+                        total: 3,
+                        rows: [{
+                            goodsId:product_B.id
+                        },{
+                            goodsId:product_C.id
+                        }],
+                        pages: 2,
+                        page: 1
+                    }
+                };
+                var expected_page_2_list = {
+                    code: '1000',
+                    datas: {
+                        total: 3,
+                        rows: [{
+                            goodsId:product_A.id
+                        }],
+                        pages: 2,
+                        page: 2
+                    }
+                };
+                Routing.Product.query_products(test_data.category_id['化肥'], null, null, null, null, function(body){
+                    body.should.containDeep(expected_page_1_list);
+                    Routing.Product.query_products(test_data.category_id['化肥'], null, null, null, null, function(body){
+                        body.should.containDeep(expected_page_2_list);
+                        done();
+                    }, 2, 2)
+                }, 1, 2)
+            });
+            it('sorting', function(done){
+                var expected_page_list_before_set_A_to_top = {
+                    code: '1000',
+                    datas: {
+                        total: 3,
+                        rows: [{
+                            goodsId:product_C.id
+                        },{
+                            goodsId:product_B.id
+                        },{
+                            goodsId:product_A.id
+                        }],
+                        pages: 1,
+                        page: 1
+                    }
+                };
+
+                var expected_page_list_after_set_A_to_top = {
+                    code: '1000',
+                    datas: {
+                        total: 3,
+                        rows: [{
+                            goodsId:product_A.id
+                        },{
+                            goodsId:product_C.id
+                        },{
+                            goodsId:product_B.id
+                        }],
+                        pages: 1,
+                        page: 1
+                    }
+                };
+
+                Routing.Product.query_products(test_data.category_id['化肥'], null, null, null, null, function(body){
+                    body.should.containDeep(expected_page_list_before_set_A_to_top);
+                    product_A.istop = true;
+                    Routing.Product.save_product(product_A, backend_admin_token, function(body){
+                        body.should.have.property('code', 1000);
+                        Routing.Product.query_products(test_data.category_id['化肥'], null, null, null, null, function(body) {
+                            body.should.containDeep(expected_page_list_after_set_A_to_top);
+                            done();
+                        })
+                    })
+                })
+            });
+        });
     });
 
     describe('banner', function(){

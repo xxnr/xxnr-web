@@ -2039,7 +2039,6 @@ exports.process_RSC_modify = function(req, res, next){
 			}
 		});
 	} else {
-		console.log(req.data);
 		RSCService.modifyRSCInfo(req.data.id, req.data, function(err){
 			if(err){
 				res.respond({code:1002, message:err});

@@ -220,10 +220,20 @@ exports.get_inviter = function(token, done){
         })
 };
 
-exports.query_invitee = function(token, done){
+exports.query_invitee = function(token, done, page, max){
     request(app)
         .get('/api/v2.0/user/getInvitee')
-        .query({token:token})
+        .query({token:token, page:page, max:max})
+        .end(function(err, res){
+            should.not.exist(err);
+            done(res.body);
+        })
+};
+
+exports.query_invitee_by_name = function(token, page, max, done){
+    request(app)
+        .get('/api/v2.0/user/getInviteeOrderbyName')
+        .query({token:token, page:page, max:max})
         .end(function(err, res){
             should.not.exist(err);
             done(res.body);
@@ -287,6 +297,16 @@ exports.update_user_address = function(token, address, done) {
             should.not.exist(err);
             done(res.body);
         });
+};
+
+exports.delete_user_address = function(token, addressId, done){
+    request(app)
+        .post('/api/v2.0/user/deleteUserAddress')
+        .send({token:token, addressId:addressId})
+        .end(function(err, res){
+            should.not.exist(err);
+            done(res.body);
+        })
 };
 
 exports.query_invitee_order = function(inviteeId, token, done){
@@ -360,6 +380,8 @@ var getPublicKey = function(callback) {
             callback(err, res.body.public_key);
         })
 };
+
+exports.getPublicKey = getPublicKey;
 
 var encryptPassword = function(password, callback) {
     getPublicKey(function (err, public_key) {

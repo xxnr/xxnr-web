@@ -15,7 +15,6 @@ module.exports = {
         id:'testproductwithoutavalidid',
         category:'化肥',
         name:'测试商品',
-        istop:true,
         price:999999999,
         deposit:1,
         description:'测试商品描述',
@@ -26,14 +25,13 @@ module.exports = {
         app_standard:'<p>test app standard</p>',
         app_support:'<p>test app support</p>'
     },
-    huafei : function(index){
+    '化肥' : function(index){
         return {
             id:'testproductwithoutavalidid'+ index,
             category:'化肥',
             name:'测试商品'+ index,
-            istop:true,
             price:999999999,
-            deposit:1,
+            deposit:0,
             description:'测试商品描述'+ index,
             body:'<p>&nbsp;测试商品详情。<img src="test.jpg"></p>',
             standard:'<p>test standard</p>',
@@ -43,7 +41,7 @@ module.exports = {
             app_support:'<p>test app support</p>'
         }
     },
-    car : function(index){
+    '汽车' : function(index){
         return {
             id:'testproductwithoutavalidid'+ index,
             category:'汽车',
@@ -71,6 +69,7 @@ module.exports = {
     test_user: {
         account: '13800000000',
         password: 'p@ssW0r$',
+        wrong_password:'wrong_password',
         name: 'test_name',
         nickname: 'test_nickname',
         sex: true,
@@ -96,6 +95,37 @@ module.exports = {
             name: 'test_user_consignee_2',
             phone: '13800000000'
         }]
+    },
+    random_test_user: function(index){
+        return {
+            account: '1380000000' + index,
+            password: 'p@ssW0r$',
+            name: 'test_name' + index,
+            nickname: 'test_nickname' + index,
+            sex: true,
+            RSCInfo: {
+                name: 'test_RSC',
+                IDNo: '10000000000000000X',
+                phone: '13800000001',
+                companyName: 'test_RSC_company'
+            },
+            user_address: [{
+                detail: 'test_detail_address',
+                receiptPhone: '13811111111',
+                receiptPeople: 'test_potential_customer_receipt_name'
+            }, {
+                detail: 'test_detail_address_2',
+                receiptPhone: '13800000000',
+                receiptPeople: 'test_potential_customer_receipt_name_2'
+            }],
+            consignee: [{
+                name: 'test_user_consignee_1',
+                phone: '13811111111'
+            }, {
+                name: 'test_user_consignee_2',
+                phone: '13800000000'
+            }]
+        }
     },
     test_address:{
         province:'河南',
@@ -131,5 +161,13 @@ module.exports = {
         title:'测试资讯标题',
         newsbody:'<p>abcdefg测试资讯body</p>',
         abstract:'测试资讯摘要'
+    },
+    RSC:function(index){
+        return {
+            name:'test RSC' + index,
+            phone:'13800000000',
+            IDNo:'10000000000000000X',
+            companyName: 'test_RSC_company' + index
+        }
     }
 };

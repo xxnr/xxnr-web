@@ -18,7 +18,8 @@ exports.get_address_by_name = function(province, city, county, town, callback){
                     return;
                 }
 
-                address.province = province;
+                address.province = province.toObject();
+                address.province._id = address.province._id.toString();
                 resolve()
             })
         }));
@@ -32,7 +33,8 @@ exports.get_address_by_name = function(province, city, county, town, callback){
                     return;
                 }
 
-                address.city = city;
+                address.city = city.toObject();
+                address.city._id = address.city._id.toString();
                 resolve()
             })
         }));
@@ -46,7 +48,8 @@ exports.get_address_by_name = function(province, city, county, town, callback){
                     return;
                 }
 
-                address.county = county;
+                address.county = county.toObject();
+                address.county._id = address.county._id.toString();
                 resolve()
             })
         }));
@@ -60,7 +63,8 @@ exports.get_address_by_name = function(province, city, county, town, callback){
                     return;
                 }
 
-                address.town = town;
+                address.town = town.toObject();
+                address.town._id = address.town._id.toString();
                 resolve()
             })
         }));

@@ -81,11 +81,11 @@ exports.online_product = function(product_id, online, token, done){
         })
 };
 
-exports.query_products = function(classId, brands, reservePrice, sort, attributes, done){
+exports.query_products = function(classId, brands, reservePrice, sort, attributes, done, page, max){
     var brandStr = build_brand_string(brands);
     request(app)
         .post('/api/v2.1/product/getProductsListPage')
-        .send({classId:classId, brand:brandStr, reservePrice:reservePrice, sort:sort, attributes:attributes})
+        .send({classId:classId, brand:brandStr, reservePrice:reservePrice, sort:sort, attributes:attributes, page:page, max:max})
         .end(function(err, res){
             should.not.exist(err);
             done(res.body);
@@ -159,6 +159,16 @@ exports.query_SKU_attributes_and_price = function(product_id, attributes, done){
         .post('/api/v2.1/SKU/attributes_and_price/query')
         .send({product:product_id, attributes:attributes})
         .end(function(err, res){
+            should.not.exist(err);
+            done(res.body);
+        })
+};
+
+exports.add_SKU_attributes = function(category, brand, name, value, token, done){
+    request(app)
+        .post(config.manager_url + '/api/v2.1/SKU/attribute/add')
+        .send({category:category, brand:brand, name:name, value:value, token:token})
+        .end(function(err, res) {
             should.not.exist(err);
             done(res.body);
         })

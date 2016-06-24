@@ -108,6 +108,26 @@ UseraddressService.prototype.create = function(options, callback) {
 								callback('error-args', {code:1001, message:'数据没有查到，没有找到请求参数中的县区'});
 								return;
 							}
+							if (options.townid && !town) {
+								callback('error-args', {code:1001, message:'数据没有查到，没有找到请求参数中的乡镇'});
+								return;
+							}
+							if(city && province && city.provinceid != province.id){
+								callback('error-args', {code:1001, message:'所选城市不属于所选省份'});
+								return;
+							}
+							if(county && city && county.cityid != city.id){
+								callback('error-args', {code:1001, message:'所选区县不属于所选城市'});
+								return;
+							}
+							if(town && county && town.countyid != county.id){
+								callback('error-args', {code:1001, message:'所选乡镇不属于所选区县'});
+								return;
+							}
+							if(town && city && town.cityid != city.id){
+								callback('error-args', {code:1001, message:'所选乡镇不属于所选城市'});
+								return;
+							}
 
 							// UseraddressModel.findOne({userid:options.userid}, function(err, doc) {
 							// 	if (!doc) {
@@ -227,6 +247,22 @@ UseraddressService.prototype.update = function(options, callback) {
 					}
 					if (options.townid && !town) {
 						callback('error-args', {'code':'1001','message':'数据没有查到，没有找到请求参数中的乡镇'});
+						return;
+					}
+					if(city && province && city.provinceid != province.id){
+						callback('error-args', {code:1001, message:'所选城市不属于所选省份'});
+						return;
+					}
+					if(county && city && county.cityid != city.id){
+						callback('error-args', {code:1001, message:'所选区县不属于所选城市'});
+						return;
+					}
+					if(town && county && town.countyid != county.id){
+						callback('error-args', {code:1001, message:'所选乡镇不属于所选区县'});
+						return;
+					}
+					if(town && city && town.cityid != city.id){
+						callback('error-args', {code:1001, message:'所选乡镇不属于所选城市'});
 						return;
 					}
 

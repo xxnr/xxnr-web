@@ -98,7 +98,7 @@ UserSchema.index({account:"text", nickname:"text", name:"text"});
 UserSchema.index({type:1});
 UserSchema.index({name:1});
 UserSchema.index({inviter:1, nameInitialType:1, namePinyin:1, dateinvited:-1, datecreated:-1});
-UserSchema.index({RSCInfo:1, typeVerified:1, 'RSCInfo.products':1, 'RSCInfo.supportEPOS':1, 'RSCInfo.EPOSNo':1});
+UserSchema.index({RSCInfo:1, 'RSCInfo.products':1, 'RSCInfo.supportEPOS':1, 'RSCInfo.EPOSNo':1});
 UserSchema.index({typeVerified:1, type:1, datecreated:-1});
 
 PotentialCustomerSchema.index({"phone":1, unique:true});
