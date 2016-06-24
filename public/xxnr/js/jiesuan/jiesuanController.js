@@ -1,8 +1,8 @@
 /**
  * Created by pepelu on 9/15/2015.
  */
-var app = angular.module('jiesuan', ['xxnr_common', 'shop_cart']);
-app.controller('jiesuanController', function ($scope, remoteApiService, payService, commonService, loginService) {
+var app = angular.module('jiesuan', ['xxnr_common', 'shop_cart',"ngFlash"]);
+app.controller('jiesuanController', function ($scope, remoteApiService, payService, commonService, loginService, Flash, $timeout) {
 
     var sweetalert = commonService.sweetalert;
 
@@ -29,6 +29,24 @@ app.controller('jiesuanController', function ($scope, remoteApiService, payServi
     $scope.selectedCompanyId = -1;
     $scope.selectingCompanyId =-1;
     $scope.selectedConsigneeNum = -1;
+    $scope.editAddressErrMsg = '';
+    $scope.focusInputGroupNum = 0; //点击中的input number
+    $scope.errorInputGroupNum = 0; //出错的input number
+
+    $scope.formInputsKeyValue = {   //用来定位出错的form input位置
+        editAddressFormAddress:1,
+        editAddressFormConsignee:2,
+        editAddressFormPhoneNum:3,
+        newAddressFormAddress:4,
+        newAddressFormConsignee:5,
+        newAddressFormPhoneNum:6,
+    };
+
+    $scope.focusShowValidate = function(formInputGroupNum) {
+        $scope.focusInputGroupNum = formInputGroupNum? formInputGroupNum : 0;
+        $scope.errorInputGroupNum = 0;
+        $scope.editAddressErrMsg = '';
+    };
 
     $scope.helpWoring = {
         deliveryMethod_help:{
@@ -232,19 +250,27 @@ app.controller('jiesuanController', function ($scope, remoteApiService, payServi
     };
     $scope.submitAddressAdd = function () {
         if (!$scope.modifyAddress.detailAddress) {
-            sweetalert("请填写详细地址");
+            //sweetalert("请填写详细地址");
+            $scope.editAddressErrMsg = '请填写详细地址';
+            $scope.errorInputGroupNum =  $scope.formInputsKeyValue.newAddressFormAddress;
             return;
         }
         if (!$scope.modifyAddress.receiptName) {
-            sweetalert("请填写收件人姓名");
+            //sweetalert("请填写收件人姓名");
+            $scope.editAddressErrMsg = '请填写收件人姓名';
+            $scope.errorInputGroupNum =  $scope.formInputsKeyValue.newAddressFormConsignee;
             return;
         }
         if (!$scope.modifyAddress.phone) {
-            sweetalert("请填写电话");
+            //sweetalert("请填写电话");
+            $scope.editAddressErrMsg = '请填写电话';
+            $scope.errorInputGroupNum =  $scope.formInputsKeyValue.newAddressFormPhoneNum;
             return;
         }
         if (!/^1\d{10}$/.test($scope.modifyAddress.phone)) {
-            sweetalert("请填写正确的电话");
+            //sweetalert("请填写正确的电话");
+            $scope.editAddressErrMsg = '请填写正确的电话';
+            $scope.errorInputGroupNum =  $scope.formInputsKeyValue.newAddressFormPhoneNum;
             return;
         }
         var type = $scope.modifyAddress.isDefault ? 1 : 0;
@@ -255,7 +281,9 @@ app.controller('jiesuanController', function ($scope, remoteApiService, payServi
             .then(function (data) {
                 if (data.code == "1000") {
                     $scope.hideAddPop();
-                    sweetalert("添加地址成功");
+                    //sweetalert("添加地址成功");
+                    var message = '<img class="xxnr--flash--icon" src="images/correct_prompt.png" alt="">添加地址成功';
+                    var id = Flash.create('success', message, 3000, {class: 'xxnr-success-flash', id: 'xxnr-success-flash'}, false);
                     if(!$scope.contacts || $scope.contacts === null || $scope.contacts === undefined || $scope.contacts.length === 0){
                         $scope.hasConsigneeAddress = true;
                     }
@@ -293,6 +321,10 @@ app.controller('jiesuanController', function ($scope, remoteApiService, payServi
                     $scope.modifyAddress.zipCode = undefined;
                     $scope.modifyAddress.receiptName = undefined;
                     $scope.modifyAddress.phone = undefined;
+                }else{
+                    //sweetalert(data.message);
+                    var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">' + data.message;
+                    var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);
                 }
             })
     };
@@ -301,19 +333,27 @@ app.controller('jiesuanController', function ($scope, remoteApiService, payServi
     };
     $scope.submitAddressEdit = function () {
         if (!$scope.modifyAddress.detailAddress) {
-            sweetalert("请填写详细地址");
+            //sweetalert("请填写详细地址");
+            $scope.editAddressErrMsg = '请填写详细地址';
+            $scope.errorInputGroupNum =  $scope.formInputsKeyValue.editAddressFormAddress;
             return;
         }
         if (!$scope.modifyAddress.receiptName) {
-            sweetalert("请填写收件人姓名");
+            //sweetalert("请填写收件人姓名");
+            $scope.editAddressErrMsg = '请填写收件人姓名';
+            $scope.errorInputGroupNum =  $scope.formInputsKeyValue.editAddressFormConsignee;
             return;
         }
         if (!$scope.modifyAddress.phone) {
-            sweetalert("请填写电话");
+            $scope.editAddressErrMsg = '请填写电话';
+            $scope.errorInputGroupNum =  $scope.formInputsKeyValue.editAddressFormPhoneNum;
+            //sweetalert("请填写电话");
             return;
         }
         if (!/^1\d{10}$/.test($scope.modifyAddress.phone)) {
-            sweetalert("请填写正确的电话");
+            $scope.editAddressErrMsg = '请填写正确的电话';
+            $scope.errorInputGroupNum =  $scope.formInputsKeyValue.editAddressFormPhoneNum;
+            //sweetalert("请填写正确的电话");
             return;
         }
         var type = $scope.modifyAddress.isDefault ? 1 : 0;
@@ -324,7 +364,9 @@ app.controller('jiesuanController', function ($scope, remoteApiService, payServi
             .then(function (data) {
                 if (data.code == "1000") {
                     $scope.hideModifyPop();
-                    sweetalert("修改地址成功");
+                    //sweetalert("修改地址成功");
+                    var message = '<img class="xxnr--flash--icon" src="images/correct_prompt.png" alt="">修改地址成功';
+                    var id = Flash.create('success', message, 3000, {class: 'xxnr-success-flash', id: 'xxnr-success-flash'}, false);
                     updateWebpageAddressData($scope.modifyAddress.addressId);
                     $scope.modifyAddress.detailAddress = undefined;
                     $scope.modifyAddress.zipCode = undefined;
@@ -358,7 +400,9 @@ app.controller('jiesuanController', function ($scope, remoteApiService, payServi
                 remoteApiService.deleteUserAddress($scope.contacts[index].addressId)
                     .then(function (data) {
                         if (data.code == "1000") {
-                            sweetalert("删除成功");
+                            //sweetalert("删除成功");
+                            var message = '<img class="xxnr--flash--icon" src="images/correct_prompt.png" alt="">删除成功';
+                            var id = Flash.create('success', message, 3000, {class: 'xxnr-success-flash', id: 'xxnr-success-flash'}, false);
                             if($scope.contacts.length === 1 ){
                                 $scope.hasConsigneeAddress = false;
                                 $scope.selectedAddressId = null;
@@ -375,7 +419,9 @@ app.controller('jiesuanController', function ($scope, remoteApiService, payServi
                                 }
                             }
                         }else{
-                            sweetalert(data.message);
+                            //sweetalert(data.message);
+                            var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">' + data.message;
+                            var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);
                         }
                     });
             } else {
@@ -383,21 +429,23 @@ app.controller('jiesuanController', function ($scope, remoteApiService, payServi
             }
         } else {
             swal({
-                    title: "是否删除该地址？",
-                    //text: nominated_inviter.name + "   " + nominated_inviter.phone,
+                    title: "",
+                    text: '是否删除该地址？',
                     //type: "warning",
                     showCancelButton: true,
                     confirmButtonColor: '#00913a',
                     confirmButtonText: '确定',
                     cancelButtonText: "取消",
-                    closeOnConfirm: false
+                    closeOnConfirm: true
                 },
                 function (isConfirm) {
                     if (isConfirm) {
                         remoteApiService.deleteUserAddress($scope.contacts[index].addressId)
                             .then(function (data) {
                                 if (data.code == "1000") {
-                                    sweetalert("删除成功");
+                                    //sweetalert("删除成功");
+                                    var message = '<img class="xxnr--flash--icon" src="images/correct_prompt.png" alt="">删除成功';
+                                    var id = Flash.create('success', message, 3000, {class: 'xxnr-success-flash', id: 'xxnr-success-flash'}, false);
                                     if($scope.contacts.length === 1 ){
                                         $scope.hasConsigneeAddress = false;
                                         $scope.selectedAddressId = null;
@@ -414,7 +462,9 @@ app.controller('jiesuanController', function ($scope, remoteApiService, payServi
                                         }
                                     }
                                 }else{
-                                    sweetalert(data.message);
+                                    //sweetalert(data.message);
+                                    var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">' + data.message;
+                                    var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);
                                 }
                             });
                     }
@@ -705,15 +755,15 @@ app.controller('jiesuanController', function ($scope, remoteApiService, payServi
 
                 }
             }else{
-                sweetalert("获取历史收货人失败,请重试", window.location.href);
+                //sweetalert("获取历史收货人失败,请重试", window.location.href);
+                var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">获取历史收货人失败,请重试';
+                var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);
+                $timeout(function(){
+                    window.location.href = window.location.href;
+                    return false
+                },3000);
             }
         });
-    $scope.focusShowValidate = function(formGroupNum) {
-        $scope.focusFormGroupNum = formGroupNum;
-    };
-    $scope.blurShowValidate = function() {
-        $scope.focusFormGroupNum = 0;
-    };
     $scope.saveConsignee = function(){
         $scope.newConsigneeCommit = true;
         remoteApiService.saveConsignees($scope.newConsigneeName, $scope.newConsigneePhone)
@@ -723,7 +773,13 @@ app.controller('jiesuanController', function ($scope, remoteApiService, payServi
                     $scope.consigneeName = $scope.newConsigneeName;
                     $scope.consigneePhone = $scope.newConsigneePhone;
                 }else{
-                    sweetalert("保存收货人失败,请重试", window.location.href);
+                    //sweetalert("保存收货人失败,请重试", window.location.href);
+                    var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">获取历史收货人失败,请重试';
+                    var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);
+                    $timeout(function(){
+                        window.location.href = window.location.href;
+                        return false
+                    },3000);
                 }
             });
     };
@@ -767,7 +823,13 @@ app.controller('jiesuanController', function ($scope, remoteApiService, payServi
                         $scope.popNewConsigneeForm.name.$dirty = false;
                         //console.log('保存收货人成功');
                     }else{
-                        sweetalert("保存收货人失败,请重试", window.location.href);
+                        //sweetalert("保存收货人失败,请重试", window.location.href);
+                        var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">保存收货人失败,请重试';
+                        var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);
+                        $timeout(function(){
+                            window.location.href = window.location.href;
+                            return false
+                        },3000);
                     }
                 });
         }
