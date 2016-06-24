@@ -184,6 +184,7 @@ router.get('/api/v2.3/rewardshop/gifts/getGiftDetail', controllers.Rewardshop.js
 router.get('/api/v2.3/rewardshop/gifts', controllers.Rewardshop.json_rewardshop_gifts);
 router.post('/api/v2.3/rewardshop/addGiftOrder', middleware.isLoggedIn_middleware, controllers.Rewardshop.add_gift_order);
 router.get('/api/v2.3/rewardshop/getGiftOrderList', middleware.isLoggedIn_middleware, controllers.Rewardshop.json_gift_order_query);
+router.get('/rewardshop/rules', controllers.Rewardshop.view_rewardshop_rules);
 
 // compatibility APIs
 controllers.Compatibility.compatibilityAPIs(router);

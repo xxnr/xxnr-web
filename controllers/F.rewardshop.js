@@ -206,7 +206,7 @@ exports.add_gift_order = function(req, res, next){
                             res.respond({code:1001, message:err});
                             return;
                         }
-                        res.respond(response);
+                        res.respond({code:1000, message:'success', giftOrder:response});
                     });
                 });
             } else if (deliveryType && deliveryType === DELIVERYTYPE['ZITI'].id) {
@@ -387,4 +387,14 @@ exports.view_gift_info = function (req, res, next) {
             }
         );
     });
+};
+
+// get reward shop rules
+exports.view_rewardshop_rules = function (req, res, next) {
+    var result = {title:"积分规则"};
+    res.render(path.join(__dirname, '../views/F.rewardshop/rewardshopRules.html'),
+        {
+            result: result
+        }
+    );
 };
