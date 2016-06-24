@@ -187,7 +187,7 @@ describe('XXNR agent', function(){
             })
         })
     });
-    describe('Bind inviter api');
+    //describe('Bind inviter api');
     describe('XXNR agent scenarios', function() {
         var potential_customer = test_data.potential_customer;
         var test_product;
