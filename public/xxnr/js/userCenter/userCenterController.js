@@ -99,7 +99,8 @@ app.controller('userCenterController', function($scope, $rootScope,$timeout ,rem
     /////////////////////////////////////
 
     $scope.user = {};
-    $scope.orderList = [];
+    //$scope.orderList = [];
+    $scope.orderList = undefined;
     $scope.searchIndex = [];
     $scope.showTypes = [{
         name: '所有订单',

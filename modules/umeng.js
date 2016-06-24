@@ -8,7 +8,8 @@ var umengConfig = require('../configuration/umeng_config');
 var moment = require('moment-timezone');
 
 // Service
-var Umeng = function(){};
+var Umeng = function () {
+};
 
 /**
  * sign umeng message
@@ -16,45 +17,49 @@ var Umeng = function(){};
  * @param  {String} appMasterSecret secret key
  * @return {String} sign info
  */
-Umeng.prototype.sign = function(params, appMasterSecret) {
-	// sign
+Umeng.prototype.sign = function (params, appMasterSecret) {
+    // sign
     var sign_info = umengConfig.sendMethod + 'http://' + umengConfig.host + umengConfig.sendPath + JSON.stringify(params) + appMasterSecret;
-	var md5 = crypto.createHash("md5");
-	md5.update(sign_info, 'utf8');
-	var sign = md5.digest('hex');
-	return sign;
+    var md5 = crypto.createHash("md5");
+    md5.update(sign_info, 'utf8');
+    var sign = md5.digest('hex');
+    return sign;
 };
 
 /**
  * umeng send function
- * @param  {Object}   options		umeng send key/value options
- * @param  {Function} callback 		callback function
+ * @param  {Object}   options        umeng send key/value options
+ * @param  {Function} callback        callback function
  * @return {null}     only callback
  */
-Umeng.prototype.umengSend = function(params, appMasterSecret, callback) {
-	var self = this;
-	if (!params) {
-		console.error('Umeng umengSend params is null');
-		callback('params is null');
-		return;
-	}
-	if (!appMasterSecret) {
-		console.error('Umeng umengSend appMasterSecret is null');
-		callback('appMasterSecret is null');
-		return;
-	}
+Umeng.prototype.umengSend = function (params, appMasterSecret, callback) {
+    var self = this;
+    if (!params) {
+        console.error('Umeng umengSend params is null');
+        callback('params is null');
+        return;
+    }
+    if (!appMasterSecret) {
+        console.error('Umeng umengSend appMasterSecret is null');
+        callback('appMasterSecret is null');
+        return;
+    }
 
-	params.production_mode = umengConfig.production_mode;
-	var sign = self.sign(params, appMasterSecret);
-	var httpOptions = {method: umengConfig.sendMethod, host: umengConfig.host, path: umengConfig.sendPath+'?sign='+sign};
-	tools.httpRequest({httpOptions: httpOptions, postData: JSON.stringify(params)}, function(err, result) {
-		if (err) {
-			console.error('Umeng umengSend httpRequest err:', err);
-			callback(err, result);
-			return;
-		}
-		callback(null, result);
-	});
+    params.production_mode = umengConfig.production_mode;
+    var sign = self.sign(params, appMasterSecret);
+    var httpOptions = {
+        method: umengConfig.sendMethod,
+        host: umengConfig.host,
+        path: umengConfig.sendPath + '?sign=' + sign
+    };
+    tools.httpRequest({httpOptions: httpOptions, postData: JSON.stringify(params)}, function (err, result) {
+        if (err) {
+            console.error('Umeng umengSend httpRequest err:', err, 'result:',result);
+            callback(err, result);
+            return;
+        }
+        callback(null, result);
+    });
 };
 
 /**
@@ -66,47 +71,47 @@ Umeng.prototype.umengSend = function(params, appMasterSecret, callback) {
  * @param  {Function} callback callback function
  * @return {null}              only callback
  */
-Umeng.prototype.sendAndroidCustomizedcast = function(type, alias, aliasType, options, callback) {
-	var self = this;
-	if (!type || !umengConfig.body[type]) {
-		callback('need message type');
-		return;
-	}
-	if (!aliasType || !umengConfig.body[type][aliasType]) {
-		callback('need message aliasType');
-		return;
-	}
-	if (!alias) {
-		callback('need alias');
-		return;
-	}
-	var customizedcast = {
-		'appkey': umengConfig.androidAppKey,
-		'timestamp': Date.parse(new Date()),
-		'type': "customizedcast",
-		'description': "aliasnotification-Android"
-	};
-	customizedcast.alias = alias;
-	customizedcast.alias_type = umengConfig.alias_type;
-	// 必填 消息内容(Android最大为1840B), 包含参数说明如下(JSON格式):
-	customizedcast.payload = {
-    	display_type: "notification",  // 必填 消息类型，值可以为: notification-通知，message-消息
-    	// 必填 消息体。display_type=message时,body的内容只需填写custom字段。display_type=notification时, body包含如下参数:
-    	body: {
-    		// 通知用户订单状态变化，打开订单详情，自提或付款
-			// 点击"通知"的后续行为，默认为打开app。
-			after_open: umengConfig.body[type][aliasType].after_open, // 必填 值可以为:"go_app": 打开应用 "go_url": 跳转到URL "go_activity": 打开特定的activity "go_custom": 用户自定义内容。
-			activity: umengConfig.body[type][aliasType].activity, // 可选 当"after_open"为"go_activity"时，必填。通知栏点击后打开的Activity
-			ticker: umengConfig.body[type][aliasType].ticker, // 必填 通知栏提示文字
-	    	title: umengConfig.body[type][aliasType].title, // 必填 通知标题
-	    	text:  umengConfig.body[type][aliasType].text // 必填 通知文字描述
-    	}
+Umeng.prototype.sendAndroidCustomizedcast = function (type, alias, aliasType, options, callback) {
+    var self = this;
+    if (!type || !umengConfig.body[type]) {
+        callback('need message type');
+        return;
+    }
+    if (!aliasType || !umengConfig.body[type][aliasType]) {
+        callback('need message aliasType');
+        return;
+    }
+    if (!alias) {
+        callback('need alias');
+        return;
+    }
+    var customizedcast = {
+        'appkey': umengConfig.androidAppKey,
+        'timestamp': Date.parse(new Date()),
+        'type': "customizedcast",
+        'description': "aliasnotification-Android"
     };
-    
+    customizedcast.alias = alias;
+    customizedcast.alias_type = umengConfig.alias_type;
+    // 必填 消息内容(Android最大为1840B), 包含参数说明如下(JSON格式):
+    customizedcast.payload = {
+        display_type: "notification",  // 必填 消息类型，值可以为: notification-通知，message-消息
+        // 必填 消息体。display_type=message时,body的内容只需填写custom字段。display_type=notification时, body包含如下参数:
+        body: {
+            // 通知用户订单状态变化，打开订单详情，自提或付款
+            // 点击"通知"的后续行为，默认为打开app。
+            after_open: umengConfig.body[type][aliasType].after_open, // 必填 值可以为:"go_app": 打开应用 "go_url": 跳转到URL "go_activity": 打开特定的activity "go_custom": 用户自定义内容。
+            activity: umengConfig.body[type][aliasType].activity, // 可选 当"after_open"为"go_activity"时，必填。通知栏点击后打开的Activity
+            ticker: umengConfig.body[type][aliasType].ticker, // 必填 通知栏提示文字
+            title: umengConfig.body[type][aliasType].title, // 必填 通知标题
+            text: umengConfig.body[type][aliasType].text // 必填 通知文字描述
+        }
+    };
+
     // 可选 用户自定义key-value。只对"通知"(display_type=notification)生效。可以配合通知到达后,打开App,打开URL,打开Activity使用。
     customizedcast.payload.extra = {};
     if (options.orderId) {
-    	customizedcast.payload.extra.orderId = options.orderId;
+        customizedcast.payload.extra.orderId = options.orderId;
     }
 
     // // 自定义通知图标:
@@ -121,15 +126,15 @@ Umeng.prototype.sendAndroidCustomizedcast = function(type, alias, aliasType, opt
     // "play_vibrate":"true/false", // 可选 收到通知是否震动,默认为"true".注意，"true/false"为字符串
     // "play_lights":"true/false",  // 可选 收到通知是否闪灯,默认为"true"
     // "play_sound":"true/false",   // 可选 收到通知是否发出声音,默认为"true"
-    
+
     // send 
-    self.umengSend(customizedcast, umengConfig.androidAppMasterSecret, function(err, result) {
-    	if (err) {
-			console.error('Umeng sendAndroidCustomizedcast umengSend err:', err, 'aliasType: '+aliasType, 'alias: '+alias);
-			callback(err, result);
-			return;
-		}
-		callback(null, result);
+    self.umengSend(customizedcast, umengConfig.androidAppMasterSecret, function (err, result) {
+        if (err) {
+            console.error('Umeng sendAndroidCustomizedcast umengSend err:', err, 'aliasType: ' + aliasType, 'alias: ' + alias);
+            callback(err, result);
+            return;
+        }
+        callback(null, result);
     });
 };
 
@@ -142,59 +147,59 @@ Umeng.prototype.sendAndroidCustomizedcast = function(type, alias, aliasType, opt
  * @param  {Function} callback callback function
  * @return {null}              only callback
  */
-Umeng.prototype.sendIOSCustomizedcast = function(type, alias, aliasType, options, callback) {
-	var self = this;
-	if (!type || !umengConfig.body[type]) {
-		callback('need message type');
-		return;
-	}
-	if (!aliasType || !umengConfig.body[type][aliasType]) {
-		callback('need message aliasType');
-		return;
-	}
-	if (!alias) {
-		callback('need alias');
-		return;
-	}
-	var customizedcast = {
-		'appkey': umengConfig.iosAppKey,
-		'timestamp': Date.parse(new Date()),
-		'type': "customizedcast",
-		'description': "aliasnotification-iOS"
-	};
-	customizedcast.alias = alias;
-	customizedcast.alias_type = umengConfig.alias_type;
-	// 必填 消息内容(iOS最大为2012B), 包含参数说明如下(JSON格式):
-	customizedcast.payload = {
-		// 必填 严格按照APNs定义来填写
-		aps: {
-	        alert: umengConfig.body[type][aliasType].text          // 必填
-	    },
-		page: umengConfig.body[type][aliasType].IOSpage,
-		title: umengConfig.body[type][aliasType].title,
-	    text:  umengConfig.body[type][aliasType].text
+Umeng.prototype.sendIOSCustomizedcast = function (type, alias, aliasType, options, callback) {
+    var self = this;
+    if (!type || !umengConfig.body[type]) {
+        callback('need message type');
+        return;
+    }
+    if (!aliasType || !umengConfig.body[type][aliasType]) {
+        callback('need message aliasType');
+        return;
+    }
+    if (!alias) {
+        callback('need alias');
+        return;
+    }
+    var customizedcast = {
+        'appkey': umengConfig.iosAppKey,
+        'timestamp': Date.parse(new Date()),
+        'type': "customizedcast",
+        'description': "aliasnotification-iOS"
+    };
+    customizedcast.alias = alias;
+    customizedcast.alias_type = umengConfig.alias_type;
+    // 必填 消息内容(iOS最大为2012B), 包含参数说明如下(JSON格式):
+    customizedcast.payload = {
+        // 必填 严格按照APNs定义来填写
+        aps: {
+            alert: umengConfig.body[type][aliasType].text          // 必填
+        },
+        page: umengConfig.body[type][aliasType].IOSpage,
+        title: umengConfig.body[type][aliasType].title,
+        text: umengConfig.body[type][aliasType].text
     };
     // "badge": xx,           // 可选        
     // "sound": "xx",         // 可选         
     // "content-available":xx // 可选       
     // "category": "xx",      // 可选, 注意: ios8才支持该字段。
-    
+
     // 可选 用户自定义内容, "d","p"为友盟保留字段，key不可以是"d","p"
     if (options.orderId) {
-    	customizedcast.payload.orderId = options.orderId;
+        customizedcast.payload.orderId = options.orderId;
     }
     if (options.IOSpage) {
-    	customizedcast.payload.page = options.IOSpage;
+        customizedcast.payload.page = options.IOSpage;
     }
 
     // send 
-    self.umengSend(customizedcast, umengConfig.iosAppMasterSecret, function(err, result) {
-    	if (err) {
-			console.error('Umeng sendIOSCustomizedcast umengSend err:', err, 'aliasType: '+aliasType, 'alias: '+alias);
-			callback(err, result);
-			return;
-		}
-		callback(null, result);
+    self.umengSend(customizedcast, umengConfig.iosAppMasterSecret, function (err, result) {
+        if (err) {
+            console.error('Umeng sendIOSCustomizedcast umengSend err:', err, 'aliasType: ' + aliasType, 'alias: ' + alias);
+            callback(err, result);
+            return;
+        }
+        callback(null, result);
     });
 };
 
@@ -208,45 +213,45 @@ Umeng.prototype.sendIOSCustomizedcast = function(type, alias, aliasType, options
  * @param  {Number}   times    the time of send Android Customized cast
  * @return {null}
  */
-Umeng.prototype.retrySendCustomizedcast = function(type, alias, aliasType, options, deviceType, times) {
-	// retry send Android Customized cast
-	var self = this;
-	if (!times) {
-		times = 1;
-	}
-	var callback = function(err, result) {
-    	if (err) {
-			console.error('Umeng retrySendCustomizedcast sendCustomizedcast ' + deviceType + ' err:', err, 'aliasType: '+aliasType, result ? result : '');
-			if (err == 500 && result) {
-				var data = JSON.parse(result);
-				// when umeng result error_code in retryCodes, retry send..
-				if (data["data"]) {
-					for (var i=0; i<umengConfig.retryCodes.length; i++) {
-						var code = umengConfig.retryCodes[i];
-						if (data["data"]["error_code"]==code) {
-							if (times && times < 2) {
-								setTimeout(function() {
-									self.retrySendCustomizedcast(type, alias, aliasType, options, deviceType, times+1)
-									}, 10000);
-							} else {
-								console.error('Umeng retrySendCustomizedcast sendCustomizedcast ' + deviceType + ' send the max times...', 'aliasType: '+aliasType);
-							}
-							break;
-						}
-					}
-				}
-			}
-		} else {
-			console.log('Umeng retrySendCustomizedcast sendCustomizedcast ' + deviceType + ' result:', result, 'aliasType: '+aliasType, 'alias: '+alias);
-		}
-		return;
+Umeng.prototype.retrySendCustomizedcast = function (type, alias, aliasType, options, deviceType, times) {
+    // retry send Android Customized cast
+    var self = this;
+    if (!times) {
+        times = 1;
+    }
+    var callback = function (err, result) {
+        if (err) {
+            console.error('Umeng retrySendCustomizedcast sendCustomizedcast ' + deviceType + ' err:', err, 'aliasType: ' + aliasType, result ? result : '');
+            if (err == 500 && result) {
+                var data = JSON.parse(result);
+                // when umeng result error_code in retryCodes, retry send..
+                if (data["data"]) {
+                    for (var i = 0; i < umengConfig.retryCodes.length; i++) {
+                        var code = umengConfig.retryCodes[i];
+                        if (data["data"]["error_code"] == code) {
+                            if (times && times < 2) {
+                                setTimeout(function () {
+                                    self.retrySendCustomizedcast(type, alias, aliasType, options, deviceType, times + 1)
+                                }, 10000);
+                            } else {
+                                console.error('Umeng retrySendCustomizedcast sendCustomizedcast ' + deviceType + ' send the max times...', 'aliasType: ' + aliasType);
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
+        } else {
+            console.log('Umeng retrySendCustomizedcast sendCustomizedcast ' + deviceType + ' result:', result, 'aliasType: ' + aliasType, 'alias: ' + alias);
+        }
+        return;
     };
-	if (deviceType == 'Android') {
-    	self.sendAndroidCustomizedcast(type, alias, aliasType, options, callback);
-   	}
-   	if (deviceType == 'IOS') {
-   		self.sendIOSCustomizedcast(type, alias, aliasType, options, callback);
-   	}
+    if (deviceType == 'Android') {
+        self.sendAndroidCustomizedcast(type, alias, aliasType, options, callback);
+    }
+    if (deviceType == 'IOS') {
+        self.sendIOSCustomizedcast(type, alias, aliasType, options, callback);
+    }
 };
 
 /**
@@ -255,25 +260,109 @@ Umeng.prototype.retrySendCustomizedcast = function(type, alias, aliasType, optio
  * @param  {String}   alias    Customized cast alias
  * @param  {Object}   options  umeng send key/value options {orderId}
  */
-Umeng.prototype.sendCustomizedcast = function(type, alias, aliasType, options) {
-	var self = this;
-	if (options) {
-		if (!options.appLoginAgent) {
-			// send Android Customized cast
-			self.retrySendCustomizedcast(type, alias, aliasType, options, "Android");
-			// send IOS Customized cast
-			self.retrySendCustomizedcast(type, alias, aliasType, options, "IOS");
-		} else {
-			if (options.appLoginAgent.toLowerCase() == "android") {
-				// send Android Customized cast
-				self.retrySendCustomizedcast(type, alias, aliasType, options, "Android");
-			}
-			if (options.appLoginAgent.toLowerCase() == "ios") {
-				// send IOS Customized cast
-				self.retrySendCustomizedcast(type, alias, aliasType, options, "IOS");
-			}
-		}
-	}
+Umeng.prototype.sendCustomizedcast = function (type, alias, aliasType, options) {
+    var self = this;
+    if (options) {
+        if (!options.appLoginAgent) {
+            // send Android Customized cast
+            self.retrySendCustomizedcast(type, alias, aliasType, options, "Android");
+            // send IOS Customized cast
+            self.retrySendCustomizedcast(type, alias, aliasType, options, "IOS");
+        } else {
+            if (options.appLoginAgent.toLowerCase() == "android") {
+                // send Android Customized cast
+                self.retrySendCustomizedcast(type, alias, aliasType, options, "Android");
+            }
+            if (options.appLoginAgent.toLowerCase() == "ios") {
+                // send IOS Customized cast
+                self.retrySendCustomizedcast(type, alias, aliasType, options, "IOS");
+            }
+        }
+    }
 };
+
+
+/**
+ * send android listCast
+ * @param device_tokens device_token列表
+ * @param callback
+ */
+Umeng.prototype.sendAndroidListCast = function (device_tokens, callback) {
+
+    var self = this;
+    var type = umengConfig.types.update;
+    var device_type = 'Android';
+
+    var sendAndroidListCast = {
+        'appkey': umengConfig.androidAppKey,
+        'timestamp': Date.parse(new Date()),
+        'type': "listcast",
+        'description': "device_tokensnotification-Android"
+    };
+    sendAndroidListCast.device_tokens = device_tokens;
+    // 必填 消息内容(Android最大为1840B), 包含参数说明如下(JSON格式):
+    sendAndroidListCast.payload = {
+        display_type: "notification",  // 必填 消息类型，值可以为: notification-通知，message-消息
+        // 必填 消息体。display_type=message时,body的内容只需填写custom字段。display_type=notification时, body包含如下参数:
+        body: {
+            // 点击"通知"的后续行为，默认为打开app。
+            after_open: umengConfig.body[type][device_type].after_open, // 必填 值可以为:"go_app": 打开应用 "go_url": 跳转到URL "go_activity": 打开特定的activity "go_custom": 用户自定义内容。
+            ticker: umengConfig.body[type][device_type].ticker,// 必填 通知栏提示文字
+            title: umengConfig.body[type][device_type].title, // 必填 通知标题
+            text: umengConfig.body[type][device_type].text // 必填 通知文字描述
+        }
+    };
+
+    // send
+    self.umengSend(sendAndroidListCast, umengConfig.androidAppMasterSecret, function (err, result) {
+        if (err) {
+            console.error('Umeng sendAndroidListCast umengSend err:', err, 'device_tokens: ' + device_tokens);
+            callback(err);
+            return;
+        }
+        callback(null, result, device_tokens);
+    });
+
+};
+
+
+/**
+ * send IOS listCast
+ * @param device_tokens device_token列表
+ * @param callback
+ */
+Umeng.prototype.sendIOSListCast = function (device_tokens, callback) {
+
+    var self = this;
+    var type = umengConfig.types.update;
+    var device_type = 'IOS';
+
+    var sendIOSListCast = {
+        'appkey': umengConfig.iosAppKey,
+        'timestamp': Date.parse(new Date()),
+        'type': "listcast",
+        'description': "device_tokensnotification-IOS"
+    };
+    sendIOSListCast.device_tokens = device_tokens;
+    // 必填 消息内容(iOS最大为2012B), 包含参数说明如下(JSON格式):
+    sendIOSListCast.payload = {
+        // 必填 严格按照APNs定义来填写
+        aps: {
+            alert: umengConfig.body[type][device_type].text
+        },
+        title: umengConfig.body[type][device_type].title,
+        text: umengConfig.body[type][device_type].text
+    };
+    // send
+    self.umengSend(sendIOSListCast, umengConfig.iosAppMasterSecret, function (err, result) {
+        if (err) {
+            console.error('Umeng sendIOSListCast umengSend err:', err, 'device_tokens: ' + device_tokens);
+            callback(err, result);
+            return;
+        }
+        callback(null, result, device_tokens);
+    });
+};
+
 
 module.exports = new Umeng();

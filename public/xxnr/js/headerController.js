@@ -23,7 +23,7 @@ app.controller('headerController', function(loginService,remoteApiService){
 				var login = document.getElementById('header_login');
 				login.href = "../../logon.html";
 				var register = document.getElementById('header_register');
-				register.href = "../../logon.html?tab=2";
+				register.href = "../../logon.html?type=register";
 				var myNewFarmer = document.getElementById('myNewFarmer');
 				myNewFarmer.href = "../../my_xxnr.html";
 				var androidLink = document.getElementById('androidLink');

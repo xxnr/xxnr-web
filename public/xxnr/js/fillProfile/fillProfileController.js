@@ -19,10 +19,13 @@ app.controller('fillProfileController', function($scope, remoteApiService, commo
     //$scope.selectedIdentity = $scope.identities[0];
     $scope.sex = 'male';
 
-    $scope.testClick = function(){
-        console.log('test');
-    };
 
+    $scope.focusShowValidate = function(formGroupNum) {
+        $scope.focusFormGroupNum = formGroupNum;
+    };
+    $scope.blurShowValidate = function() {
+        $scope.focusFormGroupNum = 0;
+    };
 
     var getProvinceList = function(provinceId,cityId,countyId,townId){
         var userHasProvince = false;
@@ -158,9 +161,7 @@ app.controller('fillProfileController', function($scope, remoteApiService, commo
 
 
     $scope.modifyProfile = function(){
-        if($scope.userName.gblen()>12){
-            sweetalert('姓名限6个汉字或12个英文字符');
-        }else {
+        if($scope.profileForm.$valid){  //表单验证通过以后才可以提交
             if($scope.profileProvince.id!=0 && $scope.profileCity.id!=0 && $scope.userName) {
                 var req = {
                     method: 'POST',
@@ -193,12 +194,13 @@ app.controller('fillProfileController', function($scope, remoteApiService, commo
                     console.log('Error');
                 });
             }else{
-                    sweetalert('请填写完整信息');
-                }
+                sweetalert('请填写完整信息');
+            }
         }
+
     };
     $scope.skip = function() {
-        window.location.href = '/my_xxnr.html';
+        window.location.href = '/';
     };
     $scope.$watch('profileProvince', function(newValue, oldValue) { 
         if (newValue === oldValue) { return; } 
@@ -221,4 +223,22 @@ app.controller('fillProfileController', function($scope, remoteApiService, commo
         }
         return len;
     }
+});
+app.directive('under12', function() {
+    return {
+        require: 'ngModel',
+        link: function(scope, elm, attrs, ctrl) {
+            ctrl.$parsers.unshift(function(modelValue) {
+                if (!modelValue || modelValue.gblen() <= 12) {
+                    // it is valid
+                    ctrl.$setValidity('under12', true);
+                    return modelValue;
+                } else {
+                    // it is invalid, return undefined (no model update)
+                    ctrl.$setValidity('under12', false);
+                    return undefined;
+                }
+            });
+        }
+    };
 });

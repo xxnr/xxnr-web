@@ -425,11 +425,12 @@ app.service('remoteApiService', function(commonService){
         };
         return commonService.ajax(params);
     };
-    this.getInvitee = function(page){
+    this.getInvitee = function(page,search){
         var params = {
             methodname:'api/v2.0/user/getInvitee',
             'userId':user.userid,
-            'page':page
+            'page':page,
+            'search':search
         };
         return commonService.ajax(params);
     };
@@ -628,7 +629,11 @@ app.service('remoteApiService', function(commonService){
         };
         return commonService.sendPost(data);
     };
-
-
+    this.getInviter = function(){
+        var params = {
+            'methodname':'api/v2.0/user/getInviter',
+        };
+        return commonService.ajax(params);
+    };
 
 });

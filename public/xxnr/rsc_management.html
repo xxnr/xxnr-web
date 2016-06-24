@@ -16,6 +16,7 @@
     <link rel="stylesheet" type="text/css" href="css/uploadify.css" />
     <link type="text/css" rel="stylesheet" href="css/style.css">
     <link type="text/css" rel="stylesheet" href="css/sweetalert.css">
+    <link type="text/css" rel="stylesheet" href="css/angular-flash.css">
     <!-- endbuild -->
     <!-- build:js -->
     <script src="js/jquery.min.js"></script>
@@ -38,10 +39,12 @@
     <script src="js/uploadService.js"></script>
     <script src="js/sideService.js"></script>
     <script src="js/myPlaceholderDirective.js"></script>
+    <script src="js/angular-flash.js"></script>
     <!-- endbuild -->
 </head>
 
 <body ng-controller="rscManagementController" ng-class="{true:'overflow_body', false:'not_overflow_body'}[isOverflow]">
+<flash-message></flash-message>
 <header ng-controller="headerController"></header>
 
 <div class="wrap nav" ng-controller="shoppingCartController">
@@ -185,7 +188,8 @@
         </div>
         <div class="rscMgmt--noOrders" ng-show="orderList.length==0">
             <img src="./images/noOrder_icon.png" alt="">
-            <p>未找到符合条件的订单</p>
+            <p ng-show="showTypes[0].isSelected && searchOrder">未找到符合条件的订单</p>
+            <p ng-show="!searchOrder">还没有相关订单</p>
         </div>
     </div>
     <div class="xxnr--pager">
@@ -206,7 +210,7 @@
         </div>
         <div class="pop--body">
             <p class="pop--subTitle">用户选择线下支付方式，请核对线下支付信息</p>
-            <p class="consigneeName"><span>收货人姓名</span> {{RSC_ConfirmPayment_consignee}}</p>
+            <p class="consigneeName" ng-click="successAlert()"><span>收货人姓名</span> {{RSC_ConfirmPayment_consignee}}</p>
             <p class="confirmPaymentAmount"><span>待审金额</span> ￥{{RSC_ConfirmPayment_duePrice}}</p>
             <div class="payMethod"><span>付款方式</span><div class="pop--selectTagRound" ng-click="RSC_ConfirmPayment_payMethod = 3" ng-class="{true:'pop--selectTagRound--selected'}[RSC_ConfirmPayment_payMethod == 3]">现金</div><div ng-class="{true:'pop--selectTagRound--selected'}[RSC_ConfirmPayment_payMethod == 4]" ng-click="RSC_ConfirmPayment_payMethod = 4" class="pop--selectTagRound">POS机刷卡</div></div>
         </div>

@@ -4,7 +4,7 @@
 var mongoose = require('mongoose');
 var config = require('../configuration/mongoose_config');
 
-mongoose.connect(config.db[config.environment],{user:'xxnr',pass:'xxnr001'});
+mongoose.connect(config.db[config.environment],{user:'xxnr',pass:'txht001'});
 
 require('./users');
 require('./auth');
@@ -27,6 +27,7 @@ require('./userrelevances');
 require('./hourlyReport');
 require('./user_sign');
 require('./vcodes');
+require('./appdeviceversion');
 
 //user
 exports.user = mongoose.model('user');
@@ -93,6 +94,8 @@ exports.agentReport = mongoose.model('agentReport');
 exports.userSign = mongoose.model('user_sign');
 // vcode
 exports.vcode = mongoose.model('vcode');
+// app upgrade
+exports.app_Device_Version = mongoose.model('app_Device_Version');
 
 exports.getModel = function (name, options) {
     options = options || {};
