@@ -276,9 +276,12 @@
             <div class="pickUpCode" ng-show="pickingUp_step == 2">
                 <div class="inputPickUpCode">
                     <span>请输入自提码</span>
-                    <input class="code" type="text" ng-model="pickUpCode" maxlength="7">
+                    <input class="code" type="text" ng-model="pickUpCode" maxlength="7" ng-focus="focusShowValidate()">
+                    <div class="rsc_pickup_err ng-cloak" ng-show="RSC_pickingUp_errMsg">
+                        <img src="../xxnr/images/login_fault.png" alt="" />
+                        <span>{{RSC_pickingUp_errMsg}}</span>
+                    </div>
                 </div>
-
             </div>
         </div>
         <div class="pop--buttons">

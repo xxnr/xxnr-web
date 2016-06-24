@@ -36,8 +36,12 @@ app.controller('rscManagementController', function($scope, $rootScope,remoteApiS
 
     $scope.shippingSKUs = [];  //RSC要配送的收货物品列表
     $scope.shippingSKU_refs = [];  //RSC要配送的收货物品id列表
-
+    $scope.RSC_pickingUp_errMsg = '';
     var sweetalert = commonService.sweetalert;
+
+    $scope.focusShowValidate = function() {
+        $scope.RSC_pickingUp_errMsg = '';
+    };
 
     $scope.current_page = 1;
     $scope.pageCount = 0;
@@ -167,10 +171,16 @@ app.controller('rscManagementController', function($scope, $rootScope,remoteApiS
                     remoteApiService.confirmOfflinePay(data.datas.rows.payment.paymentId,data.datas.rows.payment.price,$scope.RSC_ConfirmPayment_payMethod)
                         .then(function(new_data) {
                             if(new_data.code == 1000){
-                                sweetalert('审核付款成功', "rsc_management.html");
+                                //sweetalert('审核付款成功', "rsc_management.html");
+                                //$scope.closePop();
+                                var message = '<img class="xxnr--flash--icon" src="images/correct_prompt.png" alt="">审核付款成功';
+                                var id = Flash.create('success', message, 3000, {class: 'xxnr-success-flash', id: 'xxnr-success-flash'}, false);
                                 $scope.closePop();
                             } else {
-                                sweetalert('审核付款失败', "rsc_management.html");
+                                //sweetalert('审核付款失败', "rsc_management.html");
+                                //$scope.closePop();
+                                var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">订单已审核';
+                                var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);
                                 $scope.closePop();
                             }
                         });
@@ -261,7 +271,7 @@ app.controller('rscManagementController', function($scope, $rootScope,remoteApiS
                                         if(data.code == 1000) {
                                             if(data.datas.rows.order.orderStatus && data.datas.rows.order.orderStatus.type != 7){
                                                 var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">订单已审核';
-                                                var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, true);
+                                                var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);
                                                 $timeout(function(){
                                                     window.location.href = window.location.href;
                                                     return false
@@ -406,13 +416,31 @@ app.controller('rscManagementController', function($scope, $rootScope,remoteApiS
             remoteApiService.RSC_shipping($scope.shippingOrderId,$scope.shippingSKU_refs)
                 .then(function(data) {
                     if(data.code == 1000){
-                        sweetalert('开始配送成功', "rsc_management.html");
+                        //sweetalert('开始配送成功', "rsc_management.html");
                         $scope.closePop();
+                        var message = '<img class="xxnr--flash--icon" src="images/correct_prompt.png" alt="">开始配送成功';
+                        var id = Flash.create('success', message, 3000, {class: 'xxnr-success-flash', id: 'xxnr-success-flash'}, false);
+                        $timeout(function(){
+                            window.location.href = "/rsc_management.html";
+                            return false
+                        },3000);
                     }else if(data.code == 1401){
-                        sweetalert('你已被登出，请重新登录', "logon.html");
+                        //sweetalert('你已被登出，请重新登录', "logon.html");
+                        var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">你已被登出，请重新登录';
+                        var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);
+                        $timeout(function(){
+                            window.location.href = "/logon.html";
+                            return false
+                        },3000);
                     }else {
-                        sweetalert('开始配送失败', "rsc_management.html");
+                        //sweetalert('开始配送失败', "rsc_management.html");
                         $scope.closePop();
+                        var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">开始配送失败';
+                        var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);
+                        $timeout(function(){
+                            window.location.href = "/rsc_management.html";
+                            return false
+                        },3000);
                     }
                 });
         }
@@ -445,16 +473,30 @@ app.controller('rscManagementController', function($scope, $rootScope,remoteApiS
             remoteApiService.RSC_checkCode($scope.pickingUpOrderId,$scope.pickingUpSKU_refs,$scope.pickUpCode)
                 .then(function(data) {
                     if(data.code == 1429){
-                        sweetalert('您输入错误次数较多，请1分钟后再操作');
-                        $scope.closePop();
+                        //sweetalert('您输入错误次数较多，请1分钟后再操作');
+                        $scope.RSC_pickingUp_errMsg = '您输入错误次数较多，请1分钟后再操作';
+                        //$scope.closePop();
                     }else if(data.code == 1000){
-                        sweetalert('客户自提成功', "rsc_management.html");
+                        //sweetalert('客户自提成功', "rsc_management.html");
                         $scope.closePop();
+                        var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">客户自提成功';
+                        var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);
+                        $timeout(function(){
+                            window.location.href = "/rsc_management.html";
+                            return false
+                        },3000);
                     }else if(data.code == 1401){
-                        sweetalert('你已被登出，请重新登录', "logon.html");
+                        //sweetalert('你已被登出，请重新登录', "logon.html");
+                        var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">你已被登出，请重新登录';
+                        var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);
+                        $timeout(function(){
+                            window.location.href = "/logon.html";
+                            return false
+                        },3000);
                     }
                     else {
-                        sweetalert('自提码错误，请重新输入');
+                        //sweetalert('自提码错误，请重新输入');
+                        $scope.RSC_pickingUp_errMsg = '自提码错误，请重新输入';
                         $scope.errorPickupCodeCount = $scope.errorPickupCodeCount + 1;
                     }
                 });
