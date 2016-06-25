@@ -95,7 +95,7 @@ router.get(F.config['manager-url']+'/api/agents/:_id', middleware.backend_auth, 
 
 // rewardshop
 router.get(F.config['manager-url']+'/api/rewardshop/categories', middleware.backend_auth, controllers.Manager.json_rewardshop_categories);
-router.post(F.config['manager-url']+'/api/rewardshop/category/add', middleware.backend_auth, middleware.auditing_middleware, controllers.Manager.json_rewardshop_category_save);
+// router.post(F.config['manager-url']+'/api/rewardshop/category/add', middleware.backend_auth, middleware.auditing_middleware, controllers.Manager.json_rewardshop_category_save);
 router.get(F.config['manager-url']+'/api/rewardshop/gifts', middleware.backend_auth, controllers.Manager.json_rewardshop_gifts);
 router.post(F.config['manager-url']+'/api/rewardshop/gift/add', middleware.backend_auth, middleware.auditing_middleware, controllers.Manager.json_rewardshop_gift_save);
 router.post(F.config['manager-url']+'/api/rewardshop/gift/update', middleware.backend_auth, middleware.auditing_middleware, controllers.Manager.json_rewardshop_gift_update);
