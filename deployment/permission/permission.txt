@@ -75,7 +75,7 @@
 /manager/api/v2.2/RSC/orders, get, super_admin
 /manager/api/v2.2/RSC/modify, put, super_admin
 /manager/api/v2.2/RSC/queryByProducts, get, super_admin, customer_op
-/manager/api/v2.2/RSC/queryByGift, get, super_admin
+/manager/api/v2.2/RSC/queryByGift, get, super_admin, customer_op
 
 #agents
 /manager/api/agents, get, super_admin
@@ -90,12 +90,12 @@
 /manager/api/rewardshop/gift/update, post, super_admin
 /manager/api/rewardshop/gift/:_id, get, super_admin
 /manager/api/rewardshop/pointslogs, get, super_admin
-/manager/api/rewardshop/giftorders, get, super_admin
-/manager/api/rewardshop/giftorders/update, post, super_admin
+/manager/api/rewardshop/giftorders, get, super_admin, customer_op
+/manager/api/rewardshop/giftorders/update, post, super_admin, customer_op
 /manager/rewardshop/rewardshop-gifts, get, super_admin
 /manager/rewardshop/rewardshop-gifts-detail, get, super_admin
 /manager/rewardshop/rewardshop-points-logs, get, super_admin
-/manager/rewardshop/rewardshop-gifts-orders, get, super_admin
+/manager/rewardshop/rewardshop-gifts-orders, get, super_admin, customer_op
 
 #area
 /manager/api/area/getProvinceList, get, super_admin
