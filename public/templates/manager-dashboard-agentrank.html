@@ -196,7 +196,8 @@
 			        $(".agentsort").find('.selected').removeClass('selected');
 					$('#'+sortName).addClass('selected');
 					if (dashboard.pages && dashboard.count) {
-						Pagination(dashboard.count, dashboard.count/dashboard.pages, page?page:null);
+						// Pagination(dashboard.count, dashboard.count/dashboard.pages, page?page:null);
+						Pagination($('div.dashboard-pages'), dashboard.count, dashboard.count/dashboard.pages, page?page:null, function(pageNumber){redirectDashboardAgentsURL(pageNumber);});
 					}
 				} else {
 					if (response.error || response.message) {
@@ -220,7 +221,7 @@
 							if (sortName == sort) {
 								// getAgents(sortName);
 								dashboard.agentsSelected = sortName;
-								redirectURL();
+								redirectDashboardAgentsURL();
 								break;
 							}
 						}
@@ -230,21 +231,21 @@
 		}
 	}
 
-	function Pagination(count, pageCount, currentPage) {
-		$('div.dashboard-pages').pagination({
-	        items: count,
-	        itemsOnPage: pageCount,
-	        currentPage: currentPage?currentPage:0,
-			prevText: '<',
-			nextText: '>',
-	        cssStyle: 'light-theme',
-	        onPageClick: function(pageNumber, event) {
-	        	redirectURL(pageNumber);
-	        }
-	    });
-	}
+	// function Pagination(count, pageCount, currentPage) {
+	// 	$('div.dashboard-pages').pagination({
+	//         items: count,
+	//         itemsOnPage: pageCount,
+	//         currentPage: currentPage?currentPage:0,
+	// 		prevText: '<',
+	// 		nextText: '>',
+	//         cssStyle: 'light-theme',
+	//         onPageClick: function(pageNumber, event) {
+	//         	redirectDashboardAgentsURL(pageNumber);
+	//         }
+	//     });
+	// }
 
-	function redirectURL(page) {
+	function redirectDashboardAgentsURL(page) {
 		if (dashboard.agentsSelected) {
     		var names = dashboard.agentsSelected.split('-');
 			if (names.length == 2) {

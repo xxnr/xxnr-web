@@ -594,8 +594,8 @@ exports.getMinPayPrice = function (req, res, next) {
 
 exports.IOSUpgrade = function (req, res, next) {
     var postVersion = req.data['version'] || '';
-    var nowVersion = '2.1.5';
-    if (!postVersion || (postVersion != nowVersion && postVersion < nowVersion)) {
+    var nowVersion = F.config.nowIosVersion || '';
+    if (!postVersion || AppupgradeService.compareVersion(nowVersion, postVersion)) {
         res.respond({code: 1000, message: '版本升级啦，快点去更新吧', version: nowVersion});
         return;
     } else {

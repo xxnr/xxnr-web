@@ -1,8 +1,8 @@
 /**
  * Created by cuidi on 15/11/6.
  */
-var app = angular.module('invitation', ['xxnr_common','shop_cart']);
-app.controller('invitationController', function($scope, remoteApiService, commonService, loginService, sideService){
+var app = angular.module('invitation', ['xxnr_common','shop_cart',"ngFlash"]);
+app.controller('invitationController', function($scope, remoteApiService, commonService, loginService, sideService, Flash){
     var _user = commonService.user;
     var sweetalert = commonService.sweetalert;
     var sweetConfirm = commonService.sweetConfirm;
@@ -11,6 +11,7 @@ app.controller('invitationController', function($scope, remoteApiService, common
     $scope.confirm = false;
     $scope.tabNum = 1;
     $scope.showOrders = false;
+    $scope.hasInvitees = false;
     var ordersPerPage = 20;
     var selectedInviteeId = '';
     if(Number(location.search[5]) | Number(location.search[5])===0) {
@@ -67,6 +68,7 @@ app.controller('invitationController', function($scope, remoteApiService, common
             .then(function (data) {
                 $scope.invitees = data.invitee;
                 $scope.inviteesCount = data.total;
+                $scope.hasInvitees = data.total > 0 ? true : false;
                 $scope.inviteesPager.pages_count = data.pages;
                 pages_generator($scope.inviteesPager);
                 for(var index in $scope.invitees){
@@ -78,11 +80,26 @@ app.controller('invitationController', function($scope, remoteApiService, common
             });
     }
     getInvitees();
-
+    $scope.search_invitees = function(page){
+        var _page = page ? page : 1;
+        remoteApiService.getInvitee(_page,$scope.inviteeSearch)
+            .then(function (data) {
+                $scope.invitees = data.invitee;
+                $scope.inviteesCount = data.total;
+                $scope.inviteesPager.pages_count = data.pages;
+                pages_generator($scope.inviteesPager);
+                for(var index in $scope.invitees){
+                    if($scope.invitees.hasOwnProperty(index)){
+                        var d = Date.fromISO($scope.invitees[index].dateinvited);
+                        $scope.invitees[index].dateinvited = d.getFullYear().toString()+'-'+ (d.getMonth()+1).toString() +'-'+d.getDate().toString();
+                    }
+                }
+            });
+    };
 
     $scope.inviterPhoneNumberValidated = false;
     $scope.$watch('inviterNum',function(){
-        if(!isNaN($scope.inviterNum) && /*/^(?:13\d|15\d|18[123456789])-?\d{5}(\d{3}|\*{3})$/*/ /^(13[0-9]|15[012356789]|17[678]|18[0-9]|14[57])[0-9]{8}$/.test($scope.inviterNum)){
+        if(!isNaN($scope.inviterNum) && /^1\d{10}$/.test($scope.inviterNum)){
             remoteApiService.findAccount($scope.inviterNum)
                 .then(function (data) {
                     if(data.code == 1000){
@@ -108,7 +125,7 @@ app.controller('invitationController', function($scope, remoteApiService, common
                             var nominated_inviter = data.nominated_inviter;
                             if(data.code==1000){
                                 if (navigator.appName == "Microsoft Internet Explorer" && navigator.appVersion.match(/8./i) == "8.") {
-                                    var r = confirm("是否要添加该用户为您的代表？\n" + nominated_inviter.name + "   " + nominated_inviter.phone);
+                                    var r = confirm("是否要添加该用户为您的代表？\n" + nominated_inviter.name + '   ' + nominated_inviter.phone);
                                     if (r == true) {
                                         remoteApiService.bindInviter(nominated_inviter.phone)
                                             .then(function (data) {
@@ -125,13 +142,14 @@ app.controller('invitationController', function($scope, remoteApiService, common
                                 } else {
                                     swal({
                                             title: "是否要添加该用户为您的代表？",
-                                            text: nominated_inviter.name + "   " + nominated_inviter.phone,
+                                            text: nominated_inviter.name + ' &nbsp;&nbsp;<img src="images/phone-icon.png" alt="">' + nominated_inviter.phone,
                                             //type: "warning",
                                             showCancelButton: true,
                                             confirmButtonColor: '#00913a',
                                             confirmButtonText: '确定',
                                             cancelButtonText: "取消",
-                                            closeOnConfirm: false
+                                            closeOnConfirm: false,
+                                            html: true
                                         },
                                         function (isConfirm) {
                                             if (isConfirm) {
@@ -158,11 +176,18 @@ app.controller('invitationController', function($scope, remoteApiService, common
 
     $scope.bindInviter = function(){
         $scope.$apply();
-        if(!$scope.phoneNumberValidated){
-            sweetalert('该手机号未注册，请确认后重新输入')
-        }
-        else if($scope.phone==$scope.inviterNum){
-                    sweetalert('不能设置自己为邀请人')
+        if(!$scope.inviterNum){
+            //sweetalert('该手机号未注册，请确认后重新输入');
+            var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">请输入代表人手机号';
+            var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);
+        } else if(!$scope.phoneNumberValidated){
+            //sweetalert('该手机号未注册，请确认后重新输入');
+            var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">该手机号未注册，请确认后重新输入';
+            var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);
+        } else if($scope.phone==$scope.inviterNum){
+            //sweetalert('不能设置自己为邀请人');
+            var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">不能设置自己为邀请人';
+            var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);
         }else {
             if (navigator.appName == "Microsoft Internet Explorer" && navigator.appVersion.match(/8./i) == "8.") {
                 var r = confirm("代表人添加后不可修改,确定设置该用户为您的代表吗?");
@@ -206,16 +231,28 @@ app.controller('invitationController', function($scope, remoteApiService, common
             }
         }
     };
-
-    remoteApiService.getBasicUserInfo()
+    remoteApiService.getInviter()
         .then(function (data) {
-            $scope.inviter = data.datas.inviter;
+            $scope.inviterTypeNum = data.datas.inviterUserType;
+            $scope.inviterAddresses = data.datas.inviterAddress;
+            $scope.inviterIsVerified = data.datas.inviterIsVerified;
+            $scope.inviterPhone = data.datas.inviterPhone;
             $scope.inviterName = data.datas.inviterName;
+            $scope.inviterIsVerified = data.datas.inviterIsVerified;
+            $scope.inviterSex = data.datas.sex;
+            remoteApiService.userTypeList()
+                .then(function (data) {
+                    $scope.inviterType = data.data[Number($scope.inviterTypeNum)]
+                });
             $scope.imgUrl = data.datas.inviterPhoto;
             if(!$scope.imgUrl){
                 $scope.imgUrl = "images/default_avatar.png"
             }
-            $scope.phone = data.datas.phone;
+        });
+
+    remoteApiService.getBasicUserInfo()
+        .then(function (data) {
+
         });
 
     $scope.getInviteeOrders = function(inviteeUserId,page){
@@ -229,6 +266,7 @@ app.controller('invitationController', function($scope, remoteApiService, common
                 $scope.name = data.datas.name?data.datas.name:"该客户未设置姓名";
                 $scope.ordersNum = data.datas.total;
                 $scope.orderList = data.datas.rows;
+                $scope.addresses = data.datas.address;
                 for(var order in $scope.orderList){
                     $scope.orderList[order].typeName = getOrderTypeName($scope.orderList[order].typeValue);
                     // var d = new Date(commonService.parseDate($scope.orderList[order].dateCreated));
@@ -237,6 +275,14 @@ app.controller('invitationController', function($scope, remoteApiService, common
                     $scope.orderList[order].createTime_local = d.getFullYear().toString()+'-'+ (d.getMonth()+1).toString() +'-'+d.getDate().toString()+' '+d.getHours().toString()+':'+timeStringExtendZero(d.getMinutes().toString())+':'+ timeStringExtendZero(d.getSeconds().toString());
                 }
             });
+    };
+    $scope.backToInviteesList = function(){
+        $scope.tab = 1;
+        $scope.showOrders = false;
+        $scope.phone = undefined;
+        $scope.name = undefined;
+        $scope.ordersNum = 0;
+        $scope.addresses = undefined;
     };
 
     $scope.show_page = function(pager,pageId){

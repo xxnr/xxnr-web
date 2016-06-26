@@ -1,8 +1,8 @@
 /**
  * Created by cuidi on 15/11/16.
  */
-var app = angular.module('commit_pay', ['xxnr_common', 'shop_cart']);
-app.controller('commitPayController', function($scope, remoteApiService, payService, commonService, loginService){
+var app = angular.module('commit_pay', ['xxnr_common', 'shop_cart',"ngFlash"]);
+app.controller('commitPayController', function($scope, remoteApiService, payService, commonService, loginService, Flash){
     function getQueryStringByName(name) {
         var result = location.search.match(new RegExp("[\?\&]" + name + "=([^\&]+)", "i"));
         if (result == null || result.length < 1) {
@@ -13,6 +13,7 @@ app.controller('commitPayController', function($scope, remoteApiService, payServ
 
     $scope.has_offlinePay_company = false; //用来表示线下支付点的参数
     $scope.offlineSubmitted = getQueryStringByName('offlinePay') | false;   // 已提交线下订单
+    $scope.auditingOrder = getQueryStringByName('auditingOrder') | false;   // 订单正在审核中
     //console.log($scope.offlineSubmitted);
     // if not login
     if(!loginService.isLogin) {
@@ -38,7 +39,15 @@ app.controller('commitPayController', function($scope, remoteApiService, payServ
     $scope.ids = getQueryParams('id');
     // $scope.ids = $scope.ids.concat($location.search()['id']);
     // $scope.id = commonService.getParam('id');
+    $scope.orderHasPayed = false;
 
+    $scope.helpWoring = {
+        payMethod_help:{
+            full_pay:'直接支付全部待付金额',
+            multi_pay:'分次支付待付的金额，可用不同付款方式'
+        },
+        offlinePay_help:'申请线下支付后，可至服务网点交付现金或刷卡完成付款'
+    }
 
     $scope.itemClicked = function (index) {
         $scope.selectedPayMethodIndex = index;
@@ -168,49 +177,82 @@ app.controller('commitPayController', function($scope, remoteApiService, payServ
     for(var index in $scope.ids){
         if($scope.ids.hasOwnProperty(index)){
             (function(index){
-                remoteApiService.getOrderDetail($scope.ids[index])
-                    .then(function(data) {
-                        if (data.code != 1000) {
-                            //                sweetalert("该订单详情有误，请重新操作","my_xxnr.html");
-                        }
-                        else {
-                            $scope.wholePageShow = true;
-                            $scope.orders[index] = {};
-                            $scope.orders[index].id = data.datas.rows.id;
-                            $scope.orders[index].subOrders = data.datas.rows.subOrders;
-                            $scope.orders[index].paySubOrderType = data.datas.rows.paySubOrderType;
-                            if($scope.orders[index].paySubOrderType == 'deposit'){
-                                $scope.orders[index].orderType = '阶段一：订金'
-                            }else if($scope.orders[index].paySubOrderType == 'balance'){
-                                $scope.orders[index].orderType = '阶段二：尾款'
-                            }else if($scope.orders[index].paySubOrderType == 'full'){
-                                $scope.orders[index].orderType = '订单总额';
+                if(!$scope.offlineSubmitted){   //是否线下支付
+                    remoteApiService.getOrderDetail($scope.ids[index])
+                        .then(function(data) {
+                            if (data.code != 1000) {
+                                //sweetalert("该订单详情有误，请重新操作","my_xxnr.html");
+                                $scope.orderHasPayed = true;
                             }
-                            if(data.datas.rows.RSCInfo){
-                                $scope.has_offlinePay_company = true;
-                                $scope.orders[index].RSCInfo = data.datas.rows.RSCInfo;
-                            }
+                            else {
+                                if(data.datas.rows.payStatus == 2){
+                                    $scope.orderHasPayed = true;
+                                } else if(data.datas.rows.order.orderStatus &&  data.datas.rows.order.orderStatus.type != 7 && $scope.auditingOrder) {
+                                    $scope.offlineHasAudited = true;
+                                    $scope.wholePageShow = true;
+                                }else{
+                                    $scope.wholePageShow = true;
+                                    $scope.orders[index] = {};
+                                    $scope.orders[index].id = data.datas.rows.id;
+                                    $scope.orders[index].subOrders = data.datas.rows.subOrders;
+                                    $scope.orders[index].paySubOrderType = data.datas.rows.paySubOrderType;
+                                    if($scope.orders[index].paySubOrderType == 'deposit'){
+                                        $scope.orders[index].orderType = '阶段一：订金'
+                                    }else if($scope.orders[index].paySubOrderType == 'balance'){
+                                        $scope.orders[index].orderType = '阶段二：尾款'
+                                    }else if($scope.orders[index].paySubOrderType == 'full'){
+                                        $scope.orders[index].orderType = '订单总额';
+                                    }
+                                    if(data.datas.rows.RSCInfo){
+                                        $scope.has_offlinePay_company = true;
+                                        $scope.orders[index].RSCInfo = data.datas.rows.RSCInfo;
+                                    }
 
-                            $scope.orders[index].duePrice = data.datas.rows.duePrice;
-                            $scope.orders[index].totalPrice = data.datas.rows.totalPrice;
-                            $scope.orders[index].receiver = data.datas.rows.recipientName;
-                            $scope.orders[index].address = data.datas.rows.address;
-                            $scope.orders[index].receiverPhone = data.datas.rows.recipientPhone;
-                            $scope.orders[index].products = data.datas.rows.orderGoodsList;
-                            $scope.selectedPayMethodIndex = data.datas.rows.payType - 1;
-                            $scope.orders[index].resultStr = "";
-                            for(var i=0;i<$scope.orders[index].products.length;i++){
-                                $scope.orders[index].resultStr +=  $scope.orders[index].products[i].goodsName + " -" + $scope.orders[index].products[i].goodsCount + "件，";
-                            }
-                            $scope.orders[index].resultStr = $scope.orders[index].resultStr.substr(0,$scope.orders[index].resultStr.length-1);
-                            $scope.orders[index].resultStr = $scope.orders[index].resultStr.length > 100 ? ($scope.orders[index].resultStr.substr(0, 100) + '...') : $scope.orders[index].resultStr;
-                            $scope.orders[index].payUrl = payService.aliPayUrl($scope.orders[index].id);
+                                    $scope.orders[index].duePrice = data.datas.rows.duePrice;
+                                    $scope.orders[index].totalPrice = data.datas.rows.totalPrice;
+                                    $scope.orders[index].receiver = data.datas.rows.recipientName;
+                                    $scope.orders[index].address = data.datas.rows.address;
+                                    $scope.orders[index].receiverPhone = data.datas.rows.recipientPhone;
+                                    $scope.orders[index].products = data.datas.rows.orderGoodsList;
+                                    $scope.selectedPayMethodIndex = data.datas.rows.payType - 1;
+                                    $scope.orders[index].resultStr = "";
+                                    for(var i=0;i<$scope.orders[index].products.length;i++){
+                                        $scope.orders[index].resultStr +=  $scope.orders[index].products[i].goodsName + " -" + $scope.orders[index].products[i].goodsCount + "件，";
+                                    }
+                                    $scope.orders[index].resultStr = $scope.orders[index].resultStr.substr(0,$scope.orders[index].resultStr.length-1);
+                                    $scope.orders[index].resultStr = $scope.orders[index].resultStr.length > 100 ? ($scope.orders[index].resultStr.substr(0, 100) + '...') : $scope.orders[index].resultStr;
+                                    $scope.orders[index].payUrl = payService.aliPayUrl($scope.orders[index].id);
 
-                            $scope.multi_pay_amount = $scope.orders[$scope.orderSelectedNum].duePrice>3000?3000:$scope.orders[$scope.orderSelectedNum].duePrice;
-                            $scope.pay_price = $scope.orders[$scope.orderSelectedNum].duePrice;
-                            $scope.payUrl = payService.aliPayUrl($scope.orders[$scope.orderSelectedNum].id);
-                        }
-                    });
+                                    $scope.multi_pay_amount = $scope.orders[$scope.orderSelectedNum].duePrice>3000?3000:$scope.orders[$scope.orderSelectedNum].duePrice;
+                                    $scope.pay_price = $scope.orders[$scope.orderSelectedNum].duePrice;
+                                    $scope.payUrl = payService.aliPayUrl($scope.orders[$scope.orderSelectedNum].id);
+                                }
+                            }
+                        });
+                }else{
+                    remoteApiService.getOrderDetail($scope.ids[index])
+                        .then(function(data) {
+                            if (data.code != 1000) {
+                                //                sweetalert("该订单详情有误，请重新操作","my_xxnr.html");
+                                $scope.orderHasPayed = true;
+                            }
+                            else {
+                                if(data.datas.rows.payStatus == 2){
+                                    $scope.orderHasPayed = true;
+                                }else{
+                                    $scope.wholePageShow = true;
+                                    $scope.orders[index] = {};
+                                    $scope.orders[index].id = data.datas.rows.id;
+                                    if(data.datas.rows.RSCInfo){
+                                        $scope.has_offlinePay_company = true;
+                                        $scope.orders[index].RSCInfo = data.datas.rows.RSCInfo;
+                                    }
+
+                                    $scope.orders[index].duePrice = data.datas.rows.duePrice;
+                                }
+                            }
+                        });
+                }
             })(index);
         }
     }
@@ -273,6 +315,9 @@ app.controller('commitPayController', function($scope, remoteApiService, payServ
                         $scope.isOverflow = true;
                     }
 
+                }else if(data.code == 1001){
+                    var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">订单已支付';
+                    var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);
                 }
             });
     };

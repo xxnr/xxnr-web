@@ -54,7 +54,8 @@ var schema = new mongoose.Schema({
 		'dateConfirmed':Date,														// 用户确认收货时间
 		'dateRSCReceived':Date,														// 货物已到服务站的时间
 		'backendUser':{type: mongoose.Schema.ObjectId, ref:'backenduser'},			// 设置本条信息的后台用户
-		'backendUserAccount':{type: String}											// 设置本条信息的后台用户账户
+		'backendUserAccount':{type: String},										// 设置本条信息的后台用户账户
+		'rewardPoints':{type:Number}												// 完成此商品获取的积分
 	}],
 	'payStatus': {type:Number, required:true, default: PAYMENTSTATUS.UNPAID},		// 主订单付款状态，从子订单付款状态统计得来 分为未付款、部分付款、已付款三种，只用来做查询
 	'datePaid': Date,
@@ -104,7 +105,9 @@ var schema = new mongoose.Schema({
 		'RSCPhone': {type:String}													// 自提点联系电话
 	},
 	'depositPaid':{type:Boolean, default: false},									// 订金是否已付
-	'pendingApprove':{type:Boolean, default: false}								// 付款是否待审核
+	'pendingApprove':{type:Boolean, default: false},								// 付款是否待审核
+	'isRewardPoint':{type:Boolean, default: false},									// 此订单是否已经获取过积分
+	'rewardPoints':{type:Number}													// 此订单完成后能获取的总积分
 });
 
 schema.index({dateCreated: -1});

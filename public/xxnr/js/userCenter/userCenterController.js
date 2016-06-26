@@ -1,13 +1,13 @@
 /**
  * Created by pepelu on 2015/9/8.
  */
-var app = angular.module('user_center', ['xxnr_common', 'shop_cart']);
+var app = angular.module('user_center', ['xxnr_common', 'shop_cart',"ngFlash"]);
 app.filter('fixedTwo', function () {
     return function(input) {
       return input = input.toFixed(2);
     };
 });
-app.controller('userCenterController', function($scope, $rootScope,$timeout ,remoteApiService, payService, loginService, commonService, fileUpload, sideService) {
+app.controller('userCenterController', function($scope, $rootScope,$timeout ,remoteApiService, payService, loginService, commonService, fileUpload, sideService, Flash) {
     var user = commonService.user;
     $scope.nickname_adding = false;
     $scope.avatarChange = false;
@@ -19,7 +19,13 @@ app.controller('userCenterController', function($scope, $rootScope,$timeout ,rem
     $scope.ConfirmingOrderIds;  //要确认的收货物品列表
 
     $scope.showPickupPop = false; //去自提的弹窗变量
+    $scope.my_xxnr_password_err_msg = '';
 
+    $scope.focusShowValidate = function(formInputGroupNum) {
+        //$scope.focusInputGroupNum = formInputGroupNum? formInputGroupNum : 0;
+        //$scope.errorInputGroupNum = 0;
+        $scope.my_xxnr_password_err_msg = '';
+    };
 
     $scope.showModifyPwd = function () {
         window.scrollTo(0, 0);
@@ -33,6 +39,7 @@ app.controller('userCenterController', function($scope, $rootScope,$timeout ,rem
         $scope.showConfirmSKUReceivedPop = false;
         $scope.showPickupPop = false;
         $scope.ConfirmingOrderIds = null;
+        $scope.my_xxnr_password_err_msg = '';
     };
     $scope.closeAvatarPop = function () {
         $scope.isOverflow = false;
@@ -55,24 +62,45 @@ app.controller('userCenterController', function($scope, $rootScope,$timeout ,rem
                     if (data.code == 1000) {
                         window.location.href = window.location.href;
                     } else if(data.code == 1401){
-                        sweetalert('你已被登出，请重新登录', "logon.html");
+                        //sweetalert('你已被登出，请重新登录', "logon.html");
+                        var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">你已被登出，请重新登录';
+                        var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);
+                        $timeout(function(){
+                            window.location.href = "/logon.html";
+                            return false
+                        },3000);
                     }else {
                         //sweetalert('上传头像失败',' ');
                     }
                 });
         }
     };
-
+    var checkOldPassword = function () {
+        if ($scope.oldPassword) {
+            if ($scope.oldPassword.length >= 6) {
+                return true;
+            } else {
+                //sweetalert('密码长度需大于6位');
+                $scope.my_xxnr_password_err_msg = '旧密码长度需大于6位';
+            }
+        } else {
+            //sweetalert('请输入新密码');
+            $scope.my_xxnr_password_err_msg = '请输入旧密码';
+        }
+        return false;
+    };
 
     var checkNewPassword = function () {
         if ($scope.newPassword) {
             if ($scope.newPassword.length >= 6) {
                 return true;
             } else {
-                sweetalert('密码长度需大于6位');
+                //sweetalert('密码长度需大于6位');
+                $scope.my_xxnr_password_err_msg = '密码长度需大于6位';
             }
         } else {
-            sweetalert('请输入新密码');
+            //sweetalert('请输入新密码');
+            $scope.my_xxnr_password_err_msg = '请输入新密码';
         }
         return false;
     };
@@ -82,13 +110,18 @@ app.controller('userCenterController', function($scope, $rootScope,$timeout ,rem
                 if ($scope.newPassword == $scope.confirm_newPassword) {
                     return true;
                 } else {
-                    sweetalert('两次密码不一致');
+                    //sweetalert('两次密码不一致');
+                    $scope.my_xxnr_password_err_msg = '两次密码不一致';
+
                 }
             } else {
-                sweetalert('密码长度需大于6位');
+                //sweetalert('密码长度需大于6位');
+                $scope.my_xxnr_password_err_msg = '密码长度需大于6位';
+
             }
         } else {
-            sweetalert('请填写确认密码');
+            //sweetalert('请填写确认密码');
+            $scope.my_xxnr_password_err_msg = '请填写确认密码';
         }
     };
 
@@ -99,7 +132,8 @@ app.controller('userCenterController', function($scope, $rootScope,$timeout ,rem
     /////////////////////////////////////
 
     $scope.user = {};
-    $scope.orderList = [];
+    //$scope.orderList = [];
+    $scope.orderList = undefined;
     $scope.searchIndex = [];
     $scope.showTypes = [{
         name: '所有订单',
@@ -191,7 +225,7 @@ app.controller('userCenterController', function($scope, $rootScope,$timeout ,rem
     //    }
     //});
     $scope.modifyPwd = function () {
-        if (checkNewPassword() && checkConfirmNewPassword()) {
+        if (checkOldPassword() && checkNewPassword() && checkConfirmNewPassword()) {
             remoteApiService.getPublicKey()
                 .then(function (data) {
                     var public_key = data.public_key;
@@ -202,12 +236,27 @@ app.controller('userCenterController', function($scope, $rootScope,$timeout ,rem
                         .then(function (data) {
                             if (data.code == 1000) {
                                 loginService.logout();
-                                sweetalert('修改密码成功', "logon.html");
+                                //sweetalert('修改密码成功', "logon.html");
+
+                                var message = '<img class="xxnr--flash--icon" src="images/correct_prompt.png" alt="">修改密码成功';
+                                var id = Flash.create('success', message, 3000, {class: 'xxnr-success-flash', id: 'xxnr-success-flash'}, false);
+                                $timeout(function(){
+                                    window.location.href = "/logon.html";
+                                    return false
+                                },3000);
                                 //window.location.href = 'logon.html';
                             }else if(data.code == 1401){
-                                sweetalert('你已被登出，请重新登录', "logon.html");
+                                //sweetalert('你已被登出，请重新登录', "logon.html");
+                                var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">你已被登出，请重新登录';
+                                var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);
+                                $timeout(function(){
+                                    window.location.href = "/logon.html";
+                                    return false
+                                },3000);
                             }else {
-                                sweetalert(data.message);
+                                //sweetalert(data.message);
+                                var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">'+data.message;
+                                var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);
                             }
                         })
                 })
@@ -244,7 +293,9 @@ app.controller('userCenterController', function($scope, $rootScope,$timeout ,rem
                                 }
                             } else {
                                 //submit fail
-                                sweetalert(data.message);
+                                //sweetalert(data.message);
+                                var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">'+data.message;
+                                var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);
                             }
                         })
                 })
@@ -472,9 +523,21 @@ app.controller('userCenterController', function($scope, $rootScope,$timeout ,rem
                                         //$scope.pickupOrderDeliveryCode = data.
                                         $scope.pickupDeliveryCode = data.deliveryCode;
                                     }else if(data.code == 1401){
-                                        sweetalert('你已被登出，请重新登录', "logon.html");
+                                        //sweetalert('你已被登出，请重新登录', "logon.html");
+                                        var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">你已被登出，请重新登录';
+                                        var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);
+                                        $timeout(function(){
+                                            window.location.href = "/logon.html";
+                                            return false
+                                        },3000);
                                     }else{
-                                        sweetalert('获取自提码失败','my_xxnr.html');
+                                        //sweetalert('获取自提码失败','my_xxnr.html');
+                                        var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">获取自提码失败';
+                                        var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);
+                                        $timeout(function(){
+                                            window.location.href = "/my_xxnr.html";
+                                            return false
+                                        },3000);
                                     }
                                 })
                         }
@@ -489,7 +552,7 @@ app.controller('userCenterController', function($scope, $rootScope,$timeout ,rem
                             window.location.href = "commitPay.html?id=" + order.id + "&offlinePay=1";
                         };
                         order.modifyPay = function (order) {
-                            window.location.href = "commitPay.html?id=" + order.id;
+                            window.location.href = "commitPay.html?id=" + order.id + "&auditingOrder=1";
                         }
                     }
 
@@ -549,12 +612,30 @@ app.controller('userCenterController', function($scope, $rootScope,$timeout ,rem
                 .then(function (data) {
                     $scope.ConfirmingOrderIds = null;
                     if(data.code == 1000){
-                        sweetalert('收货成功','my_xxnr.html');
+                        //sweetalert('收货成功','my_xxnr.html');
+                        var message = '<img class="xxnr--flash--icon" src="images/correct_prompt.png" alt="">收货成功';
+                        var id = Flash.create('success', message, 3000, {class: 'xxnr-success-flash', id: 'xxnr-success-flash'}, false);
+                        $timeout(function(){
+                            window.location.href = "/my_xxnr.html";
+                            return false
+                        },3000);
                     }else if(data.code == 1401){
-                        sweetalert('你已被登出，请重新登录', "logon.html");
+                        //sweetalert('你已被登出，请重新登录', "logon.html");
+                        var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">你已被登出，请重新登录';
+                        var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);
+                        $timeout(function(){
+                            window.location.href = "/logon.html";
+                            return false
+                        },3000);
                     }
                     else{
-                        sweetalert('确认收货失败','my_xxnr.html');
+                        //sweetalert('确认收货失败','my_xxnr.html');
+                        var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">确认收货失败';
+                        var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);
+                        $timeout(function(){
+                            window.location.href = "/my_xxnr.html";
+                            return false
+                        },3000);
                     }
                 });
             //$scope.ConfirmingOrderIds = null;

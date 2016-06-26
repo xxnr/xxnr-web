@@ -2204,13 +2204,26 @@ body {
 .user_section {
     width: 400px;
     height: 480px;
-    border: 1px solid #00a838;
+    border: 1px solid #E0E0E0;
+    border-top: 2px solid #008A2F;
     border-radius: 0.2px;
     box-sizing: border-box;
     margin-bottom: 65px;
 }
+.user_section .login_form--title{
+    margin-top: 26px;
+    margin-bottom: 34px;
+    font-size: 16px;
+    color: #323232;
+}
+.user_section .register_form--title{
+    margin-top: 26px;
+    margin-bottom: 34px;
+    font-size: 16px;
+    color: #323232;
+}
 .user_wrap {
-    width: 360px;
+    width: 340px;
     margin: 0 auto;
     display: block;
     box-sizing: border-box;
@@ -2227,6 +2240,31 @@ body {
 }
 .user_wrap .user_tabs li a {
     color: #909090
+}
+.user_wrap .login_form {
+    width: 340px;
+    position: relative;
+}
+.user_wrap .login_form .forgetPassword{
+    color: #008A2F;
+}
+
+.user_wrap .login_form .form-group {
+    width: 340px;
+    border: 1px solid #E0E0E0;
+    height: 44px;
+    line-height: 44px;
+    margin-bottom: 20px;
+    box-sizing: border-box;
+}
+.user_wrap .login_form .form-group label img{
+    padding-top: 10px;
+    padding-left: 10px;
+    padding-right: 15px;
+}
+.user_wrap .login_form .form-group input{
+    font-size: 14px;
+    width: 260px;
 }
 .user_wrap .login_form .input_li {
     height: 44px;
@@ -2256,46 +2294,52 @@ body {
     background: #f0f0f0;
     width: 306px;
 }
-.user_wrap .login_form .input_li .checked_icon {
+.user_wrap .login_form .checked_icon {
     position: absolute;
-    top: 20px;
-    left: 260px;
+    top: 70px;
+    left: 300px;
     z-index: 5;
-    background: #f0f0f0;
     display: none;
 }
-.user_wrap .login_form .input_li .validated {
+.user_wrap .login_form .validated {
     display: block;
 }
 .user_wrap .login_form .remenberHint {
-    margin-top: 40px;
+    margin-top: 10px;
     padding-left: 15px;
-    background: #f0f0f0;
-    height: 20px;
-    line-height: 20px;
-    font-size: 11px;
+    background: #FFF0E0;
+    height: 24px;
+    line-height: 24px;
+    font-size: 12px;
     color: #909090;
+    width: 340px;
+    box-sizing: border-box;
+    margin-bottom: 10px;
 }
 .user_wrap .login_form .remenberHint img {
     vertical-align: middle;
 }
 .user_wrap .login_form .remenberHint span {
-    padding-left: 30px;
+    padding-left: 20px;
 }
 .user_wrap .login_form .get_pass {
     margin-top: 12px;
 }
-.user_wrap .login_form .login_btn a {
+.user_wrap .login_form .login_btn {
     margin-top: 16px;
     border-radius: 5px;
     display: block;
-    width: 360px;
+    width: 340px;
     height: 44px;
     line-height: 44px;
     text-align: center;
     color: #fff;
     background: #00913a;
     font-size: 14px;
+    text-shadow:none !important;
+    border:none !important;
+    box-shadow:none !important;
+    font-family: "Microsoft YaHei" !important;
 }
 .user_wrap .login_form .register_message {
     margin-top: 20px;
@@ -2303,33 +2347,47 @@ body {
 .user_wrap .login_form .register_message a {
     color: #008a2f;
 }
-.user_wrap .register_form .input_li {
-    height: 44px;
-    padding-top: 20px;
+.user_wrap .login_form .login_error{
+    position: absolute;
+    top: 0px;
+    margin-top: 26px;
+    width: 340px;
+    background: #FFEFEE;
+    height: 20px;
+}
+
+.user_wrap .login_form .login_error img{
+    padding-left: 14px;
+    padding-top: 3px;
+    padding-right: 10px;
+}
+.user_wrap .login_form .login_error span{
+    font-size: 12px;
+    color: #909090;
+}
+.user_wrap .register_form {
     position: relative;
 }
-.user_wrap .register_form .input_li div {
-    display: inline-block;
-    height: 44px;
-    width: 44px;
-    background: #d0d0d0;
-    overflow: hidden;
-    text-align: center;
-    margin-right: -5px;
-}
-.user_wrap .register_form .input_li div img {
-    display: inline-block;
-    padding-top: 12px;
-}
-.user_wrap .register_form .input_li input {
-    padding-left: 10px;
-    position: absolute;
-    display: inline-block;
+.user_wrap .register_form .form-group {
+    width: 340px;
+    border: 1px solid #E0E0E0;
     height: 44px;
     line-height: 44px;
-    padding-top: 0px;
-    background: #f0f0f0;
-    width: 306px;
+    margin-bottom: 20px;
+    display: inline-block;
+    box-sizing: border-box;
+}
+.user_wrap .register_form .form-group img{
+    padding-top: 10px;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+.user_wrap .register_form .form-group input{
+    padding-left: 15px;
+    font-size: 14px;
+}
+.user_wrap .register_form .register_code  {
+    width: 190px;
 }
 .user_wrap .register_form .reg_code {
     height: 44px;
@@ -2345,10 +2403,10 @@ body {
 .user_wrap .register_form #dynamic_code:focus::-webkit-input-placeholder {
     color: transparent;
 }
-.user_wrap .register_form .reg_get_code a {
+.user_wrap .register_form .reg_get_code_btn a {
     box-sizing: border-box;
     display: block;
-    width: 150px;
+    width: 138px;
     text-align: center;
     height: 44px;
     line-height: 44px;
@@ -2367,22 +2425,122 @@ body {
     width: 350px;
 }
 .user_wrap .register_form .policy {
-    padding-top: 20px;
+    /*padding-top: 20px;*/
 }
 .user_wrap .register_form .policy a {
     color: #008a2f
 }
-.user_wrap .register_form .reg_btn a {
+.user_wrap .register_form .register_btn {
+    margin-top: 16px;
+    border-radius: 5px;
     display: block;
-    width: 100%;
+    width: 340px;
     height: 44px;
     line-height: 44px;
     text-align: center;
     color: #fff;
     background: #00913a;
-    font-size: 16px;
-    border-radius: 5px;
-    margin-top: 20px;
+    font-size: 14px;
+    text-shadow:none !important;
+    border:none !important;
+    box-shadow:none !important;
+    font-family: "Microsoft YaHei" !important;
+}
+.user_wrap .register_form .login_link{
+    margin-top: 10px;
+}
+.user_wrap .register_form .login_link a{
+    color: #008A2F;
+}
+.user_wrap .register_form .register_error{
+    position: absolute;
+    top: 0px;
+    margin-top: 26px;
+    width: 340px;
+    background: #FFEFEE;
+    height: 20px;
+}
+.user_wrap .register_form .register_error img{
+    padding-left: 14px;
+    padding-top: 3px;
+    padding-right: 10px;
+}
+.user_wrap .register_form .register_error span{
+    font-size: 12px;
+    color: #909090;
+}
+.user_wrap .register_form .register_succeed{
+    position: absolute;
+    top: 0px;
+    margin-top: 26px;
+    width: 340px;
+    background: #DBEFE0;
+    height: 20px;
+}
+.user_wrap .register_form .register_succeed img{
+    padding-left: 14px;
+    padding-top: 3px;
+    padding-right: 10px;
+}
+.user_wrap .register_form .register_succeed span{
+    font-size: 12px;
+    color: #909090;
+}
+.logon .reset_password_err{
+    position: absolute;
+    top: 0px;
+    margin-top: 43px;
+    width: 239px;
+    background: #FFEEED;
+    height: 20px;
+    left: 99px;
+    border-radius: 2px;
+}
+.logon .reset_password_err img{
+    padding-left: 14px;
+    padding-top: 3px;
+    padding-right: 10px;
+}
+.logon .reset_password_err span{
+    font-size: 12px;
+    color: #909090;
+}
+.logon .reset_password_succeed{
+    position: absolute;
+    top: 0px;
+    margin-top: 43px;
+    width: 239px;
+    background: #DBEFE0;
+    height: 20px;
+    left: 99px;
+}
+.logon .reset_password_succeed img{
+    padding-left: 14px;
+    padding-top: 3px;
+    padding-right: 10px;
+}
+.logon .reset_password_succeed span{
+    font-size: 12px;
+    color: #909090;
+}
+
+.user_wrap .login_form .focused_input--green {
+    border: 1px solid green;
+}
+.user_wrap .register_form .focused_input--green {
+    border: 1px solid green;
+}
+.user_wrap .login_form .error_input--red {
+    border: 1px solid red;
+}
+.user_wrap .register_form .error_input--red {
+    border: 1px solid red;
+}
+.pop_body .pop_login li .focused_input--green {
+    border: 1px solid green;
+}
+.pop_body .pop_login li .error_input--red {
+    border: 1px solid red;
 }
 .pop_mask {
     width: 100%;
@@ -2438,7 +2596,21 @@ body {
     background: url(../images/close.gif) no-repeat;
 }
 .pop_body .pop_login {
-    padding-top: 10px;
+    padding-top: 15px;
+}
+.pop_body .my_xxnr_password_err{
+    position: absolute;
+    margin-top: -14px;
+    margin-left: 80px;
+    background: #FFF2ED;
+    padding-left: 6px;
+    padding-right: 6px;
+    height: 24px;
+    line-height: 24px;
+    border-radius: 4px;
+}
+.pop_body .my_xxnr_password_err img{
+    padding-top: 4px;
 }
 .pop_body .pop_login li {
     padding-bottom: 20px;
@@ -3212,11 +3384,11 @@ body {
     padding-left: 818px;
 }
 .cart_box .cart-tbody .item-item .pay-step-1 span.text-info {
-    width: 140px;
+    width: 132px;
     display: inline-block;
 }
 .cart_box .cart-tbody .item-item .pay-step-2 span.text-info {
-    width: 140px;
+    width: 132px;
     display: inline-block;
 }
 .cart_box .cart-tbody .item-item .pay-step-1 .order-price {
@@ -3277,13 +3449,20 @@ body {
     width: 1200px;
     background: #fff;
     overflow: hidden;
-    height: 74px;
+    height: 60px;
     z-index: 5;
     box-sizing: border-box;
 }
+.cart_box .options-box .cart-all-text{
+    padding-top: 20px;
+}
+.cart_box .options-box .cart-checkbox{
+    padding-left: 20px;
+    padding-top: 18px;
+}
 .price-total {
     text-align: right;
-    padding: 20px;
+    padding: 13px;
     line-height: 26px;
     padding-right: 50px;
 }
@@ -3301,21 +3480,24 @@ body {
 }
 .options-box .submit-btn {
     text-align: right;
-    padding-top: 12px;
-    padding-right: 20px;
+    /*padding-top: 12px;*/
+    /*padding-right: 20px;*/
 }
 .options-box .submit-btn a {
-    border-radius: 7px;
+    /*border-radius: 7px;*/
     display: inline-block;
     *display: inline;
     zoom: 1;
     width: 150px;
-    height: 50px;
-    line-height: 50px;
+    height: 60px;
+    line-height: 60px;
     text-align: center;
     color: #fff;
     background: #fe9b00;
     font-size: 18px;
+}
+.options-box .submit-btn .no-item-selected{
+    background: #D5D5D5;
 }
 .cart-main .cart-thead .t-goods2 {
     width: 440px;
@@ -3616,6 +3798,43 @@ body {
     margin-right: 20px;
     box-sizing: border-box;
     padding-top: 3px;
+}
+.deliveryInfo .deliveryMethod .deliveryMethod--help {
+    position: absolute;
+    display: none;
+}
+.deliveryInfo .deliveryMethod .deliveryMethod--help--img {
+    padding-top: 3px;
+}
+.deliveryInfo .deliveryMethod .deliveryMethod--help--text {
+    display: none;
+    position: absolute;
+    /*width: 380px;*/
+    white-space: nowrap;
+    background: #FEEDD3;
+    color: #FE9B00;
+    font-size: 12px;
+    margin-left: -20px;
+    margin-top: 2px;
+    padding-left: 6px;
+    padding-right: 6px;
+    height: 24px;
+    line-height: 24px;
+}
+.deliveryInfo .deliveryMethod .deliveryMethod--help:hover .deliveryMethod--help--text {
+    display: block;
+}
+.deliveryInfo .deliveryMethod .deliveryMethod--help .deliveryMethod--help--text--prompt{
+    display: none;
+    position: absolute;
+    margin-top: -3px;
+}
+.deliveryInfo .deliveryMethod .deliveryMethod--help:hover .deliveryMethod--help--text--prompt{
+    display: block;
+}
+.deliveryInfo .deliveryMethod .delivery:hover .deliveryMethod--help{
+    display: inline-block;
+    padding-left: 3px;
 }
 .deliveryInfo .deliveryMethod a.current {
     border: 2px solid #FE9B00;
@@ -4286,14 +4505,14 @@ body {
 }
 .pop_pay_btn {
     margin: auto;
-    width: 270px;
+    width: 290px;
     margin-bottom: 50px;
 }
 .pop_pay_btn .btn {
     display: block;
-    width: 120px;
-    height: 30px;
-    line-height: 30px;
+    width: 130px;
+    height: 44px;
+    line-height: 44px;
     text-align: center;
     color: #fff;
     background: #00913a;
@@ -4606,6 +4825,7 @@ body {
     height: 30px;
     padding-bottom: 20px;
 }
+
 .addressFormTable .first-td{
     width: 70px;
     display: inline-block;
@@ -4621,7 +4841,9 @@ body {
     border: 1px solid #e0e0e0;
     border-radius: 5px;
     font-family: "Microsoft YaHei";
-
+}
+.addressFormTable .address-td{
+    padding-bottom: 18px;
 }
 .addressFormTable .second-td input[type="text"]{
     width: 200px;
@@ -4645,6 +4867,47 @@ body {
 }
 .addressFormTable .postcode{
     padding-left: 20px;
+}
+
+.addressFormTable .no_address_err{
+    position: absolute;
+    background: #FFF2ED;
+    padding-left: 6px;
+    padding-right: 6px;
+    height: 24px;
+    line-height: 24px;
+    border-radius: 4px;
+}
+.addressFormTable .no_address_err img{
+    padding-top: 4px;
+}
+.addressFormTable .no_consignee_err {
+    position: absolute;
+    background: #FFF2ED;
+    padding-left: 6px;
+    padding-right: 6px;
+    height: 24px;
+    line-height: 24px;
+    border-radius: 4px;
+    margin-left: 210px;
+    margin-top: -25px;
+}
+.addressFormTable .no_consignee_err img{
+    padding-top: 4px;
+}
+.addressFormTable .no_phoneNum_err {
+    position: absolute;
+    background: #FFF2ED;
+    padding-left: 6px;
+    padding-right: 6px;
+    height: 24px;
+    line-height: 24px;
+    border-radius: 4px;
+    margin-left: 210px;
+    margin-top: -25px;
+}
+.addressFormTable .no_phoneNum_err img{
+    padding-top: 4px;
 }
 .addNewAddressBtn {
     height: 58px;
@@ -4960,6 +5223,32 @@ body {
     box-sizing: border-box;
     padding-bottom: 40px;
 }
+.myClients_forms .clients_info .invitees_search--Form {
+    padding-bottom: 22px;
+}
+.myClients_forms .clients_info .invitees_search--Form input{
+    height: 32px;
+    box-sizing: border-box;
+    border: 1px solid #e2e2e2;
+    padding-left: 11px;
+    color: #909090;
+    width: 300px;
+    float: left;
+    border-right: 0px;
+}
+.myClients_forms .clients_info .invitees_search--Form button{
+    height: 32px;
+    box-sizing: border-box;
+    border: 1px solid #e2e2e2;
+    text-shadow:none !important;
+    /*border:none !important;*/
+    box-shadow:none !important;
+    font-family: "Microsoft YaHei";
+    background: #FFFFFF;
+    width: 50px;
+    float: left;
+    color: #7A7A7A;
+}
 .myClients_forms .clients_info .clients_count {
     color: #323232;
     padding-bottom: 20px;
@@ -5029,10 +5318,22 @@ body {
 .myClients_forms .clients_info .clients_form .client_row ul .unfilled {
     color: #909090;
 }
+.myClients_forms .clients_info .no_invitees_searched{
+    height: 500px;
+    text-align: center;
+}
+.myClients_forms .clients_info .no_invitees_searched img{
+    margin-bottom: 28px;
+    margin-top: 120px;
+}
+.myClients_forms .clients_info .no_invitees_searched p{
+    color: #c7c7c7;
+}
 .myClients_forms .client_order .orders_clientInfo {
     width: 1120px;
     box-sizing: border-box;
-    margin: 38px auto;
+    margin: 30px auto;
+    margin-top: 0px;
     height: 104px;
     background: #fff9f3;
     border: 1px solid #ffb973;
@@ -5050,11 +5351,15 @@ body {
 }
 .myClients_forms .client_order .orders_clientInfo p span {
     display: inline-block;
-    margin-right: 40px;
+    margin-right: 24px;
 }
 .myClients_forms .client_order .orders_clientInfo p .OrdersNum {
     color: #ff6700;
     line-height: 22px;
+}
+.myClients_forms .client_order .orders_clientInfo .orders_clientInfo--address {
+    display: inline-block;
+    margin-right: 10px;
 }
 .myClients_forms .client_order {
     padding-bottom: 20px;
@@ -5092,24 +5397,52 @@ body {
 .myClients_forms .inviter_section .noInviter_info .add_inviter a {
     border-radius: 7px;
 }
-.myClients_forms .inviter_section .inviter_info .info_title {
+.myClients_forms .inviter_section .inviter_info .inviter_text_info{
+    padding-left: 25px;
     color: #323232;
-    display: block;
-    margin-bottom: 34px;
-    height: 20px;
-    line-height: 20px;
+}
+.myClients_forms .inviter_section .inviter_info .inviter_text_info p {
+    padding-bottom: 4px;
+}
+.myClients_forms .inviter_section .inviter_info .inviter_text_info .inviter_name {
+    font-size: 16px;
+    padding-bottom: 9px;
+    padding-top: 5px;
+}
+.myClients_forms .inviter_section .inviter_info .inviter_text_info .inviter_type img{
+    width: 12px;
+}
+.myClients_forms .inviter_section .inviter_info .inviter_text_info .inviter_info-address{
+    display: inline-block;
+    margin-right: 10px;
 }
 .myClients_forms .inviter_section .inviter_info .inviter_img img {
     height: 100px;
     width: 100px;
     border-radius: 50%;
 }
-.myClients_forms .inviter_section .inviter_info .inviter_info {
+.myClients_forms .inviter_section .inviter_info {
     display: block;
     margin-left: 26px;
-    margin-top: 10px;
+    margin-top: 5px;
     height: 80px;
-    line-height: 40px;
+    line-height: 20px;
+}
+.myClients_forms .client_order{
+    padding-top: 30px;
+}
+.myClients_forms .client_order .backToClients{
+    cursor: pointer;
+    padding-left: 42px;
+    height: 24px;
+    background: url("../images/left_arrow_gray.png") no-repeat 40px 2px;
+}
+.myClients_forms .client_order .backToClients span{
+    padding-left: 20px;
+}
+.myClients_forms .client_order .backToClients:hover{
+    color: #FE9B00;
+    background: url("../images/left_arrow_orange.png") no-repeat 40px 2px;
 }
 .myClients_forms .client_order .orders_list .orders .orders-main {
     margin: 0 auto;
@@ -5934,6 +6267,15 @@ body {
     min-height: 400px;
     background: #f5f5f5;
 }
+.payBody .chaifen_orders_helping_wording{
+    width: 1200px;
+    margin: 0 auto;
+    color: #FE9B00;
+    padding-bottom: 10px;
+}
+.payBody .chaifen_orders_helping_wording img {
+    padding-right: 5px;
+}
 .payBody .orderInfo {
     width: 1200px;
     margin: 0 auto;
@@ -6009,6 +6351,48 @@ body {
     text-align: center;
     border-radius: 12px;
     cursor: pointer;
+    position: relative;
+}
+.payBody .wrap .pay_box .pay_times .full_pay_icon:hover .payMethod--help{
+    display: inline-block;
+}
+.payBody .wrap .pay_box .pay_times .multi_pay_icon:hover .payMethod--help{
+    display: inline-block;
+}
+.payBody .wrap .pay_box .pay_times .payMethod--help{
+    position: absolute;
+    display: none;
+}
+.payBody .wrap .pay_box .pay_times .payMethod--help:hover .payMethod--help--text--prompt{
+    display: block;
+}
+.payBody .wrap .pay_box .pay_times .payMethod--help:hover .payMethod--help--text{
+    display: inline-block;
+}
+.payBody .wrap .pay_box .pay_times .payMethod--help--text--prompt {
+    position: absolute;
+    display: none;
+    margin-top: 29px;
+    margin-left: 9px;
+}
+.payBody .wrap .pay_box .pay_times .payMethod--help--img{
+    position: absolute;
+    margin-top: 15px;
+    margin-left: 8px;
+}
+.payBody .wrap .pay_box .pay_times .payMethod--help--text {
+    position: absolute;
+    display: none;
+    white-space: nowrap;
+    background: #FCE9CC;
+    font-size: 12px;
+    color: #FE9B00;
+    line-height: 22px;
+    margin-top: 33px;
+    margin-left: -17px;
+    padding-left: 6px;
+    padding-right: 6px;
+    z-index: 100;
 }
 .payBody .wrap .pay_box .pay_times .selected{
     border: 1px solid #FE9B00;
@@ -6028,7 +6412,7 @@ body {
 .payBody .wrap .pay_box .pay_times .multi_pay .buy_btn {
     display: inline-block;
 }
-.payBody .wrap .pay_box .pay_times .multi_pay p {
+.payBody .wrap .pay_box .pay_times .multi_pay .multi_pay_info {
     padding-left: 145px;
     padding-top: 10px;
     color: #323232;
@@ -6122,10 +6506,48 @@ body {
 .payBody .wrap .pay_box .payMethod .checkout-steps .pay-style li a.current {
     border: 2px solid #d88b47;
 }
+.payBody .wrap .pay_box .payMethod .checkout-steps .pay-style li a:hover .offlinePay--help{
+    display: inline-block;
+}
 .payBody .wrap .pay_box .payMethod .checkout-steps .pay-style li a {
     border: 2px solid #e0e0e0;
 }
 
+.payBody .wrap .pay_box .payMethod .checkout-steps .pay-style .offlinePay--help{
+    position: absolute;
+    display: none;
+}
+.payBody .wrap .pay_box .payMethod .checkout-steps .pay-style .offlinePay--help:hover .offlinePay--help--text--prompt{
+    display: block;
+}
+.payBody .wrap .pay_box .payMethod .checkout-steps .pay-style .offlinePay--help:hover .offlinePay--help--text{
+    display: inline-block;
+}
+.payBody .wrap .pay_box .payMethod .checkout-steps .pay-style .offlinePay--help--text--prompt {
+    position: absolute;
+    display: none;
+    margin-top: -14px;
+    margin-left: 150px;
+}
+.payBody .wrap .pay_box .payMethod .checkout-steps .pay-style .offlinePay--help--img{
+    position: absolute;
+    margin-top: -34px;
+    margin-left: 150px;
+}
+.payBody .wrap .pay_box .payMethod .checkout-steps .pay-style .offlinePay--help--text {
+    position: absolute;
+    display: none;
+    white-space: nowrap;
+    background: #FCE9CC;
+    font-size: 12px;
+    color: #FE9B00;
+    line-height: 22px;
+    margin-top: -10px;
+    margin-left: 130px;
+    padding-left: 6px;
+    padding-right: 6px;
+    z-index: 100;
+}
 
 .payBody .wrap .pay_box .payMethod .xxnr_btn {
     margin-left: 46px;
@@ -6247,117 +6669,218 @@ body {
 .offlinePay-submitted-section .to_order_detail:hover{
     color: #FE9B00;
 }
+.offlinePay-submitted-section .offlinePay-submitted-section-audited{
+    text-align: center;
+}
+.offlinePay-submitted-section .offlinePay-submitted-section-audited-wording{
+    padding-bottom: 40px;
+    padding-top: 236px;
+}
+.offlinePay-submitted-section .offlinePay-submitted-section-audited-wording span{
+    line-height: 44px;
+    display: inline-block;
+    padding-left: 12px;
+}
+.offlinePay-submitted-section .offlinePay-submitted-section-audited a{
+    display: inline-block;
+    margin-bottom: 136px;
+    height: 32px;
+    width: 100px;
+    background: #009933;
+    border-radius: 5px;
+    line-height: 32px;
+    color: #FFFFFF;
+    margin-left: 30px;
+}
+.offlinePay-submitted-section .offlinePay-submitted-section-audited a:first-child{
+    margin-left: 0px;
+}
+.offlinePay-submitted-section .offlinePay-submitted-section-audited a:hover{
+    background: #008A2F;
+}
+
+.offlinePay-submitted-section-payed{
+    text-align: center;
+}
+.offlinePay-submitted-section-payed-wording{
+    padding-bottom: 40px;
+    padding-top: 236px;
+}
+.offlinePay-submitted-section-payed-wording span{
+    line-height: 44px;
+    display: inline-block;
+    padding-left: 12px;
+}
+.offlinePay-submitted-section-payed a{
+    display: inline-block;
+    margin-bottom: 136px;
+    height: 32px;
+    width: 100px;
+    background: #009933;
+    border-radius: 5px;
+    line-height: 32px;
+    color: #FFFFFF;
+    margin-left: 30px;
+}
+.offlinePay-submitted-section-payed a:first-child{
+    margin-left: 0px;
+}
+.offlinePay-submitted-section-payed a:hover{
+    background: #008A2F;
+}
 
 .commitPay_pop_content {
-    width: 300px;
+    width: 400px;
+    height: 210px;
 }
 .commitPay_pop_content .pop_pay .pay_alter_info {
     border: 0 solid #000;
+    text-align: center;
 }
 .commitPay_pop_content .pay_alter_info {
     margin-bottom: 10px;
+    margin-top: 50px;
+    line-height: 25px;
 }
 .commitPay_pop_content .btn {
     background: #fe9b00;
     border-radius: 7px;
 }
+.commitPay_pop_content .payWithProblem {
+    color: #FE9B00;
+    background: #FFF;
+    border: 1px solid #FE9B00;
+}
 .fillProfile {
     background: #f5f5f5;
 }
+.fillProfile .guide{
+    padding-bottom: 0px;
+    padding-top: 20px;
+}
 .fillProfile .container {
-    padding-top: 30px;
-    background: url(../images/fillProfile_bg.jpg) no-repeat;
+    margin-top: 30px;
+    margin-bottom: 30px;
+    /*background: url(../images/fillProfile_bg.jpg) no-repeat;*/
+    background: #FFFFFF;
     height: 610px;
     width: 1200px;
     box-sizing: border-box;
 }
 .fillProfile .container .profile_box {
     position: relative;
-    background: url(../images/fillProfile_box.png) no-repeat;
+    /*background: url(../images/fillProfile_box.png) no-repeat;*/
     z-index: 50;
-    width: 828px;
+    /*width: 828px;*/
     height: 554px;
     display: block;
-    margin: 0 auto;
+    margin-left: 40px;
+    padding-top: 40px;
+
 }
 .fillProfile .container .profile_box ul {
     color: #909090;
-    font-size: 18px;
     position: relative;
-    top: 90px;
-    left: 300px;
 }
 .fillProfile .container .profile_box label {
     display: inline-block;
+    color: #323232;
+    width: 100px;
 }
 .fillProfile .container .profile_box .sex_form {
     display: inline-block;
 }
+.fillProfile .container .profile_box select {
+    background: #FFFFFF;
+}
 .fillProfile .container .profile_box ul .profileInput {
-    background: #f2f2f2;
+    /*background: #f2f2f2;*/
     border: 1px solid #c7c7c7;
     height: 40px;
     box-sizing: border-box;
     border-radius: 3px;
-    box-shadow: -2px -2px 2px #e2e2e2 inset;
+    /*box-shadow: -2px -2px 2px #e2e2e2 inset;*/
 }
-
+.fillProfile .container .profile_box .profile_box--title--section{
+    margin-right: 40px;
+    border-bottom: 1px solid #E0E0E0;
+    line-height: 30px;
+    margin-bottom: 45px;
+}
+.fillProfile .container .profile_box .profile_box--title{
+    font-size: 18px;
+    /*padding-right: 18px;*/
+}
+.fillProfile .container .profile_box .profile_box--orange{
+    color: #FF6700;
+}
 .fillProfile .container .profile_box ul li {
     height: 70px;
 }
 .fillProfile .container .profile_box ul .name input {
-    margin-left: 20px;
     width: 260px;
     padding-left: 10px;
     display: inline-block;
     vertical-align: text-bottom;
-    margin-bottom: -10px;
+    margin-bottom: -13px;
 }
 .fillProfile .container .profile_box ul .sex {
-    height: 60px;
+    /*height: 60px;*/
 }
 .fillProfile .container .profile_box ul .sex form {
-    margin-left: 20px;
     vertical-align: text-bottom;
-    margin-bottom: -3px;
+    margin-bottom: -6px;
+    display: inline-block;
 }
 .fillProfile .container .profile_box ul .sex form .female {
     margin-left: 10px;
 }
 .fillProfile .container .profile_box ul .sex img {
-    padding-top: 2px;
+    /*padding-top: 2px;*/
+}
+.fillProfile .container .profile_box ul .sex label {
+    /*margin-top: 2px;*/
+
 }
 .fillProfile .container .profile_box ul .address {
     margin-top: -10px;
-    width: 500px;
-    height: 100px;
+    /*width: 500px;*/
+    /*height: 100px;*/
+}
+.fillProfile .container .profile_box ul .address .address--selects {
+    display: inline-block;
+}
+.fillProfile .container .profile_box ul .address label{
+    display: inline-block;
 }
 .fillProfile .container .profile_box ul .address select {
     min-width: 100px;
     color: #c7c7c7;
     font-size: 18px;
-    margin-top: 5px;
+    /*margin-top: 5px;*/
+    font-size: 12px;
 }
 .fillProfile .container .profile_box ul .address select.changed {
     color: #323232;
 }
 .fillProfile .container .profile_box ul .identity label {
-    display: block;
+    display: inline-block;
     font-size: 14px;
 }
 .fillProfile .container .profile_box ul .identity select {
-    width: 260px;
+    width: 180px;
     margin-top: 10px;
     /*color: #c7c7c7;*/
     color: #323232;
-    font-size: 18px;
-    text-indent: 80px;
+    font-size: 14px;
+    text-indent: 50px;
+    font-family: "Microsoft YaHei";
 }
 .fillProfile .container .profile_box ul .identity select.changed {
     /*color: #323232;*/
 }
 .fillProfile .container .profile_box ul .buttons {
-    margin-top: 60px;
+    margin-top: 30px;
 }
 .fillProfile .container .profile_box ul .buttons .cancel {
     color: #c2c2c2;
@@ -6367,10 +6890,24 @@ body {
     border-radius: 3px;
 }
 .fillProfile .container .profile_box ul .buttons .save {
-    width: 260px;
+    width: 180px;
     height: 40px;
-    margin-left: 34px;
+    margin-left: 105px;
     border-radius: 3px;
+}
+.fillProfile .container .profile_box ul .buttons .invalid {
+    background: #C0C0C0;
+}
+.fillProfile .container .profile_box ul .profile--cancel{
+    display: inline-block;
+    font-size: 14px;
+    padding-left: 16px;
+    background: url("../images/arrow_left_gray.png") no-repeat 0px 3px;
+    color: #909090;
+}
+.fillProfile .container .profile_box ul .profile--cancel:hover {
+    color: #009933;
+    background: url("../images/arrow_left_green.png") no-repeat 0px 3px;
 }
 .research_section {
     background: #f5f5f5;
@@ -7938,7 +8475,18 @@ body {
     width: 150px;
     text-align: center;
 }
-
+.inputPickUpCode .rsc_pickup_err {
+    position: absolute;
+    padding-left: 6px;
+    padding-right: 6px;
+    height: 24px;
+    line-height: 24px;
+    border-radius: 4px;
+    margin-left: 116px;
+}
+.inputPickUpCode .rsc_pickup_err img{
+    padding-top: 4px;
+}
 .rscMgmt--noOrders{
     height: 500px;
 }
@@ -7952,5 +8500,35 @@ body {
     margin-top: 20px;
     text-align: center;
     font-size: 16px;
+    color: #909090;
+}
+.good_list--noGoods{
+    background: #FFF;
+    height: 440px;
+    margin-left: 22px;
+}
+.good_list--noGoods--img{
+    margin: 0 auto;
+    padding-top: 106px;
+    text-align: center;
+    padding-bottom: 42px;
+}
+.good_list--noGoods--wording{
+    font-size: 16px;
+    color: #646464;
+    text-align: center;
+}
+.order_list--no_orders{
+    height: 400px;
+}
+.order_list--no_orders--img{
+    margin: 0 auto;
+    padding-top: 122px;
+    padding-bottom: 20px;
+    text-align: center;
+}
+.order_list--no_orders--wording{
+    font-size: 16px;
+    text-align: center;
     color: #909090;
 }

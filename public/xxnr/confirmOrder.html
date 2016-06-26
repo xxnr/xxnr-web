@@ -18,6 +18,7 @@
     <link type="text/css" rel="stylesheet" href="css/style.css">
     <link type="text/css" rel="stylesheet" href="css/addAddress.css">
     <link type="text/css" rel="stylesheet" href="css/sweetalert.css">
+    <link type="text/css" rel="stylesheet" href="css/angular-flash.css">
     <!-- endbuild -->
     <!-- build:js -->
     <script src="js/jquery.min.js"></script>
@@ -38,6 +39,7 @@
     <script src="js/jiesuan/jiesuanController.js"></script>
     <script src="js/sweetalert.min.js"></script>
     <script src="js/sideService.js"></script>
+    <script src="js/angular-flash.js"></script>
     <!-- endbuild -->
     <script type="text/javascript">
         var products = function () {
@@ -75,6 +77,7 @@
     </script>
 </head>
 <body ng-controller="jiesuanController" class="confirm-order" ng-class="{true:'overflow_body', false:'not_overflow_body'}[isOverflow]">
+<flash-message></flash-message>
 <header ng-controller="headerController"></header>
 <div class="wrap nav">
     <h1 class="left logo"><a href="/">新新农人</a></h1>
@@ -91,6 +94,9 @@
 </div>
 
 <div class="clear channel3 cart_box">
+    <p class="guide ng-cloak">
+        <a href="/">首页</a> ／ <a>订单结算</a>
+    </p>
     <div class="wrap checkout-steps ng-cloak">
         <p class="confirm-tit ng-clock">
             <span class="left">配送方式</span>
@@ -99,8 +105,15 @@
             <div class="deliveryMethod ng-clock">
                 <ul>
                     <li ng-repeat="delivery in deliveries">
-                        <a href="" ng-click="deliveryMethodClick($index)"
-                           ng-class="{true:'current'}[deliveries[$index].deliveryType == deliveryMethod]">{{deliveries[$index].deliveryName}}</a>
+                        <a href="" class="delivery" ng-click="deliveryMethodClick($index)"
+                           ng-class="{true:'current'}[deliveries[$index].deliveryType == deliveryMethod]">{{deliveries[$index].deliveryName}}
+                            <div class="deliveryMethod--help">
+                                <img class="deliveryMethod--help--img" src="images/q.png" alt="">
+                                <img class="deliveryMethod--help--text--prompt" src="images/orange-up-prompt.png" alt="">
+                                <p class="deliveryMethod--help--text" ng-show="delivery.deliveryName == '网点自提'">{{helpWoring.deliveryMethod_help.pickup}}</p>
+                                <p class="deliveryMethod--help--text" ng-show="delivery.deliveryName == '配送到户'">{{helpWoring.deliveryMethod_help.deliveryHome}}</p>
+                            </div>
+                        </a>
                     </li>
                 </ul>
             </div>
@@ -447,7 +460,7 @@
                     <select class="ng-cloak" name="" id="provin" ng-model="modifyAddress.province"
                             ng-options="province as province.name for province in provinces" ng-change="getCityList()">
                     </select>
-                    <select class="ng-cloak name="" id="city" ng-model="modifyAddress.city"
+                    <select class="ng-cloak name=" id="city" ng-model="modifyAddress.city"
                     ng-options="city as city.name for city in cities" ng-change="getCountyList()">
                     </select>
                     <select class="ng-cloak ng-show=" modifyAddress.county" name="" id="county"
@@ -464,9 +477,14 @@
                 <td class="first-td" style="vertical-align:top;">
                     <img src="./images/prompt.png" alt="">详细地址
                 </td>
-                <td class="second-td">
-                    <textarea name="" class="dizhi" ng-model="modifyAddress.detailAddress"></textarea>
+                <td class="second-td address-td">
+                    <textarea name="" class="dizhi" ng-model="modifyAddress.detailAddress" ng-focus="focusShowValidate()"></textarea>
+                    <div class="no_address_err ng-cloak" ng-show="editAddressErrMsg && errorInputGroupNum == formInputsKeyValue.editAddressFormAddress">
+                        <img src="../xxnr/images/login_fault.png" alt="" />
+                        <span>{{editAddressErrMsg}}</span>
+                    </div>
                 </td>
+
             </tr>
             <tr>
                 <td class="first-td postcode">邮政编码</td>
@@ -474,8 +492,14 @@
             </tr>
             <tr>
                 <td class="first-td"><img src="./images/prompt.png" alt="">收货人</td>
-                <td class="second-td"><input type="text" class="shouhuoren" value=""
-                                             ng-model="modifyAddress.receiptName"></td>
+                <td class="second-td">
+                    <input type="text" class="shouhuoren" value="" ng-model="modifyAddress.receiptName" ng-focus="focusShowValidate()">
+                    <div class="no_consignee_err ng-cloak" ng-show="editAddressErrMsg && errorInputGroupNum == formInputsKeyValue.editAddressFormConsignee">
+                        <img src="../xxnr/images/login_fault.png" alt="" />
+                        <span>{{editAddressErrMsg}}</span>
+                    </div>
+                </td>
+
             </tr>
             <tr>
                 <td class="first-td"><img src="./images/prompt.png" alt="">联系电话</td>
@@ -483,8 +507,13 @@
                     <!--<select name="" id="select1">-->
                     <!--<option value="">中国大陆 +86</option>-->
                     <!--</select>-->
-                    <input type="text" class="mobile-num" value="" ng-model="modifyAddress.phone">
+                    <input type="text" class="mobile-num" value="" ng-model="modifyAddress.phone" ng-focus="focusShowValidate()">
+                    <div class="no_phoneNum_err ng-cloak" ng-show="editAddressErrMsg && errorInputGroupNum == formInputsKeyValue.editAddressFormPhoneNum">
+                        <img src="../xxnr/images/login_fault.png" alt="" />
+                        <span>{{editAddressErrMsg}}</span>
+                    </div>
                 </td>
+
             </tr>
             <tr>
                 <td class="first-td">&nbsp;</td>
@@ -530,8 +559,12 @@
                 <td class="first-td" style="vertical-align:top;">
                     <img src="./images/prompt.png" alt="">详细地址
                 </td>
-                <td class="second-td">
-                    <textarea name="" class="dizhi" ng-model="modifyAddress.detailAddress"></textarea>
+                <td class="second-td address-td">
+                    <textarea name="" class="dizhi" ng-model="modifyAddress.detailAddress" ng-focus="focusShowValidate()"></textarea>
+                    <div class="no_address_err ng-cloak" ng-show="editAddressErrMsg && errorInputGroupNum == formInputsKeyValue.newAddressFormAddress">
+                        <img src="../xxnr/images/login_fault.png" alt="" />
+                        <span>{{editAddressErrMsg}}</span>
+                    </div>
                 </td>
             </tr>
             <tr>
@@ -540,13 +573,22 @@
             </tr>
             <tr>
                 <td class="first-td"><img src="./images/prompt.png" alt="">收货人</td>
-                <td class="second-td"><input type="text" class="shouhuoren" value=""
-                                             ng-model="modifyAddress.receiptName"></td>
+                <td class="second-td">
+                    <input type="text" class="shouhuoren" value="" ng-model="modifyAddress.receiptName" ng-focus="focusShowValidate()">
+                    <div class="no_consignee_err ng-cloak" ng-show="editAddressErrMsg && errorInputGroupNum == formInputsKeyValue.newAddressFormConsignee">
+                        <img src="../xxnr/images/login_fault.png" alt="" />
+                        <span>{{editAddressErrMsg}}</span>
+                    </div>
+                </td>
             </tr>
             <tr>
                 <td class="first-td"><img src="./images/prompt.png" alt="">联系电话</td>
                 <td class="second-td">
-                    <input type="text" class="mobile-num" value="" ng-model="modifyAddress.phone">
+                    <input type="text" class="mobile-num" value="" ng-model="modifyAddress.phone" ng-focus="focusShowValidate()">
+                    <div class="no_phoneNum_err ng-cloak" ng-show="editAddressErrMsg && errorInputGroupNum == formInputsKeyValue.newAddressFormPhoneNum">
+                        <img src="../xxnr/images/login_fault.png" alt="" />
+                        <span>{{editAddressErrMsg}}</span>
+                    </div>
                 </td>
             </tr>
             <tr>

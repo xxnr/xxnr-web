@@ -1,8 +1,8 @@
 /**
  * Created by xxnr-cd on 15/12/21.
  */
-var app = angular.module('fillProfile', ['xxnr_common','shop_cart']);
-app.controller('fillProfileController', function($scope, remoteApiService, commonService, $http){
+var app = angular.module('fillProfile', ['xxnr_common','shop_cart',"ngFlash"]);
+app.controller('fillProfileController', function($scope, remoteApiService, commonService, $http, Flash){
     var sweetalert = commonService.sweetalert;
 
     $scope.provinces = [{name:"省份",id: 0}];
@@ -18,11 +18,14 @@ app.controller('fillProfileController', function($scope, remoteApiService, commo
     $scope.identities = [];
     //$scope.selectedIdentity = $scope.identities[0];
     $scope.sex = 'male';
+    $scope.userInfoFullFilled = false;
 
-    $scope.testClick = function(){
-        console.log('test');
+    $scope.focusShowValidate = function(formGroupNum) {
+        $scope.focusFormGroupNum = formGroupNum;
     };
-
+    $scope.blurShowValidate = function() {
+        $scope.focusFormGroupNum = 0;
+    };
 
     var getProvinceList = function(provinceId,cityId,countyId,townId){
         var userHasProvince = false;
@@ -138,6 +141,7 @@ app.controller('fillProfileController', function($scope, remoteApiService, commo
                         //}
                         $scope.userName = data.datas.name;
                         $scope.sex = data.datas.sex?'female':'male';
+                        $scope.userInfoFullFilled = data.datas.isUserInfoFullFilled;
                         for(var i in $scope.identities){
                             if($scope.identities[i].id == data.datas.userType){
                                 $scope.selectedIdentity = $scope.identities[i];
@@ -158,9 +162,7 @@ app.controller('fillProfileController', function($scope, remoteApiService, commo
 
 
     $scope.modifyProfile = function(){
-        if($scope.userName.gblen()>12){
-            sweetalert('姓名限6个汉字或12个英文字符');
-        }else {
+        if($scope.profileForm.$valid){  //表单验证通过以后才可以提交
             if($scope.profileProvince.id!=0 && $scope.profileCity.id!=0 && $scope.userName) {
                 var req = {
                     method: 'POST',
@@ -183,7 +185,9 @@ app.controller('fillProfileController', function($scope, remoteApiService, commo
                 };
                 $http(req).then(function successCallback(response) {
                     if (response.data.code == 1000) {
-                        sweetalert('个人资料保存成功','my_xxnr.html');
+                        //sweetalert('个人资料保存成功','my_xxnr.html');
+                        var message = '<img class="xxnr--flash--icon" src="images/correct_prompt.png" alt="">个人资料保存成功';
+                        var id = Flash.create('success', message, 3000, {class: 'xxnr-success-flash', id: 'xxnr-success-flash'}, false);
                     }else if(response.data.code == 1401){
                         sweetalert('你已被登出，请重新登录', "logon.html");
                     }
@@ -193,12 +197,15 @@ app.controller('fillProfileController', function($scope, remoteApiService, commo
                     console.log('Error');
                 });
             }else{
-                    sweetalert('请填写完整信息');
-                }
+                //sweetalert('请填写完整信息');
+                var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">请填写完整信息';
+                var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);
+            }
         }
+
     };
     $scope.skip = function() {
-        window.location.href = '/my_xxnr.html';
+        window.location.href = '/';
     };
     $scope.$watch('profileProvince', function(newValue, oldValue) { 
         if (newValue === oldValue) { return; } 
@@ -221,4 +228,22 @@ app.controller('fillProfileController', function($scope, remoteApiService, commo
         }
         return len;
     }
+});
+app.directive('under12', function() {
+    return {
+        require: 'ngModel',
+        link: function(scope, elm, attrs, ctrl) {
+            ctrl.$parsers.unshift(function(modelValue) {
+                if (!modelValue || modelValue.gblen() <= 12) {
+                    // it is valid
+                    ctrl.$setValidity('under12', true);
+                    return modelValue;
+                } else {
+                    // it is invalid, return undefined (no model update)
+                    ctrl.$setValidity('under12', false);
+                    return undefined;
+                }
+            });
+        }
+    };
 });

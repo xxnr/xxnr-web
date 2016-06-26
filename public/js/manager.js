@@ -234,6 +234,47 @@ jRouting.route(managerurl + '/agents/agents-detail', function(){
 	redirectToHomePage();
 });
 
+// rewardshop
+jRouting.route(managerurl + '/rewardshop', function(){
+	if(can('rewardshop')) {
+		navClass('rewardshop');
+		SET('common.page', 'rewardshop');
+		return;
+	}
+
+	redirectToHomePage();
+});
+
+jRouting.route(managerurl + '/rewardshop/gifts', function(){
+	if(can('rewardshop')) {
+		navClass('rewardshop');
+		SET('common.page', 'rewardshop-gifts');
+		return;
+	}
+
+	redirectToHomePage();
+});
+
+jRouting.route(managerurl + '/rewardshop/gifts-detail', function(){
+	if(can('rewardshop')) {
+		navClass('rewardshop');
+		SET('common.page', 'rewardshop-gifts-detail');
+		return;
+	}
+
+	redirectToHomePage();
+});
+
+jRouting.route(managerurl + '/rewardshop/points-logs', function(){
+	if(can('rewardshop')) {
+		navClass('rewardshop');
+		SET('common.page', 'rewardshop-points-logs');
+		return;
+	}
+
+	redirectToHomePage();
+});
+
 // jRouting.on('location', function(url) {
 // 	// var nav = $('nav');
 // 	// nav.find('.selected').removeClass('selected');
@@ -335,7 +376,6 @@ Delay_Search_WATCH = function(field, callback, latency_in_millisecond){
 			if (timer) {
 				clearTimeout(timer);
 			}
-
 			timer = setTimeout(function (path, value) {
 				callback(path, value);
 			}, latency_in_millisecond);
@@ -367,7 +407,7 @@ getUrlParam = function(name) {
 	if (result == null || result.length < 1) {
 		return "";
 	}
-	return result[1];
+	return decodeURIComponent(result[1]);
 };
 
 var app = angular.module('xxnr.manager',['ngCookies'])
@@ -407,6 +447,21 @@ function dashboardInit() {
 		}
 		if (url) {
         	window.location.href = managerurl + url;
+        }
+    });
+}
+
+// Pagination
+function Pagination(el, count, pageCount, currentPage, callback) {
+	el.pagination({
+        items: count,
+        itemsOnPage: pageCount,
+        currentPage: currentPage?currentPage:0,
+		prevText: '<',
+		nextText: '>',
+        cssStyle: 'light-theme',
+        onPageClick: function(pageNumber, event) {
+        	callback(pageNumber);
         }
     });
 }

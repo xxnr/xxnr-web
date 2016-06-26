@@ -491,6 +491,7 @@ UserService.prototype.getRSCInfoById = function(_id, callback){
         .populate({path: 'RSCInfo.companyAddress.county', select: ' -__v'})
         .populate({path: 'RSCInfo.companyAddress.town', select: ' -__v'})
         .populate({path:'RSCInfo.products', select:' _id category brand name'})
+        .populate({path:'RSCInfo.rewardshopGifts', select:' _id category name online'})
         .select('-_id id account RSCInfo')
         .exec(function(err, user){
             if(err){
@@ -826,6 +827,32 @@ UserService.prototype.getTestAccountList = function(callback) {
 
             callback(null, testAccountList);
         })
+};
+
+UserService.prototype.getUserBySearch = function(account, name, callback) {
+    if (!account && !name) {
+        callback('need search info');
+        return;
+    }
+    var query = {};
+    query['$or'] = [];
+    if (account) {
+        query['$or'].push({account:{$regex:new RegExp(account)}});
+    }
+    if (name) {
+        query['$or'].push({name:{$regex:new RegExp(name)}});
+    }
+
+    UserModel.findOne(query)
+        .exec(function (err, user) {
+            if (err) {
+                console.error('UserService getUserBySearch findOne err:', err);
+                callback(err);
+                return;
+            }
+
+            callback(null, user);
+        });
 };
 
 module.exports = new UserService();

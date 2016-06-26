@@ -14,6 +14,7 @@
     <!-- build:css -->
     <link type="text/css" rel="stylesheet" href="css/style.css">
     <link type="text/css" rel="stylesheet" href="css/sweetalert.css">
+    <link type="text/css" rel="stylesheet" href="css/angular-flash.css">
     <!-- endbuild -->
     <!-- build:js -->
     <script src="js/jquery.min.js"></script>
@@ -35,9 +36,11 @@
     <script src="js/sideService.js"></script>
     <script src="js/shoppingCart/shoppingCartService.js"></script>
     <script src="js/shoppingCart/shoppingCartController.js"></script>
+    <script src="js/angular-flash.js"></script>
     <!-- endbuild -->
 </head>
 <body>
+<flash-message></flash-message>
 <header ng-controller="headerController"></header>
 <div class="wrap nav" ng-controller="shoppingCartController">
     <h1 class="left logo"><a href="/">新新农人</a></h1>
@@ -60,48 +63,73 @@
     </div>
 </div>
 <div ng-controller="fillProfileController" class="fillProfile">
+    <p class="guide" ng-show="userInfoFullFilled">
+        <a href="/">首页</a> ／ <a href="fillProfile.html">修改资料</a>
+    </p>
     <div class="clearfix wrap">
         <div class="container">
             <div class="profile_box">
-                <ul class="clearfix">
-                    <li class="name clearfix">
-                        <label class="label clearfix">姓名</label>
-                            <input class="profileInput" id="name" type="text" value="" ng-model="userName" placeholder="请输入您的真实姓名" my-placeholder="请输入您的真实姓名">
-                    </li>
-                    <li class="sex">
-                        <label class="label">性别 </label>
-                        <form class="sex_form">
-                            <input type="radio" checked="checked" name="Sex" value="male" ng-model="sex" />
-                            <img src="images/boy-img.png" alt=""/>
-                            男
+                <form name="profileForm">
+                    <ul class="clearfix">
+                        <p class="profile_box--title--section">
+                            <label class="profile_box--title">用户资料</label>
+                            <span ng-hide="userInfoFullFilled">首次完善资料即可获得
+                                <span class="profile_box--orange">100</span>
+                                积分
+                            </span>
+                        </p>
+                        <li class="name clearfix form-group">
+                            <label class="label clearfix">姓名</label>
+                                <input class="profileInput" id="name" name="name" type="text" value="" ng-model="userName" placeholder="请输入您的真实姓名" my-placeholder="请输入您的真实姓名" ng-focus="focusShowValidate(1)" ng-blur="blurShowValidate()" under12 required>
+                                <span class="focus_info ng-cloak" ng-show="focusFormGroupNum == 1 && !profileForm.name.$error.under12">
+                                <div class="arrow-left"></div>
+                                    请填写真实姓名
+                                </span>
+                                <div class="validate_error ng-cloak" ng-show="profileForm.name.$dirty && profileForm.name.$error.under12">
+                                    <span ng-show="profileForm.name.$error.under12">
+                                        <div class="arrow-left"></div>
+                                        <img src="../xxnr/images/error.png" alt="" />
+                                        姓名限6个汉字或12个英文字符
+                                    </span>
+                            </div>
+                        </li>
+                        <li class="sex">
+                            <label class="label">性别 </label>
+                            <form class="sex_form">
+                                <input type="radio" checked="checked" name="Sex" value="male" ng-model="sex" />
+                                <img src="images/boy-img.png" alt=""/>
+                                男
 
-                            <input class="female" type="radio" name="Sex" value="female" ng-model="sex" />
-                            <img src="images/girl-img.png" alt=""/>
-                            女
-                        </form>
-                    </li>
-                    <li class="address">
-                        <div>
-                            <select class="profileInput" ng-class="{'changed':profileProvince.id!=0}" name="" id="provin" ng-model="profileProvince" ng-options="province as province.name for province in provinces" ng-change="getCityList()">
+                                <input class="female" type="radio" name="Sex" value="female" ng-model="sex" />
+                                <img src="images/girl-img.png" alt=""/>
+                                女
+                            </form>
+                        </li>
+                        <li class="address">
+                            <label class="label">所在地区</label>
+                            <div class="address--selects">
+                                <select class="profileInput" ng-class="{'changed':profileProvince.id!=0}" name="" id="provin" ng-model="profileProvince" ng-options="province as province.name for province in provinces" ng-change="getCityList()">
+                                </select>
+                                <select class="profileInput" ng-class="{'changed':profileCity.id!=0}" name="" id="city" ng-model="profileCity" ng-options="city as city.name for city in cities" ng-change="getCountyList()">
+                                </select>
+                                <select class="profileInput" ng-class="{'changed':profileCounty.id!=0}" name="" ng-model="profileCounty" ng-show="profileCounty" id="county" ng-options="county as county.name for county in counties" ng-change="getTownList()">
+                                </select>
+                                <select class="profileInput" ng-class="{'changed':profileTown.id!=0}" name="" id="town" ng-model="profileTown" ng-options="town as town.name for town in towns" >
+                                </select>
+                            </div>
+                        </li>
+                        <li class="identity">
+                            <label class="label">用户类型</label>
+                            <select class="profileInput" ng-class="{'changed':selectedIdentity.id!=1}" ng-model="selectedIdentity" ng-options="identity as identity.name for identity in identities">
                             </select>
-                            <select class="profileInput" ng-class="{'changed':profileCity.id!=0}" name="" id="city" ng-model="profileCity" ng-options="city as city.name for city in cities" ng-change="getCountyList()">
-                            </select>
-                            <select class="profileInput" ng-class="{'changed':profileCounty.id!=0}" name="" ng-model="profileCounty" ng-show="profileCounty" id="county" ng-options="county as county.name for county in counties" ng-change="getTownList()">
-                            </select>
-                            <select class="profileInput" ng-class="{'changed':profileTown.id!=0}" name="" id="town" ng-model="profileTown" ng-options="town as town.name for town in towns" >
-                            </select>
-                        </div>
-                    </li>
-                    <li class="identity">
-                        <label class="label">给自己个身份吧~</label>
-                        <select class="profileInput" ng-class="{'changed':selectedIdentity.id!=1}" ng-model="selectedIdentity" ng-options="identity as identity.name for identity in identities">
-                        </select>
-                    </li>
-                    <li class="buttons">
-                        <a href="" class="xxnr_btn cancel" ng-click="skip()">跳 过</a>
-                        <a href="" class="xxnr_btn save" ng-click="modifyProfile()">保&nbsp;&nbsp;&nbsp;&nbsp;存</a>
-                    </li>
-                </ul>
+                        </li>
+                        <li class="buttons">
+                            <!--<a href="" class="xxnr_btn cancel" >跳 过</a>-->
+                            <a href="" class="xxnr_btn save" ng-class="{true:'invalid'}[profileForm.$invalid]" ng-click="modifyProfile()">提交</a>
+                        </li>
+                        <a ng-show="!userInfoFullFilled" class="profile--cancel" href="" ng-click="skip()">不填了，先去首页转转</a>
+                    </ul>
+                </form>
             </div>
         </div>
     </div>
