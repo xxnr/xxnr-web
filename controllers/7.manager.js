@@ -198,7 +198,8 @@ exports.rewardshop_gifts_orders = function(req, res, next) {
 	res.render(path.join(__dirname, '../views/7.manager/rewardshop/manager-gifts-orders'),
 		{
 			manager_url:F.config['manager-url'],
-			page:'manager-gifts-orders'
+			page:'manager-gifts-orders',
+			user:req.user
 		}
 	);
 }
@@ -207,7 +208,8 @@ exports.rewardshop_gifts = function(req, res, next) {
 	res.render(path.join(__dirname, '../views/7.manager/rewardshop/manager-gifts'),
 		{
 			manager_url:F.config['manager-url'],
-			page:'manager-gifts'
+			page:'manager-gifts',
+			user:req.user
 		}
 	);
 }
@@ -216,7 +218,8 @@ exports.rewardshop_gifts_detail = function(req, res, next) {
 	res.render(path.join(__dirname, '../views/7.manager/rewardshop/manager-gifts-detail'),
 		{
 			manager_url:F.config['manager-url'],
-			page:'manager-gifts-detail'
+			page:'manager-gifts-detail',
+			user:req.user
 		}
 	);
 }
@@ -225,7 +228,8 @@ exports.rewardshop_points_logs = function(req, res, next) {
 	res.render(path.join(__dirname, '../views/7.manager/rewardshop/manager-points-logs'),
 		{
 			manager_url:F.config['manager-url'],
-			page:'manager-points-logs'
+			page:'manager-points-logs',
+			user:req.user
 		}
 	);
 }
