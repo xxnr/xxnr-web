@@ -86,7 +86,7 @@ LoyaltyPointsService.prototype.queryRewardshopGiftCategories = function(search, 
         query.$or = [{'name':new RegExp(search)}];
     }
     RewardshopGiftCategoryModel.find(query)
-        .sort({datecreated: -1})
+        .sort({datecreated: 1})
         .select('-__v')
         .lean()
         .exec(function(err, docs) {
