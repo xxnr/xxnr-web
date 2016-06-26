@@ -203,6 +203,8 @@ RSCService.prototype.modifyRSCInfo = function(id, setOptions, callback){
     }
     if(typeof setOptions.EPOSNo != 'undefined')
         setValues['RSCInfo.EPOSNo'] = setOptions.EPOSNo;
+     if(setOptions.gifts && tools.isArray(setOptions.gifts))
+        setValues['RSCInfo.rewardshopGifts'] = setOptions.gifts;
     
     UserModel.update({id:id}, {$set:setValues}, function(err, numUpdated){
         if(err){
@@ -228,6 +230,9 @@ function buildQuery(products, province, city, county, town, search, options){
         if (typeof options.EPOS != 'undefined') {
             query['RSCInfo.supportEPOS'] = true;
             query['RSCInfo.EPOSNo'] = {$exists: true};
+        }
+        if (options.gift) {
+            query['RSCInfo.rewardshopGifts'] = {$all: [options.gift]};
         }
     }
 

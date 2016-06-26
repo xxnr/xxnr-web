@@ -168,7 +168,9 @@
                                 </tbody>
                             </table>
                         {{ else }}
-                            <div class="col-md-12 mb10">暂无客户</div>
+                            {{ if !agenttabinforesponse }}
+                                <div class="col-md-12 mb10">暂无客户</div>
+                            {{ fi }}
                         {{ fi }}
                     {{ else }}
                         {{ if tabType == 'potentialCustomer' }}
@@ -215,10 +217,14 @@
                                     </tbody>
                                 </table>
                             {{ else }}
-                                <div class="col-md-12 mb10">暂无潜在客户</div>
+                                {{ if !agenttabinforesponse }}
+                                    <div class="col-md-12 mb10">暂无潜在客户</div>
+                                {{ fi }}
                             {{ fi }}
                         {{ else }}
-                            <div class="col-md-12 mb10">暂无数据</div>
+                            {{ if !agenttabinforesponse }}
+                                <div class="col-md-12 mb10">暂无数据</div>
+                            {{ fi }}
                         {{ fi }}
                     {{ fi }}
                     </script>
@@ -293,7 +299,6 @@
     
     function getAgentTabinfo(url) {
         $.components.GET(managerurl + url, null, function(response) {
-            var key = 'agentInfo';
             if (response && response.code && response.code==1000) {
                 if (agentInfo.tabType == 'invitee') {
                     agentInfo.tabinfo = response.invitees;
@@ -307,46 +312,54 @@
                 agentInfo.count = response.count;
                 agentInfo.pages = response.pageCount;
                 agentInfo.page = response.page;
-                SET(key, agentInfo);
+                SET('agentInfo', agentInfo);
                 if (agentInfo.pages && agentInfo.count) {
-                    Pagination(agentInfo.count, agentInfo.count/agentInfo.pages, agentInfo.page?agentInfo.page:null);
+                    // Pagination(agentInfo.count, agentInfo.count/agentInfo.pages, agentInfo.page?agentInfo.page:null);
+                    Pagination($('div.tabinfo-pages'), agentInfo.count, agentInfo.count/agentInfo.pages, agentInfo.page?agentInfo.page:null, function(pageNumber){
+                       if (agentInfo.tabType == 'invitee') {
+                            getInvitees(pageNumber);
+                        } else {
+                            if (agentInfo.tabType == 'potentialCustomer') {
+                                getPotentialCustomers(pageNumber);
+                            }
+                        }
+                    });
                 }
                 SET('agentInfo.agenttabinforesponse', null);
             } else {
                 if (response.error || response.message) {
-                    key = 'agentInfo.agenttabinforesponse';
                     if (response.message) {
                         response = [{error: response.message}];
                     } else {
                         response = response.error;
                     }
                 } else {
-                    response = [];
+                    response = null;
                 }
-                SET(key, response);
+                SET('agentInfo.agenttabinforesponse', response);
             }
         });
     }
 
-    function Pagination(count, pageCount, currentPage, dataType) {
-        $('div.tabinfo-pages').pagination({
-            items: count,
-            itemsOnPage: pageCount,
-            currentPage: currentPage?currentPage:0,
-            prevText: '<',
-            nextText: '>',
-            cssStyle: 'light-theme',
-            onPageClick: function(pageNumber, event) {
-                if (agentInfo.tabType == 'invitee') {
-                    getInvitees(pageNumber);
-                } else {
-                    if (agentInfo.tabType == 'potentialCustomer') {
-                        getPotentialCustomers(pageNumber);
-                    }
-                }
-            }
-        });
-    }
+    // function Pagination(count, pageCount, currentPage, dataType) {
+    //     $('div.tabinfo-pages').pagination({
+    //         items: count,
+    //         itemsOnPage: pageCount,
+    //         currentPage: currentPage?currentPage:0,
+    //         prevText: '<',
+    //         nextText: '>',
+    //         cssStyle: 'light-theme',
+    //         onPageClick: function(pageNumber, event) {
+    //             if (agentInfo.tabType == 'invitee') {
+    //                 getInvitees(pageNumber);
+    //             } else {
+    //                 if (agentInfo.tabType == 'potentialCustomer') {
+    //                     getPotentialCustomers(pageNumber);
+    //                 }
+    //             }
+    //         }
+    //     });
+    // }
 
     function select_tabmenu(el){
         $('.tabmenu li').each(function() {
