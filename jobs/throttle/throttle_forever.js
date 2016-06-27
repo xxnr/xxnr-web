@@ -53,7 +53,7 @@ FUA.aggregate({$match:{route:'/api/v2.0/sms'}},
 
                 Promise.all(promises)
                     .then(function(){
-                        console.log('', ips.length, 'ips forbidden at', new Date(), 'while', isForwardedCount, 'ips has been Forwarded');
+                        console.log('', ips.length, 'ips forbidden at', new Date(), 'while', hasForwardedCount, 'ips has been Forwarded');
                         process.exit(0);
                     })
                     .catch(function(err){
