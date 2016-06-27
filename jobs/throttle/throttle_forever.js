@@ -35,7 +35,7 @@ FUA.aggregate({$match:{route:'/api/v2.0/sms'}},
 
                 var promises = docs.map(function(doc){
                     return new Promise(function(resolve, reject){
-                        var newRecord = new FUA({route:doc.route, method:doc.method, user:doc.user, ip:doc.ip});
+                        var newRecord = new FUA({route:doc.route, method:doc.method, user:doc.user, ip:doc.ip, isForwarded:doc.isForwarded});
                         newRecord.save(function(err){
                             if(!err){
                                 //console.log(newRecord.ip, 'saved at', newRecord.createdAt);
