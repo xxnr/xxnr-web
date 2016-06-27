@@ -304,7 +304,7 @@ exports.throttle = function(req, res, next){
                     } else {
                         next();
                     }
-                })
+                }, true)
             } else{
                 next();
             }
