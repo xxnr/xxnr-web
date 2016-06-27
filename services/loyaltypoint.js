@@ -228,7 +228,7 @@ LoyaltyPointsService.prototype.updateRewardshopGift = function(giftInfo, callbac
 // query rewardsshop gifts
 LoyaltyPointsService.prototype.queryRewardshopGifts = function(page, max, type, category, search, callback) {
 
-	page = U.parseInt(page) - 1;
+	page = U.parseInt(page);
 	max = U.parseInt(max, 20);
 
 	if (page < 0)
