@@ -78,8 +78,8 @@ router.get('/app/order/getOderList', middleware.isLoggedIn_middleware, controlle
 router.post('/app/order/getOderList', middleware.isLoggedIn_middleware, controllers.Order.api10_getOrders);
 
 // Vcod
-router.get('/api/v2.0/sms', controllers.VCode.generate_sms);
-router.post('/api/v2.0/sms', controllers.VCode.generate_sms);
+router.get('/api/v2.0/sms', middleware.throttle, controllers.VCode.generate_sms);
+router.post('/api/v2.0/sms', middleware.throttle, controllers.VCode.generate_sms);
 
 // news APIs
 router.get('/api/v2.0/news', controllers.News.json_news_query);
