@@ -8,6 +8,7 @@ var path = require('path');
 
 var tempFilePath = path.join(__dirname, 'temp_ip_list');
 var ips = [];
+var hasForwardedCount = 0;
 
 FUA.aggregate({$match:{route:'/api/v2.0/sms'}},
 {$group:{_id:'$ip', count:{$sum:1}}})
@@ -35,7 +36,10 @@ FUA.aggregate({$match:{route:'/api/v2.0/sms'}},
 
                 var promises = docs.map(function(doc){
                     return new Promise(function(resolve, reject){
-                        var newRecord = new FUA({route:doc.route, method:doc.method, user:doc.user, ip:doc.ip});
+                        var newRecord = new FUA({route:doc.route, method:doc.method, user:doc.user, ip:doc.ip, forwardedBy:doc.forwardedBy});
+                        if(doc.forwardedBy){
+                            hasForwardedCount++;
+                        }
                         newRecord.save(function(err){
                             if(!err){
                                 //console.log(newRecord.ip, 'saved at', newRecord.createdAt);
@@ -49,7 +53,7 @@ FUA.aggregate({$match:{route:'/api/v2.0/sms'}},
 
                 Promise.all(promises)
                     .then(function(){
-                        console.log(ips.length, 'ips forbidden at', new Date());
+                        console.log('', ips.length, 'ips forbidden at', new Date(), 'while', isForwardedCount, 'ips has been Forwarded');
                         process.exit(0);
                     })
                     .catch(function(err){
