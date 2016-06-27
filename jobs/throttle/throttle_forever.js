@@ -3,24 +3,29 @@
  */
 var models = require('../../models');
 var FUA = models.frontendUserAccess;
-var forbidden_ip_list = require('./forbidden_ip_list');
+var fs = require('jsonfile');
+var path = require('path');
 
+var tempFilePath = path.join(__dirname, 'temp_ip_list');
 var ips = [];
-//forbidden_ip_list.forEach(function(ip){
-//    if(ip.count == 5){
-//        ips.push(ip._id);
-//    }
-//});
 
 FUA.aggregate({$match:{route:'/api/v2.0/sms'}},
 {$group:{_id:'$ip', count:{$sum:1}}})
     .exec(function(err, result){
         if(!err){
+            try {
+                ips = fs.readFileSync(tempFilePath, false);
+            } catch(e){
+
+            }
+
             result.forEach(function(ip){
-                if(ip.count == 5){
+                if(ip.count >= 3  && ips.indexOf(ip._id) == -1){
                     ips.push(ip._id);
                 }
             });
+
+            fs.writeFileSync(tempFilePath, ips);
 
             FUA.find({ip:{$in:ips}}, function(err, docs){
                 if(err){
