@@ -3,7 +3,7 @@
 		<div class="caption"><span class="fa fa-newspaper-o mr5"></span> 资讯管理</div>
 		<div class="row">
 			<div class="col-md-3 col-sm-6 m">
-				<div data-component="textbox" data-component-path="news.filter.search" data-placeholder="查询资讯 ..." data-control-icon="fa-search"></div>
+				<div data-component="textbox" data-component-path="news.filter.search" data-placeholder="资讯名称" data-control-icon="fa-search"></div>
 				<div class="help" data-component="template" data-component-path="news.info"><script type="text/html">{{ count | pluralize('items','item','items','items') }} / {{ pages | pluralize('pages','page','pages','pages') }}</script></div>
 			</div>
 			<div class="col-md-3 col-sm-6 m">
@@ -150,6 +150,7 @@
 
 	news.filter = {};
 	news.filter.page = 1;
+	news.filter.search = '';
 
 	news.grid = [];
 	news.form = {};

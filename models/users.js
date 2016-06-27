@@ -25,8 +25,8 @@ var UserSchema = new mongoose.Schema({
     "appLoginId" : String,                                                  // app login id
     "appLoginAgent" : String,                                               // app login Agent
     "registerAgent": String,                                                // 注册时的设备
-    "isUserInfoFullFilled":{type: Boolean, default: false},                   // 是否完善用户信息并获取积分
-    "address":{                                                               // 用户所在地
+    "isUserInfoFullFilled":{type: Boolean, default: false},                 // 是否完善用户信息并获取积分
+    "address":{                                                             // 用户所在地
         province:{type:mongoose.Schema.ObjectId, ref:"province"},
         city:{type:mongoose.Schema.ObjectId, ref:"city"},
         county:{type:mongoose.Schema.ObjectId, ref:"county"},
@@ -45,23 +45,28 @@ var UserSchema = new mongoose.Schema({
         "birth_date":String,
         "age":String
     },
-    "RSCInfo":{                                                                  // regional service centre info
-        "name":String,                                                           // true name
-        "IDNo":{type:String, validate:tools.regexIdentityNo},                    // identity number
-        "phone":String,                                                          // RSC phone
-        "companyName":String,                                                    // company name
-        "companyAddress":{                                                       // RSC address
+    "RSCInfo":{                                                             // regional service centre info
+        "name":String,                                                      // true name
+        "IDNo":{type:String, validate:tools.regexIdentityNo},               // identity number
+        "phone":String,                                                     // RSC phone
+        "companyName":String,                                               // company name
+        "companyAddress":{                                                  // RSC address
             province:{type:mongoose.Schema.ObjectId, ref:"province"},
             city:{type:mongoose.Schema.ObjectId, ref:"city"},
             county:{type:mongoose.Schema.ObjectId, ref:"county"},
             town:{type:mongoose.Schema.ObjectId, ref:"town"},
             details:String
         },
-        "products":[{type:mongoose.Schema.ObjectId, ref:"product"}],             // products RSC served
-        "supportEPOS":{type: Boolean},                                           // support EPOS, true: yes  false:no
-        "EPOSNo":{type:String}                                                   // RPOS No
+        "products":[{type:mongoose.Schema.ObjectId, ref:"product"}],        // products RSC served
+        "rewardshopGifts":[{type:mongoose.Schema.ObjectId, ref:"rewardshopgift"}],  // rewardshopgift RSC served
+        "supportEPOS":{type: Boolean},                                      // support EPOS, true: yes  false:no
+        "EPOSNo":{type:String}                                              // RPOS No
     },
-    "isTestAccount":{type:Boolean, default:false}                               // is test account
+    "isTestAccount":{type:Boolean, default:false},                          // is test account
+    "sign": {                                                               // user sign
+        "date": Date,                                                       // last time user sign
+        "consecutiveTimes": Number                                          // the consecutive times user sign
+    }
 });
 
 var PotentialCustomerSchema = new mongoose.Schema({

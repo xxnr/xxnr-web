@@ -14,6 +14,7 @@
     <!-- build:css -->
     <link type="text/css" rel="stylesheet" href="css/style.css">
     <link type="text/css" rel="stylesheet" href="css/sweetalert.css">
+    <link type="text/css" rel="stylesheet" href="css/angular-flash.css">
     <!-- endbuild -->
     <!-- build:js -->
     <script src="js/jquery.min.js"></script>
@@ -39,6 +40,7 @@
     <!-- endbuild -->
 </head>
 <body>
+<flash-message></flash-message>
 <header ng-controller="headerController"></header>
 <div class="wrap nav" ng-controller="shoppingCartController">
     <h1 class="left logo"><a href="/">新新农人</a></h1>
@@ -61,6 +63,9 @@
     </div>
 </div>
 <div ng-controller="fillProfileController" class="fillProfile">
+    <p class="guide" ng-show="userInfoFullFilled">
+        <a href="/">首页</a> ／ <a href="fillProfile.html">修改资料</a>
+    </p>
     <div class="clearfix wrap">
         <div class="container">
             <div class="profile_box">
@@ -68,7 +73,7 @@
                     <ul class="clearfix">
                         <p class="profile_box--title--section">
                             <label class="profile_box--title">用户资料</label>
-                            <span>首次完善资料即可获得
+                            <span ng-hide="userInfoFullFilled">首次完善资料即可获得
                                 <span class="profile_box--orange">100</span>
                                 积分
                             </span>
@@ -122,7 +127,7 @@
                             <!--<a href="" class="xxnr_btn cancel" >跳 过</a>-->
                             <a href="" class="xxnr_btn save" ng-class="{true:'invalid'}[profileForm.$invalid]" ng-click="modifyProfile()">提交</a>
                         </li>
-                        <a class="profile--cancel" href="" ng-click="skip()">不填了，先去首页转转</a>
+                        <a ng-show="!userInfoFullFilled" class="profile--cancel" href="" ng-click="skip()">不填了，先去首页转转</a>
                     </ul>
                 </form>
             </div>

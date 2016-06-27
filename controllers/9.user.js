@@ -14,6 +14,7 @@ var OrderService = services.order;
 var vCodeService = services.vCode;
 var IntentionProductService = services.intention_product;
 var PotentialCustomerService = services.potential_customer;
+var LoyaltypointService = services.loyaltypoint;
 var REG_MOBILE = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|Tablet|IOS/i;
 var config = require('../config');
 var Global = require('../global.js');
@@ -631,14 +632,16 @@ exports.json_user_modify = function(req, res, next) {
                 UserService.get({userid:req.data.userId}, function(err, new_user_info) {
                     if (new_user_info.name && new_user_info.address && new_user_info.address.province && new_user_info.type) {
                         UserService.update({userid:req.data.userId, isUserInfoFullFilled: true}, function (err, data) {
-                            UserService.increaseScore({userid: req.data.userId, score: config.user_info_full_filled_point_add}, function (err) {
+                            // UserService.increaseScore({userid: req.data.userId, score: config.user_info_full_filled_point_add}, function (err) {
+                            var points = config.user_info_full_filled_point_add;
+                            LoyaltypointService.increase(old_user_info._id, points, 'ORGANIZINGINFO', null, null, function (err) {
                                 var response = {'code': '1000', 'message': 'success'};
                                 if (!err) {
-                                    response.scoreAdded = config.user_info_full_filled_point_add;
+                                    response.scoreAdded = points;
                                 }
 
                                 res.respond(response);
-                            })
+                            });
                         });
                     } else {
                         res.respond({'code': '1000', 'message': 'success'});
@@ -1052,7 +1055,7 @@ exports.process_user_sign = function(req, res, next){
     }
     options.userid = req.data.userId;
     //get user
-    UserService.get(options, function(err, data){
+    UserService.get(options, function(err, user){
         // Error
         if (err) {
             res.respond({'code': '1001', 'message': err});
@@ -1079,7 +1082,10 @@ exports.process_user_sign = function(req, res, next){
                 }
             } else {
                 // if insert success, update user table to add points
-                UserService.increaseScore({userid:req.data.userId, score: config.user_sign_point_add}, function (err) {
+                // UserService.increaseScore({userid:req.data.userId, score: config.user_sign_point_add}, function (err) {
+                var points = config.user_sign_point_add;
+                var description = beijingTimeNow.format('YYYY-MM-DD') + '签到';
+                LoyaltypointService.increase(user._id, points, 'SIGN', description, null, function (err, points, otherOptions) {
                     if (err) {
                         // error happen,
                         // there are 2 cases of error: one is db operation error,
@@ -1091,13 +1097,24 @@ exports.process_user_sign = function(req, res, next){
                                 // rollback fail, don't know how to handle it, log to console
                                 console.error('user_sign document rollback fail, error:', error);
                             }else{
-                                res.respond({code: '1001', message: '签到失败，大侠请重新来过'});
+                                res.respond({code: '1001', message: '签到失败，请重试'});
                             }
                         });
                     } else {
-                        res.respond({code: '1000', message: '签到成功', pointAdded:config.user_sign_point_add});
+                        var consecutiveTimes = 1;
+                        if (otherOptions && otherOptions.consecutiveTimes) {
+                            consecutiveTimes = otherOptions.consecutiveTimes;
+                        } else {
+                            var maxTimes = 5;
+                            if ((points / config.user_sign_point_add) <= maxTimes) {
+                                consecutiveTimes = points / config.user_sign_point_add;
+                            } else {
+                                consecutiveTimes = maxTimes;
+                            }
+                        }
+                        res.respond({code: '1000', message: '签到成功', pointAdded:points, consecutiveTimes:consecutiveTimes});
                     }
-                }, true)
+                }, user);
             }
         });
     });

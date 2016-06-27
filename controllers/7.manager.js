@@ -18,6 +18,7 @@ var AreaService = services.area;
 var RSCService = services.RSC;
 var AgentService = services.agent;
 var DashboardService = services.dashboard;
+var LoyaltypointService = services.loyaltypoint;
 var PAYMENTSTATUS = require('../common/defs').PAYMENTSTATUS;
 var DELIVERSTATUS = require('../common/defs').DELIVERSTATUS;
 var DELIVERYTYPENAME = require('../common/defs').DELIVERYTYPENAME;
@@ -186,11 +187,327 @@ exports.install = function() {
 };
 
 var files = DB('files', null, require('../modules/database/database').BUILT_IN_DB).binary;
+var moment = require('moment');
+
+// ==========================================================================
+// rewardshop
+// ==========================================================================
+
+// pages
+exports.rewardshop_gifts_orders = function(req, res, next) {
+	res.render(path.join(__dirname, '../views/7.manager/rewardshop/manager-gifts-orders'),
+		{
+			manager_url:F.config['manager-url'],
+			page:'manager-gifts-orders',
+			user:req.user
+		}
+	);
+}
+
+exports.rewardshop_gifts = function(req, res, next) {
+	res.render(path.join(__dirname, '../views/7.manager/rewardshop/manager-gifts'),
+		{
+			manager_url:F.config['manager-url'],
+			page:'manager-gifts',
+			user:req.user
+		}
+	);
+}
+
+exports.rewardshop_gifts_detail = function(req, res, next) {
+	res.render(path.join(__dirname, '../views/7.manager/rewardshop/manager-gifts-detail'),
+		{
+			manager_url:F.config['manager-url'],
+			page:'manager-gifts-detail',
+			user:req.user
+		}
+	);
+}
+
+exports.rewardshop_points_logs = function(req, res, next) {
+	res.render(path.join(__dirname, '../views/7.manager/rewardshop/manager-points-logs'),
+		{
+			manager_url:F.config['manager-url'],
+			page:'manager-points-logs',
+			user:req.user
+		}
+	);
+}
+
+
+// apis
+exports.json_rewardshop_categories = function(req, res, next) {
+	LoyaltypointService.queryRewardshopGiftCategories(req.data.search, function(err, categories) {
+		if (err) {
+			res.respond({code:1002, message:'获取礼品类目失败'});
+			return;
+		}
+
+		res.respond({code:1000, message:'success', categories:categories});
+	});
+}
+
+exports.json_rewardshop_category_save = function(req, res, next) {
+	LoyaltypointService.getRewardshopGiftCategory(null, req.data.category, function(err, category) {
+		if (err) {
+			res.respond({code:1002, message:'保存礼品类目失败'});
+			return;
+		}
+		if (category) {
+			res.respond({code:1001, message:'新添加的礼品类目已存在'});
+			return;
+		}
+		LoyaltypointService.createRewardshopGiftCategory(req.data.category, function(err, category) {
+			if (err) {
+				res.respond({code:1002, message:'保存礼品类目失败'});
+				return;
+			}
+
+			res.respond({code:1000, message:'success', category:category});
+		});
+	});
+}
+
+exports.json_rewardshop_gift_save = function(req, res, next) {
+	if (!req.data.name) {
+		res.respond({code:1001, message:'请填写礼品名称'});
+		return;
+	}
+	if (!req.data.category) {
+		res.respond({code:1001, message:'请选择礼品类目'});
+		return;
+	}
+	if (!req.data.points) {
+		res.respond({code:1001, message:'请填写礼品所需积分'});
+		return;
+	}
+
+	LoyaltypointService.getRewardshopGift(null, null, req.data.name, function(err, gift) {
+		if (err) {
+			res.respond({code:1002, message:'获取礼品详情失败'});
+			return;
+		}
+		if (gift) {
+			res.respond({code:1001, message:'新添加的礼品已存在'});
+			return;
+		}
+		LoyaltypointService.createRewardshopGift(req.data, function(err, gift) {
+			if (err) {
+				res.respond({code:1002, message:'保存礼品失败'});
+				return;
+			}
+
+			res.respond({code:1000, message:'success', gift:gift});
+		});
+	});
+}
+
+exports.json_rewardshop_gift_update = function(req, res, next) {
+	if (!req.data._id) {
+		res.respond({code:1001, message:'请填写礼品ID'});
+		return;
+	}
+
+	LoyaltypointService.getRewardshopGift(null, req.data._id, null, function(err, gift) {
+		if (err || !gift) {
+			res.respond({code:1002, message:'获取礼品详情失败'});
+			return;
+		}
+		LoyaltypointService.updateRewardshopGift(req.data, function(err, gift) {
+			if (err) {
+				res.respond({code:1002, message:'更新礼品失败'});
+				return;
+			}
+
+			res.respond({code:1000, message:'success', gift:gift});
+		});
+	});
+}
+
+exports.json_rewardshop_gifts = function(req, res, next) {
+	var page = U.parseInt(req.data.page, 1) - 1;
+	var max = U.parseInt(req.data.max, 20);
+	LoyaltypointService.queryRewardshopGifts(page, max, req.data.type, req.data.category, req.data.search, function(err, gifts, count, pageCount) {
+		if (err) {
+			res.respond({code:1002, message:'获取礼品列表失败'});
+			return;
+		}
+
+		res.respond({code:1000, message:'success', gifts:gifts, count:count, pageCount:pageCount, page:page+1});
+	});
+}
+
+exports.json_rewardshop_gift_get = function(req, res, next) {
+	LoyaltypointService.getRewardshopGift(null, req.params._id, null, function(err, gift) {
+		if (err || !gift) {
+			res.respond({code:1002, message:'获取礼品详情失败'});
+			return;
+		}
+
+		var result = gift;
+		if (result) {
+			if (result.category)
+				result.category = result.category.ref._id;
+		}
+		res.respond({code:1000, message:'success', gift:result});
+	});
+}
+
+exports.json_rewardshop_pointslogs = function(req, res, next) {
+	var page = U.parseInt(req.data.page, 1) - 1;
+	var max = U.parseInt(req.data.max, 20);
+	if (req.data.search) {
+		UserService.getUserBySearch(req.data.search, req.data.search, function(err, user) {
+			if (err) {
+				res.respond({code:1002, message:'查询客户出错'});
+				return;
+			}
+			if (!user) {
+				res.respond({code:1002, message:'没有查询到客户'});
+				return;
+			}
+			LoyaltypointService.queryLogs(user._id, req.data.type, req.data.times, page, max, function(err, pointslogs, count, pageCount) {
+				if (err) {
+					res.respond({code:1002, message:'获取积分历史列表失败'});
+					return;
+				}
+
+				var userInfo = {'account':user.account, 'name':user.name, 'score':user.score};
+				res.respond({code:1000, message:'success', pointslogs:pointslogs, count:count, pageCount:pageCount, page:page+1, user:userInfo});
+			});
+		});
+	} else {
+		LoyaltypointService.queryLogs(null, req.data.type, req.data.times, page, max, function(err, pointslogs, count, pageCount) {
+			if (err) {
+				res.respond({code:1002, message:'获取积分历史列表失败'});
+				return;
+			}
+
+			res.respond({code:1000, message:'success', pointslogs:pointslogs, count:count, pageCount:pageCount, page:page+1});
+		});
+	}
+}
+
+// not use
+function fixPointslogs(pointslogs) {
+	if (pointslogs && pointslogs.length > 0) {
+		var results = [];
+		pointslogs.forEach(function(pointslog) {
+			var log = {
+				'user': {'name': pointslog.user.name, 'account': pointslog.user.account, 'score': pointslog.user.score},
+				'date': pointslog.date,
+				'points': pointslog.points,
+				'event': {'name': pointslog.event.name},
+				'description': pointslog.description
+			};
+			if (pointslog.event.gift) {
+				log.event.gift = {
+					'name': pointslog.event.gift.name
+				};
+			}
+			results.push(log);
+		});
+		return results;
+	} else {
+		return pointslogs;
+	}
+}
+
+exports.json_rewardshop_giftorders = function(req, res, next) {
+	var page = U.parseInt(req.data.page, 1) - 1;
+	var max = U.parseInt(req.data.max, 20);
+	LoyaltypointService.queryGiftOrders(null, req.data.type, req.data.times, req.data.search, page, max, function(err, giftorders, count, pageCount) {
+		if (err) {
+			res.respond({code:1002, message:'获取积分兑换记录失败'});
+			return;
+		}
+		var results = [];
+		giftorders.forEach(function(giftorder) {
+			giftorder.orderStatus = LoyaltypointService.giftOrderStatus(giftorder);
+			results.push(giftorder);
+		});
+		res.respond({code:1000, message:'success', giftorders:results, count:count, pageCount:pageCount, page:page+1});
+	});
+}
+
+exports.json_rewardshop_giftorders_update = function(req, res, next) {
+	if (!req.data.id) {
+		res.respond({code:1001, message:'请填写订单ID'});
+		return;
+	}
+
+	LoyaltypointService.getGiftOrder(req.data.id, null, function(err, giftOrder) {
+		if (err) {
+			res.respond({code:1002, message:'获取积分兑换记录失败'});
+			return;
+		}
+		if (!giftOrder) {
+			res.respond({code:1001, message:'没有找到相应的积分兑换记录'});
+			return;
+		}
+		var options = {};
+		if (req.user) {
+	    	options.backendUser = req.user;
+	    }
+		if (req.data.deliverStatus) {
+			if (!req.data.deliveryCode) {
+				res.respond({code:1001, message:'修改发货状态前请先输入配送码'});
+				return;
+			}
+			if (req.data.deliveryCode.trim() != giftOrder.deliveryCode) {
+				res.respond({code:1001, message:'配送码错误'});
+				return;
+			}
+		}
+		
+	    if (req.data.RSCInfo) {
+	    	UserService.getRSCInfoById(req.data.RSCInfo.RSC, function(err, RSC) {
+				if (err || !RSC) {
+					if (err) console.error('manager json_rewardshop_giftorders_update UserService getRSCInfoById err:', err);
+					res.respond({code:1002, message:'未查找到RSC'});
+					return;
+				}
+				var RSCInfo = {};
+				RSCInfo.RSC = req.data.RSCInfo.RSC;
+                RSCInfo.RSCAddress = RSC.RSCInfo.companyAddress.province.name + RSC.RSCInfo.companyAddress.city.name;
+                if (RSC.RSCInfo.companyAddress.county && RSC.RSCInfo.companyAddress.county.name) {
+                    RSCInfo.RSCAddress += RSC.RSCInfo.companyAddress.county.name;
+                }
+                if (RSC.RSCInfo.companyAddress.town && RSC.RSCInfo.companyAddress.town.name) {
+                    RSCInfo.RSCAddress += RSC.RSCInfo.companyAddress.town.name;
+                }
+                if (RSC.RSCInfo.companyAddress.details) {
+                    RSCInfo.RSCAddress += RSC.RSCInfo.companyAddress.details;
+                }
+                if (RSC.RSCInfo.companyName) {
+                    RSCInfo.companyName = RSC.RSCInfo.companyName;
+                }
+                if (RSC.RSCInfo.phone) {
+                    RSCInfo.RSCPhone = RSC.RSCInfo.phone;
+                }
+				LoyaltypointService.updateGiftOrder(req.data.id, null, req.data.deliverStatus, RSCInfo, options, function(err, giftOrder) {
+					if (err) {
+						res.respond({code:1002, message:'修改积分兑换记录失败'});
+						return;
+					}
+					res.respond({code:1000, message:'success'});
+				});
+			});
+	    } else { 
+			LoyaltypointService.updateGiftOrder(req.data.id, null, req.data.deliverStatus, null, options, function(err, giftOrder) {
+				if (err) {
+					res.respond({code:1002, message:'修改积分兑换记录失败'});
+					return;
+				}
+				res.respond({code:1000, message:'success'});
+			});
+		}
+	});
+}
 
 // ==========================================================================
 // COMMON
 // ==========================================================================
-var moment = require('moment');
 
 // admin manager page render
 exports.manager = function(req, res, next){
@@ -292,7 +609,7 @@ exports.json_province_query = function(req, res, next) {
 	AreaService.queryProvince(options, function(err, data){
 		if(!data || err){
 			if (err)
-				console.log('area json_province_query err:' + err);
+				console.error('area json_province_query err:' + err);
 			res.respond({'code':'1001','message':'没有查询到省份'});
 			return;
 		} else{
@@ -311,7 +628,7 @@ exports.json_city_query = function(req, res, next) {
 	AreaService.queryCity(options, function(err, data){
 		if(!data || err){
 			if (err)
-				console.log('area json_city_query err:' + err);
+				console.error('area json_city_query err:' + err);
 			res.respond({'code':'1001','message':'没有查询到城市'});
 			return;
 		} else{
@@ -332,7 +649,7 @@ exports.json_county_query = function(req, res, next) {
 	AreaService.queryCounty(options, function(err, data){
 		if(!data || err) {
 			if (err)
-				console.log('area json_county_query err:' + err);
+				console.error('area json_county_query err:' + err);
 			res.respond({'code':'1001','message':'没有查询到县区'});
 			return;
 		} else {
@@ -355,7 +672,7 @@ exports.json_town_query = function(req, res, next) {
 	AreaService.queryTown(options, function(err, data){
 		if(!data || err) {
 			if (err)
-				console.log('area json_town_query err:' + err);
+				console.error('area json_town_query err:' + err);
 			res.respond({'code':'1001','message':'没有查询到乡镇'});
 			return;
 		} else {
@@ -1496,7 +1813,7 @@ exports.process_login = function(req, res, next) {
     BackEndUserService.login(options, function(err, user){
         if(err){
             // login fail
-            console.log('backend user process_login err: ' + err);
+            console.error('backend user process_login err: ' + err);
 			res.respond({code:1001, message:'用户名或密码错误'});
             return
         }
@@ -1559,8 +1876,7 @@ var setCookieAndResponse = function(req, res, user, keepLogin){
     var token = tools.generate_token(user._id, options.appLoginId, options.webLoginId);
     BackEndUserService.update(options, function(err){
         if(err){
-
-            console.log('setCookieAndResponse err: ' + err);
+            console.error('setCookieAndResponse err: ' + err);
             res.respond({code:1004, message:'登录失败'});
             return;
         }
@@ -1989,8 +2305,37 @@ exports.json_RSC_info_get = function(req,res,next){
 				delete RSCInfo.products;
 			}
 		}
-		res.respond({code:1000, message:'success', RSCInfo:RSCInfo, id:user.id, account:user.account});
-	})
+		if (RSCInfo.rewardshopGifts && RSCInfo.rewardshopGifts.length > 0) {
+			LoyaltypointService.queryRewardshopGiftCategories(null, function(err, categories) {
+				if (err) {
+					res.respond({code:1000, message:'success', RSCInfo:RSCInfo, id:user.id, account:user.account});
+					return;
+				}
+				
+				if (categories && categories.length > 0) {
+					var giftsCategories = {};
+					categories.forEach(function(category){
+						giftsCategories[category._id] = category;
+					});
+					var gifts = [];
+					RSCInfo.rewardshopGifts.forEach(function(gift) {
+						var g = gift.toObject();
+						if (gift && gift.category && giftsCategories[gift.category.ref]) {
+							g.category = {
+								name: giftsCategories[gift.category.ref].name,
+								ref: gift.category.ref
+							};
+						}
+						gifts.push(g);
+					});
+					RSCInfo.rewardshopGifts = gifts;
+				}
+				res.respond({code:1000, message:'success', RSCInfo:RSCInfo, id:user.id, account:user.account});
+			});
+		} else {
+			res.respond({code:1000, message:'success', RSCInfo:RSCInfo, id:user.id, account:user.account});
+		}
+	});
 };
 
 exports.json_RSC_query = function(req, res, next){
@@ -2147,6 +2492,24 @@ exports.json_RSC_query_by_products = function(req,res,next){
 			res.respond({code:1000, message:'success', RSCs:RSCs});
 		});
 	})
+};
+
+exports.json_RSC_query_by_gift = function(req,res,next){
+	if (!req.data.gift) {
+		res.respond({code: 1002, message: '请提供礼品信息'});
+		return;
+	}
+	var options = {};
+	options.gift = req.data.gift;
+
+	RSCService.getRSCList(null, null, null, null, null, null, null, function(err, RSCs, count, pageCount) {
+		if (err) {
+			res.respond({code: 1002, message: '查找服务站失败'});
+			return;
+		}
+
+		res.respond({code:1000, message:'success', RSCs:RSCs});
+	}, null, options);
 };
 
 // ==========================================================================

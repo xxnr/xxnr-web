@@ -27,15 +27,18 @@ app.controller('loginController', function($scope, $timeout, remoteApiService, c
     $scope.registerResMsg = '';
     $scope.registerSucceedResMsg = '';
     $scope.resetPasswordMsg = '';
+    $scope.resetPasswordSucceedMsg = '';
     $scope.focusInputGroupNum = 0;
     $scope.errorInputGroupNum = 0;
 
     $scope.focusShowValidate = function(formInputGroupNum) {
-        $scope.focusInputGroupNum = formInputGroupNum;
+        $scope.focusInputGroupNum = formInputGroupNum? formInputGroupNum : 0;
+        $scope.errorInputGroupNum = 0;
         $scope.registerResMsg = '';
         $scope.loginResMsg = '';
         $scope.registerSucceedResMsg = '';
         $scope.resetPasswordMsg = '';
+        $scope.resetPasswordSucceedMsg = '';
     };
     $scope.blurShowValidate = function() {
         $scope.focusInputGroupNum = 0;
@@ -48,7 +51,12 @@ app.controller('loginController', function($scope, $timeout, remoteApiService, c
         registerCode:4,
         registerPassword:5,
         registerPasswordConfirm:6,
-        registerConfirmPasswordsMismatch:7
+        registerConfirmPasswordsMismatch:7,
+        resetPasswordPhone:8,
+        resetPasswordCode:9,
+        resetPassword:10,
+        resetPasswordConfirm:11,
+        resetConfirmPasswordsMismatch:12
     }
     $scope.login = function(){
         $scope.loginResMsg = "";
@@ -88,12 +96,12 @@ app.controller('loginController', function($scope, $timeout, remoteApiService, c
                                             }
                                         } else {
                                             //sweetalert(data.message);
-                                            $scope.loginResMsg = '用户名或密码不匹配，请重新输入';
+                                            $scope.loginResMsg = data.message;
                                         }
                                     });
                             } else {
                                 //sweetalert(data.message);
-                                $scope.loginResMsg = '用户名或密码不匹配，请重新输入';
+                                $scope.loginResMsg = data.message;
                             }
                         })
                 })
@@ -139,8 +147,14 @@ app.controller('loginController', function($scope, $timeout, remoteApiService, c
                         $scope.registerSucceedResMsg = '成功获取短信，请注意查收';
                         $scope.regBlockSendCode = true;
                         regSetTimeOut(60);
+                    }else if(data.message=='请求参数错误，无效的tel参数'){
+                        //sweetalert(data.message);
+                        $scope.registerResMsg = '手机号格式错误';
+                        $scope.errorInputGroupNum = $scope.formInputsKeyValue.registerPhone;
                     }else{
-                        sweetalert(data.message);
+                        //sweetalert(data.message);
+                        $scope.registerResMsg = data.message;
+                        $scope.errorInputGroupNum = $scope.formInputsKeyValue.registerPhone;
                     }
                 })
         }
@@ -150,19 +164,25 @@ app.controller('loginController', function($scope, $timeout, remoteApiService, c
             event.stopPropagation;
             return;
         }
-        if(checkPhoneNumber()) {
+        $scope.focusShowValidate();
+        if(checkPhoneNumber(true)) {
             remoteApiService.sendCode($scope.phoneNumber, 'resetpwd')
                 .then(function (data) {
                     if(data.code == 1000){
-                        sweetalert('成功获取短信，请注意查收');
+                        //sweetalert('成功获取短信，请注意查收');
+                        $scope.resetPasswordSucceedMsg = '成功获取短信，请注意查收';
                         $scope.resetBlockSendCode = true;
                         resetSetTimeOut(60);
                     }else{
-                        sweetalert(data.message);
+                        //sweetalert(data.message);
+                        if(data.message == '请求参数错误，无效的tel参数'){
+                            $scope.resetPasswordMsg = '手机号格式错误';
+                        }else{
+                            $scope.resetPasswordMsg = data.message;
+
+                        }
                     }
                 })
-        }else{
-            $scope.resetPasswordMsg = '请输入正确用户名';
         }
     };
     var regSetTimeOut = function(timeOut){
@@ -193,7 +213,7 @@ app.controller('loginController', function($scope, $timeout, remoteApiService, c
     var checkLoginPhoneNumber = function(){
         if(!$scope.phoneNumber){
             //sweetalert('请输入手机号');
-            $scope.loginResMsg = '请输入你的手机号';
+            $scope.loginResMsg = '请输入手机号';
             $scope.errorInputGroupNum = $scope.formInputsKeyValue.loginPhone;
         }else{
             return true;
@@ -212,75 +232,99 @@ app.controller('loginController', function($scope, $timeout, remoteApiService, c
             }
         }else{
             //sweetalert('请输入密码');
-            $scope.loginResMsg = '请输入你的密码';
+            $scope.loginResMsg = '请输入密码';
             $scope.errorInputGroupNum = $scope.formInputsKeyValue.loginPassword;
         }
         return false;
     };
 
-    var checkPhoneNumber = function(){
+    var checkPhoneNumber = function(isResetPassword){   //isResetPassword 是否正在进行找回密码的验证
         if($scope.phoneNumber){
             if(!isNaN($scope.phoneNumber) && /^1\d{10}$/.test($scope.phoneNumber)){
                 return true;
             }
-            else{
+            else if(!isResetPassword){
                 //sweetalert('手机号格式错误');
                 $scope.registerResMsg = '手机号格式错误';
                 $scope.errorInputGroupNum = $scope.formInputsKeyValue.registerPhone;
+            }else if(isResetPassword){
+                $scope.resetPasswordMsg = '手机号格式错误';
+                $scope.errorInputGroupNum = $scope.formInputsKeyValue.resetPasswordPhone
             }
-        }else{
+        }else if(!isResetPassword){
             //sweetalert('请输入手机号');
             $scope.registerResMsg = '请输入手机号';
             $scope.errorInputGroupNum = $scope.formInputsKeyValue.registerPhone;
+        }else if(isResetPassword){
+            $scope.resetPasswordMsg = '请输入手机号';
+            $scope.errorInputGroupNum = $scope.formInputsKeyValue.resetPasswordPhone;
         }
         return false;
     };
-    var checkCode = function(){
+    var checkCode = function(isResetPassword){ //isResetPassword 是否正在进行找回密码的验证
         if($scope.code){
             return true;
-        }else{
+        }else if(!isResetPassword){
             //sweetalert('请输入验证码');
             $scope.registerResMsg = '请输入验证码';
             $scope.errorInputGroupNum = $scope.formInputsKeyValue.registerCode;
+        }else if(isResetPassword){
+            $scope.resetPasswordMsg = '请输入验证码';
+            $scope.errorInputGroupNum = $scope.formInputsKeyValue.resetPasswordCode;
         }
         return false;
     };
-    var checkNewPassword = function(){
+    var checkNewPassword = function(isResetPassword){ //isResetPassword 是否正在进行找回密码的验证
         if($scope.newPassword){
             if($scope.newPassword.length>=6){
                 return true;
-            }else{
+            }else if(!isResetPassword){
                 //sweetalert('密码长度需大于6位');
                 $scope.registerResMsg = '密码长度需大于6位';
                 $scope.errorInputGroupNum = $scope.formInputsKeyValue.registerPassword;
+            }else if(isResetPassword){
+                $scope.resetPasswordMsg = '密码长度需大于6位';
+                $scope.errorInputGroupNum = $scope.formInputsKeyValue.resetPassword;
             }
-        }else{
+        }else if(!isResetPassword){
             //sweetalert('请输入密码');
             $scope.registerResMsg = '请输入密码';
             $scope.errorInputGroupNum = $scope.formInputsKeyValue.registerPassword;
+        }else if(isResetPassword){
+            $scope.resetPasswordMsg = '请输入密码';
+            $scope.errorInputGroupNum = $scope.formInputsKeyValue.resetPassword;
         }
         return false;
     };
 
-    var checkConfirmNewPassword = function(){
+    var checkConfirmNewPassword = function(isResetPassword){
         if($scope.confirm_newPassword){
             if($scope.confirm_newPassword.length>=6){
                 if($scope.newPassword == $scope.confirm_newPassword){
                     return true;
-                }else{
+                }else if(!isResetPassword){
                     //sweetalert('两次密码不一致');
                     $scope.registerResMsg = '两次密码不一致';
                     $scope.errorInputGroupNum = $scope.formInputsKeyValue.registerConfirmPasswordsMismatch;
+                }else if(isResetPassword){
+                    $scope.resetPasswordMsg = '两次密码不一致';
+                    $scope.errorInputGroupNum = $scope.formInputsKeyValue.resetConfirmPasswordsMismatch;
                 }
-            }else{
+            }else if(!isResetPassword){
                 //sweetalert('密码长度需大于6位');
                 $scope.registerResMsg = '密码长度需大于6位';
                 $scope.errorInputGroupNum = $scope.formInputsKeyValue.registerPasswordConfirm;
+            }else if(isResetPassword){
+                $scope.resetPasswordMsg = '密码长度需大于6位';
+                $scope.errorInputGroupNum = $scope.formInputsKeyValue.resetPasswordConfirm;
             }
-        }else{
+        }else if(!isResetPassword){
             //sweetalert('请再次输入密码');
             $scope.registerResMsg = '请再次输入密码';
             $scope.errorInputGroupNum = $scope.formInputsKeyValue.registerPasswordConfirm;
+        }else if(isResetPassword){
+            $scope.resetPasswordMsg = '请再次输入密码';
+            $scope.errorInputGroupNum = $scope.formInputsKeyValue.resetPasswordConfirm;
         }
     };
     $scope.policyChecked = true;
@@ -295,7 +339,9 @@ app.controller('loginController', function($scope, $timeout, remoteApiService, c
     };
     $scope.findPassword_submit = function(){
         $scope.registerResMsg = "";
-        if(checkPhoneNumber() && checkCode() && checkNewPassword() && checkConfirmNewPassword()){
+        $scope.resetPasswordMsg = "";
+        $scope.resetPasswordSucceedMsg = "";
+        if(checkPhoneNumber(true) && checkCode(true) && checkNewPassword(true) && checkConfirmNewPassword(true)){
             remoteApiService.getPublicKey()
                 .then(function(data) {
                     var public_key = data.public_key;
@@ -305,10 +351,13 @@ app.controller('loginController', function($scope, $timeout, remoteApiService, c
                     remoteApiService.resetPassword($scope.phoneNumber, encodeURI(encrypted), $scope.code)
                         .then(function (data) {
                             if (data.code == 1000) {
-                                sweetalert('重置密码成功',"logon.html");
+                                //sweetalert('重置密码成功',"logon.html");
+                                $scope.resetPasswordSucceedMsg = '重置密码成功';
                                 //window.location.href = 'logon.html';
                             } else {
-                                sweetalert(data.message);
+                                //sweetalert(data.message);
+                                $scope.resetPasswordMsg = data.message;
+                                $scope.errorInputGroupNum = $scope.formInputsKeyValue.resetPasswordCode;
                             }
                         })
                 })

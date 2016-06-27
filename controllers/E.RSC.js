@@ -250,8 +250,15 @@ exports.process_RSC_order_deliverStatus_delivering = function(req, res, next){
 
 exports.json_RSC_address_province_query = function(req, res, next){
     var options = null;
-    if(typeof req.data.EPOS != 'undefined') {
+    if (typeof req.data.EPOS != 'undefined') {
         options = {EPOS:true};
+    }
+    if (req.data.gift) {
+        if (options) {
+            options.gift = req.data.gift;
+        } else {
+            options = {gift:req.data.gift};
+        }
     }
     
     if(!req.data.products && !options){
@@ -273,6 +280,13 @@ exports.json_RSC_address_city_query = function(req, res, next){
     var options = null;
     if(typeof req.data.EPOS != 'undefined') {
         options = {EPOS:true};
+    }
+    if (req.data.gift) {
+        if (options) {
+            options.gift = req.data.gift;
+        } else {
+            options = {gift:req.data.gift};
+        }
     }
     if(!req.data.products && !options){
         res.respond({code:1001, message:'请先选择商品'});
@@ -299,6 +313,13 @@ exports.json_RSC_address_county_query = function(req, res, next){
     var options = null;
     if(typeof req.data.EPOS != 'undefined') {
         options = {EPOS:true};
+    }
+    if (req.data.gift) {
+        if (options) {
+            options.gift = req.data.gift;
+        } else {
+            options = {gift:req.data.gift};
+        }
     }
     if(!req.data.products && !options){
         res.respond({code:1001, message:'请先选择商品'});
@@ -330,6 +351,13 @@ exports.json_RSC_address_town_query = function(req, res, next){
     if(typeof req.data.EPOS != 'undefined') {
         options = {EPOS:true};
     }
+    if (req.data.gift) {
+        if (options) {
+            options.gift = req.data.gift;
+        } else {
+            options = {gift:req.data.gift};
+        }
+    }
     if(!req.data.products && !options){
         res.respond({code:1001, message:'请先选择商品'});
         return;
@@ -359,6 +387,13 @@ exports.json_RSC_query = function(req, res, next){
     var options = null;
     if(typeof req.data.EPOS != 'undefined') {
         options = {EPOS:true};
+    }
+    if (req.data.gift) {
+        if (options) {
+            options.gift = req.data.gift;
+        } else {
+            options = {gift:req.data.gift};
+        }
     }
     if(!req.data.products && !options){
         res.respond({code:1001, message:'请先选择商品'});
