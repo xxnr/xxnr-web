@@ -8,7 +8,7 @@ exports.forbidden_proxy_request = function(req, res, next){
     if(ValidIpAddressRegex.test(realIp)) {
         res.status(403);
         res.send('x-forwarded forbidden');
+    }else {
+        next();
     }
-
-    next();
 };
