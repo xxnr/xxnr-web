@@ -11,6 +11,7 @@ var config = {
 
 //ArelativeURLaddressintotheeshopmanagement
     "manager-url": "/manager",
+    "manager_url": "/manager",
 
 //Hiddensuperadminintheformusername:"password,",
 //manager-superadmin:"admin:admin,",

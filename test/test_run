@@ -1,0 +1,6 @@
+# require mocha and istanbul installed in global
+# linux
+istanbul cover --root ../ _mocha website_backend_behaviour_test -x **/common/utils** -x **/modules/database/** -x **/modules/image** --hook-run-in-context website_backend_behaviour_test\pre-run.js
+# windows
+istanbul cover --root ../ %npm_global%\node_modules\mocha\bin\_mocha website_backend_behaviour_test -x **/common/utils** -x **/modules/database/** -x **/modules/image** --hook-run-in-context website_backend_behaviour_test\pre-run.js
+

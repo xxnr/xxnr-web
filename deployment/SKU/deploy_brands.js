@@ -59,7 +59,6 @@ module.exports = function(callback) {
                         newBrand.save(function(err){
                             if(err){
                                 if(11000 == err.code){
-                                    console.log('test');
                                     BrandModel.update({name:brandName}, {$set:{categories:[category], suppliers:supplier_to_insert}}, function(err, numAffected){
                                         if(err){
                                             console.log(err);
@@ -84,7 +83,7 @@ module.exports = function(callback) {
                                 }
                             }
 
-                            console.log('Add brand:', brandName);
+                            //console.log('Add brand:', brandName);
                             resolve();
                         })
                     })
@@ -96,7 +95,7 @@ module.exports = function(callback) {
 
         Promise.all(promises)
             .then(function(){
-                console.log('deploy brand success!!!!!!!!!!!');
+                //console.log('deploy brand success!!!!!!!!!!!');
                 callback()
             })
             .catch(function(err){

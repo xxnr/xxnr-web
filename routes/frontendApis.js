@@ -78,8 +78,8 @@ router.get('/app/order/getOderList', middleware.isLoggedIn_middleware, controlle
 router.post('/app/order/getOderList', middleware.isLoggedIn_middleware, controllers.Order.api10_getOrders);
 
 // Vcod
-router.get('/api/v2.0/sms', controllers.VCode.generate_sms);
-router.post('/api/v2.0/sms', controllers.VCode.generate_sms);
+router.get('/api/v2.0/sms', middleware.throttle, controllers.VCode.generate_sms);
+router.post('/api/v2.0/sms', middleware.throttle, controllers.VCode.generate_sms);
 
 // news APIs
 router.get('/api/v2.0/news', controllers.News.json_news_query);
@@ -151,11 +151,10 @@ router.get('/api/v2.1/user/getNominatedInviter', middleware.isLoggedIn_middlewar
 router.get('/api/v2.2/user/queryConsignees', middleware.isLoggedIn_middleware, controllers.User.json_userconsignees_query);
 router.get('/api/v2.2/user/saveConsignees', middleware.isLoggedIn_middleware, controllers.User.process_userconsignees_save);
 router.post('/api/v2.2/user/saveConsignees', middleware.isLoggedIn_middleware, controllers.User.process_userconsignees_save);
-
 router.get('/api/v2.2/getOfflinePayType', controllers.Pay.json_offline_pay_type);
 
 // potential customer/intention products related APIs
-router.get('/api/v2.1/intentionProducts', middleware.isLoggedIn_middleware, middleware.isXXNRAgent_middleware, controllers.User.json_intention_products);
+router.get('/api/v2.1/intentionProducts', controllers.User.json_intention_products);
 router.get('/api/v2.1/potentialCustomer/isAvailable', middleware.isLoggedIn_middleware, middleware.isXXNRAgent_middleware, controllers.User.json_potential_customer_available);
 router.post('/api/v2.1/potentialCustomer/add', middleware.isLoggedIn_middleware, middleware.isXXNRAgent_middleware, controllers.User.process_add_potential_customer);
 router.get('/api/v2.1/potentialCustomer/query', middleware.isLoggedIn_middleware, middleware.isXXNRAgent_middleware, controllers.User.json_potential_customer);

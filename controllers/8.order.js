@@ -172,7 +172,7 @@ exports.api10_getOrders = function(req, res, next) {
                     'products': item.products || [],
                     'SKUs':item.SKUs || [],
                     'subOrders': item.subOrders || [],
-                    'duePrice': typeof(data.duePrice) != 'undefined' ? item.duePrice.toFixed(2) : null,
+                    'duePrice': typeof(item.duePrice) != 'undefined' ? item.duePrice.toFixed(2) : null,
                     'RSCInfo': item.RSCInfo
                 };
 

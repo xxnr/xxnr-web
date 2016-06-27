@@ -156,7 +156,7 @@ exports.process_login = function(req, res, next) {
         options.password = tools.decrypt_password(decodeURI(req.data.password));
     }
 
-    var keepLogin = !(req.data.keepLogin === 'false');
+    var keepLogin = !(req.data.keepLogin === false || req.data.keepLogin === 'false');
     options.useragent = req.data["user-agent"] || 'web';
     options.ip = req.ip;
     UserService.login(options, function (err, data) {
@@ -288,7 +288,7 @@ exports.process_register = function(req, res, next) {
     var options = {};
     var keepLogin = req.data.keepLogin || true; //是否保存登录状态，默认保存
     if (!req.data.account || !tools.isPhone(req.data.account.toString())) {
-        res.respond({'code': '1001', 'message': '请输入正确的11位手机号'});
+        res.respond({'code': '1001', 'message': '请输入正确的手机号'});
         return;
     }
     if (!req.data.smsCode) {
@@ -360,7 +360,7 @@ exports.process_resetpwd = function(req, res, next) {
     var options = {};
 
     if (!req.data.account || !tools.isPhone(req.data.account.toString())) {
-        res.respond({'code': '1001', 'message': '请输入正确的11位手机号'});
+        res.respond({'code': '1001', 'message': '请输入正确的手机号'});
         return;
     }
     if (!req.data.smsCode) {
@@ -369,6 +369,7 @@ exports.process_resetpwd = function(req, res, next) {
     }
     if (!req.data.newPwd) {
         res.respond({'code': '1001', 'message': '请输入密码'});
+        return;
     }
     var decrypted = tools.decrypt_password(decodeURI(req.data.newPwd));
     if (decrypted.length < 6) {
@@ -518,6 +519,7 @@ exports.json_user_modifypwd = function(req, res, next) {
     }
     if (!req.data.newPwd) {
         res.respond({'code': '1001', 'message': '请输入新密码'});
+        return;
     }
     var decryptedNewPwd = tools.decrypt_password(decodeURI(req.data.newPwd));
     var decryptedOldPwd = tools.decrypt_password(decodeURI(req.data.oldPwd));
@@ -606,6 +608,17 @@ exports.json_user_modify = function(req, res, next) {
         options.type = req.data.type;
     }
 
+    if(req.data.address && req.data.address.provinceId){
+        if(!req.data.address.cityId){
+            res.respond({code:1001, message:'请选择城市'});
+            return;
+        }
+
+        if(!req.data.address.townId){
+            res.respond({code:1001, message:'请选择乡镇'});
+            return;
+        }
+    }
     UserService.get({userid:req.data.userId}, function(err, old_user_info){
         var callback = function (err) {
             // Error
@@ -656,6 +669,11 @@ exports.json_user_modify = function(req, res, next) {
                         return;
                     }
 
+                    if(city.provinceid != province.id){
+                        res.respond({code:1001, message:'所选城市不属于所选省份'});
+                        return;
+                    }
+
                     options.address.city = city;
                     if (req.data.address.countyId) {
                         AreaService.getCounty({id: address.countyId}, function (err, county) {
@@ -665,12 +683,22 @@ exports.json_user_modify = function(req, res, next) {
                                 return;
                             }
 
+                            if(county.cityid != city.id){
+                                res.respond({code:1001, message:'所选区县不属于所选城市'});
+                                return;
+                            }
+
                             options.address.county = county;
                             if (address.townId) {
                                 AreaService.getTown({id: address.townId}, function (err, town) {
                                     if (err || !town) {
                                         if (err) console.error('get town err:', err);
                                         res.respond({code: 1001, message: '没有查到要修改的乡镇'});
+                                        return;
+                                    }
+
+                                    if(town.countyid != county.id){
+                                        res.respond({code:1001, message:'所选乡镇不属于所选区县'});
                                         return;
                                     }
 
@@ -686,6 +714,11 @@ exports.json_user_modify = function(req, res, next) {
                             if (err || !town) {
                                 if (err) console.error('get town err:', err);
                                 res.respond({code: 1001, message: '没有查到要修改的乡镇'});
+                                return;
+                            }
+
+                            if(town.city != city.id){
+                                res.respond({code:1001, message:'所选乡镇不属于所选城市'});
                                 return;
                             }
 
@@ -812,7 +845,7 @@ exports.json_useraddress_create = function(req, res, next) {
         options.townid = req.data.townId;
     if (req.data.receiptPhone) {
         if (!tools.isPhone(req.data.receiptPhone.toString())) {
-            res.respond({code: 1001, message: '请输入正确的11位手机号'});
+            res.respond({code: 1001, message: '请输入正确的手机号'});
             return;
         }
         options.receiptphone = req.data.receiptPhone;
@@ -906,7 +939,7 @@ exports.json_useraddress_update = function(req, res, next) {
         options.townid = req.data.townId;
     if (req.data.receiptPhone) {
         if (!tools.isPhone(req.data.receiptPhone.toString())) {
-            res.respond({'code': '1001', 'message': '请输入正确的11位手机号'});
+            res.respond({'code': '1001', 'message': '请输入正确的手机号'});
             return;
         }
         options.receiptphone = req.data.receiptPhone;
@@ -1604,49 +1637,63 @@ exports.json_usertypes_get = function(req, res, next) {
     res.respond({code: 1000, data: Global.usertypes});
 };
 
-exports.process_add_potential_customer = function(req, res, next){
-    if(!req.data.name){
-        res.respond({code:1001, message:'请输入姓名'});
+exports.process_add_potential_customer = function(req, res, next) {
+    if (!req.data.name) {
+        res.respond({code: 1001, message: '请输入姓名'});
         return;
     }
 
-    if(!req.data.phone || !tools.isPhone(req.data.phone.toString())){
-        res.respond({code:1001, message:'请输入正确的手机号'});
+    if (!req.data.phone || !tools.isPhone(req.data.phone.toString())) {
+        res.respond({code: 1001, message: '请输入正确的手机号'});
         return;
     }
 
-    if(typeof req.data.sex == 'undefined'){
-        res.respond({code:1001, message:'请输入性别'});
+    if (typeof req.data.sex == 'undefined') {
+        res.respond({code: 1001, message: '请输入性别'});
         return;
     }
 
-    if(typeof req.data.sex == 'string'){
+    if (typeof req.data.sex == 'string') {
         req.data.sex = (req.data.sex === 'true');
     }
 
-    if(!req.data.address || !req.data.address.province || !req.data.address.city){
-        res.respond({code:1001, message:'请选择省市'});
+    if (!req.data.address || !req.data.address.province) {
+        res.respond({code: 1001, message: '请选择省'});
         return;
     }
 
-    if(!req.data.buyIntentions || !req.data.buyIntentions.length < 0){
-        res.respond({code:1001, message:'请选择意向商品'});
+    if (!req.data.address.city) {
+        res.respond({code: 1001, message: '请选择市'});
         return;
     }
 
-    if(req.data.remarks && tools.getStringLen(req.data.remarks.toString(), 60)){
-        res.respond({code:1001, message:'备注字数过长，请输入少于30个字'});
+    if (!req.data.address.town) {
+        res.respond({code: 1001, message: '请选择乡镇'});
         return;
     }
 
-    PotentialCustomerService.add(req.user, req.data.name, req.data.phone, req.data.sex, req.data.address, req.data.buyIntentions, req.data.remarks, function(err){
-        if(err){
-            res.respond({code:1001, message:err});
-            return;
-        }
+    if (!req.data.buyIntentions || !req.data.buyIntentions.length < 0) {
+        res.respond({code: 1001, message: '请选择意向商品'});
+        return;
+    }
 
-        res.respond({code:1000, message:'success'});
-    });
+    if (req.data.remarks && tools.getStringLen(req.data.remarks.toString(), 60)) {
+        res.respond({code: 1001, message: '备注字数过长，请输入少于30个字'});
+        return;
+    }
+
+    var updator = function () {
+        PotentialCustomerService.add(req.user, req.data.name, req.data.phone, req.data.sex, req.data.address, req.data.buyIntentions, req.data.remarks, function (err) {
+            if (err) {
+                res.respond({code: 1001, message: err});
+                return;
+            }
+
+            res.respond({code: 1000, message: 'success'});
+        });
+    };
+
+    AreaService.check_address(req.data.address.province, req.data.address.city, req.data.address.county, req.data.address.town, res, updator);
 };
 
 exports.json_potential_customer = function(req, res, next){

@@ -29,12 +29,12 @@ UseraddressService.prototype.query = function(options, callback) {
 
 	// only get the special province
 	SpecialprovinceModel.find({}, function(err, docs) {
-		var ProvinceIds = [];
+		var ProvinceNames = [];
 		for (var i = 0; i < docs.length; i++) {
-			ProvinceIds[i] = docs[i].id;
+			ProvinceNames[i] = docs[i].name;
 		}
-		if (ProvinceIds && ProvinceIds.length > 0) {
-			queryoptions.provinceid = {'$in': ProvinceIds};
+		if (ProvinceNames && ProvinceNames.length > 0) {
+			queryoptions.provincename = {'$in': ProvinceNames};
 		}
 		UseraddressModel.find(queryoptions).sort(orderbyoptions).exec(
 			function(err, docs) {
@@ -106,6 +106,26 @@ UseraddressService.prototype.create = function(options, callback) {
 							}
 							if (options.countyid && !county) {
 								callback('error-args', {code:1001, message:'数据没有查到，没有找到请求参数中的县区'});
+								return;
+							}
+							if (options.townid && !town) {
+								callback('error-args', {code:1001, message:'数据没有查到，没有找到请求参数中的乡镇'});
+								return;
+							}
+							if(city && province && city.provinceid != province.id){
+								callback('error-args', {code:1001, message:'所选城市不属于所选省份'});
+								return;
+							}
+							if(county && city && county.cityid != city.id){
+								callback('error-args', {code:1001, message:'所选区县不属于所选城市'});
+								return;
+							}
+							if(town && county && town.countyid != county.id){
+								callback('error-args', {code:1001, message:'所选乡镇不属于所选区县'});
+								return;
+							}
+							if(town && city && town.cityid != city.id){
+								callback('error-args', {code:1001, message:'所选乡镇不属于所选城市'});
 								return;
 							}
 
@@ -227,6 +247,22 @@ UseraddressService.prototype.update = function(options, callback) {
 					}
 					if (options.townid && !town) {
 						callback('error-args', {'code':'1001','message':'数据没有查到，没有找到请求参数中的乡镇'});
+						return;
+					}
+					if(city && province && city.provinceid != province.id){
+						callback('error-args', {code:1001, message:'所选城市不属于所选省份'});
+						return;
+					}
+					if(county && city && county.cityid != city.id){
+						callback('error-args', {code:1001, message:'所选区县不属于所选城市'});
+						return;
+					}
+					if(town && county && town.countyid != county.id){
+						callback('error-args', {code:1001, message:'所选乡镇不属于所选区县'});
+						return;
+					}
+					if(town && city && town.cityid != city.id){
+						callback('error-args', {code:1001, message:'所选乡镇不属于所选城市'});
 						return;
 					}
 

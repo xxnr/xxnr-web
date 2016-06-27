@@ -26,7 +26,7 @@ exports.generate_sms = function(req, res, next) {
 
     if (requestType === 'resetpwd') {
         if (!req.data.tel || !tools.isPhone(req.data.tel)) {
-            res.respond({'code': '1001', 'message': '请求参数错误，无效的tel参数'});
+            res.respond({'code': '1001', 'message': '请输入正确的手机号'});
             return;
         } else {
             code_type = 'resetpwd';
@@ -35,7 +35,7 @@ exports.generate_sms = function(req, res, next) {
 
             UserService.get(user, function (err, data) {
                 if (!data || err) {
-                    res.respond({'code': '1001', 'message': '您输入的手机号未注册，请核对后重新输入'});
+                    res.respond({'code': '1001', 'message': '该手机号未注册，请重新输入'});
                     return;
                 } else {
                     generate_vcode(code_type, target, target_type, mobile_code, function (err, result) {
@@ -61,7 +61,7 @@ exports.generate_sms = function(req, res, next) {
             //   res.respond({'code':'1001','message':'用户已登录，请先登出'});
             // }
             if (!req.data.tel || !tools.isPhone(req.data.tel)) {
-                res.respond({'code': '1001', 'message': '请求参数错误，无效的tel参数'});
+                res.respond({'code': '1001', 'message': '请输入正确的手机号'});
                 return;
             } else {
                 code_type = 'register';
@@ -84,7 +84,7 @@ exports.generate_sms = function(req, res, next) {
                             }
                         });
                     } else {
-                        res.respond({'code': '1001', 'message': '该手机号已注册'});
+                        res.respond({'code': '1001', 'message': '该手机号已注册，请重新输入'});
                         return;
                     }
                 });
@@ -119,7 +119,7 @@ function generate_vcode(code_type, target, target_type, mobile_code, callback) {
                 id: vcode.id
             };
 
-            if ((vcode.start_time + F.config.vcode_resend_interval) > Date.now()) {
+            if ((vcode.start_time.getTime() + F.config.vcode_resend_interval) > Date.now()) {
                 result.renew = 2;
                 return callback(null, result);
             } else {

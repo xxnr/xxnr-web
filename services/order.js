@@ -1176,22 +1176,37 @@ OrderService.prototype.addUserOrderNumber = function(options, callback) {
 			console.error('OrderService addUserOrderNumber findOne err:', err);
 			return;
 		}
+        var update = function(doc){
+            UseOrdersNumberModel.update({userId:doc.userId}, {$inc:{numberForInviter: 1}, $set:{dateUpdated: new Date()}}, function(err, count) {
+                // Record not exists
+                if (err) {
+                    console.error('OrderService addUserOrderNumber update err:', err);
+                    return;
+                }
+                if (count.n === 0) {
+                    console.error('OrderService addUserOrderNumber update not find doc');
+                }
+            });
+        };
+
 		if (doc) {
-			UseOrdersNumberModel.update({userId:doc.userId}, {$inc:{numberForInviter: 1}, $set:{dateUpdated: new Date()}}, function(err, count) {
-				// Record not exists
-				if (err) {
-		            console.error('OrderService addUserOrderNumber update err:', err);
-		            return;
-		        }
-				if (count.n === 0) {
-					console.error('OrderService addUserOrderNumber update not find doc');
-				}
-			});
+			update(doc);
 		} else {
 			var ordernumber = new UseOrdersNumberModel({userId:options.userId});
 			ordernumber.save(function(err) {
 				if (err) {
-					console.error('OrderService addUserOrderNumber save err:', err);
+                    if(11000 == err.code){
+                        UseOrdersNumberModel.findOne({userId:options.userId}, function (err, doc) {
+                            if (err) {
+                                console.error('OrderService addUserOrderNumber findOne err:', err);
+                                return;
+                            }
+
+                            update(doc);
+                        })
+                    } else {
+                        console.error('OrderService addUserOrderNumber save err:', err);
+                    }
 				}
 			});
 		}
