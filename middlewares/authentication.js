@@ -278,6 +278,7 @@ exports.throttle = function(req, res, next){
         route = route.substring(0, route.length - 1);
     var method = req.method.trim().toLowerCase();
     var ip = req.ip.trim();
+    var realIp = req.get('x-forwarded-for');
     ThrottleService.requireAccess(route, method, ip, user?user._id:null, function(pass, reason){
         if(!pass){
             switch(reason){
@@ -289,7 +290,6 @@ exports.throttle = function(req, res, next){
                     res.respond({code:1429, message:'系统繁忙，请稍后再试'});
             }
         } else{
-            var realIp = req.get('x-forwarded-for');
             if(ValidIpAddressRegex.test(realIp)) {
                 ThrottleService.requireAccess(route, method, realIp, user ? user._id : null, function (pass, reason) {
                     if (!pass) {
@@ -304,7 +304,7 @@ exports.throttle = function(req, res, next){
                     } else {
                         next();
                     }
-                }, true)
+                }, ip)
             } else{
                 next();
             }

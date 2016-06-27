@@ -21,7 +21,7 @@ var ThrottleService = function(){
  * @param user current accessor's user _id
  * @param callback
  */
-ThrottleService.prototype.requireAccess = function(route, method, ip, user, callback, isForwarded){
+ThrottleService.prototype.requireAccess = function(route, method, ip, user, callback, forwardedBy){
     var self = this;
 
     if(!route){
@@ -40,7 +40,7 @@ ThrottleService.prototype.requireAccess = function(route, method, ip, user, call
     }
 
     var recordPassedAccess = function() {
-        var record = {route: route, method: method, ip:ip, isForwarded:isForwarded};
+        var record = {route: route, method: method, ip:ip, forwardedBy:forwardedBy};
         if(user){
             record.user = mongoose.Types.ObjectId(user);
         }
