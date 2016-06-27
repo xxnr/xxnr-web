@@ -9,7 +9,7 @@ var AuditService = services.auditservice;
 var ThrottleService = services.throttle;
 var tools = require('../common/tools');
 var path = require('path');
-const ValidIpAddressRegex = "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$";
+const ValidIpAddressRegex = /^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$/;
 
 exports.isLoggedIn_middleware = function(req, res, next){
     var token = null;
@@ -290,7 +290,7 @@ exports.throttle = function(req, res, next){
             }
         } else{
             var realIp = req.get('x-forwarded-for');
-            if(ValidIpAddressRegex.test(realIP)) {
+            if(ValidIpAddressRegex.test(realIp)) {
                 ThrottleService.requireAccess(route, method, realIp, user ? user._id : null, function (pass, reason) {
                     if (!pass) {
                         switch (reason) {
