@@ -9,6 +9,17 @@ exports.forbidden_proxy_request = function(req, res, next){
         res.status(403);
         res.send('x-forwarded forbidden');
     }else {
-        next();
+        var testResult = req.get('user-agent').match(/X-Forwarded-For:(.+)/);
+        if(testResult && testResult.length >1){
+            realIp = testResult[1].trim();
+            if(ValidIpAddressRegex.test(realIp)) {
+                res.status(403);
+                res.send('x-forwarded forbidden');
+            } else{
+                next();
+            }
+        } else{
+            next();
+        }
     }
 };
