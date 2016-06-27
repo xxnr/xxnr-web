@@ -6,6 +6,7 @@ var router = express.Router();
 var controllers = require('../controllers');
 var path = require('path');
 var middleware = require('../middlewares/authentication');
+var throttle = require('../middlewares/throttle');
 
 // area address APIs
 router.get('/api/v2.0/area/getAreaList', controllers.Area.json_province_query);
@@ -78,8 +79,8 @@ router.get('/app/order/getOderList', middleware.isLoggedIn_middleware, controlle
 router.post('/app/order/getOderList', middleware.isLoggedIn_middleware, controllers.Order.api10_getOrders);
 
 // Vcod
-router.get('/api/v2.0/sms', middleware.throttle, controllers.VCode.generate_sms);
-router.post('/api/v2.0/sms', middleware.throttle, controllers.VCode.generate_sms);
+router.get('/api/v2.0/sms', throttle.forbidden_proxy_request, middleware.throttle, controllers.VCode.generate_sms);
+router.post('/api/v2.0/sms', throttle.forbidden_proxy_request, middleware.throttle, controllers.VCode.generate_sms);
 
 // news APIs
 router.get('/api/v2.0/news', controllers.News.json_news_query);
