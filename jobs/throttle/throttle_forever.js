@@ -23,7 +23,7 @@ FUA.find({ip:{$in:ips}}, function(err, docs){
             var newRecord = new FUA({route:doc.route, method:doc.method, user:doc.user, ip:doc.ip});
             newRecord.save(function(err){
                 if(!err){
-                    console.log(newRecord.ip, 'saved at', newRecord.createdAt);
+                    //console.log(newRecord.ip, 'saved at', newRecord.createdAt);
                     resolve();
                 } else{
                     reject(err);
@@ -34,7 +34,7 @@ FUA.find({ip:{$in:ips}}, function(err, docs){
 
     Promise.all(promises)
         .then(function(){
-            console.log(ips.length, 'ips forbidden');
+            console.log(ips.length, 'ips forbidden at', new Date());
             process.exit(0);
         })
         .catch(function(err){
