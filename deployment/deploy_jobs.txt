@@ -20,6 +20,10 @@
 ###            generate agent report                ###
 #######################################################
 0 4 * * * /usr/bin/node /root/xxnr/v2.0/website-git/jobs/generate_agent_report.js >> /root/xxnr/v2.0/logs/jobs/generate_agent_report/generate_agent_report_`date +\%Y\%m`.log
+#######################################################
+###               forbidden forever                 ###
+#######################################################
+1 * * * * /usr/bin/node /root/xxnr/v2.0/website-git/jobs/throttle/throttle_forever.js >> /root/xxnr/v2.0/logs/jobs/throttle_forever/throttle_forever_`date +\%Y\%m\$d`.log
 
 
 # 192.168.1.15

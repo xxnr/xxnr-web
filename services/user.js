@@ -20,7 +20,7 @@ var UserService = function(){};
 UserService.prototype.create = function(options, callback) {
     UserModel.findOne({account: options.account}, function (err, doc) {
         if (doc) {
-            callback('用户已存在');
+            callback('该手机号已注册，请重新输入');
             return;
         } else {
             var user = new UserModel(options);

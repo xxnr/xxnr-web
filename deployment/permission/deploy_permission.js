@@ -62,7 +62,7 @@ module.exports = function(callback){
                                 return;
                             }
 
-                            console.log('Finish to add permission', route, method, roleIds);
+                            //console.log('Finish to add permission', route, method, roleIds);
                             resolve();
                         });
                     });
@@ -71,7 +71,7 @@ module.exports = function(callback){
 
             Promise.all(promises)
                 .then(function () {
-                    console.log('Deploy Permission Success!!!!!!!!!!!!!!!!!!!!!!');
+                    //console.log('Deploy Permission Success!!!!!!!!!!!!!!!!!!!!!!');
                     callback();
                 })
                 .catch(function () {

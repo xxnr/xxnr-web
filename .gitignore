@@ -8,3 +8,4 @@ tmp
 *.crt
 *.key
 /test/casper_test/*.png
+coverage

@@ -11,6 +11,7 @@ var config = {
 
 //ArelativeURLaddressintotheeshopmanagement
     "manager-url": "/manager",
+    "manager_url": "/manager",
 
 //Hiddensuperadminintheformusername:"password,",
 //manager-superadmin:"admin:admin,",
@@ -44,6 +45,12 @@ var config = {
 
 //vcodenextsendtime
     vcode_resend_interval: 60000,
+
+    netease_im: {
+        appkey: 'c68095efa5ed6d3135b5acf5a2552328',
+        appsecret: '6c3cfe19aff5',
+        url: 'https://api.netease.im/sms/sendtemplate.action'
+    },
 
 //sendphonemessageoptions
     phone_message_options: {
