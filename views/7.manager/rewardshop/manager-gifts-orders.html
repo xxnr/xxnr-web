@@ -1,0 +1,502 @@
+<% include manager-rewardshop.html %>
+
+<div class="col-md-10">
+	<div class="filter col-md-12 col-sm-12" style="padding-bottom:9px">
+        <div class="col-md-3 col-sm-6 m">
+            <div data-component="textbox" data-component-path="giftorders.filter.search" data-placeholder="姓名/电话" data-control-icon="fa-search">查询兑换订单</div>
+            <div class="help" data-component="template" data-component-path="giftorders.info"><script type="text/html">{{ count | pluralize('items','item','items','items') }} / {{ pages | pluralize('pages','page','pages','pages') }}</script></div>
+        </div>
+		<div class="ui-buttons col-md-3 col-sm-6 m" style="padding-top: 21px">
+			<button name="search" title="查询" style="height: 26px;">查询<span class="fa fa-search"></span></button>
+		</div>
+    </div>
+
+	<div style="width:100%;float:left;">
+		<ul class="tabmenu">
+			<li data-type="0">全部</li>
+            <li data-type="1">未完成</li>
+            <li data-type="2">已完成</li>
+        </ul>
+		<div data-component="template" data-component-path="giftorders" class="ui-grid giftorders" data-max="auto" data-component-id="giftorders.grid">
+			<script type="text/html">
+			{{ if grid && grid.length > 0 }}
+				<table class="table" width="100%" cellpadding="0" cellspacing="0" border="0">
+					<tbody>
+						<tr>
+							<td style="width:30px" class="silver hidden-xs ui-center active">序号</td>
+							<td style="width:80px" class="silver hidden-xs ui-right active">兑换时间</td>
+					    	<td style="width:70px" class="silver hidden-xs ui-center active">兑换人</td>
+					    	<td style="width:120px" class="silver hidden-xs ui-left active">礼品</td>
+					    	<td style="width:70px" class="silver hidden-xs ui-center active">收货人信息</td>
+					    	<td style="width:40px" class="silver hidden-xs ui-center active">配送方式</td>
+					    	<td style="width:45px" class="silver hidden-xs ui-center active">配送码</td>
+					    	<td style="width:40px" class="silver hidden-xs ui-right active">所用积分</td>
+					    	<td style="width:40px" class="silver hidden-xs ui-center active">订单状态</td>
+					    	<td style="width:25px" class="silver hidden-xs ui-center active">操作</td>
+					    </tr>
+					{{ foreach order in grid }}
+			            <tr data-index="{{ $index }}">
+			                <td style="width:30px" class="hidden-xs ui-center">{{ $index + 1 }}</td>
+			                <td style="width:80px" class="hidden-xs ui-right" title="{{order.dateCreated | format('yyyy-MM-dd HH:mm:ss')}}">{{ order.dateCreated | format('yyyy-MM-dd HH:mm:ss') }}</td>
+			                <td style="width:70px" class="hidden-xs ui-center" title="{{if order.buyerName}}{{order.buyerName}}{{else}}{{if order.buyerPhone}}{{order.buyerPhone}}{{fi}}{{fi}}">{{ order.buyerName }}</br>{{ order.buyerPhone }}</td>
+			                <td style="width:120px" class="hidden-xs ui-left" title="{{order.gift.name}}">{{if order.gift.thumbnail}}<img style="width:30px" src="{{ order.gift.thumbnail }}"></img>{{fi}}<span style="padding-left:3px;">{{ order.gift.name }}</span></td>
+			                <td style="width:70px" class="hidden-xs ui-center" title="{{if order.consigneeName}}{{order.consigneeName}}{{else}}{{if order.consigneePhone}}{{order.consigneePhone}}{{fi}}{{fi}}">{{ order.consigneeName }}</br>{{ order.consigneePhone }}</td>
+			                <td style="width:40px" class="hidden-xs ui-center" title="{{if order.deliveryType==1}}自提{{else}}配送到户{{fi}}">{{ if order.deliveryType==1 }}自提{{ else }}配送到户{{ fi }}</td>
+			                <td style="width:45px" class="hidden-xs ui-center" title="{{order.deliveryCode}}">{{ order.deliveryCode }}</td>
+			                <td style="width:40px" class="hidden-xs ui-right" title="{{order.points}}">{{ order.points }}</td>
+			                <td style="width:80px" class="hidden-xs ui-center" title="">{{ if order && order.orderStatus && order.orderStatus.value }}{{ if order.orderStatus.type == 4 }}<span class="green">{{else}}<span class="red">{{fi}}{{order.orderStatus.value}}</span>{{ else }}-{{ fi }}</td>
+			                <td style="width:25px" class="hidden-xs ui-center"><button name="edit" title="编辑"><span class="fa fa-pencil"></span></button></td>
+			            </tr>
+			        {{ end }}
+					</tbody>
+				</table>
+			{{ else }}
+				{{ if !giftordersresponse }}
+					暂无数据
+				{{ fi }}
+			{{ fi }}
+	        </script>
+	        <!-- <td style="width:110px" class="hidden-xs ui-left" title="{{if order.RSCInfo}}{{order.RSCInfo.companyName}}{{fi}}">{{ if order.RSCInfo }}{{ order.RSCInfo.companyName }}{{ fi }}</td> -->
+	        <!-- <td style="width:25px" class="hidden-xs ui-center">{{ if order && order.orderStatus.type && order.orderStatus.type != 4 }}<button name="edit" title="编辑"><span class="fa fa-pencil"></span></button>{{ fi }}</td> -->
+	    </div>
+
+	    <div class="giftorders-pages">
+		</div>
+		<div data-component="error" data-component-path="giftorders.giftordersresponse"></div>
+	</div>
+</div>
+
+<div data-component="form" data-title="订单详情" data-component-path="common.form" data-if="value === 'giftordersForm'" data-width="1200px" data-class="col-md-12" data-component-id="giftordersForm.form" data-submitbutton="true">
+	<br />
+	<div class="row padding">
+		<div class="col-md-12">
+			<div data-component="template" data-component-path="giftordersForm.form" class="padding">
+				<script type="text/html">
+				<table class="table table-bordered" border="0">
+					<tbody>
+						<tr>
+							<td class="col-xs-5 active"># 订单号</td>
+							<td>{{ id }}</td>
+						</tr>
+						<tr>
+							<td class="col-xs-5 active">兑换时间</td>
+							<td>{{ dateCreated | format('yyyy-MM-dd HH:mm:ss') }}</td>
+						</tr>
+						<tr>
+							<td class="col-xs-5 active">所用积分</td>
+							<td>{{ points }}</td>
+						</tr>
+		                <tr>
+		                    <td class="col-xs-5 active">配送码</td>
+		                    <td>{{ deliveryCode }}</td>
+		                </tr>
+		                <tr>
+		                    <td class="col-xs-5 active">状态</td>
+		                    <td>{{ if orderStatus && orderStatus.value }}{{orderStatus.value}}{{ fi }}</td>
+		                </tr>
+		                <tr>
+		                	<td class="col-xs-5 active">礼品信息</td>
+		                	<td>
+		                	{{ if gift }}
+		                		{{ if gift.name }}礼品：{{ gift.name }}</br>{{ fi }}{{ if gift.category }}礼品类目：{{ gift.category }}{{ fi }}
+		                	{{ fi }}
+		                	</td>
+		                </tr>
+		            </tbody>
+				</table>
+				</script>
+			</div>
+		</div>
+		<div class="col-md-12" style="padding-top: 0px;">
+			<hr />
+			<div class="silver"><strong>订单信息</strong></div>
+			<div class="padding col-md-12">
+				<div class="silver"><strong>收货人信息</strong></div>
+				<br />
+				<div class="col-md-12">
+					<div data-component="template" data-component-path="giftordersForm.form" class="col-md-12">
+						<script type="text/html">
+							<table class="table table-bordered" border="0">
+								<tbody>
+								<tr>
+									<td class="col-xs-3 active">收货人</td>
+									<td>{{ consigneeName }}</td>
+								</tr>
+								<tr>
+									<td class="col-xs-3 active">电话</td>
+									<td>{{ consigneePhone }}</td>
+								</tr>
+								<tr>
+									<td class="col-xs-3 active">收货地址</td>
+									<td>{{ consigneeAddress }}</td>
+								</tr>
+								</tbody>
+							</table>
+						</script>
+					</div>
+				</div>
+				<div class="silver"><strong>配送信息</strong></div>
+				<br />
+				<div class="col-md-12 m">
+					<div data-component="template" data-component-path="giftordersForm" class="col-md-12">
+						<script type="text/html">
+							<table class="table table-bordered" border="0">
+								<tbody>
+								<tr>
+									<td class="col-xs-3 active">配送方式</td>
+									<td>
+										{{ if form && form.deliveryType==1 }}
+											自提
+										{{ else }}
+											配送到户
+										{{ fi }}
+									</td>
+								</tr>
+								<tr>
+									<td class="col-xs-3 active">服务站信息</td>
+									<td>
+										<p id="RSCList">服务站:
+											<select data-name="RSCInfo">
+												<option selected disabled hidden value=''>请选择服务站</option>
+												{{ foreach RSC in RSCList }}
+													<option RSC="{{ RSC._id }}" companyName="{{RSC.RSCInfo.companyName}}" name="{{RSC.RSCInfo.name}}" phone="{{ RSC.RSCInfo.phone}}"
+															{{if RSC.RSCInfo.companyAddress}}
+																{{ if RSC.RSCInfo.companyAddress.province}}
+																	province="{{RSC.RSCInfo.companyAddress.province.name}}"
+																{{ fi }}
+																{{ if RSC.RSCInfo.companyAddress.city}}
+																	city="{{RSC.RSCInfo.companyAddress.city.name}}"
+																{{ fi }}
+																{{ if RSC.RSCInfo.companyAddress.county}}
+																	county="{{RSC.RSCInfo.companyAddress.county.name}}"
+																{{ fi }}
+																{{ if RSC.RSCInfo.companyAddress.town}}
+																	town="{{RSC.RSCInfo.companyAddress.town.name}}"
+																{{ fi }}
+																details="{{RSC.RSCInfo.companyAddress.details}}"
+															{{ fi }}
+															{{  if form.RSCInfo && RSC._id == form.RSCInfo.RSC }}selected{{ fi }}>
+														{{ RSC.RSCInfo.companyName }}
+													</option>
+												{{ end }}
+											</select>
+										</p>
+										{{ if form && form.RSCInfo }}
+											<p>服务站地址:{{ form.RSCInfo.RSCAddress}}</p>
+											<p>联系电话:{{ form.RSCInfo.RSCPhone }}</p>
+										{{ fi }}
+									</td>
+								</tr>
+								</tbody>
+							</table>
+						</script>
+					</div>
+					<div class="col-md-12">
+						<div data-component="error" data-component-path="giftordersForm.RSCInforesponse"></div>
+						<div data-component="visible" class="ui-buttons" data-component-path="giftordersForm.form.RSCInfo" data-if="giftordersForm.form">
+							<button id="RSCInfoModifyButton" name="submit" data-name="RSCInfo" data-warning="你确认提交服务站信息的修改吗?">提交修改</button>
+						</div>
+					</div>
+				</div>
+				<div class="silver"><strong>修改发货状态</strong></div>
+				<br />
+				<div class="giftordersDeliverStatus col-md-12 m">
+					<div data-component="template" data-component-path="giftordersForm" class="col-md-3">
+						<script type="text/html">
+							{{ if form }}
+	                            <div class="ui-dropdown-label ui-dropdown-label-required">发货状态:</div>
+	                            <div class="ui-dropdown-values">
+	                                <div class="ui-dropdown">
+	                                    <span class="fa fa-sort"></span>
+										<select data-name="deliverStatus" data-id="{{ form.id }}">
+										{{ foreach d in deliverStatuses }}
+											{{ if form && form.deliveryType == 1 }}
+												{{ if d.value !== 2 }}
+												<option value="{{ d.value }}" {{ if form.deliverStatus == d.value }}selected{{ fi }}>{{ d.name }}</option>
+												{{ fi }}
+											{{ else }}
+												<option value="{{ d.value }}" {{ if form.deliverStatus == d.value }}selected{{ fi }}>{{ d.name }}</option>
+											{{ fi }}
+										{{ end }}
+										</select>
+									</div>
+								</div>
+							{{ fi }}
+						</script>
+					</div>
+					<div class="col-md-3">
+						<div class="ui-textbox-label ui-textbox-label-required">提交前请先输入配送码:</div>
+						<div class="ui-textbox">
+							<input type="text" id="deliveryCode">
+						</div>
+					</div>
+					<div class="col-md-12" style="margin-top:20px;">
+						<div data-component="error" data-component-path="giftordersForm.deliverStatusresponse"></div>
+						<div data-component="visible" class="ui-buttons" data-component-path="giftordersForm.form" data-if="giftordersForm.form.deliverStatus">
+							<button name="submit" data-name="deliverStatus" data-warning="你确认提交发货状态的修改吗?">提交修改</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+</div>
+
+<script>
+
+	var giftorders = {};
+
+	// giftorders.form = {};
+    giftorders.filter = {};
+    giftorders.filter.page = 1;
+    giftorders.filter.search = '';
+    giftorders.grid = [];
+    giftorders.info = {};
+	giftorders.giftordersresponse;
+	// giftorders.deliverStatusresponse;
+
+	var giftordersForm = {};
+	giftordersForm.form = {};
+	giftordersForm.deliverStatusresponse;
+	giftordersForm.RSCList = [];
+	giftordersForm.RSCInforesponse;
+
+	var giftorders_page = getUrlParam('page');
+	if (giftorders_page) {
+		giftorders.filter.page = giftorders_page;
+	}
+	var giftorders_search = getUrlParam('search');
+	if (giftorders_search) {
+		giftorders.filter.search = giftorders_search;
+	}
+	var giftorders_type = getUrlParam('type');
+	var typeSelected = false;
+	if (giftorders_type) {
+		giftorders.filter.type = giftorders_type;
+		$('.tabmenu li').each(function() {
+			if (parseInt(giftorders.filter.type) == $(this).attr('data-type')) {
+	        	$(this).addClass('selected');
+	        	typeSelected = true;
+	        }
+	    });
+	}
+	if (!typeSelected) {
+		$('.tabmenu li').eq(0).addClass('selected');
+	}
+
+	$('.filter .ui-buttons button').off('click').on('click', function() {
+        switch ($(this).attr('name')) {
+            case 'search':
+    			redirectGiftordersURL();
+                break;
+        }
+    });
+
+    $('.tabmenu li').on('click', function(){
+        select_tabmenu($(this));
+    });
+
+    ON('#giftorders.grid', function(component){
+        giftorders.filter.max = component.max;
+        getGiftorders();
+    });
+
+    ON('#giftordersForm.form', function(component) {
+    	component.submit = function(hide, button) {
+    		SET('giftordersForm.deliverStatusresponse', null);
+			var datawarning = "你确认提交本次修改吗?";
+			var dataname = $(button).attr('data-name');
+			var warning = $(button).attr('data-warning');
+			if (warning) {
+				datawarning = warning;
+			}
+			if (dataname) {
+				if (giftordersForm.form[dataname]) {
+					var postdata = {};
+					var posturl = managerurl + '/api/rewardshop/giftorders/update';
+					if (dataname == 'deliverStatus') {
+						var input_deliveryCode = $('.giftordersDeliverStatus #deliveryCode').val().trim();
+						var error_info = null;
+						if (!input_deliveryCode)
+							error_info = '修改发货状态前请先输入配送码';
+						if (!error_info && input_deliveryCode != giftordersForm.form.deliveryCode)
+							error_info = '配送码错误';
+						if (error_info) {
+							SET('giftordersForm.deliverStatusresponse', [{error:error_info}]);
+							return;
+						}
+						postdata['deliveryCode'] = input_deliveryCode;
+					}
+
+					postdata['id'] = giftordersForm.form.id;
+					postdata[dataname] = giftordersForm.form[dataname];
+					if (!confirm(datawarning))
+						return;
+					$.components.POST(posturl, postdata, function(response) {
+						var responsekey = 'giftordersForm.' + dataname + 'response';
+						if (response && response.code && parseInt(response.code) !== 1000) {
+							if (response.message) {
+								response = [{error: response.message}];
+							} else if (response.error) {
+								response = response.error;
+							} else {
+								response = [{error:'更新失败'}];
+							}
+						}
+						// Error handling
+						SET(responsekey, response);
+						if (response instanceof Array)
+							return;
+						success();
+						window.location.reload();
+					});
+				}
+			}
+		};
+
+    	$('.giftordersDeliverStatus').on('change', 'select', function() {
+			var el = $(this);
+			var id = el.attr('data-id');
+			var name = el.attr('data-name');
+			switch (name) {
+				case 'deliverStatus':
+					var value = el.val();
+					if (value) {
+						giftordersForm.form.deliverStatus = value;
+						component.changedisabled_botton('deliverStatus');
+						UPDATE('giftordersForm.form');
+					}
+					break;
+			}
+		});
+
+		component.changedisabled_botton = function (name) {
+			component.element.find('button').each(function() {
+				switch (this.name) {
+					case 'submit':
+						if ($(this).attr('data-name') === name) {
+							var el = $(this);
+							el.prop({ disabled: false });
+						}
+						break;
+				}
+			});
+		}
+	});
+
+	function getGiftorders() {
+		var urlParam = giftorders.filter.search ? 'search=' + giftorders.filter.search : '';
+		urlParam += giftorders.filter.page ? (urlParam ? '&' : '') + 'page=' + giftorders.filter.page : '';
+		urlParam += giftorders.filter.max ? (urlParam ? '&' : '') + 'max=' + giftorders.filter.max : '';
+		urlParam += giftorders.filter.type ? (urlParam ? '&' : '') + 'type=' + giftorders.filter.type : '';
+		var url = '/api/rewardshop/giftorders' + (urlParam ? '?' + urlParam : '');
+		$.components.GET(managerurl + url, null, function(response) {
+			if (response && response.code && response.code==1000) {
+				giftorders.grid = response.giftorders;
+				giftorders.info.count = response.count;
+            	giftorders.info.pages = response.pageCount;
+            	giftorders.info.page = response.page;
+				SET('giftorders.grid', giftorders.grid);
+				if (giftorders.info.pages && giftorders.info.count) {
+					Pagination($('div.giftorders-pages'), giftorders.info.count, giftorders.info.count/giftorders.info.pages, giftorders.info.page?giftorders.info.page:null, function(pageNumber){redirectGiftordersURL(pageNumber)});
+				}
+				UPDATE('giftorders.info');
+				setTimeout(function() {
+					$('.giftorders tr td button').off('click').on('click', function() {
+						var index = parseInt($(this).parent().parent().attr('data-index'));
+						var row = typeof index != 'undefined' && giftorders.grid && index < giftorders.grid.length ? giftorders.grid[index] : null;
+						if (row) {
+				            switch ($(this).attr('name')) {
+				                case 'edit':
+				                    SET('giftordersForm.form', $.extend({}, row), true);
+				                    SET('giftordersForm.deliverStatuses', [{name:'未发货',value:1},{name:'服务站已发货',value:2},{name:'已收货',value:5}], true);
+				                    SET('giftordersForm.deliverStatusresponse', null);
+				                    $('.giftordersDeliverStatus #deliveryCode').val('');
+				                    $.components.GET(managerurl + '/api/v2.2/RSC/queryByGift', {gift:row.gift.ref}, function(RSCresponse){
+										if (RSCresponse.code != 1000) {
+											alert(RSCresponse.message);
+											if (RSCresponse.error || RSCresponse.message) {
+												if (RSCresponse.message) {
+													RSCresponse = [{error: RSCresponse.message}];
+												} else {
+													RSCresponse = RSCresponse.error;
+												}
+											} else {
+												RSCresponse = [{error: '请求服务站列表失败'}];
+											}
+											SET('giftordersForm.RSCInforesponse', RSCresponse);
+										} else {
+											giftordersForm.RSCList = RSCresponse.RSCs;
+											SET('giftordersForm.RSCList', giftordersForm.RSCList);
+											onRSCListRefreshed();
+											SET('common.form', 'giftordersForm');
+										}
+									});
+									// SET('common.form', 'giftordersForm');
+				                    break;
+			            	}
+			            }
+			        });
+				}, 200);
+			} else {
+				if (response.error || response.message) {
+					if (response.message) {
+						response = [{error: response.message}];
+					} else {
+						response = response.error;
+					}
+				} else {
+					response = null;
+				}
+				SET('giftorders.giftordersresponse', response);
+			}
+		});
+	}
+
+	function onRSCListRefreshed() {
+		$('#RSCList').on('change', 'select', function () {
+			var el = $(this);
+			var data_name = el.attr('data-name');
+			var RSC = el.find('option:selected').attr('RSC');
+			var companyName = el.find('option:selected').attr('companyName');
+			var name = el.find('option:selected').attr('name');
+			var phone = el.find('option:selected').attr('phone');
+			var province = el.find('option:selected').attr('province');
+			var city = el.find('option:selected').attr('city');
+			var county = el.find('option:selected').attr('county');
+			var town = el.find('option:selected').attr('town');
+			var details = el.find('option:selected').attr('details');
+
+			switch (data_name) {
+				case 'RSCInfo':
+					var RSCInfo = {RSC: RSC, companyName: companyName, RSCPhone:phone, RSCAddress:province+city+county+town+details};
+					giftordersForm.form.RSCInfo = RSCInfo;
+					$('#RSCInfoModifyButton').prop({ disabled: false });
+					UPDATE('giftordersForm.form');
+					onRSCListRefreshed();
+					break;
+			}
+		});
+	}
+
+	function redirectGiftordersURL(page) {
+		var urlParam = giftorders.filter.search ? 'search=' + giftorders.filter.search : '';
+		urlParam += page ? (urlParam ? '&' : '') + 'page=' + page : '';
+		urlParam += giftorders.filter.max ? (urlParam ? '&' : '') + 'max=' + giftorders.filter.max : '';
+		urlParam += giftorders.filter.type ? (urlParam ? '&' : '') + 'type=' + giftorders.filter.type : '';
+		window.location.href = managerurl + "/rewardshop" + (urlParam ? '?' + urlParam : '');
+	}
+
+	function select_tabmenu(el){
+        $('.tabmenu li').each(function() {
+            $(this).removeClass('selected');
+        });
+        el.addClass('selected');
+        if (el.attr('data-type') && giftorders.filter.type != el.attr('data-type')) {
+        	giftorders.filter.type = parseInt(el.attr('data-type'));
+        	redirectGiftordersURL();
+        }
+    }
+</script>

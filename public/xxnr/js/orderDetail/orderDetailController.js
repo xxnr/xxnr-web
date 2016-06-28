@@ -137,10 +137,10 @@ app.controller('orderDetailController', function ($scope, remoteApiService, comm
                     $scope.order.showModifyAction = true;
                     $scope.order.actionName = '查看付款信息';
                     $scope.order.action = function () {
-                        window.location.href = "commitPay.html?id=" + $scope.order.id + "&offlinePay=1";
+                        window.location.href = "commitPay.html?id=" + $scope.order.id + "&offlinePay=1&auditingOrder=1";
                     };
                     $scope.order.modifyPay = function () {
-                        window.location.href = "commitPay.html?id=" + $scope.order.id;
+                        window.location.href = "commitPay.html?id=" + $scope.order.id + "&auditingOrder=1";
                     }
                 }
 

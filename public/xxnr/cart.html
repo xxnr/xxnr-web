@@ -174,14 +174,14 @@
                                             </span>
                                         </div>
                                         <div class="addition-price ng-cloak">
-                                            ¥ {{item.additionsTotalPrice.toFixed(2)}}
+                                            ¥ {{item.additionsPrice.toFixed(2)}}
                                         </div>
                                         <div class="additions-quantity ng-cloak">
                                             {{item.buyCount}}
                                         </div>
 
                                         <div class="TotalAdditionsPrice">
-                                            ¥ {{(item.additionsTotalPrice*item.buyCount).toFixed(2)}}
+                                            ¥ {{(item.additionsTotalPrice).toFixed(2)}}
                                         </div>
                                     </div>
                                     <div class="pay-step" ng-show="{{item.hasDeposit}}">

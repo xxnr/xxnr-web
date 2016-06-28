@@ -9,6 +9,7 @@ var AuditService = services.auditservice;
 var ThrottleService = services.throttle;
 var tools = require('../common/tools');
 var path = require('path');
+const ValidIpAddressRegex = /^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$/;
 
 exports.isLoggedIn_middleware = function(req, res, next){
     var token = null;
@@ -277,6 +278,7 @@ exports.throttle = function(req, res, next){
         route = route.substring(0, route.length - 1);
     var method = req.method.trim().toLowerCase();
     var ip = req.ip.trim();
+    var realIp = req.get('x-forwarded-for');
     ThrottleService.requireAccess(route, method, ip, user?user._id:null, function(pass, reason){
         if(!pass){
             switch(reason){
@@ -288,7 +290,24 @@ exports.throttle = function(req, res, next){
                     res.respond({code:1429, message:'系统繁忙，请稍后再试'});
             }
         } else{
-            next();
+            if(ValidIpAddressRegex.test(realIp)) {
+                ThrottleService.requireAccess(route, method, realIp, user ? user._id : null, function (pass, reason) {
+                    if (!pass) {
+                        switch (reason) {
+                            case ThrottleService.THROTTLE_BY_HITS_PER_USER:
+                            case ThrottleService.THROTTLE_BY_HITS_PER_IP:
+                                res.respond({code: 1429, message: '您操作的太频繁了，请稍后再试'});
+                                break;
+                            default:
+                                res.respond({code: 1429, message: '系统繁忙，请稍后再试'});
+                        }
+                    } else {
+                        next();
+                    }
+                }, ip)
+            } else{
+                next();
+            }
         }
     })
 };

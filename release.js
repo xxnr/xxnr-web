@@ -112,6 +112,8 @@ app.use(function (err, req, res, next) {
 	next(err);
 });
 
+module.exports = app;
+
 http.createServer(app).listen(80);
 console.info('application listen at port 80');
 

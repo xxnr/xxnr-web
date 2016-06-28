@@ -6,6 +6,7 @@ var router = express.Router();
 var controllers = require('../controllers');
 var path = require('path');
 var middleware = require('../middlewares/authentication');
+var throttle = require('../middlewares/throttle');
 
 // area address APIs
 router.get('/api/v2.0/area/getAreaList', controllers.Area.json_province_query);
@@ -78,8 +79,8 @@ router.get('/app/order/getOderList', middleware.isLoggedIn_middleware, controlle
 router.post('/app/order/getOderList', middleware.isLoggedIn_middleware, controllers.Order.api10_getOrders);
 
 // Vcod
-router.get('/api/v2.0/sms', controllers.VCode.generate_sms);
-router.post('/api/v2.0/sms', controllers.VCode.generate_sms);
+router.get('/api/v2.0/sms', throttle.forbidden_sms_attack_request, middleware.throttle, controllers.VCode.generate_sms);
+router.post('/api/v2.0/sms', throttle.forbidden_sms_attack_request, middleware.throttle, controllers.VCode.generate_sms);
 
 // news APIs
 router.get('/api/v2.0/news', controllers.News.json_news_query);
@@ -151,11 +152,10 @@ router.get('/api/v2.1/user/getNominatedInviter', middleware.isLoggedIn_middlewar
 router.get('/api/v2.2/user/queryConsignees', middleware.isLoggedIn_middleware, controllers.User.json_userconsignees_query);
 router.get('/api/v2.2/user/saveConsignees', middleware.isLoggedIn_middleware, controllers.User.process_userconsignees_save);
 router.post('/api/v2.2/user/saveConsignees', middleware.isLoggedIn_middleware, controllers.User.process_userconsignees_save);
-
 router.get('/api/v2.2/getOfflinePayType', controllers.Pay.json_offline_pay_type);
 
 // potential customer/intention products related APIs
-router.get('/api/v2.1/intentionProducts', middleware.isLoggedIn_middleware, middleware.isXXNRAgent_middleware, controllers.User.json_intention_products);
+router.get('/api/v2.1/intentionProducts', controllers.User.json_intention_products);
 router.get('/api/v2.1/potentialCustomer/isAvailable', middleware.isLoggedIn_middleware, middleware.isXXNRAgent_middleware, controllers.User.json_potential_customer_available);
 router.post('/api/v2.1/potentialCustomer/add', middleware.isLoggedIn_middleware, middleware.isXXNRAgent_middleware, controllers.User.process_add_potential_customer);
 router.get('/api/v2.1/potentialCustomer/query', middleware.isLoggedIn_middleware, middleware.isXXNRAgent_middleware, controllers.User.json_potential_customer);
@@ -175,6 +175,16 @@ router.get('/api/v2.2/RSC/orderDetail', middleware.isLoggedIn_middleware, middle
 router.get('/api/v2.2/RSC/orders', middleware.isLoggedIn_middleware, middleware.isRSC_middleware, controllers.RSC.json_RSC_orders_get);
 router.post('/api/v2.2/RSC/order/deliverStatus/delivering', middleware.isLoggedIn_middleware, middleware.isRSC_middleware, controllers.RSC.process_RSC_order_deliverStatus_delivering);
 router.post('/api/v2.2/RSC/order/selfDelivery', middleware.isLoggedIn_middleware, middleware.isRSC_middleware, middleware.throttle, controllers.RSC.process_self_delivery);
+
+// rewardshop
+router.get('/api/v2.3/rewardshop/get', middleware.isLoggedIn_middleware, controllers.Rewardshop.json_rewardshop_get);
+router.get('/api/v2.3/rewardshop/pointslogs', middleware.isLoggedIn_middleware, controllers.Rewardshop.json_rewardshop_pointslogs);
+router.get('/api/v2.3/rewardshop/gifts/categories', controllers.Rewardshop.json_rewardshop_categories);
+router.get('/api/v2.3/rewardshop/gifts/getGiftDetail', controllers.Rewardshop.json_rewardshop_giftDetail);
+router.get('/api/v2.3/rewardshop/gifts', controllers.Rewardshop.json_rewardshop_gifts);
+router.post('/api/v2.3/rewardshop/addGiftOrder', middleware.isLoggedIn_middleware, controllers.Rewardshop.add_gift_order);
+router.get('/api/v2.3/rewardshop/getGiftOrderList', middleware.isLoggedIn_middleware, controllers.Rewardshop.json_gift_order_query);
+router.get('/rewardshop/rules', controllers.Rewardshop.view_rewardshop_rules);
 
 // compatibility APIs
 controllers.Compatibility.compatibilityAPIs(router);

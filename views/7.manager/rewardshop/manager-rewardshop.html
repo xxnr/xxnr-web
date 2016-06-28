@@ -1,0 +1,27 @@
+<script type="text/javascript" async src="/js/simplePagination.js"></script>
+
+<div class="filter" style="padding-bottom:9px">
+	<div class="container">
+		<div class="caption"><span class="fa fa-gift mr5"></span>积分商城</div>
+	</div>
+</div>
+
+<div class="container">
+	<div class="col-md-2">
+		<div class="filter left-nav" style="padding: 25px 15px;">
+			<% if (user && user.role && user.role.name == 'customer_op') { %>
+			<div class="ui-left"><% if (page == 'manager-gifts-orders') { %><a class="selected"><% } else { %><a href="<%= manager_url %>/rewardshop"><% } %>积分商城订单</a></div>
+			<% } else { if (user && user.role && user.role.name == 'super_admin') { %>
+			<div class="ui-left"><% if (page == 'manager-gifts-orders') { %><a class="selected"><% } else { %><a href="<%= manager_url %>/rewardshop"><% } %>积分商城订单</a></div>
+			<div class="ui-left">
+				<% if (page == 'manager-gifts') { %><a class="selected"><% } else { %><a href="<%= manager_url %>/rewardshop/gifts"><% } %>礼品列表</a>
+				<ul class="sidebar">
+		            <% if (page == 'manager-gifts-detail') { %><li class="selected">-礼品管理</li><% } %>
+		            <li class="cl"></li>
+		        </ul>
+	        </div>
+			<div class="ui-left"><% if (page == 'manager-points-logs') { %><a class="selected"><% } else { %><a href="<%= manager_url %>/rewardshop/points-logs"><% } %>积分历史查询</a></div>
+			<!-- <div class="ui-left"><% if (page == 'manager-loyaltypoint') { %><a class="selected"><% } else { %><a><% } %>积分规则</a></div> -->
+			<% }} %>
+	    </div>
+	</div>

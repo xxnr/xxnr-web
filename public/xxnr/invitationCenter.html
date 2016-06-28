@@ -82,11 +82,11 @@
         </ul>
         <div class="myClients_forms">
             <div ng-cloak ng-show="tab===1" class="clients_section ng-cloak" ng-cloak>
-                <div ng-show="invitees.length==0 && !showOrders" class="noClient-info">
+                <div ng-show="!showOrders && !hasInvitees" class="noClient-info">
                     <img src="images/represent--icon.png" alt="">
                     <p>您还没有邀请用户,若您是新新农人的代理商，快去邀请客户吧~</p>
                 </div>
-                <div class="clients_info" ng-show="invitees.length!==0 && !showOrders">
+                <div class="clients_info" ng-show="!showOrders && hasInvitees">
                     <form class="invitees_search--Form" name="searchForm" novalidate ng-submit="" >
                         <div class="form-group clearfix">
                             <label>
@@ -95,10 +95,10 @@
                                     my-placeholder="姓名/手机号"
                                     placeholder="姓名/手机号"
                                     />
-                            <button class="search_btn" type="submit" ng-click="search_invitees()" >搜索</button>
+                            <button class="search_btn" type="submit" ng-click="search_invitees();inviteesSearched = true" >搜索</button>
                         </div>
                     </form>
-                    <p class="clients_count">我已邀请<span>{{inviteesCount}}位</span>客户</p>
+                    <p ng-show="!inviteesSearched" class="clients_count">我已邀请<span>{{inviteesCount}}位</span>客户</p>
                     <ul class="clients_form">
                         <li class="form_title">
                             <ul class="row">
@@ -119,7 +119,11 @@
                             </ul>
                         </li>
                     </ul>
-                    <div class="invitees_list_pager">
+                    <div class="no_invitees_searched" ng-show="inviteesSearched && invitees.length == 0">
+                        <img src="./images/can't-find-_icon.png" alt="">
+                        <p>未查找到相关客户</p>
+                    </div>
+                    <div class="invitees_list_pager" ng-hide="invitees.length == 0">
                         <div id="invitees_page_buttons">
                             <ul class="row">
                                 <li ng-hide="inviteesPager.current_page==1" class="pre_btn"><a href="" ng-click="pre_page(inviteesPager)"><em class="ban ban_8_0">&nbsp;</em></a></li>

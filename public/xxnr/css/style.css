@@ -2339,6 +2339,8 @@ body {
     text-shadow:none !important;
     border:none !important;
     box-shadow:none !important;
+    font-family: "Microsoft YaHei" !important;
+    cursor: pointer;
 }
 .user_wrap .login_form .register_message {
     margin-top: 20px;
@@ -2443,6 +2445,8 @@ body {
     text-shadow:none !important;
     border:none !important;
     box-shadow:none !important;
+    font-family: "Microsoft YaHei" !important;
+    cursor: pointer;
 }
 .user_wrap .register_form .login_link{
     margin-top: 10px;
@@ -2488,9 +2492,11 @@ body {
     position: absolute;
     top: 0px;
     margin-top: 43px;
-    width: 340px;
+    width: 239px;
     background: #FFEEED;
     height: 20px;
+    left: 99px;
+    border-radius: 2px;
 }
 .logon .reset_password_err img{
     padding-left: 14px;
@@ -2498,6 +2504,24 @@ body {
     padding-right: 10px;
 }
 .logon .reset_password_err span{
+    font-size: 12px;
+    color: #909090;
+}
+.logon .reset_password_succeed{
+    position: absolute;
+    top: 0px;
+    margin-top: 43px;
+    width: 239px;
+    background: #DBEFE0;
+    height: 20px;
+    left: 99px;
+}
+.logon .reset_password_succeed img{
+    padding-left: 14px;
+    padding-top: 3px;
+    padding-right: 10px;
+}
+.logon .reset_password_succeed span{
     font-size: 12px;
     color: #909090;
 }
@@ -2512,6 +2536,12 @@ body {
     border: 1px solid red;
 }
 .user_wrap .register_form .error_input--red {
+    border: 1px solid red;
+}
+.pop_body .pop_login li .focused_input--green {
+    border: 1px solid green;
+}
+.pop_body .pop_login li .error_input--red {
     border: 1px solid red;
 }
 .pop_mask {
@@ -2568,7 +2598,21 @@ body {
     background: url(../images/close.gif) no-repeat;
 }
 .pop_body .pop_login {
-    padding-top: 10px;
+    padding-top: 15px;
+}
+.pop_body .my_xxnr_password_err{
+    position: absolute;
+    margin-top: -14px;
+    margin-left: 80px;
+    background: #FFF2ED;
+    padding-left: 6px;
+    padding-right: 6px;
+    height: 24px;
+    line-height: 24px;
+    border-radius: 4px;
+}
+.pop_body .my_xxnr_password_err img{
+    padding-top: 4px;
 }
 .pop_body .pop_login li {
     padding-bottom: 20px;
@@ -3342,11 +3386,11 @@ body {
     padding-left: 818px;
 }
 .cart_box .cart-tbody .item-item .pay-step-1 span.text-info {
-    width: 140px;
+    width: 132px;
     display: inline-block;
 }
 .cart_box .cart-tbody .item-item .pay-step-2 span.text-info {
-    width: 140px;
+    width: 132px;
     display: inline-block;
 }
 .cart_box .cart-tbody .item-item .pay-step-1 .order-price {
@@ -3758,8 +3802,8 @@ body {
     padding-top: 3px;
 }
 .deliveryInfo .deliveryMethod .deliveryMethod--help {
-    position: relative;
-    display: inline-block;
+    position: absolute;
+    display: none;
 }
 .deliveryInfo .deliveryMethod .deliveryMethod--help--img {
     padding-top: 3px;
@@ -3789,6 +3833,10 @@ body {
 }
 .deliveryInfo .deliveryMethod .deliveryMethod--help:hover .deliveryMethod--help--text--prompt{
     display: block;
+}
+.deliveryInfo .deliveryMethod .delivery:hover .deliveryMethod--help{
+    display: inline-block;
+    padding-left: 3px;
 }
 .deliveryInfo .deliveryMethod a.current {
     border: 2px solid #FE9B00;
@@ -4459,14 +4507,14 @@ body {
 }
 .pop_pay_btn {
     margin: auto;
-    width: 270px;
+    width: 290px;
     margin-bottom: 50px;
 }
 .pop_pay_btn .btn {
     display: block;
-    width: 120px;
-    height: 30px;
-    line-height: 30px;
+    width: 130px;
+    height: 44px;
+    line-height: 44px;
     text-align: center;
     color: #fff;
     background: #00913a;
@@ -4779,6 +4827,7 @@ body {
     height: 30px;
     padding-bottom: 20px;
 }
+
 .addressFormTable .first-td{
     width: 70px;
     display: inline-block;
@@ -4794,7 +4843,9 @@ body {
     border: 1px solid #e0e0e0;
     border-radius: 5px;
     font-family: "Microsoft YaHei";
-
+}
+.addressFormTable .address-td{
+    padding-bottom: 18px;
 }
 .addressFormTable .second-td input[type="text"]{
     width: 200px;
@@ -4818,6 +4869,47 @@ body {
 }
 .addressFormTable .postcode{
     padding-left: 20px;
+}
+
+.addressFormTable .no_address_err{
+    position: absolute;
+    background: #FFF2ED;
+    padding-left: 6px;
+    padding-right: 6px;
+    height: 24px;
+    line-height: 24px;
+    border-radius: 4px;
+}
+.addressFormTable .no_address_err img{
+    padding-top: 4px;
+}
+.addressFormTable .no_consignee_err {
+    position: absolute;
+    background: #FFF2ED;
+    padding-left: 6px;
+    padding-right: 6px;
+    height: 24px;
+    line-height: 24px;
+    border-radius: 4px;
+    margin-left: 210px;
+    margin-top: -25px;
+}
+.addressFormTable .no_consignee_err img{
+    padding-top: 4px;
+}
+.addressFormTable .no_phoneNum_err {
+    position: absolute;
+    background: #FFF2ED;
+    padding-left: 6px;
+    padding-right: 6px;
+    height: 24px;
+    line-height: 24px;
+    border-radius: 4px;
+    margin-left: 210px;
+    margin-top: -25px;
+}
+.addressFormTable .no_phoneNum_err img{
+    padding-top: 4px;
 }
 .addNewAddressBtn {
     height: 58px;
@@ -5227,6 +5319,17 @@ body {
 }
 .myClients_forms .clients_info .clients_form .client_row ul .unfilled {
     color: #909090;
+}
+.myClients_forms .clients_info .no_invitees_searched{
+    height: 500px;
+    text-align: center;
+}
+.myClients_forms .clients_info .no_invitees_searched img{
+    margin-bottom: 28px;
+    margin-top: 120px;
+}
+.myClients_forms .clients_info .no_invitees_searched p{
+    color: #c7c7c7;
 }
 .myClients_forms .client_order .orders_clientInfo {
     width: 1120px;
@@ -6250,9 +6353,17 @@ body {
     text-align: center;
     border-radius: 12px;
     cursor: pointer;
+    position: relative;
+}
+.payBody .wrap .pay_box .pay_times .full_pay_icon:hover .payMethod--help{
+    display: inline-block;
+}
+.payBody .wrap .pay_box .pay_times .multi_pay_icon:hover .payMethod--help{
+    display: inline-block;
 }
 .payBody .wrap .pay_box .pay_times .payMethod--help{
-    position: relative;
+    position: absolute;
+    display: none;
 }
 .payBody .wrap .pay_box .pay_times .payMethod--help:hover .payMethod--help--text--prompt{
     display: block;
@@ -6263,13 +6374,13 @@ body {
 .payBody .wrap .pay_box .pay_times .payMethod--help--text--prompt {
     position: absolute;
     display: none;
-    margin-top: -14px;
-    margin-left: 115px;
+    margin-top: 29px;
+    margin-left: 9px;
 }
 .payBody .wrap .pay_box .pay_times .payMethod--help--img{
     position: absolute;
-    margin-top: -30px;
-    margin-left: 35px;
+    margin-top: 15px;
+    margin-left: 8px;
 }
 .payBody .wrap .pay_box .pay_times .payMethod--help--text {
     position: absolute;
@@ -6279,8 +6390,8 @@ body {
     font-size: 12px;
     color: #FE9B00;
     line-height: 22px;
-    margin-top: -10px;
-    margin-left: 22px;
+    margin-top: 33px;
+    margin-left: -17px;
     padding-left: 6px;
     padding-right: 6px;
     z-index: 100;
@@ -6397,12 +6508,16 @@ body {
 .payBody .wrap .pay_box .payMethod .checkout-steps .pay-style li a.current {
     border: 2px solid #d88b47;
 }
+.payBody .wrap .pay_box .payMethod .checkout-steps .pay-style li a:hover .offlinePay--help{
+    display: inline-block;
+}
 .payBody .wrap .pay_box .payMethod .checkout-steps .pay-style li a {
     border: 2px solid #e0e0e0;
 }
 
 .payBody .wrap .pay_box .payMethod .checkout-steps .pay-style .offlinePay--help{
     position: absolute;
+    display: none;
 }
 .payBody .wrap .pay_box .payMethod .checkout-steps .pay-style .offlinePay--help:hover .offlinePay--help--text--prompt{
     display: block;
@@ -6617,20 +6732,33 @@ body {
 }
 
 .commitPay_pop_content {
-    width: 300px;
+    width: 400px;
+    height: 210px;
 }
 .commitPay_pop_content .pop_pay .pay_alter_info {
     border: 0 solid #000;
+    text-align: center;
 }
 .commitPay_pop_content .pay_alter_info {
     margin-bottom: 10px;
+    margin-top: 50px;
+    line-height: 25px;
 }
 .commitPay_pop_content .btn {
     background: #fe9b00;
     border-radius: 7px;
 }
+.commitPay_pop_content .payWithProblem {
+    color: #FE9B00;
+    background: #FFF;
+    border: 1px solid #FE9B00;
+}
 .fillProfile {
     background: #f5f5f5;
+}
+.fillProfile .guide{
+    padding-bottom: 0px;
+    padding-top: 20px;
 }
 .fillProfile .container {
     margin-top: 30px;
@@ -6697,11 +6825,12 @@ body {
     display: inline-block;
     vertical-align: text-bottom;
     margin-bottom: -13px;
+    font-size: 14px;
 }
 .fillProfile .container .profile_box ul .sex {
     /*height: 60px;*/
 }
-.fillProfile .container .profile_box ul .sex form {
+.fillProfile .container .profile_box ul .sex .sex_form {
     vertical-align: text-bottom;
     margin-bottom: -6px;
     display: inline-block;
@@ -6724,6 +6853,22 @@ body {
 .fillProfile .container .profile_box ul .address .address--selects {
     display: inline-block;
 }
+.fillProfile .container .profile_box ul .address .address--selects #provin
+{
+    height:40px;
+}
+.fillProfile .container .profile_box ul .address .address--selects #city
+{
+    height:40px;
+}
+.fillProfile .container .profile_box ul .address .address--selects #county
+{
+    height:40px;
+}
+.fillProfile .container .profile_box ul .address .address--selects #town
+{
+    height:40px;
+}
 .fillProfile .container .profile_box ul .address label{
     display: inline-block;
 }
@@ -6732,7 +6877,8 @@ body {
     color: #c7c7c7;
     font-size: 18px;
     /*margin-top: 5px;*/
-    font-size: 12px;
+    font-size: 14px;
+    height: 40px;
 }
 .fillProfile .container .profile_box ul .address select.changed {
     color: #323232;
@@ -6748,6 +6894,7 @@ body {
     color: #323232;
     font-size: 14px;
     text-indent: 50px;
+    font-family: "Microsoft YaHei";
 }
 .fillProfile .container .profile_box ul .identity select.changed {
     /*color: #323232;*/
@@ -6767,6 +6914,7 @@ body {
     height: 40px;
     margin-left: 105px;
     border-radius: 3px;
+    line-height: 40px;
 }
 .fillProfile .container .profile_box ul .buttons .invalid {
     background: #C0C0C0;
@@ -6775,11 +6923,12 @@ body {
     display: inline-block;
     font-size: 14px;
     padding-left: 16px;
-    background: url("../images/left_arrow_gray.png") no-repeat 0px 1px;
+    background: url("../images/arrow_left_gray.png") no-repeat 0px 3px;
+    color: #909090;
 }
 .fillProfile .container .profile_box ul .profile--cancel:hover {
-    color: #FE9B00;
-    background: url("../images/left_arrow_orange.png") no-repeat 0px 1px;
+    color: #009933;
+    background: url("../images/arrow_left_green.png") no-repeat 0px 3px;
 }
 .research_section {
     background: #f5f5f5;
@@ -7671,7 +7820,7 @@ body {
 #provin
 {
     width:100px;
-    height:31px;
+    /*height:31px;*/
     /*padding:5px 0;*/
     margin-right: 6px;
     font-family: "Microsoft YaHei";
@@ -8347,7 +8496,18 @@ body {
     width: 150px;
     text-align: center;
 }
-
+.inputPickUpCode .rsc_pickup_err {
+    position: absolute;
+    padding-left: 6px;
+    padding-right: 6px;
+    height: 24px;
+    line-height: 24px;
+    border-radius: 4px;
+    margin-left: 116px;
+}
+.inputPickUpCode .rsc_pickup_err img{
+    padding-top: 4px;
+}
 .rscMgmt--noOrders{
     height: 500px;
 }

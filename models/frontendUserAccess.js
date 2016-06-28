@@ -9,7 +9,8 @@ var schema = new mongoose.Schema({
     method:{type:String, required:true},
     user:{type:mongoose.Schema.ObjectId, ref:'user'},
     ip:{type:String, required:true},
-    createdAt:{type:Date, required:true, default:Date.now, expires: throttle_config.expire_time_in_ms}
+    createdAt:{type:Date, required:true, default:Date.now, expires: throttle_config.expire_time_in_ms},
+    forwardedBy:{type:String}
 });
 
 schema.index({route:1, method:1, user:1, ip:1});

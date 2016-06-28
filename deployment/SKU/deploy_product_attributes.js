@@ -75,12 +75,12 @@ module.exports = function(callback) {
                                     return;
                                 }
 
-                                console.log('attribute', {
-                                    category: category,
-                                    brand: brand,
-                                    name: name,
-                                    value: value
-                                }, 'saved');
+                                //console.log('attribute', {
+                                //    category: category,
+                                //    brand: brand,
+                                //    name: name,
+                                //    value: value
+                                //}, 'saved');
                                 resolve();
                             }, display)
                         })
@@ -99,7 +99,7 @@ module.exports = function(callback) {
 
         Promise.all(promises)
             .then(function () {
-                console.log('Deploy product attributes success!!!!!!!!!!!!!');
+                //console.log('Deploy product attributes success!!!!!!!!!!!!!');
                 callback();
             })
             .catch(function(err){
