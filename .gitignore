@@ -9,3 +9,4 @@ tmp
 *.key
 /test/casper_test/*.png
 coverage
+/jobs/throttle/temp_ip_list.txt

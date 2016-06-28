@@ -6,7 +6,7 @@ var FUA = models.frontendUserAccess;
 var fs = require('jsonfile');
 var path = require('path');
 
-var tempFilePath = path.join(__dirname, 'temp_ip_list');
+var tempFilePath = path.join(__dirname, 'temp_ip_list.txt');
 var ips = [];
 var hasForwardedCount = 0;
 
