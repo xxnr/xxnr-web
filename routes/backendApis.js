@@ -83,14 +83,10 @@ router.get(F.config['manager-url']+'/api/v2.1/potentialCustomer/:_id', middlewar
 router.get(F.config['manager-url']+ '/api/v2.2/RSCInfo/:_id',middleware.backend_auth,controllers.Manager.json_RSC_info_get);
 router.get(F.config['manager-url']+'/api/v2.2/RSCs', middleware.backend_auth, controllers.Manager.json_RSC_query);
 router.get(F.config['manager-url']+'/api/v2.2/RSC/orders', middleware.backend_auth, controllers.Manager.json_RSCorders_query);
-<<<<<<< HEAD
-router.put(F.config['manager-url']+'/api/v2.2/RSC/modify', middleware.backend_auth, controllers.Manager.process_RSC_modify);
-router.get(F.config['manager-url']+ '/api/v2.2/RSC/queryByProducts',middleware.backend_auth ,controllers.Manager.json_RSC_query_by_products);
-=======
+
 router.put(F.config['manager-url']+'/api/v2.2/RSC/modify', middleware.backend_auth, middleware.auditing_middleware, controllers.Manager.process_RSC_modify);
 router.get(F.config['manager-url']+ '/api/v2.2/RSC/queryByProducts', middleware.backend_auth, controllers.Manager.json_RSC_query_by_products);
 router.get(F.config['manager-url']+ '/api/v2.2/RSC/queryByGift', middleware.backend_auth, controllers.Manager.json_RSC_query_by_gift);
->>>>>>> express
 
 // agents
 router.get(F.config['manager-url']+ '/api/agents', middleware.backend_auth, controllers.Manager.json_agents_query);
