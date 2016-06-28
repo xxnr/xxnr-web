@@ -5,7 +5,7 @@
     </div>
 </template>
 <script>
-  import XxnrHeader from './components/XxnrHeader.vue'
+  import XxnrHeader from './components/xxnrHeader.vue'
   import store from './vuex/store'
 
   export default {
