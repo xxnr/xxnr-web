@@ -70,6 +70,9 @@ export default {
   },
   confirmOrder: function (data, cb, errCb) {
     jsonpPost(API_ROOT + "api/v2.2/order/confirmSKUReceived", data, cb, errCb);
+  },
+  getInviter: function (data, cb, errCb) {
+    jsonpGet(API_ROOT + "api/v2.0/user/getInviter/", data, cb, errCb);
   }
 }
 

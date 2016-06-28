@@ -22,7 +22,7 @@
         </div>
         <div class="order-consignee" @click="showConsignee();">
           <div class="order-consignee-bit"></div>
-          <span v-if="!orderConsignee.consigneePhone">请填写收货人信息</span>
+          <span v-if="!orderConsignee.consigneePhone">请填写收货人信息{{orderConsignee.consigneeName}}</span>
           {{orderConsignee.consigneeName}}
           {{orderConsignee.consigneePhone}}
         </div>
@@ -40,7 +40,7 @@
             <li>
               <div class="product-con">
                 <div class="product-img">
-                  <img :src="product.imgUrl">
+                  <img :src="cartList.imgUrl">
                 </div>
                 <div class="product-info">
                   <div class="product-info-con">
@@ -48,7 +48,7 @@
                       {{cartList.productName}}
                     </div>
                     <div class="product-sku">
-                      <span v-if="product.attributes" v-for="attribute in product.attributes">
+                      <span v-if="cartList.attributes" v-for="attribute in cartList.attributes">
                         {{attribute.name}}：{{attribute.value+ ';'}}
                       </span>
                     </div>
@@ -59,34 +59,34 @@
                 <div class="product-pay-attr">
                   x {{cartList.count}}
                 </div>
-                <div class="product-pay-value orange">
-                  ¥{{cartList.price}}
+                <div class="product-pay-value orange" v-if="cartList.price">
+                  ¥{{cartList.price.toFixed(2)}}
                 </div>
               </div>
               <div class="product-addtions">
                 <div class="container">
                   <ul>
-                    <li class="product-addtions-line" v-if="product.additions" v-for="addition in cartList.additions">
+                    <li class="product-addtions-line" v-if="cartList.additions" v-for="addition in cartList.additions">
                       <div class="product-addtions-attr">{{addition.name}}</div>
-                      <div class="product-addtions-value">{{addition.price}}</div>
+                      <div class="product-addtions-value">¥{{addition.price.toFixed(2)}}</div>
                     </li>
                   </ul>
                 </div>
               </div>
-              <div class="product-pay-line">
+              <div class="product-pay-line" v-if="cartList.deposit">
                 <div class="product-pay-attr">
                   阶段一：订金
                 </div>
                 <div class="product-pay-value orange">
-                  ¥{{cartList.deposit}}
+                  ¥{{(cartList.deposit * cartList.count).toFixed(2)}}
                 </div>
               </div>
-              <div class="product-pay-line">
+              <div class="product-pay-line" v-if="cartList.deposit">
                 <div class="product-pay-attr">
                   阶段二：尾款
                 </div>
                 <div class="product-pay-value">
-                  ¥{{cartList.price * cartList.count - cartList.deposit}}
+                  ¥{{((cartList.price + additionsTotalPrice) * cartList.count - cartList.deposit * cartList.count).toFixed(2)}}
                 </div>
               </div>
             </li>
@@ -95,57 +95,84 @@
       </ul>
     </div>
   </div>
-  <div class="order-bottom" @click="commitOrder();">
+  <div class="order-bottom">
     <div class="order-bottom-total">
       <div class="order-bottom-total-con">
-        合计：<span class="orange">¥{{totalPrice}}</span>
+        合计：<span class="orange">¥{{totalPrice.toFixed(2)}}</span>
       </div>
     </div>
-    <div class="order-bottom-commit">
+    <div class="order-bottom-commit" @click="commitOrder(),showToast()">
       提交订单
     </div>
   </div>
+  <div class="toast-container" v-show="toastMsg.length>0">
+    <xxnr-toast :show.sync="toastShow" >
+      <p>{{toastMsg}}</p>
+    </xxnr-toast>
+  </div>
 </template>
-
 <script>
-  import { getRSCListByProduct, getShoppingCart, commitOrder, editTitle, showBackBtn } from '../../vuex/actions'
+  import { getRSCListByProduct, getShoppingCart, commitOrder, editTitle, showBackBtn, resetOrderCondignee, resetOrderRSC, selectConsigneeAuto } from '../../vuex/actions'
+  import xxnrToast from '../../xxnr_mobile_ui/xxnrToast.vue'
+  import {getUrlParam} from '../../utils/common'
 
   export default {
+    data: function () {
+      return {
+        toastShow: false
+      }
+    },
     vuex: {
       getters: {
+        //TODO: state or data
         RSCList: state => state.order.RSCList,
         orderRSC: state => state.order.orderRSC,
         cartList: state => state.order.cartList,
         totalPrice: state => state.order.totalPrice,
-        orderConsignee: state => state.order.orderConsignee
-      },
-      actions: {
-        getRSCListByProduct,
-        getShoppingCart,
-        commitOrder,
-        editTitle,
-        showBackBtn
-      }
+        orderConsignee: state => state.order.orderConsignee,
+        toastMsg: state => state.toastMsg,
+        additionsTotalPrice:state => state.order.additionsTotalPrice
+  },
+  actions: {
+    getRSCListByProduct,
+      getShoppingCart,
+      commitOrder,
+      editTitle,
+      showBackBtn,
+      resetOrderCondignee,
+      resetOrderRSC,
+      selectConsigneeAuto
+  }
+  },
+  components: {
+    xxnrToast
+  }
+  ,
+  methods: {
+    showRSCList()
+    {
+      window.location.href = '/#!/orderRSC?id=' + getUrlParam('id') + '&count=' + getUrlParam('count') + '&productId=' + getUrlParam('productId');
     },
-    methods: {
-      showRSCList() {
-        var test = window.location.href.match(new RegExp("[\?\&]" + 'id' + "=([^\&]+)", "i"));
-        window.location.href = '/#!/orderRSC?id=' + test[1];
-      },
-      showConsignee() {
-        var test = window.location.href.match(new RegExp("[\?\&]" + 'id' + "=([^\&]+)", "i"));
-        window.location.href = '/#!/orderConsignee?id=' + test[1];
-      }
+    showConsignee()
+    {
+      window.location.href = '/#!/orderConsignee?id=' + getUrlParam('id') + '&count=' + getUrlParam('count') + '&productId=' + getUrlParam('productId');
     },
-    created() {
+    showToast(){
+      this.toastShow = true;
+    }
+  },
+  route: {
+    activate(transition)
+    {
+      this.editTitle('提交订单');
+      this.showBackBtn();
       this.getShoppingCart();
-    },
-    route: {
-      activate(){
-        this.editTitle('提交订单');
-        this.showBackBtn();
-        document.getElementsByTagName('body')[0].scrollTop = 0;
-      }
+      var path = transition.from.path;
+      this.resetOrderCondignee(path);
+      this.resetOrderRSC(path);
+      document.getElementsByTagName('body')[0].scrollTop = 0;
+      transition.next();
+    }
     }
   }
 
@@ -163,6 +190,7 @@
   .order-container {
     margin-top: 10px;
     background-color: #fff;
+    padding-bottom: 45px;
   }
 
   .order-rsc-info {
@@ -182,7 +210,7 @@
 
   .product-con {
     position: relative;
-    height: 90px;
+    min-height: 90px;
     margin: 0 2%;
     padding-top: 10px;
   }
@@ -191,11 +219,15 @@
     float: left;
     width: 90px;
     height: 90px;
-    background-color: #000;
+    border: 1px solid #e3e3e3;
+  }
+
+  .product-img img {
+    width: 100%;
   }
 
   .product-info {
-    position: absolute;
+    position: relative;
     left: 0px;
   }
 
@@ -205,6 +237,10 @@
     height: 36px;
     overflow: hidden;
     margin-bottom: 8px;
+    -webkit-line-clamp: 2;
+    display: -webkit-box;
+    text-overflow: ellipsis;
+    -webkit-box-orient: vertical;
   }
 
   .product-info-con {
@@ -287,7 +323,8 @@
   }
 
   .order-bottom-commit {
-    float: right;
+    position: absolute;
+    right: 0;
     width: 110px;
     background-color: #ff9b00;
     border-top: 1px solid #ff9b00;

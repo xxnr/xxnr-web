@@ -22,35 +22,53 @@
       </div>
     </li>
   </ul>
-  <div v-for="item in "></div>
+  <div v-for="item in RSCList"></div>
   <div class="rsc-confirm">
-    <div class="rsc-confirm-btn" @click="RSCConfirm();">
+    <div class="rsc-confirm-btn" @click="RSCConfirm(),showToast();">
       确定
     </div>
+  </div>
+  <div class="toast-container" v-show="toastMsg.length>0">
+    <xxnr-toast :show.sync="toastShow" >
+      <p>{{toastMsg}}</p>
+    </xxnr-toast>
   </div>
 </template>
 
 <script>
   import { getRSCListByProduct, selectRSC, RSCConfirm, editTitle, showBackBtn } from '../../vuex/actions'
+  import {getUrlParam} from '../../utils/common'
+  import xxnrToast from '../../xxnr_mobile_ui/xxnrToast.vue'
 
   export default {
+    data: function () {
+      return {
+        toastShow:false
+      }
+    },
     vuex: {
       getters: {
         RSCList: state => state.order.RSCList,
-        RSCSelected: state => state.order.RSCSelected
-    },
-      actions: {
+        RSCSelected: state => state.order.RSCSelected,
+        toastMsg: state => state.toastMsg
+    },actions: {
         getRSCListByProduct,
         selectRSC,
         RSCConfirm,
         editTitle,
         showBackBtn
       }
+    },components: {
+      xxnrToast
+    },
+    methods: {
+      showToast:function(){
+        this.toastShow=true;
+      }
     },
     route: {
       activate(transition) {
-        var test = window.location.href.match(new RegExp("[\?\&]" + 'id' + "=([^\&]+)", "i"));
-        this.getRSCListByProduct('570db646f2c135e878f078e5');
+        this.getRSCListByProduct(getUrlParam('productId'));
         this.editTitle('选择自提网点');
         this.showBackBtn();
         transition.next();
@@ -65,6 +83,10 @@
     border-bottom: 1px solid #c7c7c7;
     padding: 10px 0 10px 30px;
     background-color: #fff;
+  }
+
+  .rsc-list {
+    padding-bottom: 45px;
   }
 
   .rsc-list-radio {

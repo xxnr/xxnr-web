@@ -17,9 +17,9 @@
     content: '下拉刷新...',
     height: 60,
     autoRefresh: false,
-    downContent: '下拉刷新...',
-    upContent: '松开刷新',
-    loadingContent: '载入中',
+    downContent: '下拉刷新....',
+    upContent: '<div class="xs-plugin-loader"><img src="../../static/assets/images/loader.png"></div>松开刷新',
+    loadingContent: '<div class="xs-plugin-loader"><img src="../../static/assets/images/loader.png"></div>正在刷新',
     clsPrefix: 'xs-plugin-pulldown-'
   })
 
@@ -28,9 +28,9 @@
     pullUpHeight: 60,
     height: 40,
     autoRefresh: false,
-    downContent: '松开刷新',
+    downContent: '<div class="xs-plugin-loader"><img src="../../static/assets/images/loader.png"></div>松开刷新',
     upContent: '上拉刷新...',
-    loadingContent: '载入中',
+    loadingContent: '<div class="xs-plugin-loader"><img src="../../static/assets/images/loader.png"></div>正在刷新',
     clsPrefix: 'xs-plugin-pullup-'
   })
 
@@ -107,7 +107,6 @@
     },
     methods: {
       reset () {
-        console.log('reset scroller');
         this._xscroll && this._xscroll.render()
       }
     },
@@ -230,7 +229,7 @@
       },
       'pullup:done': function (uuid) {
         if (uuid === this.uuid) {
-          this._xscroll.unplug(this.pullup)
+          this._xscroll.unplug(this.pullup);
         }
       },
       'scroller:reset': function (uuid) {
@@ -266,5 +265,25 @@
 <style>
   .xs-plugin-pullup-container {
     text-align: center;
+  }
+
+  .xs-plugin-loader {
+    width: 22px;
+    height: 22px;
+    margin: 0 auto;
+    animation: loader 1s linear infinite;
+  }
+
+  .xs-plugin-loader img {
+    width: 100%;
+  }
+
+  @-webkit-keyframes loader {
+    from{
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
   }
 </style>

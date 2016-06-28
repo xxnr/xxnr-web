@@ -11,9 +11,13 @@ import {
   GET_ORDERDETAIL,
   SELF_DELIVERY,
   CONFIRM_ORDERSKU,
-  SAVE_CONSIGNEE
-} from '../mutation-types'
+  SAVE_CONSIGNEE,
+  RESET_ORDERRSC,
+  RESET_ORDERCONSIGNEE,
+  SELECT_CONSIGNEEAUTO
+  } from '../mutation-types'
 
+import {getUrlParam} from '../../utils/common'
 
 const state = {
   RSCList: [],
@@ -27,7 +31,8 @@ const state = {
   orderConsignee: {consigneePhone: '', consigneeName: ''},
   orderOfflinePay: {},
   orderInfo: {},
-  deliveryCode: ''
+  deliveryCode: '',
+  additionsTotalPrice: 0
 }
 
 const mutations = {
@@ -46,31 +51,19 @@ const mutations = {
     }
     state.RSCSelected.$set(index, true);
   },
-  [CONFIRM_RSC] (state) {
-    var RSCNum = -1;
-    for(let i = 0; i < state.RSCSelected.length; i++) {
-      if(state.RSCSelected[i]) {
-        RSCNum = i;
-        break;
-      }
-    }
-    if(RSCNum == -1) {
-      alert('请选择自提网点');
-      return;
-    }
-    var address = state.RSCList[RSCNum].RSCInfo.companyAddress;
+  [CONFIRM_RSC] (state, index) {
+    var address = state.RSCList[index].RSCInfo.companyAddress;
     state.orderRSC.address = address.province.name + address.city.name + address.county.name + address.town.name + address.details;
-    state.orderRSC._id = state.RSCList[RSCNum]._id;
-    var test = window.location.href.match(new RegExp("[\?\&]" + 'id' + "=([^\&]+)", "i"));
-    window.location.href = '/#!/order?id=' + test[1];
+    state.orderRSC._id = state.RSCList[index]._id;
+    window.location.href = '/#!/order?id=' + getUrlParam('id') + '&count=' + getUrlParam('count') + '&productId=' + getUrlParam('productId') ;
     //window.history.back();
   },
   [GET_SHOPPINGCARTBYSKU] (state, data, id) {
-    var sku_id = window.location.href.match(new RegExp("[\?\&]" + 'id' + "=([^\&]+)", "i"));
-    sku_id = sku_id[1];
-    console.log(sku_id);
+    var sku_id = getUrlParam('id');
+    var count = getUrlParam('count');
     var cartData = data;
     var totalPrice = 0;
+    var additionsTotalPrice = 0;
     var flag_i = false;
     for(let i = 0; i < cartData.length; i++) {
       if(flag_i) {
@@ -78,9 +71,17 @@ const mutations = {
       }
       for(let j = 0; j < cartData[i].SKUList.length; j++) {
         if(cartData[i].SKUList[j]._id == sku_id) {
-          state.cartList = cartData[i].SKUList[j];
+          var item = cartData[i].SKUList[j];
+          if(cartData[i].SKUList[j].additions != 0) {
+            for(let m = 0 ; m < cartData[i].SKUList[j].additions.length; m++) {
+              additionsTotalPrice = Number((cartData[i].SKUList[j].additions[m].price + additionsTotalPrice).toFixed(2));
+            }
+          }
+          state.cartList = item;
           state.cartList.brandName = cartData[i].brandName;
-          state.totalPrice = cartData[i].SKUList[j].price * cartData[i].SKUList[j].count;
+          state.cartList.count = count;
+          state.cartList.totalPrice = Number(item.price * count);
+          totalPrice = count * (item.deposit ? item.deposit : item.price + additionsTotalPrice);
           flag_i = true;
           break;
         }
@@ -88,14 +89,19 @@ const mutations = {
     }
     //state.cartList = data;
     state.shopCartId = id;
+    state.additionsTotalPrice = additionsTotalPrice;
+    state.totalPrice = totalPrice;
   },
   [COMMIT_ORDER] (state, data){
     window.location.href = '/#!/offlinePay?id=' + data.id;
   },
   [GET_CONSIGNEE] (state, data) {
     state.consigneeList = data;
-    for(let i = 0; i < state.consigneeList.length; i++) {
-      state.consigneeSelected.push(false);
+    state.consigneeSelected = [];
+    if(state.consigneeList.length == 0) {
+      for(let i = 0; i < state.consigneeList.length; i++) {
+        state.consigneeSelected.push(false);
+      }
     }
   },
   [SELECT_CONSIGNEE] (state, index) {
@@ -110,8 +116,7 @@ const mutations = {
   [SAVE_CONSIGNEE] (state, consigneePhone, consigneeName) {
     state.orderConsignee.consigneePhone = consigneePhone;
     state.orderConsignee.consigneeName = consigneeName;
-    var test = window.location.href.match(new RegExp("[\?\&]" + 'id' + "=([^\&]+)", "i"));
-    window.location.href = '/#!/order?id=' + test[1];
+    window.location.href = '/#!/order?id=' + getUrlParam('id') + '&count=' + getUrlParam('count') + '&productId=' + getUrlParam('productId');
   },
   [CONFIRM_CONSIGNEE] (state, index) {
       var consigneeNum = -1;
@@ -127,8 +132,7 @@ const mutations = {
       }
       state.orderConsignee.consigneePhone = state.consigneeList[consigneeNum].consigneePhone;
       state.orderConsignee.consigneeName = state.consigneeList[consigneeNum].consigneeName;
-      var test = window.location.href.match(new RegExp("[\?\&]" + 'id' + "=([^\&]+)", "i"));
-      window.location.href = '/#!/order?id=' + test[1];
+      window.location.href = '/#!/order?id=' + getUrlParam('id') + '&count=' + getUrlParam('count') + '&productId=' + getUrlParam('productId');
       //window.history.back();
   },
   [OFFLINE_PAY] (state, data) {
@@ -139,6 +143,29 @@ const mutations = {
   },
   [SELF_DELIVERY] (state, data) {
     state.deliveryCode = data;
+  },
+  [RESET_ORDERCONSIGNEE] (state) {
+    state.orderConsignee = {consigneePhone: '', consigneeName: ''};
+  },
+  [RESET_ORDERRSC] (state) {
+    state.orderRSC = {_id: '', address: ''};
+  },
+  [SELECT_CONSIGNEEAUTO] (state, data) {
+    //if(state.consigneeList.length != 0) {
+    //  state.orderConsignee = {consigneePhone: '', consigneeName: ''};
+    //  return;
+    //}
+    var consigneeList = data;
+    for(let i = 0; i < consigneeList.length; i++) {
+      if(i == 0) {
+        state.consigneeSelected.push(true);
+        continue;
+      }
+      state.consigneeSelected.push(false);
+    }
+
+    state.orderConsignee.consigneePhone = consigneeList[0].consigneePhone;
+    state.orderConsignee.consigneeName = consigneeList[0].consigneeName;
   }
 }
 

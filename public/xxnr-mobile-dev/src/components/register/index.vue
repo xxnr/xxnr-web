@@ -23,7 +23,7 @@
       <input v-model="policyChecked" type="checkbox">
       <div class="register-checkbox" :class="{checked:policyChecked}"></div>我已阅读并同意<span class="register-green"><a href="" v-link="{ path: '/userAgreement'}">《新新农人用户协议》</a></span>
     </div>
-    <button class="register-btn" @click="register(phoneNum,password,code,confirmPassword,policyChecked)">
+    <button class="register-btn" @click="register(phoneNum,password,code,confirmPassword,policyChecked),showToast()">
       注册
     </button>
   </div>

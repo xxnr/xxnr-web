@@ -27,7 +27,7 @@ export function isLogin() {
 
 export function checkOtherPlaceLogin(res,that){
   if(res.data.code==1401){
-    that.alertShow= true;
-    that.alertMessage = "你已在其他地方登录,请重新登录"
+    that.toastShow= true;
+    that.toastMessage = "你已在其他地方登录,请重新登录"
   }
 }

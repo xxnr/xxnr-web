@@ -9,7 +9,8 @@ import {
   IS_ALLSKUSSELECTED,
   QUERY_SKUS,
   BUY_PRODUCT,
-  CLEAR_PRODUCTDETAIL
+  CLEAR_PRODUCTDETAIL,
+  IS_FROMORDER
   } from '../mutation-types'
 
 const state= {
@@ -20,22 +21,30 @@ const state= {
   selectedAdditions: [],
   selectedSKUs: [],
   isAllSKUSelected: false,
-  SKUList: []
+  SKUList: [],
+  AdditionList: [],
+  attrBoxType: 0,
+  isFromOrder: false
 }
 
 const mutations = {
   [GET_PRODUCTDETAIL] (state, product) {
     state.product = product;
+    state.SKUList = [];
+    state.AdditionList = [];
     document.getElementsByTagName('body')[0].scrollTop = 0;
   },
-  [SHOW_ATTRBOX] (state) {
+  [SHOW_ATTRBOX] (state, type) {
+    state.attrBoxType = type;
+    state.SKUList = [];
+    state.AdditionList = [];
     state.attrBoxDisplay = true;
-    for(var i in state.product.SKUAttributes){
-      if(state.product.SKUAttributes.hasOwnProperty(i)){
+    for(let i = 0; i < state.product.SKUAttributes.length; i++){
+      //if(state.product.SKUAttributes.hasOwnProperty(i)){
         var _flag = false;
-        for(var j in state.product.SKUAttributes[i].isSelected){
+        for(let j = 0; j < state.product.SKUAttributes[i].isSelected.length; j++){
           if(state.product.SKUAttributes[i].isSelected[j]==true){
-            state.SKUList.push(state.product.SKUAttributes[i].name);
+            state.SKUList.push(state.product.SKUAttributes[i].values[j]);
             _flag = true;
           }
         }
@@ -43,7 +52,7 @@ const mutations = {
           //alert('请选中一个SKU');
           return;
         }
-      }
+      //}
     }
     state.isAllSKUSelected = true;
   },
@@ -79,22 +88,14 @@ const mutations = {
       }
     }
   },
-  [QUERY_SKUS] (state, SKUs){
+  [QUERY_SKUS] (state, SKUs) {
     state.product.SKU_id = '';
+    state.SKUList = [];
     if(SKUs.SKU){
       state.product.SKU_id = SKUs.SKU._id;
       state.isAllSKUSelected = true;
-      for(var i in state.product.SKUAttributes){
-        for(var j in state.product.SKUAttributes[i].isSelected){
-          if(state.product.SKUAttributes[i].isSelected[j] == true){
-            console.log(state.product.SKUAttributes[i]);
-            state.SKUList.push(state.product.SKUAttributes[i].values[j]);
-          }
-        }
-      }
     } else {
       state.isAllSKUSelected = false;
-      state.SKUList = [];
     }
     if(SKUs.price){
       state.product.minPrice = SKUs.price.min;
@@ -129,6 +130,13 @@ const mutations = {
       }
     }
 
+    for(let i = 0; i < state.product.SKUAttributes.length; i++){
+      for(let j = 0; j < state.product.SKUAttributes[i].isSelected.length; j++){
+        if(state.product.SKUAttributes[i].isSelected[j] == true){
+          state.SKUList.push(state.product.SKUAttributes[i].values[j]);
+        }
+      }
+    }
   },
   [SELECT_ADDITION] (state, index) {
     state.selectedAdditions = [];
@@ -155,19 +163,24 @@ const mutations = {
       price: state.product.SKUAdditions[index].price,
       isSelected: !state.product.SKUAdditions[index].isSelected
     });
-    for(var i in state.product.SKUAdditions){
+    state.AdditionList = [];
+    for(let i = 0; i < state.product.SKUAdditions.length; i++){
       if(state.product.SKUAdditions[i].isSelected == true){
         state.selectedAdditions.push(state.product.SKUAdditions[i].ref);
         if(state.isAllSKUSelected == true){
-          state.SKUList.push(state.product.SKUAdditions[i].name);
+          state.AdditionList.push(state.product.SKUAdditions[i].name);
         } else {
-          state.SKUList = [];
+          state.AdditionList = [];
         }
       }
     }
   },
   [CLEAR_PRODUCTDETAIL] (state) {
     state.product = {};
+    state.productNumber = 1;
+  },
+  [IS_FROMORDER] (state, value) {
+    state.isFromOrder = value;
   }
 }
 

@@ -55,7 +55,7 @@
             {{attribute.name}}：{{attribute.value}}；
           </span>
         </div>
-        <div class="self-delivery-product-sku" v-if="item.additions">
+        <div class="self-delivery-product-sku" v-if="item.additions.length != 0">
           附加项目：
           <span v-for="addition in item.additions">
             {{addition.name}};

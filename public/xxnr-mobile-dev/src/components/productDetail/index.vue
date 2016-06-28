@@ -14,7 +14,7 @@
         <div class="product-SKUPrice">
           {{'￥'+productDetail.minPrice}} {{productDetail.maxPrice==productDetail.minPrice?"":"-"}} {{(productDetail.maxPrice==productDetail.minPrice?"":productDetail.maxPrice)}}
         </div>
-        <div class="product-deposit" v-if="productDetail.deposit">
+        <div class="product-deposit" v-if="productDetail.deposit && productDetail.online">
           订金：<span class="product-deposit-num">{{'¥' + productDetail.deposit}}</span>
         </div>
         <div class="clear"></div>
@@ -27,11 +27,11 @@
   <div class="product-detail-description" v-if="productDetail.description">
     {{productDetail.description}}
   </div>
-  <div class="product-detail-title" v-if="productDetail.online" @click="showAttrBox();">
+  <div class="product-detail-title" v-if="productDetail.online" @click="showAttrBox(1);">
     <div class="container">
       <div class="product-skulist">
         <div v-if="SKUList.length == 0">请选择商品属性</div>
-        <div v-else class="product-skulist-con">已选择:<span v-for="item in SKUList">"{{item}}"</span></div>
+        <div v-else class="product-skulist-con">已选择:<span v-for="item in SKUList" track-by="$index">"{{item}}"</span><span v-if="AdditionList" v-for="item in AdditionList" track-by="$index">"{{item}}"</div>
         <img class="productDetail-arrow" src="/assets/images/productDetail_arrow.png" alt="">
       </div>
     </div>
@@ -79,17 +79,17 @@
   <div class="bottom-btn presale" v-if="!productDetail.online">
     商品已下架
   </div>
-  <div class="bottom-btn" @click="showAttrBox();" v-if="!productDetail.presale && productDetail.online">
+  <div class="bottom-btn" @click="showAttrBox(2);" v-if="!productDetail.presale && productDetail.online">
     {{productDetail.buyActionName}}
   </div>
-  <div class="bottom-btn presale" v-if="productDetail.presale && productDetail.online" @click="showAttrBox();">
+  <div class="bottom-btn presale" v-if="productDetail.presale && productDetail.online">
     敬请期待
   </div>
   <div class="attr-box" v-show="attrBoxDisplay">
     <div class="close-attr-box" @click="hideAttrBox();">
       <img src="../../../static/assets/images/close-box.png">
     </div>
-    <div class="container" style="height:400px;overflow:auto;">
+    <div class="attr-box-container" style="-webkit-overflow-scrolling: touch;">
       <div class="attr-product">
         <div class="attr-product-img">
           <img :src="productDetail.imgUrl">
@@ -109,6 +109,7 @@
         </div>
         <div class="clear"></div>
       </div>
+      <div class="attr-product-h"></div>
       <div class="container">
         <div v-for="sku in productDetail.SKUAttributes" class="sku-block">
           <div class="sku-name">{{sku.name}}</div>
@@ -141,7 +142,7 @@
       商品已下架
     </div>
     <div class="bottom-btn-static" @click="buyProduct(),showToast();" v-if="!productDetail.presale && productDetail.online" :class="{'disabled': !isAllSKUSelected}">
-      确定
+      <span v-if="attrBoxType == 2">确定</span><span v-else>{{productDetail.buyActionName}}</span>
     </div>
     <div class="bottom-btn-static presale" v-if="productDetail.presale && productDetail.online">
       敬请期待
@@ -168,9 +169,11 @@
     buyProduct,
     clearProductDetail,
     showBackBtn,
-    editTitle
+    editTitle,
+    isFromOrder
   } from '../../vuex/actions'
   import xxnrToast from '../../xxnr_mobile_ui/xxnrToast.vue'
+  import {getUrlParam} from '../../utils/common'
 
   export default {
     data: function () {
@@ -191,7 +194,9 @@
         productNumber: state => state.productDetail.productNumber,
         isAllSKUSelected: state => state.productDetail.isAllSKUSelected,
         toastMsg: state => state.toastMsg,
-        SKUList: state => state.productDetail.SKUList
+        SKUList: state => state.productDetail.SKUList,
+        AdditionList: state => state.productDetail.AdditionList,
+        attrBoxType: state => state.productDetail.attrBoxType
       },
       actions: {
         getProductDetail,
@@ -205,7 +210,8 @@
         buyProduct,
         clearProductDetail,
         showBackBtn,
-        editTitle
+        editTitle,
+        isFromOrder
       }
     },
     components: {
@@ -216,8 +222,8 @@
     },
     route: {
       activate (transition) {
-        var query = window.location.href.match(new RegExp("[\?\&]" + 'id' + "=([^\&]+)", "i"));
-        this.getProductDetail(query[1]);
+        this.isFromOrder(transition.from.path);
+        this.getProductDetail(getUrlParam('id'));
         this.showBackBtn();
         this.editTitle('商品详情');
         transition.next();
@@ -232,6 +238,12 @@
 </script>
 
 <style scoped>
+  .attr-box-container {
+    height:400px;
+    overflow-y:scroll;
+    z-index: 0;
+  }
+
   .product-info {
     border-top: 1px solid #c7c7c7;
   }
@@ -389,9 +401,16 @@
 
   .attr-product {
     height: 75px;
-    position: relative;
+    width: 100%;
+    position: absolute;
     padding: 10px 0;
     border-bottom: 1px solid #E0E0E0;
+    background-color: #fff;
+    top:0;
+  }
+
+  .attr-product-h {
+    height: 96px;
   }
 
   .sku-item {
@@ -408,6 +427,7 @@
     text-overflow: ellipsis;
     overflow: hidden;
     max-width: 98%;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
   }
 
   .sku-name {

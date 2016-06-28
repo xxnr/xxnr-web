@@ -24,12 +24,11 @@
 </script>
 
 <style scoped>
-  .product{
+  .product {
     float: left;
     width: 49%;
     margin-left: 2%;
     margin-bottom: 15px;
-    height: 220px;
   }
 
   .product:nth-child(2n+1) {
@@ -46,11 +45,11 @@
 
   .product-img {
     border: 1px solid #c7c7c7;
+    overflow: hidden;
   }
 
   .product-img img{
     width: 100%;
-    height: 150px;
   }
 
   .product-price {

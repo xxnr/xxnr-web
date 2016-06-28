@@ -11,7 +11,7 @@
     </div>
     <div class="profile_section--TextInfo">
       <p v-if="userInfo.nickname">{{userInfo.nickname}}</p>
-      <p v-else>您未设置昵称</p>
+      <p v-else>新新农人</p>
       <p class="myxxnr--address">所在地区：
         <span v-if="userInfo.address">
           <span v-for="part in userInfo.address">
@@ -23,7 +23,7 @@
         </span>
       </p>
       <p class="myxxnr--type">
-        类型：{{userInfo.userTypeInName}}
+        类型：{{userInfo.userTypeInName}}&nbsp;&nbsp;<img src="/assets/images/verified-icon.png" v-if="userInfo.isVerified">
       </p>
     </div>
   </div>
@@ -41,15 +41,29 @@
     <div class="profile_option" v-link="{ name: 'myInvitation'}">
       <img class="option_icon" src="/assets/images/my_xxnr_icon_peasant.png" alt="">新农代表
     </div>
-    <div class="profile_option">
-      <a href="tel:400-056-0371">
+    <div class="profile_option" @click="showConfirmBox();">
+      <!--<a href="tel:400-056-0371">-->
         <img class="option_icon" src="/assets/images/my_xxnr_icon_service_telephone.png" alt="">客服电话
         <span id="phone_number">400-056-0371</span>
-      </a>
+      <!--</a>-->
 
     </div>
     <div @click="logout()" v-cloak v-if="userInfo" class="profile_option">
       <img class="option_icon" src="/assets/images/my_xxnr_icon_out.png" alt="">退出登录
+    </div>
+  </div>
+  <div class="mask" v-if="showConfirm"></div>
+  <div class="confirm-box" v-if="showConfirm">
+    <div class="confirm-box-wor">400-056-0371</div>
+    <div class="confirm-btn-box">
+      <div class="confirm-btn confirm-cancel" @click="hideConfirmBox();">
+        取消
+      </div>
+      <a href="tel:400-056-0371">
+        <div class="confirm-btn confirm-confirm" @click="hideConfirmBox();">
+          拨打
+        </div>
+      </a>
     </div>
   </div>
 </template>
@@ -68,6 +82,11 @@
   } from '../../vuex/actions'
 
   export default {
+    data(){
+      return {
+        showConfirm: false
+      }
+    },
     vuex:{
       getters:{
         user : state => state.auth.user,
@@ -86,6 +105,14 @@
       }
     },
     components: {
+    },
+    methods: {
+      showConfirmBox:function () {
+        this.showConfirm =  true;
+      },
+      hideConfirmBox:function () {
+        this.showConfirm = false;
+      }
     },
     route: {
       activate(){
@@ -159,6 +186,7 @@
     color: #323232;
     margin: 0 12px;
     border-bottom: 1px solid #909090;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
   }
   .profile_option img{
     width: 27px;
@@ -178,6 +206,10 @@
   }
   .myxxnr--type{
     font-size: 14px;
+  }
 
+  .myxxnr--type img {
+    width: 10px;
+    margin-top: 5px;
   }
 </style>

@@ -16,34 +16,60 @@
           {{item.productName}}
         </div>
         <div class="confirm-product-sku" >
-          <span v-if="item.attributes" v-for="attribute in item.attributes">{{attribute.name}}：{{attribute.value}}；</span>
-          <span v-if="item.additions" v-for="addition in item.additions">{{addition.name}}：{{addition.value}}；</span>
+          <div v-if="item.attributes">
+            <span v-for="attribute in item.attributes">{{attribute.name}}：{{attribute.value}}；</span>
+          </div>
+          <div v-if="item.additions">
+            附加项目：<span v-for="addition in item.additions">{{addition.name}}；</span>
+          </div>
+        </div>
+        <div class="confirm-product-num">
+          x{{item.count}}
         </div>
       </div>
     </div>
     <div class="confirm-product-btn" @click="confirmOrder();" :class="{'disabled': !hasSKUSelected}">
-      确认
+      确认<span v-if="hasSKUSelected">({{productNumber}})</span>
     </div>
+  </div>
+  <div class="xxnr_order_toast" v-if="successToast">
+    <div class="xxnr-toast-img">
+      <img src="../../static/assets/images/success.png">
+    </div>
+    <p class="xxnr-toast-wor">收货成功</p>
+  </div>
+  <div class="xxnr_order_toast" v-if="failureToast">
+    <div class="xxnr-toast-img">
+      <img src="../../static/assets/images/failure.png">
+    </div>
+    <p class="xxnr-toast-wor">请稍后再试</p>
   </div>
 </template>
 
 <script>
   import { showPopBox, hidePopBox, selectConfirmProduct, confirmOrder } from '../vuex/actions'
-
   export default {
+    data(){
+      return{
+
+      }
+    },
     vuex: {
       getters: {
         orderSKUList: state => state.myOrders.orderSKUList,
         popBoxDisplay: state => state.myOrders.popBoxDisplay,
         checkedSKUList: state => state.myOrders.checkedSKUList,
         confirmOrderId: state => state.myOrders.confirmOrderId,
-        hasSKUSelected: state => state.myOrders.hasSKUSelected
-        },
+        hasSKUSelected: state => state.myOrders.hasSKUSelected,
+        productNumber: state => state.myOrders.productNumber,
+        failureToast: state => state.myOrders.failureToast,
+        successToast: state => state.myOrders.successToast
+      },
       actions: {
         showPopBox,
         hidePopBox,
         selectConfirmProduct,
-        confirmOrder
+        confirmOrder,
       }
     },
     methods: {
@@ -138,5 +164,62 @@
 
   .confirm-product-btn.disabled {
     background-color: #E2E2E2;
+  }
+
+  .confirm-product-num {
+    position: absolute;
+    right: 2%;
+    top: 10px;
+    line-height: 16px;
+  }
+
+  .xxnr_order_toast{
+    position: fixed;
+    width: 180px;
+    height: 140px;
+    background-color: #000;
+    opacity: .8;
+    top: 50%;
+    left: 50%;
+    margin-top: -70px;
+    margin-left: -90px;
+    border-radius: 10px;
+    color: #fff;
+    font-size: 16px;
+    opacity: 0;
+    -webkit-animation: fadeInOut 2s ease; /* Safari, Chrome and Opera > 12.1 */
+    -moz-animation: fadeInOut 2s ease; /* Firefox < 16 */
+    -ms-animation: fadeInOut 2s ease; /* Internet Explorer */
+    -o-animation: fadeInOut 2s ease; /* Opera < 12.1 */
+    animation: fadeInOut 2s ease;
+  }
+
+  @keyframes fadeInOut {
+    0% {
+      opacity: 0;
+    }
+    20% {
+      opacity: 1;
+    }
+    80% {
+     opacity: 1;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+
+  .xxnr-toast-img {
+    width: 100%;
+    text-align: center;
+    margin-top: 20px;
+  }
+  .xxnr-toast-img img {
+    width: 60px;
+  }
+
+  .xxnr-toast-wor {
+    text-align: center;
+    margin-top: 15px;
   }
 </style>

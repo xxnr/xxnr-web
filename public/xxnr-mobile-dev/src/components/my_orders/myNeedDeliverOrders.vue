@@ -78,7 +78,6 @@
         this.orders = [],
         this.end = false,
         this.getOrders(this.currentPage);
-      console.log(this.typeValue);
       this.$parent.selectedTab = this.typeValue;
       this.$broadcast('resetHeightScrollTop',true);
     }

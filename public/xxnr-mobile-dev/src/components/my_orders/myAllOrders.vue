@@ -4,15 +4,17 @@
       <orders-list :orders="orders"></orders-list>
     </div>
   </scroller>
-  <xxnr-alert :show.sync="alertShow" title="新新农人" link="/login">
-    {{alertMessage}}
-  </xxnr-alert>
+  <div v-show="toastMsg.length>0">
+    <xxnr-toast :show.sync="toastShow" >
+      <p>{{toastMsg}}</p>
+    </xxnr-toast>
+  </div>
 </template>
 
 <script>
     import ordersList from '../ordersList.vue'
     import Scroller from '../../xxnr_mobile_ui/xxnrScroller.vue'
-    import xxnrAlert from '../../xxnr_mobile_ui/xxnrAlert.vue'
+    import xxnrToast  from '../../xxnr_mobile_ui/xxnrAlert.vue'
     import api from '../../api/remoteHttpApi'
     import {scrollerHandler} from "./scrollerHandler"
     import {checkOtherPlaceLogin} from '../../utils/authService'
@@ -23,14 +25,14 @@
                 currentPage:1,
                 orders:[],
                 end:false,
-                alertShow:false,
-                alertMessage:''
+                toastShow:false,
+                toastMsg:''
             }
         },
         components:{
           ordersList,
           Scroller,
-          xxnrAlert
+            xxnrToast
         },
         methods:{
           loadMoreOrders:scrollerHandler,

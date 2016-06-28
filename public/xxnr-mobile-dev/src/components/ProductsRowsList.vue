@@ -1,7 +1,8 @@
 <template>
   <div class="productsRows clearfix">
-    <div class="productRow" v-for="product in products">
-      <a v-link="{path: '/productDetail?id=' + product.goodsId}">
+
+    <a v-link="{path: '/productDetail?id=' + product.goodsId}" v-for="product in products">
+    <div class="productRow">
         <div class="product-img">
           <img :src="product.imgUrl">
         </div>
@@ -16,8 +17,8 @@
             {{product.onSale ? '¥'+ product.unitPrice : '¥'+ product.originalPrice}}
           </div>
         </div>
-      </a>
     </div>
+    </a>
   </div>
 </template>
 
@@ -69,6 +70,10 @@
     font-size: 14px;
     height: 36px;
     overflow: hidden;
+    -webkit-line-clamp: 2;
+    display: -webkit-box;
+    text-overflow: ellipsis;
+    -webkit-box-orient: vertical;
   }
 
   .product-presale {

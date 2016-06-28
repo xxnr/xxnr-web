@@ -78,7 +78,7 @@
     activate(transition) {
       this.getOrderDetail();
       this.showBackBtn();
-      this.setRightButtonText('查看订单', 'my_orders/myAllOrders');
+      this.setRightButtonText('查看订单', 'my_orders/myPayingOrders');
       this.showRightBtn();
       this.editTitle('线下支付');
       transition.next();

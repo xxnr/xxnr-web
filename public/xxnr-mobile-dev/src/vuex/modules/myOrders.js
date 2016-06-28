@@ -4,7 +4,11 @@ import {
   SHOW_POPBOX,
   SELECT_ORDERSKU,
   CONFIRM_ORDERSKU,
-  CONFIRM_ORDER
+  CONFIRM_ORDER,
+  SHOW_SUCCESSTOAST,
+  HIDE_SUCCESSTOAST,
+  SHOW_FAILURETOAST,
+  HIDE_FAILURETOAST
 } from '../mutation-types'
 
 // initial state
@@ -14,7 +18,12 @@ const state = {
   checkedSKUList: [],
   orderSKUList: [],
   confirmOrderId: '',
-  hasSKUSelected: false
+  hasSKUSelected: false,
+  productNumber: 0,
+  toastShow: false,
+  toastMsg: '',
+  failureToast: false,
+  successToast: false
 }
 
 // mutations
@@ -36,20 +45,9 @@ const mutations = {
     state.popBoxDisplay = true;
   },
   [SELECT_ORDERSKU](state,index) {
-    //for(let i = 0; i < state.checkedSKUList.length; i++) {
-    //  if(state.checkedSKUList[i]) {
-    //    state.checkedSKUList.$set(i, false);
-    //    break;
-    //  }
-    //}
-    //var SKURefs =[];
-    //for(let i = 0; i < state.myOrders.checkedSKUList.length; i++) {
-    //  if(state.myOrders.checkedSKUList[i]) {
-    //    SKURefs.push(state.myOrders.orderSKUList.SKUList[i].ref);
-    //  }
-    //}
     if(state.checkedSKUList[index]) {
       state.checkedSKUList.$set(index, false);
+      state.productNumber -= state.orderSKUList.SKUList[index].count;
       var flag = false;
       for(let i = 0; i < state.checkedSKUList.length; i++) {
         if(state.checkedSKUList[i]) {
@@ -64,10 +62,20 @@ const mutations = {
       return;
     }
     state.checkedSKUList.$set(index, true);
+    state.productNumber += state.orderSKUList.SKUList[index].count;
     state.hasSKUSelected = true;
   },
-  [CONFIRM_ORDER] (state) {
-
+  [SHOW_SUCCESSTOAST] (state) {
+    state.successToast = true;
+  },
+  [HIDE_SUCCESSTOAST] (state) {
+    state.successToast = false;
+  },
+  [SHOW_FAILURETOAST] (state) {
+    state.failureToast = true;
+  },
+  [HIDE_FAILURETOAST] (state) {
+    state.failureToast = false;
   }
 }
 

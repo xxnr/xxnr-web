@@ -31,7 +31,6 @@
   methods:{
     loadMoreOrders:scrollerHandler,
       getOrders:function(pageNum){
-      console.log('order');
       api.getOrdersList(
         {'typeValue':this.typeValue,'page':pageNum},
         response => {
@@ -75,10 +74,9 @@
   route: {
     activate(){
       this.currentPage = 1,
-        this.orders = [],
-        this.end = false,
-        this.getOrders(this.currentPage);
-      console.log(this.typeValue);
+      this.orders = [],
+      this.end = false,
+      this.getOrders(this.currentPage);
       this.$parent.selectedTab = this.typeValue;
       this.$broadcast('resetHeightScrollTop',true);
     }

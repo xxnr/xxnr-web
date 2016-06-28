@@ -12,10 +12,10 @@ const state = {
 // mutations
 const mutations = {
   [GET_ROWSVIEWCARS](state , products){
-    state.rowsViewCars = products;
+    state.rowsViewCars = products.rows;
   },
   [GET_ROWSVIEWHUAFEI](state , products){
-    state.rowsViewHuafei = products;
+    state.rowsViewHuafei = products.rows;
   }
 }
 

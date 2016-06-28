@@ -33,6 +33,10 @@
       <div>京ICP备15037751</div>
     </div>
   </div>
+  <div class="loader-img" v-if="showLoader">
+    <img src="../../../static/assets/images/loading.png">
+    <div class="loader-wor">加载中...</div>
+  </div>
 </template>
 
 <script>
@@ -42,6 +46,11 @@
   import { getIndexCars,getIndexHeafei,showBackBtn,hideBackBtn,showRightBtn,getSliderImages,changeRightBtnMyXXNR,changeRightBtnPathMyxxnr,editTitle } from '../../vuex/actions'
   import vuxSwiper from 'vux/components/swiper'
   export default {
+    data: function() {
+        return {
+          showLoader: false
+        }
+    },
     vuex:{
       getters:{
         indexCars:state => state.indexCarsList.indexCars,
@@ -80,9 +89,13 @@
       vuxSwiper
     },
     created () {
+      this.showLoader = true;
       this.getIndexCars();
       this.getIndexHeafei();
 	    this.getSliderImages();
+    },
+    ready (){
+      this.showLoader = false;
     },
     route: {
 //      deactivate (transition) {
@@ -210,4 +223,21 @@
     background: #01E8AB;
   }
 
+  .loader-img {
+    position: fixed;
+    width: 80px;
+    top: 40%;
+    left: 50%;
+    margin-left: -40px;
+    text-align: center;
+  }
+
+  .loader-img img {
+    width: 40px;
+  }
+
+  .loader-wor {
+    text-align: center;
+    font-size: 14px;
+  }
 </style>

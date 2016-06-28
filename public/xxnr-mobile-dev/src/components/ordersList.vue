@@ -8,7 +8,7 @@
           </div>
           <div class="orders-product-info">
             <div class="orders-product-name">
-              {{SKU.name}}
+              {{SKU.productName}}
             </div>
             <div class="orders-product-count" v-else>
               ×{{SKU.count}}
@@ -36,6 +36,8 @@
         <div class="action-wor" v-if="order.order.orderStatus.type == 3">待发货</div>
         <div class="action-wor" v-if="order.order.orderStatus.type == 0">已关闭</div>
         <div class="action-wor" v-if="order.order.orderStatus.type == 6">已完成</div>
+        <div class="action-wor" v-if="order.order.orderStatus.type == 4 && !order.isShowC" >配送中</div>
+        <div class="action-wor" v-if="order.order.orderStatus.type == 5 && !order.isShowD">待自提</div>
         <input type="button" v-if="order.order.orderStatus.type == 1 || order.order.orderStatus.type == 2" class="action-btn" value="去付款" @click="payOrder(order.id);">
         <input type="button" v-if="order.order.orderStatus.type == 4 && order.isShowC" class="action-btn" value="确认收货" @click="getOrderDetailById(order.id);">
         <input type="button" v-if="order.order.orderStatus.type == 5 && order.isShowD" class="action-btn" value="去自提" @click="selfDelivery(order.id);">
@@ -95,6 +97,11 @@
     display: inline-block;
     box-sizing: border-box;
   }
+
+  .orders-product-img img {
+    width: 100%;
+  }
+
   .orders-product-info{
     display: inline-block;
     position: absolute;
@@ -104,9 +111,13 @@
   .orders-product-name{
     height: 40px;
     line-height: 20px;
-    overflow: hidden;
     margin-bottom: 12px;
     padding-right: 10px;
+    overflow : hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
   }
   .orders-product-count{
     font-size: 20px;

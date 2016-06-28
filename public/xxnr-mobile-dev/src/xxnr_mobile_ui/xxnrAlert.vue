@@ -31,7 +31,7 @@
       },
       buttonText: {
         type: String,
-        default: 'OK'
+        default: '确定'
       },
       maskTransition: {
         type: String,
