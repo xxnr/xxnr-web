@@ -2,7 +2,7 @@
  * Created by cuidi on 15/11/16.
  */
 var app = angular.module('commit_pay', ['xxnr_common', 'shop_cart',"ngFlash"]);
-app.controller('commitPayController', function($scope, remoteApiService, payService, commonService, loginService, Flash){
+app.controller('commitPayController', function($scope, remoteApiService, payService, commonService, loginService, Flash, $timeout){
     function getQueryStringByName(name) {
         var result = location.search.match(new RegExp("[\?\&]" + name + "=([^\&]+)", "i"));
         if (result == null || result.length < 1) {
@@ -185,12 +185,12 @@ app.controller('commitPayController', function($scope, remoteApiService, payServ
                                 $scope.orderHasPayed = true;
                             }
                             else {
-                                if(data.datas.rows.payStatus == 2){
-                                    $scope.orderHasPayed = true;
-                                } else if(data.datas.rows.order.orderStatus &&  data.datas.rows.order.orderStatus.type != 7 && $scope.auditingOrder) {
+                                if(data.datas.rows.order.orderStatus &&  data.datas.rows.order.orderStatus.type != 7 && $scope.auditingOrder == 1) {
                                     $scope.offlineHasAudited = true;
                                     $scope.wholePageShow = true;
-                                }else{
+                                }else if(data.datas.rows.payStatus == 2){
+                                    $scope.orderHasPayed = true;
+                                } else{
                                     $scope.wholePageShow = true;
                                     $scope.orders[index] = {};
                                     $scope.orders[index].id = data.datas.rows.id;
@@ -237,7 +237,10 @@ app.controller('commitPayController', function($scope, remoteApiService, payServ
                                 $scope.orderHasPayed = true;
                             }
                             else {
-                                if(data.datas.rows.payStatus == 2){
+                                if(data.datas.rows.order.orderStatus &&  data.datas.rows.order.orderStatus.type != 7 && $scope.auditingOrder == 1) {
+                                    $scope.offlineHasAudited = true;
+                                    $scope.wholePageShow = true;
+                                }else if(data.datas.rows.payStatus == 2){
                                     $scope.orderHasPayed = true;
                                 }else{
                                     $scope.wholePageShow = true;
@@ -310,6 +313,13 @@ app.controller('commitPayController', function($scope, remoteApiService, payServ
                             });
                         //$scope.offlineSubmitted = true;
                     }else {
+                        remoteApiService.getOrderDetail($scope.ids[$scope.orderSelectedNum])
+                            .then(function(data) {
+                                if(data.datas.rows.payStatus == 2){
+                                    var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">订单已支付';
+                                    var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);
+                                }
+                            });
                         window.open($scope.payUrl);
                         $scope.showPayPop = true;
                         $scope.isOverflow = true;
@@ -318,6 +328,10 @@ app.controller('commitPayController', function($scope, remoteApiService, payServ
                 }else if(data.code == 1001){
                     var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">订单已支付';
                     var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);
+                    $timeout(function(){
+                        window.location.href = window.location.href;
+                        return false
+                    },3000);
                 }
             });
     };

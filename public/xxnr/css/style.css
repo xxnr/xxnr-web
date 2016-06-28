@@ -2340,6 +2340,7 @@ body {
     border:none !important;
     box-shadow:none !important;
     font-family: "Microsoft YaHei" !important;
+    cursor: pointer;
 }
 .user_wrap .login_form .register_message {
     margin-top: 20px;
@@ -2445,6 +2446,7 @@ body {
     border:none !important;
     box-shadow:none !important;
     font-family: "Microsoft YaHei" !important;
+    cursor: pointer;
 }
 .user_wrap .register_form .login_link{
     margin-top: 10px;
@@ -6823,11 +6825,12 @@ body {
     display: inline-block;
     vertical-align: text-bottom;
     margin-bottom: -13px;
+    font-size: 14px;
 }
 .fillProfile .container .profile_box ul .sex {
     /*height: 60px;*/
 }
-.fillProfile .container .profile_box ul .sex form {
+.fillProfile .container .profile_box ul .sex .sex_form {
     vertical-align: text-bottom;
     margin-bottom: -6px;
     display: inline-block;
@@ -6850,6 +6853,22 @@ body {
 .fillProfile .container .profile_box ul .address .address--selects {
     display: inline-block;
 }
+.fillProfile .container .profile_box ul .address .address--selects #provin
+{
+    height:40px;
+}
+.fillProfile .container .profile_box ul .address .address--selects #city
+{
+    height:40px;
+}
+.fillProfile .container .profile_box ul .address .address--selects #county
+{
+    height:40px;
+}
+.fillProfile .container .profile_box ul .address .address--selects #town
+{
+    height:40px;
+}
 .fillProfile .container .profile_box ul .address label{
     display: inline-block;
 }
@@ -6858,7 +6877,8 @@ body {
     color: #c7c7c7;
     font-size: 18px;
     /*margin-top: 5px;*/
-    font-size: 12px;
+    font-size: 14px;
+    height: 40px;
 }
 .fillProfile .container .profile_box ul .address select.changed {
     color: #323232;
@@ -6894,6 +6914,7 @@ body {
     height: 40px;
     margin-left: 105px;
     border-radius: 3px;
+    line-height: 40px;
 }
 .fillProfile .container .profile_box ul .buttons .invalid {
     background: #C0C0C0;
@@ -7799,7 +7820,7 @@ body {
 #provin
 {
     width:100px;
-    height:31px;
+    /*height:31px;*/
     /*padding:5px 0;*/
     margin-right: 6px;
     font-family: "Microsoft YaHei";

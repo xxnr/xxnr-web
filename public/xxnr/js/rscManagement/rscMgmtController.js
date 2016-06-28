@@ -59,6 +59,7 @@ app.controller('rscManagementController', function($scope, $rootScope,remoteApiS
         $scope.RSC_ConfirmPayment_consignee = '';
         $scope.RSC_ConfirmPayment_duePrice = '';
         $scope.RSC_ConfirmPayment_orderId = null;
+        $scope.RSC_pickingUp_errMsg = '';
     };
     var reset_RSC_Shipping_pop = function(){
         $scope.shippingOrderId = null;
@@ -122,6 +123,9 @@ app.controller('rscManagementController', function($scope, $rootScope,remoteApiS
         }
     };
     $scope.show_page = function(pageId) {
+        $('html,body').animate({
+            scrollTop: 0
+        }, 100);
         $scope.current_page = pageId;
         for (var pageIndex in $scope.pages) {
             if($scope.pages.hasOwnProperty(pageIndex)){
@@ -176,6 +180,11 @@ app.controller('rscManagementController', function($scope, $rootScope,remoteApiS
                                 var message = '<img class="xxnr--flash--icon" src="images/correct_prompt.png" alt="">审核付款成功';
                                 var id = Flash.create('success', message, 3000, {class: 'xxnr-success-flash', id: 'xxnr-success-flash'}, false);
                                 $scope.closePop();
+                                $timeout(function(){
+                                    window.location.href = window.location.href;
+                                    return false
+                                },3000);
+
                             } else {
                                 //sweetalert('审核付款失败', "rsc_management.html");
                                 //$scope.closePop();
@@ -264,8 +273,6 @@ app.controller('rscManagementController', function($scope, $rootScope,remoteApiS
                             order.actionName = '审核付款';
                             order.showAction = true;
                             order.action = function(order) {
-                                $scope.showRSC_ConfirmPayment = true;
-                                $scope.isOverflow = true;
                                 remoteApiService.getOrderDetail(order.id)
                                     .then(function(data) {
                                         if(data.code == 1000) {
@@ -278,6 +285,8 @@ app.controller('rscManagementController', function($scope, $rootScope,remoteApiS
                                                 },3000);
                                             }else{
                                                 $scope.RSC_ConfirmPayment_duePrice = data.datas.rows.payment.price;
+                                                $scope.showRSC_ConfirmPayment = true;
+                                                $scope.isOverflow = true;
                                             }
                                         }
                                     });
@@ -479,8 +488,8 @@ app.controller('rscManagementController', function($scope, $rootScope,remoteApiS
                     }else if(data.code == 1000){
                         //sweetalert('客户自提成功', "rsc_management.html");
                         $scope.closePop();
-                        var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">客户自提成功';
-                        var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);
+                        var message = '<img class="xxnr--flash--icon" src="images/correct_prompt.png" alt="">客户自提成功';
+                        var id = Flash.create('success', message, 3000, {class: 'xxnr-success-flash', id: 'xxnr-success-flash'}, false);
                         $timeout(function(){
                             window.location.href = "/rsc_management.html";
                             return false

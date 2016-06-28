@@ -350,6 +350,9 @@ app.controller('userCenterController', function($scope, $rootScope,$timeout ,rem
         }
     };
     $scope.show_page = function (pageId) {
+        $('html,body').animate({
+            scrollTop: 0
+        }, 100);
         $scope.current_page = pageId;
         for (var pageIndex in $scope.pages) {
             if ($scope.pages[pageIndex].id == pageId) {
@@ -549,7 +552,7 @@ app.controller('userCenterController', function($scope, $rootScope,$timeout ,rem
                         order.showModifyAction = true;
                         order.actionName = '查看付款信息';
                         order.action = function (order) {
-                            window.location.href = "commitPay.html?id=" + order.id + "&offlinePay=1";
+                            window.location.href = "commitPay.html?id=" + order.id + "&offlinePay=1&auditingOrder=1";
                         };
                         order.modifyPay = function (order) {
                             window.location.href = "commitPay.html?id=" + order.id + "&auditingOrder=1";
