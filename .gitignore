@@ -9,4 +9,3 @@ tmp
 *.key
 /test/casper_test/*.png
 coverage
-temp_ip_list
