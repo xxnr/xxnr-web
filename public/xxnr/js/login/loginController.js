@@ -356,10 +356,11 @@ app.controller('loginController', function($scope, $timeout, remoteApiService, c
                                 //window.location.href = 'logon.html';
                                 var message = '<img class="xxnr--flash--icon" src="images/correct_prompt.png" alt="">重置密码成功';
                                 var id = Flash.create('success', message, 3000, {class: 'xxnr-success-flash', id: 'xxnr-success-flash'}, false);
-                                $timeout(function(){
-                                    window.location.href = "/logon.html";
-                                    return false
-                                },3000);
+                                //$timeout(function(){
+                                //    window.location.href = "/logon.html";
+                                //    return false
+                                //},3000);
+                                $scope.closePop();
                             } else {
                                 //sweetalert(data.message);
                                 $scope.resetPasswordMsg = data.message;

@@ -57,7 +57,7 @@
         <a href="/">首页</a> ／ <a>选择支付方式</a>
     </p>
     <p class="chaifen_orders_helping_wording" ng-show="ids.length > 1"><img src="images/chaifen_orders_helping.png" alt="">为了让您更快的收到商品，系统已为您拆分了订单。您可选择此次支付的订单,其他订单请到我的新农人继续支付。</p>
-    <div class="orderInfo ng-cloak" ng-show="!offlineSubmitted" ng-repeat='order in orders' ng-click='orderClicked($index)' ng-class="{true:'selected',false:'unselected'}[$index == orderSelectedNum && orders.length>1]">
+    <div class="orderInfo ng-cloak" ng-show="!offlineSubmitted && !offlineHasAudited" ng-repeat='order in orders' ng-click='orderClicked($index)' ng-class="{true:'selected',false:'unselected'}[$index == orderSelectedNum && orders.length>1]">
         <div class="big ng-cloak">订单号：
             <span class="ng-cloak">{{order.id}}</span>
             <span class="orderType">{{order.orderType}}</span>
@@ -74,7 +74,7 @@
             <p>商品名称：<span class="ng-cloak">{{order.resultStr}}</span></p>
         </div>
     </div>
-    <div class="wrap clearfix" ng-show="!offlineSubmitted">
+    <div class="wrap clearfix" ng-show="!offlineSubmitted && !offlineHasAudited">
         <div class="pay_box">
             <div class="pay_box_title">支付方式</div>
             <div class="pay_times">
@@ -144,7 +144,7 @@
             </div>
         </div>
     </div>
-    <div class="offlinePay-submitted-section clearfix" ng-show="offlineSubmitted">
+    <div class="offlinePay-submitted-section clearfix" ng-show="offlineSubmitted || offlineHasAudited">
         <div ng-show="!offlineHasAudited">
             <p class="section_title">线下支付</p>
             <div class="successInfo">
@@ -177,7 +177,7 @@
         </div>
         <div class="offlinePay-submitted-section-audited" ng-show="offlineHasAudited">
             <p class="offlinePay-submitted-section-audited-wording"><img src="images/audit_check.png" alt=""><span>订单已审核通过</span></p>
-            <a href="my_xxnr.html">查看订单</a>
+            <a ng-href="orderDetail.html?id={{ids[orderSelectedNum]}}">查看订单</a>
             <a href="/">回到首页</a>
         </div>
     </div>
