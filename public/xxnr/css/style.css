@@ -6834,6 +6834,8 @@ body {
     vertical-align: text-bottom;
     margin-bottom: -6px;
     display: inline-block;
+    line-height: 24px;
+    float: left;
 }
 .fillProfile .container .profile_box ul .sex form .female {
     margin-left: 10px;
@@ -6843,7 +6845,8 @@ body {
 }
 .fillProfile .container .profile_box ul .sex label {
     /*margin-top: 2px;*/
-
+    line-height: 24px;
+    float: left;
 }
 .fillProfile .container .profile_box ul .address {
     margin-top: -10px;
