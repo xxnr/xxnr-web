@@ -79,8 +79,16 @@ router.get('/app/order/getOderList', middleware.isLoggedIn_middleware, controlle
 router.post('/app/order/getOderList', middleware.isLoggedIn_middleware, controllers.Order.api10_getOrders);
 
 // Vcod
+// Old
 router.get('/api/v2.0/sms', throttle.forbidden_sms_attack_request, middleware.throttle, controllers.VCode.generate_sms);
 router.post('/api/v2.0/sms', throttle.forbidden_sms_attack_request, middleware.throttle, controllers.VCode.generate_sms);
+// new
+// graph vcode
+// refresh graph vcode
+router.get('/:type/captcha/:filename.jpg', throttle.forbidden_sms_attack_request, middleware.throttle, controllers.VCode.graph_vcode_image);
+router.get('/api/v2.3/captcha', throttle.forbidden_sms_attack_request, middleware.throttle, controllers.VCode.generate_refresh_graph_vcode);
+// new sms
+router.get('/api/v2.3/sms', throttle.forbidden_sms_attack_request, middleware.throttle, controllers.VCode.generate_validate_sms);
 
 // news APIs
 router.get('/api/v2.0/news', controllers.News.json_news_query);
