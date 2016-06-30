@@ -64,6 +64,9 @@ app.use(require('./middlewares/website'));
 // set static file path
 app.use(express.static(path.join(__dirname, F.config.directory_xxnr_mobile_public)));
 
+// handle fallback for HTML5 history API
+app.use(require('connect-history-api-fallback')())
+
 var routes = require('./routes');
 // routes
 app.use('/', routes.secureFrontendApis);

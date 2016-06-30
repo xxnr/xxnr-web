@@ -81,7 +81,7 @@ export function configRouter (router) {
       component: require('./components/my_invitation/index.vue'),
       auth: true // 这里 auth 是一个自定义字段
     },
-    '*': {
+    "*path": {
       component: require('./components/404/index.vue'),
     }
   });
