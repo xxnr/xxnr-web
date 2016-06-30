@@ -18,7 +18,7 @@ class GD {
     );
 
     private static $TextAngles = ['8', '-8', '10', '-10', '12', '-12', '15', '-15', '18', '-18', '20', '-20', '24', '-24', '30', '-30'];
-    private static $TTFFiles = ['tuffy.ttf', 'oxnard.ttf'];
+    private static $TTFFiles = ['tuffy.ttf'];
     private static $DefaultBackgroundColor = array('red'=>0xEB, 'green'=>0xF8, 'blue'=>0xFE);
     const DefaultWidth = 214;
     const DefaultHeight = 44;
@@ -81,19 +81,16 @@ class GD {
             imagesetpixel($image, rand(0, 1000) % $width, rand(0, 1000) % $height, $randColor);
         }
 
-        ob_start();
-        imagepng($image);
-        $png = ob_get_contents();
-        ob_end_clean();
+        $imgStr = imagepng($image);
         imagedestroy($image);
         
-        return $png;
+        return $imgStr;
     }
 
     /*
     ** 获取TTF字体生成的图片
     */
-    public static function getTTFPNG($str, $w=214, $h=44, $font=32, $num=800) {
+    public static function getTTFPNG($str, $w=214, $h=44, $font=32, $num=0) {
     	return self::_generatorTTFPNG($str, $w, $h, $font, $num, $ttf);
     }
 
