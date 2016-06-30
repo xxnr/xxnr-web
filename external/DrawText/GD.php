@@ -43,22 +43,23 @@ class GD {
 
         // 绘制文字
         $charArray = str_split($str);
-        $ttf = __DIR__.'/'.self::$TTFFiles[rand(0, count(self::$TTFFiles)-1)];
-        for($i = 0; $i< count($charArray); $i++){
+        $ttf = __DIR__.'/ttf/'.self::$TTFFiles[rand(0, count(self::$TTFFiles)-1)];
+        for($i = 0; $i< count($charArray)-1; $i++){
             $randomTextColor = self::$TextColors[rand(0, count(self::$TextColors)-1)];
             $textColor = imagecolorallocate($image, $randomTextColor['red'], $randomTextColor['green'], $randomTextColor['blue']);
             $textAngle = self::$TextAngles[rand(0, count(self::$TextAngles)-1)];
             $charX = self::_getCharX($charArray, $w, $font, $i);
             $charY = self::_getCharY($h, $font);
-            imagettftext($image, $font, $textAngle, $charX, $charY, $textColor, $ttf, $str[$i]);
+            imagettftext($image, $font, $textAngle, $charX, $charY, $textColor, $ttf, $charArray[$i]);
         }
-
+        
         // 绘制弧线
         $randomLineColor = self::$LineColors[rand(0, count(self::$LineColors)-1)];
         $lineColor = imagecolorallocate($image, $randomLineColor['red'], $randomLineColor['green'], $randomLineColor['blue']);
-        imagearc($image, rand(0, $width), rand(0, $height), rand($width/2, $width) , rand($height/2, $height), rand(0, 360), rand(0, 360), $lineColor);
-        imagearc($image, rand(0, $width), rand(0, $height), rand($width/2, $width) , rand($height/2, $height), rand(0, 360), rand(0, 360), $lineColor);
-
+        for($i = 0; $i < 2; $i++){
+        imagearc($image, rand($width/4, $width*3/4), rand($height*3/4, $height), rand($width*3/4, $width) , rand($height/2, $height*3/4), rand(0, 90), rand(270, 360), $lineColor);
+        }
+        
         // 绘制雪花点
         for ($i = 0; $i < $num; $i++) {
             $randColor = imagecolorallocate($image, rand(0, 255), rand(0, 255), rand(0, 255));
@@ -83,15 +84,14 @@ class GD {
 
     private static function _getCharX($charArray, $w, $font, $i){
         $charCount = count($charArray);
-        $gapLength = ($w - $charCount * $font) / ($charCount + 3);
-        return ($i+2) * $gapLength + $i * $font;
+        $gapLength = ($w - $charCount * $font) / ($charCount + 10);
+        return ($i+10) * $gapLength + $i * $font;
     }
 
     private static function _getCharY($h, $font){
         //$maxY = $h - $font / 2;
         //$minY = 3 * $font / 2;
         //return rand($minY, $maxY);
-
-        return ($h - $font) / 2 + $font;
+        return ($h - $font) * 2 / 5 + $font;
     }
 }
