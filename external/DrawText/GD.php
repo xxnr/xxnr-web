@@ -54,11 +54,26 @@ class GD {
         }
         
         // 绘制弧线
-        $randomLineColor = self::$LineColors[rand(0, count(self::$LineColors)-1)];
-        $lineColor = imagecolorallocate($image, $randomLineColor['red'], $randomLineColor['green'], $randomLineColor['blue']);
+        $start_end_pair = array(
+            array('start'=>rand(0, 45), 'end'=>rand(225, 270)),
+            array('start'=>rand(180, 225), 'end'=>rand(315, 360))
+        );
+        
+        $randLineColorIndex = rand(0, count(self::$LineColors)-1);
         for($i = 0; $i < 2; $i++){
-        imagearc($image, rand($width/4, $width*3/4), rand($height*3/4, $height), rand($width*3/4, $width) , rand($height/2, $height*3/4), rand(0, 90), rand(270, 360), $lineColor);
+            $randomLineColor = self::$LineColors[($randLineColorIndex+$i) % count(self::$LineColors)];
+            $lineColor = imagecolorallocate($image, $randomLineColor['red'], $randomLineColor['green'], $randomLineColor['blue']);
+            $x0 = rand($width/4, $width*3/4);
+            $y0 = rand($height/2, $height*3/4);
+            $xr = rand($width*3/4, $width);
+            $yr = rand($height/4, $height/2);
+            $randStartEnd = $start_end_pair[rand(0, count($start_end_pair) - 1)];
+            $start = $randStartEnd['start'];
+            $end = $randStartEnd['end'];
+            imagearc($image, $x0, $y0, $xr, $yr, $start, $end, $lineColor);
+            imagearc($image, $x0+1, $y0+1, $xr, $yr, $start, $end, $lineColor);
         }
+
         
         // 绘制雪花点
         for ($i = 0; $i < $num; $i++) {
@@ -84,8 +99,8 @@ class GD {
 
     private static function _getCharX($charArray, $w, $font, $i){
         $charCount = count($charArray);
-        $gapLength = ($w - $charCount * $font) / ($charCount + 10);
-        return ($i+10) * $gapLength + $i * $font;
+        $gapLength = ($w - $charCount * $font) / ($charCount + 25);
+        return ($i+25) * $gapLength + $i * $font;
     }
 
     private static function _getCharY($h, $font){
