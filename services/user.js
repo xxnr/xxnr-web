@@ -135,7 +135,7 @@ UserService.prototype.update = function(options, callback) {
 // Login
 UserService.prototype.login = function(options, callback) {
     if(!options.account || !options.password){
-        callback('请输入用户名和密码');
+        callback('请输入用户名或密码');
         return;
     }
 
@@ -153,7 +153,7 @@ UserService.prototype.login = function(options, callback) {
         }
 
         if (user === null) {
-            callback('账号不存在');
+            callback('该手机号未注册，请重新输入');
             return;
         }
 
@@ -186,7 +186,7 @@ UserService.prototype.login = function(options, callback) {
             userLog.save(function(){});
         }else {
             // Returns response
-            callback('密码错误');
+            callback('密码错误，请重新输入');
         }
     });
 };
