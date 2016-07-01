@@ -20,8 +20,8 @@ class GD {
     private static $TextAngles = ['8', '-8', '10', '-10', '12', '-12', '15', '-15', '18', '-18', '20', '-20', '24', '-24', '30', '-30'];
     private static $TTFFiles = ['tuffy.ttf'];
     private static $DefaultBackgroundColor = array('red'=>0xEB, 'green'=>0xF8, 'blue'=>0xFE);
-    const DefaultWidth = 214;
-    const DefaultHeight = 44;
+    const DefaultWidth = 196;
+    const DefaultHeight = 68;
     const DefaultFontSize = 20;
     const DefaultSnowPointNumber = 800;
 
@@ -93,7 +93,7 @@ class GD {
     /*
     ** 获取TTF字体生成的图片
     */
-    public static function getTTFPNG($str, $w=214, $h=44, $font=32, $num=0) {
+    public static function getTTFPNG($str, $w=190, $h=68, $font=32, $num=0) {
     	return self::_generatorTTFPNG($str, $w, $h, $font, $num, $ttf);
     }
 
