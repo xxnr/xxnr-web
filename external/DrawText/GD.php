@@ -99,8 +99,9 @@ class GD {
 
     private static function _getCharX($charArray, $w, $font, $i){
         $charCount = count($charArray);
-        $gapLength = ($w - $charCount * $font) / ($charCount + 25);
-        return ($i+13) * $gapLength + $i * $font;
+        $factor = 12;
+        $gapLength = ($w - $charCount * $font) / ($charCount + 2 * $factor);
+        return ($i + $factor) * $gapLength + $i * $font;
     }
 
     private static function _getCharY($h, $font){
