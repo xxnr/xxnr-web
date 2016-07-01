@@ -213,7 +213,7 @@ function graph_vcode(req, res) {
             } else {
                 res.respond({
                     code: 1001,
-                    message: err.message?err.message:'获取短信验证码出错，请重试'
+                    message: err.message?err.message:'获取短信验证码失败，请重试'
                 });
                 return;
             }
@@ -288,7 +288,7 @@ function graph_vcode(req, res) {
         } else {
             res.respond({
                 code: 1001,
-                message: '请求参数错误，无效的bizcode参数'
+                message: '获取短信验证码失败，请重试'
             });
             return;
         }
@@ -306,7 +306,7 @@ function generate_graph_vcode(code_type, target, target_type, mobile_code, ip, a
     vCodeService.getGraphvCode(options, function(err, graphvCode){
         if (err) {
             console.error('B.vcode generate_graph_vcode getGraphvCode err:', err);
-            return callback({type:'graphvCode', message: '获取图形验证码出错，请刷新'});
+            return callback({type:'graphvCode', message: '获取图形验证码失败，请刷新'});
         }
         if (graphvCode) {
             if (authCode) {
@@ -321,7 +321,7 @@ function generate_graph_vcode(code_type, target, target_type, mobile_code, ip, a
                         generate_vcode(code_type, target, target_type, mobile_code, function (err, result) {
                             if (err) {
                                 console.error('B.vcode generate_graph_vcode generate_vcode err:', err);
-                                return callback({type:'vCode', message: '获取短信验证码出错，请重试'});
+                                return callback({type:'vCode', message: '获取短信验证码失败，请重试'});
                             } else {
                                 if (result && result.renew && result.renew === 2) {
                                     return callback({type:'vCode', message: '获取短信验证码太频繁，请稍后再试'});
@@ -352,7 +352,7 @@ function generate_graph_vcode(code_type, target, target_type, mobile_code, ip, a
             vCodeService.createGraphvCode(options, function(err, graphvCode){
                 if (err) {
                     console.error('B.vcode generate_graph_vcode createGraphvCode err:', err);
-                    return callback({type:'graphvCode', message: '获取图形验证码出错，请刷新'});
+                    return callback({type:'graphvCode', message: '获取图形验证码失败，请刷新'});
                 }
 
                 return callback(null, graphvCode);
@@ -388,7 +388,7 @@ function generate_sms_vcode(req, res, next) {
                 } else {
                     generate_vcode(code_type, target, target_type, mobile_code, function (err, result) {
                         if (err) {
-                            res.respond({'code': '1001', 'message': '获取短信验证码出错，请重试'});
+                            res.respond({'code': '1001', 'message': '获取短信验证码失败，请重试'});
                             return;
                         } else {
                             if (result && result.renew && result.renew === 2) {
@@ -420,7 +420,7 @@ function generate_sms_vcode(req, res, next) {
                     if (!data || err) {
                         generate_vcode(code_type, target, target_type, mobile_code, function (err, result) {
                             if (err) {
-                                res.respond({'code': '1001', 'message': '获取短信验证码出错，请重试'});
+                                res.respond({'code': '1001', 'message': '获取短信验证码失败，请重试'});
                                 return;
                             } else {
                                 if (result && result.renew && result.renew === 2) {
