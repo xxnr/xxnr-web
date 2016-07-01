@@ -20,7 +20,7 @@ class GD {
     private static $TextAngles = ['8', '-8', '10', '-10', '12', '-12', '15', '-15', '18', '-18', '20', '-20', '24', '-24', '30', '-30'];
     private static $TTFFiles = ['tuffy.ttf'];
     private static $DefaultBackgroundColor = array('red'=>0xEB, 'green'=>0xF8, 'blue'=>0xFE);
-    const DefaultWidth = 196;
+    const DefaultWidth = 190;
     const DefaultHeight = 68;
     const DefaultFontSize = 20;
     const DefaultSnowPointNumber = 800;
