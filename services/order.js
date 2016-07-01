@@ -2219,18 +2219,20 @@ OrderService.prototype.increaseLoyaltyPointsbyOrder = function(order, type) {
 		        	}
 				});
 			}
-			LoyaltypointService.increase(user._id, points, type, null, order._id, function (err) {
-				if (err) {
-					console.error('OrderService increaseLoyaltyPointsbyOrder LoyaltypointService increase err:', err, 'orderId:', order.id);
-					return;
-				}
-				OrderModel.update({id: order.id}, {$set:{isRewardPoint: true}}, function(err) {
-					if (err) {
-						console.error('OrderService increaseLoyaltyPointsbyOrder OrderModel update err:', err, 'orderId:', order.id);
-						return;
-					}
-				});
-			});
+            if(points > 0) {
+                LoyaltypointService.increase(user._id, points, type, null, order._id, function (err) {
+                    if (err) {
+                        console.error('OrderService increaseLoyaltyPointsbyOrder LoyaltypointService increase err:', err, 'orderId:', order.id);
+                        return;
+                    }
+                    OrderModel.update({id: order.id}, {$set: {isRewardPoint: true}}, function (err) {
+                        if (err) {
+                            console.error('OrderService increaseLoyaltyPointsbyOrder OrderModel update err:', err, 'orderId:', order.id);
+                            return;
+                        }
+                    });
+                });
+            }
 		});
 	} else {
 		console.error('OrderService increaseLoyaltyPointsbyOrder order is null', 'type:', type);
