@@ -18,7 +18,7 @@ class GD {
     );
 
     private static $TextAngles = ['8', '-8', '10', '-10', '12', '-12', '15', '-15', '18', '-18', '20', '-20', '24', '-24', '30', '-30'];
-    private static $TTFFiles = ['tuffy.ttf'];
+    private static $TTFFiles = ['Arial.ttf', 'Helvetica.ttf', '方正细黑—简体.ttf', '简启体.ttf', '简姚体.ttf', '微软雅黑.ttf', '文鼎妞妞体.ttf', '造字工坊悦黑常规体.ttf'];
     private static $DefaultBackgroundColor = array('red'=>0xEB, 'green'=>0xF8, 'blue'=>0xFE);
     const DefaultWidth = 190;
     const DefaultHeight = 68;
