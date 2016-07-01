@@ -18,6 +18,8 @@ ln -sf /usr/local/freetype/include/freetype2 /usr/local/freetype/include/freetyp
 
 #安装php
 ./configure --prefix=/usr/local/php --sbindir=/sbin/  --enable-fastcgi --enable-force-cgi-redirect --with-libxml-dir=/usr/local/ --with-openssl --with-zlib --enable-calendar --with-curl --with-curlwrappers --enable-dba=shared --with-gd --with-jpeg-dir --enable-mbstring   --with-ncurses --enable-pcntl  --enable-soap --enable-sockets --with-xmlrpc --enable-bcmath --with-freetype-dir=/usr/local/freetype && make && make install
+/usr/local/setup/php-5.4.43/build/shtool install -c ext/phar/phar.phar /usr/local/php/bin
+ln -s -f /usr/local/php/bin/phar.phar /usr/local/php/bin/phar
 ln -s /usr/local/php/bin/php /usr/bin/php
 
 #动态编译imagick模块
@@ -55,6 +57,7 @@ cp config0.m4 config.m4
 
 ###########################################################
 #配置php.ini，请参照php.ini
+#注意：php.ini中的extension_dir和error_log 必须配置为正确的位置，error_log所在文件夹需要实现建立（/usr/www/logs/）
 vim /usr/local/php/lib/php.ini
 extension_dir = "/usr/local/php/lib/php/extensions/no-debug-non-zts-20100525/"
 [memcache]
