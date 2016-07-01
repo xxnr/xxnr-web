@@ -43,8 +43,8 @@ class GD {
 
         // 绘制文字
         $charArray = str_split($str);
-        $ttf = __DIR__.'/ttf/'.self::$TTFFiles[rand(0, count(self::$TTFFiles)-1)];
-        for($i = 0; $i< count($charArray)-1; $i++){
+        $ttf = __DIR__.'/'.self::$TTFFiles[rand(0, count(self::$TTFFiles)-1)];
+        for($i = 0; $i< count($charArray); $i++){
             $randomTextColor = self::$TextColors[rand(0, count(self::$TextColors)-1)];
             $textColor = imagecolorallocate($image, $randomTextColor['red'], $randomTextColor['green'], $randomTextColor['blue']);
             $textAngle = self::$TextAngles[rand(0, count(self::$TextAngles)-1)];
@@ -81,10 +81,13 @@ class GD {
             imagesetpixel($image, rand(0, 1000) % $width, rand(0, 1000) % $height, $randColor);
         }
 
-        $imgStr = imagepng($image);
+        ob_start();
+        imagepng($image);
+        $png = ob_get_contents();
+        ob_end_clean();
         imagedestroy($image);
-        
-        return $imgStr;
+
+        return $png;
     }
 
     /*
@@ -97,7 +100,7 @@ class GD {
     private static function _getCharX($charArray, $w, $font, $i){
         $charCount = count($charArray);
         $gapLength = ($w - $charCount * $font) / ($charCount + 25);
-        return ($i+25) * $gapLength + $i * $font;
+        return ($i+13) * $gapLength + $i * $font;
     }
 
     private static function _getCharY($h, $font){
