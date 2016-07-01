@@ -95,6 +95,9 @@ exports.agentReport = mongoose.model('agentReport');
 exports.userSign = mongoose.model('user_sign');
 // vcode
 exports.vcode = mongoose.model('vcode');
+exports.graphvCode = mongoose.model('graphvcode');
+exports.ipThrottle = mongoose.model('ipthrottle');
+exports.dailySmsNumber = mongoose.model('dailysmsnumber');
 // loyaltypoints
 exports.rewardshopgiftcategory = mongoose.model('rewardshopgiftcategory');
 exports.rewardshopgift = mongoose.model('rewardshopgift');
