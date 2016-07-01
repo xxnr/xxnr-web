@@ -329,7 +329,7 @@ exports.process_register = function(req, res, next) {
     var vcodeoptions = {'target': req.data.account.toString(), 'code_type': 'register', 'code': req.data.smsCode};
     vCodeService.verify(vcodeoptions, function(err, result){
         if (err || !result) {
-            res.respond({'code': '1001', 'message': '验证码验证出错'});
+            res.respond({'code': '1001', 'message': '验证码验证失败'});
             return;
         } else {
             if (result && result.type === 1) {
@@ -400,14 +400,14 @@ exports.process_resetpwd = function(req, res, next) {
             vcodeoptions = {'target': req.data.account.toString(), 'code_type': 'resetpwd', 'code': req.data.smsCode};
             vCodeService.verify(vcodeoptions, function(err, result){
                 if (err || !result) {
-                    res.respond({'code': '1001', 'message': '验证码验证出错'});
+                    res.respond({'code': '1001', 'message': '验证码验证失败'});
                     return;
                 } else {
                     if (result && result.type === 1) {
                         UserService.update(options, function (err) {
                             // Error
                             if (err) {
-                                res.respond({'code': '1001', 'message': '密码修改失败'});
+                                res.respond({'code': '1001', 'message': '修改密码失败'});
                                 return;
                             } else {
                                 // Return results
