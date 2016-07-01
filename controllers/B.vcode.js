@@ -1,8 +1,19 @@
 var tools = require('../common/tools');
+var utils = require('../common/utils');
+var DrawText = require('../modules/DrawText')();
 var services = require('../services');
 var UserService = services.user;
 var vCodeService = services.vCode;
 var vcode_config = require('../configuration/vcode_config');
+var path = require('path');
+var TEMPORARY_KEY_REGEX = /\//g;
+var RESPONSE_HEADER_CACHECONTROL = 'Cache-Control';
+var RESPONSE_HEADER_CONTENTTYPE = 'Content-Type';
+var RESPONSE_HEADER_CONTENTLENGTH = 'Content-Length';
+var CONTENTTYPE_TEXTPLAIN = 'text/plain';
+var CONTENTTYPE_TEXTHTML = 'text/html';
+var REQUEST_COMPRESS_CONTENTTYPE = { 'text/plain': true, 'text/javascript': true, 'text/css': true, 'application/x-javascript': true, 'application/json': true, 'text/xml': true, 'image/svg+xml': true, 'text/x-markdown': true, 'text/html': true };
+
 
 exports.install = function() {
 	// SMS
@@ -15,10 +26,41 @@ exports.install = function() {
 // ==========================================================================
 // graph vcode image
 // ==========================================================================
+var temporary = {
+    path: {},
+    processing : {}
+};
+var img_extension = 'png';
+
+function createTemporaryKey(req) {
+    return req.path.replace(TEMPORARY_KEY_REGEX, '-').substring(1);
+}
+
+function responseImg(res, graphvCode, extension) {
+    if (res && graphvCode) {
+        // return image for graphvCode.code
+        var buf = DrawText(graphvCode.code);
+        if (!buf) {
+            console.error('B.vcode graph_vcode_image getGraphvCode err:', err);
+            // return 404
+            next();
+            return res.sendStatus(404);
+        }
+        res.set('Pragma', 'no-cache');
+        res.set(RESPONSE_HEADER_CACHECONTROL, 'no-cache, no-store, max-age=0, must-revalidate');
+        res.set('Expires', new Date().add('Y', -10));
+        res.set(RESPONSE_HEADER_CONTENTTYPE, utils.getContentType(extension?extension:img_extension));
+        res.end(buf);
+    }
+    return;
+}
 
 exports.graph_vcode_image = function(req, res, next) {
     var code_type = req.params.type;
     var filename = req.params.filename;
+    if (filename.indexOf('.') !== -1) {
+        filename = filename.split('.')[0];
+    }
     var target_type = 'phone';
     var options = {};
     options.target = decrypt_filename(filename);
@@ -35,12 +77,116 @@ exports.graph_vcode_image = function(req, res, next) {
             return res.sendStatus(404);
         }
         // return image for graphvCode.code
-        res.respond({
-            code: graphvCode.code,
-            graphvCode: graphvCode
-        });
+        var key = createTemporaryKey(req);
+        var extension = req.extension;
+        if (!extension) {
+            if (key)
+                extension = path.extname(key);
+        }
+        responseImg(res, graphvCode, extension);
         return;
     });
+}
+
+// refresh graph vcode
+exports.generate_refresh_graph_vcode = function(req, res, next) {
+    var requestType = '';
+    var code_type, target;
+    var target_type = 'phone';
+    var mobile_code = '86';
+    if (req.data.bizcode)
+        requestType = req.data.bizcode;
+    var callback = function (err, graphvCode) {
+        if (err || !graphvCode) {
+            if (err)
+                console.error('B.vcode generate_refresh_graph_vcode updateOrCreateGraphvCode err:', err);
+            // res.respond({
+            //     code: 1001,
+            //     message: '获取图形验证码出错，请刷新'
+            // });
+            // return;
+            next();
+            return res.sendStatus(404);
+        }
+        // var host = req.hostname;
+        // var prevurl = 'http://' + host;
+        // var captchaUrl = generate_captcha_url(graphvCode);
+        // res.respond({
+        //     code: 1000,
+        //     captcha: captchaUrl ? prevurl + captchaUrl : ''
+        // });
+        responseImg(res, graphvCode, img_extension);
+        return;
+    };
+    if (requestType === 'resetpwd') {
+        if (!req.data.tel || !tools.isPhone(req.data.tel)) {
+            // res.respond({
+            //     code: 1001,
+            //     message: '请输入正确的手机号'
+            // });
+            // return;
+            next();
+            return res.sendStatus(404);
+        } else {
+            code_type = 'resetpwd';
+            target = req.data.tel;
+            var user = {'account': target};
+
+            UserService.get(user, function (err, data) {
+                if (!data || err) {
+                    // res.respond({
+                    //     code: 1001,
+                    //     message: '没有找到用户，请重新输入'
+                    // });
+                    // return;
+                    next();
+                    return res.sendStatus(404);
+                } else {
+                    var options = {target: target, code_type: code_type, ip: req.ip, target_type:target_type};
+                    vCodeService.updateOrCreateGraphvCode(options, callback);
+                }
+            });
+        }
+    } else {
+        if (requestType === 'register') {
+            if (!req.data.tel || !tools.isPhone(req.data.tel)) {
+                // res.respond({
+                //     code: 1001,
+                //     message: '请输入正确的手机号'
+                // });
+                // return;
+                next();
+                return res.sendStatus(404);
+            } else {
+                code_type = 'register';
+                target = req.data.tel;
+                var user = {'account': target};
+
+                UserService.get(user, function (err, data) {
+                    if (!data || err) {
+                        var options = {target: target, code_type: code_type, ip: req.ip, target_type:target_type};
+                        vCodeService.updateOrCreateGraphvCode(options, callback);
+                    } else {
+                        // res.respond({
+                        //     code: 1001,
+                        //     message: '该手机号已注册，请重新输入'
+                        // });
+                        // return;
+                        next();
+                        return res.sendStatus(404);
+                    }
+                });
+            }
+        } else {
+            // res.respond({
+            //     code: 1001,
+            //     message: '请求参数错误，无效的bizcode参数'
+            // });
+            // return;
+            next();
+            return res.sendStatus(404);
+        }
+    }
 }
 
 // ==========================================================================
@@ -50,6 +196,7 @@ exports.graph_vcode_image = function(req, res, next) {
 // new sms
 exports.generate_validate_sms = function(req, res, next) {
     var self = this;
+    // 判断今天发短信条数是否超过阈值
     vCodeService.getDailySmsNumber(null, function(err, dailySmsNumber) {
         if (err) {
             console.error('B.vcode generate_validate_sms getDailySmsNumber err:', err);
@@ -57,6 +204,7 @@ exports.generate_validate_sms = function(req, res, next) {
         if (dailySmsNumber && vcode_config.daily_max_sms && dailySmsNumber.num > vcode_config.daily_max_sms) {
             graph_vcode(req, res);
         } else {
+            // 发短信的ip throttle机制
             if (vcode_config.ipThrottle && req.ip) {
                 vCodeService.getAndAddIpThrottle({ip: req.ip, type:'sms'}, function(err, ipThrottle) {
                     if (err) {
@@ -77,97 +225,6 @@ exports.generate_validate_sms = function(req, res, next) {
     });
 }
 
-// refresh graph vcode
-exports.generate_refresh_graph_vcode = function(req, res, next) {
-    var requestType = '';
-    var code_type, target;
-    var target_type = 'phone';
-    var mobile_code = '86';
-    if (req.data.bizcode)
-        requestType = req.data.bizcode;
-    var callback = function (err, graphvCode) {
-        if (err || !graphvCode) {
-            if (err)
-                console.error('B.vcode generate_refresh_graph_vcode updateOrCreateGraphvCode err:', err);
-            res.respond({
-                code: 1001,
-                message: '获取图形验证码出错，请刷新'
-            });
-            return;
-        }
-        var host = req.hostname;
-        var prevurl = 'http://' + host;
-        var imgUrl = generate_captcha_url(graphvCode);
-        res.respond({
-            code: 1000,
-            img_url: imgUrl ? prevurl + imgUrl : ''
-        });
-        return;
-    };
-    if (requestType === 'resetpwd') {
-        if (!req.data.tel || !tools.isPhone(req.data.tel)) {
-            res.respond({
-                code: 1001,
-                message: '请输入正确的手机号'
-            });
-            return;
-        } else {
-            code_type = 'resetpwd';
-            target = req.data.tel;
-            var user = {'account': target};
-
-            UserService.get(user, function (err, data) {
-                if (!data || err) {
-                    res.respond({
-                        code: 1001,
-                        message: '没有找到用户，请重新输入'
-                    });
-                    return;
-                } else {
-                    var options = {target: target, code_type: code_type, ip: req.ip, target_type:target_type};
-                    vCodeService.updateOrCreateGraphvCode(options, callback);
-                }
-            });
-        }
-    } else {
-        if (requestType === 'register') {
-            //if (req.user) {
-            //   res.respond({'code':'1001','message':'用户已登录，请先登出'});
-            // }
-            if (!req.data.tel || !tools.isPhone(req.data.tel)) {
-                res.respond({
-                    code: 1001,
-                    message: '请输入正确的手机号'
-                });
-                return;
-            } else {
-                code_type = 'register';
-                target = req.data.tel;
-                var user = {'account': target};
-
-                UserService.get(user, function (err, data) {
-                    if (!data || err) {
-                        var options = {target: target, code_type: code_type, ip: req.ip, target_type:target_type};
-                        vCodeService.updateOrCreateGraphvCode(options, callback);
-                    } else {
-                        res.respond({
-                            code: 1001,
-                            message: '该手机号已注册，请重新输入'
-                        });
-                        return;
-                    }
-                });
-            }
-        } else {
-            res.respond({
-                code: 1001,
-                message: '请求参数错误，无效的bizcode参数'
-            });
-            return;
-        }
-    }
-}
-
 function graph_vcode(req, res) {
     var requestType = '';
     var code_type, target, authCode;
@@ -183,11 +240,11 @@ function graph_vcode(req, res) {
     var callback = function (err, graphvCode) {
         if (err) {
             if (err.type == 'graphvCode' && graphvCode) {
-                var imgUrl = generate_captcha_url(graphvCode);;
+                var captchaUrl = generate_captcha_url(graphvCode);;
                 res.respond({
                     code: 1000,
                     message: err.message?err.message:'图形验证码错误',
-                    img_url: imgUrl ? prevurl + imgUrl : ''
+                    captcha: captchaUrl ? prevurl + captchaUrl : ''
                 });
                 return;
             } else {
@@ -199,10 +256,10 @@ function graph_vcode(req, res) {
             }
         } else {
             if (graphvCode) {
-                var imgUrl = generate_captcha_url(graphvCode);
+                var captchaUrl = generate_captcha_url(graphvCode);
                 res.respond({
                     code: 1000,
-                    img_url: imgUrl ? prevurl + imgUrl : ''
+                    captcha: captchaUrl ? prevurl + captchaUrl : ''
                 });
                 return;
             }
@@ -503,20 +560,53 @@ function generate_vcode(code_type, target, target_type, mobile_code, callback) {
     });
 }
 
-
 function generate_captcha_url(graphvCode) {
     if (graphvCode) {
-        var filename = encrypt_filename(graphvCode);
-        return '/' + graphvCode.code_type + '/captcha/' + filename + '.jpg';
+        var filename = encrypt_filename(graphvCode.target);
+        return '/' + graphvCode.code_type + '/captcha/' + filename + '.' + img_extension;
     } else {
         return null;
-    } 
+    }
 }
 
-function encrypt_filename(graphvCode) {
-    return graphvCode.target;
+var ENCRYPTMAP = {'0':'9','1':'0','2':'7','3':'2','4':'5','5':'4','6':'3','7':'6','8':'1','9':'8'};
+var DECRYPTMAP = {'9':'0','0':'1','7':'2','2':'3','5':'4','4':'5','3':'6','6':'7','1':'8','8':'9'};
+function encrypt_filename(target) {
+    if (!target || typeof target !== 'string' || target.length == 0) {
+        return target;
+    }
+    var filename = '';
+    for (var i = 0; i < target.length; i++) {
+        if (i % 2 !== 0) {
+            filename += tools.generateAuthCode(1);
+        }
+        var k = target[i];
+        if (ENCRYPTMAP[k]) {
+            filename += ENCRYPTMAP[k];
+        } else {
+            filename += k;
+        }
+    }
+    filename = tools.generateAuthCode(2) + filename + tools.generateAuthCode(2);
+    return filename;
 }
 
 function decrypt_filename(filename) {
-    return filename;
+    if (!filename || typeof filename !== 'string' || filename.length < 5) {
+        return filename;
+    }
+    var start = 2, end = filename.length - 2;
+    filename = filename.substring(start, end);
+    var target = '';
+    for (var i = 0; i < filename.length; i++) {
+        if (i % 3 !== 1) {
+            var k = filename[i];
+            if (DECRYPTMAP[k]) {
+                target += DECRYPTMAP[k];
+            } else {
+                target += k;
+            }
+        }
+    }
+    return target;
 }

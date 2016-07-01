@@ -85,10 +85,10 @@ router.post('/api/v2.0/sms', throttle.forbidden_sms_attack_request, middleware.t
 // new
 // graph vcode
 // refresh graph vcode
-router.get('/:type/captcha/:filename.jpg', throttle.forbidden_sms_attack_request, middleware.throttle, controllers.VCode.graph_vcode_image);
+router.get('/:type/captcha/:filename', throttle.forbidden_sms_attack_request, middleware.throttle, controllers.VCode.graph_vcode_image);
 router.get('/api/v2.3/captcha', throttle.forbidden_sms_attack_request, middleware.throttle, controllers.VCode.generate_refresh_graph_vcode);
 // new sms
-router.get('/api/v2.3/sms', throttle.forbidden_sms_attack_request, middleware.throttle, controllers.VCode.generate_validate_sms);
+router.post('/api/v2.3/sms', throttle.forbidden_sms_attack_request, middleware.throttle, controllers.VCode.generate_validate_sms);
 
 // news APIs
 router.get('/api/v2.0/news', controllers.News.json_news_query);
