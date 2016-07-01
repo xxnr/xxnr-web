@@ -10,6 +10,7 @@ module.exports = function(str, callback){
         if (error) {
             console.error('draw text fail with error:', error);
             callback();
+            return;
         }
 
         var index = 0;

@@ -141,8 +141,8 @@ var files = DB('files', null, require('../modules/database/database').BUILT_IN_D
 // Login
 exports.process_login = function(req, res, next) {
     var options = {};
-    if (!req.data.account){
-        res.respond({code:1001,message:'请输入账号'});
+    if (!req.data.account || !tools.isPhone(req.data.account.toString())) {
+        res.respond({'code': '1001', 'message': '请输入正确的手机号'});
         return;
     }
 
@@ -186,12 +186,12 @@ exports.process_login = function(req, res, next) {
             }
 
             user.cartId = cart.cartId;
-            setCookieAndResponse(req, res, user, keepLogin);
+            setCookieAndResponse(req, res, user, keepLogin, 'login');
         }, false);
     });
 };
 
-var setCookieAndResponse = function(req, res, user, keepLogin){
+var setCookieAndResponse = function(req, res, user, keepLogin, type){
     // Set cookie
     var options = {userid:user.userid};
     var userAgent = req.data['user-agent'];
@@ -260,8 +260,19 @@ var setCookieAndResponse = function(req, res, user, keepLogin){
                 res.cookie(config.shopingCartcookie, shoppingCart_count, {domain: config.domain});
             }
 
+            var resultMessage = 'success';
+            if (type) {
+                switch(type) {
+                    case 'login':
+                        resultMessage = '登录成功';
+                        break;
+                    case 'register':
+                        resultMessage = '注册成功';
+                        break;
+                }
+            }
             // Return results
-            var result = {'code': '1000', 'message': 'success', 'datas': user, token:token};
+            var result = {'code': '1000', 'message': resultMessage, 'datas': user, token:token};
             res.respond(result);
             return;
         }, true);
@@ -302,7 +313,7 @@ exports.process_register = function(req, res, next) {
 
     var decrypted = tools.decrypt_password(decodeURI(req.data.password));
     if (decrypted.length < 6) {
-        res.respond({'code': '1001', 'message': '密码长度需不小于6位'});
+        res.respond({'code': '1001', 'message': '密码需不小于6位'});
         return;
     }
     options.account = req.data.account;
@@ -318,7 +329,7 @@ exports.process_register = function(req, res, next) {
     var vcodeoptions = {'target': req.data.account.toString(), 'code_type': 'register', 'code': req.data.smsCode};
     vCodeService.verify(vcodeoptions, function(err, result){
         if (err || !result) {
-            res.respond({'code': '1001', 'message': '验证码验证错误'});
+            res.respond({'code': '1001', 'message': '验证码验证出错'});
             return;
         } else {
             if (result && result.type === 1) {
@@ -340,7 +351,7 @@ exports.process_register = function(req, res, next) {
                         user.isVerified = false;
                         user.isUserInfoFullFilled = data.isUserInfoFullFilled;
 
-                        setCookieAndResponse(req, res, user, keepLogin);
+                        setCookieAndResponse(req, res, user, keepLogin, 'register');
                     }
                 }, true);
             } else {
@@ -373,7 +384,7 @@ exports.process_resetpwd = function(req, res, next) {
     }
     var decrypted = tools.decrypt_password(decodeURI(req.data.newPwd));
     if (decrypted.length < 6) {
-        res.respond({'code': '1001', 'message': '密码长度需不小于6位'});
+        res.respond({'code': '1001', 'message': '密码需不小于6位'});
         return;
     }
     options.account = req.data.account;
@@ -381,29 +392,36 @@ exports.process_resetpwd = function(req, res, next) {
     options.password = decrypted;
     options.ip = req.ip;
 
-    vcodeoptions = {'target': req.data.account.toString(), 'code_type': 'resetpwd', 'code': req.data.smsCode};
-    vCodeService.verify(vcodeoptions, function(err, result){
-        if (err || !result) {
-            res.respond({'code': '1001', 'message': '验证码验证错误'});
+    UserService.get({'account': req.data.account}, function (err, data) {
+        if (!data || err) {
+            res.respond({'code': '1001', 'message': '该手机号未注册，请重新输入'});
             return;
         } else {
-            if (result && result.type === 1) {
-                UserService.update(options, function (err) {
-                    // Error
-                    if (err) {
-                        res.respond({'code': '1001', 'message': '密码修改失败'});
-                        return;
+            vcodeoptions = {'target': req.data.account.toString(), 'code_type': 'resetpwd', 'code': req.data.smsCode};
+            vCodeService.verify(vcodeoptions, function(err, result){
+                if (err || !result) {
+                    res.respond({'code': '1001', 'message': '验证码验证出错'});
+                    return;
+                } else {
+                    if (result && result.type === 1) {
+                        UserService.update(options, function (err) {
+                            // Error
+                            if (err) {
+                                res.respond({'code': '1001', 'message': '密码修改失败'});
+                                return;
+                            } else {
+                                // Return results
+                                res.respond({'code': '1000', 'message': '重置密码成功'});
+                            }
+                        });
                     } else {
-                        // Return results
-                        res.respond({'code': '1000', 'message': 'success'});
+                        res.respond({'code': '1001', 'message': result.data});
+                        return;
                     }
-                });
-            } else {
-                res.respond({'code': '1001', 'message': result.data});
-                return;
-            }
+                }
+            }, true);
         }
-    }, true);
+    });
 };
 
 // Get user
