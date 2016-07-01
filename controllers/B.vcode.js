@@ -1,6 +1,6 @@
 var tools = require('../common/tools');
 var utils = require('../common/utils');
-var DrawText = require('../modules/DrawText')();
+var DrawText = require('../modules/DrawText');
 var services = require('../services');
 var UserService = services.user;
 var vCodeService = services.vCode;
