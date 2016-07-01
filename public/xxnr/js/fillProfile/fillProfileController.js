@@ -2,7 +2,7 @@
  * Created by xxnr-cd on 15/12/21.
  */
 var app = angular.module('fillProfile', ['xxnr_common','shop_cart',"ngFlash"]);
-app.controller('fillProfileController', function($scope, remoteApiService, commonService, $http, Flash){
+app.controller('fillProfileController', function($scope, remoteApiService, commonService, $http, Flash, $timeout){
     var sweetalert = commonService.sweetalert;
 
     $scope.provinces = [{name:"省份",id: 0}];
@@ -188,6 +188,10 @@ app.controller('fillProfileController', function($scope, remoteApiService, commo
                         //sweetalert('个人资料保存成功','my_xxnr.html');
                         var message = '<img class="xxnr--flash--icon" src="images/correct_prompt.png" alt="">个人资料保存成功';
                         var id = Flash.create('success', message, 3000, {class: 'xxnr-success-flash', id: 'xxnr-success-flash'}, false);
+                        $timeout(function(){
+                            window.location.href = "/my_xxnr.html";
+                            return false
+                        },3000);
                     }else if(response.data.code == 1401){
                         sweetalert('你已被登出，请重新登录', "logon.html");
                     }

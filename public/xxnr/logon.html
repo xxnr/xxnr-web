@@ -14,6 +14,7 @@
     <!-- build:css -->
     <link type="text/css" rel="stylesheet" href="css/style.css">
     <link type="text/css" rel="stylesheet" href="css/sweetalert.css">
+    <link type="text/css" rel="stylesheet" href="css/angular-flash.css">
     <!-- endbuild -->
     <!-- build:js -->
     <script src="js/jquery.min.js"></script>
@@ -35,6 +36,7 @@
     <!-- endbuild -->
 </head>
 <body>
+<flash-message></flash-message>
 <header ng-controller="headerController"></header>
 <div ng-controller="loginController" ng-class="{true:'overflow_body', false:'not_overflow_body'}[isOverflow]">
 <div class="logon clearfix">
@@ -149,7 +151,7 @@
                                        required phoneverfied/>
                             </div>
                             <div class="form-group register_code"
-                                 ng-class="{'focused_input--green':focusInputGroupNum == formInputsKeyValue.registerCode, 'error_input--red': registerResMsg.length > 0 &&  errorInputGroupNum ==formInputsKeyValue.registerCode && registerForm.code.$error.required}"
+                                 ng-class="{'focused_input--green':focusInputGroupNum == formInputsKeyValue.registerCode, 'error_input--red': registerResMsg.length > 0 &&  errorInputGroupNum ==formInputsKeyValue.registerCode}"
                                  ng-click="focusShowValidate(formInputsKeyValue.registerCode)">
                                 <input type="text"
                                        my-placeholder="短信验证码" placeholder="短信验证码"
@@ -188,7 +190,7 @@
                                 <input type="checkbox" checked="true" name="readPolicy" ng-model="policyChecked" /> <span>我已阅读并同意<a href="" ng-click="showPolicy()">《新新农人网站使用协议》</a></span>
 
                             </div>
-                            <div class="register_error ng-cloak" ng-show="registerResMsg && errorInputGroupNum >= 3">
+                            <div class="register_error ng-cloak" ng-show="registerResMsg">
                                 <img src="../xxnr/images/login_fault.png" alt="" />
                                 <span>{{registerResMsg}}</span>
                             </div>

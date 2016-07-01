@@ -1,8 +1,8 @@
 /**
  * Created by pepelu on 9/18/2015.
  */
-var app = angular.module('login', ['xxnr_common']);
-app.controller('loginController', function($scope, $timeout, remoteApiService, commonService,$window){
+var app = angular.module('login', ['xxnr_common',"ngFlash"]);
+app.controller('loginController', function($scope, $timeout, remoteApiService, commonService,$window,Flash){
     function getQueryStringByName(name) {
         var result = location.search.match(new RegExp("[\?\&]" + name + "=([^\&]+)", "i"));
         if (result == null || result.length < 1) {
@@ -149,7 +149,7 @@ app.controller('loginController', function($scope, $timeout, remoteApiService, c
                         regSetTimeOut(60);
                     }else if(data.message=='请求参数错误，无效的tel参数'){
                         //sweetalert(data.message);
-                        $scope.registerResMsg = '手机号格式错误';
+                        $scope.registerResMsg = '请输入正确的手机号';
                         $scope.errorInputGroupNum = $scope.formInputsKeyValue.registerPhone;
                     }else{
                         //sweetalert(data.message);
@@ -352,8 +352,15 @@ app.controller('loginController', function($scope, $timeout, remoteApiService, c
                         .then(function (data) {
                             if (data.code == 1000) {
                                 //sweetalert('重置密码成功',"logon.html");
-                                $scope.resetPasswordSucceedMsg = '重置密码成功';
+                                //$scope.resetPasswordSucceedMsg = '重置密码成功';
                                 //window.location.href = 'logon.html';
+                                var message = '<img class="xxnr--flash--icon" src="images/correct_prompt.png" alt="">重置密码成功';
+                                var id = Flash.create('success', message, 3000, {class: 'xxnr-success-flash', id: 'xxnr-success-flash'}, false);
+                                //$timeout(function(){
+                                //    window.location.href = "/logon.html";
+                                //    return false
+                                //},3000);
+                                $scope.closePop();
                             } else {
                                 //sweetalert(data.message);
                                 $scope.resetPasswordMsg = data.message;
@@ -392,13 +399,22 @@ app.controller('loginController', function($scope, $timeout, remoteApiService, c
                     var encrypt = new JSEncrypt();
                     encrypt.setPublicKey(public_key);
                     var encrypted = encrypt.encrypt($scope.newPassword);
+                    $scope.registerSucceedResMsg = '';  //当点击注册按钮的时候初始化提示信息
+                    $scope.registerResMsg = '';   //当点击注册按钮的时候初始化提示信息
                     remoteApiService.regist($scope.phoneNumber, encodeURI(encrypted), $scope.code, $scope.nickName)
                         .then(function (data) {
                             if (data.code == 1000) {
                                 sessionStorage.setItem('user', JSON.stringify(data.datas));
                                 window.location.href = '/fillProfile.html';
                             } else {
-                                sweetalert(data.message);
+                                //sweetalert(data.message);
+                                if(data.message =='请输入正确的11位手机号'){
+                                    $scope.registerResMsg = '请输入正确的手机号';
+                                    $scope.errorInputGroupNum = $scope.formInputsKeyValue.registerPhone;
+                                }else if(data.message =='验证码输入错误'){
+                                    $scope.registerResMsg = '验证码输入错误';
+                                    $scope.errorInputGroupNum = $scope.formInputsKeyValue.registerCode;
+                                }
                             }
                         })
                 })

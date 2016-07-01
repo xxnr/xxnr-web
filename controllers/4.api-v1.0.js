@@ -634,11 +634,10 @@ exports.AppUpgrade = function (req, res, next) {
         if (!postVersion || AppupgradeService.compareVersion(nowAndroidVersion, postVersion)) {
             res.respond({
                 code: 1000,
-                message: '1.签到规则全新升级，更多积分等你来拿!\n2.积分商城全面上线，精美礼品汽车服务都能兑换哦，快去看看吧!',
+                message: '1.积分商城全新上线，精美礼品等你兑换\n2.签到规则改装升级，连续签到积分翻倍\n3.完成订单奖励积分，还能兑换礼品呦',
                 version: nowAndroidVersion,
                 android_update_url: android_update_url
             });
-
         } else {
             res.respond({code: 1200, message: '最新版本', version: nowAndroidVersion});
         }
