@@ -94,7 +94,7 @@ var config = {
 
     //Android IOS app版本号
     nowIosVersion: '2.2.1',
-    nowAndroidVersion: '2.2.5'
+    nowAndroidVersion: '2.3.2'
 
 };
 
