@@ -39,18 +39,19 @@ function createTemporaryKey(req) {
 function responseImg(res, graphvCode, extension) {
     if (res && graphvCode) {
         // return image for graphvCode.code
-        var buf = DrawText(graphvCode.code);
-        if (!buf) {
-            console.error('B.vcode graph_vcode_image getGraphvCode err:', err);
-            // return 404
-            next();
-            return res.sendStatus(404);
-        }
-        res.set('Pragma', 'no-cache');
-        res.set(RESPONSE_HEADER_CACHECONTROL, 'no-cache, no-store, max-age=0, must-revalidate');
-        res.set('Expires', new Date().add('Y', -10));
-        res.set(RESPONSE_HEADER_CONTENTTYPE, utils.getContentType(extension?extension:img_extension));
-        res.end(buf);
+        DrawText(graphvCode.code, function(buf) {
+            if (!buf) {
+                console.error('B.vcode graph_vcode_image getGraphvCode err:', err);
+                // return 404
+                next();
+                return res.sendStatus(404);
+            }
+            res.set('Pragma', 'no-cache');
+            res.set(RESPONSE_HEADER_CACHECONTROL, 'no-cache, no-store, max-age=0, must-revalidate');
+            res.set('Expires', new Date().add('Y', -10));
+            res.set(RESPONSE_HEADER_CONTENTTYPE, utils.getContentType(extension?extension:img_extension));
+            res.end(buf);
+        });
     }
     return;
 }
@@ -265,7 +266,7 @@ function graph_vcode(req, res) {
             }
             res.respond({
                 code: 1000,
-                message: 'success'
+                message: '成功获取短信，请注意查收'
             });
             return;
         }
