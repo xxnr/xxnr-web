@@ -21,7 +21,7 @@ FUA.aggregate({$match:{route:'/api/v2.0/sms'}},
             }
 
             result.forEach(function(ip){
-                if(ip.count >= 3  && ips.indexOf(ip._id) == -1){
+                if(ip.count >= 5  && ips.indexOf(ip._id) == -1){
                     ips.push(ip._id);
                 }
             });
@@ -36,7 +36,7 @@ FUA.aggregate({$match:{route:'/api/v2.0/sms'}},
 
                 var promises = docs.map(function(doc){
                     return new Promise(function(resolve, reject){
-                        var newRecord = new FUA({route:doc.route, method:doc.method, user:doc.user, ip:doc.ip, forwardedBy:doc.forwardedBy});
+                        var newRecord = new FUA({route:doc.route, method:doc.method, user:doc.user, ip:doc.ip, forwardedBy:doc.forwardedBy, expireAt: new Date().add('h', 2)});
                         if(doc.forwardedBy){
                             hasForwardedCount++;
                         }
