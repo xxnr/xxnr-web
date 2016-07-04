@@ -39,26 +39,28 @@ ThrottleService.prototype.requireAccess = function(route, method, ip, user, call
         return;
     }
 
-    var recordPassedAccess = function() {
-        var record = {route: route, method: method, ip:ip, forwardedBy:forwardedBy};
-        if(user){
-            record.user = mongoose.Types.ObjectId(user);
-        }
-
-        var newEntry = new frontendUserAccessModel(record);
-
-        // record this hit
-        newEntry.save(function(err){
-            if(err){
-                console.error(err);
-            }
-        });
-    };
-
     var promises = [];
     if(throttle_config.max_hits && throttle_config.max_hits[route] && throttle_config.max_hits[route][method]){
+        var route_throttle = throttle_config.max_hits[route][method];
+        var interval_in_second = route_throttle.interval;
+        var recordPassedAccess = function() {
+            var record = {route: route, method: method, ip:ip, forwardedBy:forwardedBy, expireAt:new Date().add('s', interval_in_second)};
+            if(user){
+                record.user = mongoose.Types.ObjectId(user);
+            }
+
+            var newEntry = new frontendUserAccessModel(record);
+
+            // record this hit
+            newEntry.save(function(err){
+                if(err){
+                    console.error(err);
+                }
+            });
+        };
+
         // this api is configured as throttled
-        var max_hits = throttle_config.max_hits[route][method].max_hits;
+        var max_hits = route_throttle.max_hits;
         if(max_hits) {
             // this api is configured as throttle by hits
             promises.push(new Promise(function (resolve, reject) {
@@ -79,7 +81,7 @@ ThrottleService.prototype.requireAccess = function(route, method, ip, user, call
             }));
         }
 
-        var max_hits_per_user = throttle_config.max_hits[route][method].max_hits_per_user;
+        var max_hits_per_user = route_throttle.max_hits_per_user;
         if(max_hits_per_user){
             if(!user){
                 callback('user required');
@@ -105,7 +107,7 @@ ThrottleService.prototype.requireAccess = function(route, method, ip, user, call
             }));
         }
 
-        var max_hits_per_ip = throttle_config.max_hits[route][method].max_hits_per_ip;
+        var max_hits_per_ip = route_throttle.max_hits_per_ip;
         if(max_hits_per_ip){
             // this api is configured as throttle by ip
             promises.push(new Promise(function (resolve, reject) {
@@ -130,7 +132,6 @@ ThrottleService.prototype.requireAccess = function(route, method, ip, user, call
     if(promises.length == 0){
         // this api is not configured to be throttle
         callback(true);
-        recordPassedAccess();
     } else{
         Promise.all(promises)
             .then(function(){
