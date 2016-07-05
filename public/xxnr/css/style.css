@@ -2584,6 +2584,10 @@ body {
     line-height: 44px;
     font-size: 14px;
 }
+.pop_body .pop_login li .reset_captcha_graph{
+    position: relative;
+    float: left;
+}
 .pop_body .pop_login li .reset_captcha_graph img{
     width: 120px;
     height: 44px;
@@ -2595,8 +2599,8 @@ body {
 .pop_body .pop_login li .reset_captcha_graph .refresh_btn{
     background: #FFFFFF;
     position: absolute;
-    bottom: 0;
-    right: 0;
+    bottom: 0px;
+    right: 0px;
     height: 22px;
     width: 68px;
     border: 1px solid #909090;
