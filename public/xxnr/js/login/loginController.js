@@ -150,7 +150,7 @@ app.controller('loginController', function($scope, $timeout, remoteApiService, c
                             if(!$scope.graph_code && $scope.captcha){
                                 $scope.registerResMsg = '请输入图形验证码';
                                 $scope.errorInputGroupNum = $scope.formInputsKeyValue.registerCaptcha;
-                            }else if($scope.graph_code && $scope.captcha) {
+                            }else if($scope.graph_code && $scope.captcha){
                                 $scope.registerResMsg = '请输入正确图形验证码';
                                 $scope.errorInputGroupNum = $scope.formInputsKeyValue.registerCaptcha;
                             }
@@ -171,12 +171,14 @@ app.controller('loginController', function($scope, $timeout, remoteApiService, c
                 })
         }
     };
-    $scope.getCaptcha = function(){
+    $scope.getCaptcha = function(bizcode){
         if(checkPhoneNumber()) {
-            remoteApiService.captcha($scope.phoneNumber, 'register')
-                .then(function (data) {
-                    console.log(data);
-                })
+            var captchaUrl = commonService.baseUrl + 'api/v2.3/captcha?' + 'bizcode=' + bizcode + '&tel=' + $scope.phoneNumber + '&time=' + new Date().getTime();
+            if(bizcode == 'register'){
+                $scope.captcha = captchaUrl;
+            }else if(bizcode == 'resetpwd'){
+                $scope.reset_captcha = captchaUrl;
+            }
         }
     };
     $scope.sendResetCode = function(event){
@@ -186,23 +188,47 @@ app.controller('loginController', function($scope, $timeout, remoteApiService, c
         }
         $scope.focusShowValidate();
         if(checkPhoneNumber(true)) {
-            remoteApiService.sendCode($scope.phoneNumber, 'resetpwd')
+            remoteApiService.sendCode($scope.phoneNumber, 'resetpwd', $scope.reset_graph_code?$scope.reset_graph_code:'')
                 .then(function (data) {
                     if(data.code == 1000){
                         //sweetalert('成功获取短信，请注意查收');
-                        $scope.resetPasswordSucceedMsg = '成功获取短信，请注意查收';
-                        $scope.resetBlockSendCode = true;
-                        resetSetTimeOut(60);
-                    }else{
-                        //sweetalert(data.message);
-                        if(data.message == '请求参数错误，无效的tel参数'){
-                            $scope.resetPasswordMsg = '手机号格式错误';
+                        if(data.captcha){
+                            if(!$scope.reset_graph_code && $scope.reset_captcha){
+                                $scope.resetPasswordMsg = '请输入图形验证码';
+                            }else if($scope.reset_graph_code && $scope.reset_captcha){
+                                $scope.resetPasswordMsg = '请输入正确图形验证码';
+                            }
+                            $scope.reset_captcha = data.captcha?data.captcha:'';
                         }else{
-                            $scope.resetPasswordMsg = data.message;
-
+                            $scope.reset_captcha = '';
+                            $scope.resetPasswordSucceedMsg = '成功获取短信，请注意查收';
+                            $scope.resetBlockSendCode = true;
+                            resetSetTimeOut(60);
                         }
+                    }else if(data.message=='请求参数错误，无效的tel参数'){
+                        $scope.resetPasswordMsg = '手机号格式错误';
+                    }else{
+                        $scope.resetPasswordMsg = data.message;
                     }
                 })
+
+            //remoteApiService.sendCode($scope.phoneNumber, 'resetpwd')
+            //    .then(function (data) {
+            //        if(data.code == 1000){
+            //            //sweetalert('成功获取短信，请注意查收');
+            //            $scope.resetPasswordSucceedMsg = '成功获取短信，请注意查收';
+            //            $scope.resetBlockSendCode = true;
+            //            resetSetTimeOut(60);
+            //        }else{
+            //            //sweetalert(data.message);
+            //            if(data.message == '请求参数错误，无效的tel参数'){
+            //                $scope.resetPasswordMsg = '手机号格式错误';
+            //            }else{
+            //                $scope.resetPasswordMsg = data.message;
+            //
+            //            }
+            //        }
+            //    })
         }
     };
     var regSetTimeOut = function(timeOut){
@@ -289,7 +315,15 @@ app.controller('loginController', function($scope, $timeout, remoteApiService, c
             return true;
         }
         return false;
-    }
+    };
+    var checkResetCaptcha = function(){
+        if($scope.reset_captcha){
+            $scope.resetPasswordMsg = '请先发送验证码';
+        }else{
+            return true;
+        }
+        return false;
+    };
     var checkCode = function(isResetPassword){ //isResetPassword 是否正在进行找回密码的验证
         if($scope.code){
             return true;
@@ -370,7 +404,7 @@ app.controller('loginController', function($scope, $timeout, remoteApiService, c
         $scope.registerResMsg = "";
         $scope.resetPasswordMsg = "";
         $scope.resetPasswordSucceedMsg = "";
-        if(checkPhoneNumber(true) && checkCode(true) && checkNewPassword(true) && checkConfirmNewPassword(true)){
+        if(checkPhoneNumber(true) && checkResetCaptcha(true) && checkCode(true) && checkNewPassword(true) && checkConfirmNewPassword(true)){
             remoteApiService.getPublicKey()
                 .then(function(data) {
                     var public_key = data.public_key;

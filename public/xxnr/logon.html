@@ -150,6 +150,16 @@
                                        ng-blur="blurShowValidate()"
                                        required phoneverfied/>
                             </div>
+                            <div class="form-group verification-code" ng-show="captcha"
+                                 ng-class="{'focused_input--green':focusInputGroupNum == formInputsKeyValue.registerCaptcha, 'error_input--red': registerResMsg.length > 0 &&  errorInputGroupNum ==formInputsKeyValue.registerCaptcha}"
+                                 ng-click="focusShowValidate(formInputsKeyValue.registerCaptcha)">
+                                <input type="text" class="verification-code-input"
+                                       my-placeholder="图形验证码" placeholder="图形验证码"
+                                       ng-model="graph_code" name="graph_code"
+                                       ng-blur="blurShowValidate()"
+                                       required />
+                            </div>
+                            <div class="captcha_graph" ng-show="captcha"><img ng-src="{{captcha}}" alt=""><div class="refresh_btn" ng-click="getCaptcha('register')">换一张</div></div>
                             <div class="form-group register_code"
                                  ng-class="{'focused_input--green':focusInputGroupNum == formInputsKeyValue.registerCode, 'error_input--red': registerResMsg.length > 0 &&  errorInputGroupNum ==formInputsKeyValue.registerCode}"
                                  ng-click="focusShowValidate(formInputsKeyValue.registerCode)">
@@ -268,6 +278,18 @@
                                ng-class="{'focused_input--green':focusInputGroupNum == formInputsKeyValue.resetPasswordPhone,'error_input--red': resetPasswordMsg.length > 0 && errorInputGroupNum ==formInputsKeyValue.resetPasswordPhone }"
                                ng-click="focusShowValidate(formInputsKeyValue.resetPasswordPhone)">
                     </div>
+                </li>
+                <li>
+                    <div class="form-group verification-code" ng-show="reset_captcha"
+                         ng-class="{'focused_input--green':focusInputGroupNum == formInputsKeyValue.registerCaptcha, 'error_input--red': registerResMsg.length > 0 &&  errorInputGroupNum ==formInputsKeyValue.registerCaptcha}"
+                         ng-click="focusShowValidate(formInputsKeyValue.registerCaptcha)">
+                        <input type="text" class="reset_verification-code-input"
+                               my-placeholder="图形验证码" placeholder="图形验证码"
+                               ng-model="reset_graph_code" name="reset_graph_code"
+                               ng-blur="blurShowValidate()"
+                               required />
+                    </div>
+                    <div class="reset_captcha_graph" ng-show="reset_captcha"><img ng-src="{{reset_captcha}}" alt=""><div class="refresh_btn" ng-click="getCaptcha()">换一张</div></div>
                 </li>
                 <li>
                     <label for="" class="left label">验证码：</label>

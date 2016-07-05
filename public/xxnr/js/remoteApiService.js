@@ -300,11 +300,12 @@ app.service('remoteApiService', function(commonService){
         return commonService.ajax(params);
     };
 
-    this.sendCode = function(phoneNumber, bizCode){
+    this.sendCode = function(phoneNumber, bizCode, authCode){
         var params = {
-            methodname:'api/v2.0/sms',
+            methodname:'api/v2.3/sms',
             bizcode:bizCode,
-            tel:phoneNumber
+            tel:phoneNumber,
+            authCode:authCode
         };
         return commonService.ajax(params);
     };
