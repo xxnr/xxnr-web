@@ -307,7 +307,7 @@ app.service('remoteApiService', function(commonService){
             tel:phoneNumber,
             authCode:authCode
         };
-        return commonService.ajax(params);
+        return commonService.sendPost(params);
     };
     this.resetPassword = function(phoneNumber, newPassword, code){
         var params ={
