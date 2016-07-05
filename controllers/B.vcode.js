@@ -260,7 +260,7 @@ function graph_vcode(req, res) {
     } else {
         if (requestType === 'register') {
             //if (req.user) {
-            //   res.respond({'code':'1001','message':'用户已登录，请先登出'});
+            //   res.respond({code:1001,message:'用户已登录，请先登出'});
             // }
             if (!req.data.tel || !tools.isPhone(req.data.tel)) {
                 res.respond({
@@ -374,7 +374,7 @@ function generate_sms_vcode(req, res, next) {
 
     if (requestType === 'resetpwd') {
         if (!req.data.tel || !tools.isPhone(req.data.tel)) {
-            res.respond({'code': '1001', 'message': '请输入正确的手机号'});
+            res.respond({code: 1001, message: '请输入正确的手机号'});
             return;
         } else {
             code_type = 'resetpwd';
@@ -383,19 +383,19 @@ function generate_sms_vcode(req, res, next) {
 
             UserService.get(user, function (err, data) {
                 if (!data || err) {
-                    res.respond({'code': '1001', 'message': '该手机号未注册，请重新输入'});
+                    res.respond({code: 1001, message: '该手机号未注册，请重新输入'});
                     return;
                 } else {
                     generate_vcode(code_type, target, target_type, mobile_code, function (err, result) {
                         if (err) {
-                            res.respond({'code': '1001', 'message': '获取短信验证码失败，请重试'});
+                            res.respond({code: 1001, message: '获取短信验证码失败，请重试'});
                             return;
                         } else {
                             if (result && result.renew && result.renew === 2) {
-                                res.respond({'code': '1001', 'message': '获取短信验证码太频繁，请稍后再试'});
+                                res.respond({code: 1001, message: '获取短信验证码太频繁，请稍后再试'});
                                 return;
                             }
-                            res.respond({'code': '1000', 'message': 'success'});
+                            res.respond({code: 1000, message: 'success'});
                             return;
                         }
                     });
@@ -406,10 +406,10 @@ function generate_sms_vcode(req, res, next) {
     } else {
         if (requestType === 'register') {
             //if (req.user) {
-            //   res.respond({'code':'1001','message':'用户已登录，请先登出'});
+            //   res.respond({code:1001,message:'用户已登录，请先登出'});
             // }
             if (!req.data.tel || !tools.isPhone(req.data.tel)) {
-                res.respond({'code': '1001', 'message': '请输入正确的手机号'});
+                res.respond({code: 1001, message: '请输入正确的手机号'});
                 return;
             } else {
                 code_type = 'register';
@@ -420,25 +420,25 @@ function generate_sms_vcode(req, res, next) {
                     if (!data || err) {
                         generate_vcode(code_type, target, target_type, mobile_code, function (err, result) {
                             if (err) {
-                                res.respond({'code': '1001', 'message': '获取短信验证码失败，请重试'});
+                                res.respond({code: 1001, message: '获取短信验证码失败，请重试'});
                                 return;
                             } else {
                                 if (result && result.renew && result.renew === 2) {
-                                    res.respond({'code': '1001', 'message': '获取短信验证码太频繁，请稍后再试'});
+                                    res.respond({code: 1001, message: '获取短信验证码太频繁，请稍后再试'});
                                     return;
                                 }
-                                res.respond({'code': '1000', 'message': 'success'});
+                                res.respond({code: 1000, message: 'success'});
                                 return;
                             }
                         });
                     } else {
-                        res.respond({'code': '1001', 'message': '该手机号已注册，请重新输入'});
+                        res.respond({code: 1001, message: '该手机号已注册，请重新输入'});
                         return;
                     }
                 });
             }
         } else {
-            res.respond({'code': '1001', 'message': '请求参数错误，无效的bizcode参数'});
+            res.respond({code: 1001, message: '请求参数错误，无效的bizcode参数'});
             return;
         }
     }
