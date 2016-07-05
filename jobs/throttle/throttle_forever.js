@@ -5,11 +5,12 @@ var models = require('../../models');
 var FUA = models.frontendUserAccess;
 var fs = require('jsonfile');
 var path = require('path');
+require('../../common/utils');
 
 var tempFilePath = path.join(__dirname, 'temp_ip_list.txt');
 var ips = [];
 var hasForwardedCount = 0;
-
+var updatedRecordCount = 0;
 FUA.aggregate({$match:{route:'/api/v2.0/sms'}},
 {$group:{_id:'$ip', count:{$sum:1}}})
     .exec(function(err, result){
@@ -21,7 +22,7 @@ FUA.aggregate({$match:{route:'/api/v2.0/sms'}},
             }
 
             result.forEach(function(ip){
-                if(ip.count >= 5  && ips.indexOf(ip._id) == -1){
+                if(ip.count >= 3  && ips.indexOf(ip._id) == -1){
                     ips.push(ip._id);
                 }
             });
@@ -42,6 +43,7 @@ FUA.aggregate({$match:{route:'/api/v2.0/sms'}},
                         }
                         newRecord.save(function(err){
                             if(!err){
+                                updatedRecordCount++;
                                 //console.log(newRecord.ip, 'saved at', newRecord.createdAt);
                                 resolve();
                             } else{
@@ -53,7 +55,7 @@ FUA.aggregate({$match:{route:'/api/v2.0/sms'}},
 
                 Promise.all(promises)
                     .then(function(){
-                        console.log('', ips.length, 'ips forbidden at', new Date(), 'while', hasForwardedCount, 'ips has been Forwarded');
+                        console.log('', ips.length, 'ips forbidden at', new Date(), 'while', hasForwardedCount, 'ips has been Forwarded.', updatedRecordCount, 'records have been updated');
                         process.exit(0);
                     })
                     .catch(function(err){
