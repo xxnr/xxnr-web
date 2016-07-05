@@ -276,17 +276,17 @@
                                    ng-click="focusShowValidate(formInputsKeyValue.resetPasswordPhone)">
                         </div>
                     </li>
-                    <li>
-                        <div class="form-group verification-code" ng-show="reset_captcha"
-                             ng-class="{'focused_input--green':focusInputGroupNum == formInputsKeyValue.registerCaptcha, 'error_input--red': registerResMsg.length > 0 &&  errorInputGroupNum ==formInputsKeyValue.registerCaptcha}"
-                             ng-click="focusShowValidate(formInputsKeyValue.registerCaptcha)">
+                    <li ng-show="reset_captcha">
+                        <label for="" class="left label">图形验证码：</label>
+                        <div class="form-group verification-code"
+                             ng-class="{'focused_input--green':focusInputGroupNum == formInputsKeyValue.resetCaptcha, 'error_input--red': registerResMsg.length > 0 &&  errorInputGroupNum ==formInputsKeyValue.resetCaptcha}"
+                             ng-click="focusShowValidate(formInputsKeyValue.resetCaptcha)">
                             <input type="text" class="reset_verification-code-input"
-                                   my-placeholder="图形验证码" placeholder="图形验证码"
                                    ng-model="reset_graph_code" name="reset_graph_code"
                                    ng-blur="blurShowValidate()"
                                    required />
                         </div>
-                        <div class="reset_captcha_graph" ng-show="reset_captcha"><img ng-src="{{reset_captcha}}" alt=""><div class="refresh_btn" ng-click="getCaptcha('resetpwd')">换一张</div></div>
+                        <div class="reset_captcha_graph"><img ng-src="{{reset_captcha}}" alt=""><div class="refresh_btn" ng-click="getCaptcha('resetpwd')">换一张</div></div>
                     </li>
                     <li>
                         <label for="" class="left label">验证码：</label>
@@ -295,7 +295,7 @@
                                    ng-class="{'focused_input--green':focusInputGroupNum == formInputsKeyValue.resetPasswordCode,'error_input--red': resetPasswordMsg.length > 0 && errorInputGroupNum ==formInputsKeyValue.resetPasswordCode }"
                                    ng-click="focusShowValidate(formInputsKeyValue.resetPasswordCode)">
                         </div>
-                        <div class="right reg_get_code"><a href="" ng-click="sendResetCode($event)">{{resetCountDown}}</a></div>
+                        <div class="left reg_get_code"><a href="" ng-click="sendResetCode($event)">{{resetCountDown}}</a></div>
                     </li>
                     <li>
                         <label for="" class="left label">新密码：</label>

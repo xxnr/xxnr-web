@@ -2,8 +2,8 @@
  * Created by cuidi on 15/11/11.
  */
 
-var app = angular.module('order_detail', ['xxnr_common', 'shop_cart']);
-app.controller('orderDetailController', function ($scope, remoteApiService, commonService, payService, loginService) {
+var app = angular.module('order_detail', ['xxnr_common', 'shop_cart',"ngFlash"]);
+app.controller('orderDetailController', function ($scope, remoteApiService, commonService, payService, loginService,Flash) {
     var sweetalert = commonService.sweetalert;
     $scope.order = {};
     $scope.order.orderType = 0;
@@ -126,9 +126,17 @@ app.controller('orderDetailController', function ($scope, remoteApiService, comm
                             if (data.code == 1000) {
                                 $scope.pickupDeliveryCode = data.deliveryCode;
                             }else if(data.code == 1401){
-                                sweetalert('你已被登出，请重新登录', "logon.html");
+                                //sweetalert('你已被登出，请重新登录', "logon.html");
+                                var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">你已被登出，请重新登录';
+                                var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);
+                                $timeout(function(){
+                                    window.location.href = "/logon.html";
+                                    return false
+                                },3000);
                             } else {
-                                sweetalert('获取提货码失败');
+                                //sweetalert('获取提货码失败');
+                                var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">获取提货码失败';
+                                var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);
                             }
                         });
                 } else if ($scope.order.orderStatus.type == 6) {
@@ -248,11 +256,29 @@ app.controller('orderDetailController', function ($scope, remoteApiService, comm
                 .then(function(data) {
                     $scope.ConfirmingOrderIds = null;
                     if(data.code == 1000){
-                        sweetalert('收货成功',window.location.pathname+"?id="+$scope.id);
+                        //sweetalert('收货成功',window.location.pathname+"?id="+$scope.id);
+                        var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">收货成功';
+                        var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);
+                        $timeout(function(){
+                            window.location.href = window.location.pathname+"?id="+$scope.id;
+                            return false
+                        },3000);
                     }else if(data.code == 1401){
-                        sweetalert('你已被登出，请重新登录', "logon.html");
+                        //sweetalert('你已被登出，请重新登录', "logon.html");
+                        var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">你已被登出，请重新登录';
+                        var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);
+                        $timeout(function(){
+                            window.location.href = "/logon.html";
+                            return false
+                        },3000);
                     }else{
-                        sweetalert('确认收货失败',window.location.pathname+"?id="+$scope.id);
+                        var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">确认收货失败';
+                        var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);
+                        $timeout(function(){
+                            window.location.href = window.location.pathname+"?id="+$scope.id;
+                            return false
+                        },3000);
+                        //sweetalert('确认收货失败',window.location.pathname+"?id="+$scope.id);
                     }
                 });
         }

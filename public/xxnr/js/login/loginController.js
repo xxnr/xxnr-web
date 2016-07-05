@@ -58,7 +58,8 @@ app.controller('loginController', function($scope, $timeout, remoteApiService, c
         resetPassword:10,
         resetPasswordConfirm:11,
         resetConfirmPasswordsMismatch:12,
-        registerCaptcha:13
+        registerCaptcha:13,
+        resetCaptcha:14
     }
     $scope.login = function(){
         $scope.loginResMsg = "";
@@ -135,6 +136,11 @@ app.controller('loginController', function($scope, $timeout, remoteApiService, c
         $scope.isOverflow = false;
         $scope.showPop = false;
         $scope.phoneNumber = "";
+        $scope.code = undefined;
+        $scope.newPassword = undefined;
+        $scope.confirm_newPassword = undefined;
+        $scope.resetPasswordMsg = '';
+        $scope.reset_captcha = undefined;
     };
     $scope.sendRegistCode = function(event){
         if($scope.regBlockSendCode){
@@ -195,8 +201,10 @@ app.controller('loginController', function($scope, $timeout, remoteApiService, c
                         if(data.captcha){
                             if(!$scope.reset_graph_code && $scope.reset_captcha){
                                 $scope.resetPasswordMsg = '请输入图形验证码';
+                                $scope.errorInputGroupNum = $scope.formInputsKeyValue.resetCaptcha;
                             }else if($scope.reset_graph_code && $scope.reset_captcha){
                                 $scope.resetPasswordMsg = '请输入正确图形验证码';
+                                $scope.errorInputGroupNum = $scope.formInputsKeyValue.resetCaptcha;
                             }
                             $scope.reset_captcha = data.captcha?data.captcha:'';
                         }else{

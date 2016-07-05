@@ -193,7 +193,13 @@ app.controller('fillProfileController', function($scope, remoteApiService, commo
                             return false
                         },3000);
                     }else if(response.data.code == 1401){
-                        sweetalert('你已被登出，请重新登录', "logon.html");
+                        //sweetalert('你已被登出，请重新登录', "logon.html");
+                        var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">你已被登出，请重新登录';
+                        var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);
+                        $timeout(function(){
+                            window.location.href = "/logon.html";
+                            return false
+                        },3000);
                     }
                 }, function errorCallback(response) {
                     // called asynchronously if an error occurs

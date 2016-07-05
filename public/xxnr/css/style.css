@@ -2568,23 +2568,42 @@ body {
     color: #909090;
 }
 
-.user_wrap .login_form .focused_input--green {
-    border: 1px solid green;
+
+.pop_body .pop_login li .verification-code {
+    width: 105px;
+    display: inline-block;
+    float: left;
+    margin-right: 12px;
+    border: 1px solid #cacaca;
 }
-.user_wrap .register_form .focused_input--green {
-    border: 1px solid green;
+.pop_body .pop_login li .verification-code input{
+    float: left;
+    height: 44px;
+    width: 105px;
+    padding: 0 15px;
+    line-height: 44px;
+    font-size: 14px;
 }
-.user_wrap .login_form .error_input--red {
-    border: 1px solid red;
+.pop_body .pop_login li .reset_captcha_graph img{
+    width: 120px;
+    height: 44px;
+    float: left;
 }
-.user_wrap .register_form .error_input--red {
-    border: 1px solid red;
+.pop_body .pop_login li .reset_captcha_graph:hover .refresh_btn{
+    display: inline-block;
 }
-.pop_body .pop_login li .focused_input--green {
-    border: 1px solid green;
-}
-.pop_body .pop_login li .error_input--red {
-    border: 1px solid red;
+.pop_body .pop_login li .reset_captcha_graph .refresh_btn{
+    background: #FFFFFF;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    height: 22px;
+    width: 68px;
+    border: 1px solid #909090;
+    line-height: 22px;
+    text-align: center;
+    display: none;
+    cursor: pointer;
 }
 .pop_mask {
     width: 100%;
@@ -2617,7 +2636,7 @@ body {
 .pop_content {
     z-index: 10;
     position: absolute;
-    width: 400px;
+    width: 480px;
     left: 50%;
     top: 50%;
     margin-left: -200px;
@@ -2659,10 +2678,10 @@ body {
 .pop_body .pop_login li {
     padding-bottom: 20px;
     overflow: hidden;
-    width: 317px;
+    /*width: 317px;*/
 }
 .pop_body .pop_login label {
-    width: 80px;
+    width: 125px;
     text-align: right;
     line-height: 44px;
     color: #424242;
@@ -2709,6 +2728,7 @@ body {
     border: 1px solid #008a2f;
     background: #fff;
     color: #008a2f;
+    margin-left: 10px;
 }
 .pop_body .pop_login .reg_get_code a:hover {
     background: #008a2f;
@@ -3043,6 +3063,24 @@ body {
     height: 300px;
     top: -134px;
     left: -130px;
+}
+.user_wrap .login_form .focused_input--green {
+    border: 1px solid green;
+}
+.user_wrap .register_form .focused_input--green {
+    border: 1px solid green;
+}
+.user_wrap .login_form .error_input--red {
+    border: 1px solid red;
+}
+.user_wrap .register_form .error_input--red {
+    border: 1px solid red;
+}
+.pop_body .pop_login li .focused_input--green {
+    border: 1px solid green;
+}
+.pop_body .pop_login li .error_input--red {
+    border: 1px solid red;
 }
 
 /*gouwuche*/
@@ -5316,19 +5354,20 @@ body {
 }
 .myClients_forms .clients_info .clients_form .form_title {
     box-sizing: border-box;
-    height: 50px;
-    line-height: 50px;
+    height: 40px;
+    line-height: 40px;
     background: #e5e5e5;
     font-size: 16px;
 }
 .myClients_forms .clients_info .clients_form .form_title ul {
-    height: 50px;
+    height: 40px;
 }
 .myClients_forms .clients_info .clients_form .form_title ul li {
     float: left;
     text-align: center;
     border-left: 1px solid #e5e5e5;
-    height: 50px;
+    height: 40px;
+    line-height: 40px;
 }
 .myClients_forms .clients_info .clients_form .form_title ul li:first-child {
     width: 160px;
@@ -5409,7 +5448,7 @@ body {
     padding-bottom: 20px;
 }
 .myClients_forms .inviter_section .inviter_wrap {
-    padding-top: 40px;
+    padding-top: 60px;
     padding-left: 65px;
 }
 .myClients_forms .inviter_section .noInviter_info p {
@@ -5476,6 +5515,7 @@ body {
     padding-top: 30px;
 }
 .myClients_forms .client_order .backToClients{
+    color: #323232;
     cursor: pointer;
     padding-left: 42px;
     height: 24px;
