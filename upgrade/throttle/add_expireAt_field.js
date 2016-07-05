@@ -8,28 +8,46 @@ var throttle_config = require('../../configuration/throttle_config');
 FUA.find({}, function(err, records){
     var total = records.length;
     var count = 0;
-    var promises = records.map(function(record){
-        return new Promise(function(resolve, reject){
-            if(throttle_config.max_hits && throttle_config.max_hits[record.route] && throttle_config.max_hits[record.route][record.method]) {
-                record.expireAt = record.createdAt.add('s', throttle_config.max_hits[record.route][record.method].interval);
-                record.save(function(err){
-                    if(err) {
-                        console.error(err);
-                    } else{
-                        count++;
-                    }
+    console.log('found', total, 'record');
+    var concurrency = 1000;
+    var batchUpdateFUA = function(i, max){
+        var promises = [];
+        for(; i< max; i++){
+            promises.push(new Promise(function(resolve, reject){
+                var record = records[i];
+                if(throttle_config.max_hits && throttle_config.max_hits[record.route] && throttle_config.max_hits[record.route][record.method]) {
+                    record.expireAt = record.createdAt.add('s', throttle_config.max_hits[record.route][record.method].interval);
+                    record.save(function(err){
+                        if(err) {
+                            console.error(err);
+                        } else{
+                            count++;
+                        }
 
+                        resolve();
+                    });
+                } else{
                     resolve();
-                });
-            } else{
-                resolve();
-            }
-        })
-    });
+                }
+            }))
+        }
 
-    Promise.all(promises)
-        .then(function(){
-            console.log('convert', count, 'record(s) out of', total);
-            process.exit(0);
-        });
+        Promise.all(promises)
+            .then(function(){
+                console.log('convert', count, 'record(s) out of', total);
+                if(max >= total){
+                    process.exit(0);
+                } else if(max < total - concurrency){
+                    batchUpdateFUA(max, max+currency);
+                } else if(max >= total - concurrency && max < total){
+                    batchUpdateFUA(max, total);
+                }
+            });
+    };
+
+    if(total > concurrency){
+        batchUpdateFUA(0, concurrency)
+    } else{
+        batchUpdateFUA(0, total);
+    }
 });
