@@ -65,11 +65,11 @@ module.exports = {
         },
         '/api/v2.0/sms':{
             'get':{
-                max_hits_per_ip : 5,
+                max_hits_per_ip : 3,
                 interval:60 * 60
             },
             'post':{
-                max_hits_per_ip : 5,
+                max_hits_per_ip : 3,
                 interval:60 * 60
             }
         }
