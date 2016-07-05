@@ -5,6 +5,7 @@ var models = require('../../models');
 var FUA = models.frontendUserAccess;
 var fs = require('jsonfile');
 var path = require('path');
+require('../../common/utils');
 
 var tempFilePath = path.join(__dirname, 'temp_ip_list.txt');
 var ips = [];
@@ -21,7 +22,7 @@ FUA.aggregate({$match:{route:'/api/v2.0/sms'}},
             }
 
             result.forEach(function(ip){
-                if(ip.count >= 5  && ips.indexOf(ip._id) == -1){
+                if(ip.count >= 3  && ips.indexOf(ip._id) == -1){
                     ips.push(ip._id);
                 }
             });
