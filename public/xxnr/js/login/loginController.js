@@ -423,7 +423,7 @@ app.controller('loginController', function($scope, $timeout, remoteApiService, c
         $scope.registerResMsg = "";
         $scope.resetPasswordMsg = "";
         $scope.resetPasswordSucceedMsg = "";
-        if(checkPhoneNumber(true) && checkResetCaptcha(true) && checkCode(true) && checkNewPassword(true) && checkConfirmNewPassword(true)){
+        if(checkPhoneNumber(true) && checkCode(true) && checkNewPassword(true) && checkConfirmNewPassword(true)){
             remoteApiService.getPublicKey()
                 .then(function(data) {
                     var public_key = data.public_key;
@@ -474,7 +474,7 @@ app.controller('loginController', function($scope, $timeout, remoteApiService, c
         $scope.isOverflow = false;
     };
     $scope.regist = function(){
-        if(checkPolicybox() && checkPhoneNumber() && checkCaptcha() && checkCode() && checkNewPassword() && checkConfirmNewPassword()){
+        if(checkPolicybox() && checkPhoneNumber() && checkCode() && checkNewPassword() && checkConfirmNewPassword()){
             remoteApiService.getPublicKey()
                 .then(function(data) {
                     var public_key = data.public_key;
