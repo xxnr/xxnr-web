@@ -26,6 +26,7 @@ describe('User', function() {
     var backend_admin = test_data.backend_admin;
     var backend_admin_token;
     var test_address;
+    var test_address_2, test_address_3, test_address_4;
     before('deploy supplier, brands, product_attributes, SKU_attributes', function(done){
         deployment.deploy_SKU(done);
     });
@@ -45,6 +46,29 @@ describe('User', function() {
         Routing.Address.get_address_by_name(test_data.test_address.province, test_data.test_address.city, test_data.test_address.county, test_data.test_address.town, function (err, address) {
             test_address = address;
             done();
+        })
+    });
+
+    before('prepare test address 2 3 4', function(done){
+        var address_3 = {
+            province:'山西',
+            city:'吕梁',
+            county:'离石'
+        };
+        var address_4 = {
+            province:'河南',
+            city:'济源',
+            town:'济水街道'
+        };
+        Routing.Address.get_address_by_name(test_data.test_address_2.province, test_data.test_address_2.city, test_data.test_address_2.county, test_data.test_address_2.town, function (err, address) {
+            test_address_2 = address;
+            Routing.Address.get_address_by_name(address_3.province, address_3.city, address_3.county, address_3.town, function (err, address) {
+                test_address_3 = address;
+                Routing.Address.get_address_by_name(address_4.province, address_4.city, address_4.county, address_4.town, function (err, address) {
+                    test_address_4 = address;
+                    done();
+                })
+            })
         })
     });
     after('delete backend admin', function (done) {
@@ -421,25 +445,10 @@ describe('User', function() {
     });
     describe('Modify user info api', function(){
         var token;
-        var test_address_2, test_address_3;
         before('register empty account and login', function (done) {
             Routing.User.create_frontend_account(test_user.account, test_user.password, function () {
                 Routing.User.frontendLogin(test_user.account, test_user.password, function (body) {
                     token = body.token;
-                    done();
-                })
-            })
-        });
-        before('prepare test address 2 3', function(done){
-            var address_3 = {
-                province:'山西',
-                city:'吕梁',
-                county:'离石'
-            };
-            Routing.Address.get_address_by_name(test_data.test_address_2.province, test_data.test_address_2.city, test_data.test_address_2.county, test_data.test_address_2.town, function (err, address) {
-                test_address_2 = address;
-                Routing.Address.get_address_by_name(address_3.province, address_3.city, address_3.county, address_3.town, function (err, address) {
-                    test_address_3 = address;
                     done();
                 })
             })
@@ -510,7 +519,7 @@ describe('User', function() {
                     townId:'invalidtownid'
                 }
             }},
-            result:{code: 1001, message: '没有查到要修改的县'}
+            result:{code: 1001, message: '没有查到要修改的区县'}
         },{
             name:'modify user info w/ invalid town id',
             params:function(){return{
@@ -580,6 +589,17 @@ describe('User', function() {
                 }
             }},
             result:{code: 1001, message: '所选乡镇不属于所选城市'}
+        },{
+            name:'modify user info w/ only province city town',
+            params:function(){return{
+                token:token,
+                address:{
+                    provinceId:test_address_4.province.id,
+                    cityId:test_address_4.city.id,
+                    townId:test_address_4.town.id
+                }
+            }},
+            result:{code: '1000'}
         }];
 
         invalidTests.forEach(function (test) {
@@ -650,12 +670,12 @@ describe('User', function() {
             result:{code: 1001, message: '该手机号已注册，请重新输入'}
         },{
             name:'generate vcode (register) w/ new account',
-            params:{bizcode:'register', tel:test_data.random_test_user(1).account},
+            params:{bizcode:'register', tel:test_data.random_test_user('0001').account},
             result:{code: 1000},
             noGet:true
         },{
             name:'generate vcode (register) w/ new account 2nd time',
-            params:{bizcode:'register', tel:test_data.random_test_user(1).account},
+            params:{bizcode:'register', tel:test_data.random_test_user('0001').account},
             result:{code: 1001, message: '获取短信验证码太频繁，请稍后再试'}
         },{
             name:'generate vcode (reset password) w/o account',
@@ -667,7 +687,7 @@ describe('User', function() {
             result:{code: 1001, message: '请输入正确的手机号'}
         },{
             name:'generate vcode (reset password) w/ unregistered account',
-            params:{bizcode:'resetpwd', tel:test_data.random_test_user(2).account},
+            params:{bizcode:'resetpwd', tel:test_data.random_test_user('0002').account},
             result:{code: 1001, message: '该手机号未注册，请重新输入'}
         },{
             name:'generate vcode (reset password) w/ unregistered account',
@@ -732,7 +752,6 @@ describe('User', function() {
             })
     });
     describe('User consignee address apis', function() {
-        var test_address_2, test_address_3;
         var token;
         var test_user_consignee_address_id;
         var test_consignee = test_user.user_address[0];
@@ -740,20 +759,6 @@ describe('User', function() {
             Routing.User.create_frontend_account(test_user.account, test_user.password, function () {
                 Routing.User.frontendLogin(test_user.account, test_user.password, function (body) {
                     token = body.token;
-                    done();
-                })
-            })
-        });
-        before('prepare test address 2 3', function(done){
-            var address_3 = {
-                province:'山西',
-                city:'吕梁',
-                county:'离石'
-            };
-            Routing.Address.get_address_by_name(test_data.test_address_2.province, test_data.test_address_2.city, test_data.test_address_2.county, test_data.test_address_2.town, function (err, address) {
-                test_address_2 = address;
-                Routing.Address.get_address_by_name(address_3.province, address_3.city, address_3.county, address_3.town, function (err, address) {
-                    test_address_3 = address;
                     done();
                 })
             })
@@ -853,6 +858,12 @@ describe('User', function() {
                     return {token:token, address:test_consignee.detail, areaId:test_address.province.id, receiptPhone:test_consignee.receiptPhone, receiptPeople:test_consignee.receiptPeople, cityId:test_address.city.id, townId:test_address_2.town.id}
                 },
                 result:{code: 1001, message: '所选乡镇不属于所选城市'}
+            },{
+                name:'add user address w/ right province city and town',
+                params:function(){
+                    return {token:token, address:test_consignee.detail, areaId:test_address_4.province.id, receiptPhone:test_consignee.receiptPhone, receiptPeople:test_consignee.receiptPeople, cityId:test_address_4.city.id, townId:test_address_4.town.id}
+                },
+                result:{code:1000}
             }
             ];
 
@@ -927,6 +938,12 @@ describe('User', function() {
                     return {token:token, addressId: test_user_consignee_address_id, address:test_consignee.detail, areaId:test_address.province.id, receiptPhone:test_consignee.receiptPhone, receiptPeople:test_consignee.receiptPeople, cityId:test_address.city.id, townId:test_address_2.town.id}
                 },
                 result:{code: 1001, message: '所选乡镇不属于所选城市'}
+            },{
+                name:'modify user address w/ right province city and town',
+                params:function(){
+                    return {token:token, addressId: test_user_consignee_address_id, address:test_consignee.detail, areaId:test_address_4.province.id, receiptPhone:test_consignee.receiptPhone, receiptPeople:test_consignee.receiptPeople, cityId:test_address_4.city.id, townId:test_address_4.town.id}
+                },
+                result:{code:'1000'}
             }
             ];
 

@@ -148,6 +148,7 @@ app.controller('loginController', function($scope, $timeout, remoteApiService, c
             return;
         }
         if(checkPhoneNumber()) {
+            $scope.captcha_loading = true;
             remoteApiService.sendCode($scope.phoneNumber, 'register', $scope.graph_code?$scope.graph_code:'')
                 .then(function (data) {
                     if(data.code == 1000){
@@ -157,22 +158,26 @@ app.controller('loginController', function($scope, $timeout, remoteApiService, c
                                 $scope.registerResMsg = '请输入图形验证码';
                                 $scope.errorInputGroupNum = $scope.formInputsKeyValue.registerCaptcha;
                             }else if($scope.graph_code && $scope.captcha){
-                                $scope.registerResMsg = '请输入正确图形验证码';
+                                $scope.registerResMsg = data.message;
                                 $scope.errorInputGroupNum = $scope.formInputsKeyValue.registerCaptcha;
                             }
                             $scope.captcha = data.captcha?data.captcha:'';
                         }else{
                             $scope.captcha = '';
                             $scope.registerSucceedResMsg = '成功获取短信，请注意查收';
+                            $scope.graph_code = undefined;
                             $scope.regBlockSendCode = true;
                             regSetTimeOut(60);
                         }
+                        $scope.captcha_loading = false;
                     }else if(data.message=='请求参数错误，无效的tel参数'){
                         $scope.registerResMsg = '请输入正确的手机号';
                         $scope.errorInputGroupNum = $scope.formInputsKeyValue.registerPhone;
+                        $scope.captcha_loading = false;
                     }else{
                         $scope.registerResMsg = data.message;
                         $scope.errorInputGroupNum = $scope.formInputsKeyValue.registerPhone;
+                        $scope.captcha_loading = false;
                     }
                 })
         }
@@ -194,6 +199,7 @@ app.controller('loginController', function($scope, $timeout, remoteApiService, c
         }
         $scope.focusShowValidate();
         if(checkPhoneNumber(true)) {
+            $scope.captcha_loading = true;
             remoteApiService.sendCode($scope.phoneNumber, 'resetpwd', $scope.reset_graph_code?$scope.reset_graph_code:'')
                 .then(function (data) {
                     if(data.code == 1000){
@@ -203,20 +209,24 @@ app.controller('loginController', function($scope, $timeout, remoteApiService, c
                                 $scope.resetPasswordMsg = '请输入图形验证码';
                                 $scope.errorInputGroupNum = $scope.formInputsKeyValue.resetCaptcha;
                             }else if($scope.reset_graph_code && $scope.reset_captcha){
-                                $scope.resetPasswordMsg = '请输入正确图形验证码';
+                                $scope.resetPasswordMsg = data.message;
                                 $scope.errorInputGroupNum = $scope.formInputsKeyValue.resetCaptcha;
                             }
                             $scope.reset_captcha = data.captcha?data.captcha:'';
                         }else{
                             $scope.reset_captcha = '';
                             $scope.resetPasswordSucceedMsg = '成功获取短信，请注意查收';
+                            $scope.reset_graph_code = undefined;
                             $scope.resetBlockSendCode = true;
                             resetSetTimeOut(60);
                         }
+                        $scope.captcha_loading = false;
                     }else if(data.message=='请求参数错误，无效的tel参数'){
                         $scope.resetPasswordMsg = '手机号格式错误';
+                        $scope.captcha_loading = false;
                     }else{
                         $scope.resetPasswordMsg = data.message;
+                        $scope.captcha_loading = false;
                     }
                 })
 
@@ -299,10 +309,10 @@ app.controller('loginController', function($scope, $timeout, remoteApiService, c
             }
             else if(!isResetPassword){
                 //sweetalert('手机号格式错误');
-                $scope.registerResMsg = '手机号格式错误';
+                $scope.registerResMsg = '请输入正确的手机号';
                 $scope.errorInputGroupNum = $scope.formInputsKeyValue.registerPhone;
             }else if(isResetPassword){
-                $scope.resetPasswordMsg = '手机号格式错误';
+                $scope.resetPasswordMsg = '请输入正确的手机号';
                 $scope.errorInputGroupNum = $scope.formInputsKeyValue.resetPasswordPhone
             }
         }else if(!isResetPassword){
@@ -327,6 +337,7 @@ app.controller('loginController', function($scope, $timeout, remoteApiService, c
     var checkResetCaptcha = function(){
         if($scope.reset_captcha){
             $scope.resetPasswordMsg = '请先发送验证码';
+            $scope.errorInputGroupNum = $scope.formInputsKeyValue.resetCaptcha;
         }else{
             return true;
         }
@@ -375,10 +386,10 @@ app.controller('loginController', function($scope, $timeout, remoteApiService, c
                     return true;
                 }else if(!isResetPassword){
                     //sweetalert('两次密码不一致');
-                    $scope.registerResMsg = '两次密码不一致';
+                    $scope.registerResMsg = '两次密码输入不一致，请重新输入';
                     $scope.errorInputGroupNum = $scope.formInputsKeyValue.registerConfirmPasswordsMismatch;
                 }else if(isResetPassword){
-                    $scope.resetPasswordMsg = '两次密码不一致';
+                    $scope.resetPasswordMsg = '两次密码输入不一致，请重新输入';
                     $scope.errorInputGroupNum = $scope.formInputsKeyValue.resetConfirmPasswordsMismatch;
                 }
             }else if(!isResetPassword){
@@ -404,7 +415,7 @@ app.controller('loginController', function($scope, $timeout, remoteApiService, c
             return true;
         }else{
             //sweetalert('请接受使用协议');
-            $scope.registerResMsg = '请接受使用协议';
+            $scope.registerResMsg = '请同意网站使用协议';
         }
         return false;
     };

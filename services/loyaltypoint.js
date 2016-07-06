@@ -444,11 +444,14 @@ LoyaltyPointsService.prototype.addGiftOrder = function(addGiftOptions, callback)
 }
 
 // get gift order
-LoyaltyPointsService.prototype.getGiftOrder = function(id, userId, callback) {
+LoyaltyPointsService.prototype.getGiftOrder = function(id, userId, RSC, callback) {
     var self = this;
     var query = {id: id};
     if (userId) {
         query.buyerId = userId;
+    }
+    if (RSC) {
+        query['RSCInfo.RSC'] = RSC;     
     }
     RewardshopGiftOrderModel.findOne(query, function (err, giftOrder) {
         if (err) {
@@ -485,7 +488,7 @@ LoyaltyPointsService.prototype.updateGiftOrder = function(id, userId, deliverSta
                     }
                     giftOrder.dateCompleted = new Date();
                 }
-                if (options.backendUser) {
+                if (options && options.backendUser) {
                     giftOrder.dateSet = new Date();
                     giftOrder.backendUser = options.backendUser._id;
                     giftOrder.backendUserAccount = options.backendUser.account;
@@ -496,7 +499,7 @@ LoyaltyPointsService.prototype.updateGiftOrder = function(id, userId, deliverSta
                 giftOrder.RSCInfo.RSCAddress = RSCInfo.RSCAddress ? RSCInfo.RSCAddress : '';
                 giftOrder.RSCInfo.companyName = RSCInfo.companyName ? RSCInfo.companyName : '';
                 giftOrder.RSCInfo.RSCPhone = RSCInfo.RSCPhone ? RSCInfo.companyName : '';
-                if (options.backendUser) {
+                if (options && options.backendUser) {
                     giftOrder.RSCInfo.dateSet = new Date();
                     giftOrder.RSCInfo.backendUser = options.backendUser._id;
                     giftOrder.RSCInfo.backendUserAccount = options.backendUser.account;
@@ -720,7 +723,7 @@ LoyaltyPointsService.prototype.giftOrderStatus = function (order) {
 };
 
 // query gift orders logs
-LoyaltyPointsService.prototype.queryGiftOrders = function(buyerId, type, times, search, page, max, callback) {
+LoyaltyPointsService.prototype.queryGiftOrders = function(buyerId, RSC, type, times, search, page, max, callback) {
     var query = {};
     
     if (type) {
@@ -765,6 +768,8 @@ LoyaltyPointsService.prototype.queryGiftOrders = function(buyerId, type, times, 
 
     if (buyerId)
         query.buyerId = buyerId;
+    if (RSC)
+        query['RSCInfo.RSC'] = RSC;
     RewardshopGiftOrderModel.count(query, function(err, count) {
         if (err) {
             console.error('LoyaltyPointsService queryGiftOrders count err:', err);

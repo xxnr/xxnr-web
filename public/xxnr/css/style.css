@@ -2408,8 +2408,8 @@ body {
 .user_wrap .register_form .captcha_graph .refresh_btn{
     background: #FFFFFF;
     position: absolute;
-    bottom: 0;
-    right: 0;
+    bottom: -10px;
+    right: -10px;
     height: 22px;
     width: 68px;
     border: 1px solid #909090;
@@ -2423,6 +2423,31 @@ body {
     height: 44px;
     float: left;
     margin-left: 12px;
+}
+.loading_spinner{
+    animation: 1s spin linear infinite;
+    width: 24px;
+    height: 24px;
+}
+.loading_spinner_overlay{
+    position: absolute;
+    background: #FFFFFF;
+    width: 100%;
+    height: 100%;
+}
+.loading_spinner_overlay img{
+    width: 24px !important;
+    height: 24px !important;
+    position: absolute;
+    top: 10px;
+    left: 50px;
+}
+@keyframes spin {
+    from{
+        transform: rotate(0deg);  }
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 .user_wrap .register_form .register_code  {
@@ -2556,7 +2581,7 @@ body {
     width: 239px;
     background: #DBEFE0;
     height: 20px;
-    left: 99px;
+    left: 143px;
 }
 .logon .reset_password_succeed img{
     padding-left: 14px;
@@ -2599,8 +2624,8 @@ body {
 .pop_body .pop_login li .reset_captcha_graph .refresh_btn{
     background: #FFFFFF;
     position: absolute;
-    bottom: 0px;
-    right: 0px;
+    bottom: -10px;
+    right: -10px;
     height: 22px;
     width: 68px;
     border: 1px solid #909090;
