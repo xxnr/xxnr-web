@@ -268,7 +268,7 @@ AreaService.prototype.check_address = function(province_id, city_id, county_id, 
 						return;
 					}
 
-					if (town.city != city.id) {
+					if (town.cityid != city.id) {
 						res.respond({code: 1001, message: '所选乡镇不属于所选城市'});
 						return;
 					}
