@@ -2424,6 +2424,31 @@ body {
     float: left;
     margin-left: 12px;
 }
+.loading_spinner{
+    animation: 1s spin linear infinite;
+    width: 24px;
+    height: 24px;
+}
+.loading_spinner_overlay{
+    position: absolute;
+    background: #FFFFFF;
+    width: 100%;
+    height: 100%;
+}
+.loading_spinner_overlay img{
+    width: 24px !important;
+    height: 24px !important;
+    position: absolute;
+    top: 10px;
+    left: 50px;
+}
+@keyframes spin {
+    from{
+        transform: rotate(0deg);  }
+    to {
+        transform: rotate(360deg);
+    }
+}
 
 .user_wrap .register_form .register_code  {
     width: 190px;
@@ -2556,7 +2581,7 @@ body {
     width: 239px;
     background: #DBEFE0;
     height: 20px;
-    left: 99px;
+    left: 143px;
 }
 .logon .reset_password_succeed img{
     padding-left: 14px;
