@@ -2408,8 +2408,8 @@ body {
 .user_wrap .register_form .captcha_graph .refresh_btn{
     background: #FFFFFF;
     position: absolute;
-    bottom: 0;
-    right: 0;
+    bottom: -10px;
+    right: -10px;
     height: 22px;
     width: 68px;
     border: 1px solid #909090;
@@ -2599,8 +2599,8 @@ body {
 .pop_body .pop_login li .reset_captcha_graph .refresh_btn{
     background: #FFFFFF;
     position: absolute;
-    bottom: 0px;
-    right: 0px;
+    bottom: -10px;
+    right: -10px;
     height: 22px;
     width: 68px;
     border: 1px solid #909090;
