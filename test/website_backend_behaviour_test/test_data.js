@@ -98,7 +98,7 @@ module.exports = {
     },
     random_test_user: function(index){
         return {
-            account: '1380000000' + index,
+            account: '1380000' + index,
             password: 'p@ssW0r$',
             name: 'test_name' + index,
             nickname: 'test_nickname' + index,

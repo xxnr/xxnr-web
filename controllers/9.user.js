@@ -671,83 +671,11 @@ exports.json_user_modify = function(req, res, next) {
         };
         if (req.data.address && req.data.address.provinceId && req.data.address.cityId) {
             var address = req.data.address;
-            options.address = {};
-            AreaService.getProvince({id: address.provinceId}, function (err, province) {
-                if (err || !province) {
-                    if (err) console.error('get province err:', err);
-                    res.respond({code: 1001, message: '没有查到要修改的省'});
-                    return;
-                }
-
-                options.address.province = province;
-                AreaService.getCity({id: address.cityId}, function (err, city) {
-                    if (err || !city) {
-                        if (err) console.error('get city err:', err);
-                        res.respond({code: 1001, message: '没有查到要修改的市'});
-                        return;
-                    }
-
-                    if(city.provinceid != province.id){
-                        res.respond({code:1001, message:'所选城市不属于所选省份'});
-                        return;
-                    }
-
-                    options.address.city = city;
-                    if (req.data.address.countyId) {
-                        AreaService.getCounty({id: address.countyId}, function (err, county) {
-                            if (err || !county) {
-                                if (err) console.error('get county err:', err);
-                                res.respond({code: 1001, message: '没有查到要修改的县'});
-                                return;
-                            }
-
-                            if(county.cityid != city.id){
-                                res.respond({code:1001, message:'所选区县不属于所选城市'});
-                                return;
-                            }
-
-                            options.address.county = county;
-                            if (address.townId) {
-                                AreaService.getTown({id: address.townId}, function (err, town) {
-                                    if (err || !town) {
-                                        if (err) console.error('get town err:', err);
-                                        res.respond({code: 1001, message: '没有查到要修改的乡镇'});
-                                        return;
-                                    }
-
-                                    if(town.countyid != county.id){
-                                        res.respond({code:1001, message:'所选乡镇不属于所选区县'});
-                                        return;
-                                    }
-
-                                    options.address.town = town;
-                                    UserService.update(options, callback);
-                                });
-                            } else {
-                                UserService.update(options, callback);
-                            }
-                        })
-                    } else if (address.townId) {
-                        AreaService.getTown({id: address.townId}, function (err, town) {
-                            if (err || !town) {
-                                if (err) console.error('get town err:', err);
-                                res.respond({code: 1001, message: '没有查到要修改的乡镇'});
-                                return;
-                            }
-
-                            if(town.city != city.id){
-                                res.respond({code:1001, message:'所选乡镇不属于所选城市'});
-                                return;
-                            }
-
-                            options.address.town = town;
-                            UserService.update(options, callback);
-                        });
-                    } else {
-                        UserService.update(options, callback);
-                    }
-                });
-            });
+            var updator = function(address_object){
+                options.address = address_object;
+                UserService.update(options, callback);
+            };
+            AreaService.check_address(address.provinceId, address.cityId, address.countyId, address.townId, res, updator, true);
         } else{
             UserService.update(options, callback);
         }

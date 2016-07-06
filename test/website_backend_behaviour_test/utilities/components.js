@@ -82,11 +82,12 @@ exports.prepare_SKU_attributes = function(category, brand_index, index, count, b
 
 exports.create_RSC = function(RSC, backend_admin_token, done) {
     var test_user_token;
-    var account = utils.GUID(11);
+    var account = '1380000' + utils.random(1999, 1000);
     var password = utils.GUID(20);
     Routing.User.create_frontend_account(account, password, function (body) {
         var user_id = body._id;
         Routing.User.frontendLogin(account, password, function (body) {
+            body.should.have.property('code', 1000);
             test_user_token = body.token;
             var user = body.datas;
             user._id = user_id;

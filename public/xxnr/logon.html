@@ -158,7 +158,11 @@
                                            ng-blur="blurShowValidate()"
                                            required />
                                 </div>
-                                <div class="captcha_graph" ng-show="captcha"><img ng-src="{{captcha}}" alt=""><div class="refresh_btn" ng-click="getCaptcha('register')">换一张</div></div>
+                                <div class="captcha_graph" ng-show="captcha">
+                                    <div class="loading_spinner_overlay" ng-show="captcha_loading">
+                                        <img src="images/spinner_gray-.png" class="loading_spinner" alt="">
+                                    </div>
+                                    <img ng-src="{{captcha}}" alt="" ng-click="getCaptcha('register')"><div class="refresh_btn" >换一张</div></div>
                                 <div class="form-group register_code"
                                      ng-class="{'focused_input--green':focusInputGroupNum == formInputsKeyValue.registerCode, 'error_input--red': registerResMsg.length > 0 &&  errorInputGroupNum ==formInputsKeyValue.registerCode}"
                                      ng-click="focusShowValidate(formInputsKeyValue.registerCode)">
@@ -286,7 +290,13 @@
                                    ng-blur="blurShowValidate()"
                                    required />
                         </div>
-                        <div class="reset_captcha_graph clearfix"><img ng-src="{{reset_captcha}}" alt=""><div class="refresh_btn" ng-click="getCaptcha('resetpwd')">换一张</div></div>
+                        <div class="reset_captcha_graph clearfix">
+                            <div class="loading_spinner_overlay" ng-show="captcha_loading">
+                                <img src="images/spinner_gray-.png" class="loading_spinner" alt="">
+                            </div>
+                            <img ng-src="{{reset_captcha}}" alt="" ng-click="getCaptcha('resetpwd')">
+                            <div class="refresh_btn" >换一张</div>
+                        </div>
                     </li>
                     <li>
                         <label for="" class="left label">验证码：</label>
