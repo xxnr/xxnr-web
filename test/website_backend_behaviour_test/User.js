@@ -650,12 +650,12 @@ describe('User', function() {
             result:{code: 1001, message: '该手机号已注册，请重新输入'}
         },{
             name:'generate vcode (register) w/ new account',
-            params:{bizcode:'register', tel:test_data.random_test_user(1).account},
+            params:{bizcode:'register', tel:test_data.random_test_user('0001').account},
             result:{code: 1000},
             noGet:true
         },{
             name:'generate vcode (register) w/ new account 2nd time',
-            params:{bizcode:'register', tel:test_data.random_test_user(1).account},
+            params:{bizcode:'register', tel:test_data.random_test_user('0001').account},
             result:{code: 1001, message: '获取短信验证码太频繁，请稍后再试'}
         },{
             name:'generate vcode (reset password) w/o account',
@@ -667,7 +667,7 @@ describe('User', function() {
             result:{code: 1001, message: '请输入正确的手机号'}
         },{
             name:'generate vcode (reset password) w/ unregistered account',
-            params:{bizcode:'resetpwd', tel:test_data.random_test_user(2).account},
+            params:{bizcode:'resetpwd', tel:test_data.random_test_user('0002').account},
             result:{code: 1001, message: '该手机号未注册，请重新输入'}
         },{
             name:'generate vcode (reset password) w/ unregistered account',
