@@ -95,6 +95,7 @@ router.get(F.config['manager-url']+ '/api/agents/potentialCustomers', middleware
 router.get(F.config['manager-url']+ '/api/agents/:_id', middleware.backend_auth, controllers.Manager.json_agents_get);
 
 // rewardshop
+router.post(F.config['manager-url']+'/rewardshop/uploadImage', middleware.backend_auth, controllers.Manager.CKEditor_uploadImage);
 router.get(F.config['manager-url']+'/api/rewardshop/categories', middleware.backend_auth, controllers.Manager.json_rewardshop_categories);
 // router.post(F.config['manager-url']+'/api/rewardshop/category/add', middleware.backend_auth, middleware.auditing_middleware, controllers.Manager.json_rewardshop_category_save);
 router.get(F.config['manager-url']+'/api/rewardshop/gifts', middleware.backend_auth, controllers.Manager.json_rewardshop_gifts);
