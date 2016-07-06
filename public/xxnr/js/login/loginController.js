@@ -164,6 +164,7 @@ app.controller('loginController', function($scope, $timeout, remoteApiService, c
                         }else{
                             $scope.captcha = '';
                             $scope.registerSucceedResMsg = '成功获取短信，请注意查收';
+                            $scope.graph_code = undefined;
                             $scope.regBlockSendCode = true;
                             regSetTimeOut(60);
                         }
@@ -210,6 +211,7 @@ app.controller('loginController', function($scope, $timeout, remoteApiService, c
                         }else{
                             $scope.reset_captcha = '';
                             $scope.resetPasswordSucceedMsg = '成功获取短信，请注意查收';
+                            $scope.reset_graph_code = undefined;
                             $scope.resetBlockSendCode = true;
                             resetSetTimeOut(60);
                         }
@@ -327,6 +329,7 @@ app.controller('loginController', function($scope, $timeout, remoteApiService, c
     var checkResetCaptcha = function(){
         if($scope.reset_captcha){
             $scope.resetPasswordMsg = '请先发送验证码';
+            $scope.errorInputGroupNum = $scope.formInputsKeyValue.resetCaptcha;
         }else{
             return true;
         }
