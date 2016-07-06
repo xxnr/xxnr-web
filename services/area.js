@@ -53,7 +53,7 @@ AreaService.prototype.queryProvince = function(options, callback) {
 AreaService.prototype.getProvince = function(options, callback) {
 	// options.id {String}
 
-	var query = options._id ? {_id:options._id} :{id:options.id};
+	var query = options._id ? {_id:options._id} : options.id ? {id:options.id} : options;
 	// Gets a specific document from DB
 	ProvinceModel.findOne(query, { __v: 0, tid: 0 }, function (err, province) {
 		if (!province || err) {
@@ -211,16 +211,18 @@ AreaService.prototype.getTown = function(options, callback) {
 	});
 };
 
-AreaService.prototype.check_address = function(province_id, city_id, county_id, town_id, res, updator){
+AreaService.prototype.check_address = function(province_id, city_id, county_id, town_id, res, updator, useId){
 	var self = this;
-	self.getProvince({_id: province_id}, function (err, province) {
+	var address = {};
+	self.getProvince(useId ? {id:province_id} : {_id: province_id}, function (err, province) {
 		if (err || !province) {
 			if (err) console.error('get province err:', err);
 			res.respond({code: 1001, message: '没有查到要修改的省'});
 			return;
 		}
 
-		self.getCity({_id: city_id}, function (err, city) {
+		address.province = province;
+		self.getCity(useId ? {id:city_id} : {_id: city_id}, function (err, city) {
 			if (err || !city) {
 				if (err) console.error('get city err:', err);
 				res.respond({code: 1001, message: '没有查到要修改的市'});
@@ -232,8 +234,9 @@ AreaService.prototype.check_address = function(province_id, city_id, county_id, 
 				return;
 			}
 
+			address.city = city;
 			if (county_id) {
-				self.getCounty({_id: county_id}, function (err, county) {
+				self.getCounty(useId ? {id:county_id} : {_id: county_id}, function (err, county) {
 					if (err || !county) {
 						if (err) console.error('get county err:', err);
 						res.respond({code: 1001, message: '没有查到要修改的区县'});
@@ -245,7 +248,8 @@ AreaService.prototype.check_address = function(province_id, city_id, county_id, 
 						return;
 					}
 
-					self.getTown({_id: town_id}, function (err, town) {
+					address.county = county;
+					self.getTown(useId ? {id:town_id} : {_id: town_id}, function (err, town) {
 						if (err || !town) {
 							if (err) console.error('get town err:', err);
 							res.respond({code: 1001, message: '没有查到要修改的乡镇'});
@@ -257,11 +261,12 @@ AreaService.prototype.check_address = function(province_id, city_id, county_id, 
 							return;
 						}
 
-						updator();
+						address.town = town;
+						updator(address);
 					})
 				})
 			} else {
-				self.getTown({_id: town_id}, function (err, town) {
+				self.getTown(useId ? {id:town_id} : {_id: town_id}, function (err, town) {
 					if (err || !town) {
 						if (err) console.error('get town err:', err);
 						res.respond({code: 1001, message: '没有查到要修改的乡镇'});
@@ -273,7 +278,8 @@ AreaService.prototype.check_address = function(province_id, city_id, county_id, 
 						return;
 					}
 
-					updator();
+					address.town = town;
+					updator(address);
 				})
 			}
 		})

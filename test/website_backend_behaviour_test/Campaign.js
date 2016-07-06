@@ -40,13 +40,13 @@ describe('campaign', function(){
     });
 
     describe('Q/A campaign apis', function(){
-        before('create Q/A campaign');
+        before('create Q/A campaign', function(){});
         it('query Q/A api');
         it('require reward api');
     });
 
     describe('reward times and query', function(){
-        before('create Q/A campaign, w/ reward times 1');
+        before('create Q/A campaign, w/ reward times 1', function(){});
         it('request reward -> check campaign status, got times up -> check points, got added -> request reward, got times up -> check points, got not added');
     });
 });
