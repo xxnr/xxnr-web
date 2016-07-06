@@ -19,6 +19,7 @@ gulp.task('css_minify', function() {                                //- 创建�
         './css/sweetalert.css',
         './css/uploadify.css',
         './css/angular-flash.css',
+        './css/invitationSweetalert.css',
         './css/style.css'])    //- 需要处理的css文件，放到一个字符串数组里
         .pipe(concat('styleAllInOne.css'))                            //- 合并后的文件名
         .pipe(minifyCss())                                      //- 压缩处理成一行
