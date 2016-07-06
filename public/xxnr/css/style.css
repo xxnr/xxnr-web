@@ -2401,6 +2401,7 @@ body {
 .user_wrap .register_form .captcha_graph{
     display: inline-block;
     position: relative;
+    cursor: pointer;
 }
 .user_wrap .register_form .captcha_graph:hover .refresh_btn{
     display: inline-block;
@@ -2595,7 +2596,7 @@ body {
 
 
 .pop_body .pop_login li .verification-code {
-    width: 105px;
+    width: 135px;
     display: inline-block;
     float: left;
     margin-right: 12px;
@@ -2604,7 +2605,7 @@ body {
 .pop_body .pop_login li .verification-code input{
     float: left;
     height: 44px;
-    width: 105px;
+    width: 135px;
     padding: 0 15px;
     line-height: 44px;
     font-size: 14px;
@@ -2612,9 +2613,10 @@ body {
 .pop_body .pop_login li .reset_captcha_graph{
     position: relative;
     float: left;
+    cursor: pointer;
 }
 .pop_body .pop_login li .reset_captcha_graph img{
-    width: 120px;
+    width: 90px;
     height: 44px;
     float: left;
 }
@@ -7934,7 +7936,7 @@ body {
 #provin
 {
     width:100px;
-    /*height:31px;*/
+    height:31px;
     /*padding:5px 0;*/
     margin-right: 6px;
     font-family: "Microsoft YaHei";
