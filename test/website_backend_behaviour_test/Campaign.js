@@ -19,8 +19,8 @@ describe('campaign', function(){
     });
 
     describe('create new campaign -> query backend -> query frontend -> get campaign page', function(){
-        beforeEach('prepare default campaign page');
-        afterEach('delete all campaigns');
+        beforeEach('prepare default campaign page', function(){});
+        afterEach('delete all campaigns', function(){});
         it('propagate campaign');
         it('Q/A campaign');
     });
@@ -31,7 +31,7 @@ describe('campaign', function(){
         before('create campaign C, w/ online time < start time < #datetime now# < end time < offline time',function(){});
         before('create campaign D, w/ online time < start time < end time < #datetime now# < offline time',function(){});
         before('create campaign E, w/ online time < start time < end time < offline time < #datetime now# ',function(){});
-        after('delete all campaigns');
+        after('delete all campaigns', function(){});
         it('backend query campaign -> got A, B, C, D, E w/ right status');
         it('frontend query campaign -> got B, C, D');
         it('check campaign A status -> got not online');
@@ -50,14 +50,14 @@ describe('campaign', function(){
 
     describe('Q/A campaign apis', function(){
         before('create Q/A campaign', function(){});
-        after('delete all campaigns');
+        after('delete all campaigns', function(){});
         it('query Q/A api');
         it('require reward api');
     });
 
     describe('reward times and query', function(){
         before('create Q/A campaign, w/ reward times 1', function(){});
-        after('delete all campaigns');
+        after('delete all campaigns', function(){});
         it('request reward -> check campaign status, got times up -> check points, got added -> request reward, got times up -> check points, got not added');
     });
 });
