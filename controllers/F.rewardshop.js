@@ -20,7 +20,7 @@ exports.json_rewardshop_get = function(req, res, next) {
 
     if (req.data.userId)
         options.userid = req.data.userId;
-    options.ip = req.ip;
+    options.ip = req.clientIp;
 
     UserService.get(options, function (err, user) {
     	// Error
