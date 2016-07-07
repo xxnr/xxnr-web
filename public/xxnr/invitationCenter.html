@@ -223,14 +223,16 @@
                                 <img ng-if="!inviterSex" src="images/boy-img.png" alt="">
                                 <img ng-if="inviterSex" src="images/girl-img.png" alt="">
                             </p>
-                            <p class="inviter_type">用户类型：
+                            <p class="inviter_type"><span ng-cloak>用户类型：</span>
                                 <span ng-cloak>{{inviterType}}</span>
                                 <a ng-if="inviterIsVerified">
                                     <img class="huizhang"  src="images/huiyuan.png" alt="" />
                                 </a>
                             </p>
-                            <p>所在地区：<span class="inviter_info-address" ng-repeat="inviterAddress in inviterAddresses" ng-cloak>{{inviterAddress.name}}</span></p>
-                            <p>电话号码：<span class="phoneNumber" ng-cloak>{{ inviterPhone }}</span></p>
+                            <p>所在地区：
+                                <span class="inviter_info-address" ng-cloak>{{inviterAddressesString}}</span>
+                            </p>
+                            <p>电话号码： <span class="phoneNumber" ng-cloak>{{ inviterPhone }}</span></p>
                         </div>
                     </div>
                 </div>

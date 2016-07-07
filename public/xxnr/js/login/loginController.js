@@ -182,14 +182,23 @@ app.controller('loginController', function($scope, $timeout, remoteApiService, c
                 })
         }
     };
-    $scope.getCaptcha = function(bizcode){
-        if(checkPhoneNumber()) {
-            var captchaUrl = commonService.baseUrl + 'api/v2.3/captcha?' + 'bizcode=' + bizcode + '&tel=' + $scope.phoneNumber + '&time=' + new Date().getTime();
-            if(bizcode == 'register'){
-                $scope.captcha = captchaUrl;
-            }else if(bizcode == 'resetpwd'){
-                $scope.reset_captcha = captchaUrl;
-            }
+    $scope.getCaptcha = function(bizcode,isReset){
+        if(checkPhoneNumber(isReset)) {
+            remoteApiService.findAccount($scope.phoneNumber)
+                .then(function (data) {
+                    if(data.code == 1000){
+                        var captchaUrl = commonService.baseUrl + 'api/v2.3/captcha?' + 'bizcode=' + bizcode + '&tel=' + $scope.phoneNumber + '&time=' + new Date().getTime();
+                        if(bizcode == 'register'){
+                            $scope.captcha = captchaUrl;
+                        }else if(bizcode == 'resetpwd'){
+                            $scope.reset_captcha = captchaUrl;
+                        }
+                    }else{
+                        $scope.resetPasswordMsg = data.message;
+                        $scope.errorInputGroupNum = $scope.formInputsKeyValue.resetPasswordPhone
+                    }
+                })
+
         }
     };
     $scope.sendResetCode = function(event){
