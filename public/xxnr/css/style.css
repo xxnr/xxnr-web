@@ -2443,6 +2443,13 @@ body {
     top: 10px;
     left: 50px;
 }
+.reset_loading_spinner_overlay img{
+    width: 24px !important;
+    height: 24px !important;
+    position: absolute;
+    top: 10px;
+    left: 30px;
+}
 @keyframes spin {
     from{
         transform: rotate(0deg);  }
@@ -2695,7 +2702,7 @@ body {
 .pop_body .my_xxnr_password_err{
     position: absolute;
     margin-top: -14px;
-    margin-left: 80px;
+    margin-left: 124px;
     background: #FFF2ED;
     padding-left: 6px;
     padding-right: 6px;
