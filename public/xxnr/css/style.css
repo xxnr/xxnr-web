@@ -5681,8 +5681,9 @@ body {
 .myClients_forms .client_order .orders_list .orders .orders-main .product .p-quantity p {
     position: absolute;
     top: 50%;
-    left: 50%;
+    /* left: 50%; */
     margin-top: -10px;
+    width: 100%;
 }
 .myClients_forms .client_order .orders_list .orders .orders-main .product .pay-step {
     height: 120px;
@@ -7041,6 +7042,7 @@ body {
 }
 .fillProfile .container .profile_box ul .buttons .invalid {
     background: #C0C0C0;
+    cursor: not-allowed;
 }
 .fillProfile .container .profile_box ul .profile--cancel{
     display: inline-block;
