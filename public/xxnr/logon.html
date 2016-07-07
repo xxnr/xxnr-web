@@ -284,7 +284,7 @@
                     <li ng-show="reset_captcha">
                         <label for="" class="left label">图形验证码：</label>
                         <div class="form-group verification-code"
-                             ng-class="{'focused_input--green':focusInputGroupNum == formInputsKeyValue.resetCaptcha, 'error_input--red': registerResMsg.length > 0 &&  errorInputGroupNum ==formInputsKeyValue.resetCaptcha}"
+                             ng-class="{'focused_input--green':focusInputGroupNum == formInputsKeyValue.resetCaptcha, 'error_input--red': resetPasswordMsg.length > 0 &&  errorInputGroupNum ==formInputsKeyValue.resetCaptcha}"
                              ng-click="focusShowValidate(formInputsKeyValue.resetCaptcha)">
                             <input type="text" class="reset_verification-code-input"
                                    ng-model="reset_graph_code" name="reset_graph_code"
@@ -292,7 +292,7 @@
                                    required />
                         </div>
                         <div class="reset_captcha_graph clearfix">
-                            <div class="loading_spinner_overlay" ng-show="captcha_loading">
+                            <div class="reset_loading_spinner_overlay" ng-show="captcha_loading">
                                 <img src="images/spinner_gray-.png" class="loading_spinner" alt="">
                             </div>
                             <img ng-src="{{reset_captcha}}" alt="" ng-click="getCaptcha('resetpwd')" title="换一张">

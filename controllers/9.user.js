@@ -158,7 +158,7 @@ exports.process_login = function(req, res, next) {
 
     var keepLogin = !(req.data.keepLogin === false || req.data.keepLogin === 'false');
     options.useragent = req.data["user-agent"] || 'web';
-    options.ip = req.ip;
+    options.ip = req.clientIp;
     UserService.login(options, function (err, data) {
         // Error
         if (err) {
@@ -323,7 +323,7 @@ exports.process_register = function(req, res, next) {
         options.regMethod = req.data.regMethod;
     if (req.data.nickname)
         options.nickname = req.data.nickname;
-    options.ip = req.ip;
+    options.ip = req.clientIp;
     options.useragent = req.data["user-agent"] || 'web';
 
     var vcodeoptions = {'target': req.data.account.toString(), 'code_type': 'register', 'code': req.data.smsCode};
@@ -390,7 +390,7 @@ exports.process_resetpwd = function(req, res, next) {
     options.account = req.data.account;
     options.smsCode = req.data.smsCode;
     options.password = decrypted;
-    options.ip = req.ip;
+    options.ip = req.clientIp;
 
     UserService.get({'account': req.data.account}, function (err, data) {
         if (!data || err) {
@@ -431,7 +431,7 @@ exports.json_user_get = function(req, res, next) {
 
     if (req.data.id)
         options.userid = req.data.id;
-    options.ip = req.ip;
+    options.ip = req.clientIp;
 
     UserService.get(options, function (err, data) {
         // Error
@@ -506,7 +506,7 @@ var json_userscore_get = function(req, res, next, callback) {
 
     if (req.data.userId)
         options.userid = req.data.userId;
-    options.ip = req.ip;
+    options.ip = req.clientIp;
 
     UserService.get(options, function (err, data) {
         // Error
@@ -551,7 +551,7 @@ exports.json_user_modifypwd = function(req, res, next) {
     }
 
     options.password = decryptedNewPwd;
-    options.ip = req.ip;
+    options.ip = req.clientIp;
 
     UserService.get(options, function (err, data) {
         // Error
@@ -616,7 +616,7 @@ exports.json_user_modify = function(req, res, next) {
         options.photo = req.data.userPhoto;
     if (req.data.sex)
         options.sex = req.data.sex;
-    options.ip = req.ip;
+    options.ip = req.clientIp;
 	if (req.data.type) {
         if(!Global.usertypes[req.data.type]){
             res.respond({code:1001, message:'未查询到用户类型'});
@@ -688,7 +688,7 @@ exports.json_user_findaccount = function(req, res, next) {
 
     if (req.data.account)
         options.account = req.data.account;
-    options.ip = req.ip;
+    options.ip = req.clientIp;
 
     UserService.get(options, function (err, data) {
         // Error
@@ -713,7 +713,7 @@ var json_useraddresslist_query = function(req, res, next ,callback){
         return;
     }
     options.userid = req.data.userId;
-    options.ip = req.ip;
+    options.ip = req.clientIp;
 
     UseraddressService.query(options, function (err, data) {
         // Error
