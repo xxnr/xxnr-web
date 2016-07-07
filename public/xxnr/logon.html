@@ -162,7 +162,7 @@
                                     <div class="loading_spinner_overlay" ng-show="captcha_loading">
                                         <img src="images/spinner_gray-.png" class="loading_spinner" alt="">
                                     </div>
-                                    <img ng-src="{{captcha}}" alt="" ng-click="getCaptcha('register')" title="换一张">
+                                    <img ng-src="{{captcha}}" alt="" ng-click="getCaptcha('register',false)" title="换一张">
                                 </div>
                                 <div class="form-group register_code"
                                      ng-class="{'focused_input--green':focusInputGroupNum == formInputsKeyValue.registerCode, 'error_input--red': registerResMsg.length > 0 &&  errorInputGroupNum ==formInputsKeyValue.registerCode}"
