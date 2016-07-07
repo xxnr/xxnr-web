@@ -367,7 +367,7 @@ app.controller('shoppingCartController', function($scope, $timeout, remoteApiSer
         } else {
             swal({
                     title: " ",
-                    text: "\n\n您确定要删除吗?\n\n",
+                    text: "\n您确定要删除吗?\n",
                     //type: "warning",
                     showCancelButton: true,
                     confirmButtonColor: '#00913a',
