@@ -684,20 +684,26 @@ exports.json_user_modify = function(req, res, next) {
 
 // Find Account in users
 exports.json_user_findaccount = function(req, res, next) {
+    if (!req.data.account|| !tools.isPhone(req.data.account.toString())) {
+        res.respond({code: 1001, message: '请输入正确的手机号'});
+        return;
+    }
     var options = {};
-
-    if (req.data.account)
-        options.account = req.data.account;
+    options.account = req.data.account;
     options.ip = req.clientIp;
 
     UserService.get(options, function (err, data) {
         // Error
-        if (err) {
-            res.respond({'code': '1001', 'message': err});
+        if (err || !data) {
+            if (err && data) {
+                res.respond({code: 1001, message: '查找信息失败'});
+                return;
+            }
+            res.respond({code: 1001, message: '该手机号未注册'});
             return;
         }
 
-        res.respond({'code': '1000', 'message': 'success'});
+        res.respond({code: 1000, message: '该手机号已注册'});
     });
 };
 
