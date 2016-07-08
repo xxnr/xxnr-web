@@ -66,7 +66,7 @@ exports.graph_vcode_image = function(req, res, next) {
     options.target = decrypt_filename(filename);
     options.code_type = code_type;
     options.target_type = target_type;
-    options.ip = req.ip;
+    options.ip = req.clientIp;
 
     vCodeService.getGraphvCode(options, function(err, graphvCode) {
         if (err || !graphvCode) {
@@ -120,7 +120,7 @@ exports.generate_refresh_graph_vcode = function(req, res, next) {
                     next();
                     return res.sendStatus(404);
                 } else {
-                    var options = {target: target, code_type: code_type, ip: req.ip, target_type:target_type};
+                    var options = {target: target, code_type: code_type, ip: req.clientIp, target_type:target_type};
                     vCodeService.updateOrCreateGraphvCode(options, callback);
                 }
             });
@@ -137,7 +137,7 @@ exports.generate_refresh_graph_vcode = function(req, res, next) {
 
                 UserService.get(user, function (err, data) {
                     if (!data || err) {
-                        var options = {target: target, code_type: code_type, ip: req.ip, target_type:target_type};
+                        var options = {target: target, code_type: code_type, ip: req.clientIp, target_type:target_type};
                         vCodeService.updateOrCreateGraphvCode(options, callback);
                     } else {
                         next();
@@ -167,9 +167,10 @@ exports.generate_validate_sms = function(req, res, next) {
         if (dailySmsNumber && vcode_config.daily_max_sms && dailySmsNumber.num > vcode_config.daily_max_sms) {
             graph_vcode(req, res);
         } else {
+            var ip = req.clientIp;
             // 发短信的ip throttle机制
-            if (vcode_config.ipThrottle && req.ip) {
-                vCodeService.getAndAddIpThrottle({ip: req.ip, type:'sms'}, function(err, ipThrottle) {
+            if (vcode_config.ipThrottle && ip) {
+                vCodeService.getAndAddIpThrottle({ip: ip, type:'sms'}, function(err, ipThrottle) {
                     if (err) {
                         console.error('B.vcode generate_validate_sms getAndAddIpThrottle err:', err);
                         graph_vcode(req, res);
@@ -193,7 +194,7 @@ function graph_vcode(req, res) {
     var code_type, target, authCode;
     var target_type = 'phone';
     var mobile_code = '86';
-    var ip = req.ip;
+    var ip = req.clientIp;
     if (req.data.bizcode)
         requestType = req.data.bizcode;
     if (req.data.authCode)
