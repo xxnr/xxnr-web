@@ -467,7 +467,6 @@ app.controller('rscManagementController', function($scope, $rootScope,remoteApiS
                     for(var i in SKU_list){
                         if(SKU_list.hasOwnProperty(i)){
                             if(SKU_ref == SKU_list[i].ref){
-                                console.log(SKU_list.count);
                                 resultNum = resultNum + SKU_list[i].count;
                             }
                         }
