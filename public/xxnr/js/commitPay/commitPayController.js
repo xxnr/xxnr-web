@@ -187,7 +187,6 @@ app.controller('commitPayController', function($scope, remoteApiService, payServ
                                 if(data.datas.rows.order.orderStatus &&  data.datas.rows.order.orderStatus.type != 7 && $scope.auditingOrder == 1) {
                                     $scope.offlineHasAudited = true;
                                     $scope.wholePageShow = true;
-                                    console.log('haha');
                                 }else if(data.datas.rows.payStatus == 2){
                                     $scope.orderHasPayed = true;
                                 } else{
