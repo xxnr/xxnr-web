@@ -478,12 +478,12 @@ describe('Product', function(){
                 };
 
                 Routing.Product.query_products(test_data.category_id['化肥'], null, null, null, null, function(body){
-                    body.should.containDeep(expected_page_list_before_set_A_to_top);
+                    body.should.containDeepOrdered(expected_page_list_before_set_A_to_top);
                     product_A.istop = true;
                     Routing.Product.save_product(product_A, backend_admin_token, function(body){
                         body.should.have.property('code', 1000);
                         Routing.Product.query_products(test_data.category_id['化肥'], null, null, null, null, function(body) {
-                            body.should.containDeep(expected_page_list_after_set_A_to_top);
+                            body.should.containDeepOrdered(expected_page_list_after_set_A_to_top);
                             done();
                         })
                     })

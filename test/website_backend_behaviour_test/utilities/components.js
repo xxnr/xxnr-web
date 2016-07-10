@@ -10,6 +10,8 @@ var supertest = require('supertest');
 var should = require('should');
 var request = supertest(app);
 var extend = require('extend');
+var fs = require('fs');
+var path = require('path');
 
 exports.prepare_SKU = function(backend_admin_token, brand_index, category, product_index, SKU, SKU_index, done){
     if(!done){
@@ -203,3 +205,22 @@ function GetAndPostTest(caseName) {
 }
 
 exports.request = request;
+
+exports.save_file = function(content, path, done){
+    var dir = path.dirname(path);
+    if(!fs.existsSync(dir)){
+        fs.mkdir(dir);
+    }
+
+    fs.writeFile(path, content, 'utf-8', function(err){
+        shoule.not.exist(err);
+        done();
+    })
+};
+
+exports.remove_file = function(path, done){
+    fs.unlink(path, function(err){
+        should.not.exist(err);
+        done();
+    })
+};
