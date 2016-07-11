@@ -6,7 +6,7 @@ var app = require('../../../release');
 var should = require('should');
 var config = require('../../../config');
 
-exports.create_campaign = function(token, type, title, online_time, offline_time, start_time, end_time, campaign_url_name, comment, image, shareable, share_button, share_title, share_url_name, share_abstract, share_image, reward_times, detail, done) {
+exports.create_campaign = function(token, type, title, online_time, offline_time, start_time, end_time, campaign_url_name, comment, image, shareable, share_points_add, share_button, share_title, share_url_name, share_abstract, share_image, reward_times, detail, done) {
     request(app)
         .post(config.manager_url + '/campaign/create')
         .send({
@@ -21,6 +21,7 @@ exports.create_campaign = function(token, type, title, online_time, offline_time
             comment: comment,
             image: image,
             shareable: shareable,
+            share_points_add: share_points_add,
             share_button: share_button,
             share_title: share_title,
             share_url_name: share_url_name,
@@ -35,7 +36,7 @@ exports.create_campaign = function(token, type, title, online_time, offline_time
         })
 };
 
-exports.modify_campaign = function(token, _id, type, title, online_time, offline_time, start_time, end_time, campaign_url_name, comment, image, shareable, share_button, share_title, share_url_name, share_abstract, share_image, reward_times, detail, done) {
+exports.modify_campaign = function(token, _id, type, title, online_time, offline_time, start_time, end_time, campaign_url_name, comment, image, shareable, share_points_add, share_button, share_title, share_url_name, share_abstract, share_image, reward_times, detail, done) {
     request(app)
         .post(config.manager_url + '/campaign/create')
         .send({
@@ -51,6 +52,7 @@ exports.modify_campaign = function(token, _id, type, title, online_time, offline
             comment: comment,
             image: image,
             shareable: shareable,
+            share_points_add: share_points_add,
             share_button: share_button,
             share_title: share_title,
             share_url_name: share_url_name,
