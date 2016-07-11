@@ -159,6 +159,7 @@ describe('campaign', function(){
             it('get campaign page api');
             it('check campaign status api');
             it('backend query campaign api');
+            it('offline campaign api');
         });
         describe('create new campaign', function(){
             var propagate_campaign_path = '../views/campaigns/propagate/' + default_campaign_url_name + '.ejs';
@@ -628,6 +629,7 @@ describe('campaign', function(){
             describe('apis', function(){
                 it('query Q/A api');
                 it('require reward api');
+                it('backend modify QA api');
             });
 
             it('modify Q/A campaign', function(done) {
@@ -744,8 +746,11 @@ describe('campaign', function(){
             });
             describe('apis', function(){
                 it('query questions api');
+                it('backend modify quiz question api');
                 it('user answer api');
+                it('user quern my answer api');
                 it('backend modify right answer api');
+                it('backend query quiz right answer api');
                 it('trigger reward job api');
                 it('query result api');
             });
