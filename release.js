@@ -73,6 +73,9 @@ app.use(function (req, res, next) {
 
 	// APP will add extra slash at the beginning of the path improperly, here to remove them
 	req.url = req.url.replace(/\/*/, '/');
+
+	// for nginx proxy
+	req.clientIp = req.headers['x-real-ip'] || req.headers['ip'] || req.ip;
 	return next();
 });
 

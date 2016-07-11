@@ -416,7 +416,7 @@ function fixPointslogs(pointslogs) {
 exports.json_rewardshop_giftorders = function(req, res, next) {
 	var page = U.parseInt(req.data.page, 1) - 1;
 	var max = U.parseInt(req.data.max, 20);
-	LoyaltypointService.queryGiftOrders(null, req.data.type, req.data.times, req.data.search, page, max, function(err, giftorders, count, pageCount) {
+	LoyaltypointService.queryGiftOrders(null, null, req.data.type, req.data.times, req.data.search, page, max, function(err, giftorders, count, pageCount) {
 		if (err) {
 			res.respond({code:1002, message:'获取积分兑换记录失败'});
 			return;
@@ -436,7 +436,7 @@ exports.json_rewardshop_giftorders_update = function(req, res, next) {
 		return;
 	}
 
-	LoyaltypointService.getGiftOrder(req.data.id, null, function(err, giftOrder) {
+	LoyaltypointService.getGiftOrder(req.data.id, null, null, function(err, giftOrder) {
 		if (err) {
 			res.respond({code:1002, message:'获取积分兑换记录失败'});
 			return;

@@ -253,7 +253,10 @@ app.controller('userCenterController', function($scope, $rootScope,$timeout ,rem
                                     window.location.href = "/logon.html";
                                     return false
                                 },3000);
-                            }else {
+                            }else if(data.code == 1001){
+                                $scope.my_xxnr_password_err_msg = data.message;
+                            }
+                            else {
                                 //sweetalert(data.message);
                                 var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">'+data.message;
                                 var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);

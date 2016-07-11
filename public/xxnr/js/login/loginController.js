@@ -182,13 +182,31 @@ app.controller('loginController', function($scope, $timeout, remoteApiService, c
                 })
         }
     };
-    $scope.getCaptcha = function(bizcode){
-        if(checkPhoneNumber()) {
-            var captchaUrl = commonService.baseUrl + 'api/v2.3/captcha?' + 'bizcode=' + bizcode + '&tel=' + $scope.phoneNumber + '&time=' + new Date().getTime();
+    $scope.getCaptcha = function(bizcode,isReset){
+        if(checkPhoneNumber(isReset)) {
             if(bizcode == 'register'){
-                $scope.captcha = captchaUrl;
+                remoteApiService.findAccount($scope.phoneNumber)
+                    .then(function (data) {
+                        if(data.code == 1000){
+                            $scope.registerResMsg = data.message;
+                            $scope.errorInputGroupNum = $scope.formInputsKeyValue.registerPhone;
+                        }else if(data.code == 1001){
+                            var captchaUrl = commonService.baseUrl + 'api/v2.3/captcha?' + 'bizcode=' + bizcode + '&tel=' + $scope.phoneNumber + '&time=' + new Date().getTime();
+                            $scope.captcha = captchaUrl;
+                        }
+                    })
+
             }else if(bizcode == 'resetpwd'){
-                $scope.reset_captcha = captchaUrl;
+                remoteApiService.findAccount($scope.phoneNumber)
+                    .then(function (data) {
+                        if(data.code == 1000){
+                            var captchaUrl = commonService.baseUrl + 'api/v2.3/captcha?' + 'bizcode=' + bizcode + '&tel=' + $scope.phoneNumber + '&time=' + new Date().getTime();
+                            $scope.reset_captcha = captchaUrl;
+                        }else{
+                            $scope.resetPasswordMsg = data.message;
+                            $scope.errorInputGroupNum = $scope.formInputsKeyValue.resetPasswordPhone
+                        }
+                    })
             }
         }
     };
@@ -423,7 +441,7 @@ app.controller('loginController', function($scope, $timeout, remoteApiService, c
         $scope.registerResMsg = "";
         $scope.resetPasswordMsg = "";
         $scope.resetPasswordSucceedMsg = "";
-        if(checkPhoneNumber(true) && checkResetCaptcha(true) && checkCode(true) && checkNewPassword(true) && checkConfirmNewPassword(true)){
+        if(checkPhoneNumber(true) && checkCode(true) && checkNewPassword(true) && checkConfirmNewPassword(true)){
             remoteApiService.getPublicKey()
                 .then(function(data) {
                     var public_key = data.public_key;
@@ -474,7 +492,7 @@ app.controller('loginController', function($scope, $timeout, remoteApiService, c
         $scope.isOverflow = false;
     };
     $scope.regist = function(){
-        if(checkPolicybox() && checkPhoneNumber() && checkCaptcha() && checkCode() && checkNewPassword() && checkConfirmNewPassword()){
+        if(checkPolicybox() && checkPhoneNumber() && checkCode() && checkNewPassword() && checkConfirmNewPassword()){
             remoteApiService.getPublicKey()
                 .then(function(data) {
                     var public_key = data.public_key;

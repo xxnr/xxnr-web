@@ -75,7 +75,7 @@ app.controller('categoryController', function($scope, remoteApiService, commonSe
                             });
 
                     }
-                    console.log($scope.$parent.search_categories);
+                    //console.log($scope.$parent.search_categories);
                     for(var j = 1;j<$scope.$parent.search_categories.length-1;j++){   //生成queryAttribute 的字符串
                         var a = {
                             name:"",

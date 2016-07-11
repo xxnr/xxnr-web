@@ -20,7 +20,7 @@ exports.json_rewardshop_get = function(req, res, next) {
 
     if (req.data.userId)
         options.userid = req.data.userId;
-    options.ip = req.ip;
+    options.ip = req.clientIp;
 
     UserService.get(options, function (err, user) {
     	// Error
@@ -123,6 +123,7 @@ exports.json_rewardshop_pointslogs = function(req, res, next) {
 	});
 }
 
+// gift order
 // add gift order
 exports.add_gift_order = function(req, res, next){
     var data = req.data;
@@ -285,7 +286,7 @@ exports.json_gift_order_query = function(req, res, next) {
             res.respond({code: 1002, message: '没有查找到用户，获取积分兑换记录失败'});
             return;
         }
-        LoyaltypointService.queryGiftOrders(user.id, req.data.type, null, null, page, max, function(err, giftorders, count, pageCount) {
+        LoyaltypointService.queryGiftOrders(user.id, null, req.data.type, null, null, page, max, function(err, giftorders, count, pageCount) {
             if (err) {
                 res.respond({code:1002, message:'获取积分兑换记录失败'});
                 return;
@@ -296,6 +297,89 @@ exports.json_gift_order_query = function(req, res, next) {
                 results.push(giftorder);
             });
             res.respond({code:1000, message:'success', datas:{giftorders:giftorders, total:count, pages:pageCount, page:page}});
+        });
+    });
+}
+
+// RSC gift order
+exports.json_RSC_gift_order_query = function(req, res, next) {
+    var self = this;
+    var page = U.parseInt(req.data.page, 1) - 1;
+    var max = U.parseInt(req.data.max, 20);
+    var options = {};
+    if (req.data.userId)
+        options.userid = req.data.userId;
+
+    UserService.get(options, function (err, RSC) {
+        // Error
+        if (err) {
+            console.error('F.rewardshop json_RSC_gift_order_query UserService get err:', err);
+            res.respond({code: 1004, message: '获取积分兑换记录失败'});
+            return;
+        }
+        if (!RSC) {
+            res.respond({code: 1002, message: '没有查找到用户，获取积分兑换记录失败'});
+            return;
+        }
+        if (!RSC.isRSC) {
+            res.respond({code: 1002, message: '用户没有权限获取兑换积分记录'});
+            return;
+        }
+        LoyaltypointService.queryGiftOrders(null, RSC._id, req.data.type, null, req.data.search, page, max, function(err, giftorders, count, pageCount) {
+            if (err) {
+                console.error('F.rewardshop json_RSC_gift_order_query LoyaltypointService queryGiftOrders err:', err);
+                res.respond({code:1002, message:'获取积分兑换记录失败'});
+                return;
+            }
+            var results = [];
+            giftorders.forEach(function(giftorder) {
+                delete giftorder.deliveryCode;
+                giftorder.orderStatus = LoyaltypointService.giftOrderStatus(giftorder);
+                results.push(giftorder);
+            });
+            res.respond({code:1000, message:'success', datas:{giftorders:giftorders, total:count, pages:pageCount, page:page}});
+        });
+    });
+}
+
+exports.process_RSC_gift_order_self_delivery = function(req, res, next) {
+    var orderId = req.data.orderId;
+    var deliveryCode = req.data.code;
+    var RSC = req.user;
+
+    if (!orderId) {
+        res.respond({code: 1001, message: '请先提供订单ID'});
+        return;
+    }
+
+    if (!deliveryCode) {
+        res.respond({code: 1001, message: '请先提供订单自提码'});
+        return;
+    }
+
+    LoyaltypointService.getGiftOrder(orderId, null, RSC._id, function(err, giftOrder) {
+        if (err) {
+            console.error('F.rewardshop process_RSC_gift_order_self_delivery LoyaltypointService getGiftOrder err:', err);
+            res.respond({code:1002, message:'获取积分兑换记录失败'});
+            return;
+        }
+        if (!giftOrder) {
+            res.respond({code:1001, message:'没有找到相应的积分兑换记录'});
+            return;
+        }
+        if (deliveryCode.trim() != giftOrder.deliveryCode) {
+            res.respond({code:1001, message:'自提码错误'});
+            return;
+        }
+
+        var deliverStatus = 5; // 已收货
+        LoyaltypointService.updateGiftOrder(orderId, null, deliverStatus, null, null, function(err, giftOrder) {
+            if (err) {
+                console.error('F.rewardshop process_RSC_gift_order_self_delivery LoyaltypointService updateGiftOrder err:', err);
+                res.respond({code:1002, message:'自提失败'});
+                return;
+            }
+            res.respond({code:1000, message:'success'});
         });
     });
 }

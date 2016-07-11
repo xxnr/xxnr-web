@@ -262,7 +262,7 @@ exports.isXXNRAgent_middleware = function(req, res, next){
  */
 exports.auditing_middleware = function(req, res, next) {
     try {
-        req.auditInfo = AuditService.generateAuditInfo(req.url, req.method, req.ip, req.user, req.data);
+        req.auditInfo = AuditService.generateAuditInfo(req.url, req.method, req.clientIp, req.user, req.data);
         next();
     } catch(e) {
         // auditing fail
@@ -277,7 +277,7 @@ exports.throttle = function(req, res, next){
     if (route.endsWith('/'))
         route = route.substring(0, route.length - 1);
     var method = req.method.trim().toLowerCase();
-    var ip = req.ip.trim();
+    var ip = req.clientIp.trim();
     var realIp = req.get('x-forwarded-for');
     ThrottleService.requireAccess(route, method, ip, user?user._id:null, function(pass, reason){
         if(!pass){

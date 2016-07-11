@@ -210,7 +210,7 @@ UserService.prototype.get = function(options, callback) {
         .exec(function (err, user) {
             if (err) {
                 console.error('User Service get user error:', err);
-                callback('获取用户信息失败');
+                callback('获取用户信息失败', err);
                 return;
             }
 
