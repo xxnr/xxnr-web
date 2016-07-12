@@ -1,6 +1,6 @@
 <template>
   <div class="no-order-box">
-    <div class="no-order-img"><img src="../../../static/assets/images/blank-space.png" ></div>
+    <div class="no-order-img"><img src="/assets/images/blank-space.png" ></div>
     <div class="no-order-wor">
       <p>您还没有订单</p>
       <p>快去挑选心仪的商品吧~</p>

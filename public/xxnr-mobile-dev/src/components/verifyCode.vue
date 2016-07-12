@@ -4,24 +4,24 @@
     <div class="verify-code-con">
       <input type="text" class="verify-code" placeholder="请输入图形验证码" maxlength="4" v-model="captcha">
       <div class="reset-captche" v-if="captcha.length > 0">
-        <img src="../../static/assets/images/delete.png" @click="resetCaptcha();">
+        <img src="/assets/images/delete.png" @click="resetCaptcha();">
       </div>
 
       <div class="verify-code-img-normal" v-if="isNormal">
-        <img :src="codeImg" onerror="javascript:this.src='../../static/assets/images/load-failed.png'">
+        <img :src="codeImg" onerror="javascript:this.src='/static/assets/images/load-failed.png';this.onerror = null;">
       </div>
       <!--<div class="verify-code-img-error">-->
-        <!--<img src="../../static/assets/images/load-failed.png">-->
+        <!--<img src="/assets/images/load-failed.png">-->
       <!--</div>-->
       <div class="verify-code-img-loading" v-if="isLoading">
-        <img src="../../static/assets/images/spinner_gray.png">
+        <img src="/assets/images/spinner_gray.png">
       </div>
       <div class="verify-code-refresh" @click="refreshCode(phoneNum);">
-        <img src="../../static/assets/images/refresh.png">
+        <img src="/assets/images/refresh.png">
       </div>
     </div>
     <div class="verify-code-tips" v-if="codeTips">
-      <img src="../../static/assets/images/error.png">请输入图形验证码
+      <img src="/assets/images/error.png">请输入图形验证码
     </div>
     <div class="verify-code-btn-box">
       <div class="verify-code-btn left-btn" @click="hideCodeBox();">取消</div>

@@ -3,7 +3,7 @@
     <div class="product" v-for="product in products">
       <a v-link="{path: '/productDetail?id=' + product.id}">
       <div class="product-img">
-        <img :src="product.imgUrl" onerror="javascript:this.src='../../../static/assets/images/no_picture.png'">
+        <img :src="product.imgUrl" onerror="javascript:this.src='/static/assets/images/no_picture.png';this.onerror = null;">
       </div>
       <div class="product-name">{{product.name}}</div>
       <div class="product-presale" v-if="product.presale">

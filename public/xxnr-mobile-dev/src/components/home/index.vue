@@ -34,7 +34,7 @@
     </div>
   </div>
   <div class="loader-img" v-if="showLoader">
-    <img src="../../../static/assets/images/loading.png">
+    <img src="/assets/images/loading.png">
     <div class="loader-wor">加载中...</div>
   </div>
 </template>

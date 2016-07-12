@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <div class="product-img"><img :src="productDetail.imgUrl" onerror="javascript:this.src='../../../static/assets/images/no_picture.png'"></div>
+    <div class="product-img"><img :src="productDetail.imgUrl" onerror="javascript:this.src='/static/assets/images/no_picture.png';this.onerror = null;"></div>
   </div>
   <div class="product-info">
     <div class="container">
@@ -87,11 +87,11 @@
   </div>
   <div class="attr-box" v-show="attrBoxDisplay">
     <div class="close-attr-box" @click="hideAttrBox();">
-      <img src="../../../static/assets/images/close-box.png">
+      <img src="/assets/images/close-box.png">
     </div>
     <div class="attr-product">
       <div class="attr-product-img">
-        <img :src="productDetail.imgUrl" onerror="javascript:this.src='../../../static/assets/images/no_picture.png'">
+        <img :src="productDetail.imgUrl" onerror="javascript:this.src='/static/assets/images/no_picture.png';this.onerror = null;">
       </div>
       <div class="attr-product-info">
         <div class="attr-product-info-con">
@@ -164,7 +164,6 @@
     productDetailTab,
     changeProductNumber,
     selectSKU,
-    querySKUs,
     selectAddition,
     buyProduct,
     clearProductDetail,
@@ -205,7 +204,6 @@
         productDetailTab,
         changeProductNumber,
         selectSKU,
-        querySKUs,
         selectAddition,
         buyProduct,
         clearProductDetail,

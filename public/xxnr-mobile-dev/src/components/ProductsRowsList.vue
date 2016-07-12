@@ -3,7 +3,7 @@
     <a v-link="{path: '/productDetail?id=' + product.goodsId}" v-for="product in products">
     <div class="productRow">
         <div class="product-img">
-          <img :src="product.imgUrl">
+          <img :src="product.imgUrl" onerror="javascript:this.src='/static/assets/images/no_picture.png';this.onerror = null;">
         </div>
         <div class="product-info">
           <div class="product-name">

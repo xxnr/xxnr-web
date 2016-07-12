@@ -4,7 +4,7 @@
     <div class="confirm-order-title">
       确认收货
       <div class="confirm-order-close" @click="hidePopBox();">
-        <img src="../../static/assets/images/close-box.png">
+        <img src="/assets/images/close-box.png">
       </div>
     </div>
     <div class="confirm-product" v-for="item in orderSKUList.SKUList" v-if="item.deliverStatus == 2"  @click="selectConfirmProduct($index);">
@@ -34,13 +34,13 @@
   </div>
   <div class="xxnr_order_toast" v-if="successToast">
     <div class="xxnr-toast-img">
-      <img src="../../static/assets/images/success.png">
+      <img src="/assets/images/success.png">
     </div>
     <p class="xxnr-toast-wor">收货成功</p>
   </div>
   <div class="xxnr_order_toast" v-if="failureToast">
     <div class="xxnr-toast-img">
-      <img src="../../static/assets/images/failure.png">
+      <img src="/assets/images/failure.png">
     </div>
     <p class="xxnr-toast-wor">请稍后再试</p>
   </div>
