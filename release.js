@@ -73,6 +73,9 @@ app.use(function (req, res, next) {
 
 	// APP will add extra slash at the beginning of the path improperly, here to remove them
 	req.url = req.url.replace(/\/*/, '/');
+
+	// for nginx proxy
+	req.clientIp = req.headers['x-real-ip'] || req.headers['ip'] || req.ip;
 	return next();
 });
 
@@ -111,6 +114,8 @@ app.use(function (err, req, res, next) {
 
 	next(err);
 });
+
+module.exports = app;
 
 http.createServer(app).listen(80);
 console.info('application listen at port 80');

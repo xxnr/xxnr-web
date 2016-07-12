@@ -49,7 +49,7 @@ module.exports = function(callback){
                                 return;
                             }
 
-                            console.log('Finish to add role:', role, viewRoles);
+                            //console.log('Finish to add role:', role, viewRoles);
                             resolve();
                         })
                     } else {
@@ -60,7 +60,7 @@ module.exports = function(callback){
                                 return;
                             }
 
-                            console.log('Finish to update role:', role_name, viewRoles);
+                            //console.log('Finish to update role:', role_name, viewRoles);
                             resolve();
                         })
                     }
@@ -70,7 +70,7 @@ module.exports = function(callback){
 
         Promise.all(promises)
             .then(function () {
-                console.log('Deploy Roles Success!!!!!!!!!!!!!!!!!!!!!!');
+                //console.log('Deploy Roles Success!!!!!!!!!!!!!!!!!!!!!!');
                 callback();
             })
             .catch(function () {

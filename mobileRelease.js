@@ -45,6 +45,9 @@ app.use(function (req, res, next) {
 
     // APP will add extra slash at the beginning of the path improperly, here to remove them
     req.path.replace(/\/*/, '/');
+
+    // for nginx proxy
+    req.clientIp = req.headers['x-real-ip'] || req.headers['ip'] || req.ip;
     return next();
 });
 
@@ -64,11 +67,14 @@ app.use(require('./middlewares/website'));
 // set static file path
 app.use(express.static(path.join(__dirname, F.config.directory_xxnr_mobile_public)));
 
+// handle fallback for HTML5 history API
+app.use(require('connect-history-api-fallback')())
+
 var routes = require('./routes');
 // routes
 app.use('/', routes.secureFrontendApis);
 app.use('/', routes.frontendApis);
-//app.use('/', routes.frontendPages);
+app.use('/', routes.frontendPages);
 //app.use('/', routes.appRelatedPages);
 //app.use('/', routes.backendApis);
 //app.use('/', routes.backendPages);
@@ -83,8 +89,8 @@ app.use(function (err, req, res, next) {
     next(err);
 });
 
-http.createServer(app).listen(8080);
-console.info('application listen at port 8080');
+http.createServer(app).listen(8060);
+console.info('application listen at port 8060');
 
 
 if(config.secure) {

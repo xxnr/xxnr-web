@@ -83,10 +83,12 @@ app.controller('shoppingCartController', function($scope, $timeout, remoteApiSer
                                 }
                                 item.name = itemData.productName.length > 40 ? (itemData.productName.substr(0, 40) + '...') : itemData.productName;
                                 item.additions = itemData.additions;
-                                item.additionsTotalPrice = 0;
+                                item.additionsPrice = 0;
+                                item.additionsIds = [];
                                 for (var i in item.additions) {
                                     if(item.additions.hasOwnProperty(i)){
-                                        item.additionsTotalPrice = item.additionsTotalPrice + item.additions[i].price;
+                                        item.additionsPrice = item.additionsPrice + item.additions[i].price;
+                                        item.additionsIds.push(item.additions[i]._id);
                                     }
                                 }
                                 item.attributes = itemData.attributes;
@@ -104,8 +106,9 @@ app.controller('shoppingCartController', function($scope, $timeout, remoteApiSer
                                 item.oldBuyCount = item.buyCount;
                                 // item.count = parseInt(itemData.goodsCount);
                                 item.deposit = itemData.deposit;
-                                item.additionsTotalPrice = Number((item.additionsTotalPrice).toFixed(2));
+                                item.additionsTotalPrice = Number((item.additionsPrice*item.buyCount).toFixed(2));
                                 item.totalPrice = Number((item.buyCount * (item.nowPrice)).toFixed(2));
+
                                 item.totalDeposit = Number((item.buyCount * (item.deposit ? item.deposit : item.nowPrice)).toFixed(2));
                                 item.saving = item.buyCount * (item.oldPrice - item.nowPrice);
                                 item.hasDeposit = (item.deposit ? true : false);
@@ -243,7 +246,7 @@ app.controller('shoppingCartController', function($scope, $timeout, remoteApiSer
             $scope.shops[shopIndex].items[itemIndex].buyCount++;
             $scope.shops[shopIndex].totalCount++;
             $scope.buyCountChange(shopIndex, itemIndex, $scope.shops[shopIndex].items[itemIndex].buyCount, $scope.shops[shopIndex].items[itemIndex].buyCount - 1);
-            addToSKUCartNum($scope.shops[shopIndex].items[itemIndex].SKU_id);
+            addToSKUCartNum($scope.shops[shopIndex].items[itemIndex].SKU_id,$scope.shops[shopIndex].items[itemIndex].additionsIds);
         }
     };
     $scope.reduce = function(shopIndex, itemIndex) {
@@ -251,7 +254,7 @@ app.controller('shoppingCartController', function($scope, $timeout, remoteApiSer
             $scope.shops[shopIndex].items[itemIndex].buyCount--;
             $scope.shops[shopIndex].totalCount--;
             $scope.buyCountChange(shopIndex, itemIndex, $scope.shops[shopIndex].items[itemIndex].buyCount, $scope.shops[shopIndex].items[itemIndex].buyCount + 1);
-            reduceToSKUCartNum($scope.shops[shopIndex].items[itemIndex].SKU_id);
+            reduceToSKUCartNum($scope.shops[shopIndex].items[itemIndex].SKU_id,$scope.shops[shopIndex].items[itemIndex].additionsIds);
         }
     };
     $scope.buyCountChange = function(shopIndex, itemIndex, newValue, oldValue) {
@@ -288,6 +291,11 @@ app.controller('shoppingCartController', function($scope, $timeout, remoteApiSer
                 var item = $scope.shops[i].items[j];
                 if (item.selected) {
                     totalPrice = Number(totalPrice) + item.buyCount * Number(item.deposit ? item.deposit : item.nowPrice);
+                    //console.log(item);
+                    item.additionsTotalPrice = Number((item.additionsPrice*item.buyCount).toFixed(2));
+                    if(item.deposit == 0){          //如果定金为0,就为一口价商品,如要加上附加选项的价格
+                        totalPrice = totalPrice + item.additionsTotalPrice;
+                    };
                     totalCount += item.buyCount;
                     totalSaving += item.buyCount * (item.oldPrice - item.nowPrice);
                 }
@@ -311,8 +319,8 @@ app.controller('shoppingCartController', function($scope, $timeout, remoteApiSer
                 }
             });
     };
-    var addToSKUCartNum = function(SKU_id){
-        remoteApiService.addToShoppingCart(SKU_id,1,[] ,true)
+    var addToSKUCartNum = function(SKU_id,additionsIds){
+        remoteApiService.addToShoppingCart(SKU_id,1,additionsIds,true)
             .then(function(data) {
                 if (data && data.code == 1000) {
                     // set shoppingCartCount
@@ -320,8 +328,8 @@ app.controller('shoppingCartController', function($scope, $timeout, remoteApiSer
                 }
             });
     };
-    var reduceToSKUCartNum = function(SKU_id){
-        remoteApiService.addToShoppingCart(SKU_id,-1,[] ,true)
+    var reduceToSKUCartNum = function(SKU_id,additionsIds){
+        remoteApiService.addToShoppingCart(SKU_id,-1,additionsIds,true)
             .then(function(data) {
                 if (data && data.code == 1000) {
                     // set shoppingCartCount
@@ -334,22 +342,32 @@ app.controller('shoppingCartController', function($scope, $timeout, remoteApiSer
         if (navigator.appName == "Microsoft Internet Explorer" && navigator.appVersion.match(/8./i) == "8.") {
             var r = confirm("您确定要删除吗?");
             if (r == true) {
-                $scope.shoppingCartCount -= $scope.shops[shopIndex].items[itemIndex].buyCount;
-                submitChange($scope.shops[shopIndex].items[itemIndex].SKU_id, 0);
-                $scope.shops[shopIndex].items.splice(itemIndex, 1);
-                if ($scope.shops[shopIndex].items.length == 0) {
-                    $scope.shops.splice(shopIndex, 1);
-                }
-                calculateTotal();
-                var message = '<img class="xxnr--flash--icon" src="images/correct_prompt.png" alt="">删除商品成功';
-                var id = Flash.create('success', message, 3000, {class: 'xxnr-success-flash', id: 'xxnr-success-flash'}, true);
+                remoteApiService.changeCartNum($scope.shops[shopIndex].items[itemIndex].SKU_id, 0)
+                    .then(function(data) {
+                        if (data && data.code == 1000) {
+                            $scope.shoppingCartCount -= $scope.shops[shopIndex].items[itemIndex].buyCount;
+                            $scope.shops[shopIndex].items.splice(itemIndex, 1);
+                            if ($scope.shops[shopIndex].items.length == 0) {
+                                $scope.shops.splice(shopIndex, 1);
+                            }
+                            calculateTotal();
+                            var message = '<img class="xxnr--flash--icon" src="images/correct_prompt.png" alt="">删除商品成功';
+                            var id = Flash.create('success', message, 3000, {class: 'xxnr-success-flash', id: 'xxnr-success-flash'}, false);
+                            // set shoppingCartCount
+                            shoppingCartService.setSCart($scope.shoppingCartCount);
+                        } else {
+                            //window.location.href = window.location.href;
+                            var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">'+data.message;
+                            var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);
+                        }
+                    });
             } else {
                 return false;
             }
         } else {
             swal({
                     title: " ",
-                    text: "\n\n您确定要删除吗?\n\n",
+                    text: "\n您确定要删除吗?\n",
                     //type: "warning",
                     showCancelButton: true,
                     confirmButtonColor: '#00913a',
@@ -359,15 +377,29 @@ app.controller('shoppingCartController', function($scope, $timeout, remoteApiSer
                 },
                 function (isConfirm) {
                     if (isConfirm) {
-                        $scope.shoppingCartCount -= $scope.shops[shopIndex].items[itemIndex].buyCount;
-                        submitChange($scope.shops[shopIndex].items[itemIndex].SKU_id, 0);
-                        $scope.shops[shopIndex].items.splice(itemIndex, 1);
-                        if ($scope.shops[shopIndex].items.length == 0) {
-                            $scope.shops.splice(shopIndex, 1);
-                        }
-                        calculateTotal();
-                        var message = '<img class="xxnr--flash--icon" src="images/correct_prompt.png" alt="">删除商品成功';
-                        var id = Flash.create('success', message, 3000, {class: 'xxnr-success-flash', id: 'xxnr-success-flash'}, true);
+                        //submitChange($scope.shops[shopIndex].items[itemIndex].SKU_id, 0);
+
+                        remoteApiService.changeCartNum($scope.shops[shopIndex].items[itemIndex].SKU_id, 0)
+                            .then(function(data) {
+                                if (data && data.code == 1000) {
+                                    $scope.shoppingCartCount -= $scope.shops[shopIndex].items[itemIndex].buyCount;
+                                    $scope.shops[shopIndex].items.splice(itemIndex, 1);
+                                    if ($scope.shops[shopIndex].items.length == 0) {
+                                        $scope.shops.splice(shopIndex, 1);
+                                    }
+                                    calculateTotal();
+                                    var message = '<img class="xxnr--flash--icon" src="images/correct_prompt.png" alt="">删除商品成功';
+                                    var id = Flash.create('success', message, 3000, {class: 'xxnr-success-flash', id: 'xxnr-success-flash'}, false);
+                                    // set shoppingCartCount
+                                    shoppingCartService.setSCart($scope.shoppingCartCount);
+                                } else {
+                                    //window.location.href = window.location.href;
+                                    var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">'+data.message;
+                                    var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);
+                                }
+                            });
+
+
                     }
                 });
         }
@@ -390,19 +422,27 @@ app.controller('shoppingCartController', function($scope, $timeout, remoteApiSer
         //}
 
         if (deliveryType == 2 && (!$scope.$parent.selectedAddressId || $scope.$parent.selectedAddressId == '')) {
-            sweetalert("请填写您的收货地址");
+            //sweetalert("请填写您的收货地址");
+            var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">请填写您的收货地址';
+            var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);
             return;
         }
         if (deliveryType == 1) {
             if(!$scope.$parent.hasCompany){
-                sweetalert("您选择的商品不能在同一个网点自提，请返回购物车重新选择");
+                //sweetalert("您选择的商品不能在同一个网点自提，请返回购物车重新选择");
+                var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">您选择的商品不能在同一个网点自提，请返回购物车重新选择';
+                var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);
                 return;
             }else if(RSCId==-1 && $scope.$parent.hasCompany){
-                sweetalert("请选择自提网点");
+                //sweetalert("请选择自提网点");
+                var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">请选择自提网点';
+                var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);
                 return;
             }
             if(!consigneePhone || !consigneeName){
-                sweetalert("请填写收货人信息");
+                //sweetalert("请填写收货人信息");
+                var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">请填写收货人信息';
+                var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);
                 return;
             }
         }
@@ -433,9 +473,13 @@ app.controller('shoppingCartController', function($scope, $timeout, remoteApiSer
     $scope.checkout = function(checkoutPage) {
 
         if ($scope.shoppingCartCount == 0) {
-            sweetalert("购物车是空的,快去采购");
+            //sweetalert("购物车是空的,快去采购");
+            var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">购物车是空的,快去采购';
+            var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);
         } else if ($scope.totalCount == 0) {
-            sweetalert("请至少选中一件商品进行结算");
+            //sweetalert("请至少选中一件商品进行结算");
+            var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">请至少选中一件商品进行结算';
+            var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);
         } else {
             // console.log( $scope.shoppingCartCount);
             var products = [];

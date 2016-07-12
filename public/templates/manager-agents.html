@@ -5,7 +5,7 @@
 		<div class="caption"><span class="fa fa-user-secret mr5"></span>经纪人管理</div>
 		<div class="row">
             <div class="col-md-3 col-sm-6 m">
-                <div data-component="textbox" data-component-path="agents.filter.search" data-placeholder="" data-control-icon="fa-search">经纪人姓名/电话</div>
+                <div data-component="textbox" data-component-path="agents.filter.search" data-placeholder="经纪人姓名/电话" data-control-icon="fa-search">查询经纪人</div>
                 <div class="help" data-component="template" data-component-path="agents.info"><script type="text/html">{{ count | pluralize('items','item','items','items') }} / {{pages | pluralize('pages', 'page', 'pages', 'pages') }}</script></div>
             </div>
         </div>
@@ -46,6 +46,10 @@
 					{{ end }}
 				</tbody>
 			</table>
+		{{ else }}
+			{{ if !agentsresponse }}
+				暂无数据
+			{{ fi }}
 		{{ fi }}
 		</script>
 	</div>
@@ -61,6 +65,8 @@
 
     agents.filter = {};
     agents.filter.page = 1;
+    agents.filter.search = '';
+
     agents.grid = [];
     agents.info = {};
 	agents.agentsresponse;
@@ -83,7 +89,7 @@
             return;
         if (NOTMODIFIED('agents.filter', agents.filter))
             return;
-        redirectURL();
+        redirectAgentsURL();
     }, 1500);
 
 	function agents_refresh() {
@@ -97,48 +103,47 @@
 		urlParam += agents.filter.max ? (urlParam ? '&' : '') + 'max=' + agents.filter.max : '';
 		var url = '/api/agents/' + (urlParam ? '?' + urlParam : '');
 		$.components.GET(managerurl + url, null, function(response) {
-			var key = 'agents.grid';
 			if (response && response.code && response.code==1000) {
 				agents.grid = response.agents;
 				agents.info.count = response.count;
             	agents.info.pages = response.pageCount;
             	agents.info.page = response.page;
-				SET(key, agents.grid);
+				SET('agents.grid', agents.grid);
 				if (agents.info.pages && agents.info.count) {
-					Pagination(agents.info.count, agents.info.count/agents.info.pages, agents.info.page?agents.info.page:null);
+					// Pagination(agents.info.count, agents.info.count/agents.info.pages, agents.info.page?agents.info.page:null);
+					Pagination($('div.agents-pages'), agents.info.count, agents.info.count/agents.info.pages, agents.info.page?agents.info.page:null, function(pageNumber){redirectAgentsURL(pageNumber);});
 				}
 				UPDATE('agents.info');
 			} else {
 				if (response.error || response.message) {
-					key = 'agents.agentsresponse';
 					if (response.message) {
 						response = [{error: response.message}];
 					} else {
 						response = response.error;
 					}
 				} else {
-					response = [];
+					response = null;
 				}
-				SET(key, response);
+				SET('agents.agentsresponse', response);
 			}
 		});
 	}
 
-	function Pagination(count, pageCount, currentPage) {
-		$('div.agents-pages').pagination({
-	        items: count,
-	        itemsOnPage: pageCount,
-	        currentPage: currentPage?currentPage:0,
-			prevText: '<',
-			nextText: '>',
-	        cssStyle: 'light-theme',
-	        onPageClick: function(pageNumber, event) {
-	        	redirectURL(pageNumber);
-	        }
-	    });
-	}
+	// function Pagination(count, pageCount, currentPage) {
+	// 	$('div.agents-pages').pagination({
+	//         items: count,
+	//         itemsOnPage: pageCount,
+	//         currentPage: currentPage?currentPage:0,
+	// 		prevText: '<',
+	// 		nextText: '>',
+	//         cssStyle: 'light-theme',
+	//         onPageClick: function(pageNumber, event) {
+	//         	redirectAgentsURL(pageNumber);
+	//         }
+	//     });
+	// }
 
-	function redirectURL(page) {
+	function redirectAgentsURL(page) {
 		var urlParam = (agents.filter.search ? 'search=' + agents.filter.search : '') + (page ? '&page='+page : '');
     	window.location.href = managerurl + "/agents/" + (urlParam ? '?' + urlParam : '');
 	}

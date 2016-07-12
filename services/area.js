@@ -24,12 +24,12 @@ AreaService.prototype.queryProvince = function(options, callback) {
 
 	// only get the special province
 	SpecialprovinceModel.find({}, { __v: 0, tid: 0 }, function(err, docs) {
-		var ProvinceIds = [];
+		var ProvinceNames = [];
 		for (var i = 0; i < docs.length; i++) {
-			ProvinceIds[i] = docs[i].id;
+			ProvinceNames[i] = docs[i].name;
 		}
-		if (ProvinceIds && ProvinceIds.length > 0) {
-			queryoptions.id = {'$in': ProvinceIds};
+		if (ProvinceNames && ProvinceNames.length > 0) {
+			queryoptions.name = {'$in': ProvinceNames};
 		}
 		ProvinceModel.find(queryoptions, { __v: 0, tid: 0 }).sort({shortname:1}).exec(
 			function (err, docs) {
@@ -53,8 +53,9 @@ AreaService.prototype.queryProvince = function(options, callback) {
 AreaService.prototype.getProvince = function(options, callback) {
 	// options.id {String}
 
+	var query = options._id ? {_id:options._id} : options.id ? {id:options.id} : options;
 	// Gets a specific document from DB
-	ProvinceModel.findOne({id:options.id}, { __v: 0, tid: 0 }, function (err, province) {
+	ProvinceModel.findOne(query, { __v: 0, tid: 0 }, function (err, province) {
 		if (!province || err) {
 			callback();
 			return;
@@ -91,8 +92,9 @@ AreaService.prototype.queryCity = function(options, callback) {
 AreaService.prototype.getCity = function(options, callback) {
 	// options.id {String}
 
+	var query = options._id ? {_id:options._id} :{id:options.id};
 	// Gets a specific document from DB
-	CityModel.findOne({id:options.id}, { __v: 0, tid: 0 }, function(err, city) {
+	CityModel.findOne(query, { __v: 0, tid: 0 }, function(err, city) {
 		if (!city || err) {
 			callback();
 			return;
@@ -141,8 +143,9 @@ AreaService.prototype.queryCounty = function(options, callback) {
 AreaService.prototype.getCounty = function(options, callback) {
 	// options.id {String}
 
+	var query = options._id ? {_id:options._id} :{id:options.id};
 	// Gets a specific document from DB
-	CountyModel.findOne({id:options.id}, { __v: 0, tid: 0 }, function(err, county) {
+	CountyModel.findOne(query, { __v: 0, tid: 0 }, function(err, county) {
 		if (!county || err) {
 			callback();
 			return;
@@ -194,8 +197,9 @@ AreaService.prototype.queryTown = function(options, callback) {
 AreaService.prototype.getTown = function(options, callback) {
 	// options.id {String}
 
+	var query = options._id ? {_id:options._id} :{id:options.id};
 	// Gets a specific document from DB
-	TownModel.findOne({id:options.id}, { __v: 0, tid: 0 }, function(err, town) {
+	TownModel.findOne(query, { __v: 0, tid: 0 }, function(err, town) {
 		if (!town || err) {
 			callback();
 			return;
@@ -205,6 +209,81 @@ AreaService.prototype.getTown = function(options, callback) {
 			return;
 		}
 	});
+};
+
+AreaService.prototype.check_address = function(province_id, city_id, county_id, town_id, res, updator, useId){
+	var self = this;
+	var address = {};
+	self.getProvince(useId ? {id:province_id} : {_id: province_id}, function (err, province) {
+		if (err || !province) {
+			if (err) console.error('get province err:', err);
+			res.respond({code: 1001, message: '没有查到要修改的省'});
+			return;
+		}
+
+		address.province = province;
+		self.getCity(useId ? {id:city_id} : {_id: city_id}, function (err, city) {
+			if (err || !city) {
+				if (err) console.error('get city err:', err);
+				res.respond({code: 1001, message: '没有查到要修改的市'});
+				return;
+			}
+
+			if (city.provinceid != province.id) {
+				res.respond({code: 1001, message: '所选城市不属于所选省份'});
+				return;
+			}
+
+			address.city = city;
+			if (county_id) {
+				self.getCounty(useId ? {id:county_id} : {_id: county_id}, function (err, county) {
+					if (err || !county) {
+						if (err) console.error('get county err:', err);
+						res.respond({code: 1001, message: '没有查到要修改的区县'});
+						return;
+					}
+
+					if (county.cityid != city.id) {
+						res.respond({code: 1001, message: '所选区县不属于所选城市'});
+						return;
+					}
+
+					address.county = county;
+					self.getTown(useId ? {id:town_id} : {_id: town_id}, function (err, town) {
+						if (err || !town) {
+							if (err) console.error('get town err:', err);
+							res.respond({code: 1001, message: '没有查到要修改的乡镇'});
+							return;
+						}
+
+						if (town.countyid != county.id) {
+							res.respond({code: 1001, message: '所选乡镇不属于所选区县'});
+							return;
+						}
+
+						address.town = town;
+						updator(address);
+					})
+				})
+			} else {
+				self.getTown(useId ? {id:town_id} : {_id: town_id}, function (err, town) {
+					if (err || !town) {
+						if (err) console.error('get town err:', err);
+						res.respond({code: 1001, message: '没有查到要修改的乡镇'});
+						return;
+					}
+
+					if (town.cityid != city.id) {
+						res.respond({code: 1001, message: '所选乡镇不属于所选城市'});
+						return;
+					}
+
+					address.town = town;
+					updator(address);
+				})
+			}
+		})
+	})
 };
 
 module.exports = new AreaService();

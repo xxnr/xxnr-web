@@ -23,9 +23,9 @@ if [ -d "production_html" ]; then
 	mkdir -p $oldversion
 	# save old productions*
 	cp production_html $oldversion/production_html_old -rf
-	rm -f $oldversion/production_html_old/production_css
+	rm -rf $oldversion/production_html_old/production_css
 	cp production_css $oldversion/production_html_old/production_css -rf
-	rm -f $oldversion/production_html_old/production_js
+	rm -rf $oldversion/production_html_old/production_js
 	cp production_js $oldversion/production_html_old/production_js -rf
 else
 	echo "-------- no old codes DIR, no production_html DIR..."

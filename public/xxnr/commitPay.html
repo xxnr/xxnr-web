@@ -15,6 +15,7 @@
     <link type="text/css" rel="stylesheet" href="css/addAddress.css">
     <link type="text/css" rel="stylesheet" href="css/sweetalert.css">
     <link type="text/css" rel="stylesheet" href="css/style.css">
+    <link type="text/css" rel="stylesheet" href="css/angular-flash.css">
     <!-- endbuild -->
     <!-- build:js -->
     <script src="js/jquery.min.js"></script>
@@ -39,6 +40,7 @@
     <!-- endbuild -->
 </head>
 <body ng-controller="commitPayController" ng-class="{true:'overflow_body', false:'not_overflow_body'}[isOverflow]">
+<flash-message></flash-message>
 <header ng-controller="headerController"></header>
 <div class="wrap nav" ng-controller="shoppingCartController">
     <h1 class="left logo"><a href="/">新新农人</a></h1>
@@ -55,7 +57,7 @@
         <a href="/">首页</a> ／ <a>选择支付方式</a>
     </p>
     <p class="chaifen_orders_helping_wording" ng-show="ids.length > 1"><img src="images/chaifen_orders_helping.png" alt="">为了让您更快的收到商品，系统已为您拆分了订单。您可选择此次支付的订单,其他订单请到我的新农人继续支付。</p>
-    <div class="orderInfo ng-cloak" ng-show="!offlineSubmitted" ng-repeat='order in orders' ng-click='orderClicked($index)' ng-class="{true:'selected',false:'unselected'}[$index == orderSelectedNum && orders.length>1]">
+    <div class="orderInfo ng-cloak" ng-show="!offlineSubmitted && !offlineHasAudited" ng-repeat='order in orders' ng-click='orderClicked($index)' ng-class="{true:'selected',false:'unselected'}[$index == orderSelectedNum && orders.length>1]">
         <div class="big ng-cloak">订单号：
             <span class="ng-cloak">{{order.id}}</span>
             <span class="orderType">{{order.orderType}}</span>
@@ -72,13 +74,13 @@
             <p>商品名称：<span class="ng-cloak">{{order.resultStr}}</span></p>
         </div>
     </div>
-    <div class="wrap clearfix" ng-show="!offlineSubmitted">
+    <div class="wrap clearfix" ng-show="!offlineSubmitted && !offlineHasAudited">
         <div class="pay_box">
             <div class="pay_box_title">支付方式</div>
             <div class="pay_times">
                 <div class="full_pay_icon" ng-click="changePayTimes(0)" ng-class="{true:'selected'}[payTimes == 0]">
                     全额支付
-                    <div class="payMethod--help" ng-show="payTimes == 0">
+                    <div class="payMethod--help">
                         <img class="payMethod--help--img" src="images/q.png" alt="">
                         <img class="payMethod--help--text--prompt" src="images/orange-up-prompt.png" alt="">
                         <p class="payMethod--help--text">{{helpWoring.payMethod_help.full_pay}}</p>
@@ -89,7 +91,7 @@
                     <div class="multi_pay_icon" ng-click="changePayTimes(1)" ng-class="{true:'selected'}[payTimes == 1]">
                         分次支付
                         <!--<img class="selected" src="images/pay_type_check.png" alt="" ng-show="payTimes == 1" />-->
-                        <div class="payMethod--help" ng-show="payTimes == 1">
+                        <div class="payMethod--help">
                             <img class="payMethod--help--img" src="images/q.png" alt="">
                             <img class="payMethod--help--text--prompt" src="images/orange-up-prompt.png" alt="">
                             <p class="payMethod--help--text">{{helpWoring.payMethod_help.multi_pay}}</p>
@@ -142,7 +144,7 @@
             </div>
         </div>
     </div>
-    <div class="offlinePay-submitted-section clearfix" ng-show="offlineSubmitted">
+    <div class="offlinePay-submitted-section clearfix" ng-show="offlineSubmitted || offlineHasAudited">
         <div ng-show="!offlineHasAudited">
             <p class="section_title">线下支付</p>
             <div class="successInfo">
@@ -175,15 +177,15 @@
         </div>
         <div class="offlinePay-submitted-section-audited" ng-show="offlineHasAudited">
             <p class="offlinePay-submitted-section-audited-wording"><img src="images/audit_check.png" alt=""><span>订单已审核通过</span></p>
-            <a href="my_xxnr.html">查看订单</a>
+            <a ng-href="orderDetail.html?id={{ids[orderSelectedNum]}}">查看订单</a>
             <a href="/">回到首页</a>
         </div>
     </div>
 </div>
-<div class="payBody">
+<div class="payBody" ng-show="orderHasPayed">
     <div class="offlinePay-submitted-section-payed wrap" ng-show="orderHasPayed">
         <p class="offlinePay-submitted-section-payed-wording"><img src="images/audit_check.png" alt=""><span>订单已支付</span></p>
-        <a href="my_xxnr.html">查看订单</a>
+        <a href="orderDetail.html?id={{ids[0]}}">查看订单</a>
         <a href="/">回到首页</a>
     </div>
 </div>
@@ -195,13 +197,13 @@
         <span class="left">确认付款</span>
     </div> -->
     <div class="pop_pay">
-        <p for="" class="pay_alter_info">请在新打开的页面上完成支付；支付完成前请不要关闭此窗口</p>
+        <p for="" class="pay_alter_info">请在新打开的页面上完成支付<br />支付完成前请不要关闭此窗口</p>
         <div class="pop_pay_btn">
             <div class="left">
                 <a href="" class="btn" ng-click="finishPay()">支付完成</a>
             </div>
             <div class="right">
-                <a href="" class="btn" ng-click="notFinishPay()">支付遇到问题</a>
+                <a href="" class="btn payWithProblem" ng-click="notFinishPay()">支付遇到问题</a>
             </div>
         </div>
     </div>

@@ -83,14 +83,28 @@ router.get(F.config['manager-url']+'/api/v2.1/potentialCustomer/:_id', middlewar
 router.get(F.config['manager-url']+ '/api/v2.2/RSCInfo/:_id',middleware.backend_auth,controllers.Manager.json_RSC_info_get);
 router.get(F.config['manager-url']+'/api/v2.2/RSCs', middleware.backend_auth, controllers.Manager.json_RSC_query);
 router.get(F.config['manager-url']+'/api/v2.2/RSC/orders', middleware.backend_auth, controllers.Manager.json_RSCorders_query);
-router.put(F.config['manager-url']+'/api/v2.2/RSC/modify', middleware.backend_auth, controllers.Manager.process_RSC_modify);
-router.get(F.config['manager-url']+ '/api/v2.2/RSC/queryByProducts',middleware.backend_auth ,controllers.Manager.json_RSC_query_by_products);
+
+router.put(F.config['manager-url']+'/api/v2.2/RSC/modify', middleware.backend_auth, middleware.auditing_middleware, controllers.Manager.process_RSC_modify);
+router.get(F.config['manager-url']+ '/api/v2.2/RSC/queryByProducts', middleware.backend_auth, controllers.Manager.json_RSC_query_by_products);
+router.get(F.config['manager-url']+ '/api/v2.2/RSC/queryByGift', middleware.backend_auth, controllers.Manager.json_RSC_query_by_gift);
 
 // agents
 router.get(F.config['manager-url']+ '/api/agents', middleware.backend_auth, controllers.Manager.json_agents_query);
 router.get(F.config['manager-url']+ '/api/agents/invitees', middleware.backend_auth, controllers.Manager.json_agents_invitees_query);
 router.get(F.config['manager-url']+ '/api/agents/potentialCustomers', middleware.backend_auth, controllers.Manager.json_agents_potentialCustomers_query);
 router.get(F.config['manager-url']+ '/api/agents/:_id', middleware.backend_auth, controllers.Manager.json_agents_get);
+
+// rewardshop
+router.post(F.config['manager-url']+'/rewardshop/uploadImage', middleware.backend_auth, controllers.Manager.CKEditor_uploadImage);
+router.get(F.config['manager-url']+'/api/rewardshop/categories', middleware.backend_auth, controllers.Manager.json_rewardshop_categories);
+// router.post(F.config['manager-url']+'/api/rewardshop/category/add', middleware.backend_auth, middleware.auditing_middleware, controllers.Manager.json_rewardshop_category_save);
+router.get(F.config['manager-url']+'/api/rewardshop/gifts', middleware.backend_auth, controllers.Manager.json_rewardshop_gifts);
+router.post(F.config['manager-url']+'/api/rewardshop/gift/add', middleware.backend_auth, middleware.auditing_middleware, controllers.Manager.json_rewardshop_gift_save);
+router.post(F.config['manager-url']+'/api/rewardshop/gift/update', middleware.backend_auth, middleware.auditing_middleware, controllers.Manager.json_rewardshop_gift_update);
+router.get(F.config['manager-url']+'/api/rewardshop/gift/:_id', middleware.backend_auth, controllers.Manager.json_rewardshop_gift_get);
+router.get(F.config['manager-url']+'/api/rewardshop/pointslogs', middleware.backend_auth, controllers.Manager.json_rewardshop_pointslogs);
+router.get(F.config['manager-url']+'/api/rewardshop/giftorders', middleware.backend_auth, controllers.Manager.json_rewardshop_giftorders);
+router.post(F.config['manager-url']+'/api/rewardshop/giftorders/update', middleware.backend_auth, controllers.Manager.json_rewardshop_giftorders_update);
 
 // area
 router.get(F.config['manager-url']+'/api/area/getProvinceList', middleware.backend_auth, controllers.Manager.json_province_query);

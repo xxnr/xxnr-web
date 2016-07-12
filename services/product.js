@@ -201,14 +201,14 @@ ProductService.prototype.save = function(model, callback) {
 
     var updator = function() {
         // Updates database file
-        ProductModel.update({id: model.id}, {$set: model}, function (err, numAffected) {
+        ProductModel.findOneAndUpdate({id: model.id}, {$set: model}, {new:true}, function (err, updatedProduct) {
             if (err) {
                 console.error('product save err', err, 'model', model);
                 callback(err);
                 return;
             }
 
-            if (numAffected.n == 0) {
+            if (!updatedProduct) {
                 var newProduct = new ProductModel(model);
                 newProduct.save(function (err) {
                     if (err) {
@@ -240,7 +240,7 @@ ProductService.prototype.save = function(model, callback) {
                 });
             } else {
                 updateSKUName(model);
-                callback(null);
+                callback(null, updatedProduct);
                 //setTimeout(refresh, 1000);
             }
         })
@@ -471,7 +471,7 @@ ProductService.prototype.addAttribute = function(category, brand, name, value, o
         var productAttribute = new ProductAttributeModel(model);
         productAttribute.save(function(err){
             if(err){
-                console.error(err);
+                //console.error(err);
                 callback(err);
                 return;
             }

@@ -27,6 +27,7 @@ require('./userrelevances');
 require('./hourlyReport');
 require('./user_sign');
 require('./vcodes');
+require('./loyaltypoints');
 require('./appdeviceversion');
 
 //user
@@ -94,6 +95,14 @@ exports.agentReport = mongoose.model('agentReport');
 exports.userSign = mongoose.model('user_sign');
 // vcode
 exports.vcode = mongoose.model('vcode');
+exports.graphvCode = mongoose.model('graphvcode');
+exports.ipThrottle = mongoose.model('ipthrottle');
+exports.dailySmsNumber = mongoose.model('dailysmsnumber');
+// loyaltypoints
+exports.rewardshopgiftcategory = mongoose.model('rewardshopgiftcategory');
+exports.rewardshopgift = mongoose.model('rewardshopgift');
+exports.loyaltypointslogs = mongoose.model('loyalty_points_logs');
+exports.rewardshopgiftorder = mongoose.model('rewardshopgiftorder');
 // app upgrade
 exports.app_Device_Version = mongoose.model('app_Device_Version');
 

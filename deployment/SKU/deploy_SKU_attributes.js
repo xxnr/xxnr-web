@@ -69,12 +69,12 @@ module.exports = function(callback) {
                                     return;
                                 }
 
-                                console.log('sku attribute', {
-                                    category: category,
-                                    brand: brand,
-                                    name: name,
-                                    value: value
-                                }, 'saved');
+                                //console.log('sku attribute', {
+                                //    category: category,
+                                //    brand: brand,
+                                //    name: name,
+                                //    value: value
+                                //}, 'saved');
 
                                 resolve();
                             });
@@ -94,7 +94,7 @@ module.exports = function(callback) {
 
         Promise.all(promises)
             .then(function () {
-                console.log('Deploy SKU attributes success!!!!!!!!!!!!!');
+                //console.log('Deploy SKU attributes success!!!!!!!!!!!!!');
                 callback();
             })
             .catch(function(err){

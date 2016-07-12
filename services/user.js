@@ -20,7 +20,7 @@ var UserService = function(){};
 UserService.prototype.create = function(options, callback) {
     UserModel.findOne({account: options.account}, function (err, doc) {
         if (doc) {
-            callback('用户已存在');
+            callback('该手机号已注册，请重新输入');
             return;
         } else {
             var user = new UserModel(options);
@@ -135,7 +135,7 @@ UserService.prototype.update = function(options, callback) {
 // Login
 UserService.prototype.login = function(options, callback) {
     if(!options.account || !options.password){
-        callback('请输入用户名和密码');
+        callback('请输入用户名或密码');
         return;
     }
 
@@ -153,7 +153,7 @@ UserService.prototype.login = function(options, callback) {
         }
 
         if (user === null) {
-            callback('账号不存在');
+            callback('该手机号未注册，请重新输入');
             return;
         }
 
@@ -186,7 +186,7 @@ UserService.prototype.login = function(options, callback) {
             userLog.save(function(){});
         }else {
             // Returns response
-            callback('密码错误');
+            callback('密码错误，请重新输入');
         }
     });
 };
@@ -210,7 +210,7 @@ UserService.prototype.get = function(options, callback) {
         .exec(function (err, user) {
             if (err) {
                 console.error('User Service get user error:', err);
-                callback('获取用户信息失败');
+                callback('获取用户信息失败', err);
                 return;
             }
 
@@ -491,6 +491,7 @@ UserService.prototype.getRSCInfoById = function(_id, callback){
         .populate({path: 'RSCInfo.companyAddress.county', select: ' -__v'})
         .populate({path: 'RSCInfo.companyAddress.town', select: ' -__v'})
         .populate({path:'RSCInfo.products', select:' _id category brand name'})
+        .populate({path:'RSCInfo.rewardshopGifts', select:' _id category name online'})
         .select('-_id id account RSCInfo')
         .exec(function(err, user){
             if(err){
@@ -826,6 +827,32 @@ UserService.prototype.getTestAccountList = function(callback) {
 
             callback(null, testAccountList);
         })
+};
+
+UserService.prototype.getUserBySearch = function(account, name, callback) {
+    if (!account && !name) {
+        callback('need search info');
+        return;
+    }
+    var query = {};
+    query['$or'] = [];
+    if (account) {
+        query['$or'].push({account:{$regex:new RegExp(account)}});
+    }
+    if (name) {
+        query['$or'].push({name:{$regex:new RegExp(name)}});
+    }
+
+    UserModel.findOne(query)
+        .exec(function (err, user) {
+            if (err) {
+                console.error('UserService getUserBySearch findOne err:', err);
+                callback(err);
+                return;
+            }
+
+            callback(null, user);
+        });
 };
 
 module.exports = new UserService();

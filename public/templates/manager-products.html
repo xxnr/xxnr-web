@@ -3,7 +3,7 @@
         <div class="caption"><span class="fa fa-navicon mr5"></span> 商品管理</div>
         <div class="row">
             <div class="col-md-3 col-sm-6 m">
-                <div data-component="textbox" data-component-path="products.filter.search" data-placeholder="查找商品..." data-control-icon="fa-search"></div>
+                <div data-component="textbox" data-component-path="products.filter.search" data-placeholder="商品名称" data-control-icon="fa-search"></div>
                 <div class="help" data-component="template" data-component-path="products.info"><script type="text/html">{{ count | pluralize('items','item','items','items') }} / {{ pages | pluralize('pages','page','pages','pages') }}</script></div>
             </div>
             <div class="col-md-3 col-sm-6 m">
@@ -156,6 +156,7 @@
                 <div class="col-md-8">
                     <div class="mb10" data-component="textbox" data-component-path="products.form.name" data-required="true">商品名称</div>
                     <div class="mb10" data-component="textbox" data-component-path="products.form.deposit" data-component-type="currency" data-increment="true" data-icon="fa-jpy">定金</div>
+                    <div class="mb10" data-component="textbox" data-component-path="products.form.rewardPoints">交易可获积分</div>
                     <!--<div class="mb10" data-component="textbox" data-component-path="products.form.originprice">市场价格</div>
                     <div class="mb10" data-component="textbox" data-component-path="products.form.stock">库存数量</div>
                     <div class="mb10" data-component="textbox" data-component-path="products.form.reference">商品货号</div>-->
@@ -378,6 +379,7 @@
 
     products.filter = {};
     products.filter.page = 1;
+    products.filter.search = '';
 
     products.grid = [];
     products.info = {};
@@ -563,7 +565,8 @@
 //				{'key':'model','name':'车系'},{'key':'engine','name':'排量'},{'key':'gearbox','name':'变速器'},{'key':'level','name':'车型'},
             {'key':'name','name':'商品名称'},
 //				{'key':'price','name':'平台价格','re':/^[0-9]*(\.[0-9]{1,2})?$/},
-            {'key':'deposit','name':'定金','re':/^[0-9]*(\.[0-9]{1,2})?$/}];
+            {'key':'deposit','name':'定金','re':/^[0-9]*(\.[0-9]{1,2})?$/},
+            {'key':'rewardPoints','name':'交易可获积分','re':/^[0-9]*?$/}];
         if (!required(requiredlist, products.form))
             return;
 

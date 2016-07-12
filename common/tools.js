@@ -18,6 +18,8 @@ var moment = require('moment-timezone');
 var REG_MOBILE = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|Tablet/i;
 var REG_IOS = /ios|iphone|ipad|ipod/i;
 var REG_Andriod = /android/i;
+var crypto = require('crypto');
+var request = require('request');
 
 /*
     Phone in china validation
@@ -67,36 +69,56 @@ exports.generateAuthCode = function (length) {
     return authCode;
 };
 
-function sendPhoneMessage(phonenumber, content) {
+function sendPhoneMessage(phonenumber, template_id, params, callback) {
 
-    var options = config.phone_message_options;
-    var httpOptions = options.http_request_options;
+    function getCheckSum(nonce, curTime)
+    {
+        var hash = crypto.createHash('sha1');
+        hash.update(config.netease_im.appsecret + nonce + curTime);
+        return hash.digest('hex');
+    }
 
-    httpOptions.path = options['url'] + querystring.stringify({
-            action: 'send',
-            userid: options['userid'],
-            account: options['account'],
-            password: options['password'],
-            mobile: phonenumber,
-            content: content
-        });
+    var curTime = Math.ceil(Date.now() / 1000);
+    var nonce = exports.generateAuthCode(16);
 
-    var req = http.request(httpOptions, function (res) {
-        res.setEncoding('utf8');
-        res.on('data', function (chunk) {
-            if ((chunk.indexOf('<returnstatus>Success</returnstatus>', 0) == -1) || (chunk.indexOf('<message>ok</message>', 0) == -1)) {
-                console.error('sendPhoneMessage return err:', chunk);
-            }
-        });
+    var checkSum = getCheckSum(nonce, curTime);
+    request.post({
+        'url': config.netease_im.url,
+        'headers': {
+            'AppKey': config.netease_im.appkey,
+            'CurTime': curTime,
+            'CheckSum': checkSum,
+            'Nonce': nonce,
+            'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8'
+        },
+        'body': querystring.stringify({
+            'templateid': template_id,
+            'mobiles': JSON.stringify([phonenumber]),
+            'params': JSON.stringify(params)
+        })
+    }, function(err, response, body){
+        if (err)
+        {
+            return callback(err);
+        }
+
+        var bodyObj = null;
+        try
+        {
+            bodyObj = JSON.parse(body);
+        }
+        catch (err)
+        {
+            return callback(err);
+        }
+
+        if (bodyObj.code != 200)
+        {
+            return callback(new Error(bodyObj.msg));
+        }
+
+        return callback();
     });
-
-    req.on('error', function (e) {
-        console.error('problem with request:', e.message);
-    });
-
-    // req.write(postData); we don't have body.
-
-    req.end();
 };
 
 exports.sendMessage = function(phonenumber, message){
@@ -109,10 +131,10 @@ exports.sendActivePhoneMessage = function (phonenumber, code) {
     // If anyone change the content below, please DO phone the 和信通 to add it into whitelist, otherwise, our short message will be blocked.
     //var content = '【新新农人】验证码：' + code + '，确认后请在10分钟内填写，切勿泄露给他人，如非本人操作，建议及时与客服人员联系'
     var content = '验证码：' + code + '，确认后请在10分钟内填写，切勿泄露给他人，如非本人操作，建议及时与客服人员联系 - 新新农人';
+    const template_id = '3021025';
     console.log(phonenumber + content);
-    sendPhoneMessage(phonenumber, content);
+    sendPhoneMessage(phonenumber, template_id, [code], function(){});
 };
-
 
 function guessMobileCode(mobile_code, target) {
     // only supports China now.
@@ -389,3 +411,21 @@ exports.isMobileTestUserAgent = function(userAgent){
     }
     return REG_MOBILE.test(userAgent);
 };
+
+exports.randomWord = function(randomFlag, min, max){
+    var str = "",
+        range = min || 4,
+        // arr = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'],
+        arr = ['2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'],
+        max = max ? max : arr.length;
+ 
+    // 随机产生
+    if (randomFlag) {
+        range = Math.round(Math.random() * (max-min)) + min;
+    }
+    for (var i=0; i<range; i++) {
+        pos = Math.round(Math.random() * (arr.length-1));
+        str += arr[pos];
+    }
+    return str;
+}

@@ -1,8 +1,8 @@
 /**
  * Created by xxnr-cd on 15/12/21.
  */
-var app = angular.module('fillProfile', ['xxnr_common','shop_cart']);
-app.controller('fillProfileController', function($scope, remoteApiService, commonService, $http){
+var app = angular.module('fillProfile', ['xxnr_common','shop_cart',"ngFlash"]);
+app.controller('fillProfileController', function($scope, remoteApiService, commonService, $http, Flash, $timeout){
     var sweetalert = commonService.sweetalert;
 
     $scope.provinces = [{name:"省份",id: 0}];
@@ -18,7 +18,7 @@ app.controller('fillProfileController', function($scope, remoteApiService, commo
     $scope.identities = [];
     //$scope.selectedIdentity = $scope.identities[0];
     $scope.sex = 'male';
-
+    $scope.userInfoFullFilled = false;
 
     $scope.focusShowValidate = function(formGroupNum) {
         $scope.focusFormGroupNum = formGroupNum;
@@ -141,6 +141,7 @@ app.controller('fillProfileController', function($scope, remoteApiService, commo
                         //}
                         $scope.userName = data.datas.name;
                         $scope.sex = data.datas.sex?'female':'male';
+                        $scope.userInfoFullFilled = data.datas.isUserInfoFullFilled;
                         for(var i in $scope.identities){
                             if($scope.identities[i].id == data.datas.userType){
                                 $scope.selectedIdentity = $scope.identities[i];
@@ -184,9 +185,21 @@ app.controller('fillProfileController', function($scope, remoteApiService, commo
                 };
                 $http(req).then(function successCallback(response) {
                     if (response.data.code == 1000) {
-                        sweetalert('个人资料保存成功','my_xxnr.html');
+                        //sweetalert('个人资料保存成功','my_xxnr.html');
+                        var message = '<img class="xxnr--flash--icon" src="images/correct_prompt.png" alt="">个人资料保存成功';
+                        var id = Flash.create('success', message, 3000, {class: 'xxnr-success-flash', id: 'xxnr-success-flash'}, false);
+                        $timeout(function(){
+                            window.location.href = "/my_xxnr.html";
+                            return false
+                        },3000);
                     }else if(response.data.code == 1401){
-                        sweetalert('你已被登出，请重新登录', "logon.html");
+                        //sweetalert('你已被登出，请重新登录', "logon.html");
+                        var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">你已被登出，请重新登录';
+                        var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);
+                        $timeout(function(){
+                            window.location.href = "/logon.html";
+                            return false
+                        },3000);
                     }
                 }, function errorCallback(response) {
                     // called asynchronously if an error occurs
@@ -194,7 +207,9 @@ app.controller('fillProfileController', function($scope, remoteApiService, commo
                     console.log('Error');
                 });
             }else{
-                sweetalert('请填写完整信息');
+                //sweetalert('请填写完整信息');
+                var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">请填写完整信息';
+                var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);
             }
         }
 

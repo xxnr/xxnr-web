@@ -172,7 +172,7 @@ exports.api10_getOrders = function(req, res, next) {
                     'products': item.products || [],
                     'SKUs':item.SKUs || [],
                     'subOrders': item.subOrders || [],
-                    'duePrice': typeof(data.duePrice) != 'undefined' ? item.duePrice.toFixed(2) : null,
+                    'duePrice': typeof(item.duePrice) != 'undefined' ? item.duePrice.toFixed(2) : null,
                     'RSCInfo': item.RSCInfo
                 };
 
@@ -535,6 +535,13 @@ exports.api10_getOrderDetails = function(req, res, next) {
             if (payment) {
                 order.payment       = {'paymentId':payment.id, 'price':payment.price.toFixed(2), 'suborderId':payment.suborderId};
             }
+            // 积分相关
+            if (data.isRewardPoint) {
+                order.isRewardPoint = data.isRewardPoint;
+                order.rewardPoints = data.rewardPoints;
+            } else {
+                order.isRewardPoint = false;
+            }
             // 订单中商品信息列表（旧的订单才会存在）
             for (var i=0; i < productslength; i++) {
                 var product = data.products[i];
@@ -622,12 +629,12 @@ exports.addOrderBySKU = function(req, res, next){
         return;
     }
 
-    if (deliveryType && deliveryType === DELIVERYTYPE['SONGHUO'].id) {
+    if (deliveryType && parseInt(deliveryType) === DELIVERYTYPE['SONGHUO'].id) {
         if (!addressId) {
             res.respond({"code":1001, "message":"请先填写收货地址"});
             return;
         }
-    } else if (deliveryType && deliveryType === DELIVERYTYPE['ZITI'].id) {
+    } else if (deliveryType && parseInt(deliveryType) === DELIVERYTYPE['ZITI'].id) {
         if (!RSCId) {
             res.respond({"code":1001, "message":"请先选择自提点"});
             return;

@@ -113,7 +113,7 @@ function payOrder(req, res, payExecutor){
                     res.respond({code:1001, message:'获取支付信息出错'});
                     return;
                 }
-                payExecutor(resultPayment.id, parseFloat(resultPayPrice).toFixed(2), req.ip, order.id, resultPayment);
+                payExecutor(resultPayment.id, parseFloat(resultPayPrice).toFixed(2), req.clientIp, order.id, resultPayment);
                 return;
             });
         } catch (e) {
@@ -384,7 +384,7 @@ exports.process_RSC_confirm_OfflinePay = function(req, res, next){
     }
 
     OrderService.get({"paymentId": paymentId}, function(err, order) {
-        if (err) {
+        if (err || !order) {
             res.respond({code:1002, message:'获取订单失败'});
             return;
         }
@@ -395,7 +395,7 @@ exports.process_RSC_confirm_OfflinePay = function(req, res, next){
         }
 
         if(!order.pendingApprove){
-            res.respond({code:1002, message:'该订单没有待审核的线下支付'});
+            res.respond({code:1002, message:'订单已审核'});
             return;
         }
 

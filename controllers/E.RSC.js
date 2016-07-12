@@ -11,6 +11,7 @@ var DELIVERSTATUS = require('../common/defs').DELIVERSTATUS;
 var DELIVERYTYPE = require('../common/defs').DELIVERYTYPE;
 var DELIVERYTYPENAME = require('../common/defs').DELIVERYTYPENAME;
 var DeliveryCodeService = services.deliveryCode;
+var AreaService = services.area;
 
 exports.install = function() {
     // RSC info related
@@ -35,97 +36,108 @@ exports.install = function() {
 /**
  * fill RSC info. All RSC related info can only be filled once.
  */
-exports.process_RSC_info_fill = function(req, res, next){
+exports.process_RSC_info_fill = function(req, res, next) {
     var user = req.user;
-    if(!user){
-        res.respond({code:1001, message:'需要登录'});
+    if (!user) {
+        res.respond({code: 1001, message: '需要登录'});
         return;
     }
 
     var options = {};
-    UserService.getById(user._id, function(err, user){
-        if(!user.RSCInfo || !user.RSCInfo.name){
-            if(!req.data.name) {
+    UserService.getById(user._id, function (err, user) {
+        if (!user.RSCInfo || !user.RSCInfo.name) {
+            if (!req.data.name) {
                 res.respond({code: 1001, message: '请填写真实姓名'});
                 return;
-            } else{
-                options.RSCInfo = {name:req.data.name};
+            } else {
+                options.RSCInfo = {name: req.data.name};
             }
         }
 
-        if(!user.RSCInfo || !user.RSCInfo.IDNo){
-            if(!tools.isValidIdentityNo(req.data.IDNo)){
-                res.respond({code:1001, message:'请填写正确的身份证号'});
-                return;
-            } else{
-                if(options.RSCInfo){
-                    options.RSCInfo.IDNo = req.data.IDNo;
-                } else{
-                    options.RSCInfo = {IDNo:req.data.IDNo};
-                }
-            }
-        }
-
-        if(!user.RSCInfo || !user.RSCInfo.phone){
-            if(!tools.isPhone(req.data.phone)){
-                res.respond({code:1001, message:'请填写正确的手机号'});
-                return;
-            } else{
-                if(options.RSCInfo){
-                    options.RSCInfo.phone = req.data.phone;
-                } else{
-                    options.RSCInfo = {phone:req.data.phone};
-                }
-            }
-        }
-
-        if(!user.RSCInfo || !user.RSCInfo.companyName){
-            if(!req.data.companyName){
-                res.respond({code:1001, message:'请填写公司门店名称'});
+        if (!user.RSCInfo || !user.RSCInfo.IDNo) {
+            if (!tools.isValidIdentityNo(req.data.IDNo)) {
+                res.respond({code: 1001, message: '请填写正确的身份证号'});
                 return;
             } else {
-                if(options.RSCInfo){
-                    options.RSCInfo.companyName = req.data.companyName;
-                } else{
-                    options.RSCInfo = {companyName:req.data.companyName};
+                if (options.RSCInfo) {
+                    options.RSCInfo.IDNo = req.data.IDNo;
+                } else {
+                    options.RSCInfo = {IDNo: req.data.IDNo};
                 }
             }
         }
 
-        if(!user.RSCInfo || !user.RSCInfo.companyAddress){
-            if(!req.data.companyAddress){
-                res.respond({code:1001, message:'请填写网点地址'});
+        if (!user.RSCInfo || !user.RSCInfo.phone) {
+            if (!tools.isPhone(req.data.phone)) {
+                res.respond({code: 1001, message: '请填写正确的手机号'});
                 return;
-            } else if(!req.data.companyAddress.province){
-                res.respond({code:1001, message:'请选择省份'});
+            } else {
+                if (options.RSCInfo) {
+                    options.RSCInfo.phone = req.data.phone;
+                } else {
+                    options.RSCInfo = {phone: req.data.phone};
+                }
+            }
+        }
+
+        if (!user.RSCInfo || !user.RSCInfo.companyName) {
+            if (!req.data.companyName) {
+                res.respond({code: 1001, message: '请填写公司门店名称'});
                 return;
-            } else if (!req.data.companyAddress.city){
-                res.respond({code:1001, message:'请选择城市'});
+            } else {
+                if (options.RSCInfo) {
+                    options.RSCInfo.companyName = req.data.companyName;
+                } else {
+                    options.RSCInfo = {companyName: req.data.companyName};
+                }
+            }
+        }
+
+        if (!user.RSCInfo || !user.RSCInfo.companyAddress) {
+            if (!req.data.companyAddress) {
+                res.respond({code: 1001, message: '请填写网点地址'});
                 return;
-            } else{
-                if(options.RSCInfo){
+            } else if (!req.data.companyAddress.province) {
+                res.respond({code: 1001, message: '请选择省份'});
+                return;
+            } else if (!req.data.companyAddress.city) {
+                res.respond({code: 1001, message: '请选择城市'});
+                return;
+            } else if (!req.data.companyAddress.town) {
+                res.respond({code: 1001, message: '请选择区县'});
+                return;
+            } else {
+                if (options.RSCInfo) {
                     options.RSCInfo.companyAddress = req.data.companyAddress;
-                } else{
+                } else {
                     options.RSCInfo = {companyAddress: req.data.companyAddress};
                 }
             }
         }
 
-        if(tools.isEmptyObject(options)){
-            res.respond({code:1001, message:'没有可以更新的内容'});
+        if (tools.isEmptyObject(options)) {
+            res.respond({code: 1001, message: '没有可以更新的内容'});
             return;
-        } else{
+        } else {
             options.userid = user.id;
         }
 
-        UserService.update(options, function(err){
-            if(err){
-                res.respond({code:1001, message:'更新失败'});
-                return;
-            }
+        var updator = function () {
+            UserService.update(options, function (err) {
+                if (err) {
+                    res.respond({code: 1001, message: '更新失败'});
+                    return;
+                }
 
-            res.respond({code:1000, message:'success'});
-        })
+                res.respond({code: 1000, message: 'success'});
+            })
+        };
+
+        if (options.RSCInfo && options.RSCInfo.companyAddress && options.RSCInfo.companyAddress.province) {
+            AreaService.check_address(options.RSCInfo.companyAddress.province, options.RSCInfo.companyAddress.city, options.RSCInfo.companyAddress.county, options.RSCInfo.companyAddress.town, res, updator);
+        } else {
+            updator();
+        }
     })
 };
 
@@ -238,8 +250,15 @@ exports.process_RSC_order_deliverStatus_delivering = function(req, res, next){
 
 exports.json_RSC_address_province_query = function(req, res, next){
     var options = null;
-    if(typeof req.data.EPOS != 'undefined') {
+    if (typeof req.data.EPOS != 'undefined') {
         options = {EPOS:true};
+    }
+    if (req.data.gift) {
+        if (options) {
+            options.gift = req.data.gift;
+        } else {
+            options = {gift:req.data.gift};
+        }
     }
     
     if(!req.data.products && !options){
@@ -261,6 +280,13 @@ exports.json_RSC_address_city_query = function(req, res, next){
     var options = null;
     if(typeof req.data.EPOS != 'undefined') {
         options = {EPOS:true};
+    }
+    if (req.data.gift) {
+        if (options) {
+            options.gift = req.data.gift;
+        } else {
+            options = {gift:req.data.gift};
+        }
     }
     if(!req.data.products && !options){
         res.respond({code:1001, message:'请先选择商品'});
@@ -287,6 +313,13 @@ exports.json_RSC_address_county_query = function(req, res, next){
     var options = null;
     if(typeof req.data.EPOS != 'undefined') {
         options = {EPOS:true};
+    }
+    if (req.data.gift) {
+        if (options) {
+            options.gift = req.data.gift;
+        } else {
+            options = {gift:req.data.gift};
+        }
     }
     if(!req.data.products && !options){
         res.respond({code:1001, message:'请先选择商品'});
@@ -318,6 +351,13 @@ exports.json_RSC_address_town_query = function(req, res, next){
     if(typeof req.data.EPOS != 'undefined') {
         options = {EPOS:true};
     }
+    if (req.data.gift) {
+        if (options) {
+            options.gift = req.data.gift;
+        } else {
+            options = {gift:req.data.gift};
+        }
+    }
     if(!req.data.products && !options){
         res.respond({code:1001, message:'请先选择商品'});
         return;
@@ -347,6 +387,13 @@ exports.json_RSC_query = function(req, res, next){
     var options = null;
     if(typeof req.data.EPOS != 'undefined') {
         options = {EPOS:true};
+    }
+    if (req.data.gift) {
+        if (options) {
+            options.gift = req.data.gift;
+        } else {
+            options = {gift:req.data.gift};
+        }
     }
     if(!req.data.products && !options){
         res.respond({code:1001, message:'请先选择商品'});
