@@ -24,13 +24,13 @@
   })
 
   const pullupDefaultConfig = () => ({
-    content: '上拉刷新...',
+    content: '',//上拉刷新.
     pullUpHeight: 60,
     height: 40,
     autoRefresh: false,
-    downContent: '<div class="xs-plugin-loader"><img src="../../static/assets/images/loader.png"></div>松开刷新',
-    upContent: '上拉刷新...',
-    loadingContent: '<div class="xs-plugin-loader"><img src="../../static/assets/images/loader.png"></div>正在刷新',
+    downContent: '',//<div class="xs-plugin-loader"><img src="../../static/assets/images/loader.png"></div>松开刷新
+    upContent: '', //上拉刷新...
+    loadingContent: '',//<div class="xs-plugin-loader"><img src="../../static/assets/images/loader.png"></div>正在刷新
     clsPrefix: 'xs-plugin-pullup-'
   })
 

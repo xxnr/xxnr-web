@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <div class="product-img"><img :src="productDetail.imgUrl"></div>
+    <div class="product-img"><img :src="productDetail.imgUrl" onerror="javascript:this.src='../../../static/assets/images/no_picture.png'"></div>
   </div>
   <div class="product-info">
     <div class="container">
@@ -89,27 +89,27 @@
     <div class="close-attr-box" @click="hideAttrBox();">
       <img src="../../../static/assets/images/close-box.png">
     </div>
-    <div class="attr-box-container" style="-webkit-overflow-scrolling: touch;">
-      <div class="attr-product">
-        <div class="attr-product-img">
-          <img :src="productDetail.imgUrl">
-        </div>
-        <div class="attr-product-info">
-          <div class="attr-product-info-con">
-            <div class="attr-product-name">
-              {{productDetail.name}}
-            </div>
-            <div class="attr-product-price" v-if="!productDetail.presale">
-              {{'¥'+productDetail.minPrice}} {{productDetail.maxPrice==productDetail.minPrice?"":"-"}} {{(productDetail.maxPrice==productDetail.minPrice?"":productDetail.maxPrice)}}
-            </div>
-            <div v-if="productDetail.presale" style="color: #909090;">
-              即将上线
-            </div>
+    <div class="attr-product">
+      <div class="attr-product-img">
+        <img :src="productDetail.imgUrl" onerror="javascript:this.src='../../../static/assets/images/no_picture.png'">
+      </div>
+      <div class="attr-product-info">
+        <div class="attr-product-info-con">
+          <div class="attr-product-name">
+            {{productDetail.name}}
+          </div>
+          <div class="attr-product-price" v-if="!productDetail.presale">
+            {{'¥'+productDetail.minPrice}} {{productDetail.maxPrice==productDetail.minPrice?"":"-"}} {{(productDetail.maxPrice==productDetail.minPrice?"":productDetail.maxPrice)}}
+          </div>
+          <div v-if="productDetail.presale" style="color: #909090;">
+            即将上线
           </div>
         </div>
-        <div class="clear"></div>
       </div>
-      <div class="attr-product-h"></div>
+      <div class="clear"></div>
+    </div>
+    <div class="attr-box-container" style="-webkit-overflow-scrolling: touch;">
+      <!--<div class="attr-product-h"></div>-->
       <div class="container">
         <div v-for="sku in productDetail.SKUAttributes" class="sku-block">
           <div class="sku-name">{{sku.name}}</div>
@@ -239,9 +239,10 @@
 
 <style scoped>
   .attr-box-container {
-    height:400px;
+    height:300px;
     overflow-y:scroll;
     z-index: 0;
+    background-color: #fff;
   }
 
   .product-info {
@@ -375,6 +376,7 @@
     width: 75px;
     border: 1px solid #c7c7c7;
     margin-right: 6px;
+    margin-left: 2%;
   }
 
   .attr-product-img img {
@@ -402,7 +404,7 @@
   .attr-product {
     height: 75px;
     width: 100%;
-    position: absolute;
+    /*position: absolute;*/
     padding: 10px 0;
     border-bottom: 1px solid #E0E0E0;
     background-color: #fff;
@@ -437,14 +439,15 @@
   }
 
   .attr-product-info-con {
-    margin-left: 81px;
+    margin-left: 90px;
     padding-right: 15px;
+    height: 80px;
   }
 
   .product-num-text {
     border-top: 1px solid #c1c1c1;
     border-bottom: 1px solid #c1c1c1;
-    height: 25px;
+    height: 27px;
     margin: 0;
     width: 46px;
     outline: none;
@@ -452,10 +455,15 @@
     text-align: center;
     color: #323232;
     margin-bottom: 16px;
+    box-sizing: border-box;
+  }
+
+  input.product-num-text {
+    -webkit-appearance: none;
   }
 
   .product-num-btn {
-    width: 27px;
+    width: 25px;
     height: 27px;
     border: 1px solid #c1c1c1;
     font-size: 18px;
@@ -463,6 +471,7 @@
     color: #646464;
     outline: none;
     float: left;
+    box-sizing: border-box;
   }
 
   .sku-item.checked {

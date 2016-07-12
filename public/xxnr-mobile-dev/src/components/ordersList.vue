@@ -4,7 +4,7 @@
       <template v-if="order.SKUs.length>0">
         <div class="productRow" v-for="SKU in order.SKUs">
           <div class="orders-product-img">
-            <img :src="SKU.thumbnail">
+            <img :src="SKU.thumbnail" onerror="javascript:this.src='../../../static/assets/images/no_picture.png'">
           </div>
           <div class="orders-product-info">
             <div class="orders-product-name">
@@ -20,7 +20,7 @@
       <template v-else>
         <div v-else class="productRow" v-for="SKU in order.products">
           <div class="orders-product-img">
-            <img :src="SKU.thumbnail">
+            <img :src="SKU.thumbnail" onerror="javascript:this.src='../../../static/assets/images/no_picture.png'">
           </div>
           <div class="orders-product-info">
             <div class="orders-product-name">
@@ -155,7 +155,7 @@
   .action-wor {
     color: #fe9b00;
     line-height: 44px;
-    padding-left: 2%;
+    padding-left: 10px;
     font-size: 14px;
   }
 

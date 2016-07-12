@@ -3,7 +3,7 @@
     <div class="product" v-for="product in products">
       <a v-link="{path: '/productDetail?id=' + product.id}">
       <div class="product-img">
-        <img :src="product.imgUrl">
+        <img :src="product.imgUrl" onerror="javascript:this.src='../../../static/assets/images/no_picture.png'">
       </div>
       <div class="product-name">{{product.name}}</div>
       <div class="product-presale" v-if="product.presale">
@@ -41,6 +41,11 @@
     height: 30px;
     overflow: hidden;
     margin-top: 5px;
+    overflow : hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
   }
 
   .product-img {
@@ -61,5 +66,6 @@
   .product-presale {
     color: #909090;
     font-size: 16px;
+    line-height:30px;
   }
 </style>

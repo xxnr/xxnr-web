@@ -1,6 +1,5 @@
 <template>
   <div class="productsRows clearfix">
-
     <a v-link="{path: '/productDetail?id=' + product.goodsId}" v-for="product in products">
     <div class="productRow">
         <div class="product-img">

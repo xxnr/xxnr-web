@@ -1,9 +1,10 @@
 <template>
-  <scroller v-ref:scroller lock-x scrollbar-y use-pullup @pullup:loading="loadMoreOrders">
+  <scroller v-ref:scroller lock-x scrollbar-y use-pullup @pullup:loading="loadMoreOrders" v-if="orders.length != 0">
     <div class="orders-list">
       <orders-list :orders="orders"></orders-list>
     </div>
   </scroller>
+  <no-order v-if="isEmpty"></no-order>
   <div v-show="toastMsg.length>0">
     <xxnr-toast :show.sync="toastShow" >
       <p>{{toastMsg}}</p>
@@ -13,6 +14,7 @@
 
 <script>
     import ordersList from '../ordersList.vue'
+    import noOrder from './noOrder.vue'
     import Scroller from '../../xxnr_mobile_ui/xxnrScroller.vue'
     import xxnrToast  from '../../xxnr_mobile_ui/xxnrAlert.vue'
     import api from '../../api/remoteHttpApi'
@@ -26,13 +28,15 @@
                 orders:[],
                 end:false,
                 toastShow:false,
-                toastMsg:''
+                toastMsg:'',
+                isEmpty: false
             }
         },
         components:{
           ordersList,
           Scroller,
-            xxnrToast
+          xxnrToast,
+          noOrder
         },
         methods:{
           loadMoreOrders:scrollerHandler,
@@ -41,7 +45,9 @@
               {'typeValue':this.typeValue,'page':pageNum},
               response => {
                 checkOtherPlaceLogin(response,this);
-
+                if(response.data.count == 0) {
+                  this.isEmpty = true;
+                }
                 if(pageNum<=response.data.pages){
                 //console.log(response);
                   if(pageNum==response.data.pages){

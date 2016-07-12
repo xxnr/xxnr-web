@@ -53,8 +53,9 @@
     components: {
       xxnrToast
     },
-    created () {
+    detached () {
 //      this.showBackBtn()
+    console.log('detached');
       this.password = '';
     },
     route: {

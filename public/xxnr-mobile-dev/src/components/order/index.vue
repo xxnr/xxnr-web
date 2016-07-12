@@ -40,7 +40,7 @@
             <li>
               <div class="product-con">
                 <div class="product-img">
-                  <img :src="cartList.imgUrl">
+                  <img :src="cartList.imgUrl" onerror="javascript:this.src='../../../static/assets/images/no_picture.png'">
                 </div>
                 <div class="product-info">
                   <div class="product-info-con">

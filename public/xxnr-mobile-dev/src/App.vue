@@ -5,13 +5,13 @@
     </div>
 </template>
 <script>
-  import XxnrHeader from './components/XxnrHeader.vue'
+  import xxnrHeader from './components/xxnrHeader.vue'
   import store from './vuex/store'
 
   export default {
     store,
     components: {
-      XxnrHeader
+      xxnrHeader
     },
     ready() {
 
@@ -31,6 +31,7 @@
     font-family: "Microsoft YaHei", "Lucida Sans Unicode", "Myriad Pro", "Hiragino Sans GB", "Heiti SC", Verdana, simsun;
     background-color: #fafafa;
     color: #595757;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
   }
   input {
     border: none;
@@ -186,7 +187,7 @@
     height: 100%;
     background-color: #000;
     opacity: .6;
-    z-index: 100;
+    z-index: 99;
   }
 
 </style>

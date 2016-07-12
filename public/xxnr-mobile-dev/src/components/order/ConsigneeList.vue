@@ -82,6 +82,10 @@
   },components: {
     xxnrToast
   },
+  detached() {
+    this.consigneeName = '';
+    this.consigneePhone = '';
+  },
   route: {
     activate(transition) {
       this.getConsigneeList();
@@ -122,8 +126,9 @@
 
   .consignee-val input[type=text]{
     width:100%;
-    height: 49px;
-    line-height: 49px;
+    height: 30px;
+    padding: 10px 0;
+    line-height: 30px;
     font-size: 16px;
     color: #909090;
   }

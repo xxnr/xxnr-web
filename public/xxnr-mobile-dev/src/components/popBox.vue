@@ -19,7 +19,7 @@
           <div v-if="item.attributes">
             <span v-for="attribute in item.attributes">{{attribute.name}}：{{attribute.value}}；</span>
           </div>
-          <div v-if="item.additions">
+          <div v-if="item.additions.length != 0">
             附加项目：<span v-for="addition in item.additions">{{addition.name}}；</span>
           </div>
         </div>

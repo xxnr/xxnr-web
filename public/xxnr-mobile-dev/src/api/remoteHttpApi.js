@@ -73,6 +73,12 @@ export default {
   },
   getInviter: function (data, cb, errCb) {
     jsonpGet(API_ROOT + "api/v2.0/user/getInviter/", data, cb, errCb);
+  },
+  sendCode: function (data, cb, errCb) {
+    jsonpPost(API_ROOT + "api/v2.3/sms", data, cb, errCb);
+  },
+  refreshCode: function (data, cb, errCb) {
+    jsonpPost(API_ROOT + "api/v2.3/captcha", data, cb, errCb);
   }
 }
 
