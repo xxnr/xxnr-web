@@ -213,5 +213,6 @@ export default {
 
   .verify-code-con input[type=text] {
     -webkit-appearance: none;
+    box-shadow: none;
   }
 </style>
