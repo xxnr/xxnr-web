@@ -3,6 +3,7 @@
  */
 var AppUpgrade = require('../models').app_Device_Version;
 var UMENG = require('../modules/umeng');
+var appVersionConfig = require('../configuration/appVersion_config');
 
 
 // Service
@@ -13,8 +14,10 @@ var AppUpgradeService = function () {
 //是否需要发送app升级推送
 AppUpgradeService.prototype.isNeedPush = function (callback) {
     var self = this;
-    var nowIosVersion = F.config.nowIosVersion;
-    var nowAndroidVersion = F.config.nowAndroidVersion;
+    // var nowIosVersion = F.config.nowIosVersion;
+    // var nowAndroidVersion = F.config.nowAndroidVersion;
+    var nowIosVersion = appVersionConfig.nowIosVersion;
+    var nowAndroidVersion = appVersionConfig.nowAndroidVersion;
 
     AppUpgrade.find({'date_update': {$lte: new Date().add('days', -15)}})
         .select('device_token date_update user_agent version')
