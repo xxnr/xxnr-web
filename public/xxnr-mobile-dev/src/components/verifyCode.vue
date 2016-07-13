@@ -20,7 +20,7 @@
         <img src="/assets/images/refresh.png">
       </div>
     </div>
-    <div class="verify-code-tips" v-if="hasCodeTips">
+    <div class="verify-code-tips" v-show="hasCodeTips">
       <img src="/assets/images/error.png"><span>{{codeTips}}</span>
     </div>
     <div class="verify-code-btn-box">

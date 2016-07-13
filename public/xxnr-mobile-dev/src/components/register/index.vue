@@ -21,7 +21,7 @@
     </div>
     <div class="user-agreement clearfix">
       <input v-model="policyChecked" type="checkbox">
-      <div class="register-checkbox" :class="{checked:policyChecked}"></div>我已阅读并同意<span class="register-green"><a href="" v-link="{ path: '/userAgreement'}">《新新农人用户协议》</a></span>
+      <div class="register-checkbox" :class="{checked:policyChecked}" @click="policyToggle();"></div>我已阅读并同意<span class="register-green"><a href="" v-link="{ path: '/userAgreement'}">《新新农人用户协议》</a></span>
     </div>
     <button class="register-btn" @click="register(phoneNum,password,code,confirmPassword,policyChecked),showToast()">
       注册
@@ -48,12 +48,18 @@
       return {
         toastShow:false,
         policyChecked:true,
-        phoneNum: ''
+        phoneNum: '',
+        password: '',
+        code: '',
+        confirmPassword: ''
       }
     },
     methods: {
       showToast:function(){
         this.toastShow=true;
+      },
+      policyToggle:function(){
+        this.policyChecked = !this.policyChecked;
       }
     },
     vuex:{
@@ -76,6 +82,9 @@
     },
     created () {
       this.showBackBtn()
+    },
+    detached() {
+      this.policyChecked = true
     },
     route: {
       activate(){

@@ -315,6 +315,12 @@ export const register = ({dispatch,state},phoneNumber,password,registerCode,conf
     dispatch(types.SET_TOASTMSG, '两次密码不一致，请重新输入');
     return;
   }
+
+  if(!policyChecked) {
+    dispatch(types.SET_TOASTMSG, '请同意网站使用协议');
+    return;
+  }
+
   api.getPublicKey(response => {
     var public_key = response.data.public_key;
     var encrypt = new jsencrypt.default.JSEncryptExports.JSEncrypt();
@@ -328,8 +334,8 @@ export const register = ({dispatch,state},phoneNumber,password,registerCode,conf
         dispatch(types.SET_TOASTMSG, '注册成功');
         router.go('/home');
       }else{
-        //TODO
-
+        dispatch(types.SET_TOASTMSG, response.data.message);
+        return;
       }
     })
   }, response => {
@@ -772,7 +778,8 @@ export const verifyCaptcha = ({dispatch, state}, phoneNum, authCode) => {
   };
   api.sendCode(postData, response => {
   if(response.data.code != '1000') { //error
-    dispatch(types.SET_TOASTMSG, response.data.message);
+    dispatch(types.SET_CODETIPS, response.data.message);
+    dispatch(types.SHOW_CODETIPS);
     return;
   }
 
