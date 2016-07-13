@@ -263,24 +263,12 @@ export const clearProductDetail = ({dispatch, state}) => {
 }
 
 export const getSliderImages = ({dispatch, state}) => {
-
   api.getSliderImages(
     response => {
     dispatch(types.GET_SLIDERIMAGES, response.data.datas.rows)
     }, response => {
     })
 }
-
-export const sendRegisterCode = ({dispatch, state},phoneNum) => {
-  dispatch(types.RESET_TOASTMSG);
-  api.sendRegisterCode(
-    {tel:phoneNum,bizcode:'register'},
-    response => {
-      dispatch(types.SET_TOASTMSG,response.data.message);
-  }, response => {
-  })
-}
-
 
 export const register = ({dispatch,state},phoneNumber,password,registerCode,confirmPassword,policyChecked) => {
   dispatch(types.RESET_TOASTMSG);
@@ -550,7 +538,7 @@ export const commitOrder = ({dispatch, state}) => {
   }
 
   api.addOrder(postData,response => {
-    if(response.data.code == '1000') {
+    if(response.data.code == 1000) {
       dispatch(types.COMMIT_ORDER, response.data);
     } else {
       dispatch(types.SET_TOASTMSG, response.data.message);
@@ -566,7 +554,7 @@ export const offlinePay = ({dispatch, state}, id, price) => {
       price: price
     },
     response => {
-      if(response.data.code == '1000') {
+      if(response.data.code == 1000) {
         window.location.href = '/#!/orderDone?id=' + getUrlParam('id');
       } else {
         alert(response.data.message);
@@ -590,7 +578,7 @@ export const selfDelivery = ({dispatch, state}) => {
   api.getDeliveryCode({
     orderId: getUrlParam('id')
   },response=>{
-    if(response.data.code == '1000') {
+    if(response.data.code == 1000) {
       dispatch(types.SELF_DELIVERY, response.data.deliveryCode);
       api.getOrderDetail({
         orderId: getUrlParam('id')
@@ -621,7 +609,7 @@ export const confirmOrder = ({dispatch, state}) => {
     orderId: state.myOrders.confirmOrderId,
     SKURefs: SKURefs
   },response=>{
-    if(response.data.code == '1000') {
+    if(response.data.code == 1000) {
       dispatch(types.SHOW_SUCCESSTOAST);
       dispatch(types.HIDE_POPBOX);
       setTimeout("window.location.reload();dispatch(types.HIDE_SUCCESSTOAST);", 2000 );
@@ -698,3 +686,101 @@ export const isFromOrder = ({dispatch, state}, path) => {
   dispatch(types.IS_FROMORDER, true);
 }
 
+export const sendRegisterCode = ({dispatch, state},phoneNum) => {
+  dispatch(types.RESET_TOASTMSG);
+  if(!phoneNum) {
+    dispatch(types.SET_TOASTMSG,'请输入手机号');
+    return;
+  }
+  var reg = /^1\d{10}$/;
+  if(!reg.test(phoneNum)) {
+    dispatch(types.SET_TOASTMSG, '请输入正确的手机号');
+    return;
+  }
+
+  var postData = {
+    bizcode: 'register',
+    tel: phoneNum
+  };
+  api.sendCode(postData, response => {
+  if(response.data.code != '1000') { //error
+    dispatch(types.SET_TOASTMSG, response.data.message);
+    return;
+  }
+
+  if(response.data.captcha) {
+    dispatch(types.SET_CODEIMG, response.data.captcha);
+    dispatch(types.SHOW_CODEBOX);
+  } else {
+    dispatch(types.HIDE_CODEBOX);
+    dispatch(types.SET_TOASTMSG, "验证码获取成功，请注意查收");
+  }
+}, response => {
+
+});
+
+}
+
+export const verifyCaptcha = ({dispatch, state}, phoneNum, authCode) => {
+  dispatch(types.RESET_TOASTMSG);
+  if(!phoneNum) {
+    dispatch(types.SET_TOASTMSG,'请输入手机号');
+    return;
+  }
+  var reg = /^1\d{10}$/;
+  if(!reg.test(phoneNum)) {
+    dispatch(types.SET_TOASTMSG, '请输入正确的手机号');
+    return;
+  }
+  if(authCode == '') {
+    dispatch(types.SHOW_CODETIPS);
+    return;
+  }
+
+  dispatch(types.HIDE_CODETIPS);
+
+  var postData = {
+    bizcode: 'register',
+    tel: phoneNum,
+    authCode: authCode
+  };
+  api.sendCode(postData, response => {
+  if(response.data.code != '1000') { //error
+    dispatch(types.SET_TOASTMSG, response.data.message);
+    return;
+  }
+
+  if(response.data.captcha) {
+    dispatch(types.SET_CODEIMG, response.data.captcha);
+  } else {
+    dispatch(types.HIDE_CODEBOX);
+    dispatch(types.SET_TOASTMSG, '验证码获取成功，请注意查收');
+  }
+}, response => {
+
+});
+}
+
+export const refreshCode = ({dispatch, state},phoneNum) => {
+  dispatch(types.RESET_TOASTMSG);
+  if(!phoneNum) {
+    dispatch(types.SET_TOASTMSG,'请输入手机号');
+    return;
+  }
+  var reg = /^1\d{10}$/;
+  if(!reg.test(phoneNum)) {
+    dispatch(types.SET_TOASTMSG, '请输入正确的手机号');
+    return;
+  }
+  var time = new Date().getTime();
+  var imgUrl = '/api/v2.3/captcha?bizcode=register' + '&tel=' + phoneNum + '&time=' + time;
+  dispatch(types.SET_CODEIMG, imgUrl);
+}
+
+export const hideCodeBox = ({dispatch, state}) => {
+  dispatch(types.HIDE_CODEBOX);
+}
+
+export const showCodeBox = ({dispatch, state}) => {
+  dispatch(types.SHOW_CODEBOX);
+}

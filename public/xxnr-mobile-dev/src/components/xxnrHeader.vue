@@ -40,7 +40,7 @@
     /*font-weight: bold;*/
     position: fixed;
     width: 100%;
-    z-index: 100;
+    z-index: 50;
   }
   .header-bit {
     position: absolute;

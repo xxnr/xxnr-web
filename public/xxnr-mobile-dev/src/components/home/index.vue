@@ -1,7 +1,7 @@
 <template>
   <div class="container" style="padding: 0">
     <app-download-overlay></app-download-overlay>
-    <vux-swiper :list="slider" height="180px" auto @on-index-change="onIndexChange"></vux-swiper>
+    <xxnr-swiper :list="slider" height="auto" auto @on-index-change="onIndexChange"></xxnr-swiper>
   </div>
   <section-tabs></section-tabs>
   <div class="container">
@@ -34,7 +34,7 @@
     </div>
   </div>
   <div class="loader-img" v-if="showLoader">
-    <img src="../../../static/assets/images/loading.png">
+    <img src="/assets/images/loading.png">
     <div class="loader-wor">加载中...</div>
   </div>
 </template>
@@ -44,7 +44,7 @@
   import IndexProductsBlockList from './IndexProductsBlockList.vue'
   import appDownloadOverlay from './appDownloadOverlay.vue'
   import { getIndexCars,getIndexHeafei,showBackBtn,hideBackBtn,showRightBtn,getSliderImages,changeRightBtnMyXXNR,changeRightBtnPathMyxxnr,editTitle } from '../../vuex/actions'
-  import vuxSwiper from 'vux/components/swiper'
+  import xxnrSwiper from '../../xxnr_mobile_ui/xxnrSwiper.vue'
   export default {
     data: function() {
         return {
@@ -86,7 +86,7 @@
       sectionTabs,
       IndexProductsBlockList,
       appDownloadOverlay,
-      vuxSwiper
+      xxnrSwiper
     },
     created () {
       this.showLoader = true;
@@ -118,7 +118,6 @@
 </script>
 
 <style>
-  @import '~vux/vux.css';
   .xxnr-title {
     position: relative;
     padding: 0 2%;
@@ -208,36 +207,5 @@
     width: 10px;
     height: 10px;
     border-radius: 5px;
-  }
-
-  .swiper .item .desc{
-    display: none;
-  }
-  .indicator{
-    /*position: absolute;*/
-    left: 50%;
-    transform: translateX(-50%);
-    right:auto;
-  }
-  .icon_dot.active{
-    background: #01E8AB;
-  }
-
-  .loader-img {
-    position: fixed;
-    width: 80px;
-    top: 40%;
-    left: 50%;
-    margin-left: -40px;
-    text-align: center;
-  }
-
-  .loader-img img {
-    width: 40px;
-  }
-
-  .loader-wor {
-    text-align: center;
-    font-size: 14px;
   }
 </style>

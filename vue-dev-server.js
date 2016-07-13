@@ -68,7 +68,8 @@ app.use(hotMiddleware)
 
 // serve pure static assets
 var staticPath = path.posix.join(config.build.assetsPublicPath, config.build.assetsSubDirectory)
-app.use(staticPath, express.static('./public/xxnr-mobile-dev/static'))
+app.use(staticPath, express.static('./public/xxnr-mobile-dev/static'));
+app.use(express.static('./public/xxnr'));
 
 require('./modules/database');
 global.U = require('./common/utils');

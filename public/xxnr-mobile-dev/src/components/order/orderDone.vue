@@ -42,7 +42,7 @@
   </div>
   <div v-else>
     <div class="no-rsc-img">
-      <img src="../../../static/assets/images/no_RSC.png">
+      <img src="/assets/images/no_RSC.png">
     </div>
     <div class="no-rsc-wor">
       小新正在为您匹配最近的网点，请稍后从我的订单查看

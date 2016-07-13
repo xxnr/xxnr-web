@@ -30,6 +30,7 @@
   <div class="reg-section">
     已有账号？<a href="" v-link="{ path: '/login'}" class="reg-section-green">登录</a>
   </div>
+  <verify-code :phone-num="phoneNum"></verify-code>
   <div v-show="toastMsg.length>0">
     <xxnr-toast :show.sync="toastShow" >
       <p>{{toastMsg}}</p>
@@ -40,12 +41,14 @@
 <script>
   import { sendRegisterCode,register,showBackBtn,changeRightBtnMyXXNR,changeRightBtnPathMyxxnr } from '../../vuex/actions'
   import xxnrToast from '../../xxnr_mobile_ui/xxnrToast.vue'
+  import verifyCode from '../verifyCode.vue'
 
   export default {
     data: function () {
       return {
         toastShow:false,
-        policyChecked:true
+        policyChecked:true,
+        phoneNum: ''
       }
     },
     methods: {
@@ -56,7 +59,8 @@
     vuex:{
       getters:{
         toastMsg: state => state.toastMsg,
-        forbidSendCode: state => state.register.forbidSendCode
+        forbidSendCode: state => state.register.forbidSendCode,
+        //phoneNum: state => state.register.phoneNum
       },
       actions:{
         sendRegisterCode,
@@ -67,7 +71,8 @@
       },
     },
     components: {
-      xxnrToast
+      xxnrToast,
+      verifyCode
     },
     created () {
       this.showBackBtn()

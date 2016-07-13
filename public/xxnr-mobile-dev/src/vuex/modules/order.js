@@ -149,6 +149,7 @@ const mutations = {
   },
   [RESET_ORDERRSC] (state) {
     state.orderRSC = {_id: '', address: ''};
+    state.RSCSelected = [];
   },
   [SELECT_CONSIGNEEAUTO] (state, data) {
     //if(state.consigneeList.length != 0) {

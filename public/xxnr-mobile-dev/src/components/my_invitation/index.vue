@@ -131,6 +131,7 @@
     route: {
       activate(){
         this.getInviter(this.user.userId);
+        this.inviterPhone = '';
         this.showBackBtn();
         this.hideRightBtn();
       },
@@ -217,17 +218,6 @@
 
   .inviter-info img {
     width: 12px;
-  }
-
-  .mask {
-    position: fixed;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-    background-color: #000;
-    opacity: .5;
-    z-index: 99;
   }
 
   .confirm-box {
