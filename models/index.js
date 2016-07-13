@@ -29,6 +29,7 @@ require('./user_sign');
 require('./vcodes');
 require('./loyaltypoints');
 require('./appdeviceversion');
+require('./campaign');
 
 //user
 exports.user = mongoose.model('user');
@@ -105,6 +106,12 @@ exports.loyaltypointslogs = mongoose.model('loyalty_points_logs');
 exports.rewardshopgiftorder = mongoose.model('rewardshopgiftorder');
 // app upgrade
 exports.app_Device_Version = mongoose.model('app_Device_Version');
+// campaign
+exports.campaign = mongoose.model('campaign');
+exports.QA_campaign = mongoose.model('QA_campaign');
+exports.quiz_campaign = mongoose.model('quiz_campaign');
+exports.reward_control = mongoose.model('reward_control');
+exports.quiz_answer = mongoose.model('quiz_answer');
 
 exports.getModel = function (name, options) {
     options = options || {};
