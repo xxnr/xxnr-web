@@ -7,7 +7,7 @@
         <img src="/assets/images/delete.png" @click="resetCaptcha();">
       </div>
 
-      <div class="verify-code-img-normal" v-if="isNormal">
+      <div class="verify-code-img-normal" v-if="isNormal" @click="refreshCode(phoneNum),resetCaptcha();">
         <img :src="codeImg" onerror="javascript:this.src='/static/assets/images/load-failed.png';this.onerror = null;">
       </div>
       <!--<div class="verify-code-img-error">-->
@@ -16,16 +16,16 @@
       <div class="verify-code-img-loading" v-if="isLoading">
         <img src="/assets/images/spinner_gray.png">
       </div>
-      <div class="verify-code-refresh" @click="refreshCode(phoneNum);">
+      <div class="verify-code-refresh" @click="refreshCode(phoneNum),resetCaptcha();">
         <img src="/assets/images/refresh.png">
       </div>
     </div>
-    <div class="verify-code-tips" v-if="codeTips">
-      <img src="/assets/images/error.png">请输入图形验证码
+    <div class="verify-code-tips" v-if="hasCodeTips">
+      <img src="/assets/images/error.png"><span>{{codeTips}}</span>
     </div>
     <div class="verify-code-btn-box">
-      <div class="verify-code-btn left-btn" @click="hideCodeBox();">取消</div>
-      <div class="verify-code-btn right-btn" @click="verifyCaptcha(phoneNum, captcha),showToast();">确定</div>
+      <div class="verify-code-btn left-btn" @click="hideCodeBox(),resetCaptcha();">取消</div>
+      <div class="verify-code-btn right-btn" @click="verifyCaptcha(phoneNum, captcha),showToast(),resetCaptcha();">确定</div>
     </div>
   </div>
   <div class="mask" v-show="isShowBox" @click="hideCodeBox();"></div>
@@ -52,13 +52,14 @@ export default {
       codeImg: state => state.register.codeImg,
       isNormal: state => state.register.isNormal,
       isLoading: state => state.register.isLoading,
-      codeTips: state => state.register.codeTips,
-      toastMsg: state => state.toastMsg
+      hasCodeTips: state => state.register.hasCodeTips,
+      toastMsg: state => state.toastMsg,
+      codeTips: state => state.register.codeTips
     },
     actions: {
       hideCodeBox,
       refreshCode,
-      verifyCaptcha
+      verifyCaptcha,
     }
   },
   components: {

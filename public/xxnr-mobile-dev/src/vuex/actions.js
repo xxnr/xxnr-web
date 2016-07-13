@@ -95,7 +95,6 @@ export const goBack = ({dispatch,state}) => {
     router.go('/my_xxnr')
   }else if(window.location.hash.indexOf('order?')!=-1) {
     if(state.order.cartList.goodsId) {
-      console.log(state.order.cartList.goodsId);
       router.go('/productDetail?id='+ state.order.cartList.goodsId);
     } else {
       window.history.back();
@@ -113,6 +112,20 @@ export const goBack = ({dispatch,state}) => {
 
 export const login = ({dispatch,state},PhoneNumber,password) => {
   dispatch(types.RESET_TOASTMSG);
+  if(!PhoneNumber){
+    dispatch(types.SET_TOASTMSG, '请输入手机号');
+    return;
+  }
+  var reg = /^1\d{10}$/;
+  if(!reg.test(PhoneNumber)) {
+    dispatch(types.SET_TOASTMSG, '请输入正确的手机号');
+    return;
+  }
+  if(!password){
+    dispatch(types.SET_TOASTMSG, '请输入密码');
+    return;
+  }
+
   api.getPublicKey(response => {
     var public_key = response.data.public_key;
     var encrypt = new jsencrypt.default.JSEncryptExports.JSEncrypt();
@@ -276,6 +289,11 @@ export const register = ({dispatch,state},phoneNumber,password,registerCode,conf
     dispatch(types.SET_TOASTMSG, '请输入手机号');
     return;
   }
+  var reg = /^1\d{10}$/;
+  if(!reg.test(phoneNumber)) {
+    dispatch(types.SET_TOASTMSG, '请输入正确的手机号');
+    return;
+  }
   if(!registerCode){
     dispatch(types.SET_TOASTMSG, '请输入验证码');
     return;
@@ -288,6 +306,15 @@ export const register = ({dispatch,state},phoneNumber,password,registerCode,conf
     dispatch(types.SET_TOASTMSG, '请输入确认密码');
     return;
   }
+  if(password.length < 6){
+    dispatch(types.SET_TOASTMSG, '密码需不小于6位');
+    return;
+  }
+
+  if(password != confirmPassword) {
+    dispatch(types.SET_TOASTMSG, '两次密码不一致，请重新输入');
+    return;
+  }
   api.getPublicKey(response => {
     var public_key = response.data.public_key;
     var encrypt = new jsencrypt.default.JSEncryptExports.JSEncrypt();
@@ -298,6 +325,7 @@ export const register = ({dispatch,state},phoneNumber,password,registerCode,conf
       ,response => {
       if (response.data.code == 1000) {
       //sessionStorage.setItem('user', JSON.stringify(response.data.datas));
+        dispatch(types.SET_TOASTMSG, '注册成功');
         router.go('/home');
       }else{
         //TODO
@@ -312,7 +340,6 @@ export const bindInviter = ({dispatch,state},inviterPhone) => {
   dispatch(types.RESET_TOASTMSG);
   var reg = /^1\d{10}$/;
   if(!reg.test(inviterPhone)) {
-    console.log('111');
     dispatch(types.SET_TOASTMSG, '请输入正确的手机号');
     return;
   }
@@ -322,7 +349,6 @@ export const bindInviter = ({dispatch,state},inviterPhone) => {
     {'userId':userId,'inviter':inviterPhone},
     response => {
       if(response.data.code == 1001) {
-        console.log('ssss');
         dispatch(types.SET_TOASTMSG, '该手机号未注册，请重新输入');
         return;
       }
@@ -722,6 +748,7 @@ export const sendRegisterCode = ({dispatch, state},phoneNum) => {
 }
 
 export const verifyCaptcha = ({dispatch, state}, phoneNum, authCode) => {
+  dispatch(types.HIDE_CODETIPS);
   dispatch(types.RESET_TOASTMSG);
   if(!phoneNum) {
     dispatch(types.SET_TOASTMSG,'请输入手机号');
@@ -733,11 +760,10 @@ export const verifyCaptcha = ({dispatch, state}, phoneNum, authCode) => {
     return;
   }
   if(authCode == '') {
+    dispatch(types.SET_CODETIPS, '请输入图形验证码 ');
     dispatch(types.SHOW_CODETIPS);
     return;
   }
-
-  dispatch(types.HIDE_CODETIPS);
 
   var postData = {
     bizcode: 'register',
@@ -751,6 +777,10 @@ export const verifyCaptcha = ({dispatch, state}, phoneNum, authCode) => {
   }
 
   if(response.data.captcha) {
+    if(response.data.message) {
+      dispatch(types.SET_CODETIPS, response.data.message);
+      dispatch(types.SHOW_CODETIPS);
+    }
     dispatch(types.SET_CODEIMG, response.data.captcha);
   } else {
     dispatch(types.HIDE_CODEBOX);
@@ -762,6 +792,7 @@ export const verifyCaptcha = ({dispatch, state}, phoneNum, authCode) => {
 }
 
 export const refreshCode = ({dispatch, state},phoneNum) => {
+  dispatch(types.HIDE_CODETIPS);
   dispatch(types.RESET_TOASTMSG);
   if(!phoneNum) {
     dispatch(types.SET_TOASTMSG,'请输入手机号');
