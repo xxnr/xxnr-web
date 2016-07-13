@@ -4,7 +4,7 @@
       <img src="/assets/images/invitation_icon.png" alt="">
     </div>
     <div v-else class="addInviter clearfix">
-      <input class="roundInput" type="text" v-model="inviterPhone" placeholder="输入代表人手机号进行添加">
+      <input type="text" v-model="inviterPhone" placeholder="输入代表人手机号进行添加">
       <button class="xxnr_Btn" @click="bindInviterMethod()">
         添加
       </button>
@@ -128,10 +128,12 @@
     created () {
 
     },
+    detached(){
+      this.inviterPhone = '';
+    },
     route: {
       activate(){
         this.getInviter(this.user.userId);
-        this.inviterPhone = '';
         this.showBackBtn();
         this.hideRightBtn();
       },
@@ -259,5 +261,17 @@
 
   .confirm-confirm {
     right: 0;
+  }
+
+  .addInviter input[type=text] {
+    float: left;
+    width: 75%;
+    font-size: 16px;
+    box-sizing: border-box;
+    border: 1px solid #C7C7C7;
+    border-radius: 5px;
+    color: #B0B0B0;
+    height: 35px;
+    padding-left: 10px;
   }
 </style>
