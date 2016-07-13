@@ -10,7 +10,8 @@ import {
   HIDE_CODEIMG,
   SHOW_CODEIMG,
   SHOW_CODETIPS,
-  HIDE_CODETIPS
+  HIDE_CODETIPS,
+  SET_CODETIPS
 } from '../mutation-types'
 
 // initial state
@@ -23,8 +24,9 @@ const state = {
   isNormal: true,
   isLoading: false,
   isError: false,
-  codeTips: false
-  //phoneNum: ''
+  hasCodeTips: false,
+  codeTips: '',
+  captcha: ''
 }
 
 // mutations
@@ -60,10 +62,13 @@ const mutations = {
     state.isNormal = true
   },
   [SHOW_CODETIPS] (state) {
-    state.codeTips = true;
+    state.hasCodeTips = true;
   },
   [HIDE_CODETIPS] (state) {
-    state.codeTips = false;
+    state.hasCodeTips = false;
+  },
+  [SET_CODETIPS] (state, data) {
+    state.codeTips = data;
   }
 }
 
