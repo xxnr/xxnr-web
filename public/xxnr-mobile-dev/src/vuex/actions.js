@@ -719,6 +719,7 @@ export const isFromOrder = ({dispatch, state}, path) => {
 }
 
 export const sendRegisterCode = ({dispatch, state},phoneNum) => {
+  dispatch(types.HIDE_CODETIPS);
   dispatch(types.RESET_TOASTMSG);
   if(!phoneNum) {
     dispatch(types.SET_TOASTMSG,'请输入手机号');
