@@ -624,11 +624,15 @@ describe('User', function() {
         var testCases = [{
             name:'test user account w/ invalid account',
             params:{account:'10000000000'},
-            result:{code:'1001'}
+            result:{code:1001, message: '请输入正确的手机号'}
+        },{
+            name:'test user account w/ invalid account',
+            params:{account:'17112341234'},
+            result:{code:1001, message: '该手机号未注册'}
         },{
             name:'test user account w/ valid account',
             params:{account:test_user.account},
-            result:{code:'1000'}
+            result:{code:1000, message: '该手机号已注册'}
         }];
 
         testCases.forEach(function (test) {
