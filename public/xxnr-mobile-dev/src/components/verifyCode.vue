@@ -210,4 +210,8 @@ export default {
     width: 15px;
     margin-right: 7px;
   }
+
+  .verify-code-con input[type=text] {
+    -webkit-appearance: none;
+  }
 </style>
