@@ -3,6 +3,7 @@
  */
 var services = require('../services');
 var CampaignService = services.Campaign;
+var path = require('path');
 
 exports.query_campaign = function(req, res, next){
     CampaignService.query(function(err, campaigns){
@@ -19,6 +20,31 @@ exports.campaign_page = function(req, res, next){
     var type = req.params.type;
     var name = req.params.name;
     // TODO: render view in /views/campaigns/{type}/{name}, w/ some common
+
+    if (type && name) {
+        switch (type){
+            case 'events':
+                switch (name){
+                    case 'rewardShopLaunch':
+                        res.render(path.join(__dirname, '../views/G.campaign/' + type + '/' + name),
+                            {
+                                title: "积分商城上线了"
+                            }
+                        );
+                        break;
+                    default:
+                        res.status(404).send('404: Page not found');
+                }
+                break;
+            default:
+                res.status(404).send('404: Page not found');
+        }
+    } else {
+        res.status(404).send('404: Page not found');
+        return;
+    }
+
+
 };
 
 exports.campaign_status = function(req, res, next){
