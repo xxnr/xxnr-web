@@ -54,8 +54,6 @@
       xxnrToast
     },
     detached () {
-//      this.showBackBtn()
-    console.log('detached');
       this.password = '';
     },
     route: {
@@ -72,9 +70,9 @@
     padding: 80px 40px;
   }
   .login-input{
+    position: relative;
     height: 40px;
     line-height: 40px;
-    border-bottom: 1px solid #c0c0c0;
     margin-bottom: 10px;
   }
   .login-input input{
@@ -82,9 +80,11 @@
     font-size: 15px;
   }
   .login-input img{
+    position: absolute;
     height: 22px;
     width: 17px;
     margin-top: 10px;
+    top: 0;
   }
   .forget-pass{
     text-align: right;
@@ -108,5 +108,23 @@
 
   .reg-section-green {
     color: #00B38A;
+  }
+
+  .login-input input[type=text] {
+    padding-left: 47px;
+    font-size: 15px;
+    width: 100%;
+    height: 40px;
+    box-sizing: border-box;
+    border-bottom: 1px solid #c0c0c0;
+  }
+
+  .login-input input[type=password] {
+    padding-left: 47px;
+    font-size: 15px;
+    width: 100%;
+    height: 40px;
+    box-sizing: border-box;
+    border-bottom: 1px solid #c0c0c0;
   }
 </style>
