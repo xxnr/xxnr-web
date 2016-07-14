@@ -178,6 +178,7 @@ const mutations = {
   [CLEAR_PRODUCTDETAIL] (state) {
     state.product = {};
     state.productNumber = 1;
+    state.isAllSKUSelected = false;
   },
   [IS_FROMORDER] (state, value) {
     state.isFromOrder = value;
