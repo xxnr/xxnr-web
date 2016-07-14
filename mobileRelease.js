@@ -92,13 +92,12 @@ app.use(function (err, req, res, next) {
 http.createServer(app).listen(8060);
 console.info('application listen at port 8060');
 
-
 if(config.secure) {
     var options = {
         ca:fs.readFileSync('xxnr.ca-bundle'),
         key: fs.readFileSync('xxnr.key'),
         cert: fs.readFileSync('xxnr.crt')
     };
-    https.createServer(options, app).listen(1111);
-    console.info('application listen at port 1111');
+    https.createServer(options, app).listen(8443);
+    console.info('application listen at port 8443');
 }
