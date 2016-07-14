@@ -72,7 +72,7 @@ var routes = require('./routes');
 app.use('/', routes.secureFrontendApis);
 app.use('/', routes.frontendApis);
 app.use('/', routes.frontendPages);
-//app.use('/', routes.appRelatedPages);
+app.use('/', routes.appRelatedPages);
 //app.use('/', routes.backendApis);
 //app.use('/', routes.backendPages);
 
