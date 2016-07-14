@@ -271,7 +271,7 @@ exports.getAppProductDetails = function (req, res, next) {
         return;
     }
     var host = req.hostname;
-    var prevurl = 'http://' + host + '/product/';
+    var prevurl = req.protocal + '://' + host + '/product/';
     var options = {};
     options.id = req.data['productId'];
 
