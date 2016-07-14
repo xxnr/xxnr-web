@@ -16,7 +16,25 @@ CampaignService.prototype.query = function(callback, options){
         if(options.online){
             query.online = options.online;
         }
+        if(options.type){
+            query.type = type;
+        }
+        if(options.search){
+            query.title = {$regex:new RegExp(options.search)}
+        }
+        if(options.status){
+
+        }
     }
+
+    CampaignModel.find(query, function(err, campaigns){
+        if(err){
+            console.error(err);
+            callback(err);
+        }
+
+        callback(null, campaigns);
+    })
 };
 
 module.exports = new CampaignService();

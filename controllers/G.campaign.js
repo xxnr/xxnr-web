@@ -83,3 +83,23 @@ exports.get_QA = function(req, res, next){
     })
 };
 
+exports.QA_require_reward = function(req, res, next){
+    //TODO:QA require reward
+};
+
+exports.query_quiz_question = function(req, res, next){
+    //TODO: get quiz question
+};
+
+exports.submit_quiz_answer = function(req, res, next){
+    //TODO: quiz answer
+};
+
+exports.query_my_quiz_answer = function(req, res, next){
+    //TODO: query quiz answer
+};
+
+exports.query_quiz_result = function(req, res, next){
+    //TODO; query quiz result
+};
+

@@ -204,6 +204,12 @@ router.get('/campaigns/:type/:name', controllers.Campaign.campaign_page);
 router.get('/api/v2.3/campaign_status', middleware.convert_token_to_user, controllers.Campaign.campaign_status);
 // QA
 router.get('/api/v2.3/campaign/QA/getQA', controllers.Campaign.get_QA);
+router.post('/api/v2.3/campaign/QA/require_reward', middleware.isLoggedIn_middleware, controllers.Campaign.QA_require_reward);
+// quiz
+router.get('/api/v2.3/campaign/quiz/getQ', controllers.Campaign.query_quiz_question);
+router.post('/api/v2.3/campaign/quiz/answer', middleware.isLoggedIn_middleware, controllers.Campaign.submit_quiz_answer);
+router.get('/api/v2.3/campaign/quiz/my_answer', middleware.isLoggedIn_middleware, controllers.Campaign.query_my_quiz_answer);
+router.get('/api/v2.3/campaign/quiz/result', middleware.isLoggedIn_middleware, controllers.Campaign.query_quiz_result);
 
 // compatibility APIs
 controllers.Compatibility.compatibilityAPIs(router);

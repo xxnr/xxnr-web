@@ -26,6 +26,7 @@ var OFFLINEPAYTYPE = require('../common/defs').OFFLINEPAYTYPE;
 var DELIVERYTYPE =  require('../common/defs').DELIVERYTYPE;
 var config = require('../config');
 var path = require('path');
+var CampaignService = services.Campaign;
 
 exports.install = function() {
 	// Auto-localize static HTML templates
@@ -2750,4 +2751,59 @@ exports.queryAgentReportYesterday = function(req, res, next){
 			res.respond({code:1001, message:'没有获取到经纪人数据'});
 		})
 	}, req.data.sort, req.data.sortOrder, req.data.page)
+};
+
+exports.create_campaign = function(req, res, next){
+	//TODO: create campaign
+};
+
+exports.modify_campaign = function(req, res, next){
+	//TODO: modify campaign
+};
+
+exports.query_campaign = function(req, res, next){
+	//TODO:query campaign
+	var type = req.data.type;
+	var search = req.data.search;
+	var status = req.data.status;
+
+	var options = {};
+	if(type)
+		options.type = type;
+	if(search)
+		options.search = search;
+	if(status)
+		options.status = status;
+	CampaignService.query(options, function(err, campaigns){
+		if(err){
+			res.respond({code:1001, message:'查询失败'});
+			return;
+		}
+
+		res.respond({code:1000, campaigns:campaigns});
+	})
+};
+
+exports.offline_campaign = function(req, res, next){
+	//TODO:offline campaign
+};
+
+exports.modify_QA = function(req, res, next){
+	//TODO:modify QA
+};
+
+exports.modify_quiz_question = function(req, res, next){
+	//TODO:modify quiz question
+};
+
+exports.modify_quiz_right_answer = function(req, res, next){
+	//TODO:modify quiz right answer
+};
+
+exports.query_quiz_right_answer = function(req, res, next){
+	//TODO: query quiz right answer
+};
+
+exports.trigger_quiz_reward = function(req, res, next){
+	//TODO: trigger quiz reward
 };

@@ -853,7 +853,7 @@ describe('campaign', function(){
                     points_added: expected_points_added
                 };
                 // answer quiz question
-                Routing.Campaign.quiz_answer(test_user_token, campaign_A._id, answers, function (body) {
+                Routing.Campaign.submit_quiz_answer(test_user_token, campaign_A._id, answers, function (body) {
                     body.should.have.property('code', 1000);
                     // query quiz result before trigger reward job, fail
                     Routing.Campaign.query_quiz_result(test_user_token, campaign_A._id, function (body) {
@@ -895,16 +895,16 @@ describe('campaign', function(){
                         body.should.have.property('code', 1000);
                         var campaign_id = body.campaigns[0]._id;
                         // answer quiz question 1
-                        Routing.Campaign.quiz_answer(test_user_token, campaign_id, answers, function (body) {
+                        Routing.Campaign.submit_quiz_answer(test_user_token, campaign_id, answers, function (body) {
                             body.should.have.property('code', 1001);
                             // answer quiz question 1, 2
-                            Routing.Campaign.quiz_answer(test_user_token, campaign_id, new_answers, function (body) {
+                            Routing.Campaign.submit_quiz_answer(test_user_token, campaign_id, new_answers, function (body) {
                                 body.should.have.property('code', 1000);
                                 // query my answers, got question 2 modified
                                 Routing.Campaign.query_my_quiz_answer(test_user_token, campaign_id, function (body) {
                                     body.shold.have.properties(expected_my_answers);
                                     // modify quiz answers, fail
-                                    Routing.Campaign.quiz_answer(test_user_token, campaign_id, right_answers, function (body) {
+                                    Routing.Campaign.submit_quiz_answer(test_user_token, campaign_id, right_answers, function (body) {
                                         body.should.have.property('code', 1021);
                                         // query my answers, got not modified
                                         Routing.Campaign.query_my_quiz_answer(test_user_token, campaign_id, function (body) {
