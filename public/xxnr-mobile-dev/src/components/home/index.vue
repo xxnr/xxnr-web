@@ -25,7 +25,7 @@
     <div class="container">
       <div class="footer-link">
         <a>移动版</a>
-        <a @click="setCookie('mobile_use_www','true',(12/24),'xinxinnongren.com')" href="http://www.xinxinnongren.com">电脑版</a>
+        <a @click="setCookie('mobile_use_www','true',(12/24),hostName)" href="{{protocolStr}}//{{hostNameStr}}">电脑版</a>
         <a href="http://a.app.qq.com/o/simple.jsp?pkgname=com.ksfc.newfarmer">客户端</a>
       </div>
       <div class="footer-tel">客服电话：400-056-0371</div>
@@ -48,7 +48,9 @@
   export default {
     data: function() {
         return {
-          showLoader: false
+          showLoader: false,
+          hostNameStr: window.location.hostname,
+          protocolStr: window.location.protocol
         }
     },
     vuex:{
