@@ -23,12 +23,12 @@
         .title_image {text-align: center;background: #CAEAEF;}
         .title_image img{width: 100%}
         .main_contents {width: 100%}
-        .first_section {width: 100%}
+        .first_section {width: 100%;margin-top: -10px;}
         .second_section {width: 100%}
         .first_section--text {float: left;width: 38%;margin-left: 5%;margin-top: 28px;}
         .first_section--image {float: left;width: 56%}
-        .second_section--text {float: left;width: 38%;margin-top: 56px;margin-left: -10px;}
-        .second_section--image {float: left;width: 60%}
+        .second_section--text {float: left;width: 38%;margin-top: 46px;margin-left: -10px;}
+        .second_section--image {float: left;width: 60%;margin-top: -10px;}
         .jump_App_button {margin-bottom: 60px;}
         .jump_App_button a{width: 50%;display: block;margin: 0 auto;}
         .jump_App_button img{width: 100%;}
@@ -38,30 +38,33 @@
 <body>
 <div class="container">
     <div class="title_image">
-        <img src="/images/campaign/activity_banner1.png"/>
+        <img src="/images/campaign/event/activity_banner1.png"/>
     </div>
     <div class="main_contents">
         <div class="first_section clearfix">
-            <img class="first_section--text" src="/images/campaign/activity_text2.png" alt="">
-            <img class="first_section--image" src="/images/campaign/activity_photo1.png" alt="">
+            <img class="first_section--text" src="/images/campaign/event/activity_text2.png" alt="">
+            <img class="first_section--image" src="/images/campaign/event/activity_photo1.png" alt="">
         </div>
         <div class="second_section clearfix">
-            <img class="second_section--image" src="/images/campaign/activity_photo2.png" alt="">
-            <img class="second_section--text" src="/images/campaign/activity_text3.png" alt="">
+            <img class="second_section--image" src="/images/campaign/event/activity_photo2.png" alt="">
+            <img class="second_section--text" src="/images/campaign/event/activity_text3.png" alt="">
         </div>
         <div class="jump_App_button">
-            <a href="">
-                <img src="/images/campaign/reward_shop_button.png" alt="">
+            <a id="page_jump" href="">
+                <img src="/images/campaign/event/reward_shop_button.png" alt="">
             </a>
         </div>
     </div>
 </div>
 
-<!--<script src="/js/jquery.min.js"></script>-->
-<!--<script  type="text/javascript">-->
-<!--var data = JSON.parse($('#product').html());-->
-<!--$("#product_info").html(data.productInfo);-->
-<!--</script>-->
+<script src="/js/zepto.js"></script>
+<script  type="text/javascript">
+    $(function() {
+        $('#page_jump').on('click', function(){
+            jsObj.startActivity("rewardShopActivity");
+        });
+    });
+</script>
 
 </body>
 </html>

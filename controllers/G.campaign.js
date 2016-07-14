@@ -23,14 +23,15 @@ exports.campaign_page = function(req, res, next){
 
     if (type && name) {
         switch (type){
-            case 'events':
+            case type:
                 switch (name){
                     case 'rewardShopLaunch':
-                        res.render(path.join(__dirname, '../views/G.campaign/' + type + '/' + name),
-                            {
-                                title: "积分商城上线了"
-                            }
+                        res.render(path.join(__dirname, '../views/G.campaign/' + type + '/' + name)
+                            //{title: "积分商城上线了"}
                         );
+                        break;
+                    case 'shareAndGetPoints':
+                        res.render(path.join(__dirname, '../views/G.campaign/' + type + '/' + name));
                         break;
                     default:
                         res.status(404).send('404: Page not found');
