@@ -75,6 +75,9 @@ app.use('/', routes.frontendPages);
 app.use('/', routes.appRelatedPages);
 //app.use('/', routes.backendApis);
 //app.use('/', routes.backendPages);
+app.use(/(^home\/|cars\/|huafei\/|my_xxnr\/|login\/|productDetail\/|order\/|orderRSC\/|orderConsignee\/|offlinePay\/|orderDone\/|selfDelivery\/|register\/|userAgreement\/|my_orders\/|my_points\/|my_invitation\/)/, function(req, res, next) {
+    res.sendFile(path.join(__dirname, '.'+ F.config.directory_xxnr_mobile_public + 'index.html'));
+});
 
 // handle fallback for HTML5 history API
 app.use(require('connect-history-api-fallback')());

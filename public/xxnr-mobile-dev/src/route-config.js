@@ -1,6 +1,8 @@
 import {getCookie} from './utils/authService'
 
 export function configRouter (router) {
+  //因为链接不能加#!以区分前端路由还是后端路由,所以需要在后端服务器最后加一个路由正则以匹配到前端的路由  (mobileRelease.js)
+
   // normal routes
   router.map({
     '/home': {
