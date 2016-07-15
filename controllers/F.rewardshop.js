@@ -424,7 +424,8 @@ exports.json_rewardshop_gifts = function(req, res, next) {
 // get online gift detail
 exports.json_rewardshop_giftDetail = function(req, res, next) {
 	var host = req.hostname;
-    var prevurl = 'http://' + host + '/gift/';
+    var protocol = req.protocol + '://';
+    var prevurl = protocol + host + '/gift/';
 	LoyaltypointService.getRewardshopGift(req.data.id, null, null, function(err, gift) {
 		if (err || !gift) {
 			res.respond({code:1002, message:'获取礼品详情失败'});
