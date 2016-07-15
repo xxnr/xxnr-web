@@ -31,9 +31,10 @@ exports.json_news_query = function(req, res, next) {
             } else {
                 hosturl = 'www.xinxinnongren.com';
             }
-            var prevurl = 'http://' + hosturl + '/news/';
-            var prevshareurl = 'http://' + hosturl + '/sharenews/';
-            var previmg = 'http://' + hosturl + '/images/original/';
+            var protocol = req.protocol + '://';
+            var prevurl = protocol + hosturl + '/news/';
+            var prevshareurl = protocol + hosturl + '/sharenews/';
+            var previmg = protocol + hosturl + '/images/original/';
             var imgtype = '.jpg';
             var items = result.items || [];
             var length = items.length || 0;
@@ -139,7 +140,8 @@ exports.view_newsshare_detail = function(req,res,next) {
 
         var result = result.toObject();
         var datecreated = JSON.stringify(result.datecreated);
-        result.shareurl = 'http://' + req.hostname + '/newsshare/' + id;
+        var protocol = req.protocol + '://';
+        result.shareurl = protocol + req.hostname + '/newsshare/' + id;
         result.datecreated = moment(datecreated,"YYYY-MM-DDTHH:mm:ssZ").format('YYYY-MM-DD HH:mm:ss');
         res.render(path.join(__dirname, '../views/9.new/newsAppDetailTemplate.html'),
             {

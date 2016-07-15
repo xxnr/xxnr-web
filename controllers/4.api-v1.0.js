@@ -271,7 +271,8 @@ exports.getAppProductDetails = function (req, res, next) {
         return;
     }
     var host = req.hostname;
-    var prevurl = 'http://' + host + '/product/';
+    var protocol = req.protocol + '://';
+    var prevurl = protocol + host + '/product/';
     var options = {};
     options.id = req.data['productId'];
 
@@ -618,7 +619,8 @@ exports.AppUpgrade = function (req, res, next) {
     var device_id = req.data['device_id'] || '';
 
     var host = req.hostname;
-    var android_update_url = 'http://' + host + '/resources/newFarmer.apk';
+    var protocol = req.protocol + '://';
+    var android_update_url = protocol + host + '/resources/newFarmer.apk';
 
     // var nowIosVersion = F.config.nowIosVersion;
     // var nowAndroidVersion = F.config.nowAndroidVersion;
