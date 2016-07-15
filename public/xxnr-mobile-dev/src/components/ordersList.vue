@@ -64,13 +64,13 @@
   },
   methods: {
     payOrder: function (id) {
-      window.location.href = '/#!/offlinePay?id=' + id;
+      window.location.href = '/offlinePay?id=' + id;
     },
     selfDelivery: function (id) {
-      window.location.href = '/#!/selfDelivery?id=' + id;
+      window.location.href = '/selfDelivery?id=' + id;
     },
     checkPayInfo: function (id) {
-      window.location.href = '/#!/orderDone?id=' + id;
+      window.location.href = '/orderDone?id=' + id;
     }
 
   }

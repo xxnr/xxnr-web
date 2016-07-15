@@ -8,7 +8,8 @@ Vue.use(VueRouter)
 
 // create router
 const router = new VueRouter({
-  saveScrollPosition: true
+  saveScrollPosition: true,
+  history:true
 })
 
 // configure router

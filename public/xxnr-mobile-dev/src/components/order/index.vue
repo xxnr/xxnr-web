@@ -151,11 +151,11 @@
   methods: {
     showRSCList()
     {
-      window.location.href = '/#!/orderRSC?id=' + getUrlParam('id') + '&count=' + getUrlParam('count') + '&productId=' + getUrlParam('productId');
+      window.location.href = '/orderRSC?id=' + getUrlParam('id') + '&count=' + getUrlParam('count') + '&productId=' + getUrlParam('productId');
     },
     showConsignee()
     {
-      window.location.href = '/#!/orderConsignee?id=' + getUrlParam('id') + '&count=' + getUrlParam('count') + '&productId=' + getUrlParam('productId');
+      window.location.href = '/orderConsignee?id=' + getUrlParam('id') + '&count=' + getUrlParam('count') + '&productId=' + getUrlParam('productId');
     },
     showToast(){
       this.toastShow = true;

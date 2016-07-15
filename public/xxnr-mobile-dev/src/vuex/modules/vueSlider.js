@@ -13,8 +13,8 @@ const mutations = {
       delete obj['imgUrl'];
     }
     slider[0].url = "javascript:"; //手动设置slider的链接
-    slider[1].url = "#!/cars";
-    slider[2].url = "#!/huafei";
+    slider[1].url = "/cars";
+    slider[2].url = "/huafei";
     state.slider = slider;
   }
 }

@@ -447,7 +447,7 @@ export const buyProduct = ({dispatch, state}) => {
             return;
           }
         }
-        window.location.href = '/#!/order?id=' + state.productDetail.product.SKU_id + '&count='+ state.productDetail.productNumber + '&productId=' + state.productDetail.product._id;
+        window.location.href = '/order?id=' + state.productDetail.product.SKU_id + '&count='+ state.productDetail.productNumber + '&productId=' + state.productDetail.product._id;
       }, response=> {
       })
     } else {
@@ -587,7 +587,7 @@ export const offlinePay = ({dispatch, state}, id, price) => {
     },
     response => {
       if(response.data.code == 1000) {
-        window.location.href = '/#!/orderDone?id=' + getUrlParam('id');
+        window.location.href = '/orderDone?id=' + getUrlParam('id');
       } else {
         alert(response.data.message);
       }
