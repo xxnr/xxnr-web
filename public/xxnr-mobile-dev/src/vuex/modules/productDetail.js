@@ -24,12 +24,14 @@ const state= {
   SKUList: [],
   AdditionList: [],
   attrBoxType: 0,
-  isFromOrder: false
+  isFromOrder: false,
+  isNull: true
 }
 
 const mutations = {
   [GET_PRODUCTDETAIL] (state, product) {
     state.product = product;
+    state.isNull = false;
     state.SKUList = [];
     state.AdditionList = [];
     document.getElementsByTagName('body')[0].scrollTop = 0;
@@ -179,6 +181,7 @@ const mutations = {
     state.product = {};
     state.productNumber = 1;
     state.isAllSKUSelected = false;
+    state.isNull = true;
   },
   [IS_FROMORDER] (state, value) {
     state.isFromOrder = value;

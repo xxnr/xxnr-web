@@ -1,89 +1,90 @@
 <template>
-  <div class="container">
-    <div class="product-img"><img :src="productDetail.imgUrl" onerror="javascript:this.src='/static/assets/images/no_picture.png';this.onerror = null;"></div>
-  </div>
-  <div class="product-info">
+  <div v-show="!isNull">
     <div class="container">
-      <div class="product-name">
-        {{productDetail.name}}
-      </div>
-      <div class="" v-if="productDetail.presale">
-        即将上线
-      </div>
-      <div class="product-price-box" v-if="!productDetail.presale">
-        <div class="product-SKUPrice">
-          {{'￥'+productDetail.minPrice}} {{productDetail.maxPrice==productDetail.minPrice?"":"-"}} {{(productDetail.maxPrice==productDetail.minPrice?"":productDetail.maxPrice)}}
+      <div class="product-img"><img :src="productDetail.imgUrl" onerror="javascript:this.src='/static/assets/images/no_picture.png';this.onerror = null;"></div>
+    </div>
+    <div class="product-info">
+      <div class="container">
+        <div class="product-name">
+          {{productDetail.name}}
         </div>
-        <div class="product-deposit" v-if="productDetail.deposit && productDetail.online">
-          订金：<span class="product-deposit-num">{{'¥' + productDetail.deposit}}</span>
+        <div class="" v-if="productDetail.presale">
+          即将上线
         </div>
-        <div class="clear"></div>
-        <div class="product-SKUMarketPrice" v-if="productDetail.marketMinPrice != 0">
-          市场价：{{'￥ '+productDetail.marketMinPrice}} {{productDetail.marketMaxPrice==productDetail.marketMinPrice?"":"-"}} {{(productDetail.marketMaxPrice==productDetail.marketMinPrice?"":productDetail.marketMaxPrice)}}
+        <div class="product-price-box" v-if="!productDetail.presale">
+          <div class="product-SKUPrice">
+            {{'￥'+productDetail.minPrice}} {{productDetail.maxPrice==productDetail.minPrice?"":"-"}} {{(productDetail.maxPrice==productDetail.minPrice?"":productDetail.maxPrice)}}
+          </div>
+          <div class="product-deposit" v-if="productDetail.deposit && productDetail.online">
+            订金：<span class="product-deposit-num">{{'¥' + productDetail.deposit}}</span>
+          </div>
+          <div class="clear"></div>
+          <div class="product-SKUMarketPrice" v-if="productDetail.marketMinPrice != 0">
+            市场价：{{'￥ '+productDetail.marketMinPrice}} {{productDetail.marketMaxPrice==productDetail.marketMinPrice?"":"-"}} {{(productDetail.marketMaxPrice==productDetail.marketMinPrice?"":productDetail.marketMaxPrice)}}
+          </div>
         </div>
       </div>
     </div>
-  </div>
-  <div class="product-detail-description" v-if="productDetail.description">
-    {{productDetail.description}}
-  </div>
-  <div class="product-detail-title" v-if="productDetail.online" @click="showAttrBox(1);">
-    <div class="container">
-      <div class="product-skulist">
-        <div v-if="SKUList.length == 0">请选择商品属性</div>
-        <div v-else class="product-skulist-con">已选择:<span v-for="item in SKUList" track-by="$index">"{{item}}"</span><span v-if="AdditionList" v-for="item in AdditionList" track-by="$index">"{{item}}"</div>
-        <img class="productDetail-arrow" src="/assets/images/productDetail_arrow.png" alt="">
-      </div>
+    <div class="product-detail-description" v-if="productDetail.description">
+      {{productDetail.description}}
     </div>
-  </div>
-  <div class="product-detail-tab">
-    <div class="container">
-      <ul class="product-detail-tab-ul">
-        <li :class="{'checked': tabIndex == 0}" @click="productDetailTab(0);">
-          <div class="tab-underline">
-            商品描述
-          </div>
-        </li>
-        <li :class="{'checked': tabIndex == 1}" @click="productDetailTab(1);">
-          <div class="tab-underline">
-            详细参数
-          </div>
-        </li>
-        <li :class="{'checked': tabIndex == 2}" @click="productDetailTab(2);">
-          <div class="tab-underline">
-            服务说明
-          </div>
-        </li>
-        <li class="clear"></li>
-      </ul>
-      <div class="product-detail-tab-con">
-        <div v-if="tabIndex == 0">
-          <iframe name="Info1" id="Info1" onload="this.height = Info1.document.body.scrollHeight" width="100%" scrolling="no" frameborder="0" :src="productDetail.app_body_url">
-
-          </iframe>
-          <!--{{{productDetail.productDesc}}}-->
-        </div>
-        <div v-if="tabIndex == 1">
-          <iframe name="Info2" id="Info2" onload="this.height = Info2.document.body.scrollHeight" width="100%" scrolling="no" frameborder="0" :src="productDetail.app_standard_url">
-
-          </iframe>
-        </div>
-        <div v-if="tabIndex == 2">
-          <iframe name="Info3" id="Info3" onload="this.height = Info3.document.body.scrollHeight" width="100%" scrolling="no" frameborder="0" :src="productDetail.app_support_url">
-
-          </iframe>
+    <div class="product-detail-title" v-if="productDetail.online" @click="showAttrBox(1);">
+      <div class="container">
+        <div class="product-skulist">
+          <div v-if="SKUList.length == 0">请选择商品属性</div>
+          <div v-else class="product-skulist-con">已选择:<span v-for="item in SKUList" track-by="$index">"{{item}}"</span><span v-if="AdditionList" v-for="item in AdditionList" track-by="$index">"{{item}}"</div>
+          <img class="productDetail-arrow" src="/assets/images/productDetail_arrow.png" alt="">
         </div>
       </div>
     </div>
-  </div>
-  <div class="bottom-btn presale" v-if="!productDetail.online">
-    商品已下架
-  </div>
-  <div class="bottom-btn" @click="showAttrBox(2);" v-if="!productDetail.presale && productDetail.online">
-    {{productDetail.buyActionName}}
-  </div>
-  <div class="bottom-btn presale" v-if="productDetail.presale && productDetail.online">
-    敬请期待
+    <div class="product-detail-tab">
+      <div class="container">
+        <ul class="product-detail-tab-ul">
+          <li :class="{'checked': tabIndex == 0}" @click="productDetailTab(0);">
+            <div class="tab-underline">
+              商品描述
+            </div>
+          </li>
+          <li :class="{'checked': tabIndex == 1}" @click="productDetailTab(1);">
+            <div class="tab-underline">
+              详细参数
+            </div>
+          </li>
+          <li :class="{'checked': tabIndex == 2}" @click="productDetailTab(2);">
+            <div class="tab-underline">
+              服务说明
+            </div>
+          </li>
+          <li class="clear"></li>
+        </ul>
+        <div class="product-detail-tab-con">
+          <div v-if="tabIndex == 0">
+            <iframe name="Info1" id="Info1" onload="this.height = Info1.document.body.scrollHeight" width="100%" scrolling="no" frameborder="0" v-if="productDetail.app_body_url" :src="productDetail.app_body_url">
+
+            </iframe>
+          </div>
+          <div v-if="tabIndex == 1">
+            <iframe name="Info2" id="Info2" onload="this.height = Info2.document.body.scrollHeight" width="100%" scrolling="no" frameborder="0" v-if="productDetail.app_standard_url" :src="productDetail.app_standard_url">
+
+            </iframe>
+          </div>
+          <div v-if="tabIndex == 2">
+            <iframe name="Info3" id="Info3" onload="this.height = Info3.document.body.scrollHeight" width="100%" scrolling="no" frameborder="0" v-if="productDetail.app_support_url" :src="productDetail.app_support_url">
+
+            </iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="bottom-btn presale" v-if="!productDetail.online">
+      商品已下架
+    </div>
+    <div class="bottom-btn" @click="showAttrBox(2);" v-if="!productDetail.presale && productDetail.online">
+      {{productDetail.buyActionName}}
+    </div>
+    <div class="bottom-btn presale" v-if="productDetail.presale && productDetail.online">
+      敬请期待
+    </div>
   </div>
   <div class="attr-box" v-show="attrBoxDisplay">
     <div class="close-attr-box" @click="hideAttrBox();">
@@ -195,7 +196,8 @@
         toastMsg: state => state.toastMsg,
         SKUList: state => state.productDetail.SKUList,
         AdditionList: state => state.productDetail.AdditionList,
-        attrBoxType: state => state.productDetail.attrBoxType
+        attrBoxType: state => state.productDetail.attrBoxType,
+        isNull: state => state.productDetail.isNull
       },
       actions: {
         getProductDetail,
@@ -216,7 +218,6 @@
       xxnrToast
     },
     detached() {
-      this.clearProductDetail();
     },
     route: {
       activate (transition) {
@@ -225,12 +226,10 @@
         this.showBackBtn();
         this.editTitle('商品详情');
         transition.next();
-      }//,
-//      canDeactivate (transition) {
-//        this.clearProductDetail();
-//        transition.next();
-//      }
-
+      },
+      deactivate() {
+        this.clearProductDetail();
+      }
     }
   }
 </script>
