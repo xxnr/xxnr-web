@@ -450,7 +450,7 @@ export const buyProduct = ({dispatch, state}) => {
             return;
           }
         }
-        window.location.href = '/order?id=' + state.productDetail.product.SKU_id + '&count='+ state.productDetail.productNumber + '&productId=' + state.productDetail.product._id;
+        router.go('/order?id=' + state.productDetail.product.SKU_id + '&count='+ state.productDetail.productNumber + '&productId=' + state.productDetail.product._id);
       }, response=> {
       })
     } else {
@@ -464,10 +464,19 @@ export const buyProduct = ({dispatch, state}) => {
 }
 
 export const getRSCListByProduct = ({dispatch, state}, id) => {
+  dispatch(types.RESET_TOASTMSG);
   api.getRSCListByProduct({
     products: id
   }, response => {
-    dispatch(types.GET_RSCLISTBYPRODUCT, response.data.RSCs);
+    if(response.data.code == 1000) {
+      dispatch(types.GET_RSCLISTBYPRODUCT, response.data.RSCs);
+      return;
+    }
+    if(response.data.code == 1401) {
+      router.go('/login');
+      return;
+    }
+    dispatch(types.SET_TOASTMSG, response.data.message);
   }, response => {
   })
 }
@@ -607,7 +616,7 @@ export const offlinePay = ({dispatch, state}, id, price) => {
     },
     response => {
       if(response.data.code == 1000) {
-        window.location.href = '/orderDone?id=' + getUrlParam('id');
+        router.go('/orderDone?id=' + getUrlParam('id'));
       } else {
         alert(response.data.message);
       }

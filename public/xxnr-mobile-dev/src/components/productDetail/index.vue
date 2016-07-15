@@ -170,7 +170,8 @@
     clearProductDetail,
     showBackBtn,
     editTitle,
-    isFromOrder
+    isFromOrder,
+    hideRightBtn
   } from '../../vuex/actions'
   import xxnrToast from '../../xxnr_mobile_ui/xxnrToast.vue'
   import {getUrlParam} from '../../utils/common'
@@ -211,7 +212,8 @@
         clearProductDetail,
         showBackBtn,
         editTitle,
-        isFromOrder
+        isFromOrder,
+        hideRightBtn
       }
     },
     components: {
@@ -224,6 +226,7 @@
         this.isFromOrder(transition.from.path);
         this.getProductDetail(getUrlParam('id'));
         this.showBackBtn();
+        this.hideRightBtn();
         this.editTitle('商品详情');
         transition.next();
       },

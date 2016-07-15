@@ -15,12 +15,12 @@
     </div>
     <div class="order-rsc-info">
       <div class="container">
-        <div class="order-rsc" @click="showRSCList();">
+        <div class="order-rsc" v-link="{path: '/orderRSC?id=' + orderId + '&count=' + count + '&productId=' + productId}">
           <div class="order-rsc-bit"></div>
           <span v-if="!orderRSC.address">订单中的商品将配送至服务站，请选择自提网点</span>
           {{orderRSC.address}}
         </div>
-        <div class="order-consignee" @click="showConsignee();">
+        <div class="order-consignee" v-link="/orderConsignee?id=' + orderId + '&count=' + count + '&productId=' + productId">
           <div class="order-consignee-bit"></div>
           <span v-if="!orderConsignee.consigneePhone">请填写收货人信息{{orderConsignee.consigneeName}}</span>
           {{orderConsignee.consigneeName}}
@@ -119,7 +119,10 @@
   export default {
     data: function () {
       return {
-        toastShow: false
+        toastShow: false,
+        orderId: getUrlParam('id'),
+        count: getUrlParam('count'),
+        productId: getUrlParam('productId')
       }
     },
     vuex: {
@@ -151,11 +154,11 @@
   methods: {
     showRSCList()
     {
-      window.location.href = '/orderRSC?id=' + getUrlParam('id') + '&count=' + getUrlParam('count') + '&productId=' + getUrlParam('productId');
+      //window.location.href = '/orderRSC?id=' + getUrlParam('id') + '&count=' + getUrlParam('count') + '&productId=' + getUrlParam('productId');
     },
     showConsignee()
     {
-      window.location.href = '/orderConsignee?id=' + getUrlParam('id') + '&count=' + getUrlParam('count') + '&productId=' + getUrlParam('productId');
+      //window.location.href = '/#!/orderConsignee?id=' + getUrlParam('id') + '&count=' + getUrlParam('count') + '&productId=' + getUrlParam('productId');
     },
     showToast(){
       this.toastShow = true;

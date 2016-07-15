@@ -30,6 +30,28 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'html');
 app.engine('html', require('ejs-mate'));
 
+
+/**
+ * middleware
+ */
+app.use(function (req, res, next) {
+  if (req.headers['content-type']){
+    req.headers['content-type'] = req.headers['content-type'].replace('charset=utf8', 'charset=utf-8');
+  }
+
+  // utf-8 is not a valid content-encoding while old android app will add this header improperly, so we need to remove them.
+  if(req.headers['content-encoding'] && req.headers['content-encoding'].toLocaleLowerCase() === 'utf-8'){
+    delete req.headers['content-encoding'];
+  }
+
+  // APP will add extra slash at the beginning of the path improperly, here to remove them
+  req.url = req.url.replace(/\/*/, '/');
+
+  // for nginx proxy
+  req.clientIp = req.headers['x-real-ip'] || req.headers['ip'] || req.ip;
+  return next();
+});
+
 var devMiddleware = require('webpack-dev-middleware')(compiler, {
   publicPath: webpackConfig.output.publicPath,
   stats: {
