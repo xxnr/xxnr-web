@@ -200,7 +200,8 @@ function graph_vcode(req, res) {
     if (req.data.authCode)
         authCode = req.data.authCode;
     var host = req.hostname;
-    var prevurl = 'http://' + host;
+    var protocol = req.protocol + '://';
+    var prevurl = protocol + host;
     var callback = function (err, graphvCode) {
         if (err) {
             if (err.type == 'graphvCode' && graphvCode) {
