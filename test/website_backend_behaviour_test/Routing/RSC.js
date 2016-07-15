@@ -53,14 +53,17 @@ exports.fill_RSC_info = function(token, name, IDNo, phone, companyName, companyA
         })
 };
 
-exports.modify_RSC_info = function(token, id, products, done){
+exports.modify_RSC_info = function(token, id, products, gifts, done){
+    var putData = {token:token, id:id};
+    if (products) {
+        putData.products = products;
+    }
+    if (gifts) {
+        putData.gifts = gifts;
+    }
     request(app)
         .put(config.manager_url + '/api/v2.2/RSC/modify')
-        .send({
-            token:token,
-            id:id,
-            products:products
-        })
+        .send(putData)
         .end(function(err, res){
             should.not.exist(err);
             done(res.body);
