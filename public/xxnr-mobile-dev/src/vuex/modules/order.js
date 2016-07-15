@@ -55,7 +55,7 @@ const mutations = {
     var address = state.RSCList[index].RSCInfo.companyAddress;
     state.orderRSC.address = address.province.name + address.city.name + address.county.name + address.town.name + address.details;
     state.orderRSC._id = state.RSCList[index]._id;
-    window.location.href = '/#!/order?id=' + getUrlParam('id') + '&count=' + getUrlParam('count') + '&productId=' + getUrlParam('productId') ;
+    window.location.href = '/order?id=' + getUrlParam('id') + '&count=' + getUrlParam('count') + '&productId=' + getUrlParam('productId') ;
     //window.history.back();
   },
   [GET_SHOPPINGCARTBYSKU] (state, data, id) {
@@ -93,7 +93,7 @@ const mutations = {
     state.totalPrice = totalPrice;
   },
   [COMMIT_ORDER] (state, data){
-    window.location.href = '/#!/offlinePay?id=' + data.id;
+    window.location.href = '/offlinePay?id=' + data.id;
   },
   [GET_CONSIGNEE] (state, data) {
     state.consigneeList = data;
@@ -116,7 +116,7 @@ const mutations = {
   [SAVE_CONSIGNEE] (state, consigneePhone, consigneeName) {
     state.orderConsignee.consigneePhone = consigneePhone;
     state.orderConsignee.consigneeName = consigneeName;
-    window.location.href = '/#!/order?id=' + getUrlParam('id') + '&count=' + getUrlParam('count') + '&productId=' + getUrlParam('productId');
+    window.location.href = '/order?id=' + getUrlParam('id') + '&count=' + getUrlParam('count') + '&productId=' + getUrlParam('productId');
   },
   [CONFIRM_CONSIGNEE] (state, index) {
       var consigneeNum = -1;
@@ -132,7 +132,7 @@ const mutations = {
       }
       state.orderConsignee.consigneePhone = state.consigneeList[consigneeNum].consigneePhone;
       state.orderConsignee.consigneeName = state.consigneeList[consigneeNum].consigneeName;
-      window.location.href = '/#!/order?id=' + getUrlParam('id') + '&count=' + getUrlParam('count') + '&productId=' + getUrlParam('productId');
+      window.location.href = '/order?id=' + getUrlParam('id') + '&count=' + getUrlParam('count') + '&productId=' + getUrlParam('productId');
       //window.history.back();
   },
   [OFFLINE_PAY] (state, data) {
