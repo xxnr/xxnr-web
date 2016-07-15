@@ -1,7 +1,7 @@
 import api from '../api/remoteHttpApi'
 import * as types from './mutation-types'
 import {getCookie,removeCookie} from '../utils/authService'
-import {getUrlParam, checkPath} from '../utils/common'
+import {getUrlParam, checkPath, getStringLen} from '../utils/common'
 let jsencrypt = require('../jsencrypt')
 
 export const getCategories = ({dispatch,state}) => {
@@ -349,8 +349,11 @@ export const bindInviter = ({dispatch,state},inviterPhone) => {
     dispatch(types.SET_TOASTMSG, '请输入正确的手机号');
     return;
   }
-
-  let userId = state.auth.user.userid;
+  let loginName = state.auth.userInfo.loginName;
+  if(inviterPhone == loginName) {
+    dispatch(types.SET_TOASTMSG, '不能绑定自己为新农代表，请重新输入');
+    return;
+  }
   api.bindInviter(
     {'userId':userId,'inviter':inviterPhone},
     response => {
@@ -490,8 +493,17 @@ export const RSCConfirm = ({dispatch, state}) => {
 }
 
 export const getShoppingCart = ({dispatch, state}) => {
+  dispatch(types.RESET_TOASTMSG);
   api.getShoppingCart(response => {
-    dispatch(types.GET_SHOPPINGCARTBYSKU, response.data.datas.rows, response.data.datas.shopCartId);
+    if(response.data.code == 1401){
+      router.go('/login');
+      return;
+    }
+    if(response.data.code == 1000) {
+      dispatch(types.GET_SHOPPINGCARTBYSKU, response.data.datas.rows, response.data.datas.shopCartId);
+      return;
+    }
+    dispatch(types.SET_TOASTMSG, response.data.message);
   },
   response=> {
   })
@@ -515,6 +527,10 @@ export const loadNextPageOrders = ({dispatch,state},inviterPhone) => {
 
 export const getConsigneeList = ({dispatch, state}) => {
   api.getConsignee(response=> {
+    if(response.data.code == '1401') {
+      router.go('/login');
+      return;
+    }
     dispatch(types.GET_CONSIGNEE, response.data.datas.rows);
   }, response=>{
   })
@@ -529,6 +545,10 @@ export const saveConsignee = ({dispatch, state}, consigneeName, consigneePhone) 
   }
   if(consigneePhone == '') {
     dispatch(types.SET_TOASTMSG, '请输入联系方式');
+    return;
+  }
+  if(getStringLen(consigneeName) > 12) {
+    dispatch(types.SET_TOASTMSG, '收货人姓名限6个汉字或12个字符');
     return;
   }
   if(!reg.test(consigneePhone)) {
@@ -670,18 +690,34 @@ export const selectConfirmProduct = ({dispatch, state}, index) => {
   dispatch(types.SELECT_ORDERSKU, index);
 }
 
-export const getInviter = ({dispatch, state}, userId) => {
+export const getInviter = ({dispatch, state},userId) => {
+  dispatch(types.RESET_TOASTMSG);
   api.getUserInfo(
     {'userId':userId},
     response => {
-    dispatch(types.GET_USERINFO,response.data.datas);
-    if(response.data.datas.inviter) {
-      api.getInviter(response=>{
-        dispatch(types.GET_INVITERINFO, response.datas);
-      },response=>{
+    if(response.data.code == 1000) {
+      dispatch(types.GET_USERINFO,response.data.datas);
+      if(response.data.datas.inviter) {
+        api.getInviter(response=>{
+          if(response.code == 1000) {
+            dispatch(types.GET_INVITERINFO, response.datas);
+            return;
+          }
+          if(response.code == 1401) {
+            router.go('/login');
+            return;
+          }
+          dispatch(types.SET_TOASTMSG, response.data.message);
+        },response=>{
 
-      })
+        })
+      }
     }
+    if(response.data.code == 1401) {
+      router.go('/login');
+      return;
+    }
+    dispatch(types.SET_TOASTMSG, response.data.message);
   }, response => {
 
   })
@@ -822,4 +858,28 @@ export const hideCodeBox = ({dispatch, state}) => {
 
 export const showCodeBox = ({dispatch, state}) => {
   dispatch(types.SHOW_CODEBOX);
+}
+
+export const getMyPoints = ({dispatch, state}, userId) => {
+  dispatch(types.RESET_TOASTMSG);
+  api.getUserInfo({
+    userId: userId
+  },response => {
+    if(response.data.code == 1000) {
+      dispatch(types.GET_USERINFO,response.data.datas);
+      return;
+    }
+
+    if(response.data.code == 1401) {
+      router.go('/login');
+      return;
+    }
+    dispatch(types.SET_TOASTMSG, response.data.message);
+  }, response=> {
+
+  });
+}
+
+export const resetConfirmOrder = ({dispatch, state}) => {
+  dispatch(types.RESET_CONFIRMORDER);
 }

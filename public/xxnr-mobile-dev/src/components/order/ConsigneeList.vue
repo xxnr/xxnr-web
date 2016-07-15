@@ -6,7 +6,7 @@
       </div>
       <div class="consignee-val">
         <div class="consignee-val-con">
-          <input type="text" placeholder="请填写收货人的真实姓名" maxlength="10" v-model="consigneeName">
+          <input type="text" placeholder="请填写收货人的真实姓名" maxlength="12" v-model="consigneeName" >
         </div>
       </div>
       <div class="clear"></div>
@@ -53,6 +53,7 @@
 <script>
   import { getConsigneeList, saveConsignee, selectConsignee, confirmConsignee, showBackBtn, editTitle } from '../../vuex/actions'
   import xxnrToast from '../../xxnr_mobile_ui/xxnrToast.vue'
+  //import { getStringLen } from '../../utils/common'
 
   export default {
     data: function () {
@@ -63,7 +64,12 @@
     methods: {
       showToast:function(){
         this.toastShow=true;
-      }
+      }//,
+//      verifyConsignee: function() {
+//        if(getStringLen(this.consigneeName) > 12) {
+//          this.consigneeName =
+//        }
+//      }
     },
     vuex: {
       getters: {

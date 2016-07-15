@@ -10,6 +10,7 @@ import productDetail from './modules/productDetail'
 import order from './modules/order'
 import vueSlider from './modules/vueSlider'
 import register from './modules/register'
+import indexConfig from './modules/indexConfig'
 import {
   CLOSE_APPDOWNLOAD,
   SET_TOASTMSG,
@@ -47,7 +48,8 @@ const store = new Vuex.Store({
 	productDetail,
 	vueSlider,
     register,
-    order
+    order,
+    indexConfig
   },
   strict: debug
 });

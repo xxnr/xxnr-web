@@ -9,6 +9,9 @@ module.exports = {
     assetsPublicPath: '/',
     productionSourceMap: true
   },
+  domain: ".xinxinnongren.com",
+  pcsubdomain: "ppe",
+  mobilesubdomain: "mppe",
   dev: {
     port: 8080,
     proxyTable: {}

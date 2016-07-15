@@ -47,7 +47,7 @@
 </template>
 
 <script>
-  import { showPopBox, hidePopBox, selectConfirmProduct, confirmOrder } from '../vuex/actions'
+  import { showPopBox, hidePopBox, selectConfirmProduct, confirmOrder, resetConfirmOrder } from '../vuex/actions'
   export default {
     data(){
       return{
@@ -70,10 +70,14 @@
         hidePopBox,
         selectConfirmProduct,
         confirmOrder,
+        resetConfirmOrder
       }
     },
     methods: {
 
+    },
+    detached(){
+      this.resetConfirmOrder();
     }
   }
 </script>

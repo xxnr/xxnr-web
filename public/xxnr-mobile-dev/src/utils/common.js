@@ -23,3 +23,21 @@ export function checkPath(value, str) {
   return -1;
 }
 
+export function getStringLen (val, max) {
+  var len = 0;
+  for (var i = 0; i < val.length; i++) {
+    var length = val.charCodeAt(i);
+    if(length>=0&&length<=128) {
+      len += 1;
+    } else {
+      len += 2;
+    }
+    if (max && len > parseInt(max))
+      return true;
+  }
+  if (max)
+    return false;
+  else
+    return len;
+}
+

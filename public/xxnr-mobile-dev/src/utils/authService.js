@@ -1,8 +1,8 @@
 import cookie from 'react-cookie'
-import { domain } from '../../config.js'
+let config = require('../../config.js')
 let cookieConfig = {}
-if(domain !== ''){
-  cookieConfig = { domain: domain }
+if(config.domain !== ''){
+  cookieConfig = { domain: config.domain }
 }
 
 export function saveCookie(name,value) {
@@ -28,6 +28,7 @@ export function isLogin() {
 export function checkOtherPlaceLogin(res,that){
   if(res.data.code==1401){
     that.toastShow= true;
-    that.toastMessage = "你已在其他地方登录,请重新登录"
+    that.toastMessage = "你已在其他地方登录,请重新登录";
+    router.go('/login');
   }
 }

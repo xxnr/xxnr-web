@@ -9,7 +9,7 @@
 
 <script>
   import ordersList from '../ordersList.vue'
-  import { getOrders,getUserInfo,showBackBtn,hideRightBtn,editTitle } from '../../vuex/actions'
+  import { getOrders,getUserInfo,showBackBtn,hideRightBtn,editTitle, getMyPoints } from '../../vuex/actions'
 
   export default {
     vuex:{
@@ -22,7 +22,8 @@
         getUserInfo,
         showBackBtn,
         hideRightBtn,
-        editTitle
+        editTitle,
+        getMyPoints
       }
     },
     components:{
@@ -32,8 +33,9 @@
         this.showBackBtn();
         this.hideRightBtn();
         this.editTitle('我的积分');
+        this.getMyPoints(this.user.userId);
       }
-    },
+    }
   }
 </script>
 

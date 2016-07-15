@@ -25,7 +25,7 @@
     <div class="container">
       <div class="footer-link">
         <a>移动版</a>
-        <a @click="setCookie('mobile_use_www','true',(12/24),hostName)" href="{{protocolStr}}//{{hostNameStr}}">电脑版</a>
+        <a @click="setCookie('mobile_use_www','true',(12/24),domain)" href="{{protocol}}//{{pcsubdomain}}{{domain}}">电脑版</a>
         <a href="http://a.app.qq.com/o/simple.jsp?pkgname=com.ksfc.newfarmer">客户端</a>
       </div>
       <div class="footer-tel">客服电话：400-056-0371</div>
@@ -45,19 +45,22 @@
   import appDownloadOverlay from './appDownloadOverlay.vue'
   import { getIndexCars,getIndexHeafei,showBackBtn,hideBackBtn,showRightBtn,getSliderImages,changeRightBtnMyXXNR,changeRightBtnPathMyxxnr,editTitle } from '../../vuex/actions'
   import xxnrSwiper from '../../xxnr_mobile_ui/xxnrSwiper.vue'
+  //import { pcsubdomain, domain } from '../../../config'
   export default {
     data: function() {
         return {
           showLoader: false,
-          hostNameStr: window.location.hostname,
-          protocolStr: window.location.protocol
+          protocol: window.location.protocol
         }
     },
     vuex:{
       getters:{
         indexCars:state => state.indexCarsList.indexCars,
         indexHuafei:state => state.indexCarsList.indexHuafei,
-        slider: state => state.vueSlider.slider
+        slider: state => state.vueSlider.slider,
+        test: state => state.indexConfig.test,
+        domain: state => state.indexConfig.domain,
+        pcsubdomain: state => state.indexConfig.pcsubdomain
       },
       actions:{
         getIndexCars,

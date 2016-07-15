@@ -8,7 +8,8 @@ import {
   SHOW_SUCCESSTOAST,
   HIDE_SUCCESSTOAST,
   SHOW_FAILURETOAST,
-  HIDE_FAILURETOAST
+  HIDE_FAILURETOAST,
+  RESET_CONFIRMORDER
 } from '../mutation-types'
 
 // initial state
@@ -76,6 +77,11 @@ const mutations = {
   },
   [HIDE_FAILURETOAST] (state) {
     state.failureToast = false;
+  },
+  [RESET_CONFIRMORDER] (state) {
+    state.productNumber = 0;
+    state.checkedSKUList = [];
+    state.hasSKUSelected = false;
   }
 }
 

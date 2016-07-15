@@ -26,7 +26,7 @@
 </template>
 
 <script>
-  import { login,showBackBtn,hideRightBtn } from '../../vuex/actions'
+  import { login,showBackBtn,hideRightBtn,editTitle } from '../../vuex/actions'
   import xxnrToast from '../../xxnr_mobile_ui/xxnrToast.vue'
 
   export default {
@@ -47,7 +47,8 @@
       actions:{
         login,
         showBackBtn,
-        hideRightBtn
+        hideRightBtn,
+        editTitle
       },
     },
     components: {
@@ -60,6 +61,7 @@
       activate(){
         this.hideRightBtn();
         this.showBackBtn();
+        this.editTitle('我的新农人');
       }
     },
   }

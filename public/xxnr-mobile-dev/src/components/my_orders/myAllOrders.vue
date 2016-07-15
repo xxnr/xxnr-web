@@ -77,7 +77,7 @@
                   this.$broadcast('resetHeightScrollTop');
                 }
               }, response => {
-                  console.log(response);
+                  //console.log(response);
               })
           }
         },
