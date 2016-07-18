@@ -84,22 +84,22 @@ export const setRightButtonText = ({dispatch, state}, data, path) => {
 }
 
 export const goBack = ({dispatch,state}) => {
-  if(window.location.hash.indexOf('my_orders')!=-1){
+  if(window.location.pathname.indexOf('my_orders')!=-1){
     //window.location.href = '#!/my_xxnr';  //对我的订单页面有个特殊的路由处理,在任何一个标签都跳会我的新新农人
     router.go('/my_xxnr')
-  }else if(window.location.hash.indexOf('my_xxnr')!=-1){
+  }else if(window.location.pathname.indexOf('my_xxnr')!=-1){
     //window.location.href = '#!/home';
     router.go('/home')
-  }else if(window.location.hash.indexOf('login')!=-1){
+  }else if(window.location.pathname.indexOf('login')!=-1){
     //window.location.href = '#!/home';
     router.go('/my_xxnr')
-  }else if(window.location.hash.indexOf('order?')!=-1) {
+  }else if(window.location.pathname == '/order') {
     if(state.order.cartList.goodsId) {
       router.go('/productDetail?id='+ state.order.cartList.goodsId);
     } else {
       window.history.back();
     }
-  } else if (window.location.hash.indexOf('productDetail')!=-1){
+  } else if (window.location.pathname.indexOf('productDetail')!=-1){
     if(state.productDetail.isFromOrder) {
       router.go('/home');
       return;
@@ -345,6 +345,10 @@ export const register = ({dispatch,state},phoneNumber,password,registerCode,conf
 export const bindInviter = ({dispatch,state},inviterPhone) => {
   dispatch(types.RESET_TOASTMSG);
   var reg = /^1\d{10}$/;
+  if(inviterPhone == '') {
+    dispatch(types.SET_TOASTMSG, '请输入手机号');
+    return;
+  }
   if(!reg.test(inviterPhone)) {
     dispatch(types.SET_TOASTMSG, '请输入正确的手机号');
     return;
@@ -433,6 +437,7 @@ export const buyProduct = ({dispatch, state}) => {
         }
       }
     }
+    dispatch(types.HIDE_ATTRBOX);
     if(state.productDetail.product.SKU_id) {
       api.addToCart({
         SKUId: state.productDetail.product.SKU_id,
@@ -721,6 +726,7 @@ export const getInviter = ({dispatch, state},userId) => {
 
         })
       }
+      return;
     }
     if(response.data.code == 1401) {
       router.go('/login');
