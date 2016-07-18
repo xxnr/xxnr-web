@@ -5,7 +5,7 @@ var should = require('should');
 var Components = require('./utilities/components');
 var test_data = require('./test_data');
 var Routing = require('./Routing');
-require('../../common/utils');
+var utils = require('../../common/utils');
 var fs = require('fs');
 
 const default_campaign_url_name = 'testcampaign';
@@ -105,7 +105,22 @@ var test_campaign = {
                 ],
                 points: 20
             }]
-    }
+    },
+    ramdon_events:function(){return {
+        type: 1,
+        title: '测试品牌宣传标题',
+        online_time: new Date().add('h', -2),
+        start_time: new Date().add('h', -1),
+        campaign_url_name: utils.GUID(10),
+        comment: '测试备注1',
+        shareable: false,
+        share_points_add: 10,
+        share_button: false,
+        share_title: '分享活动标题1',
+        share_url_name: utils.GUID(10),
+        share_abstract: 'testshareabstract1',
+        reward_times:1
+    }}
 };
 describe('campaign', function(){
     var backend_admin = test_data.backend_admin;
@@ -158,6 +173,9 @@ describe('campaign', function(){
     after('remove test user', function (done) {
         Routing.User.delete_frontend_account(test_user.account, done);
     });
+    after('remove all campaigns', function(done){
+        Routing.Campaign.delete_all_campaigns(done);
+    });
     describe('framework', function(){
         describe('apis', function(){
             it('create campaign api');
@@ -204,7 +222,7 @@ describe('campaign', function(){
                 Routing.Campaign.delete_all_campaigns(done);
             });
             it('events campaign', function(done) {
-                var campaign = test_campaign.events;
+                var campaign = utils.cloneJSON(test_campaign.events);
                 var expected_backend_campaign_list = {
                     code:1000,
                     campaigns:[{
@@ -212,12 +230,15 @@ describe('campaign', function(){
                         title: campaign.title,
                         campaign_url_name: campaign.campaign_url_name,
                         comment: campaign.comment,
+                        image:campaign_image_url,
                         shareable: campaign.shareable,
                         share_points_add: campaign.share_points_add,
                         share_button: campaign.share_button,
                         share_title: campaign.share_title,
                         share_url_name: campaign.share_url_name,
-                        share_abstract: campaign.share_abstract
+                        share_abstract: campaign.share_abstract,
+                        share_image:campaign_share_image_url,
+                        reward_times:campaign.reward_times
                     }]
                 };
                 var expected_frontend_campaign_list = {
@@ -233,8 +254,9 @@ describe('campaign', function(){
                         share_abstract: campaign.share_abstract
                     }]
                 };
-
-                Routing.Campaign.create_campaign(backend_admin_token, campaign.type, campaign.title, campaign.online_time, null, campaign.start_time, null, campaign.campaign_url_name, campaign.comment, campaign_image_url, campaign.shareable, campaign.share_points_add, campaign.share_button, campaign.share_title, campaign.share_url_name, campaign.share_abstract, campaign_share_image_url, campaign.reward_times, null, function (body) {
+                campaign.image = campaign_image_url;
+                campaign.share_image = campaign_share_image_url;
+                Routing.Campaign.create_campaign(backend_admin_token, campaign, function (body) {
                     body.should.have.property('code', 1000);
                     Routing.Campaign.backend_query_campaign(backend_admin_token, function (body) {
                         body.should.containDeep(expected_backend_campaign_list);
@@ -252,7 +274,7 @@ describe('campaign', function(){
                 })
             });// create events campaign -> query backend, got exact campaign with right property -> query frontend, verify property -> get campaign page, verify property
             it('Q/A campaign', function(done){
-                var campaign = test_campaign.QA;
+                var campaign = utils.cloneJSON(test_campaign.QA);
                 var expected_backend_campaign_list = {
                     code:1000,
                     campaigns:[{
@@ -285,8 +307,9 @@ describe('campaign', function(){
                     code:1000,
                     QA:campaign.detail
                 };
-
-                Routing.Campaign.create_campaign(backend_admin_token, campaign.type, campaign.title, campaign.online_time, null, campaign.start_time, null, campaign.campaign_url_name, campaign.comment, campaign_image_url, campaign.shareable, campaign.share_points_add, campaign.share_button, campaign.share_title, campaign.share_url_name, campaign.share_abstract, campaign_share_image_url, campaign.reward_times, campaign.detail, function(body){
+                campaign.image = campaign_image_url;
+                campaign.share_image = campaign_share_image_url;
+                Routing.Campaign.create_campaign(backend_admin_token, campaign, function(body){
                     body.should.have.property('code', 1000);
                     Routing.Campaign.backend_query_campaign(backend_admin_token, function(body){
                         body.should.containDeep(expected_backend_campaign_list);
@@ -308,7 +331,7 @@ describe('campaign', function(){
                 })
             });// create Q/A campaign with Q/A -> query backend, got exact campaign with right property -> query frontend, verify property -> get campaign page, verify property -> query Q/A, verify
             it('quiz campaign',function(done){
-                var campaign = test_campaign.quiz;
+                var campaign = utils.cloneJSON(test_campaign.quiz);
                 var expected_backend_campaign_list = {
                     code:1000,
                     campaigns:[{
@@ -342,7 +365,9 @@ describe('campaign', function(){
                     questions:campaign.detail
                 };
 
-                Routing.Campaign.create_campaign(backend_admin_token, campaign.type, campaign.title, campaign.online_time, null, campaign.start_time, null, campaign.campaign_url_name, campaign.comment, campaign_image_url, campaign.shareable, campaign.share_points_add, campaign.share_button, campaign.share_title, campaign.share_url_name, campaign.share_abstract, campaign_share_image_url, campaign.reward_times, campaign.detail, function(body){
+                campaign.image = campaign_image_url;
+                campaign.share_image = campaign_share_image_url;
+                Routing.Campaign.create_campaign(backend_admin_token, campaign, function(body){
                     body.should.have.property('code', 1000);
                     Routing.Campaign.backend_query_campaign(backend_admin_token, function(body){
                         body.should.containDeep(expected_backend_campaign_list);
@@ -367,16 +392,130 @@ describe('campaign', function(){
         });
         describe('modify campaign', function(){
             it('events campaign', function(done){
+                var campaign = utils.cloneJSON(test_campaign.events);
+                var expected_backend_campaign_list = {
+                    code:1000,
+                    campaigns:[{
+                        type: campaign.type,
+                        title: 'anothertitle',
+                        campaign_url_name: 'anothername',
+                        comment: 'anothercomment',
+                        image:'testurl',
+                        shareable: !campaign.shareable,
+                        share_points_add: campaign.share_points_add + 10,
+                        share_button: !campaign.share_button,
+                        share_title: 'another share title',
+                        share_url_name: 'another share name',
+                        share_abstract: 'another share abstract',
+                        share_image:'sharetesturl',
+                        reward_times:campaign.reward_times+1
+                    }]
+                };
 
+                campaign.online_time = new Date().add('h', 2);
+                campaign.image = campaign_image_url;
+                campaign.share_image = campaign_share_image_url;
+                Routing.Campaign.create_campaign(backend_admin_token, campaign, function (body) {
+                    body.should.have.property('code', 1000);
+                    var campaign_A = body.campaign;
+                    var modified_campaign = utils.cloneJSON(expected_backend_campaign_list.campaigns[0]);
+                    modified_campaign._id = campaign_A._id;
+                    Routing.Campaign.modify_campaign(backend_admin_token, modified_campaign, function(body){
+                        body.should.have.property('code', 1000);
+                        Routing.Campaign.backend_query_campaign(backend_admin_token, function(body) {
+                            body.should.containDeep(expected_backend_campaign_list);
+                            modified_campaign.online_time = new Date().add('h', -1);
+                            Routing.Campaign.modify_campaign(backend_admin_token, modified_campaign, function(body){
+                                body.should.have.property('code', 1000);
+                                modified_campaign.title = 'title should not exists';
+                                Routing.Campaign.modify_campaign(backend_admin_token, modified_campaign, function(body){
+                                    body.should.have.property('code', 1001);
+                                    Routing.Campaign.backend_query_campaign(backend_admin_token, function(body) {
+                                        body.should.containDeep(expected_backend_campaign_list);
+                                        done();
+                                    })
+                                })
+                            })
+                        })
+                    })
+                });
             });// create events campaign -> modify all basic info before online_time, success -> query, got expected -> modify basic info after online_time, fail, query, got not modified
         });
         describe('online/offline and query', function(){
             var campaign_A, campaign_B, campaign_C, campaign_D, campaign_E;
-            before('create campaign A, w/ #datetime now# < online time < start time < end time < offline time',function(){});
-            before('create campaign B, w/ online time < #datetime now# < start time < end time < offline time',function(){});
-            before('create campaign C, w/ online time < start time < #datetime now# < end time < offline time',function(){});
-            before('create campaign D, w/ online time < start time < end time < #datetime now# < offline time',function(){});
-            before('create campaign E, w/ online time < start time < end time < offline time < #datetime now# ',function(){});
+            before('remove all campaign', function(done){
+                Routing.Campaign.delete_all_campaigns(done);
+            });
+            before('create campaign A, w/ #datetime now# < online time < start time < end time < offline time',function(done){
+                var campaign = test_campaign.ramdon_events();
+                campaign.image = campaign_image_url;
+                campaign.share_image = campaign_share_image_url;
+                campaign.online_time = new Date().add('h', 1);
+                campaign.start_time = new Date().add('h', 2);
+                campaign.end_time = new Date().add('h', 3);
+                campaign.offline_time = new Date().add('h', 4);
+                Routing.Campaign.create_campaign(backend_admin_token, campaign, function(body){
+                    body.should.have.property('code', 1000);
+                    campaign_A = body.campaign;
+                    done();
+                })
+            });
+            before('create campaign B, w/ online time < #datetime now# < start time < end time < offline time',function(done){
+                var campaign = test_campaign.ramdon_events();
+                campaign.image = campaign_image_url;
+                campaign.share_image = campaign_share_image_url;
+                campaign.online_time = new Date().add('h', -1);
+                campaign.start_time = new Date().add('h', 1);
+                campaign.end_time = new Date().add('h', 2);
+                campaign.offline_time = new Date().add('h', 3);
+                Routing.Campaign.create_campaign(backend_admin_token, campaign, function(body){
+                    body.should.have.property('code', 1000);
+                    campaign_B = body.campaign;
+                    done();
+                })
+            });
+            before('create campaign C, w/ online time < start time < #datetime now# < end time < offline time',function(done){
+                var campaign = test_campaign.ramdon_events();
+                campaign.image = campaign_image_url;
+                campaign.share_image = campaign_share_image_url;
+                campaign.online_time = new Date().add('h', -2);
+                campaign.start_time = new Date().add('h', -1);
+                campaign.end_time = new Date().add('h', 1);
+                campaign.offline_time = new Date().add('h', 2);
+                Routing.Campaign.create_campaign(backend_admin_token, campaign, function(body){
+                    body.should.have.property('code', 1000);
+                    campaign_C = body.campaign;
+                    done();
+                })
+            });
+            before('create campaign D, w/ online time < start time < end time < #datetime now# < offline time',function(done){
+                var campaign = test_campaign.ramdon_events();
+                campaign.image = campaign_image_url;
+                campaign.share_image = campaign_share_image_url;
+                campaign.online_time = new Date().add('h', -3);
+                campaign.start_time = new Date().add('h', -2);
+                campaign.end_time = new Date().add('h', -1);
+                campaign.offline_time = new Date().add('h', 1);
+                Routing.Campaign.create_campaign(backend_admin_token, campaign, function(body){
+                    body.should.have.property('code', 1000);
+                    campaign_D = body.campaign;
+                    done();
+                })
+            });
+            before('create campaign E, w/ online time < start time < end time < offline time < #datetime now# ',function(done){
+                var campaign = test_campaign.ramdon_events();
+                campaign.image = campaign_image_url;
+                campaign.share_image = campaign_share_image_url;
+                campaign.online_time = new Date().add('h', -4);
+                campaign.start_time = new Date().add('h', -3);
+                campaign.end_time = new Date().add('h', -2);
+                campaign.offline_time = new Date().add('h', -1);
+                Routing.Campaign.create_campaign(backend_admin_token, campaign, function(body){
+                    body.should.have.property('code', 1000);
+                    campaign_E = body.campaign;
+                    done();
+                })
+            });
             after('delete all campaigns', function(done){
                 Routing.Campaign.delete_all_campaigns(done);
             });
@@ -435,7 +574,7 @@ describe('campaign', function(){
                     message:campaign_status_message[1]
                 };
                 Routing.Campaign.check_campaign_status(null, campaign_A._id, function(body){
-                    body.should.have.property(expected_campaign_A_status);
+                    body.should.have.properties(expected_campaign_A_status);
                     done();
                 })
             });
@@ -446,7 +585,7 @@ describe('campaign', function(){
                     message:campaign_status_message[2]
                 };
                 Routing.Campaign.check_campaign_status(null, campaign_B._id, function(body){
-                    body.should.have.property(expected_campaign_B_status);
+                    body.should.have.properties(expected_campaign_B_status);
                     done();
                 })
             });
@@ -457,7 +596,7 @@ describe('campaign', function(){
                     message:campaign_status_message[3]
                 };
                 Routing.Campaign.check_campaign_status(null, campaign_C._id, function(body){
-                    body.should.have.property(expected_campaign_C_status);
+                    body.should.have.properties(expected_campaign_C_status);
                     done();
                 })
             });
@@ -468,7 +607,7 @@ describe('campaign', function(){
                     message:campaign_status_message[4]
                 };
                 Routing.Campaign.check_campaign_status(null, campaign_D._id, function(body){
-                    body.should.have.property(expected_campaign_D_status);
+                    body.should.have.properties(expected_campaign_D_status);
                     done();
                 })
             });
@@ -479,7 +618,7 @@ describe('campaign', function(){
                     message:campaign_status_message[5]
                 };
                 Routing.Campaign.check_campaign_status(null, campaign_E._id, function(body){
-                    body.should.have.property(expected_campaign_E_status);
+                    body.should.have.properties(expected_campaign_E_status);
                     done();
                 })
             });
@@ -493,7 +632,7 @@ describe('campaign', function(){
                     Routing.Campaign.offline_campaign(backend_admin_token, campaign_A._id, function(body){
                         body.should.have.property('code', 1001);
                         Routing.Campaign.check_campaign_status(null, campaign_A._id, function(body){
-                            body.should.have.property(expected_campaign_A_status);
+                            body.should.have.properties(expected_campaign_A_status);
                             done();
                         })
                     })
@@ -507,7 +646,7 @@ describe('campaign', function(){
                     Routing.Campaign.offline_campaign(backend_admin_token, campaign_B._id, function(body){
                         body.should.have.property('code', 1000);
                         Routing.Campaign.check_campaign_status(null, campaign_B._id, function(body){
-                            body.should.have.property(expected_campaign_B_status);
+                            body.should.have.properties(expected_campaign_B_status);
                             done();
                         })
                     })
@@ -521,7 +660,7 @@ describe('campaign', function(){
                     Routing.Campaign.offline_campaign(backend_admin_token, campaign_C._id, function(body){
                         body.should.have.property('code', 1000);
                         Routing.Campaign.check_campaign_status(null, campaign_C._id, function(body){
-                            body.should.have.property(expected_campaign_C_status);
+                            body.should.have.properties(expected_campaign_C_status);
                             done();
                         })
                     })
@@ -535,7 +674,7 @@ describe('campaign', function(){
                     Routing.Campaign.offline_campaign(backend_admin_token, campaign_D._id, function(body){
                         body.should.have.property('code', 1000);
                         Routing.Campaign.check_campaign_status(null, campaign_D._id, function(body){
-                            body.should.have.property(expected_campaign_D_status);
+                            body.should.have.properties(expected_campaign_D_status);
                             done();
                         })
                     })
@@ -549,7 +688,7 @@ describe('campaign', function(){
                     Routing.Campaign.offline_campaign(backend_admin_token, campaign_E._id, function(body){
                         body.should.have.property('code', 1001);
                         Routing.Campaign.check_campaign_status(null, campaign_E._id, function(body){
-                            body.should.have.property(expected_campaign_E_status);
+                            body.should.have.properties(expected_campaign_E_status);
                             done();
                         })
                     })
@@ -557,10 +696,12 @@ describe('campaign', function(){
             })
         });
         describe('reward times and query', function(){
-            var campaign = test_campaign.QA;
+            var campaign = utils.cloneJSON(test_campaign.QA);
             var campaign_A;
             before('create Q/A campaign A, w/ reward times 1', function(done){
-                Routing.Campaign.create_campaign(backend_admin_token, campaign.type, campaign.title, campaign.online_time, null, campaign.start_time, null, campaign.campaign_url_name, campaign.comment, campaign_image_url, campaign.shareable, campaign.share_points_add, campaign.share_button, campaign.share_title, campaign.share_url_name, campaign.share_abstract, campaign_share_image_url, 1, campaign.detail, function(body) {
+                campaign.image = campaign_image_url;
+                campaign.share_image = campaign_share_image_url;
+                Routing.Campaign.create_campaign(backend_admin_token, campaign, function(body) {
                     body.should.have.property('code', 1000);
                     campaign_A = body.campaign;
                     done();
@@ -638,10 +779,13 @@ describe('campaign', function(){
     });
     describe('campaign type', function() {
         describe('Q/A campaign', function () {
-            var campaign = test_campaign.QA;
+            var campaign = utils.cloneJSON(test_campaign.QA);
             var campaign_A;
             beforeEach('create Q/A campaign', function (done) {
-                Routing.Campaign.create_campaign(backend_admin_token, campaign.type, campaign.title, campaign.online_time, null, campaign.start_time, null, campaign.campaign_url_name, campaign.comment, campaign_image_url, campaign.shareable, campaign.share_points_add, campaign.share_button, campaign.share_title, campaign.share_url_name, campaign.share_abstract, campaign_share_image_url, campaign.reward_times, campaign.detail, function (body) {
+                campaign.online_time = new Date().add('h', 2);
+                campaign.image = campaign_image_url;
+                campaign.share_image = campaign_share_image_url;
+                Routing.Campaign.create_campaign(backend_admin_token, campaign, function (body) {
                     body.should.have.property('code', 1000);
                     campaign_A = body.campaign;
                     done();
@@ -697,7 +841,8 @@ describe('campaign', function(){
                     QA: new_QA
                 };
                 // modify start time to 1 hour later
-                Routing.Campaign.modify_campaign(backend_admin_token, campaign_A._id, undefined, undefined, undefined, undefined, new Date().add('h', 1), undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, function (body) {
+                var modified_campaign = {_id:campaign_A._id, start_time : new Date().add('h', 1)};
+                Routing.Campaign.modify_campaign(backend_admin_token, modified_campaign, function (body) {
                     body.should.have.property('code', 1000);
                     // modify QA, got success
                     Routing.Campaign.backend_modify_QA(backend_admin_token, campaign_A._id, new_QA, function (body) {
@@ -706,7 +851,8 @@ describe('campaign', function(){
                         Routing.Campaign.query_QA(campaign_A._id, function (body) {
                             body.should.containDeep(expected_QA_list);
                             // modify start time to now
-                            Routing.Campaign.modify_campaign(backend_admin_token, campaign_A._id, undefined, undefined, undefined, undefined, new Date(), undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, function (body) {
+                            modified_campaign.start_time = new Date();
+                            Routing.Campaign.modify_campaign(backend_admin_token, modified_campaign, function (body) {
                                 body.should.have.property('code', 1000);
                                 // modify QA, got failed
                                 Routing.Campaign.backend_modify_QA(backend_admin_token, campaign_A._id, [{
@@ -723,7 +869,8 @@ describe('campaign', function(){
                                     body.should.have.property('code', 1001);
                                     // query QA, got modified
                                     Routing.Campaign.query_QA(campaign_A._id, function (body) {
-                                        body.should.have.properties(expected_QA_list);
+                                        body.should.containDeep(expected_QA_list);
+                                        done();
                                     })
                                 })
                             })
@@ -756,10 +903,13 @@ describe('campaign', function(){
             });
         });
         describe('quiz campaign', function () {
-            var campaign = test_campaign.quiz;
+            var campaign = utils.cloneJSON(test_campaign.quiz);
             var campaign_A;
+            campaign.online_time = new Date().add('h', 2);
+            campaign.image = campaign_image_url;
+            campaign.share_image = campaign_share_image_url;
             beforeEach('create quiz campaign', function (done) {
-                Routing.Campaign.create_campaign(backend_admin_token, campaign.type, campaign.title, campaign.online_time, null, campaign.start_time, null, campaign.campaign_url_name, campaign.comment, campaign_image_url, campaign.shareable, campaign.share_points_add, campaign.share_button, campaign.share_title, campaign.share_url_name, campaign.share_abstract, campaign_share_image_url, campaign.reward_times, campaign.detail, function (body) {
+                Routing.Campaign.create_campaign(backend_admin_token, campaign, function (body) {
                     body.should.have.property('code', 1000);
                     campaign_A = body.campaign;
                     done();
@@ -814,7 +964,8 @@ describe('campaign', function(){
                     answers: [{order_key: 1, choices: [1]}]
                 };
                 // modify start time to 1 hour later
-                Routing.Campaign.modify_campaign(backend_admin_token, campaign_A._id, null, null, null, null, new Date().add('h', 1), null, null, null, null, null, null, null, null, null, null, null, null, null, function (body) {
+                var modified_campaign = {_id:campaign_A._id, start_time: new Date('h', 1)};
+                Routing.Campaign.modify_campaign(backend_admin_token, modified_campaign, function (body) {
                     body.should.have.property('code', 1000);
                     // modify question, success
                     Routing.Campaign.backend_modify_quiz_question(backend_admin_token, campaign_A._id, questions, function (body) {
@@ -823,7 +974,8 @@ describe('campaign', function(){
                         Routing.Campaign.query_quiz_question(campaign_A._id, function (body) {
                             body.should.have.properties(expected_question_list);
                             // modify start time to now
-                            Routing.Campaign.modify_campaign(backend_admin_token, campaign_A._id, null, null, null, null, new Date(), null, null, null, null, null, null, null, null, null, null, null, null, null, function (body) {
+                            modified_campaign.start_time = new Date();
+                            Routing.Campaign.modify_campaign(backend_admin_token, modified_campaign, function (body) {
                                 body.should.have.property('code', 1000);
                                 // modify questions, failed
                                 Routing.Campaign.backend_modify_quiz_question(backend_admin_token, campaign_A._id, fail_modified_questions, function (body) {
@@ -925,7 +1077,8 @@ describe('campaign', function(){
                                         Routing.Campaign.query_my_quiz_answer(test_user_token, campaign_id, function (body) {
                                             body.shold.containDeep(expected_my_answers);
                                             // modify end time to now
-                                            Routing.Campaign.modify_campaign(backend_admin_token, campaign_id, null, null, null, null, null, new Date(), null, null, null, null, null, null, null, null, null, null, null, null, function (body) {
+                                            var modified_campaign = {_id:campaign_id, end_time: new Date()};
+                                            Routing.Campaign.modify_campaign(backend_admin_token, modified_campaign, function (body) {
                                                 body.should.have.property('code', 1000);
                                                 // backend modify right answer
                                                 Routing.Campaign.backend_modify_quiz_right_answer(backend_admin_token, campaign_id, right_answers, function (body) {

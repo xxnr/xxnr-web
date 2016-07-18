@@ -8,31 +8,12 @@ var config = require('../../../config');
 var models = require('../../../models');
 var CampaignModel = models.campaign;
 
-exports.create_campaign = function(token, type, title, online_time, offline_time, start_time, end_time, campaign_url_name, comment, image, shareable, share_points_add, share_button, share_title, share_url_name, share_abstract, share_image, reward_times, detail, done) {
+exports.create_campaign = function(token, campaign, done) {
     request(app)
         .post(config.manager_url + '/api/campaign/create')
         .send({
             token: token,
-            campaign: {
-                type: type,
-                title: title,
-                online_time: online_time,
-                offline_time: offline_time,
-                start_time: start_time,
-                end_time: end_time,
-                campaign_url_name: campaign_url_name,
-                comment: comment,
-                image: image,
-                shareable: shareable,
-                share_points_add: share_points_add,
-                share_button: share_button,
-                share_title: share_title,
-                share_url_name: share_url_name,
-                share_abstract: share_abstract,
-                share_image: share_image,
-                reward_times: reward_times,
-                detail: detail
-            }
+            campaign: campaign
         })
         .end(function (err, res) {
             should.not.exist(err);
@@ -40,32 +21,12 @@ exports.create_campaign = function(token, type, title, online_time, offline_time
         })
 };
 
-exports.modify_campaign = function(token, _id, type, title, online_time, offline_time, start_time, end_time, campaign_url_name, comment, image, shareable, share_points_add, share_button, share_title, share_url_name, share_abstract, share_image, reward_times, detail, done) {
+exports.modify_campaign = function(token, campaign, done) {
     request(app)
         .post(config.manager_url + '/api/campaign/modify')
         .send({
             token: token,
-            campaign: {
-                _id: _id,
-                type: type,
-                title: title,
-                online_time: online_time,
-                offline_time: offline_time,
-                start_time: start_time,
-                end_time: end_time,
-                campaign_url_name: campaign_url_name,
-                comment: comment,
-                image: image,
-                shareable: shareable,
-                share_points_add: share_points_add,
-                share_button: share_button,
-                share_title: share_title,
-                share_url_name: share_url_name,
-                share_abstract: share_abstract,
-                share_image: share_image,
-                reward_times: reward_times,
-                detail: detail
-            }
+            campaign: campaign
         })
         .end(function (err, res) {
             should.not.exist(err);
@@ -94,7 +55,7 @@ exports.backend_query_campaign = function(token, done){
 
 exports.offline_campaign = function(token, _id, done){
     request(app)
-        .post(config.manager_url + '/campaign/offline')
+        .post(config.manager_url + '/api/campaign/offline')
         .send({token:token, _id:_id})
         .end(function(err, res){
             should.not.exist(err);
@@ -165,8 +126,8 @@ exports.query_quiz_question = function(_id, done){
 
 exports.backend_modify_quiz_question = function(token, _id, questions, done){
     request(app)
-        .post(config.manager_url + 'campaign/quiz/question')
-        .send({token:token, _id:_id, questions:questions})
+        .post(config.manager_url + '/api/campaign/modify')
+        .send({token:token, campaign:{_id:_id, detail:questions}})
         .end(function(err, res){
             should.not.exist(err);
             done(res.body);

@@ -58,6 +58,7 @@ exports.campaign_status = function(req, res, next){
 
     var user = req.user;
     var campaign_status = {};
+    var promises = [];
     if(user){
         var user_status_promise = new Promise(function(resolve, reject){
             CampaignService.get_times_left(user._id, campaign_id, function(err, times_left){
@@ -69,7 +70,8 @@ exports.campaign_status = function(req, res, next){
                 campaign_status.times_left = times_left;
                 resolve();
             })
-        })
+        });
+        promises.push(user_status_promise);
     }
 
     var campaign_status_promise = new Promise(function(resolve, reject){
@@ -81,15 +83,18 @@ exports.campaign_status = function(req, res, next){
 
             campaign_status.status = status;
             campaign_status.message = message;
+            resolve();
         })
     });
+    promises.push(campaign_status_promise);
 
-    Promise.all([user_status_promise, campaign_status_promise])
+    Promise.all(promises)
         .then(function(){
             campaign_status.code = 1000;
             res.respond(campaign_status);
         })
         .catch(function(err){
+            console.error(err);
             res.respond({code:1001, message:'查询状态错误'});
         })
 };

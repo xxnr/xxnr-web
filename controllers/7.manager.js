@@ -2803,7 +2803,8 @@ exports.modify_campaign = function(req, res, next){
 		}
 
 		var updateBasicInfo = false;
-		var canUpdateProperties = ['type', 'title', 'offline_time', 'end_time', 'url', 'image', 'comment', 'reward_times', 'shareable', 'share_point_add', 'share_button', 'share_title', 'share_url', 'share_abstract', 'share_image'];
+		var online_time = currentCampaign.online_time;
+		var canUpdateProperties = ['type', 'title', 'online_time', 'offline_time', 'start_time', 'end_time', 'campaign_url_name', 'url', 'image', 'comment', 'reward_times', 'shareable', 'share_points_add', 'share_button', 'share_title', 'share_url_name', 'share_url', 'share_abstract', 'share_image'];
 		canUpdateProperties.forEach(function(property){
 			if(campaign.hasOwnProperty(property)) {
 				updateBasicInfo = true;
@@ -2812,8 +2813,8 @@ exports.modify_campaign = function(req, res, next){
 		});
 
 		var datetimeNow = new Date();
-		if(updateBasicInfo && currentCampaign.online_time > datetimeNow){
-			res.respond({code:1001, message:'上线后不能更改'});
+		if(updateBasicInfo && online_time < datetimeNow){
+			res.respond({code:1001, message:'活动上线后不能更改基础信息'});
 			return;
 		}
 
@@ -2825,7 +2826,7 @@ exports.modify_campaign = function(req, res, next){
 
 			campaign.type = newCampaign.type;
 			if(campaign.detail){
-				if(currentCampaign.start_time > datetimeNow){
+				if(new Date(currentCampaign.start_time) < datetimeNow){
 					res.respond({code:1001, message:'活动开始后不能修改详情'});
 					return;
 				}
@@ -2869,6 +2870,47 @@ exports.query_campaign = function(req, res, next){
 
 exports.offline_campaign = function(req, res, next){
 	//TODO:offline campaign
+	var campaign_id = req.data._id;
+	if(!campaign_id){
+		res.respond({code:1001, message:'campaign_id required'});
+		return;
+	}
+
+	CampaignService.findById(campaign_id, function(err, campaign){
+		if(err){
+			console.error(err);
+			res.respond({code:1001, message:'查询失败'});
+			return;
+		}
+
+		var current_time = new Date();
+		if(current_time < campaign.online_time){
+			res.respond({code:1001, message:'不能下线还未上线的活动'});
+			return;
+		}
+
+		if(campaign.offline_time && campaign.offline_time < current_time){
+			res.respond({code:1001, message:'不能下线已经下线的活动'});
+			return;
+		}
+
+		if(!(campaign.start_time && campaign.start_time <= current_time)){
+			campaign.start_time = current_time;
+		}
+		if(!(campaign.end_time && campaign.end_time <= current_time)){
+			campaign.end_time = current_time;
+		}
+		campaign.offline_time = current_time;
+		CampaignService.save(campaign, function(err, newCampaign){
+			if(err){
+				console.error(err);
+				res.respond({code:1001, message:'修改失败'});
+				return;
+			}
+
+			res.respond({code:1000, message:'success'});
+		})
+	})
 };
 
 exports.modify_QA = function(req, res, next){
