@@ -102,6 +102,7 @@
     box-shadow:none !important;
     border:none !important;
     border-radius: 4px;
+    outline: none;
   }
   .reg-section{
     margin-top: 30px;

@@ -37,7 +37,6 @@ const state = {
 
 const mutations = {
   [GET_RSCLISTBYPRODUCT] (state, data) {
-    console.log(data);
     state.RSCList = data;
     for(let i = 0; i < state.RSCList.length; i++) {
       state.RSCSelected.push(false);
@@ -140,6 +139,13 @@ const mutations = {
     state.orderOfflinePay = data;
   },
   [GET_ORDERDETAIL] (state, data) {
+    for(let i = 0; i < data.rows.SKUList.length; i++) {
+      if(data.rows.SKUList[i].deliverStatus == 4) {
+        data.rows.SKUList[i].isShow = true;
+      } else {
+        data.rows.SKUList[i].isShow = false;
+      }
+    }
     state.orderInfo = data;
   },
   [SELF_DELIVERY] (state, data) {

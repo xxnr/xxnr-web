@@ -30,7 +30,7 @@
       </div>
       <div class="footer-tel">客服电话：400-056-0371</div>
       <div class="footer-company">北京新新农人网络科技有限公司</div>
-      <div>京ICP备15037751</div>
+      <div class="footer-ICP">京ICP备15037751</div>
     </div>
   </div>
   <div class="loader-img" v-if="showLoader">
@@ -181,8 +181,10 @@
     margin-bottom: 8px;
   }
 
-  .footer-company {
-
+  .footer-company, .footer-ICP {
+    color: #999;
+    text-align: center;
+    font-size: 12px;
   }
 
   .footer-link {

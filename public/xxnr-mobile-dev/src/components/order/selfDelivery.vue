@@ -45,7 +45,7 @@
     可自提商品
   </div>
   <div class="self-delivery-product-box">
-    <div class="self-delivery-product" v-for="item in SKUList">
+    <div class="self-delivery-product" v-for="item in SKUList" v-if="item.isShow">
       <div class="container">
         <div class="self-delivery-product-name">
           {{item.productName}}

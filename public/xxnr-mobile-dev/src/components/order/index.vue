@@ -20,7 +20,7 @@
           <span v-if="!orderRSC.address">订单中的商品将配送至服务站，请选择自提网点</span>
           {{orderRSC.address}}
         </div>
-        <div class="order-consignee" v-link="/orderConsignee?id=' + orderId + '&count=' + count + '&productId=' + productId">
+        <div class="order-consignee" v-link="{path: '/orderConsignee?id=' + orderId + '&count=' + count + '&productId=' + productId}">
           <div class="order-consignee-bit"></div>
           <span v-if="!orderConsignee.consigneePhone">请填写收货人信息{{orderConsignee.consigneeName}}</span>
           {{orderConsignee.consigneeName}}

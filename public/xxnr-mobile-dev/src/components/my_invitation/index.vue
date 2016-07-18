@@ -76,7 +76,8 @@
       return {
         showConfirm: false,
         showConfirmTel: false,
-        toastShow:false
+        toastShow:false,
+        inviterPhone: ''
       }
     },
     vuex:{
@@ -102,7 +103,7 @@
       bindInviterMethod: function() {
         var reg = /^1\d{10}$/;
         if(!this.inviterPhone || !reg.test(this.inviterPhone)) {
-          this.bindInviter();
+          this.bindInviter(this.inviterPhone);
           this.showToast();
         } else {
           this.showConfirm =  true;
@@ -180,6 +181,7 @@
     height: 35px;
     width: 20%;
     margin-left: 5%;
+    outline: none;
   }
   .addInviter{
     text-align: center;

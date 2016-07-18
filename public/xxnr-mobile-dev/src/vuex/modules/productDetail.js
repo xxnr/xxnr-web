@@ -182,6 +182,7 @@ const mutations = {
     state.productNumber = 1;
     state.isAllSKUSelected = false;
     state.isNull = true;
+    state.tabIndex = 0;
   },
   [IS_FROMORDER] (state, value) {
     state.isFromOrder = value;
