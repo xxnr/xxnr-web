@@ -187,7 +187,32 @@ describe('XXNR agent', function(){
             })
         })
     });
-    //describe('Bind inviter api');
+    describe('Bind inviter api', function(){
+        var token;
+        var user = test_data.random_test_user('2000');
+        beforeEach('create frontend account', function(done){
+            Routing.User.create_frontend_account(user.account, user.password, function () {
+                Routing.User.frontendLogin(user.account, user.password, function (body) {
+                    token = body.token;
+                    done();
+                })
+            })
+        });
+        afterEach('delete frontend account', function(done){
+            Routing.User.delete_frontend_account(user.account, done);
+        });
+        it('bind self', function(done) {
+            var expected_result = {
+                code:1002,
+                message:'不能添加自己为新农代表'
+            };
+
+            Routing.User.bind_inviter(token, user.account, function (body) {
+                body.should.have.properties(expected_result);
+                done();
+            })
+        });
+    });
     describe('XXNR agent scenarios', function() {
         var potential_customer = test_data.potential_customer;
         var test_product;

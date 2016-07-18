@@ -1265,6 +1265,11 @@ exports.process_bind_inviter = function(req, res, next){
             return;
         }
 
+        if(data.account == req.data.inviter){
+            res.respond({code:1002, message:'不能添加自己为新农代表'});
+            return;
+        }
+
         //check if the inviter is a valid user
         UserService.get({account:req.data.inviter}, function(err, data) {
             if (err) {
