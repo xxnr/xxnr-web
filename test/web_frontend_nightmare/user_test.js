@@ -43,11 +43,11 @@ describe('Nightmare', function() {
     it('2.登录页面进入', function * () {
         var result = yield nightmare
             .goto(BaseUrl+'logon.html')
-            .wait('div.login_form')
-            .click('div.login_form form.ng-pristine.ng-invalid.ng-invalid-required div.register_message.clearfix span.right a')
-            .wait('div.register_form')
+            .wait(logonSelectors.logonLoginForm)
+            .click(logonSelectors.logonLoginFormRegisterBtn)
+            .wait(logonSelectors.logonRegisterForm)
             .evaluate(function () {
-                return document.querySelector('div.register_form p.register_form--title').innerHTML
+                return document.querySelector(logonSelectors.logonRegisterFormTitle).innerHTML
             });
         expect(result).to.equal('注册');
     });
@@ -60,46 +60,46 @@ describe('Nightmare', function() {
     it('5.未填写手机号', function * () {
         var result = yield nightmare
             .goto(BaseUrl+'logon.html?type=register')
-            .wait('div.register_form')
-            .click('button.register_btn')
+            .wait(logonSelectors.logonRegisterForm)
+            .click(logonSelectors.logonRegisterFormRegisterBtn)
             .evaluate(function () {
-                return document.querySelector('div.register_error span.ng-binding').innerHTML
+                return document.querySelector(logonSelectors.logonRegisterFormErrMessage).innerHTML
             });
         expect(result).to.equal(logonWording.noPhoneErrMsg);
     });
     it('6.手机号已注册', function * () {
         var result = yield nightmare
             .goto(BaseUrl+'logon.html?type=register')
-            .wait('div.register_form')
-            .type('div.register_form form.registerForm div.form-group input',config.registeredPhone.number)
-            .click('div.right.reg_get_code_btn a.ng-binding')
+            .wait(logonSelectors.logonRegisterForm)
+            .type(logonSelectors.logonRegisterFormPhoneInput,config.registeredPhone.number)
+            .click(logonSelectors.logonRegisterFormGetCodeBtn)
             .wait(500)
             .evaluate(function () {
-                return document.querySelector('div.register_error span.ng-binding').innerHTML
+                return document.querySelector(logonSelectors.logonRegisterFormErrMessage).innerHTML
             });
         expect(result).to.equal(logonWording.registeredErrMsg);
     });
     it('7.手机号格式错误', function * () {
         var result = yield nightmare
             .goto(BaseUrl+'logon.html?type=register')
-            .wait('div.register_form')
-            .type('div.register_form form.registerForm div.form-group input',"999")
-            .click('div.right.reg_get_code_btn a.ng-binding')
+            .wait(logonSelectors.logonRegisterForm)
+            .type(logonSelectors.logonRegisterFormPhoneInput,"999")
+            .click(logonSelectors.logonRegisterFormGetCodeBtn)
             .wait(500)
             .evaluate(function () {
-                return document.querySelector('div.register_error span.ng-binding').innerHTML
+                return document.querySelector(logonSelectors.logonRegisterFormErrMessage).innerHTML
             });
         expect(result).to.equal(logonWording.wrongPhoneMsg);
     });
     it('8.手机号格式错误', function * () {
         var result = yield nightmare
             .goto(BaseUrl+'logon.html?type=register')
-            .wait('div.register_form')
-            .type('div.register_form form.registerForm div.form-group input',"99999999999")
-            .click('div.right.reg_get_code_btn a.ng-binding')
+            .wait(logonSelectors.logonRegisterForm)
+            .type(logonSelectors.logonRegisterFormPhoneInput,"99999999999")
+            .click(logonSelectors.logonRegisterFormGetCodeBtn)
             .wait(500)
             .evaluate(function () {
-                return document.querySelector('div.register_error span.ng-binding').innerHTML
+                return document.querySelector(logonSelectors.logonRegisterFormErrMessage).innerHTML
             });
         expect(result).to.equal(logonWording.wrongPhoneMsg);
     });
@@ -115,20 +115,20 @@ describe('Nightmare', function() {
     it('12.未输入图形验证码，点发送验证码', function * () {
         var shows = yield nightmare
             .goto(BaseUrl+'logon.html?type=register')
-            .wait('div.register_form')
-            .type('div.register_form form.registerForm div.form-group input',config.notRegisterPhone.number)
-            .click('div.right.reg_get_code_btn a.ng-binding')
+            .wait(logonSelectors.logonRegisterForm)
+            .type(logonSelectors.logonRegisterFormPhoneInput,config.notRegisterPhone.number)
+            .click(logonSelectors.logonRegisterFormGetCodeBtn)
             .wait(500)
-            .checkNgShow('.verification-code');
+            .checkNgShow(logonSelectors.logonRegisterFormVerificationCode);
         shows.should.be.true;
 
         yield nightmare
-            .click('div.right.reg_get_code_btn a.ng-binding')
+            .click(logonSelectors.logonRegisterFormGetCodeBtn)
             .wait(500)
 
         var errMsg = yield nightmare
             .evaluate(function () {
-                return document.querySelector('div.register_error span.ng-binding').innerHTML
+                return document.querySelector(logonSelectors.logonRegisterFormErrMessage).innerHTML
             });
         expect(errMsg).to.equal(logonWording.needGraphCaptcha);
     });
