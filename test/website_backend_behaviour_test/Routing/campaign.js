@@ -5,30 +5,34 @@ var request = require('supertest');
 var app = require('../../../release');
 var should = require('should');
 var config = require('../../../config');
+var models = require('../../../models');
+var CampaignModel = models.campaign;
 
 exports.create_campaign = function(token, type, title, online_time, offline_time, start_time, end_time, campaign_url_name, comment, image, shareable, share_points_add, share_button, share_title, share_url_name, share_abstract, share_image, reward_times, detail, done) {
     request(app)
         .post(config.manager_url + '/api/campaign/create')
         .send({
             token: token,
-            type: type,
-            title: title,
-            online_time: online_time,
-            offline_time: offline_time,
-            start_time: start_time,
-            end_time: end_time,
-            campaign_url_name: campaign_url_name,
-            comment: comment,
-            image: image,
-            shareable: shareable,
-            share_points_add: share_points_add,
-            share_button: share_button,
-            share_title: share_title,
-            share_url_name: share_url_name,
-            share_abstract: share_abstract,
-            share_image: share_image,
-            reward_times:reward_times,
-            detail: detail
+            campaign: {
+                type: type,
+                title: title,
+                online_time: online_time,
+                offline_time: offline_time,
+                start_time: start_time,
+                end_time: end_time,
+                campaign_url_name: campaign_url_name,
+                comment: comment,
+                image: image,
+                shareable: shareable,
+                share_points_add: share_points_add,
+                share_button: share_button,
+                share_title: share_title,
+                share_url_name: share_url_name,
+                share_abstract: share_abstract,
+                share_image: share_image,
+                reward_times: reward_times,
+                detail: detail
+            }
         })
         .end(function (err, res) {
             should.not.exist(err);
@@ -41,25 +45,27 @@ exports.modify_campaign = function(token, _id, type, title, online_time, offline
         .post(config.manager_url + '/api/campaign/modify')
         .send({
             token: token,
-            _id:_id,
-            type: type,
-            title: title,
-            online_time: online_time,
-            offline_time: offline_time,
-            start_time: start_time,
-            end_time: end_time,
-            campaign_url_name: campaign_url_name,
-            comment: comment,
-            image: image,
-            shareable: shareable,
-            share_points_add: share_points_add,
-            share_button: share_button,
-            share_title: share_title,
-            share_url_name: share_url_name,
-            share_abstract: share_abstract,
-            share_image: share_image,
-            reward_times:reward_times,
-            detail: detail
+            campaign: {
+                _id: _id,
+                type: type,
+                title: title,
+                online_time: online_time,
+                offline_time: offline_time,
+                start_time: start_time,
+                end_time: end_time,
+                campaign_url_name: campaign_url_name,
+                comment: comment,
+                image: image,
+                shareable: shareable,
+                share_points_add: share_points_add,
+                share_button: share_button,
+                share_title: share_title,
+                share_url_name: share_url_name,
+                share_abstract: share_abstract,
+                share_image: share_image,
+                reward_times: reward_times,
+                detail: detail
+            }
         })
         .end(function (err, res) {
             should.not.exist(err);
@@ -127,10 +133,10 @@ exports.query_QA = function(_id, done){
         })
 };
 
-exports.backend_modify_QA = function(token, _id, questions, done){
+exports.backend_modify_QA = function(token, _id, QA, done){
     request(app)
-        .post(config.manager_url + '/campaign/QA/modifyQA')
-        .send({token:token, _id:_id, questions:questions})
+        .post(config.manager_url + '/api/campaign/modify')
+        .send({token:token, campaign:{_id:_id, detail:QA}})
         .end(function(err, res){
             should.not.exist(err);
             done(res.body);
@@ -228,5 +234,5 @@ exports.trigger_quiz_reward = function(token, _id, done){
 };
 
 exports.delete_all_campaigns = function(done){
-    //TODO: delete all campaigns using model accessing directly
+    CampaignModel.find({}).remove(done);
 };

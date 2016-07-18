@@ -2755,14 +2755,97 @@ exports.queryAgentReportYesterday = function(req, res, next){
 
 exports.create_campaign = function(req, res, next){
 	//TODO: create campaign
+	var campaign = req.data.campaign;
+	if(!campaign){
+		res.respond({code:1001, message:'请填写活动信息'});
+		return;
+	}
+
+	CampaignService.save(campaign, function(err, newCampaign){
+		if(err){
+			res.respond({code:1001, message:err});
+			return;
+		}
+
+		campaign._id = newCampaign._id;
+		if(campaign.detail){
+			CampaignService.save_detail(campaign, function(err, newCampaignDetail){
+				if(err){
+					res.respond({code:1001, message:err});
+					return;
+				}
+
+				res.respond({code:1000, campaign:newCampaign, campaignDetail:newCampaignDetail});
+			})
+		} else{
+			res.respond({code:1000, campaign:newCampaign});
+		}
+	})
 };
 
 exports.modify_campaign = function(req, res, next){
 	//TODO: modify campaign
+	var campaign = req.data.campaign;
+	if(!campaign){
+		res.respond({code:1001, message:'请填写活动信息'});
+		return;
+	}
+
+	if(!campaign._id){
+		res.respond({code:1001, message:'缺少活动_id'});
+		return;
+	}
+
+	CampaignService.findById(campaign._id, function(err, currentCampaign){
+		if(err){
+			self.respond({code:1001, message:'查找失败'});
+			return;
+		}
+
+		var updateBasicInfo = false;
+		var canUpdateProperties = ['type', 'title', 'offline_time', 'end_time', 'url', 'image', 'comment', 'reward_times', 'shareable', 'share_point_add', 'share_button', 'share_title', 'share_url', 'share_abstract', 'share_image'];
+		canUpdateProperties.forEach(function(property){
+			if(campaign.hasOwnProperty(property)) {
+				updateBasicInfo = true;
+				currentCampaign[property] = campaign[property];
+			}
+		});
+
+		var datetimeNow = new Date();
+		if(updateBasicInfo && currentCampaign.online_time > datetimeNow){
+			res.respond({code:1001, message:'上线后不能更改'});
+			return;
+		}
+
+		CampaignService.save(currentCampaign, function(err, newCampaign){
+			if(err){
+				res.respond({code:1001, message:err});
+				return;
+			}
+
+			campaign.type = newCampaign.type;
+			if(campaign.detail){
+				if(currentCampaign.start_time > datetimeNow){
+					res.respond({code:1001, message:'活动开始后不能修改详情'});
+					return;
+				}
+
+				CampaignService.save_detail(campaign, function(err, newCampaignDetail) {
+					if (err) {
+						res.respond({code: 1001, message: err});
+						return;
+					}
+
+					res.respond({code:1000, campaign:newCampaign, campaignDetail:newCampaignDetail});
+				})
+			} else {
+				res.respond({code: 1000, campaign: newCampaign});
+			}
+		})
+	})
 };
 
 exports.query_campaign = function(req, res, next){
-	//TODO:query campaign
 	var type = req.data.type;
 	var search = req.data.search;
 	var status = req.data.status;

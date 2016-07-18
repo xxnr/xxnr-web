@@ -8,15 +8,18 @@ var campaign_schema = new mongoose.Schema({
     date_created:{type:Date, default:Date.now},
     online_time:{type:Date, required:true},
     offline_time:{type:Date},
-    start_time:{type:Date},
+    start_time:{type:Date, required:true},
     end_time:{type:Date},
+    campaign_url_name:{type:String, required:true},
     url:{type:String, required:true, unique:true},
     image:{type:String, required:true},
+    comment:{type:String},
     reward_times:{type:Number, default:0},
     shareable:{type:Boolean, default:false},
-    share_points_add: {type:Boolean},
+    share_points_add: {type:Number},
     share_button:{type:Boolean, default:false},
     share_title:{type:String},
+    share_url_name:{type:String},
     share_url:{type:String, unique:true},
     share_abstract:{type:String},
     share_image:{type:String}
@@ -33,6 +36,7 @@ var QA_campaign_schema = new mongoose.Schema({
     QA:[{
         question:{type:String, required:true},
         type:{type:Number, required:true},
+        points:{type:Number, default:0},
         options:[{
             value:{type:String, required:true},
             is_right_answer:{type:Boolean, default:false},
@@ -40,6 +44,7 @@ var QA_campaign_schema = new mongoose.Schema({
         }],
         order_key:{type:Number, required:true}
     }],
+    date_created:{type:Date, default:Date.now},
     date_last_modified:{type:Date, required:true}
 }, {_id: false});
 
@@ -48,6 +53,7 @@ var quiz_campaign_schema = new mongoose.Schema({
     QA:[{
         question:{type:String, required:true},
         type:{type:Number, required:true},
+        points:{type:Number, default:0},
         options:[{
             value:{type:String, required:true},
             is_right_answer:{type:Boolean, default:false},
@@ -56,6 +62,7 @@ var quiz_campaign_schema = new mongoose.Schema({
         order_key:{type:Number, required:true}
     }],
     right_answer_published:{type:Boolean, default:false},
+    date_created:{type:Date, default:Date.now},
     date_last_modified:{type:Date, required:true}
 }, {_id: false});
 
@@ -69,7 +76,7 @@ var quiz_answer_schema = new mongoose.Schema({
     date_created:{type:Date, default:Date.now}
 });
 
-mongoose.model('campaign', campaign_schema);
+var CampaignModel = mongoose.model('campaign', campaign_schema);
 mongoose.model('QA_campaign', QA_campaign_schema);
 mongoose.model('quiz_campaign', quiz_campaign_schema);
 mongoose.model('reward_control', reward_control_schema);

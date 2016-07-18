@@ -4,6 +4,7 @@
 var config = require('../../../config');
 var request = require('supertest');
 var should = require('should');
+require('should-http');
 var authentication = require('../../../middlewares/authentication');
 
 if(config.environment != 'sandbox'){

@@ -206,14 +206,11 @@ function GetAndPostTest(caseName) {
 
 exports.request = request;
 
-exports.save_file = function(content, path, done){
-    var dir = path.dirname(path);
-    if(!fs.existsSync(dir)){
-        fs.mkdir(dir);
-    }
+exports.save_file = function(content, filepath, done){
+    var dir = path.dirname(filepath);
 
-    fs.writeFile(path, content, 'utf-8', function(err){
-        shoule.not.exist(err);
+    fs.appendFile(filepath, content, 'utf-8', function(err){
+        should.not.exist(err);
         done();
     })
 };

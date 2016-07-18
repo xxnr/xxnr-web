@@ -6,14 +6,14 @@ var CampaignService = services.Campaign;
 var path = require('path');
 
 exports.query_campaign = function(req, res, next){
-    CampaignService.query(function(err, campaigns){
+    CampaignService.query({online:true}, function(err, campaigns){
         if(err){
             res.respond({code:1001, message:'查询活动失败'});
             return;
         }
 
         res.respond({code:1000, campaigns:campaigns});
-    }, {online:true})
+    })
 };
 
 exports.campaign_page = function(req, res, next){
@@ -22,24 +22,25 @@ exports.campaign_page = function(req, res, next){
     // TODO: render view in /views/campaigns/{type}/{name}, w/ some common
 
     if (type && name) {
-        switch (type){
-            case type:
-                switch (name){
-                    case 'rewardShopLaunch':
-                        res.render(path.join(__dirname, '../views/G.campaign/' + type + '/' + name)
-                            //{title: "积分商城上线了"}
-                        );
-                        break;
-                    case 'shareAndGetPoints':
-                        res.render(path.join(__dirname, '../views/G.campaign/' + type + '/' + name));
-                        break;
-                    default:
-                        res.status(404).send('404: Page not found');
-                }
-                break;
-            default:
-                res.status(404).send('404: Page not found');
-        }
+        res.render(path.join(__dirname, '../views/G.campaign/', type, name));
+        //switch (type){
+        //    case type:
+        //        switch (name){
+        //            case 'rewardShopLaunch':
+        //                res.render(path.join(__dirname, '../views/G.campaign/' + type + '/' + name)
+        //                    //{title: "积分商城上线了"}
+        //                );
+        //                break;
+        //            case 'shareAndGetPoints':
+        //                res.render(path.join(__dirname, '../views/G.campaign/' + type + '/' + name));
+        //                break;
+        //            default:
+        //                res.status(404).send('404: Page not found');
+        //        }
+        //        break;
+        //    default:
+        //        res.status(404).send('404: Page not found');
+        //}
     } else {
         res.status(404).send('404: Page not found');
         return;
@@ -116,6 +117,20 @@ exports.QA_require_reward = function(req, res, next){
 
 exports.query_quiz_question = function(req, res, next){
     //TODO: get quiz question
+    var campaign_id = req.data._id;
+    if(!campaign_id){
+        res.respond({code:1001, message:'campaign_id required'});
+        return;
+    }
+
+    CampaignService.query_quiz_question(campaign_id, function(err, questions){
+        if(err){
+            res.respond({code:1001, message:'查询失败'});
+            return;
+        }
+
+        res.respond({code:1000, questions:questions});
+    })
 };
 
 exports.submit_quiz_answer = function(req, res, next){

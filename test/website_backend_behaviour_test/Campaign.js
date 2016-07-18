@@ -6,13 +6,14 @@ var Components = require('./utilities/components');
 var test_data = require('./test_data');
 var Routing = require('./Routing');
 require('../../common/utils');
+var fs = require('fs');
 
 const default_campaign_url_name = 'testcampaign';
 const default_campaign_share_url_name = 'testcampaignshare';
 const campaign_type_name = {1:'品牌宣传', 2:'答题活动', 3:'竞猜活动'};
 const campaign_status_message = {1:'活动尚未上线', 2:'活动还未开始', 3:'活动正在进行', 4:'活动已经结束', 5:'活动已经下线'};
 var test_campaign = {
-    propagate:{
+    events:{
         type: 1,
         title: '测试品牌宣传标题',
         online_time: new Date().add('h', -2),
@@ -111,7 +112,10 @@ describe('campaign', function(){
     var test_user = test_data.random_test_user('1000');
     var backend_admin_token, test_user_token;
     var campaign_image_url, campaign_share_image_url;
-    var campaign_url = function(url_name){return '/campaigns/propagate/' + url_name;};
+    var campaign_url = function(url_name, type){
+        var campaign_type_english_name = {1:'events', 2:'QAs', 3:'quizs'};
+        return '/campaigns/' + campaign_type_english_name[type] + '/' + url_name;
+    };
     before('create backend admin and login', function (done) {
         Routing.User.create_backend_account(backend_admin.account, backend_admin.password, backend_admin.role, function () {
             Routing.User.backendLogin(backend_admin.account, backend_admin.password, function (err, token) {
@@ -165,21 +169,32 @@ describe('campaign', function(){
             it('offline campaign api');
         });
         describe('create new campaign', function(){
-            var propagate_campaign_path = '../views/campaigns/propagate/' + default_campaign_url_name + '.ejs';
-            var QA_campaign_path = '../views/campaigns/QA/' + default_campaign_url_name + '.ejs';
-            var quiz_campaign_path = '../views/campaigns/quiz/' + default_campaign_url_name + '.ejs';
+            var events_campaign_path =__dirname +  '/../../views/G.campaign/events/' + default_campaign_url_name + '.html';
+            var QA_campaign_path = __dirname + '/../../views/G.campaign/QAs/' + default_campaign_url_name + '.html';
+            var quiz_campaign_path = __dirname + '/../../views/G.campaign/quizs/' + default_campaign_url_name + '.html';
+
+            var events_campaign_share_path =__dirname +  '/../../views/G.campaign/events/' + default_campaign_share_url_name + '.html';
+            var QA_campaign_share_path = __dirname + '/../../views/G.campaign/QAs/' + default_campaign_share_url_name + '.html';
+            var quiz_campaign_share_path = __dirname + '/../../views/G.campaign/quizs/' + default_campaign_share_url_name + '.html';
+
             before('prepare default campaign page', function(done){
-                fs.read('./data/'+default_campaign_url_name + '.ejs', function(err, content){
+                fs.readFile(__dirname + '/data/'+default_campaign_url_name + '.html', function(err, content){
                     should.not.exist(err);
-                    Components.save_file(content, propagate_campaign_path, function(){
+                    Components.save_file(content, events_campaign_path, function(){
                         Components.save_file(content, QA_campaign_path, function(){
-                            Components.save_file(content, quiz_campaign_path, done);
+                            Components.save_file(content, quiz_campaign_path, function(){
+                                Components.save_file(content, events_campaign_share_path, function() {
+                                    Components.save_file(content, QA_campaign_share_path, function () {
+                                        Components.save_file(content, quiz_campaign_share_path, done);
+                                    })
+                                })
+                            })
                         })
                     })
                 });
             });
             after('delete all campaign pages', function(done){
-                Components.remove_file(propagate_campaign_path, function(){
+                Components.remove_file(events_campaign_path, function(){
                     Components.remove_file(QA_campaign_path, function(){
                         Components.remove_file(quiz_campaign_path, done);
                     })
@@ -188,13 +203,12 @@ describe('campaign', function(){
             afterEach('delete all campaigns', function(done){
                 Routing.Campaign.delete_all_campaigns(done);
             });
-            it('propagate campaign', function(done) {
-                var campaign = test_campaign.propagate;
+            it('events campaign', function(done) {
+                var campaign = test_campaign.events;
                 var expected_backend_campaign_list = {
                     code:1000,
                     campaigns:[{
                         type: campaign.type,
-                        typeName:campaign_type_name[campaign.type],
                         title: campaign.title,
                         campaign_url_name: campaign.campaign_url_name,
                         comment: campaign.comment,
@@ -210,12 +224,12 @@ describe('campaign', function(){
                     code:1000,
                     campaigns:[{
                         title: campaign.title,
-                        campaign_url: campaign_url(campaign.campaign_url_name),
+                        url: campaign_url(campaign.campaign_url_name, campaign.type),
                         comment: campaign.comment,
                         share_points_add: campaign.share_points_add,
                         share_button: campaign.share_button,
                         share_title: campaign.share_title,
-                        share_url: campaign_url(campaign.share_url_name),
+                        share_url: campaign_url(campaign.share_url_name, campaign.type),
                         share_abstract: campaign.share_abstract
                     }]
                 };
@@ -226,7 +240,7 @@ describe('campaign', function(){
                         body.should.containDeep(expected_backend_campaign_list);
                         Routing.Campaign.frontend_query_campaign(function (body) {
                             body.should.containDeep(expected_frontend_campaign_list);
-                            var campaign_page_url = body.campaigns[0].campaign_url;
+                            var campaign_page_url = body.campaigns[0].url;
                             var campaign_share_url = body.campaigns[0].share_url;
                             Routing.Campaign.get_page(campaign_page_url, function () {
                                 Routing.Campaign.get_page(campaign_share_url, function () {
@@ -236,14 +250,13 @@ describe('campaign', function(){
                         })
                     })
                 })
-            });// create propagate campaign -> query backend, got exact campaign with right property -> query frontend, verify property -> get campaign page, verify property
+            });// create events campaign -> query backend, got exact campaign with right property -> query frontend, verify property -> get campaign page, verify property
             it('Q/A campaign', function(done){
                 var campaign = test_campaign.QA;
                 var expected_backend_campaign_list = {
                     code:1000,
                     campaigns:[{
                         type: campaign.type,
-                        typeName:campaign_type_name[campaign.type],
                         title: campaign.title,
                         campaign_url_name: campaign.campaign_url_name,
                         comment: campaign.comment,
@@ -259,12 +272,12 @@ describe('campaign', function(){
                     code:1000,
                     campaigns:[{
                         title: campaign.title,
-                        campaign_url: campaign_url(campaign.campaign_url_name),
+                        url: campaign_url(campaign.campaign_url_name, campaign.type),
                         comment: campaign.comment,
                         share_points_add: campaign.share_points_add,
                         share_button: campaign.share_button,
                         share_title: campaign.share_title,
-                        share_url_name: campaign_url(campaign.share_url_name),
+                        share_url: campaign_url(campaign.share_url_name, campaign.type),
                         share_abstract: campaign.share_abstract
                     }]
                 };
@@ -280,7 +293,7 @@ describe('campaign', function(){
                         Routing.Campaign.frontend_query_campaign(function(body){
                             body.should.containDeep(expected_frontend_campaign_list);
                             var campaign_id = body.campaigns[0]._id;
-                            var campaign_page_url = body.campaigns[0].campaign_url;
+                            var campaign_page_url = body.campaigns[0].url;
                             var campaign_share_url = body.campaigns[0].share_url;
                             Routing.Campaign.get_page(campaign_page_url, function(){
                                 Routing.Campaign.get_page(campaign_share_url, function(){
@@ -300,7 +313,6 @@ describe('campaign', function(){
                     code:1000,
                     campaigns:[{
                         type: campaign.type,
-                        typeName:campaign_type_name[campaign.type],
                         title: campaign.title,
                         campaign_url_name: campaign.campaign_url_name,
                         comment: campaign.comment,
@@ -316,12 +328,12 @@ describe('campaign', function(){
                     code:1000,
                     campaigns:[{
                         title: campaign.title,
-                        campaign_url: campaign_url(campaign.campaign_url_name),
+                        url: campaign_url(campaign.campaign_url_name, campaign.type),
                         comment: campaign.comment,
                         share_points_add: campaign.share_points_add,
                         share_button: campaign.share_button,
                         share_title: campaign.share_title,
-                        share_url_name: campaign_url(campaign.share_url_name),
+                        share_url: campaign_url(campaign.share_url_name, campaign.type),
                         share_abstract: campaign.share_abstract
                     }]
                 };
@@ -337,12 +349,13 @@ describe('campaign', function(){
                         Routing.Campaign.frontend_query_campaign(function(body){
                             body.should.containDeep(expected_frontend_campaign_list);
                             var campaign_id = body.campaigns[0]._id;
-                            var campaign_page_url = body.campaigns[0].campaign_url;
+                            var campaign_page_url = body.campaigns[0].url;
                             var campaign_share_url = body.campaigns[0].share_url;
                             Routing.Campaign.get_page(campaign_page_url, function(){
                                 Routing.Campaign.get_page(campaign_share_url, function(){
                                     Routing.Campaign.query_quiz_question(campaign_id, function(body){
                                         body.should.containDeep(expected_question_list);
+                                        body.questions[0].options[0].should.not.have.property('is_right_answer');
                                         done();
                                     });
                                 })
@@ -353,7 +366,9 @@ describe('campaign', function(){
             });// create quiz campaign with questions -> query backend, got exact campaign with right property -> query frontend, verify property -> get campaign page, verify property -> query questions, verify
         });
         describe('modify campaign', function(){
-            it('propagate campaign');// create propagate campaign -> modify all basic info and query
+            it('events campaign', function(done){
+
+            });// create events campaign -> modify all basic info before online_time, success -> query, got expected -> modify basic info after online_time, fail, query, got not modified
         });
         describe('online/offline and query', function(){
             var campaign_A, campaign_B, campaign_C, campaign_D, campaign_E;
@@ -682,16 +697,16 @@ describe('campaign', function(){
                     QA: new_QA
                 };
                 // modify start time to 1 hour later
-                Routing.Campaign.modify_campaign(backend_admin_token, campaign_A._id, null, null, null, null, new Date().add('h', 1), null, null, null, null, null, null, null, null, null, null, null, null, null, function (body) {
+                Routing.Campaign.modify_campaign(backend_admin_token, campaign_A._id, undefined, undefined, undefined, undefined, new Date().add('h', 1), undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, function (body) {
                     body.should.have.property('code', 1000);
                     // modify QA, got success
                     Routing.Campaign.backend_modify_QA(backend_admin_token, campaign_A._id, new_QA, function (body) {
                         body.should.have.property('code', 1000);
                         // query QA, got modified
                         Routing.Campaign.query_QA(campaign_A._id, function (body) {
-                            body.should.have.properties(expected_QA_list);
+                            body.should.containDeep(expected_QA_list);
                             // modify start time to now
-                            Routing.Campaign.modify_campaign(backend_admin_token, campaign_A._id, null, null, null, null, new Date(), null, null, null, null, null, null, null, null, null, null, null, null, null, function (body) {
+                            Routing.Campaign.modify_campaign(backend_admin_token, campaign_A._id, undefined, undefined, undefined, undefined, new Date(), undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, function (body) {
                                 body.should.have.property('code', 1000);
                                 // modify QA, got failed
                                 Routing.Campaign.backend_modify_QA(backend_admin_token, campaign_A._id, [{
