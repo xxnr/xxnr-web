@@ -1605,7 +1605,12 @@ exports.process_add_potential_customer = function(req, res, next) {
         return;
     }
 
-    if (!req.data.phone || !tools.isPhone(req.data.phone.toString())) {
+    if(!req.data.phone){
+        res.respond({code:1001, message:'请输入手机号'});
+        return;
+    }
+
+    if (!tools.isPhone(req.data.phone.toString())) {
         res.respond({code: 1001, message: '请输入正确的手机号'});
         return;
     }

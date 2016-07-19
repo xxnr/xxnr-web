@@ -107,7 +107,7 @@ describe('XXNR agent', function(){
             },{
                 name:'add potential customer w/o phone',
                 params:function(){return {name:test_potential_customer.name}},
-                result:{code:1001, message:'请输入正确的手机号'}
+                result:{code:1001, message:'请输入手机号'}
             },{
                 name:'add potential customer w/ invalid phone',
                 params:function(){return {name:test_potential_customer.name, phone:'131'}},
@@ -143,39 +143,39 @@ describe('XXNR agent', function(){
             },{
                 name:'add potential customer w/ invalid province id',
                 params:function(){return {name:test_potential_customer.name, phone:test_potential_customer.phone, sex:test_potential_customer.sex, address:{province:'invalidid', city:test_address.city._id, county:test_address.county._id, town:test_address.town._id}, buyIntentions:[intention_product._id]}},
-                result:{code:1001, message:'没有查到要修改的省'}
+                result:{code:1001, message:'没有查找到省'}
             },{
                 name:'add potential customer w/ invalid city id',
                 params:function(){return {name:test_potential_customer.name, phone:test_potential_customer.phone, sex:test_potential_customer.sex, address:{province:test_address.province._id, city:'invalidid', county:test_address.county._id, town:test_address.town._id}, buyIntentions:[intention_product._id]}},
-                result:{code:1001, message:'没有查到要修改的市'}
+                result:{code:1001, message:'没有查找到市'}
             },{
                 name:'add potential customer w/ invalid county id',
                 params:function(){return {name:test_potential_customer.name, phone:test_potential_customer.phone, sex:test_potential_customer.sex, address:{province:test_address.province._id, city:test_address.city._id, county:'invalidid', town:test_address.town._id}, buyIntentions:[intention_product._id]}},
-                result:{code:1001, message:'没有查到要修改的区县'}
+                result:{code:1001, message:'没有查找到区县'}
             },{
                 name:'add potential customer w/ invalid town id',
                 params:function(){return {name:test_potential_customer.name, phone:test_potential_customer.phone, sex:test_potential_customer.sex, address:{province:test_address.province._id, city:test_address.city._id, county:test_address.county._id, town:'invalidid'}, buyIntentions:[intention_product._id]}},
-                result:{code:1001, message:'没有查到要修改的乡镇'}
+                result:{code:1001, message:'没有查找到乡镇'}
             },{
                 name:'add potential customer w/ invalid town id',
                 params:function(){return {name:test_potential_customer.name, phone:test_potential_customer.phone, sex:test_potential_customer.sex, address:{province:test_address.province._id, city:test_address.city._id, town:'invalidid'}, buyIntentions:[intention_product._id]}},
-                result:{code:1001, message:'没有查到要修改的乡镇'}
+                result:{code:1001, message:'没有查找到乡镇'}
             },{
                 name:'add potential customer w/ city not belong to province',
                 params:function(){return {name:test_potential_customer.name, phone:test_potential_customer.phone, sex:test_potential_customer.sex, address:{province:test_address.province._id, city:test_address_3.city._id, county:test_address.county._id, town:test_address.town._id}, buyIntentions:[intention_product._id]}},
-                result:{code:1001, message:'所选城市不属于所选省份'}
+                result:{code:1001, message:'所选城市与省份不匹配，请重新选择'}
             },{
                 name:'add potential customer w/ county not belong to city',
                 params:function(){return {name:test_potential_customer.name, phone:test_potential_customer.phone, sex:test_potential_customer.sex, address:{province:test_address.province._id, city:test_address.city._id, county:test_address_2.county._id, town:test_address.town._id}, buyIntentions:[intention_product._id]}},
-                result:{code:1001, message:'所选区县不属于所选城市'}
+                result:{code:1001, message:'所选区县与城市不匹配，请重新选择'}
             },{
                 name:'add potential customer w/ town not belong to county',
                 params:function(){return {name:test_potential_customer.name, phone:test_potential_customer.phone, sex:test_potential_customer.sex, address:{province:test_address.province._id, city:test_address.city._id, county:test_address.county._id, town:test_address_2.town._id}, buyIntentions:[intention_product._id]}},
-                result:{code:1001, message:'所选乡镇不属于所选区县'}
+                result:{code:1001, message:'所选乡镇与区县不匹配，请重新选择'}
             },{
                 name:'add potential customer w/ town not belong to city',
                 params:function(){return {name:test_potential_customer.name, phone:test_potential_customer.phone, sex:test_potential_customer.sex, address:{province:test_address.province._id, city:test_address.city._id, town:test_address_2.town._id}, buyIntentions:[intention_product._id]}},
-                result:{code:1001, message:'所选乡镇不属于所选城市'}
+                result:{code:1001, message:'所选乡镇与城市不匹配，请重新选择'}
             }
         ];
 

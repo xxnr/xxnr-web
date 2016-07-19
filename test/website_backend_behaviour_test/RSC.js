@@ -112,39 +112,39 @@ describe('RSC', function(){
             },{
                 name:'fill RSC info w/ invalid province',
                 params:function(){return {token:token, name:test_RSC_info.name, IDNo:test_RSC_info.IDNo, phone:test_RSC_info.phone, companyName:test_RSC_info.companyName, companyAddress:{province:'wrongprovinceid', city:test_address.city._id, town:test_address.town._id}}},
-                result:{code: 1001, message: '没有查到要修改的省'}
+                result:{code: 1001, message: '没有查找到省'}
             },{
                 name:'fill RSC info w/ invalid city',
                 params:function(){return {token:token, name:test_RSC_info.name, IDNo:test_RSC_info.IDNo, phone:test_RSC_info.phone, companyName:test_RSC_info.companyName, companyAddress:{province:test_address.province._id, city:'wrongcityid', town:test_address.town._id}}},
-                result:{code: 1001, message: '没有查到要修改的市'}
+                result:{code: 1001, message: '没有查找到市'}
             },{
                 name:'fill RSC info w/ invalid county',
                 params:function(){return {token:token, name:test_RSC_info.name, IDNo:test_RSC_info.IDNo, phone:test_RSC_info.phone, companyName:test_RSC_info.companyName, companyAddress:{province:test_address.province._id, city:test_address.city._id, county:'wrongcountyid', town:test_address.town._id}}},
-                result:{code: 1001, message: '没有查到要修改的区县'}
+                result:{code: 1001, message: '没有查找到区县'}
             },{
                 name:'fill RSC info w/ invalid town',
                 params:function(){return {token:token, name:test_RSC_info.name, IDNo:test_RSC_info.IDNo, phone:test_RSC_info.phone, companyName:test_RSC_info.companyName, companyAddress:{province:test_address.province._id, city:test_address.city._id, county:test_address.county._id, town:'wrongtownid'}}},
-                result:{code: 1001, message: '没有查到要修改的乡镇'}
+                result:{code: 1001, message: '没有查找到乡镇'}
             },{
                 name:'fill RSC info w/ invalid town',
                 params:function(){return {token:token, name:test_RSC_info.name, IDNo:test_RSC_info.IDNo, phone:test_RSC_info.phone, companyName:test_RSC_info.companyName, companyAddress:{province:test_address.province._id, city:test_address.city._id, town:'wrongtownid'}}},
-                result:{code: 1001, message: '没有查到要修改的乡镇'}
+                result:{code: 1001, message: '没有查找到乡镇'}
             },{
                 name:'fill RSC info w/ city not belong to province',
                 params:function(){return {token:token, name:test_RSC_info.name, IDNo:test_RSC_info.IDNo, phone:test_RSC_info.phone, companyName:test_RSC_info.companyName, companyAddress:{province:test_address.province._id, city:test_address_3.city._id, county:test_address.county._id, town:test_address.town._id}}},
-                result:{code: 1001, message: '所选城市不属于所选省份'}
+                result:{code: 1001, message: '所选城市与省份不匹配，请重新选择'}
             },{
                 name:'fill RSC info w/ county not belong to city',
                 params:function(){return {token:token, name:test_RSC_info.name, IDNo:test_RSC_info.IDNo, phone:test_RSC_info.phone, companyName:test_RSC_info.companyName, companyAddress:{province:test_address.province._id, city:test_address.city._id, county:test_address_2.county._id, town:test_address.town._id}}},
-                result:{code: 1001, message: '所选区县不属于所选城市'}
+                result:{code: 1001, message: '所选区县与城市不匹配，请重新选择'}
             },{
                 name:'fill RSC info w/ town not belong to county',
                 params:function(){return {token:token, name:test_RSC_info.name, IDNo:test_RSC_info.IDNo, phone:test_RSC_info.phone, companyName:test_RSC_info.companyName, companyAddress:{province:test_address.province._id, city:test_address.city._id, county:test_address.county._id, town:test_address_2.town._id}}},
-                result:{code: 1001, message: '所选乡镇不属于所选区县'}
+                result:{code: 1001, message: '所选乡镇与区县不匹配，请重新选择'}
             },{
                 name:'fill RSC info w/ town not belong to city',
                 params:function(){return {token:token, name:test_RSC_info.name, IDNo:test_RSC_info.IDNo, phone:test_RSC_info.phone, companyName:test_RSC_info.companyName, companyAddress:{province:test_address.province._id, city:test_address.city._id, town:test_address_2.town._id}}},
-                result:{code: 1001, message: '所选乡镇不属于所选城市'}
+                result:{code: 1001, message: '所选乡镇与城市不匹配，请重新选择'}
             },{
                 name:'fill RSC info w/ right province city and town',
                 params:function(){return {token:token, name:test_RSC_info.name, IDNo:test_RSC_info.IDNo, phone:test_RSC_info.phone, companyName:test_RSC_info.companyName, companyAddress:{province:test_address_4.province._id, city:test_address_4.city._id, town:test_address_4.town._id}}},
