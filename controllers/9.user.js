@@ -1246,6 +1246,11 @@ exports.process_bind_inviter = function(req, res, next){
         return;
     }
 
+    if(!tools.isPhone(req.data.inviter)){
+        res.respond({code:1001,message:'请输入正确的手机号'});
+        return;
+    }
+
     if(!req.data.userId){
         res.respond({code:1001,message:'请填写用户ID'});
         return;
@@ -1262,6 +1267,11 @@ exports.process_bind_inviter = function(req, res, next){
         if(data.inviter){
             // already has inviter
             res.respond({code:1002, message:'已经绑定过邀请人，请勿重复操作'});
+            return;
+        }
+
+        if(data.account == req.data.inviter){
+            res.respond({code:1002, message:'不能绑定自己为新农代表，请重新输入'});
             return;
         }
 
@@ -1298,13 +1308,13 @@ exports.json_get_inviter = function(req, res, next) {
     UserService.get(options, function (err, data) {
         // Error
         if (err) {
-            res.respond({'code': '1001', 'message': err});
+            res.respond({'code': '1001', 'message': '获取新农代表失败，请重试'});
             return;
         }
         if (data && data.inviter && data.inviter.id) {
             UserService.get({userid: data.inviter.id}, function (err, inviter) {
                 if (err) {
-                    res.respond({'code': '1001', 'message': err});
+                    res.respond({'code': '1001', 'message': '获取新农代表失败，请重试'});
                     return;
                 }
                 if (inviter) {
@@ -1332,12 +1342,12 @@ exports.json_get_inviter = function(req, res, next) {
                     user.inviterIsVerified = inviter.isVerified;
                     res.respond({code: '1000', message: 'success', datas: user});
                 } else {
-                    res.respond({code: '1001', message: '没有找到新农代表信息'});
+                    res.respond({code: '1001', 'message': '获取新农代表失败，请重试'});
                     return; 
                 }
             });
         } else {
-            res.respond({code: '1000', message: '没有找到新农代表信息', datas:{}});
+            res.respond({code: '1000', datas:{}});
             return;
         }
     });
@@ -1350,7 +1360,7 @@ exports.json_get_inviteeOrderbynamePinyin = function(req, res, next) {
     UserService.getInviteeOrderbynamePinyin(options, function(err, result) {
         if (err) {
             console.error('user getInviteeOrderbynamePinyin err:', err);
-            res.respond({code:1001, message:'获取被邀请人列表失败'});
+            res.respond({code:1001});
             return;
         }
 
@@ -1381,7 +1391,7 @@ exports.json_get_inviteeOrderbynamePinyin = function(req, res, next) {
                 UserService.getInviteeOrderNumber(inviteeIds, function (err, inviteeOrderData) {
                     if (err) {
                         console.error('user json_get_invitee getInviteeOrderNumber err:', err);
-                        res.respond({code:1001, message:'获取被邀请人列表失败'});
+                        res.respond({code:1001});
                         return;
                     }
 
@@ -1423,7 +1433,7 @@ exports.json_get_invitee = function(req, res, next) {
     UserService.getInvitee(options, function(err, result) {
         if (err) {
             console.error('user json_get_invitee err:', err);
-            res.respond({code:1001, message:'无法获取被邀请人列表'});
+            res.respond({code:1001, message:'获取客户列表失败，请重试'});
             return;
         }
 
@@ -1451,7 +1461,7 @@ exports.json_get_invitee = function(req, res, next) {
                 UserService.getInviteeOrderNumber(inviteeIds, function (err, inviteeOrderData) {
                     if (err) {
                         console.error('user json_get_invitee getInviteeOrderNumber err:', err);
-                        res.respond({code:1001, message:'获取被邀请人列表错误'});
+                        res.respond({code:1001, message:'获取客户列表失败，请重试'});
                         return;
                     }
 
@@ -1486,7 +1496,7 @@ exports.json_get_invitee_orders = function(req, res, next) {
     UserService.getOneInvitee({_id:req.user._id, inviteeId:req.data.inviteeId}, function(err, user) {
         if (err) {
             console.error('user json_get_invitee err:', err);
-            res.respond({code:1001, message:'获取客户信息失败'});
+            res.respond({code:1001, message:'获取客户订单列表失败，请重试'});
             return;
         }
 
@@ -1508,7 +1518,7 @@ exports.json_get_invitee_orders = function(req, res, next) {
         OrderService.query(options, function(err, data) {
             if (err) {
                 console.error('User json_get_invitee_orders err:', err);
-                res.respond({code:1001, message:'获取客户订单失败'});
+                res.respond({code:1001, message:'获取客户订单列表失败，请重试'});
                 return;
             }
 
@@ -1655,13 +1665,13 @@ exports.json_potential_customer = function(req, res, next){
         var max = U.parseInt(req.data.max, 20);
         PotentialCustomerService.queryPage(req.user, page, max, function (err, potentialCustomers, totalCount, pageCount) {
             if (err) {
-                res.respond({code: 1001, message: '获取潜在客户列表失败'});
+                res.respond({code: 1001, message: '获取潜在客户列表失败，请重试'});
                 return;
             }
 
             PotentialCustomerService.countLeftToday(req.user, function (err, count) {
                 if (err) {
-                    res.respond({code: 1001, message: '查询客户列表失败'});
+                    res.respond({code: 1001, message: '获取潜在客户列表失败，请重试'});
                     return;
                 }
 
@@ -1682,7 +1692,7 @@ exports.json_potential_customer = function(req, res, next){
 exports.json_potential_customer_orderby_namePinyin = function(req, res, next){
     PotentialCustomerService.queryOrderbynamePinyin(req.user, function (err, potentialCustomers) {
         if (err) {
-            res.respond({code: 1001, message: '获取潜在客户列表失败'});
+            res.respond({code: 1001});
             return;
         }
 
@@ -1699,13 +1709,13 @@ exports.json_potential_customer_islatest = function(req, res, next){
     var count = req.data.count || 0;
     PotentialCustomerService.queryOrderbynamePinyin(req.user, function (err, potentialCustomers) {
         if (err) {
-            res.respond({code: 1001, message: '获取潜在客户列表失败'});
+            res.respond({code: 1001, message: '查询失败，请重试'});
             return;
         }
 
         PotentialCustomerService.countLeftToday(req.user, function (err, countLeftToday) {
             if (err) {
-                res.respond({code: 1001, message: '查询客户列表失败'});
+                res.respond({code: 1001, message: '查询失败，请重试'});
                 return;
             }
 
@@ -1762,7 +1772,7 @@ exports.json_potential_customer_get = function(req, res, next){
 
     PotentialCustomerService.getById(req.data._id, function(err, doc){
         if(err){
-            res.respond({code:1001, message:'获取客户信息失败'});
+            res.respond({code:1001, message:'获取客户详情失败，请重试'});
             return;
         }
 

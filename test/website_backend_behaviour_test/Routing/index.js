@@ -23,6 +23,7 @@ exports.Order = require('./order');
 exports.News = require('./news');
 exports.RSC = require('./RSC');
 exports.Campaign = require('./campaign');
+exports.Rewardshop = require('./rewardshop');
 
 exports.backend_upload_photo = function(token, imgPath, done){
     request(app)
