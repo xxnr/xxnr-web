@@ -214,7 +214,13 @@ describe('campaign', function(){
             after('delete all campaign pages', function(done){
                 Components.remove_file(events_campaign_path, function(){
                     Components.remove_file(QA_campaign_path, function(){
-                        Components.remove_file(quiz_campaign_path, done);
+                        Components.remove_file(quiz_campaign_path, function(){
+                            Components.remove_file(events_campaign_share_path, function() {
+                                Components.remove_file(QA_campaign_share_path, function () {
+                                    Components.remove_file(quiz_campaign_share_path, done);
+                                })
+                            })
+                        });
                     })
                 })
             });
