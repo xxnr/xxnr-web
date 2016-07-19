@@ -62,20 +62,21 @@ CategoryService.prototype.getDeliveries = function(categoryIds, callback) {
 function refresh() {
     var categories = {};
 
-    CategoryModel.find({}, function(err, docs) {
-        if (err) {
-            console.error('models category refresh err:', err);
-        } else {
-            if (docs) {
-                for (var i = 0; i < docs.length; i++) {
-                    var doc = docs[i];
-                    categories[doc.id] = doc;
+    if (typeof F != 'undefined' && F.global) {
+        CategoryModel.find({}, function(err, docs) {
+            if (err) {
+                console.error('models category refresh err:', err);
+            } else {
+                if (docs) {
+                    for (var i = 0; i < docs.length; i++) {
+                        var doc = docs[i];
+                        categories[doc.id] = doc;
+                    }
                 }
             }
-        }
-        F.global.mapCategories = categories;
-    });
-
+            F.global.mapCategories = categories;
+        });
+    }
 }
 
 setTimeout(refresh, 1000);
