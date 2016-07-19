@@ -496,7 +496,7 @@ describe('User', function() {
                     townId:'invalidtownid'
                 }
             }},
-            result:{code: 1001, message: '没有查到要修改的省'}
+            result:{code: 1001, message: '没有查找到省'}
         },{
             name:'modify user info w/ invalid city id',
             params:function(){return{
@@ -507,7 +507,7 @@ describe('User', function() {
                     townId:'invalidtownid'
                 }
             }},
-            result:{code: 1001, message: '没有查到要修改的市'}
+            result:{code: 1001, message: '没有查找到市'}
         },{
             name:'modify user info w/ invalid county id',
             params:function(){return{
@@ -519,7 +519,7 @@ describe('User', function() {
                     townId:'invalidtownid'
                 }
             }},
-            result:{code: 1001, message: '没有查到要修改的区县'}
+            result:{code: 1001, message: '没有查找到区县'}
         },{
             name:'modify user info w/ invalid town id',
             params:function(){return{
@@ -531,7 +531,7 @@ describe('User', function() {
                     townId:'invalidtownid'
                 }
             }},
-            result:{code: 1001, message: '没有查到要修改的乡镇'}
+            result:{code: 1001, message: '没有查找到乡镇'}
         },{
             name:'modify user info w/ invalid town id',
             params:function(){return{
@@ -542,7 +542,7 @@ describe('User', function() {
                     townId:'invalidtownid'
                 }
             }},
-            result:{code: 1001, message: '没有查到要修改的乡镇'}
+            result:{code: 1001, message: '没有查找到乡镇'}
         },{
             name:'modify user info w/ city not belong to province',
             params:function(){return{
@@ -553,7 +553,7 @@ describe('User', function() {
                     townId:'invalidtownid'
                 }
             }},
-            result:{code: 1001, message: '所选城市不属于所选省份'}
+            result:{code: 1001, message: '所选城市与省份不匹配，请重新选择'}
         },{
             name:'modify user info w/ county not belong to city',
             params:function(){return{
@@ -565,9 +565,9 @@ describe('User', function() {
                     townId:'invalidtownid'
                 }
             }},
-            result:{code: 1001, message: '所选区县不属于所选城市'}
+            result:{code: 1001, message: '所选区县与城市不匹配，请重新选择'}
         },{
-            name:'modify user info w/ city not belong to province',
+            name:'modify user info w/ town not belong to county',
             params:function(){return{
                 token:token,
                 address:{
@@ -577,9 +577,9 @@ describe('User', function() {
                     townId:test_address_2.town.id
                 }
             }},
-            result:{code: 1001, message: '所选乡镇不属于所选区县'}
+            result:{code: 1001, message: '所选乡镇与区县不匹配，请重新选择'}
         },{
-            name:'modify user info w/ city not belong to province',
+            name:'modify user info w/ town not belong to city',
             params:function(){return{
                 token:token,
                 address:{
@@ -588,7 +588,7 @@ describe('User', function() {
                     townId:test_address_2.town.id
                 }
             }},
-            result:{code: 1001, message: '所选乡镇不属于所选城市'}
+            result:{code: 1001, message: '所选乡镇与城市不匹配，请重新选择'}
         },{
             name:'modify user info w/ only province city town',
             params:function(){return{
