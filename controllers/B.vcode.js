@@ -199,9 +199,10 @@ function graph_vcode(req, res) {
         requestType = req.data.bizcode;
     if (req.data.authCode)
         authCode = req.data.authCode;
-    var host = req.hostname;
-    // var protocol = req.protocol + '://';
-    // var prevurl = protocol + host;
+    var host = req.get('host');
+    host = host ? host : req.hostname;
+    var protocol = req.protocol + '://';
+    var prevurl = protocol + host;
     var callback = function (err, graphvCode) {
         if (err) {
             if (err.type == 'graphvCode' && graphvCode) {
@@ -209,7 +210,7 @@ function graph_vcode(req, res) {
                 res.respond({
                     code: 1000,
                     message: err.message?err.message:'图形验证码错误',
-                    captcha: captchaUrl ? captchaUrl : ''
+                    captcha: captchaUrl ? prevurl + captchaUrl : ''
                 });
                 return;
             } else {
@@ -224,7 +225,7 @@ function graph_vcode(req, res) {
                 var captchaUrl = generate_captcha_url(graphvCode);
                 res.respond({
                     code: 1000,
-                    captcha: captchaUrl ? captchaUrl : ''
+                    captcha: captchaUrl ? prevurl + captchaUrl : ''
                 });
                 return;
             }
