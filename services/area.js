@@ -217,7 +217,7 @@ AreaService.prototype.check_address = function(province_id, city_id, county_id, 
 	self.getProvince(useId ? {id:province_id} : {_id: province_id}, function (err, province) {
 		if (err || !province) {
 			if (err) console.error('get province err:', err);
-			res.respond({code: 1001, message: '没有查到要修改的省'});
+			res.respond({code: 1001, message: '没有查找到省'});
 			return;
 		}
 
@@ -225,12 +225,12 @@ AreaService.prototype.check_address = function(province_id, city_id, county_id, 
 		self.getCity(useId ? {id:city_id} : {_id: city_id}, function (err, city) {
 			if (err || !city) {
 				if (err) console.error('get city err:', err);
-				res.respond({code: 1001, message: '没有查到要修改的市'});
+				res.respond({code: 1001, message: '没有查找到市'});
 				return;
 			}
 
 			if (city.provinceid != province.id) {
-				res.respond({code: 1001, message: '所选城市不属于所选省份'});
+				res.respond({code: 1001, message: '所选城市与省份不匹配，请重新选择'});
 				return;
 			}
 
@@ -239,12 +239,12 @@ AreaService.prototype.check_address = function(province_id, city_id, county_id, 
 				self.getCounty(useId ? {id:county_id} : {_id: county_id}, function (err, county) {
 					if (err || !county) {
 						if (err) console.error('get county err:', err);
-						res.respond({code: 1001, message: '没有查到要修改的区县'});
+						res.respond({code: 1001, message: '没有查找到区县'});
 						return;
 					}
 
 					if (county.cityid != city.id) {
-						res.respond({code: 1001, message: '所选区县不属于所选城市'});
+						res.respond({code: 1001, message: '所选区县与城市不匹配，请重新选择'});
 						return;
 					}
 
@@ -252,12 +252,12 @@ AreaService.prototype.check_address = function(province_id, city_id, county_id, 
 					self.getTown(useId ? {id:town_id} : {_id: town_id}, function (err, town) {
 						if (err || !town) {
 							if (err) console.error('get town err:', err);
-							res.respond({code: 1001, message: '没有查到要修改的乡镇'});
+							res.respond({code: 1001, message: '没有查找到乡镇'});
 							return;
 						}
 
 						if (town.countyid != county.id) {
-							res.respond({code: 1001, message: '所选乡镇不属于所选区县'});
+							res.respond({code: 1001, message: '所选乡镇与区县不匹配，请重新选择'});
 							return;
 						}
 
@@ -269,12 +269,12 @@ AreaService.prototype.check_address = function(province_id, city_id, county_id, 
 				self.getTown(useId ? {id:town_id} : {_id: town_id}, function (err, town) {
 					if (err || !town) {
 						if (err) console.error('get town err:', err);
-						res.respond({code: 1001, message: '没有查到要修改的乡镇'});
+						res.respond({code: 1001, message: '没有查找到乡镇'});
 						return;
 					}
 
 					if (town.cityid != city.id) {
-						res.respond({code: 1001, message: '所选乡镇不属于所选城市'});
+						res.respond({code: 1001, message: '所选乡镇与城市不匹配，请重新选择'});
 						return;
 					}
 
