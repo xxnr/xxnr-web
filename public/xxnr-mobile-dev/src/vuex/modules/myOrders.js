@@ -40,6 +40,9 @@ const mutations = {
   },
   [HIDE_POPBOX](state) {
     state.popBoxDisplay = false;
+    state.productNumber = 0;
+    state.checkedSKUList = [];
+    state.hasSKUSelected = false;
   },
   [SHOW_POPBOX](state, id) {
     state.confirmOrderId = id;

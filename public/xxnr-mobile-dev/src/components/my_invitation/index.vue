@@ -275,5 +275,6 @@
     color: #B0B0B0;
     height: 35px;
     padding-left: 10px;
+    -webkit-appearance: none;
   }
 </style>

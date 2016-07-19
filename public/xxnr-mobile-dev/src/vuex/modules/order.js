@@ -23,7 +23,7 @@ const state = {
   RSCList: [],
   RSCSelected: [],
   orderRSC: {_id: '', address: ''},
-  cartList: [],
+  cartList: {},
   shopCartId: '',
   totalPrice: 0,
   consigneeList: [],

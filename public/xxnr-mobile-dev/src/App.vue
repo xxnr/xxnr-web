@@ -38,9 +38,13 @@
     _border: 0;
     outline: none;
     background: none;
-    font-family: "Microsoft YaHei";
+    font-family: "Microsoft YaHei","Arial";
     border-radius: 0;
     opacity: 1;
+  }
+
+  button {
+    font-family: "Microsoft YaHei";
   }
 
   input[type=button] {

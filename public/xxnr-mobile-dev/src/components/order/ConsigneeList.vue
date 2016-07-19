@@ -6,7 +6,7 @@
       </div>
       <div class="consignee-val">
         <div class="consignee-val-con">
-          <input type="text" placeholder="请填写收货人的真实姓名" maxlength="12" v-model="consigneeName" >
+          <input type="text" placeholder="请填写收货人的真实姓名" maxlength="12" v-model="consigneeName" onblur="this.onblur = null;">
         </div>
       </div>
       <div class="clear"></div>
@@ -19,7 +19,7 @@
       </div>
       <div class="consignee-val">
         <div class="consignee-val-con">
-          <input type="text" placeholder="请填写联系方式" maxlength="11" v-model="consigneePhone">
+          <input type="text" placeholder="请填写联系方式" maxlength="11" v-model="consigneePhone" onblur="this.onblur = null;">
         </div>
       </div>
       <div class="clear"></div>

@@ -180,6 +180,7 @@ const mutations = {
   [CLEAR_PRODUCTDETAIL] (state) {
     state.product = {};
     state.productNumber = 1;
+    state.selectedAdditions = [];
     state.isAllSKUSelected = false;
     state.isNull = true;
     state.tabIndex = 0;

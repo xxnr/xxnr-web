@@ -2,7 +2,7 @@
   <div class="login-section">
     <div class="login-input phone-input">
       <img src="/assets/images/my_xxnr_user.png" alt="">
-      <input v-model="phoneNum" type="text" placeholder="请输入手机号">
+      <input v-model="phoneNum" type="text" placeholder="请输入手机号" onblur="this.onblur = null;">
     </div>
     <div class="login-input password-input">
       <img src="/assets/images/my_xxnr_password.png" alt="">

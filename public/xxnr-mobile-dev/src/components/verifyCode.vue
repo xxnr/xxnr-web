@@ -8,7 +8,7 @@
       </div>
 
       <div class="verify-code-img-normal" v-if="isNormal" @click="refreshCode(phoneNum),resetCaptcha();">
-        <img :src="codeImg" onerror="javascript:this.src='/static/assets/images/load-failed.png';this.onerror = null;">
+        <img :src="codeImg" v-if="codeImg" onerror="javascript:this.src='/static/assets/images/load-failed.png';console.log('error');this.onerror = null;">
       </div>
       <!--<div class="verify-code-img-error">-->
         <!--<img src="/assets/images/load-failed.png">-->
