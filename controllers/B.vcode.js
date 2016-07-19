@@ -199,7 +199,8 @@ function graph_vcode(req, res) {
         requestType = req.data.bizcode;
     if (req.data.authCode)
         authCode = req.data.authCode;
-    var host = req.hostname;
+    var host = req.get('host');
+    host = host ? host : req.hostname;
     var protocol = req.protocol + '://';
     var prevurl = protocol + host;
     var callback = function (err, graphvCode) {

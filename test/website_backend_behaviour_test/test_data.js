@@ -169,5 +169,27 @@ module.exports = {
             IDNo:'10000000000000000X',
             companyName: 'test_RSC_company' + index
         }
+    },
+    // rewardshop
+    gift_categories:{
+
+    },
+    // gift
+    test_gift:{
+        name: "24K纯金凯凯",
+        marketPrice: 3000,
+        points: 100,
+        soldout: false,
+        istop: true,
+        appbody:'<p>&nbsp;测试app礼品详情。<img src="test.jpg"></p>'
+    },
+    random_test_gift: function(index){
+        return {
+            name: "24K纯金凯凯"+index,
+            marketPrice: 3000,
+            points: 1,
+            soldout: false,
+            istop: true
+        };
     }
 };
