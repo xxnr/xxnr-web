@@ -6,7 +6,7 @@
     </div>
     <div class="login-input password-input">
       <img src="/assets/images/my_xxnr_password.png" alt="">
-      <input v-model="password" type="text" placeholder="请输入密码" onfocus="this.type='password'" autocomplete="off">
+      <input v-model="password" type="text" placeholder="请输入密码" onfocus="this.type='password'" autocomplete="off" onblur="this.onblur = null;">
     </div>
     <!--<div class="forget-pass">-->
       <!--忘记密码？-->

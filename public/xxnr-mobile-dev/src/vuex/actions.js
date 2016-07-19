@@ -353,6 +353,7 @@ export const bindInviter = ({dispatch,state},inviterPhone) => {
     dispatch(types.SET_TOASTMSG, '请输入正确的手机号');
     return;
   }
+  let userId = state.auth.user.userid;
   let loginName = state.auth.userInfo.loginName;
   if(inviterPhone == loginName) {
     dispatch(types.SET_TOASTMSG, '不能绑定自己为新农代表，请重新输入');

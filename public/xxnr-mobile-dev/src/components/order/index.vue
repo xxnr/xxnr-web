@@ -22,7 +22,7 @@
         </div>
         <div class="order-consignee" v-link="{path: '/orderConsignee?id=' + orderId + '&count=' + count + '&productId=' + productId}">
           <div class="order-consignee-bit"></div>
-          <span v-if="!orderConsignee.consigneePhone">请填写收货人信息{{orderConsignee.consigneeName}}</span>
+          <span v-if="!orderConsignee.consigneePhone">请填写收货人信息</span>
           {{orderConsignee.consigneeName}}
           {{orderConsignee.consigneePhone}}
         </div>
@@ -173,6 +173,9 @@
       var path = transition.from.path;
       this.resetOrderCondignee(path);
       this.resetOrderRSC(path);
+      this.orderId = getUrlParam('id');
+      this.count = getUrlParam('count');
+      this.productId = getUrlParam('productId');
       document.getElementsByTagName('body')[0].scrollTop = 0;
       transition.next();
     }
