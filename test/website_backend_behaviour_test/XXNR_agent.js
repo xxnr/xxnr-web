@@ -14,6 +14,7 @@ var deployment = require('../../deployment');
 var PotentialCustomerModel = models.potential_customer;
 var utils = require('../../common/utils');
 var ProductModel = models.product;
+var Components = require('./utilities/components');
 var SKUModel = models.SKU;
 
 describe('XXNR agent', function(){
@@ -201,17 +202,31 @@ describe('XXNR agent', function(){
         afterEach('delete frontend account', function(done){
             Routing.User.delete_frontend_account(user.account, done);
         });
-        it('bind self', function(done) {
-            var expected_result = {
-                code:1002,
-                message:'不能添加自己为新农代表'
-            };
+        var testCases = [{
+            name:'bind self',
+            params:function(){return {token:token, inviter:user.account}},
+            result:{code:1002, message:'不能绑定自己为新农代表，请重新输入'}
+        },
+            {
+                name:'bind wrong phone number',
+                params:function(){return {token:token, inviter:'151223'}},
+                result:{code:1001,message:'请输入正确的手机号'}
+            },
+            {
+                name:'bind w/ unregistered phone',
+                params:function(){return {token:token, inviter:'13800009999'}},
+                result:{code:1001,message:'该手机号未注册，请重新输入'}
+            }
+        ];
 
-            Routing.User.bind_inviter(token, user.account, function (body) {
-                body.should.have.properties(expected_result);
-                done();
-            })
-        });
+        testCases.forEach(function (test) {
+            Components.testGetAndPost(test.name)
+                .call('/api/v2.0/user/bindInviter')
+                .send(test.params)
+                .end(function (err, res) {
+                    res.body.should.have.properties(test.result)
+                })
+        })
     });
     describe('XXNR agent scenarios', function() {
         var potential_customer = test_data.potential_customer;
