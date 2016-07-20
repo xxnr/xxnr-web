@@ -28,8 +28,10 @@ var campaign_schema = new mongoose.Schema({
 var reward_control_schema = new mongoose.Schema({
     user:{type:mongoose.Schema.ObjectId, ref:'user', required:true},
     campaign:{type:mongoose.Schema.ObjectId, ref:'campaign', required:true},
-    reward_times:{type:Number, default:0}
+    reward_times:{type:Number, default:1}
 }, {_id: false});
+
+reward_control_schema.index({user:1, campaign:1});
 
 var QA_campaign_schema = new mongoose.Schema({
     campaign:{type:mongoose.Schema.ObjectId, ref:"campaign", required:true},

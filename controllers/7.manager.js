@@ -2804,7 +2804,10 @@ exports.modify_campaign = function(req, res, next){
 
 		var updateBasicInfo = false;
 		var online_time = currentCampaign.online_time;
-		var canUpdateProperties = ['type', 'title', 'online_time', 'offline_time', 'start_time', 'end_time', 'campaign_url_name', 'url', 'image', 'comment', 'reward_times', 'shareable', 'share_points_add', 'share_button', 'share_title', 'share_url_name', 'share_url', 'share_abstract', 'share_image'];
+		var canUpdateProperties = ['type', 'title', 'online_time', 'offline_time'
+			, 'start_time', 'end_time', 'campaign_url_name', 'url', 'image', 'comment'
+			, 'reward_times', 'shareable', 'share_points_add', 'share_button', 'share_title'
+			, 'share_url_name', 'share_url', 'share_abstract', 'share_image'];
 		canUpdateProperties.forEach(function(property){
 			if(campaign.hasOwnProperty(property)) {
 				updateBasicInfo = true;
@@ -2813,10 +2816,11 @@ exports.modify_campaign = function(req, res, next){
 		});
 
 		var datetimeNow = new Date();
-		if(updateBasicInfo && online_time < datetimeNow){
-			res.respond({code:1001, message:'活动上线后不能更改基础信息'});
-			return;
-		}
+		// don't do this
+		//if(updateBasicInfo && online_time < datetimeNow){
+		//	res.respond({code:1001, message:'活动上线后不能更改基础信息'});
+		//	return;
+		//}
 
 		CampaignService.save(currentCampaign, function(err, newCampaign){
 			if(err){
@@ -2913,16 +2917,13 @@ exports.offline_campaign = function(req, res, next){
 	})
 };
 
-exports.modify_QA = function(req, res, next){
-	//TODO:modify QA
-};
-
-exports.modify_quiz_question = function(req, res, next){
-	//TODO:modify quiz question
-};
-
 exports.modify_quiz_right_answer = function(req, res, next){
 	//TODO:modify quiz right answer
+	var campaign_id = req.data._id;
+	var answers = req.data.answers;
+	CampaignService.findById(campaign_id, function(err, campaign){
+		
+	})
 };
 
 exports.query_quiz_right_answer = function(req, res, next){

@@ -7,6 +7,10 @@ var should = require('should');
 var config = require('../../../config');
 var models = require('../../../models');
 var CampaignModel = models.campaign;
+var QACampaignModel = models.QA_campaign;
+var QuizCampaignModel = models.quiz_campaign;
+var QuizAnswerModel = models.quiz_answer;
+var RewardControlModel = models.reward_control;
 
 exports.create_campaign = function(token, campaign, done) {
     request(app)
@@ -195,5 +199,17 @@ exports.trigger_quiz_reward = function(token, _id, done){
 };
 
 exports.delete_all_campaigns = function(done){
-    CampaignModel.find({}).remove(done);
+    CampaignModel.find({}).remove(function(err){
+        should.not.exist(err);
+        QACampaignModel.find({}).remove(function(err){
+            should.not.exist(err);
+            QuizCampaignModel.find({}).remove(function(err){
+                should.not.exist(err);
+                QuizAnswerModel.find({}).remove(function(err){
+                    should.not.exist(err);
+                    RewardControlModel.find({}).remove(done);
+                })
+            })
+        })
+    });
 };

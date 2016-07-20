@@ -3,6 +3,8 @@
  */
 var services = require('../services');
 var CampaignService = services.Campaign;
+var LoyaltypointService = services.loyaltypoint;
+var LOYALTYPOINTSTYPE = require('../common/defs').LOYALTYPOINTSTYPE;
 var path = require('path');
 
 exports.query_campaign = function(req, res, next){
@@ -19,7 +21,6 @@ exports.query_campaign = function(req, res, next){
 exports.campaign_page = function(req, res, next){
     var type = req.params.type;
     var name = req.params.name;
-    // TODO: render view in /views/campaigns/{type}/{name}, w/ some common
 
     if (type && name) {
         res.render(path.join(__dirname, '../views/G.campaign/', type, name));
@@ -43,7 +44,6 @@ exports.campaign_page = function(req, res, next){
         //}
     } else {
         res.status(404).send('404: Page not found');
-        return;
     }
 
 
@@ -75,7 +75,7 @@ exports.campaign_status = function(req, res, next){
     }
 
     var campaign_status_promise = new Promise(function(resolve, reject){
-        CampaignService.campaign_status(campaign_id, function(err, status, message){
+        CampaignService.get_campaign_status(campaign_id, function(err, status, message){
             if(err){
                 reject(err);
                 return;
@@ -118,6 +118,52 @@ exports.get_QA = function(req, res, next){
 
 exports.QA_require_reward = function(req, res, next){
     //TODO:QA require reward
+    var user = req.user;
+    var campaign_id = req.data._id;
+    var answers = req.data.answers;
+
+    if(!user){
+        res.respond({code:1001, message:'请先登录'});
+        return;
+    }
+
+    if(!campaign_id){
+        res.respond({code:1001, message:'campaign_id required'});
+        return;
+    }
+
+    if(!answers){
+        res.respond({code:1001, message:'answers required'});
+        return;
+    }
+
+    CampaignService.findById(campaign_id, function(err, campaign){
+        if(err){
+            console.error(err);
+            res.respond({code:1001, message:'提交答案失败'});
+            return;
+        }
+
+        CampaignService.QA_check_answers(user._id, campaign_id, answers, function(err, code, points_added, right_answered_questions_count){
+            if(err){
+                console.error(err);
+                res.respond({code:code||1001, message:err});
+                return;
+            }
+
+            LoyaltypointService.increase(user._id, points_added, LOYALTYPOINTSTYPE.COMPAIGNREWARD, campaign.title, campaign._id, function(err){
+                CampaignService.record_reward(user._id, campaign_id, function(err){
+                    if(err){
+                        console.error(err);
+                        res.respond({code:1001, message:'提交答案失败'});
+                        return;
+                    }
+
+                    res.respond({code:1000, points_added:points_added, right_answered_questions_count:right_answered_questions_count});
+                })
+            })
+        })
+    })
 };
 
 exports.query_quiz_question = function(req, res, next){
