@@ -84,7 +84,11 @@
       this.showBackBtn()
     },
     detached() {
-      this.policyChecked = true
+      this.policyChecked = true;
+      this.phoneNum = '';
+      this.password = '';
+      this.code = '';
+      this.confirmPassword = '';
     },
     route: {
       activate(){

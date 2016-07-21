@@ -40,21 +40,20 @@
   .xxnr_toast{
     position: fixed;
     bottom: 40px;
-    width: 210px;
+    width: 75%;
     left: 50%;
     transform: translateX(-50%);
     background-color:rgba(0,0,0,0.4);
     color: #EAF8F4;
-    height: 30px;
     border-radius: 5px;
     text-align: center;
-    line-height: 30px;
+    line-height: 20px;
     z-index: 102;
     -webkit-animation: fadein 1s; /* Safari, Chrome and Opera > 12.1 */
     -moz-animation: fadein 1s; /* Firefox < 16 */
     -ms-animation: fadein 1s; /* Internet Explorer */
     -o-animation: fadein 1s; /* Opera < 12.1 */
     animation: fadein 1s;
-
+    padding: 5px;
   }
 </style>

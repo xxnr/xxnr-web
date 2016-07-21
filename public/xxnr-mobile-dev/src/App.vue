@@ -19,6 +19,7 @@
   }
 </script>
 <style>
+  @import './xxnr_mobile_ui/vux.css';
   /*some common css style */
   [v-cloak] { display: none }
   html, body, p, div, ul, li, a, span {
@@ -32,6 +33,7 @@
     background-color: #fafafa;
     color: #595757;
     -webkit-tap-highlight-color: rgba(0,0,0,0);
+    -webkit-text-size-adjust: none;
   }
   input {
     border: none;

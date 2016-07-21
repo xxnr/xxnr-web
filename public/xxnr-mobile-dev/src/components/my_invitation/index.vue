@@ -5,7 +5,7 @@
     </div>
     <div v-else class="addInviter clearfix">
       <input type="text" v-model="inviterPhone" placeholder="输入代表人手机号进行添加">
-      <button class="xxnr_Btn" @click="bindInviterMethod()">
+      <button class="xxnr_Btn" @click="bindInviterMethod(inviterPhone)">
         添加
       </button>
     </div>
@@ -41,7 +41,7 @@
       <div class="confirm-btn confirm-cancel" @click="hideConfirmBox();">
         取消
       </div>
-      <div class="confirm-btn confirm-confirm" @click="bindInviter(inviterPhone),hideConfirmBox(),showToast();">
+      <div class="confirm-btn confirm-confirm" @click="bindInviter(inviterPhone),hideConfirmBox()">
         确定
       </div>
     </div>
@@ -68,8 +68,9 @@
 </template>
 
 <script>
-  import { bindInviter,getUserInfo,showBackBtn,hideRightBtn,getInviter,clearInviter} from '../../vuex/actions'
+  import { getUserInfo,showBackBtn,hideRightBtn,getInviter,clearInviter} from '../../vuex/actions'
   import xxnrToast from '../../xxnr_mobile_ui/xxnrToast.vue'
+  import api from '../../api/remoteHttpApi'
 
   export default {
     data(){
@@ -77,18 +78,17 @@
         showConfirm: false,
         showConfirmTel: false,
         toastShow:false,
-        inviterPhone: ''
+        inviterPhone: '',
+        toastMsg: ''
       }
     },
     vuex:{
       getters:{
         user : state => state.auth.user,
         userInfo : state => state.auth.userInfo,
-        inviterInfo: state => state.auth.inviterInfo,
-        toastMsg: state => state.toastMsg
+        inviterInfo: state => state.auth.inviterInfo
       },
       actions:{
-        bindInviter,
         getUserInfo,
         showBackBtn,
         hideRightBtn,
@@ -100,17 +100,72 @@
       xxnrToast
     },
     methods: {
-      bindInviterMethod: function() {
+      bindInviterMethod: function(inviterPhone) {
         var reg = /^1\d{10}$/;
-        if(!this.inviterPhone || !reg.test(this.inviterPhone)) {
-          this.bindInviter(this.inviterPhone);
+        if(inviterPhone == '') {
+          this.setToastTitle('请输入手机号');
           this.showToast();
-        } else {
-          this.showConfirm =  true;
-          //this.bindInviter(inviterPhone);
+          return;
         }
+        if(!reg.test(inviterPhone)) {
+          this.setToastTitle('请输入正确的手机号');
+          this.showToast();
+          return;
+        }
+        let userId = this.user.userid;
+        let loginName = this.userInfo.loginName;
+        if(inviterPhone == loginName) {
+          this.setToastTitle('不能绑定自己为新农代表，请重新输入');
+          this.showToast();
+          return;
+        }
+        api.findAccount({
+          account: inviterPhone
+        }, response => {
+          if(response.data.code == 1000) {
+            this.showConfirm = true;
+          } else {
+            this.setToastTitle(response.data.message);
+            this.showToast();
+          }
+          return;
+        }, response => {
+
+        });
       },
-      showConfirmBox:function (inviterPhone) {
+      bindInviter: function (inviterPhone) {
+        var reg = /^1\d{10}$/;
+        if(inviterPhone == '') {
+          this.setToastTitle('请输入手机号');
+          this.showToast();
+          return;
+        }
+        if(!reg.test(inviterPhone)) {
+          this.setToastTitle('请输入正确的手机号');
+          this.showToast();
+          return;
+        }
+        let userId = this.user.userid;
+        let loginName = this.userInfo.loginName;
+        if(inviterPhone == loginName) {
+          this.setToastTitle('不能绑定自己为新农代表，请重新输入');
+          this.showToast();
+          return;
+        }
+        api.bindInviter(
+          {'userId':userId,'inviter':inviterPhone},
+          response => {
+          console.log(response);
+          if (response.data.code == 1000) {
+            router.go('/home');
+            return;
+          }
+          this.setToastTitle(response.data.message);
+          this.showToast();
+          }, response => {
+          })
+      },
+      showConfirmBox:function () {
           this.showConfirm =  true;
       },
       hideConfirmBox:function () {
@@ -124,6 +179,9 @@
       },
       showToast:function(){
         this.toastShow=true;
+      },
+      setToastTitle: function(text) {
+        this.toastMsg = text;
       }
     },
     created () {

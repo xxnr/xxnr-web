@@ -79,6 +79,9 @@ export default {
   },
   refreshCode: function (data, cb, errCb) {
     jsonpPost(API_ROOT + "api/v2.3/captcha", data, cb, errCb);
+  },
+  findAccount: function (data, cb, errCb) {
+    jsonpGet(API_ROOT + "api/v2.0/user/findAccount", data, cb, errCb);
   }
 }
 
