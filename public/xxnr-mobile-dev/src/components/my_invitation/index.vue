@@ -157,7 +157,7 @@
           response => {
           console.log(response);
           if (response.data.code == 1000) {
-            router.go('/home');
+            window.location.reload();
             return;
           }
           this.setToastTitle(response.data.message);
@@ -196,7 +196,7 @@
         this.showBackBtn();
         this.hideRightBtn();
       },
-      deactivate() {
+      deactivate(){
         this.clearInviter();
       }
     },
