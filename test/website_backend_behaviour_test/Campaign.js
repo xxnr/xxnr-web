@@ -386,7 +386,6 @@ describe('campaign', function(){
                                 Routing.Campaign.get_page(campaign_share_url, function(){
                                     Routing.Campaign.query_quiz_question(campaign_id, function(body){
                                         body.should.containDeep(expected_question_list);
-                                        body.questions[0].options[0].should.not.have.property('is_right_answer');
                                         done();
                                     });
                                 })
@@ -938,7 +937,8 @@ describe('campaign', function(){
                             {order_key: 2, value: '选项2'},
                             {order_key: 3, value: '选项3'}
                         ],
-                        points: 15
+                        points: 15,
+                        order_key:1
                     }
                 ];
                 var fail_modified_questions = [
@@ -949,7 +949,8 @@ describe('campaign', function(){
                             {order_key: 1, value: '选项1'},
                             {order_key: 2, value: '选项2'}
                         ],
-                        points: 5
+                        points: 5,
+                        order_key:1
                     }
                 ];
                 var answers = [{order_key: 1, choices: [1]}];
@@ -960,7 +961,17 @@ describe('campaign', function(){
                 };
                 var expected_quiz_right_answers = {
                     code: 1000,
-                    answers: [{order_key: 1, choices: [1]}]
+                    questions:[{
+                        question: '测试问题',
+                        type: 1,
+                        options: [
+                            {order_key: 1, value: '选项1', is_right_answer:true},
+                            {order_key: 2, value: '选项2'},
+                            {order_key: 3, value: '选项3'}
+                        ],
+                        points: 15,
+                        order_key:1
+                    }]
                 };
                 // modify start time to 1 hour later
                 var modified_campaign = {_id:campaign_A._id, start_time: new Date().add('h', 1)};
@@ -971,7 +982,7 @@ describe('campaign', function(){
                         body.should.have.property('code', 1000);
                         // query QA, got expected
                         Routing.Campaign.query_quiz_question(campaign_A._id, function (body) {
-                            body.should.have.properties(expected_question_list);
+                            body.should.containDeep(expected_question_list);
                             // modify start time to now
                             modified_campaign.start_time = new Date();
                             Routing.Campaign.modify_campaign(backend_admin_token, modified_campaign, function (body) {
@@ -981,13 +992,13 @@ describe('campaign', function(){
                                     body.should.have.property('code', 1001);
                                     // query quiz question, got not modified
                                     Routing.Campaign.query_quiz_question(campaign_A._id, function (body) {
-                                        body.should.have.properties(expected_question_list);
+                                        body.should.containDeep(expected_question_list);
                                         // modify right quiz answers, success
                                         Routing.Campaign.backend_modify_quiz_right_answer(backend_admin_token, campaign_A._id, answers, function (body) {
                                             body.should.have.property('code', 1000);
                                             // query right quiz answer, got expected
-                                            Routing.Campaign.backend_query_quiz_right_answer(backend_admin_token, campaign_A._id, function (body) {
-                                                body.should.have.properties(expected_quiz_right_answers);
+                                            Routing.Campaign.query_quiz_question(campaign_A._id, function (body) {
+                                                body.should.containDeep(expected_quiz_right_answers);
                                                 // set end time to 1 hour later
                                                 modified_campaign.end_time = new Date().add('h', 1);
                                                 Routing.Campaign.modify_campaign(backend_admin_token, modified_campaign, function (body) {
@@ -1006,8 +1017,8 @@ describe('campaign', function(){
                                                                 Routing.Campaign.backend_modify_quiz_right_answer(backend_admin_token, campaign_A._id, fail_modified_answers, function (body) {
                                                                     body.should.have.property('code', 1001);
                                                                     // query right quiz answer, got expected
-                                                                    Routing.Campaign.backend_query_quiz_right_answer(backend_admin_token, campaign_A._id, function (body) {
-                                                                        body.should.have.properties(expected_quiz_right_answers);
+                                                                    Routing.Campaign.query_quiz_question(campaign_A._id, function (body) {
+                                                                        body.should.containDeep(expected_quiz_right_answers);
                                                                         done();
                                                                     })
                                                                 })
@@ -1027,27 +1038,44 @@ describe('campaign', function(){
             it('query quiz result', function (done) {
                 var answers = [{order_key: 1, choices: [1]}, {order_key: 2, choices: [2]}];
                 var expected_points_added = 30;
-                var expected_quiz_result = {
+                var expected_my_answer_before_trigger = {
                     code: 1000,
-                    right_answer: [{order_key: 1, choices: [1]}, {order_key: 2, choices: [2]}],
-                    points_added: expected_points_added
+                    answers: {1:{1:true}, 2:{2:true}},
+                    result:{
+                        has_result:false,
+                        points:0,
+                        right_answer_count:0
+                    }
+                };
+                var expected_my_answer_after_trigger = {
+                    code: 1000,
+                    answers: {1:{1:true}, 2:{2:true}},
+                    result:{
+                        has_result:true,
+                        points:expected_points_added,
+                        right_answer_count:2
+                    }
                 };
                 // answer quiz question
                 Routing.Campaign.submit_quiz_answer(test_user_token, campaign_A._id, answers, function (body) {
                     body.should.have.property('code', 1000);
                     // query quiz result before trigger reward job, fail
-                    Routing.Campaign.query_quiz_result(test_user_token, campaign_A._id, function (body) {
-                        body.should.have.property('code', 1001);
+                    Routing.Campaign.query_my_quiz_answer(test_user_token, campaign_A._id, function (body) {
+                        body.should.containDeep(expected_my_answer_before_trigger);
                         // backend modify right answer
                         Routing.Campaign.backend_modify_quiz_right_answer(backend_admin_token, campaign_A._id, answers, function (body) {
                             body.should.have.property('code', 1000);
-                            // trigger reward
-                            Routing.Campaign.trigger_quiz_reward(backend_admin_token, campaign_A._id, function (body) {
+                            // set end time to now
+                            Routing.Campaign.modify_campaign(backend_admin_token, {_id:campaign_A._id, end_time:new Date()}, function (body) {
                                 body.should.have.property('code', 1000);
-                                // query quiz result after trigger reward job, success
-                                Routing.Campaign.query_quiz_result(test_user_token, campaign_A._id, function (body) {
-                                    body.should.have.properties(expected_quiz_result);
-                                    done();
+                                // trigger reward
+                                Routing.Campaign.trigger_quiz_reward(backend_admin_token, campaign_A._id, function (body) {
+                                    body.should.have.property('code', 1000);
+                                    // query quiz result after trigger reward job, success
+                                    Routing.Campaign.query_my_quiz_answer(test_user_token, campaign_A._id, function (body) {
+                                        body.should.containDeep(expected_my_answer_after_trigger);
+                                        done();
+                                    })
                                 })
                             })
                         })
@@ -1057,16 +1085,23 @@ describe('campaign', function(){
             it('play quiz campaign', function (done) {
                 var answers = [{order_key: 1, choices: [2]}];
                 var new_answers = [{order_key: 1, choices: [2]}, {order_key: 2, choices: [1]}];
-                var expected_my_answers = {
+                var expected_my_answers_before_trigger = {
                     code: 1000,
-                    answers: [{order_key: 1, choices: [2]}, {order_key: 2, choices: [1]}]
+                    answers: {1:{2:true}, 2:{1:true}},
+                    result:{
+                        has_result:false
+                    }
                 };
                 var right_answers = [{order_key: 1, choices: [1]}, {order_key: 2, choices: [1]}];
-                var expected_points_added = 10;
-                var expected_quiz_result = {
+                var expected_points_added = 20;
+                var expected_my_answers_after_trigger = {
                     code: 1000,
-                    right_answer: [{order_key: 1, choices: [1]}, {order_key: 2, choices: [1]}],
-                    points_added: expected_points_added
+                    answers: {1:{2:true}, 2:{1:true}},
+                    result:{
+                        has_result:true,
+                        points:expected_points_added,
+                        right_answer_count:1
+                    }
                 };
                 Routing.User.get_user_info(test_user_token, function (body) {
                     body.datas.should.have.property('pointLaterTrade');
@@ -1082,13 +1117,13 @@ describe('campaign', function(){
                                 body.should.have.property('code', 1000);
                                 // query my answers, got question 2 modified
                                 Routing.Campaign.query_my_quiz_answer(test_user_token, campaign_id, function (body) {
-                                    body.shold.have.properties(expected_my_answers);
+                                    body.should.containDeep(expected_my_answers_before_trigger);
                                     // modify quiz answers, fail
                                     Routing.Campaign.submit_quiz_answer(test_user_token, campaign_id, right_answers, function (body) {
-                                        body.should.have.property('code', 1021);
+                                        body.should.have.property('code', 1020);
                                         // query my answers, got not modified
                                         Routing.Campaign.query_my_quiz_answer(test_user_token, campaign_id, function (body) {
-                                            body.shold.containDeep(expected_my_answers);
+                                            body.should.containDeep(expected_my_answers_before_trigger);
                                             // modify end time to now
                                             var modified_campaign = {_id:campaign_id, end_time: new Date()};
                                             Routing.Campaign.modify_campaign(backend_admin_token, modified_campaign, function (body) {
@@ -1099,8 +1134,8 @@ describe('campaign', function(){
                                                     // trigger reward
                                                     Routing.Campaign.trigger_quiz_reward(backend_admin_token, campaign_id, function (body) {
                                                         body.should.have.property('code', 1000);
-                                                        Routing.Campaign.query_quiz_result(test_user_token, campaign_id, function (body) {
-                                                            body.should.have.properties(expected_quiz_result);
+                                                        Routing.Campaign.query_my_quiz_answer(test_user_token, campaign_id, function (body) {
+                                                            body.should.containDeep(expected_my_answers_after_trigger);
                                                             Routing.User.get_user_info(test_user_token, function (body) {
                                                                 body.datas.should.have.property('pointLaterTrade');
                                                                 var points_after = body.datas.pointLaterTrade;

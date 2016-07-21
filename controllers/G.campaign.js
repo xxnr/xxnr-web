@@ -139,27 +139,40 @@ exports.QA_require_reward = function(req, res, next){
 
     CampaignService.findById(campaign_id, function(err, campaign){
         if(err){
-            console.error(err);
             res.respond({code:1001, message:'提交答案失败'});
             return;
         }
 
-        CampaignService.QA_check_answers(user._id, campaign_id, answers, function(err, code, points_added, right_answered_questions_count){
+        CampaignService.canPlay(user._id, campaign_id, function(err, code) {
             if(err){
-                console.error(err);
-                res.respond({code:code||1001, message:err});
+                res.respond({code: code || 1001, message: err});
                 return;
             }
 
-            LoyaltypointService.increase(user._id, points_added, LOYALTYPOINTSTYPE.COMPAIGNREWARD, campaign.title, campaign._id, function(err){
-                CampaignService.record_reward(user._id, campaign_id, function(err){
-                    if(err){
-                        console.error(err);
-                        res.respond({code:1001, message:'提交答案失败'});
+            CampaignService.QA_check_answers(user._id, campaign_id, answers, function (err, points_added, right_answered_questions_count) {
+                if (err) {
+                    res.respond({code: 1001, message: err});
+                    return;
+                }
+
+                LoyaltypointService.increase(user._id, points_added, LOYALTYPOINTSTYPE.COMPAIGNREWARD, campaign.title, campaign._id, function (err) {
+                    if (err) {
+                        res.respond({code: 1001, message: '提交答案失败'});
                         return;
                     }
 
-                    res.respond({code:1000, points_added:points_added, right_answered_questions_count:right_answered_questions_count});
+                    CampaignService.record_reward(user._id, campaign_id, function (err) {
+                        if (err) {
+                            res.respond({code: 1001, message: '提交答案失败'});
+                            return;
+                        }
+
+                        res.respond({
+                            code: 1000,
+                            points_added: points_added,
+                            right_answered_questions_count: right_answered_questions_count
+                        });
+                    })
                 })
             })
         })
@@ -167,7 +180,6 @@ exports.QA_require_reward = function(req, res, next){
 };
 
 exports.query_quiz_question = function(req, res, next){
-    //TODO: get quiz question
     var campaign_id = req.data._id;
     if(!campaign_id){
         res.respond({code:1001, message:'campaign_id required'});
@@ -185,14 +197,60 @@ exports.query_quiz_question = function(req, res, next){
 };
 
 exports.submit_quiz_answer = function(req, res, next){
-    //TODO: quiz answer
+    var user = req.user;
+    var campaign_id = req.data._id;
+    var answers = req.data.answers;
+
+    CampaignService.canPlay(user._id, campaign_id, function(err, code){
+        if(err){
+            res.respond({code: code || 1001, message: err});
+            return;
+        }
+
+        CampaignService.submit_quiz_answer(user._id, campaign_id, answers, function(err){
+            if(err){
+                res.respond({code:1001, message:err});
+                return;
+            }
+
+            CampaignService.record_reward(user._id, campaign_id, function (err) {
+                if (err) {
+                    res.respond({code: 1001, message: '提交答案失败'});
+                    return;
+                }
+
+                res.respond({code:1000});
+            })
+        })
+    })
 };
 
 exports.query_my_quiz_answer = function(req, res, next){
     //TODO: query quiz answer
+    var user = req.user;
+    var campaign_id = req.data._id;
+
+    CampaignService.query_my_quiz_answer(user._id, campaign_id, function(err, myAnswer){
+        if(err){
+            res.respond({code:1001, message:err});
+            return;
+        }
+
+        var result = {};
+        if(myAnswer){
+            myAnswer.answer.forEach(function(answer){
+                result[answer.order_key] = {};
+                answer.choices.forEach(function(choice){
+                    result[answer.order_key][choice] = true;
+                })
+            })
+        }
+
+        res.respond({code:1000, answers:result, result:myAnswer?myAnswer.result : null});
+    })
 };
 
-exports.query_quiz_result = function(req, res, next){
-    //TODO; query quiz result
-};
+exports.get_campaign = function(req, res, next){
+    var url = req.data.url;
 
+}

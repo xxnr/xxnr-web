@@ -7,11 +7,14 @@ var QACampaignModel = models.QA_campaign;
 var QuizCampaignModel = models.quiz_campaign;
 var QuizAnswerModel = models.quiz_answer;
 var RewardControlModel = models.reward_control;
+var LoyaltypointService = require('./loyaltypoint');
+var LOYALTYPOINTSTYPE = require('../common/defs').LOYALTYPOINTSTYPE;
 
 const CAMPAIGNTYPE = {EVENTS : 1, QA : 2, QUIZ : 3};
 const CAMPAIGNSTATUS = {NOTONLINE : 1, NOTSTART : 2, START : 3, END : 4, OFFLINE : 5};
 const campaign_type_name = {1:'品牌宣传', 2:'答题活动', 3:'竞猜活动'};
 const campaign_status_message = {1:'活动尚未上线', 2:'活动还未开始', 3:'活动正在进行', 4:'活动已经结束', 5:'活动已经下线'};
+const batchCount = 10;
 var CampaignService = function(){
     this.campaign_type_name = campaign_type_name;
     this.campaign_status_message = campaign_status_message;
@@ -240,7 +243,6 @@ CampaignService.prototype.queryQA = function(campaign_id, callback){
 
 CampaignService.prototype.query_quiz_question = function(campaign_id, callback){
     QuizCampaignModel.findOne({campaign:campaign_id})
-        .select('QA.question QA.type QA.options.value QA.options.order_key QA.order_key QA.points')
         .exec(function(err, QuizCampaign){
             if(err){
                 console.error(err);
@@ -318,70 +320,33 @@ CampaignService.prototype.QA_check_answers = function(user_id, campaign_id, answ
         return;
     }
 
-    self.get_campaign_status(campaign_id, function(err, status){
-        if(err){
-            console.error(err);
+    QACampaignModel.findOne({campaign:campaign_id}, function(err, QACampaign){
+        if(err || !QACampaign){
+            console.error(err || 'cannot find QA details');
             callback('提交答案失败');
             return;
         }
 
-        switch(status){
-            case self.campaign_status.NOTONLINE:
-            case self.campaign_status.NOTSTART:
-                callback('活动尚未开始');
-                return;
-            case self.campaign_status.END:
-            case self.campaign_status.OFFLINE:
-                callback('活动已经结束');
-                return;
-            case self.campaign_status.START:
-                break;
-            default:
-                callback('提交答案失败');
-                return;
-        }
-
-        self.get_times_left(user_id, campaign_id, function(err, times_left){
-            if(err){
-                console.error(err);
-                callback('提交答案失败');
-                return;
-            }
-
-            if(times_left <= 0){
-                callback('already played', 1020);
-                return;
-            }
-
-            QACampaignModel.findOne({campaign:campaign_id}, function(err, QACampaign){
-                if(err || !QACampaign){
-                    console.error(err || 'cannot find QA details');
-                    callback('提交答案失败');
-                    return;
+        var points_added = 0;
+        var right_answered_questions_count = 0;
+        var questions = {};
+        QACampaign.QA.forEach(function(question){
+            questions[question.order_key] = {points:question.points, right_answers:[]};
+            question.options.forEach(function(option){
+                if(option.is_right_answer) {
+                    questions[question.order_key].right_answers.push(option.order_key);
                 }
+            });
+        });
 
-                var points_added = 0;
-                var right_answered_questions_count = 0;
-                var questions = {};
-                QACampaign.QA.forEach(function(question){
-                    questions[question.order_key] = {points:question.points, right_answers:[]};
-                    question.options.forEach(function(option){
-                        if(option.is_right_answer) {
-                            questions[question.order_key].right_answers.push(option.order_key);
-                        }
-                    });
-                });
+        answers.forEach(function(answer){
+            if(answers_equal(questions[answer.order_key].right_answers, answer.choices)){
+                right_answered_questions_count++;
+                points_added += questions[answer.order_key].points;
+            }
+        });
 
-                answers.forEach(function(answer){
-                    if(answers_equal(questions[answer.order_key].right_answers, answer.choices)){
-                        right_answered_questions_count++;
-                        points_added += questions[answer.order_key].points;
-                    }
-                });
-
-                callback(null, null, points_added, right_answered_questions_count);
-            })
-        })
+        callback(null, points_added, right_answered_questions_count);
     })
 };
 
@@ -405,6 +370,309 @@ CampaignService.prototype.record_reward = function(user_id, campaign_id, callbac
         }
 
         callback();
+    })
+};
+
+CampaignService.prototype.modify_quiz_right_answer = function(campaign_id, answers, callback){
+    if(!campaign_id){
+        callback('campaign_id required');
+        return;
+    }
+
+    if(!answers){
+        callback('answers required');
+        return;
+    }
+
+    QuizCampaignModel.findOne({campaign:campaign_id}, function(err, quizCampaign){
+        if(err || !quizCampaign){
+            console.error(err || 'quiz not found');
+            callback('更新竞猜答案失败，请重试');
+            return;
+        }
+
+        if(quizCampaign.right_answer_published){
+            callback('答案已发布，请勿再次修改答案');
+            return;
+        }
+
+        answers.forEach(function(answer){
+            for(var i=0; i<quizCampaign.QA.length; i++){
+                if(answer.order_key == quizCampaign.QA[i].order_key){
+                    quizCampaign.QA[i].options.forEach(function(option){
+                        if(answer.choices.indexOf(option.order_key) != -1){
+                            option.is_right_answer = true;
+                        }
+                    });
+
+                    quizCampaign.QA[i].right_answer_set = true;
+                    break;
+                }
+            }
+        });
+
+        quizCampaign.date_last_modified = new Date();
+        quizCampaign.save(function(err){
+            if(err){
+                console.error(err);
+                callback('更新竞猜答案失败，请重试');
+                return;
+            }
+
+            callback();
+        })
+    })
+};
+
+CampaignService.prototype.trigger_quiz_reward = function(campaign_id, callback){
+    var self = this;
+    if(!campaign_id){
+        callback('campaign_id required');
+        return;
+    }
+
+    self.get_campaign_status(campaign_id, function(err, status){
+        if(!(status == self.campaign_status.END || status == self.campaign_status.OFFLINE)){
+            callback('活动尚未结束，无法公布答案');
+            return;
+        }
+
+        // check if all answers are set
+        QuizCampaignModel.find({campaign:campaign_id, 'QA.right_answer_set':false}, function(err,quizCampaign){
+            if(err){
+                console.error(err);
+                callback('公布结果失败，请重试');
+                return;
+            }
+
+            if(quizCampaign && quizCampaign.length > 0){
+                callback('答案未设置完毕');
+                return;
+            }
+
+            // check if already triggered
+            QuizCampaignModel.findOne({campaign:campaign_id}, function(err, quizCampaign){
+                if(err || !quizCampaign){
+                    console.error(err || 'quiz campaign not found');
+                    callback('公布结果失败，请重试');
+                    return;
+                }
+
+                if(quizCampaign.right_answer_published){
+                    callback('结果已经公布，请勿重复操作');
+                    return;
+                }
+
+                var quiz = {};
+                quizCampaign.QA.forEach(function(question){
+                    quiz[question.order_key] = {points:question.points, right_answers:[]};
+                    question.options.forEach(function(option){
+                        if(option.is_right_answer){
+                            quiz[question.order_key].right_answers.push(option.order_key);
+                        }
+                    })
+                });
+
+                QuizAnswerModel.find({campaign:campaign_id})
+                    .populate('campaign')
+                    .exec(function(err, quizAnswers){
+                        if(err || !quizAnswers){
+                            console.error(err || 'quiz answer not found');
+                            callback('公布结果失败，请重试');
+                            return;
+                        }
+
+                        var userCount = quizAnswers.length;
+                        var batchRequireReward = function(i, max){
+                            var promises = [];
+                            for(; i<max; i++){
+                                promises.push(new Promise(function(resolve, reject){
+                                    var user = quizAnswers[i];
+                                    var points_add = 0;
+                                    var right_answer_count = 0;
+                                    user.answer.forEach(function (answer) {
+                                        if (answers_equal(quiz[answer.order_key].right_answers, answer.choices)) {
+                                            // answer right
+                                            points_add += quiz[answer.order_key].points;
+                                            right_answer_count++;
+                                        }
+                                    });
+
+                                    LoyaltypointService.increase(user.user, points_add, LOYALTYPOINTSTYPE.COMPAIGNREWARD, quizAnswers[i].campaign.title, quizAnswers[i].campaign._id, function (err) {
+                                        if(err){
+                                            console.error(err);
+                                            reject(err);
+                                            return;
+                                        }
+
+                                        self.record_reward(user.user, campaign_id, function (err) {
+                                            if(err){
+                                                console.error(err);
+                                                reject(err);
+                                                return;
+                                            }
+
+                                            QuizAnswerModel.findOneAndUpdate({user:user.user, campaign:campaign_id}, {$set:{result:{has_result:true, points:points_add, right_answer_count:right_answer_count, date_time:new Date()}}}, function(err){
+                                                if(err){
+                                                    console.error(err);
+                                                    reject(err);
+                                                    return;
+                                                }
+
+                                                resolve();
+                                            })
+                                        })
+                                    })
+                                }))
+                            }
+
+                            Promise.all(promises)
+                                .then(function(){
+                                    if(userCount-max>batchCount){
+                                        batchRequireReward(max, max + batchCount);
+                                    } else if(userCount-max > 0){
+                                        batchRequireReward(max, userCount);
+                                    } else{
+                                        // all finished
+                                        quizCampaign.right_answer_published = true;
+                                        quizCampaign.save(function(err){
+                                            if(err){
+                                                callback('公布答案失败');
+                                                return;
+                                            }
+
+                                            callback()
+                                        })
+                                    }
+                                })
+                        };
+
+                        if(userCount > batchCount){
+                            batchRequireReward(0, batchCount)
+                        } else{
+                            batchRequireReward(0, userCount);
+                        }
+                    })
+            })
+        })
+    })
+};
+
+CampaignService.prototype.submit_quiz_answer = function(user_id, campaign_id, answers, callback){
+    if(!user_id){
+        callback('user_id required');
+        return;
+    }
+
+    if(!campaign_id){
+        callback('campaign_id required');
+        return;
+    }
+
+    if(!answers){
+        callback('answers required');
+        return;
+    }
+
+    QuizCampaignModel.findOne({campaign:campaign_id}, function(err, quizCampaign) {
+        if (err || !quizCampaign) {
+            console.error(err || 'quiz campaign not found');
+            callback('提交答案失败');
+            return;
+        }
+
+        if (quizCampaign.QA.length > answers.length) {
+            callback('您还有题目未选择答案');
+            return;
+        }
+
+        var quizAnswer = {user: user_id, campaign: campaign_id, answer: answers, date_last_modified: new Date()};
+        QuizAnswerModel.update({
+            user: user_id,
+            campaign: campaign_id
+        }, {$set: quizAnswer}, {upsert: true}, function (err) {
+            if (err) {
+                console.error(err);
+                callback('提交答案失败');
+                return;
+            }
+
+            callback();
+        })
+    })
+};
+
+CampaignService.prototype.query_my_quiz_answer = function(user_id, campaign_id, callback){
+    if(!user_id){
+        callback('user_id required');
+        return;
+    }
+
+    if(!campaign_id){
+        callback('campaign_id required');
+        return;
+    }
+
+    QuizAnswerModel.findOne({user:user_id, campaign:campaign_id}, function(err, myAnswer){
+        if(err){
+            console.error(err);
+            callback('查询失败');
+            return;
+        }
+
+        callback(null, myAnswer);
+    })
+};
+
+CampaignService.prototype.canPlay = function(user_id, campaign_id, callback){
+    var self = this;
+    if(!user_id){
+        callback('user_id required');
+        return;
+    }
+
+    if(!campaign_id){
+        callback('campaign_id required');
+        return;
+    }
+
+    self.get_campaign_status(campaign_id, function(err, status) {
+        if (err) {
+            console.error(err);
+            callback('提交答案失败');
+            return;
+        }
+
+        switch (status) {
+            case self.campaign_status.NOTONLINE:
+            case self.campaign_status.NOTSTART:
+                callback('活动尚未开始');
+                return;
+            case self.campaign_status.END:
+            case self.campaign_status.OFFLINE:
+                callback('活动已经结束');
+                return;
+            case self.campaign_status.START:
+                break;
+            default:
+                callback('提交答案失败');
+                return;
+        }
+
+        self.get_times_left(user_id, campaign_id, function (err, times_left) {
+            if (err) {
+                console.error(err);
+                callback('提交答案失败');
+                return;
+            }
+
+            if (times_left <= 0) {
+                callback('already played', 1020);
+                return;
+            }
+
+            callback();
+        })
     })
 };
 

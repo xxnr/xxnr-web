@@ -2873,7 +2873,6 @@ exports.query_campaign = function(req, res, next){
 };
 
 exports.offline_campaign = function(req, res, next){
-	//TODO:offline campaign
 	var campaign_id = req.data._id;
 	if(!campaign_id){
 		res.respond({code:1001, message:'campaign_id required'});
@@ -2882,7 +2881,6 @@ exports.offline_campaign = function(req, res, next){
 
 	CampaignService.findById(campaign_id, function(err, campaign){
 		if(err){
-			console.error(err);
 			res.respond({code:1001, message:'查询失败'});
 			return;
 		}
@@ -2907,7 +2905,6 @@ exports.offline_campaign = function(req, res, next){
 		campaign.offline_time = current_time;
 		CampaignService.save(campaign, function(err, newCampaign){
 			if(err){
-				console.error(err);
 				res.respond({code:1001, message:'修改失败'});
 				return;
 			}
@@ -2918,18 +2915,33 @@ exports.offline_campaign = function(req, res, next){
 };
 
 exports.modify_quiz_right_answer = function(req, res, next){
-	//TODO:modify quiz right answer
 	var campaign_id = req.data._id;
 	var answers = req.data.answers;
-	CampaignService.findById(campaign_id, function(err, campaign){
-		
+
+	CampaignService.modify_quiz_right_answer(campaign_id, answers, function(err){
+		if(err){
+			res.respond({code:1001, message:err});
+			return;
+		}
+
+		res.respond({code:1000});
 	})
 };
 
-exports.query_quiz_right_answer = function(req, res, next){
-	//TODO: query quiz right answer
+exports.trigger_quiz_reward = function(req, res, next){
+	var campaign_id = req.data._id;
+
+	CampaignService.trigger_quiz_reward(campaign_id, function(err){
+		if(err){
+			res.respond({code:1001, message:err});
+			return;
+		}
+
+		res.respond({code:1000});
+	})
 };
 
-exports.trigger_quiz_reward = function(req, res, next){
-	//TODO: trigger quiz reward
-};
+exports.get_campaign = function(req, res, next){
+	//TODO: get campaign details
+	var
+}

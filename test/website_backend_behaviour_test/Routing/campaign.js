@@ -40,7 +40,7 @@ exports.modify_campaign = function(token, campaign, done) {
 
 exports.frontend_query_campaign = function(done){
     request(app)
-        .get('/api/v2.3/campaign')
+        .get('/api/v2.3/campaigns')
         .end(function(err, res){
             should.not.exist(err);
             done(res.body);
@@ -49,7 +49,7 @@ exports.frontend_query_campaign = function(done){
 
 exports.backend_query_campaign = function(token, done){
     request(app)
-        .get(config.manager_url + '/api/campaign')
+        .get(config.manager_url + '/api/campaigns')
         .query({token:token})
         .end(function(err, res){
             should.not.exist(err);
@@ -162,16 +162,6 @@ exports.backend_modify_quiz_right_answer = function(token, _id, answers, done){
     request(app)
         .post(config.manager_url + '/api/campaign/quiz/modify_right_answer')
         .send({token:token, _id:_id, answers:answers})
-        .end(function(err, res){
-            should.not.exist(err);
-            done(res.body);
-        })
-};
-
-exports.backend_query_quiz_right_answer = function(token, _id, done){
-    request(app)
-        .get(config.manager_url + '/api/campaign/quiz/right_answer')
-        .query({token:token, _id:_id})
         .end(function(err, res){
             should.not.exist(err);
             done(res.body);
