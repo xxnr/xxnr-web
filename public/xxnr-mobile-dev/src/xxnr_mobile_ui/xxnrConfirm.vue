@@ -9,14 +9,13 @@
     <div class="weui_dialog_bd"><slot></slot></div>
     <div class="weui_dialog_ft">
       <a href="javascript:;" class="weui_btn_dialog default" @click="onCancel">{{cancelText}}</a>
-      <a href="javascript:;" class="weui_btn_dialog primary" @click="onConfirm">{{confirmText}}</a>
+      <a href="javascript:;" class="weui_btn_dialog primary" @click=confirmMethod>{{confirmText}}</a>
     </div>
   </dialog>
 </template>
 
 <script>
-  import Dialog from '../dialog'
-
+  import  Dialog from './xxnrDialog.vue'
   export default {
     components: {
       Dialog
@@ -33,11 +32,11 @@
       },
       confirmText: {
         type: String,
-        default: 'confirm'
+        default: '确定'
       },
       cancelText: {
         type: String,
-        default: 'cancel'
+        default: '取消'
       },
       maskTransition: {
         type: String,
@@ -46,6 +45,9 @@
       dialogTransition: {
         type: String,
         default: 'vux-dialog'
+      },
+      confirmMethod: {
+        type: Function
       }
     },
     methods: {
@@ -54,7 +56,7 @@
         this.$emit('on-confirm')
       },
       onCancel: function () {
-        this.show = false
+        this.show = false;
         this.$emit('on-cancel')
       }
     },
