@@ -7,29 +7,33 @@
         <img src="/assets/images/close-box.png">
       </div>
     </div>
-    <div class="confirm-product" v-for="item in orderSKUList.SKUList" v-if="item.deliverStatus == 2"  @click="selectConfirmProduct($index);">
-      <div class="confirm-radio" :class="{'checked ': checkedSKUList[$index]}">
+    <div class="confirm-product-box">
+      <div class="confirm-product" v-for="item in orderSKUList.SKUList" v-if="item.deliverStatus == 2"  @click="selectConfirmProduct($index);">
+        <div class="confirm-radio" :class="{'checked ': checkedSKUList[$index]}">
 
-      </div>
-      <div class="container">
-        <div class="confirm-product-name">
-          {{item.productName}}
         </div>
-        <div class="confirm-product-sku" >
-          <div v-if="item.attributes">
-            <span v-for="attribute in item.attributes">{{attribute.name}}：{{attribute.value}}；</span>
+        <div class="container">
+          <div class="confirm-product-name">
+            {{item.productName}}
           </div>
-          <div v-if="item.additions.length != 0">
-            附加项目：<span v-for="addition in item.additions">{{addition.name}}；</span>
+          <div class="confirm-product-sku" >
+            <div v-if="item.attributes">
+              <span v-for="attribute in item.attributes">{{attribute.name}}：{{attribute.value}}；</span>
+            </div>
+            <div v-if="item.additions.length != 0">
+              附加项目：<span v-for="addition in item.additions">{{addition.name}}；</span>
+            </div>
           </div>
-        </div>
-        <div class="confirm-product-num">
-          x{{item.count}}
+          <div class="confirm-product-num">
+            x{{item.count}}
+          </div>
         </div>
       </div>
     </div>
-    <div class="confirm-product-btn" @click="confirmOrder();" :class="{'disabled': !hasSKUSelected}">
-      确认<span v-if="hasSKUSelected">({{productNumber}})</span>
+    <div class="confirm-product-btn-box">
+      <div class="confirm-product-btn" @click="confirmOrder();" :class="{'disabled': !hasSKUSelected}">
+        确认<span v-if="hasSKUSelected">({{productNumber}})</span>
+      </div>
     </div>
   </div>
   <div class="xxnr_order_toast" v-if="successToast">
@@ -86,11 +90,16 @@
   .confirm-order-box {
     position: fixed;
     width: 100%;
-    height: 60%;
     background-color: #fff;
     bottom: 0;
     left: 0;
     z-index: 100;
+  }
+
+  .confirm-product-box {
+    height: 250px;
+    overflow: auto;
+    padding-bottom: 60px;
   }
 
   .confirm-order-title {
@@ -160,10 +169,7 @@
     background-color: #FE9B00;
     color: #fff;
     border-radius: 3px;
-    position: absolute;
-    bottom: 10px;
-    left: 50%;
-    margin-left: -60px;
+    margin: 10px auto 0;
   }
 
   .confirm-product-btn.disabled {
@@ -225,5 +231,14 @@
   .xxnr-toast-wor {
     text-align: center;
     margin-top: 15px;
+  }
+
+  .confirm-product-btn-box {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 50px;
+    background-color: #fff;
+    border-top: 1px solid #ccc;
   }
 </style>
