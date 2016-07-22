@@ -79,7 +79,7 @@
         var expires = '';
         if (days) {
           var d = new Date();
-          d.setTime(d.getTime() + (12*60*60*1000)); // 过期时间 12小时
+          d.setTime(d.getTime() + (0.5*60*60*1000)); // 过期时间 0.5小时
           expires = '; expires=' + d.toGMTString();
         }
         domain = domain ? '; domain=' + domain : '';
