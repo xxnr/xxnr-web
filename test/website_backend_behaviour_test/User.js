@@ -103,7 +103,7 @@ describe('User', function() {
         });
 
         var userLoginValidator = function (res, keepLogin) {
-            res.body.should.have.property('code', 1000);
+            res.body.should.have.property('code', '1000');
             res.body.should.have.properties('datas', 'token');
             res.body.token.should.match(/.+/);
             res.body.datas.should.have.properties('userid', 'loginName', 'phone', 'sex', 'isUserInfoFullFilled', 'isVerified', 'isXXNRAgent', 'isRSC', 'RSCInfoVerifing', 'userType', 'userTypeInName', 'verifiedTypes', 'verifiedTypesInJson', 'cartId');
@@ -632,7 +632,7 @@ describe('User', function() {
         },{
             name:'test user account w/ valid account',
             params:{account:test_user.account},
-            result:{code:1000, message: '该手机号已注册'}
+            result:{code:'1000', message: '该手机号已注册'}
         }];
 
         testCases.forEach(function (test) {
@@ -675,7 +675,7 @@ describe('User', function() {
         },{
             name:'generate vcode (register) w/ new account',
             params:{bizcode:'register', tel:test_data.random_test_user('0001').account},
-            result:{code: 1000},
+            result:{code: '1000'},
             noGet:true
         },{
             name:'generate vcode (register) w/ new account 2nd time',
@@ -696,7 +696,7 @@ describe('User', function() {
         },{
             name:'generate vcode (reset password) w/ unregistered account',
             params:{bizcode:'resetpwd', tel:test_user.account},
-            result:{code: 1000},
+            result:{code: '1000'},
             noGet:true
         },{
             name:'generate vcode (reset password) w/ unregistered account 2nd time',
