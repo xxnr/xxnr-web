@@ -22,7 +22,7 @@ var test_campaign = {
         comment: '测试备注1',
         shareable: false,
         share_points_add: 10,
-        share_button: false,
+        share_button: true,
         share_title: '分享活动标题1',
         share_url_name: default_campaign_share_url_name,
         share_abstract: 'testshareabstract1',
@@ -76,7 +76,7 @@ var test_campaign = {
         comment: '测试备注3',
         shareable: true,
         share_points_add: 10,
-        share_button: true,
+        share_button: false,
         share_title: '分享活动标题3',
         share_url_name: default_campaign_share_url_name,
         share_abstract: 'testshareabstract3',
@@ -260,6 +260,14 @@ describe('campaign', function(){
                         share_abstract: campaign.share_abstract
                     }]
                 };
+                var expected_app_share_info = {
+                    code:1000,
+                    share_button:false,
+                    share_title:campaign.share_title,
+                    share_url:campaign_url(campaign.campaign_url_name, campaign.type),
+                    share_abstract:campaign.share_abstract,
+                    share_image:campaign_share_image_url
+                };
                 campaign.image = campaign_image_url;
                 campaign.share_image = campaign_share_image_url;
                 Routing.Campaign.create_campaign(backend_admin_token, campaign, function (body) {
@@ -272,7 +280,10 @@ describe('campaign', function(){
                             var campaign_share_url = body.campaigns[0].share_url;
                             Routing.Campaign.get_page(campaign_page_url, function () {
                                 Routing.Campaign.get_page(campaign_share_url, function () {
-                                    done();
+                                    Routing.Campaign.get_app_share_info(campaign_page_url, function(body){
+                                        body.should.have.properties(expected_app_share_info);
+                                        done();
+                                    })
                                 })
                             })
                         })
@@ -313,6 +324,30 @@ describe('campaign', function(){
                     code:1000,
                     QA:campaign.detail
                 };
+                var expected_app_share_info = {
+                    code:1000,
+                    share_button:true,
+                    share_title:campaign.share_title,
+                    share_url:campaign_url(campaign.campaign_url_name, campaign.type),
+                    share_abstract:campaign.share_abstract,
+                    share_image:campaign_share_image_url
+                };
+                var expected_campaign_detail = {
+                    code:1000,
+                    campaign:{
+                        type: campaign.type,
+                        title: campaign.title,
+                        campaign_url_name: campaign.campaign_url_name,
+                        comment: campaign.comment,
+                        shareable: campaign.shareable,
+                        share_points_add: campaign.share_points_add,
+                        share_button: campaign.share_button,
+                        share_title: campaign.share_title,
+                        share_url_name: campaign.share_url_name,
+                        share_abstract: campaign.share_abstract,
+                        detail:campaign.detail
+                    }
+                };
                 campaign.image = campaign_image_url;
                 campaign.share_image = campaign_share_image_url;
                 Routing.Campaign.create_campaign(backend_admin_token, campaign, function(body){
@@ -328,7 +363,13 @@ describe('campaign', function(){
                                 Routing.Campaign.get_page(campaign_share_url, function(){
                                     Routing.Campaign.query_QA(campaign_id, function(body){
                                         body.should.containDeep(expected_QA_list);
-                                        done();
+                                        Routing.Campaign.get_app_share_info(campaign_page_url, function(body){
+                                            body.should.have.properties(expected_app_share_info);
+                                            Routing.Campaign.backend_get_campaign_detail(backend_admin_token, campaign_id, function(body){
+                                                body.should.containDeep(expected_campaign_detail);
+                                                done();
+                                            })
+                                        })
                                     });
                                 })
                             })
@@ -370,7 +411,30 @@ describe('campaign', function(){
                     code:1000,
                     questions:campaign.detail
                 };
-
+                var expected_app_share_info = {
+                    code:1000,
+                    share_button:false,
+                    share_title:campaign.share_title,
+                    share_url:campaign_url(campaign.campaign_url_name, campaign.type),
+                    share_abstract:campaign.share_abstract,
+                    share_image:campaign_share_image_url
+                };
+                var expected_campaign_detail = {
+                    code:1000,
+                    campaign:{
+                        type: campaign.type,
+                        title: campaign.title,
+                        campaign_url_name: campaign.campaign_url_name,
+                        comment: campaign.comment,
+                        shareable: campaign.shareable,
+                        share_points_add: campaign.share_points_add,
+                        share_button: campaign.share_button,
+                        share_title: campaign.share_title,
+                        share_url_name: campaign.share_url_name,
+                        share_abstract: campaign.share_abstract,
+                        detail:campaign.detail
+                    }
+                };
                 campaign.image = campaign_image_url;
                 campaign.share_image = campaign_share_image_url;
                 Routing.Campaign.create_campaign(backend_admin_token, campaign, function(body){
@@ -386,7 +450,13 @@ describe('campaign', function(){
                                 Routing.Campaign.get_page(campaign_share_url, function(){
                                     Routing.Campaign.query_quiz_question(campaign_id, function(body){
                                         body.should.containDeep(expected_question_list);
-                                        done();
+                                        Routing.Campaign.get_app_share_info(campaign_page_url, function(body){
+                                            body.should.have.properties(expected_app_share_info);
+                                            Routing.Campaign.backend_get_campaign_detail(backend_admin_token, campaign_id, function(body){
+                                                body.should.containDeep(expected_campaign_detail);
+                                                done();
+                                            })
+                                        })
                                     });
                                 })
                             })

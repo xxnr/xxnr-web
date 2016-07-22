@@ -202,7 +202,7 @@ router.post('/api/v2.3/RSC/rewardshop/order/selfDelivery', middleware.isLoggedIn
 router.get('/api/v2.3/campaigns', controllers.Campaign.query_campaign);
 router.get('/campaigns/:type/:name', controllers.Campaign.campaign_page);
 router.get('/api/v2.3/campaign_status', middleware.convert_token_to_user, controllers.Campaign.campaign_status);
-router.get('/api/v2.3/campaign', controllers.Campaign.get_campaign);
+router.get('/api/v2.3/campaign/app_share_info', controllers.Campaign.get_app_share_info);
 // QA
 router.get('/api/v2.3/campaign/QA/getQA', controllers.Campaign.get_QA);
 router.post('/api/v2.3/campaign/QA/require_reward', middleware.isLoggedIn_middleware, controllers.Campaign.QA_require_reward);

@@ -250,7 +250,26 @@ exports.query_my_quiz_answer = function(req, res, next){
     })
 };
 
-exports.get_campaign = function(req, res, next){
+exports.get_app_share_info = function(req, res, next){
     var url = req.data.url;
+    CampaignService.findByUrl(url, function(err, campaign) {
+        if (err) {
+            res.respond({code: 1001, message: err});
+            return;
+        }
 
-}
+        if (!campaign) {
+            res.respond({code: 1001, message: '未找到该活动'});
+            return;
+        }
+
+        res.respond({
+            code: 1000,
+            share_button: campaign.shareable && campaign.share_button,
+            share_title: campaign.share_title,
+            share_url: campaign.url,
+            share_abstract: campaign.share_abstract,
+            share_image: campaign.share_image
+        })
+    })
+};

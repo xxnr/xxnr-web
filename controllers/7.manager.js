@@ -2942,6 +2942,13 @@ exports.trigger_quiz_reward = function(req, res, next){
 };
 
 exports.get_campaign = function(req, res, next){
-	//TODO: get campaign details
-	var
-}
+	var campaign_id = req.data._id;
+	CampaignService.findById(campaign_id, function(err, campaign){
+		if(err){
+			res.respond({code:1001, message:err});
+			return;
+		}
+
+		res.respond({code:1000, campaign:campaign});
+	}, true)
+};

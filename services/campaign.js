@@ -164,20 +164,50 @@ CampaignService.prototype.save = function(campaign, callback){
     }
 };
 
-CampaignService.prototype.findById = function(_id, callback){
+CampaignService.prototype.findById = function(_id, callback, findDetail){
     if(!_id){
         callback('_id required');
         return;
     }
 
-    CampaignModel.findById(_id, function(err, campaign){
+    CampaignModel.findById(_id)
+        .lean()
+        .exec(function(err, campaign){
         if(err || !campaign){
             console.error(err || 'campaign not found');
             callback(err || 'campaign not found');
             return;
         }
 
-        callback(null, campaign.toObject());
+        if(findDetail){
+            switch(campaign.type){
+                case CAMPAIGNTYPE.QA:
+                    QACampaignModel.findOne({campaign:campaign._id}, function(err, QACampaign){
+                        if(err || !QACampaign){
+                            console.error(err || 'campaign detail not found');
+                            callback(err || 'campaign detail not found');
+                            return;
+                        }
+
+                        campaign.detail = QACampaign.QA;
+                        callback(null, campaign);
+                    });
+                    break;
+                case CAMPAIGNTYPE.QUIZ:
+                    QuizCampaignModel.findOne({campaign:campaign._id}, function(err, QuizCampaign){
+                        if(err || !QuizCampaign){
+                            console.error(err || 'campaign detail not found');
+                            callback(err || 'campaign detail not found');
+                            return;
+                        }
+
+                        campaign.detail = QuizCampaign.QA;
+                        callback(null, campaign);
+                    });
+            }
+        } else{
+            callback(null, campaign);
+        }
     });
 };
 
@@ -673,6 +703,24 @@ CampaignService.prototype.canPlay = function(user_id, campaign_id, callback){
 
             callback();
         })
+    })
+};
+
+CampaignService.prototype.findByUrl = function(url, callback){
+    if(!url){
+        callback('url required');
+        return;
+    }
+
+    CampaignModel.findOne({url:url})
+        .exec(function(err, campaign){
+        if(err || !campaign){
+            console.error(err || 'campaign not found with url ' + url);
+            callback('查找活动失败，请重试');
+            return;
+        }
+
+        callback(null, campaign);
     })
 };
 

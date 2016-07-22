@@ -203,3 +203,23 @@ exports.delete_all_campaigns = function(done){
         })
     });
 };
+
+exports.get_app_share_info = function(url, done){
+    request(app)
+        .get('/api/v2.3/campaign/app_share_info')
+        .query({url:url})
+        .end(function(err, res){
+            should.not.exist(err);
+            done(res.body);
+        })
+};
+
+exports.backend_get_campaign_detail = function(token, _id, done){
+    request(app)
+        .get(config.manager_url + '/api/campaign')
+        .query({_id:_id, token:token})
+        .end(function(err, res){
+            should.not.exist(err);
+            done(res.body);
+        })
+};
