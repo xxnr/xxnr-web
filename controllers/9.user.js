@@ -272,7 +272,7 @@ var setCookieAndResponse = function(req, res, user, keepLogin, type){
                 }
             }
             // Return results
-            var result = {code: 1000, message: resultMessage, datas: user, token:token};
+            var result = {code: '1000', message: resultMessage, datas: user, token:token};
             res.respond(result);
             return;
         }, true);
@@ -411,7 +411,7 @@ exports.process_resetpwd = function(req, res, next) {
                                 return;
                             } else {
                                 // Return results
-                                res.respond({code: 1000, message: '重置密码成功'});
+                                res.respond({code: '1000', message: '重置密码成功'});
                             }
                         });
                     } else {
@@ -703,7 +703,7 @@ exports.json_user_findaccount = function(req, res, next) {
             return;
         }
 
-        res.respond({code: 1000, message: '该手机号已注册'});
+        res.respond({code: '1000', message: '该手机号已注册'});
     });
 };
 

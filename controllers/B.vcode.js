@@ -398,7 +398,7 @@ function generate_sms_vcode(req, res, next) {
                                 res.respond({code: 1001, message: '获取短信验证码太频繁，请稍后再试'});
                                 return;
                             }
-                            res.respond({code: 1000, message: 'success'});
+                            res.respond({code: '1000', message: 'success'});
                             return;
                         }
                     });
@@ -430,7 +430,7 @@ function generate_sms_vcode(req, res, next) {
                                     res.respond({code: 1001, message: '获取短信验证码太频繁，请稍后再试'});
                                     return;
                                 }
-                                res.respond({code: 1000, message: 'success'});
+                                res.respond({code: '1000', message: 'success'});
                                 return;
                             }
                         });
