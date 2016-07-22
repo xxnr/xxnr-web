@@ -93,7 +93,7 @@ const mutations = {
     state.totalPrice = totalPrice;
   },
   [COMMIT_ORDER] (state, data){
-    router.go('/offlinePay?id=' + data.id);
+    router.go('/offlinePay?id=' + data.id + '&fromOrder=true');
   },
   [GET_CONSIGNEE] (state, data) {
     state.consigneeList = data;
