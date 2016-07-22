@@ -212,7 +212,18 @@ var setCookieAndResponse = function(req, res, user, keepLogin, type){
     UserService.update(options, function(err){
         if(err){
             console.error('setCookieAndResponse err:', err);
-            res.respond({code:1001, message:'登录失败'});
+            var resultMessage = '登录失败';
+            if (type) {
+                switch(type) {
+                    case 'login':
+                        resultMessage = '登录失败';
+                        break;
+                    case 'register':
+                        resultMessage = '注册失败';
+                        break;
+                }
+            }
+            res.respond({code:'1001', message:resultMessage});
             return;
         }
 
@@ -299,21 +310,21 @@ exports.process_register = function(req, res, next) {
     var options = {};
     var keepLogin = req.data.keepLogin || true; //是否保存登录状态，默认保存
     if (!req.data.account || !tools.isPhone(req.data.account.toString())) {
-        res.respond({code: 1001, message: '请输入正确的手机号'});
+        res.respond({code: '1001', message: '请输入正确的手机号'});
         return;
     }
     if (!req.data.smsCode) {
-        res.respond({code: 1001, message: '请输入验证码'});
+        res.respond({code: '1001', message: '请输入验证码'});
         return;
     }
     if (!req.data.password) {
-        res.respond({code: 1001, message: '请输入密码'});
+        res.respond({code: '1001', message: '请输入密码'});
         return;
     }
 
     var decrypted = tools.decrypt_password(decodeURI(req.data.password));
     if (decrypted.length < 6) {
-        res.respond({code: 1001, message: '密码需不小于6位'});
+        res.respond({code: '1001', message: '密码需不小于6位'});
         return;
     }
     options.account = req.data.account;
@@ -329,7 +340,7 @@ exports.process_register = function(req, res, next) {
     var vcodeoptions = {'target': req.data.account.toString(), 'code_type': 'register', 'code': req.data.smsCode};
     vCodeService.verify(vcodeoptions, function(err, result){
         if (err || !result) {
-            res.respond({code: 1001, message: '验证码验证失败'});
+            res.respond({code: '1001', message: '验证码验证失败'});
             return;
         } else {
             if (result && result.type === 1) {
@@ -355,7 +366,7 @@ exports.process_register = function(req, res, next) {
                     }
                 }, true);
             } else {
-                res.respond({code: 1001, message: result.data});
+                res.respond({code: '1001', message: result.data});
                 return;
             }
         }
@@ -411,7 +422,7 @@ exports.process_resetpwd = function(req, res, next) {
                                 return;
                             } else {
                                 // Return results
-                                res.respond({code: '1000', message: '重置密码成功'});
+                                res.respond({code: 1000, message: '重置密码成功'});
                             }
                         });
                     } else {
@@ -703,7 +714,7 @@ exports.json_user_findaccount = function(req, res, next) {
             return;
         }
 
-        res.respond({code: '1000', message: '该手机号已注册'});
+        res.respond({code: 1000, message: '该手机号已注册'});
     });
 };
 
