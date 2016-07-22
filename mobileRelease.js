@@ -92,6 +92,11 @@ app.use(function (err, req, res, next) {
     next(err);
 });
 
+app.use('/', function(req, res, next) {
+    res.sendFile(path.join(__dirname, '.'+ F.config.directory_xxnr_mobile_public + 'index.html'));
+    return;
+});
+
 http.createServer(app).listen(8060);
 console.info('application listen at port 8060');
 
