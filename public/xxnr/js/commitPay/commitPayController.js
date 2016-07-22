@@ -236,7 +236,7 @@ app.controller('commitPayController', function($scope, remoteApiService, payServ
                                 $scope.orderHasPayed = true;
                             }
                             else {
-                                if(data.datas.rows.order.orderStatus &&  data.datas.rows.order.orderStatus.ty充mpe != 7 && $scope.auditingOrder == 1) {
+                                if(data.datas.rows.order.orderStatus &&  data.datas.rows.order.orderStatus.type != 7 && $scope.auditingOrder == 1) {
                                     $scope.offlineHasAudited = true;
                                     $scope.wholePageShow = true;
                                 }else if(data.datas.rows.payStatus == 2){
