@@ -9,7 +9,7 @@ var fs = require("fs");
 var https = require('https');
 var http = require('http');
 var proxyMiddleware = require('http-proxy-middleware')
-
+var buildMobileApp = require('./buildMobileApp');
 
 process.chdir(__dirname);
 var webpackConfig = process.env.NODE_ENV === 'testing'
@@ -22,35 +22,18 @@ var port = process.env.PORT || config.dev.port
 // https://github.com/chimurai/http-proxy-middleware
 var proxyTable = config.dev.proxyTable
 
+require('./modules/database');
+global.U = require('./common/utils');
+global.F = {
+  config:require('./config'),
+  global:require('./global')
+};
+global.RELEASE = true;
+global.isDebug = false;
+global.framework_image = global.Image = require('./modules/image');
+
 var app = express()
 var compiler = webpack(webpackConfig)
-
-//view template setting
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'html');
-app.engine('html', require('ejs-mate'));
-
-
-/**
- * middleware
- */
-app.use(function (req, res, next) {
-  if (req.headers['content-type']){
-    req.headers['content-type'] = req.headers['content-type'].replace('charset=utf8', 'charset=utf-8');
-  }
-
-  // utf-8 is not a valid content-encoding while old android app will add this header improperly, so we need to remove them.
-  if(req.headers['content-encoding'] && req.headers['content-encoding'].toLocaleLowerCase() === 'utf-8'){
-    delete req.headers['content-encoding'];
-  }
-
-  // APP will add extra slash at the beginning of the path improperly, here to remove them
-  req.url = req.url.replace(/\/*/, '/');
-
-  // for nginx proxy
-  req.clientIp = req.headers['x-real-ip'] || req.headers['ip'] || req.ip;
-  return next();
-});
 
 var devMiddleware = require('webpack-dev-middleware')(compiler, {
   publicPath: webpackConfig.output.publicPath,
@@ -78,60 +61,13 @@ Object.keys(proxyTable).forEach(function (context) {
   app.use(proxyMiddleware(context, options))
 })
 
-// handle fallback for HTML5 history API
-app.use(require('connect-history-api-fallback')())
-
 // serve webpack bundle output
 app.use(devMiddleware)
 
 // enable hot-reload and state-preserving
 // compilation error display
 app.use(hotMiddleware)
-
-// serve pure static assets
-var staticPath = path.posix.join(config.build.assetsPublicPath, config.build.assetsSubDirectory)
-app.use(staticPath, express.static('./public/xxnr-mobile-dev/static'));
-app.use(express.static('./public/xxnr'));
-
-require('./modules/database');
-global.U = require('./common/utils');
-global.F = {
-  config:require('./config'),
-  global:require('./global')
-};
-global.RELEASE = true;
-global.isDebug = false;
-global.framework_image = global.Image = require('./modules/image');
-
-// bodyParser based on content type
-app.use(bodyParser.json({
-  'limit': '1mb'
-}));
-app.use(bodyParser.urlencoded({extended: false}));
-
-// cookieParser
-app.use(cookieParser());
-
-// busboy
-app.use(busboy({
-  limits: {
-    fileSize: F.config.file_size_limit,
-    files: F.config.file_count_limit
-  }
-}));
-
-
-// website common middleware
-app.use(require('./middlewares/website'));
-
-// routes
-var routes = require('./routes');
-app.use('/', routes.secureFrontendApis);
-app.use('/', routes.frontendApis);
-app.use('/', routes.frontendPages);
-app.use('/', routes.appRelatedPages);
-app.use('/', routes.backendApis);
-app.use('/', routes.backendPages);
+buildMobileApp(app);
 
 module.exports = app.listen(port, function (err) {
   if (err) {
