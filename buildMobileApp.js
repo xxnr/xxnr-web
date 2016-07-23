@@ -1,6 +1,10 @@
 /**
  * Created by pepelu on 2016/7/23.
  */
+var bodyParser = require('body-parser');
+var cookieParser = require('cookie-parser');
+var multer  = require('multer');
+var path = require('path');
 module.exports = function(app){
 
     app.disable('etag');
