@@ -5,6 +5,8 @@ var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
 var multer  = require('multer');
 var path = require('path');
+var express = require('express');
+
 module.exports = function(app){
 
     app.disable('etag');
