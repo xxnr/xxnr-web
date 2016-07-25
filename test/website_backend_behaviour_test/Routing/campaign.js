@@ -11,6 +11,7 @@ var QACampaignModel = models.QA_campaign;
 var QuizCampaignModel = models.quiz_campaign;
 var QuizAnswerModel = models.quiz_answer;
 var RewardControlModel = models.reward_control;
+var URL = require('url');
 
 exports.create_campaign = function(token, campaign, done) {
     request(app)
@@ -68,7 +69,7 @@ exports.offline_campaign = function(token, _id, done){
 };
 
 exports.get_page = function(url, done){
-    request(app)
+    request('')
         .get(url)
         .end(function(err, res){
             should.not.exist(err);
@@ -205,9 +206,10 @@ exports.delete_all_campaigns = function(done){
 };
 
 exports.get_app_share_info = function(url, done){
+    var urlObject = URL.parse(url);
     request(app)
         .get('/api/v2.3/campaign/app_share_info')
-        .query({url:url})
+        .query({url:urlObject.pathname})
         .end(function(err, res){
             should.not.exist(err);
             done(res.body);

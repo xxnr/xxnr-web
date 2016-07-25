@@ -46,7 +46,9 @@ CampaignService.prototype.query = function(options, callback){
         }
     }
 
-    CampaignModel.find(query, function(err, campaigns){
+    CampaignModel.find(query)
+        .lean()
+        .exec(function(err, campaigns){
         if(err){
             console.error(err);
             callback(err);
@@ -274,9 +276,9 @@ CampaignService.prototype.queryQA = function(campaign_id, callback){
 CampaignService.prototype.query_quiz_question = function(campaign_id, callback){
     QuizCampaignModel.findOne({campaign:campaign_id})
         .exec(function(err, QuizCampaign){
-            if(err){
-                console.error(err);
-                callback(err);
+            if(err || !QuizCampaign){
+                console.error(err || 'quiz campaign not found');
+                callback(err || 'quiz campaign not found');
                 return;
             }
 

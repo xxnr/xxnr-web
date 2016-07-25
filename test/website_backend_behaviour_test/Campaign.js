@@ -129,7 +129,10 @@ describe('campaign', function(){
     var campaign_image_url, campaign_share_image_url;
     var campaign_url = function(url_name, type){
         var campaign_type_english_name = {1:'events', 2:'QAs', 3:'quizs'};
-        return '/campaigns/' + campaign_type_english_name[type] + '/' + url_name;
+        return 'http://127.0.0.1/campaigns/' + campaign_type_english_name[type] + '/' + url_name;
+    };
+    var campaign_image = function(image){
+        return 'http://127.0.0.1/images/original/' + image + '.jpg';
     };
     before('create backend admin and login', function (done) {
         Routing.User.create_backend_account(backend_admin.account, backend_admin.password, backend_admin.role, function () {
@@ -252,12 +255,12 @@ describe('campaign', function(){
                     campaigns:[{
                         title: campaign.title,
                         url: campaign_url(campaign.campaign_url_name, campaign.type),
-                        comment: campaign.comment,
-                        share_points_add: campaign.share_points_add,
-                        share_button: campaign.share_button,
+                        share_button:campaign.shareable && campaign.share_button,
                         share_title: campaign.share_title,
                         share_url: campaign_url(campaign.share_url_name, campaign.type),
-                        share_abstract: campaign.share_abstract
+                        share_abstract: campaign.share_abstract,
+                        image:campaign_image(campaign_image_url),
+                        share_image:campaign_image(campaign_share_image_url)
                     }]
                 };
                 var expected_app_share_info = {
@@ -266,7 +269,7 @@ describe('campaign', function(){
                     share_title:campaign.share_title,
                     share_url:campaign_url(campaign.campaign_url_name, campaign.type),
                     share_abstract:campaign.share_abstract,
-                    share_image:campaign_share_image_url
+                    share_image:campaign_image(campaign_share_image_url)
                 };
                 campaign.image = campaign_image_url;
                 campaign.share_image = campaign_share_image_url;
@@ -312,12 +315,12 @@ describe('campaign', function(){
                     campaigns:[{
                         title: campaign.title,
                         url: campaign_url(campaign.campaign_url_name, campaign.type),
-                        comment: campaign.comment,
-                        share_points_add: campaign.share_points_add,
-                        share_button: campaign.share_button,
+                        share_button:campaign.shareable && campaign.share_button,
                         share_title: campaign.share_title,
                         share_url: campaign_url(campaign.share_url_name, campaign.type),
-                        share_abstract: campaign.share_abstract
+                        share_abstract: campaign.share_abstract,
+                        image:campaign_image(campaign_image_url),
+                        share_image:campaign_image(campaign_share_image_url)
                     }]
                 };
                 var expected_QA_list = {
@@ -330,7 +333,7 @@ describe('campaign', function(){
                     share_title:campaign.share_title,
                     share_url:campaign_url(campaign.campaign_url_name, campaign.type),
                     share_abstract:campaign.share_abstract,
-                    share_image:campaign_share_image_url
+                    share_image:campaign_image(campaign_share_image_url)
                 };
                 var expected_campaign_detail = {
                     code:1000,
@@ -399,12 +402,12 @@ describe('campaign', function(){
                     campaigns:[{
                         title: campaign.title,
                         url: campaign_url(campaign.campaign_url_name, campaign.type),
-                        comment: campaign.comment,
-                        share_points_add: campaign.share_points_add,
-                        share_button: campaign.share_button,
+                        share_button:campaign.shareable && campaign.share_button,
                         share_title: campaign.share_title,
                         share_url: campaign_url(campaign.share_url_name, campaign.type),
-                        share_abstract: campaign.share_abstract
+                        share_abstract: campaign.share_abstract,
+                        image:campaign_image(campaign_image_url),
+                        share_image:campaign_image(campaign_share_image_url)
                     }]
                 };
                 var expected_question_list = {
@@ -417,7 +420,7 @@ describe('campaign', function(){
                     share_title:campaign.share_title,
                     share_url:campaign_url(campaign.campaign_url_name, campaign.type),
                     share_abstract:campaign.share_abstract,
-                    share_image:campaign_share_image_url
+                    share_image:campaign_image(campaign_share_image_url)
                 };
                 var expected_campaign_detail = {
                     code:1000,

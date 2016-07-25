@@ -6,6 +6,7 @@ var CampaignService = services.Campaign;
 var LoyaltypointService = services.loyaltypoint;
 var LOYALTYPOINTSTYPE = require('../common/defs').LOYALTYPOINTSTYPE;
 var path = require('path');
+var tools = require('../common/tools');
 
 exports.query_campaign = function(req, res, next){
     CampaignService.query({online:true}, function(err, campaigns){
@@ -14,6 +15,40 @@ exports.query_campaign = function(req, res, next){
             return;
         }
 
+        var hosturl = req.hostname;
+        if (hosturl) {
+            hosturl = tools.getXXNRHost(hosturl);
+        } else {
+            hosturl = 'www.xinxinnongren.com';
+        }
+        var protocol = req.protocol + '://';
+        var prevurl = protocol + hosturl;
+        var previmg = protocol + hosturl + '/images/original/';
+        var imgtype = '.jpg';
+        campaigns.forEach(function(campaign){
+            delete campaign.type;
+            delete campaign.campaign_url_name;
+            delete campaign.comment;
+            delete campaign.share_points_add;
+            delete campaign.__v;
+
+            campaign.share_button = campaign.shareable && campaign.share_button;
+
+            delete campaign.shareable;
+
+            if(campaign.image){
+                campaign.image = previmg + campaign.image + imgtype;
+            }
+            if(campaign.share_image){
+                campaign.share_image = previmg + campaign.share_image + imgtype;
+            }
+            if(campaign.url){
+                campaign.url = prevurl + campaign.url;
+            }
+            if(campaign.share_url){
+                campaign.share_url = prevurl + campaign.share_url;
+            }
+        });
         res.respond({code:1000, campaigns:campaigns});
     })
 };
@@ -155,12 +190,27 @@ exports.QA_require_reward = function(req, res, next){
                     return;
                 }
 
-                LoyaltypointService.increase(user._id, points_added, LOYALTYPOINTSTYPE.COMPAIGNREWARD, campaign.title, campaign._id, function (err) {
-                    if (err) {
-                        res.respond({code: 1001, message: '提交答案失败'});
-                        return;
-                    }
+                if(points_added) {
+                    LoyaltypointService.increase(user._id, points_added, LOYALTYPOINTSTYPE.COMPAIGNREWARD, campaign.title, campaign._id, function (err) {
+                        if (err) {
+                            res.respond({code: 1001, message: '提交答案失败'});
+                            return;
+                        }
 
+                        CampaignService.record_reward(user._id, campaign_id, function (err) {
+                            if (err) {
+                                res.respond({code: 1001, message: '提交答案失败'});
+                                return;
+                            }
+
+                            res.respond({
+                                code: 1000,
+                                points_added: points_added,
+                                right_answered_questions_count: right_answered_questions_count
+                            });
+                        })
+                    })
+                } else{
                     CampaignService.record_reward(user._id, campaign_id, function (err) {
                         if (err) {
                             res.respond({code: 1001, message: '提交答案失败'});
@@ -173,7 +223,7 @@ exports.QA_require_reward = function(req, res, next){
                             right_answered_questions_count: right_answered_questions_count
                         });
                     })
-                })
+                }
             })
         })
     })
@@ -263,6 +313,22 @@ exports.get_app_share_info = function(req, res, next){
             return;
         }
 
+        var hosturl = req.hostname;
+        if (hosturl) {
+            hosturl = tools.getXXNRHost(hosturl);
+        } else {
+            hosturl = 'www.xinxinnongren.com';
+        }
+        var protocol = req.protocol + '://';
+        var prevurl = protocol + hosturl;
+        var previmg = protocol + hosturl + '/images/original/';
+        var imgtype = '.jpg';
+        if(campaign.url){
+            campaign.url = prevurl + campaign.url;
+        }
+        if(campaign.share_image){
+            campaign.share_image = previmg + campaign.share_image + imgtype;
+        }
         res.respond({
             code: 1000,
             share_button: campaign.shareable && campaign.share_button,
