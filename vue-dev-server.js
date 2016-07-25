@@ -8,6 +8,7 @@ var busboy = require('connect-busboy');
 var fs = require("fs");
 var https = require('https');
 var http = require('http');
+
 var proxyMiddleware = require('http-proxy-middleware')
 var buildMobileApp = require('./buildMobileApp');
 
@@ -26,6 +27,7 @@ require('./modules/database');
 global.U = require('./common/utils');
 global.F = {
   config:require('./config'),
+
   global:require('./global')
 };
 global.RELEASE = true;
@@ -67,7 +69,18 @@ app.use(devMiddleware)
 // enable hot-reload and state-preserving
 // compilation error display
 app.use(hotMiddleware)
+var staticPath = path.posix.join(config.build.assetsPublicPath, config.build.assetsSubDirectory)
+app.use(staticPath, express.static('./public/xxnr-mobile-dev/static'));
+app.use(express.static('./public/xxnr'));
+
 buildMobileApp(app);
+
+// serve webpack bundle output
+app.use(devMiddleware)
+
+// enable hot-reload and state-preserving
+// compilation error display
+app.use(hotMiddleware)
 
 module.exports = app.listen(port, function (err) {
   if (err) {

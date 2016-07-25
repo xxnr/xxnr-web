@@ -18,7 +18,16 @@ global.isDebug = false;
 global.framework_image = global.Image = require('./modules/image');
 
 var app = express();
+
+// set static file path
+app.use(express.static(path.join(__dirname, F.config.directory_xxnr_mobile_public)));
+
 buildMobileApp(app);
+
+app.use('/', function(req, res, next) {
+    res.sendFile(path.join(__dirname, '.'+ F.config.directory_xxnr_mobile_public + 'index.html'));
+    return;
+});
 
 http.createServer(app).listen(8060);
 console.info('application listen at port 8060');

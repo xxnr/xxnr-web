@@ -51,9 +51,6 @@ module.exports = function(app){
 // website common middleware
     app.use(require('./middlewares/website'));
 
-// set static file path
-    app.use(express.static(path.join(__dirname, F.config.directory_xxnr_mobile_public)));
-
     var routes = require('./routes');
 // routes
     app.use('/', routes.secureFrontendApis);
@@ -77,11 +74,6 @@ module.exports = function(app){
         }
 
         next(err);
-    });
-
-    app.use('/', function(req, res, next) {
-        res.sendFile(path.join(__dirname, '.'+ F.config.directory_xxnr_mobile_public + 'index.html'));
-        return;
     });
 
     return app;
