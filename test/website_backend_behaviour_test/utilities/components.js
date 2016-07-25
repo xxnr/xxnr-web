@@ -89,7 +89,7 @@ exports.create_RSC = function(RSC, backend_admin_token, done) {
     Routing.User.create_frontend_account(account, password, function (body) {
         var user_id = body._id;
         Routing.User.frontendLogin(account, password, function (body) {
-            body.should.have.property('code', 1000);
+            body.should.have.property('code', '1000');
             test_user_token = body.token;
             var user = body.datas;
             user._id = user_id;

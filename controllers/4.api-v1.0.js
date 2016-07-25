@@ -270,9 +270,8 @@ exports.getAppProductDetails = function (req, res, next) {
         res.respond({"code": "1001", "message": "缺少商品ID"});
         return;
     }
-    var host = req.hostname;
-    var protocol = req.protocol + '://';
-    var prevurl = protocol + host + '/product/';
+
+    var prevurl = req.url_prefix + '/product/';
     var options = {};
     options.id = req.data['productId'];
 
@@ -618,7 +617,9 @@ exports.AppUpgrade = function (req, res, next) {
     var userAgent = (req.data['user_agent'] || '').toLowerCase();
     var device_id = req.data['device_id'] || '';
 
-    var host = req.hostname;
+    var host = req.get('host');
+    host = host ? host : req.hostname;
+    // var host = req.hostname;
     var protocol = req.protocol + '://';
     var android_update_url = protocol + host + '/resources/newFarmer.apk';
 
