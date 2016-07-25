@@ -38,7 +38,7 @@
         <div class="action-wor" v-if="order.order.orderStatus.type == 6">已完成</div>
         <div class="action-wor" v-if="order.order.orderStatus.type == 4 && !order.isShowC" >配送中</div>
         <div class="action-wor" v-if="order.order.orderStatus.type == 5 && !order.isShowD">待自提</div>
-        <input type="button" v-if="order.order.orderStatus.type == 1 || order.order.orderStatus.type == 2" class="action-btn" value="去付款" v-link="{path: '/offlinePay?id=' + order.id}">
+        <input type="button" v-if="order.order.orderStatus.type == 1 || order.order.orderStatus.type == 2" class="action-btn" value="去付款" v-link="{path: '/commitPay?id=' + order.id}">
         <input type="button" v-if="order.order.orderStatus.type == 4 && order.isShowC" class="action-btn" value="确认收货" @click="getOrderDetailById(order.id);">
         <input type="button" v-if="order.order.orderStatus.type == 5 && order.isShowD" class="action-btn" value="去自提" v-link="{path: '/selfDelivery?id=' + order.id}">
         <input type="button" v-if="order.order.orderStatus.type == 7" class="action-btn" value="查看付款信息" v-link="{path: '/orderDone?id=' + order.id}">

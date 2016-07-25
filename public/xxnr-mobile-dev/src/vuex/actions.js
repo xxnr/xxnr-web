@@ -105,7 +105,7 @@ export const goBack = ({dispatch,state}) => {
       return;
     }
     window.history.back();
-  } else if(window.location.pathname.indexOf('offlinePay')!=-1 && window.location.search.indexOf('fromOrder') != -1) {
+  } else if(window.location.pathname.indexOf('commitPay')!=-1 && window.location.search.indexOf('fromOrder') != -1) {
       if(state.order.orderInfo.rows.orderGoodsList[0].goodsId) {
         router.go('/productDetail?id='+ state.order.orderInfo.rows.orderGoodsList[0].goodsId);
         return;

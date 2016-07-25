@@ -36,8 +36,8 @@ export function configRouter (router) {
     '/orderConsignee': {
       component: require('./components/order/ConsigneeList.vue')
     },
-    '/offlinePay': {
-      component: require('./components/order/offlinePay.vue')
+    '/commitPay': {
+      component: require('./components/order/commitPay.vue')
     },
     '/orderDone': {
       component: require('./components/order/orderDone.vue')

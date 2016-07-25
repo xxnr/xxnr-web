@@ -2,7 +2,7 @@
   <scroller v-ref:scroller lock-x scrollbar-y use-pullup @pullup:loading="loadMoreCars">
       <products-rows-list :products="carsRows"></products-rows-list>
   </scroller>
-  <xxnr-back-to-top></xxnr-back-to-top>
+  <xxnr-back-to-top :can-back-to-top = canBackToTop></xxnr-back-to-top>
 </template>
 
 <script>
@@ -17,7 +17,8 @@
       return{
         currentPage:1,
         carsRows:[],
-        end:false
+        end:false,
+        canBackToTop: 0
       }
     },
     vuex:{
@@ -43,6 +44,14 @@
             }
         }, response => {
         })
+      }
+    },
+    events: {
+       'backToTopParent': function() {
+        this.$broadcast('backToTop');
+      },
+      'canBackToTop': function(scrollTop) {
+        this.canBackToTop = scrollTop;
       }
     },
     components: {

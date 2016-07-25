@@ -1,6 +1,6 @@
 <template>
   <div :style="styles">
-    <div class="xs-container">
+    <div class="xs-container" @touchmove="scrolling()">
       <slot></slot>
       <slot name="pulldown"></slot>
       <slot name="pullup"></slot>
@@ -106,8 +106,11 @@
       }
     },
     methods: {
-      reset () {
+      reset: function() {
         this._xscroll && this._xscroll.render()
+      },
+      scrolling: function() {
+        this.$dispatch('canBackToTop', this._xscroll.getScrollTop());
       }
     },
     compiled () {
@@ -245,6 +248,9 @@
             this._xscroll.scrollTop(0,100);
           }
         })
+      },
+      'backToTop': function() {
+        this._xscroll.scrollTop(0,100);
       }
     },
     beforeDestroy () {
