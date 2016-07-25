@@ -146,7 +146,7 @@ describe('campaign', function(){
     before('register account and login', function (done) {
         Routing.User.create_frontend_account(test_user.account, test_user.password, function () {
             Routing.User.frontendLogin(test_user.account, test_user.password, function (body) {
-                body.should.have.property('code', 1000);
+                body.should.have.property('code', '1000');
                 test_user_token = body.token;
                 done();
             });

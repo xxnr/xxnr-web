@@ -16,7 +16,7 @@ exports.query_campaign = function(req, res, next){
             return;
         }
 
-        var prevurl = getPrevUrl(req);
+        var prevurl = req.url_prefix;
         var previmg = getprevImg(req);
         var imgtype = '.jpg';
         campaigns.forEach(function(campaign){
@@ -307,7 +307,7 @@ exports.get_app_share_info = function(req, res, next){
             return;
         }
 
-        var prevurl = getPrevUrl(req);
+        var prevurl = req.url_prefix;
         var previmg = getprevImg(req);
         var imgtype = '.jpg';
         if(campaign.url){
@@ -328,30 +328,7 @@ exports.get_app_share_info = function(req, res, next){
 };
 
 function getprevImg(req){
-    var prevurl = getPrevUrl(req);
+    var prevurl = req.url_prefix;
     var previmg = prevurl + '/images/original/';
     return previmg;
-}
-
-function getPrevUrl(req){
-    var urlObject = URL.parse(req.protocol + '://' + req.get('host'));
-    var port = urlObject.port;
-    if(port == '80' || port == '443'){
-        port = undefined;
-    }
-
-    var hosturl = getHostUrl(req);
-    var protocol = req.protocol + '://';
-    var prevurl = protocol + hosturl + (port ? ':' + port : '');
-    return prevurl;
-}
-
-function getHostUrl(req){
-    var hosturl = req.hostname;
-    if (hosturl) {
-        hosturl = tools.getXXNRHost(hosturl);
-    } else {
-        hosturl = 'www.xinxinnongren.com';
-    }
-    return hosturl;
 }
