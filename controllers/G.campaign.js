@@ -7,6 +7,7 @@ var LoyaltypointService = services.loyaltypoint;
 var LOYALTYPOINTSTYPE = require('../common/defs').LOYALTYPOINTSTYPE;
 var path = require('path');
 var tools = require('../common/tools');
+var URL = require('url');
 
 exports.query_campaign = function(req, res, next){
     CampaignService.query({online:true}, function(err, campaigns){
@@ -15,15 +16,8 @@ exports.query_campaign = function(req, res, next){
             return;
         }
 
-        var hosturl = req.hostname;
-        if (hosturl) {
-            hosturl = tools.getXXNRHost(hosturl);
-        } else {
-            hosturl = 'www.xinxinnongren.com';
-        }
-        var protocol = req.protocol + '://';
-        var prevurl = protocol + hosturl;
-        var previmg = protocol + hosturl + '/images/original/';
+        var prevurl = getPrevUrl(req);
+        var previmg = getprevImg(req);
         var imgtype = '.jpg';
         campaigns.forEach(function(campaign){
             delete campaign.type;
@@ -313,15 +307,8 @@ exports.get_app_share_info = function(req, res, next){
             return;
         }
 
-        var hosturl = req.hostname;
-        if (hosturl) {
-            hosturl = tools.getXXNRHost(hosturl);
-        } else {
-            hosturl = 'www.xinxinnongren.com';
-        }
-        var protocol = req.protocol + '://';
-        var prevurl = protocol + hosturl;
-        var previmg = protocol + hosturl + '/images/original/';
+        var prevurl = getPrevUrl(req);
+        var previmg = getprevImg(req);
         var imgtype = '.jpg';
         if(campaign.url){
             campaign.url = prevurl + campaign.url;
@@ -339,3 +326,32 @@ exports.get_app_share_info = function(req, res, next){
         })
     })
 };
+
+function getprevImg(req){
+    var prevurl = getPrevUrl(req);
+    var previmg = prevurl + '/images/original/';
+    return previmg;
+}
+
+function getPrevUrl(req){
+    var urlObject = URL.parse(req.protocol + '://' + req.get('host'));
+    var port = urlObject.port;
+    if(port == '80' || port == '443'){
+        port = undefined;
+    }
+
+    var hosturl = getHostUrl(req);
+    var protocol = req.protocol + '://';
+    var prevurl = protocol + hosturl + (port ? ':' + port : '');
+    return prevurl;
+}
+
+function getHostUrl(req){
+    var hosturl = req.hostname;
+    if (hosturl) {
+        hosturl = tools.getXXNRHost(hosturl);
+    } else {
+        hosturl = 'www.xinxinnongren.com';
+    }
+    return hosturl;
+}
