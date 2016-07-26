@@ -3,7 +3,7 @@
     <scroller v-ref:scroller lock-x scrollbar-y use-pullup @pullup:loading="loadMoreHuafeis">
       <products-rows-list :products="huafeiRows"></products-rows-list>
     </scroller>
-    <xxnr-back-to-top></xxnr-back-to-top>
+    <xxnr-back-to-top :can-back-to-top = canBackToTop></xxnr-back-to-top>
   </div>
 </template>
 
@@ -19,7 +19,8 @@
     return{
       currentPage:1,
       huafeiRows:[],
-      end:false
+      end:false,
+      canBackToTop: 0
     }
   },
   vuex:{
@@ -51,6 +52,14 @@
     ProductsRowsList,
       xxnrBackToTop,
       Scroller
+  },
+  events: {
+    'backToTopParent': function() {
+      this.$broadcast('backToTop');
+    },
+    'canBackToTop': function(scrollTop) {
+      this.canBackToTop = scrollTop;
+    }
   },
   created () {
     this.getHuafeiRowsViewCars();
