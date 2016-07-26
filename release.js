@@ -37,6 +37,8 @@ var https = require('https');
 var http = require('http');
 var path = require('path');
 var config = require('./config');
+var URL = require('url');
+var tools = require('./common/tools');
 //require('./common/extension_methods');
 require('./modules/database');
 global.U = require('./common/utils');
@@ -77,6 +79,25 @@ app.use(function (req, res, next) {
 	// for nginx proxy
 	req.clientIp = req.headers['x-real-ip'] || req.headers['ip'] || req.ip;
 	return next();
+});
+
+app.use('/', function(req, res, next) {
+	var urlObject = URL.parse(req.protocol + '://' + req.get('host'));
+	var port = urlObject.port;
+	if (port == '80' || port == '443' || config.environment == 'sandbox') {
+		port = undefined;
+	}
+
+	var hosturl = req.hostname;
+	if (hosturl) {
+		hosturl = tools.getXXNRHost(hosturl);
+	} else {
+		hosturl = 'www.xinxinnongren.com';
+	}
+
+	var protocol = req.protocol + '://';
+	req.url_prefix = protocol + hosturl + (port ? ':' + port : '');
+	next();
 });
 
 // bodyParser based on content type
