@@ -8,8 +8,8 @@ var path = require('path');
 var middleware = require('../middlewares/authentication');
 
 // backend admin APIs
-router.get(F.config['manager-url']+'/api/login', controllers.Manager.process_login);
-router.post(F.config['manager-url']+'/api/login', controllers.Manager.process_login);
+router.get(F.config['manager-url']+'/api/login', middleware.auditing_middleware, controllers.Manager.process_login);
+router.post(F.config['manager-url']+'/api/login', middleware.auditing_middleware, controllers.Manager.process_login);
 
 //7.manager
 // common
