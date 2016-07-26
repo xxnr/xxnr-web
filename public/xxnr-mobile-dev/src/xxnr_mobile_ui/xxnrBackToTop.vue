@@ -25,6 +25,7 @@
       },
       methods: {
         backToTop:function(){
+          this.canBackToTop = 0;
           this.$dispatch('backToTopParent');
         }
       },
