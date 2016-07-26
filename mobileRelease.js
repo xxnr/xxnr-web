@@ -3,6 +3,7 @@ var fs = require("fs");
 var express = require('express');
 var https = require('https');
 var http = require('http');
+var path = require('path');
 var config = require('./config');
 var buildMobileApp = require('./buildMobileApp');
 
