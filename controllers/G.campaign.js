@@ -51,31 +51,12 @@ exports.campaign_page = function(req, res, next){
     var type = req.params.type;
     var name = req.params.name;
 
-    if (type && name) {
-        res.render(path.join(__dirname, '../views/G.campaign/', type, name));
-        //switch (type){
-        //    case type:
-        //        switch (name){
-        //            case 'rewardShopLaunch':
-        //                res.render(path.join(__dirname, '../views/G.campaign/' + type + '/' + name)
-        //                    //{title: "积分商城上线了"}
-        //                );
-        //                break;
-        //            case 'shareAndGetPoints':
-        //                res.render(path.join(__dirname, '../views/G.campaign/' + type + '/' + name));
-        //                break;
-        //            default:
-        //                res.status(404).send('404: Page not found');
-        //        }
-        //        break;
-        //    default:
-        //        res.status(404).send('404: Page not found');
-        //}
-    } else {
-        res.status(404).send('404: Page not found');
-    }
-
-
+    res.render(path.join(__dirname, '../views/G.campaign/', type, name), function (err, html) {
+        if (err) {
+            res.status(404).send('404: Page not found');
+        }
+        res.send(html);
+    });
 };
 
 exports.campaign_status = function(req, res, next){

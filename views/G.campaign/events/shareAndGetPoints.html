@@ -28,6 +28,7 @@
         .red_packet {width: 100%;position: relative;margin-top: 20px;}
         .red_packet--text{ width: 100%;position: absolute;padding-top: 20px;font-size: 4vw;color:#ED9200}
         .red_packet--image_body {width: 75%;margin: auto;display: block;}
+        .red_packet--btn {width: 45%;margin: auto;display: block;position: absolute;margin-top: -15%;margin-left: 28%;}
         .red_packet--title {text-align: center;}
         .red_packet--info {text-align: center;font-size: 4.5vw;padding-top: 2px;}
         .red_packet--info span{font-size: 6vw;color: #E94935}
@@ -44,6 +45,8 @@
         .event_info--text--title {font-size: 4vw;color:#FF6600;margin-bottom: 16px;}
         .event_info--text p {margin-top: 10px;}
         .event_info--comment {margin-left: 6%;margin-bottom: 60px;margin-top: 30px;}
+        #test1{ background:red;height: 200px;width: 100px}
+        #test2{ background:blue;height: 200px;width: 100px}
     </style>
 </head>
 
@@ -58,7 +61,7 @@
             <p class="red_packet--info">领<span>30</span>积分</p>
         </div>
         <img class="red_packet--image_body" src="/images/campaign/event/red-packet.png" alt="">
-
+        <img class="red_packet--btn" src="" alt="">
     </div>
     <div class="event_rule">
         <p class="event_rule--title">更多抢积分的姿势</p>
@@ -86,6 +89,7 @@
 </div>
 
 <script src="/js/zepto.js"></script>
+<script src="/js/campaignConfig.js"></script>
 <script  type="text/javascript">
     $(function() {
         var deepshareUrl;
@@ -108,7 +112,41 @@
             error: function() {
                 //出错情况下可以继续用户正常逻辑，可设置一个默认url.
             }
-        })
+        });
+        config.ajaxGet(config.baseURI, '/api/v2.3/campaign_status', {_id:config.shareAndGetPointsEventId})
+            .then(function(data){
+                if(data.code == 1000){
+                    if(data.status == 3){
+                        if(jsObj.isLogin()){
+                            var appToken = jsObj.getToken();
+                            config.ajaxGet(config.baseURI, '/api/v2.3/campaign_status', {token:appToken,_id:config.shareAndGetPointsEventId})
+                                    .then(function(data){
+                                      if(data.times_left >= 1){
+                                          $('.red_packet--btn').attr('src','/images/campaign/event/button（has-not）.png');
+                                          $('.red_packet--btn').on('click', function(){
+                                              jsObj.shareUrl('m.xinxinnongren.com');
+                                          });
+                                      }else if(data.times_left == 0){
+                                          $('.red_packet--btn').attr('src','/images/campaign/event/button（share-）-.png');
+                                      }
+                                    })
+                        }else{
+                            $('.red_packet--btn').attr('src','/images/campaign/event/button（not）-.png');
+                            $('.red_packet--btn').on('click', function(){
+                                jsObj.toLogin();
+                            })
+                        }
+                    }else if(data.status == 1){
+                        $('.red_packet--btn').attr('src','/images/campaign/event/activity_online.png');
+                    }else if(data.status == 2){
+                        $('.red_packet--btn').attr('src','/images/campaign/event/activity_begin.png');
+                    }else if(data.status == 4){
+                        $('.red_packet--btn').attr('src','/images/campaign/event/has-ended.png');
+                    }else if(data.status == 5){
+                        $('.red_packet--btn').attr('src','/images/campaign/event/activity_offline-.png');
+                    }
+                }
+            });
     });
 </script>
 
