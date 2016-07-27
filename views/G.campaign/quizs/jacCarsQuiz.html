@@ -35,11 +35,11 @@
         .start_button img{width: 100%}
         .question { position: absolute;margin-top: 75%;width: 60%;margin-left: 20%;}
         .question--title { font-size: 4vw;margin-bottom: 20px;}
-        .question--option{ background: url('/images/campaign/quiz/activity_option.png') no-repeat;background-size: 100% 100%;height: 4vh;margin-bottom: 5%;text-align: center;line-height: 4vh;font-size: 2vw;position: relative;}
-        .question--option--title {position: absolute;left: 4%;color: #FFF;}
+        .question--option{ background: url('/images/campaign/quiz/activity_option.png') no-repeat;background-size: 100% 100%;height: 4vh;margin-bottom: 5%;text-align: center;line-height: 4vh;font-size: 4.2vw;position: relative;}
+        .question--option--title {position: absolute;left: 3.5%;color: #FFF;}
         .result_img{position: absolute;right: 10%;height: 15px;width: 15px;top:20%}
         .quiz--rule {margin-top: 155%;background: url('/images/campaign/quiz/activity_text_box1.png') no-repeat;background-position: center top;background-size: 90% 100%;}
-        .quiz--rule p {font-size: 2vw;padding: 5%;padding-left: 15%;padding-right: 15%;}
+        .quiz--rule p {font-size: 3vw;padding: 5%;padding-left: 15%;padding-right: 15%;}
         .quiz--info {background: url('/images/campaign/quiz/activity_text_box2.png') no-repeat;background-position: center top;background-size: 90% 100%;}
         .quiz--info--text {padding: 15%;font-size: 3vw}
         .quiz--info--text p{margin-bottom: 6px;color:#280505}
@@ -50,15 +50,26 @@
         .points_image {position: relative}
         .points_earned { text-shadow: #bfa326 0 2px 0;    color: #FEF973;font-size: 14vw;top: 20%;position: absolute;text-align: center;margin: auto;display: block;margin-left: auto;margin-right: auto;left: 0;right: 0;padding-left: 2%;}
         .points_image p{text-align: center;font-size: 3vw;margin-top: 10px;color: #280505;}
-        .download_app {}
-        .download_app .download_btn{border: 1px solid white}
+        .download_app {background: #FFFFFF;height: 60px;}
+        .download_app .download_btn{background: #FF9700;color: #FFFFFF;display: inline-block;height: 22px;width: 60px;margin-right: 5%;margin-top: 20px;text-align: center;float: right;font-size: 10px;line-height: 22px;border-radius: 3px;}
+        .xxnr_logo {float: left;height: 80%;display: inline-block;margin: auto;margin-top: 6px;}
+        .download_app--text_info {float: left;display: inline-block;margin-top: 15px;margin-left: 7px}
+        .download_app--text_title {color:#323232}
+        .download_app--text_text {font-size: 9px;color: #909090;}
+        .download_app--close {float: left;width: 10px;height: 10px;margin-top: 25px;margin-left: 6px;margin-right: 12px;}
     </style>
 </head>
 
 <body>
 <div id="app">
     <div class="container">
-        <div class="download_app">
+        <div class="download_app" v-show="showDownloadApp">
+            <img @click="closeDownloadApp()" class="download_app--close" src="/images/campaign/quiz/activity_shut_down.png" alt="">
+            <img class="xxnr_logo" src="/images/campaign/quiz/activity_xxnr_logo.png" alt="">
+            <div class="download_app--text_info">
+                <p class="download_app--text_title">新新农人</p>
+                <p class="download_app--text_text">农业互联网综合服务领先者</p>
+            </div>
             <div class="download_btn">打开APP</div>
         </div>
         <div class="question_backgroud clearfix">
@@ -115,6 +126,11 @@
 <script type="text/javascript">
     Vue.config.debug = true;
     Vue.config.devtools = true;
+    function getCookie(name) {
+        var value = "; " + document.cookie;
+        var parts = value.split("; " + name + "=");
+        if (parts.length == 2) return parts.pop().split(";").shift();
+    };
     $('.download_btn').on('click', function(){
         var params = {
             inapp_data :{
@@ -129,7 +145,7 @@
         };
         var paramsJson = JSON.stringify(params);
         $.ajax({
-            url: 'https://fds.so/v2/url/c8c3c0850ecb8d07',
+            url: 'https://fds.so/v2/url/363ebd292023cc28',
             type: 'POST',
             data: paramsJson,
             xhrFields: {withCredentials: true},
@@ -139,7 +155,7 @@
             },
             error: function() {
                 //出错情况下可以继续用户正常逻辑，可设置一个默认url.
-            },
+            }
         })
     });
     new Vue({
@@ -156,18 +172,24 @@
             pointsEarned:0,
             answersWillCommit:[],
             test:'',
-            testMsg:''
+            testMsg:'',
+            token:'',
+            showDownloadApp:false
         },
         created: function () {
             this.getQA();
             this.currentQuestion = this.quizs[this.currentQuestionIndex];
             this.checkLogin();
-//            this.isLogin = true;
+            if(typeof jsObj == "undefined"){
+                this.showDownloadApp = true;
+            }else {
+                this.showDownloadApp = false
+            }
         },
         methods: {
             answerAndNext: function ($index,option) {
-                this.answerOptionIndex = $index;
                 if(!this.clicked){
+                    this.answerOptionIndex = $index;
                     var _that = this;
                     this.clicked = true;
                     this.answersWillCommit.push({order_key:this.currentQuestion.order_key,choices:[option.order_key]});
@@ -183,18 +205,28 @@
                             _that.clicked = false;
                             _that.answerOptionIndex = -1;
                         }else{
-
-                            var appToken = jsObj.getToken();
-//                            var appToken = '123123';
-                            config.ajaxPost(config.baseURI, '/api/v2.3/campaign/QA/require_reward', {token:appToken,_id:config.jacCarsQuizEventId,answers:_that.answersWillCommit})
-                                .then(function(data){
+                            (function(){
+                                var token;
+                                if(typeof jsObj == "undefined"){
+                                    token = getCookie(token);
+                                    if(token){
+                                        this.token = token;
+                                        this.isLogin = true;
+                                    }
+                                }else {
+                                    token = jsObj.getToken();
+                                }
+                                config.ajaxPost(config.baseURI, '/api/v2.3/campaign/QA/require_reward', {token:token,_id:config.jacCarsQuizEventId,answers:_that.answersWillCommit})
+                                        .then(function(data){
 //                                    _that.test = data.code;
 //                                    _that.testMsg = data.message;
-                                    if(data.code==1000){
-                                        _that.currentQuestion = null;
-                                        _that.currentQuestionIndex = 0;
-                                    }
-                                })
+                                            if(data.code==1000){
+                                                _that.currentQuestion = null;
+                                                _that.currentQuestionIndex = 0;
+                                            }
+                                        })
+                            }());
+
                         }
                     },2000);
 
@@ -220,10 +252,27 @@
                     })
             },
             checkLogin : function(){
-                this.isLogin = jsObj.isLogin();
+                if(typeof jsObj == "undefined"){
+                    var token = getCookie('token');
+//                    console.log(token);
+                    if(token){
+                        this.token = token;
+                        this.isLogin = true;
+                    }
+                } else {
+                    this.isLogin = jsObj.isLogin();
+                }
+
             },
             goToLogin : function(){
-                jsObj.toLogin();
+                if(typeof jsObj == "undefined"){
+                    window.location.href = encodeURI("http://mppe.xinxinnongren.com:8080/login?redirect="+window.location.href);
+                } else {
+                    jsObj.toLogin();
+                }
+            },
+            closeDownloadApp : function(){
+                this.showDownloadApp = false;
             }
         }
     });
