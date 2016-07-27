@@ -13,8 +13,10 @@ module.exports = {
         logonLoginFormRegisterBtn:'div.login_form form.ng-pristine.ng-invalid.ng-invalid-required div.register_message.clearfix span.right a',
         logonRegisterFormRegisterBtn:'button.register_btn',
         logonRegisterFormErrMessage:'div.register_error span.ng-binding',
-        logonRegisterFormPhoneInput:'div.register_form form.registerForm div.form-group input',
+        logonRegisterFormPhoneInput:'div.register_form form.registerForm div.form-group:first-child input',
         logonRegisterFormGetCodeBtn:'div.right.reg_get_code_btn a.ng-binding',
-        logonRegisterFormVerificationCode:'.verification-code'
+        logonRegisterFormVerificationCode:'.verification-code',
+        logonRegisterFormVerificationCodeInput:'.verification-code-input',
+        logonRegisterFormGraphCaptchaImg:'.captcha_graph > img'
     }
 };
