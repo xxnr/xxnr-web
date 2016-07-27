@@ -40,6 +40,7 @@
     border-left: 1px solid #c7c7c7;
     box-sizing: border-box;
     position: relative;
+    background-color: #fff;
   }
 
   .section-tab a {

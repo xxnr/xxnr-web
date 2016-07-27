@@ -36,7 +36,7 @@
   <div class="order-done-tips">
     您可下载新新农人APP，或者登陆电脑版网站，选择更多的支付方式
   </div>
-  <div @click="offlinePay(orderInfo.rows.id, orderInfo.rows.payment.price);" div class="order-done-btn">
+  <div @click="offlinePay(orderInfo.rows.id, orderInfo.rows.payment.price);" class="order-done-btn">
     去支付
   </div>
 </template>

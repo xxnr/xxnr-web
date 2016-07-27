@@ -1,5 +1,5 @@
 <template>
-  <div v-show="windowOffsetTop > 0" class="backToTop-container">
+  <div class="backToTop-container" v-show="canBackToTop > 0">
     <img @click="backToTop()" src="../../static/assets/images/backToTop.png" alt="">
   </div>
 </template>
@@ -17,6 +17,7 @@
 </style>
 <script>
     export default{
+      props:['canBackToTop'],
       data: function () {
         return {
           windowOffsetTop: $(window)[0].pageYOffset
@@ -24,7 +25,8 @@
       },
       methods: {
         backToTop:function(){
-          $(window).scrollTop(0); // include Zepto by webpack plugin
+          this.canBackToTop = 0;
+          this.$dispatch('backToTopParent');
         }
       },
       created () {
@@ -32,6 +34,14 @@
         $(window).on('scroll',function(){
           that.windowOffsetTop = $(window)[0].pageYOffset;
         });
+      },
+      route: {
+        activate() {
+          let that = this;
+          $(window).on('scroll',function(){
+            that.windowOffsetTop = $(window)[0].pageYOffset;
+          });
+        }
       }
     }
 </script>

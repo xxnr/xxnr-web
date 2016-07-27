@@ -93,6 +93,7 @@ export const goBack = ({dispatch,state}) => {
   }else if(window.location.pathname.indexOf('login')!=-1){
     //window.location.href = '#!/home';
     router.go('/my_xxnr')
+    //window.history.back();
   }else if(window.location.pathname == '/order') {
     if(state.order.cartList.goodsId) {
       router.go('/productDetail?id='+ state.order.cartList.goodsId);
@@ -105,7 +106,7 @@ export const goBack = ({dispatch,state}) => {
       return;
     }
     window.history.back();
-  } else if(window.location.pathname.indexOf('offlinePay')!=-1 && window.location.search.indexOf('fromOrder') != -1) {
+  } else if(window.location.pathname.indexOf('commitPay')!=-1 && window.location.search.indexOf('fromOrder') != -1) {
       if(state.order.orderInfo.rows.orderGoodsList[0].goodsId) {
         router.go('/productDetail?id='+ state.order.orderInfo.rows.orderGoodsList[0].goodsId);
         return;
@@ -141,6 +142,15 @@ export const login = ({dispatch,state},PhoneNumber,password) => {
       ,response => {
       if (response.data.code == 1000) {
         sessionStorage.setItem('user', JSON.stringify(response.data.datas));
+        //router.go('/home');
+        if(getUrlParam('ref')) {
+          router.go(decodeURIComponent(getUrlParam('ref')));
+          return;
+        }
+        if(getUrlParam('redirect')) {
+          window.location.href = decodeURIComponent(getUrlParam('redirect'));
+          return;
+        }
         router.go('/home');
       }else{
         dispatch(types.SET_TOASTMSG,response.data.message);

@@ -233,7 +233,7 @@
   }
 
   .product-info {
-    position: relative;
+    position: absolute;
     left: 0px;
   }
 
