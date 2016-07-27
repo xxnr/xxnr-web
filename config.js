@@ -25,8 +25,9 @@ var config = {
     backendtokencookie: "be_token",
     tokencookie: "token",
     usercookie: "__user",
-    //domain: ".xinxinnongren.com",
-    domain: "101.200.194.203",
+    domain: ".xinxinnongren.com",
+    //mobileDomain: "m.xinxinnongren.com",
+    //mobileDevDomain: "localhost",
     usercookie_expires_in: "30 days",
     shopingCartcookie: "__scart",
 
@@ -85,6 +86,7 @@ var config = {
     directory_public: '/public/',
     //directory_xxnr_public: '/public/xxnr/',
     directory_xxnr_public: '/public/xxnrpro/',
+    directory_xxnr_mobile_public: '/public/xxnrMobilePro/',
 
     default_request_timeout: 5000,
     default_maximum_file_descriptors: 0,
@@ -93,7 +95,7 @@ var config = {
 
     //Android IOS app版本号
     nowIosVersion: '2.2.1',
-    nowAndroidVersion: '2.2.5'
+    nowAndroidVersion: '2.3.1'
 
 };
 

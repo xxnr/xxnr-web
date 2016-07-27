@@ -2254,7 +2254,7 @@ body {
     border: 1px solid #E0E0E0;
     height: 44px;
     line-height: 44px;
-    margin-bottom: 20px;
+    margin-bottom: 12px;
     box-sizing: border-box;
 }
 .user_wrap .login_form .form-group label img{
@@ -2305,7 +2305,7 @@ body {
     display: block;
 }
 .user_wrap .login_form .remenberHint {
-    margin-top: 10px;
+    margin-top: 30px;
     padding-left: 15px;
     background: #FFF0E0;
     height: 24px;
@@ -2326,7 +2326,7 @@ body {
     margin-top: 12px;
 }
 .user_wrap .login_form .login_btn {
-    margin-top: 16px;
+    margin-top: 10px;
     border-radius: 5px;
     display: block;
     width: 340px;
@@ -2334,12 +2334,16 @@ body {
     line-height: 44px;
     text-align: center;
     color: #fff;
-    background: #00913a;
+    background: #009933;
     font-size: 14px;
     text-shadow:none !important;
     border:none !important;
     box-shadow:none !important;
     font-family: "Microsoft YaHei" !important;
+    cursor: pointer;
+}
+.user_wrap .login_form .login_btn:hover {
+    background: #008A2F;
 }
 .user_wrap .login_form .register_message {
     margin-top: 20px;
@@ -2373,7 +2377,7 @@ body {
     border: 1px solid #E0E0E0;
     height: 44px;
     line-height: 44px;
-    margin-bottom: 20px;
+    margin-bottom: 12px;
     display: inline-block;
     box-sizing: border-box;
 }
@@ -2386,6 +2390,74 @@ body {
     padding-left: 15px;
     font-size: 14px;
 }
+.user_wrap .register_form .verification-code {
+    width: 190px;
+    display: inline-block;
+    float: left;
+}
+.user_wrap .register_form .verification-code input{
+
+}
+.user_wrap .register_form .captcha_graph{
+    display: inline-block;
+    position: relative;
+    cursor: pointer;
+}
+.user_wrap .register_form .captcha_graph:hover .refresh_btn{
+    display: inline-block;
+}
+.user_wrap .register_form .captcha_graph .refresh_btn{
+    background: #FFFFFF;
+    position: absolute;
+    bottom: -10px;
+    right: -10px;
+    height: 22px;
+    width: 68px;
+    border: 1px solid #909090;
+    line-height: 22px;
+    text-align: center;
+    display: none;
+    cursor: pointer;
+}
+.user_wrap .register_form .captcha_graph img{
+    width: 138px;
+    height: 44px;
+    float: left;
+    margin-left: 12px;
+}
+.loading_spinner{
+    animation: 1s spin linear infinite;
+    width: 24px;
+    height: 24px;
+}
+.loading_spinner_overlay{
+    position: absolute;
+    background: #FFFFFF;
+    width: 100%;
+    height: 100%;
+}
+.loading_spinner_overlay img{
+    width: 24px !important;
+    height: 24px !important;
+    position: absolute;
+    top: 10px;
+    left: 50px;
+}
+.reset_loading_spinner_overlay img{
+    width: 24px !important;
+    height: 24px !important;
+    position: absolute;
+    top: 10px;
+    left: 30px;
+}
+@keyframes spin {
+    from{
+        transform: rotate(0deg);  }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
 .user_wrap .register_form .register_code  {
     width: 190px;
 }
@@ -2439,13 +2511,18 @@ body {
     line-height: 44px;
     text-align: center;
     color: #fff;
-    background: #00913a;
+    background: #009933;
     font-size: 14px;
     text-shadow:none !important;
     border:none !important;
     box-shadow:none !important;
     font-family: "Microsoft YaHei" !important;
+    cursor: pointer;
 }
+.user_wrap .register_form .register_btn:hover {
+    background: #008A2F;
+}
+
 .user_wrap .register_form .login_link{
     margin-top: 10px;
 }
@@ -2493,7 +2570,7 @@ body {
     width: 239px;
     background: #FFEEED;
     height: 20px;
-    left: 99px;
+    left: 144px;
     border-radius: 2px;
 }
 .logon .reset_password_err img{
@@ -2512,7 +2589,7 @@ body {
     width: 239px;
     background: #DBEFE0;
     height: 20px;
-    left: 99px;
+    left: 144px;
 }
 .logon .reset_password_succeed img{
     padding-left: 14px;
@@ -2524,23 +2601,47 @@ body {
     color: #909090;
 }
 
-.user_wrap .login_form .focused_input--green {
-    border: 1px solid green;
+
+.pop_body .pop_login li .verification-code {
+    width: 135px;
+    display: inline-block;
+    float: left;
+    margin-right: 12px;
+    border: 1px solid #cacaca;
 }
-.user_wrap .register_form .focused_input--green {
-    border: 1px solid green;
+.pop_body .pop_login li .verification-code input{
+    float: left;
+    height: 44px;
+    width: 135px;
+    padding: 0 15px;
+    line-height: 44px;
+    font-size: 14px;
 }
-.user_wrap .login_form .error_input--red {
-    border: 1px solid red;
+.pop_body .pop_login li .reset_captcha_graph{
+    position: relative;
+    float: left;
+    cursor: pointer;
 }
-.user_wrap .register_form .error_input--red {
-    border: 1px solid red;
+.pop_body .pop_login li .reset_captcha_graph img{
+    width: 90px;
+    height: 44px;
+    float: left;
 }
-.pop_body .pop_login li .focused_input--green {
-    border: 1px solid green;
+.pop_body .pop_login li .reset_captcha_graph:hover .refresh_btn{
+    display: inline-block;
 }
-.pop_body .pop_login li .error_input--red {
-    border: 1px solid red;
+.pop_body .pop_login li .reset_captcha_graph .refresh_btn{
+    background: #FFFFFF;
+    position: absolute;
+    bottom: -10px;
+    right: -10px;
+    height: 22px;
+    width: 68px;
+    border: 1px solid #909090;
+    line-height: 22px;
+    text-align: center;
+    display: none;
+    cursor: pointer;
 }
 .pop_mask {
     width: 100%;
@@ -2573,7 +2674,7 @@ body {
 .pop_content {
     z-index: 10;
     position: absolute;
-    width: 400px;
+    width: 480px;
     left: 50%;
     top: 50%;
     margin-left: -200px;
@@ -2601,7 +2702,7 @@ body {
 .pop_body .my_xxnr_password_err{
     position: absolute;
     margin-top: -14px;
-    margin-left: 80px;
+    margin-left: 124px;
     background: #FFF2ED;
     padding-left: 6px;
     padding-right: 6px;
@@ -2615,10 +2716,10 @@ body {
 .pop_body .pop_login li {
     padding-bottom: 20px;
     overflow: hidden;
-    width: 317px;
+    /*width: 317px;*/
 }
 .pop_body .pop_login label {
-    width: 80px;
+    width: 125px;
     text-align: right;
     line-height: 44px;
     color: #424242;
@@ -2665,6 +2766,7 @@ body {
     border: 1px solid #008a2f;
     background: #fff;
     color: #008a2f;
+    margin-left: 10px;
 }
 .pop_body .pop_login .reg_get_code a:hover {
     background: #008a2f;
@@ -2999,6 +3101,24 @@ body {
     height: 300px;
     top: -134px;
     left: -130px;
+}
+.user_wrap .login_form .focused_input--green {
+    border: 1px solid green;
+}
+.user_wrap .register_form .focused_input--green {
+    border: 1px solid green;
+}
+.user_wrap .login_form .error_input--red {
+    border: 1px solid red;
+}
+.user_wrap .register_form .error_input--red {
+    border: 1px solid red;
+}
+.pop_body .pop_login li .focused_input--green {
+    border: 1px solid green;
+}
+.pop_body .pop_login li .error_input--red {
+    border: 1px solid red;
 }
 
 /*gouwuche*/
@@ -5272,19 +5392,20 @@ body {
 }
 .myClients_forms .clients_info .clients_form .form_title {
     box-sizing: border-box;
-    height: 50px;
-    line-height: 50px;
+    height: 40px;
+    line-height: 40px;
     background: #e5e5e5;
     font-size: 16px;
 }
 .myClients_forms .clients_info .clients_form .form_title ul {
-    height: 50px;
+    height: 40px;
 }
 .myClients_forms .clients_info .clients_form .form_title ul li {
     float: left;
     text-align: center;
     border-left: 1px solid #e5e5e5;
-    height: 50px;
+    height: 40px;
+    line-height: 40px;
 }
 .myClients_forms .clients_info .clients_form .form_title ul li:first-child {
     width: 160px;
@@ -5365,7 +5486,7 @@ body {
     padding-bottom: 20px;
 }
 .myClients_forms .inviter_section .inviter_wrap {
-    padding-top: 40px;
+    padding-top: 60px;
     padding-left: 65px;
 }
 .myClients_forms .inviter_section .noInviter_info p {
@@ -5432,6 +5553,7 @@ body {
     padding-top: 30px;
 }
 .myClients_forms .client_order .backToClients{
+    color: #323232;
     cursor: pointer;
     padding-left: 42px;
     height: 24px;
@@ -5559,8 +5681,9 @@ body {
 .myClients_forms .client_order .orders_list .orders .orders-main .product .p-quantity p {
     position: absolute;
     top: 50%;
-    left: 50%;
+    /* left: 50%; */
     margin-top: -10px;
+    width: 100%;
 }
 .myClients_forms .client_order .orders_list .orders .orders-main .product .pay-step {
     height: 120px;
@@ -6823,14 +6946,17 @@ body {
     display: inline-block;
     vertical-align: text-bottom;
     margin-bottom: -13px;
+    font-size: 14px;
 }
 .fillProfile .container .profile_box ul .sex {
     /*height: 60px;*/
 }
-.fillProfile .container .profile_box ul .sex form {
+.fillProfile .container .profile_box ul .sex .sex_form {
     vertical-align: text-bottom;
     margin-bottom: -6px;
     display: inline-block;
+    line-height: 24px;
+    float: left;
 }
 .fillProfile .container .profile_box ul .sex form .female {
     margin-left: 10px;
@@ -6840,7 +6966,8 @@ body {
 }
 .fillProfile .container .profile_box ul .sex label {
     /*margin-top: 2px;*/
-
+    line-height: 24px;
+    float: left;
 }
 .fillProfile .container .profile_box ul .address {
     margin-top: -10px;
@@ -6850,6 +6977,22 @@ body {
 .fillProfile .container .profile_box ul .address .address--selects {
     display: inline-block;
 }
+.fillProfile .container .profile_box ul .address .address--selects #provin
+{
+    height:40px;
+}
+.fillProfile .container .profile_box ul .address .address--selects #city
+{
+    height:40px;
+}
+.fillProfile .container .profile_box ul .address .address--selects #county
+{
+    height:40px;
+}
+.fillProfile .container .profile_box ul .address .address--selects #town
+{
+    height:40px;
+}
 .fillProfile .container .profile_box ul .address label{
     display: inline-block;
 }
@@ -6858,7 +7001,8 @@ body {
     color: #c7c7c7;
     font-size: 18px;
     /*margin-top: 5px;*/
-    font-size: 12px;
+    font-size: 14px;
+    height: 40px;
 }
 .fillProfile .container .profile_box ul .address select.changed {
     color: #323232;
@@ -6894,9 +7038,11 @@ body {
     height: 40px;
     margin-left: 105px;
     border-radius: 3px;
+    line-height: 40px;
 }
 .fillProfile .container .profile_box ul .buttons .invalid {
     background: #C0C0C0;
+    cursor: not-allowed;
 }
 .fillProfile .container .profile_box ul .profile--cancel{
     display: inline-block;

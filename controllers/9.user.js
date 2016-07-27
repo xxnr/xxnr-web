@@ -141,13 +141,13 @@ var files = DB('files', null, require('../modules/database/database').BUILT_IN_D
 // Login
 exports.process_login = function(req, res, next) {
     var options = {};
-    if (!req.data.account){
-        res.respond({code:1001,message:'请输入账号'});
+    if (!req.data.account || !tools.isPhone(req.data.account.toString())) {
+        res.respond({code: 1001, message: '请输入正确的手机号'});
         return;
     }
 
     if (!req.data.password){
-        res.respond({code:1001,message:'请输入密码'});
+        res.respond({code: 1001, message:'请输入密码'});
         return;
     }
 
@@ -158,7 +158,7 @@ exports.process_login = function(req, res, next) {
 
     var keepLogin = !(req.data.keepLogin === false || req.data.keepLogin === 'false');
     options.useragent = req.data["user-agent"] || 'web';
-    options.ip = req.ip;
+    options.ip = req.clientIp;
     UserService.login(options, function (err, data) {
         // Error
         if (err) {
@@ -186,12 +186,12 @@ exports.process_login = function(req, res, next) {
             }
 
             user.cartId = cart.cartId;
-            setCookieAndResponse(req, res, user, keepLogin);
+            setCookieAndResponse(req, res, user, keepLogin, 'login');
         }, false);
     });
 };
 
-var setCookieAndResponse = function(req, res, user, keepLogin){
+var setCookieAndResponse = function(req, res, user, keepLogin, type){
     // Set cookie
     var options = {userid:user.userid};
     var userAgent = req.data['user-agent'];
@@ -212,7 +212,18 @@ var setCookieAndResponse = function(req, res, user, keepLogin){
     UserService.update(options, function(err){
         if(err){
             console.error('setCookieAndResponse err:', err);
-            res.respond({code:1001, message:'登录失败'});
+            var resultMessage = '登录失败';
+            if (type) {
+                switch(type) {
+                    case 'login':
+                        resultMessage = '登录失败';
+                        break;
+                    case 'register':
+                        resultMessage = '注册失败';
+                        break;
+                }
+            }
+            res.respond({code:'1001', message:resultMessage});
             return;
         }
 
@@ -260,8 +271,19 @@ var setCookieAndResponse = function(req, res, user, keepLogin){
                 res.cookie(config.shopingCartcookie, shoppingCart_count, {domain: config.domain});
             }
 
+            var resultMessage = 'success';
+            if (type) {
+                switch(type) {
+                    case 'login':
+                        resultMessage = '登录成功';
+                        break;
+                    case 'register':
+                        resultMessage = '注册成功';
+                        break;
+                }
+            }
             // Return results
-            var result = {'code': '1000', 'message': 'success', 'datas': user, token:token};
+            var result = {code: '1000', message: resultMessage, datas: user, token:token};
             res.respond(result);
             return;
         }, true);
@@ -288,21 +310,21 @@ exports.process_register = function(req, res, next) {
     var options = {};
     var keepLogin = req.data.keepLogin || true; //是否保存登录状态，默认保存
     if (!req.data.account || !tools.isPhone(req.data.account.toString())) {
-        res.respond({'code': '1001', 'message': '请输入正确的手机号'});
+        res.respond({code: '1001', message: '请输入正确的手机号'});
         return;
     }
     if (!req.data.smsCode) {
-        res.respond({'code': '1001', 'message': '请输入验证码'});
+        res.respond({code: '1001', message: '请输入验证码'});
         return;
     }
     if (!req.data.password) {
-        res.respond({'code': '1001', 'message': '请输入密码'});
+        res.respond({code: '1001', message: '请输入密码'});
         return;
     }
 
     var decrypted = tools.decrypt_password(decodeURI(req.data.password));
     if (decrypted.length < 6) {
-        res.respond({'code': '1001', 'message': '密码长度需不小于6位'});
+        res.respond({code: '1001', message: '密码需不小于6位'});
         return;
     }
     options.account = req.data.account;
@@ -312,20 +334,20 @@ exports.process_register = function(req, res, next) {
         options.regMethod = req.data.regMethod;
     if (req.data.nickname)
         options.nickname = req.data.nickname;
-    options.ip = req.ip;
+    options.ip = req.clientIp;
     options.useragent = req.data["user-agent"] || 'web';
 
     var vcodeoptions = {'target': req.data.account.toString(), 'code_type': 'register', 'code': req.data.smsCode};
     vCodeService.verify(vcodeoptions, function(err, result){
         if (err || !result) {
-            res.respond({'code': '1001', 'message': '验证码验证错误'});
+            res.respond({code: '1001', message: '验证码验证失败'});
             return;
         } else {
             if (result && result.type === 1) {
                 UserService.create(options, function (err, data) {
                     // Error
                     if (err) {
-                        res.respond({'code': '1001', 'message': err});
+                        res.respond({code: 1001, message: err});
                         return;
                     } else {
                         // Return user data
@@ -340,11 +362,11 @@ exports.process_register = function(req, res, next) {
                         user.isVerified = false;
                         user.isUserInfoFullFilled = data.isUserInfoFullFilled;
 
-                        setCookieAndResponse(req, res, user, keepLogin);
+                        setCookieAndResponse(req, res, user, keepLogin, 'register');
                     }
                 }, true);
             } else {
-                res.respond({'code': '1001', 'message': result.data});
+                res.respond({code: '1001', message: result.data});
                 return;
             }
         }
@@ -360,50 +382,57 @@ exports.process_resetpwd = function(req, res, next) {
     var options = {};
 
     if (!req.data.account || !tools.isPhone(req.data.account.toString())) {
-        res.respond({'code': '1001', 'message': '请输入正确的手机号'});
+        res.respond({code: 1001, message: '请输入正确的手机号'});
         return;
     }
     if (!req.data.smsCode) {
-        res.respond({'code': '1001', 'message': '请输入验证码'});
+        res.respond({code: 1001, message: '请输入验证码'});
         return;
     }
     if (!req.data.newPwd) {
-        res.respond({'code': '1001', 'message': '请输入密码'});
+        res.respond({code: 1001, message: '请输入密码'});
         return;
     }
     var decrypted = tools.decrypt_password(decodeURI(req.data.newPwd));
     if (decrypted.length < 6) {
-        res.respond({'code': '1001', 'message': '密码长度需不小于6位'});
+        res.respond({code: 1001, message: '密码需不小于6位'});
         return;
     }
     options.account = req.data.account;
     options.smsCode = req.data.smsCode;
     options.password = decrypted;
-    options.ip = req.ip;
+    options.ip = req.clientIp;
 
-    vcodeoptions = {'target': req.data.account.toString(), 'code_type': 'resetpwd', 'code': req.data.smsCode};
-    vCodeService.verify(vcodeoptions, function(err, result){
-        if (err || !result) {
-            res.respond({'code': '1001', 'message': '验证码验证错误'});
+    UserService.get({'account': req.data.account}, function (err, data) {
+        if (!data || err) {
+            res.respond({code: 1001, message: '该手机号未注册，请重新输入'});
             return;
         } else {
-            if (result && result.type === 1) {
-                UserService.update(options, function (err) {
-                    // Error
-                    if (err) {
-                        res.respond({'code': '1001', 'message': '密码修改失败'});
-                        return;
+            vcodeoptions = {'target': req.data.account.toString(), 'code_type': 'resetpwd', 'code': req.data.smsCode};
+            vCodeService.verify(vcodeoptions, function(err, result){
+                if (err || !result) {
+                    res.respond({code: 1001, message: '验证码验证失败'});
+                    return;
+                } else {
+                    if (result && result.type === 1) {
+                        UserService.update(options, function (err) {
+                            // Error
+                            if (err) {
+                                res.respond({code: 1001, message: '修改密码失败'});
+                                return;
+                            } else {
+                                // Return results
+                                res.respond({code: 1000, message: '重置密码成功'});
+                            }
+                        });
                     } else {
-                        // Return results
-                        res.respond({'code': '1000', 'message': 'success'});
+                        res.respond({code: 1001, message: result.data});
+                        return;
                     }
-                });
-            } else {
-                res.respond({'code': '1001', 'message': result.data});
-                return;
-            }
+                }
+            }, true);
         }
-    }, true);
+    });
 };
 
 // Get user
@@ -413,7 +442,7 @@ exports.json_user_get = function(req, res, next) {
 
     if (req.data.id)
         options.userid = req.data.id;
-    options.ip = req.ip;
+    options.ip = req.clientIp;
 
     UserService.get(options, function (err, data) {
         // Error
@@ -488,7 +517,7 @@ var json_userscore_get = function(req, res, next, callback) {
 
     if (req.data.userId)
         options.userid = req.data.userId;
-    options.ip = req.ip;
+    options.ip = req.clientIp;
 
     UserService.get(options, function (err, data) {
         // Error
@@ -533,7 +562,7 @@ exports.json_user_modifypwd = function(req, res, next) {
     }
 
     options.password = decryptedNewPwd;
-    options.ip = req.ip;
+    options.ip = req.clientIp;
 
     UserService.get(options, function (err, data) {
         // Error
@@ -598,7 +627,7 @@ exports.json_user_modify = function(req, res, next) {
         options.photo = req.data.userPhoto;
     if (req.data.sex)
         options.sex = req.data.sex;
-    options.ip = req.ip;
+    options.ip = req.clientIp;
 	if (req.data.type) {
         if(!Global.usertypes[req.data.type]){
             res.respond({code:1001, message:'未查询到用户类型'});
@@ -653,83 +682,11 @@ exports.json_user_modify = function(req, res, next) {
         };
         if (req.data.address && req.data.address.provinceId && req.data.address.cityId) {
             var address = req.data.address;
-            options.address = {};
-            AreaService.getProvince({id: address.provinceId}, function (err, province) {
-                if (err || !province) {
-                    if (err) console.error('get province err:', err);
-                    res.respond({code: 1001, message: '没有查到要修改的省'});
-                    return;
-                }
-
-                options.address.province = province;
-                AreaService.getCity({id: address.cityId}, function (err, city) {
-                    if (err || !city) {
-                        if (err) console.error('get city err:', err);
-                        res.respond({code: 1001, message: '没有查到要修改的市'});
-                        return;
-                    }
-
-                    if(city.provinceid != province.id){
-                        res.respond({code:1001, message:'所选城市不属于所选省份'});
-                        return;
-                    }
-
-                    options.address.city = city;
-                    if (req.data.address.countyId) {
-                        AreaService.getCounty({id: address.countyId}, function (err, county) {
-                            if (err || !county) {
-                                if (err) console.error('get county err:', err);
-                                res.respond({code: 1001, message: '没有查到要修改的县'});
-                                return;
-                            }
-
-                            if(county.cityid != city.id){
-                                res.respond({code:1001, message:'所选区县不属于所选城市'});
-                                return;
-                            }
-
-                            options.address.county = county;
-                            if (address.townId) {
-                                AreaService.getTown({id: address.townId}, function (err, town) {
-                                    if (err || !town) {
-                                        if (err) console.error('get town err:', err);
-                                        res.respond({code: 1001, message: '没有查到要修改的乡镇'});
-                                        return;
-                                    }
-
-                                    if(town.countyid != county.id){
-                                        res.respond({code:1001, message:'所选乡镇不属于所选区县'});
-                                        return;
-                                    }
-
-                                    options.address.town = town;
-                                    UserService.update(options, callback);
-                                });
-                            } else {
-                                UserService.update(options, callback);
-                            }
-                        })
-                    } else if (address.townId) {
-                        AreaService.getTown({id: address.townId}, function (err, town) {
-                            if (err || !town) {
-                                if (err) console.error('get town err:', err);
-                                res.respond({code: 1001, message: '没有查到要修改的乡镇'});
-                                return;
-                            }
-
-                            if(town.city != city.id){
-                                res.respond({code:1001, message:'所选乡镇不属于所选城市'});
-                                return;
-                            }
-
-                            options.address.town = town;
-                            UserService.update(options, callback);
-                        });
-                    } else {
-                        UserService.update(options, callback);
-                    }
-                });
-            });
+            var updator = function(address_object){
+                options.address = address_object;
+                UserService.update(options, callback);
+            };
+            AreaService.check_address(address.provinceId, address.cityId, address.countyId, address.townId, res, updator, true);
         } else{
             UserService.update(options, callback);
         }
@@ -738,20 +695,26 @@ exports.json_user_modify = function(req, res, next) {
 
 // Find Account in users
 exports.json_user_findaccount = function(req, res, next) {
+    if (!req.data.account|| !tools.isPhone(req.data.account.toString())) {
+        res.respond({code: 1001, message: '请输入正确的手机号'});
+        return;
+    }
     var options = {};
-
-    if (req.data.account)
-        options.account = req.data.account;
-    options.ip = req.ip;
+    options.account = req.data.account;
+    options.ip = req.clientIp;
 
     UserService.get(options, function (err, data) {
         // Error
-        if (err) {
-            res.respond({'code': '1001', 'message': err});
+        if (err || !data) {
+            if (err && data) {
+                res.respond({code: 1001, message: '查找信息失败'});
+                return;
+            }
+            res.respond({code: 1001, message: '该手机号未注册'});
             return;
         }
 
-        res.respond({'code': '1000', 'message': 'success'});
+        res.respond({code: 1000, message: '该手机号已注册'});
     });
 };
 
@@ -767,7 +730,7 @@ var json_useraddresslist_query = function(req, res, next ,callback){
         return;
     }
     options.userid = req.data.userId;
-    options.ip = req.ip;
+    options.ip = req.clientIp;
 
     UseraddressService.query(options, function (err, data) {
         // Error
@@ -1294,6 +1257,11 @@ exports.process_bind_inviter = function(req, res, next){
         return;
     }
 
+    if(!tools.isPhone(req.data.inviter)){
+        res.respond({code:1001,message:'请输入正确的手机号'});
+        return;
+    }
+
     if(!req.data.userId){
         res.respond({code:1001,message:'请填写用户ID'});
         return;
@@ -1310,6 +1278,11 @@ exports.process_bind_inviter = function(req, res, next){
         if(data.inviter){
             // already has inviter
             res.respond({code:1002, message:'已经绑定过邀请人，请勿重复操作'});
+            return;
+        }
+
+        if(data.account == req.data.inviter){
+            res.respond({code:1002, message:'不能绑定自己为新农代表，请重新输入'});
             return;
         }
 
@@ -1346,13 +1319,13 @@ exports.json_get_inviter = function(req, res, next) {
     UserService.get(options, function (err, data) {
         // Error
         if (err) {
-            res.respond({'code': '1001', 'message': err});
+            res.respond({'code': '1001', 'message': '获取新农代表失败，请重试'});
             return;
         }
         if (data && data.inviter && data.inviter.id) {
             UserService.get({userid: data.inviter.id}, function (err, inviter) {
                 if (err) {
-                    res.respond({'code': '1001', 'message': err});
+                    res.respond({'code': '1001', 'message': '获取新农代表失败，请重试'});
                     return;
                 }
                 if (inviter) {
@@ -1380,12 +1353,12 @@ exports.json_get_inviter = function(req, res, next) {
                     user.inviterIsVerified = inviter.isVerified;
                     res.respond({code: '1000', message: 'success', datas: user});
                 } else {
-                    res.respond({code: '1001', message: '没有找到新农代表信息'});
+                    res.respond({code: '1001', 'message': '获取新农代表失败，请重试'});
                     return; 
                 }
             });
         } else {
-            res.respond({code: '1000', message: '没有找到新农代表信息', datas:{}});
+            res.respond({code: '1000', datas:{}});
             return;
         }
     });
@@ -1398,7 +1371,7 @@ exports.json_get_inviteeOrderbynamePinyin = function(req, res, next) {
     UserService.getInviteeOrderbynamePinyin(options, function(err, result) {
         if (err) {
             console.error('user getInviteeOrderbynamePinyin err:', err);
-            res.respond({code:1001, message:'获取被邀请人列表失败'});
+            res.respond({code:1001});
             return;
         }
 
@@ -1429,7 +1402,7 @@ exports.json_get_inviteeOrderbynamePinyin = function(req, res, next) {
                 UserService.getInviteeOrderNumber(inviteeIds, function (err, inviteeOrderData) {
                     if (err) {
                         console.error('user json_get_invitee getInviteeOrderNumber err:', err);
-                        res.respond({code:1001, message:'获取被邀请人列表失败'});
+                        res.respond({code:1001});
                         return;
                     }
 
@@ -1471,7 +1444,7 @@ exports.json_get_invitee = function(req, res, next) {
     UserService.getInvitee(options, function(err, result) {
         if (err) {
             console.error('user json_get_invitee err:', err);
-            res.respond({code:1001, message:'无法获取被邀请人列表'});
+            res.respond({code:1001, message:'获取客户列表失败，请重试'});
             return;
         }
 
@@ -1499,7 +1472,7 @@ exports.json_get_invitee = function(req, res, next) {
                 UserService.getInviteeOrderNumber(inviteeIds, function (err, inviteeOrderData) {
                     if (err) {
                         console.error('user json_get_invitee getInviteeOrderNumber err:', err);
-                        res.respond({code:1001, message:'获取被邀请人列表错误'});
+                        res.respond({code:1001, message:'获取客户列表失败，请重试'});
                         return;
                     }
 
@@ -1534,7 +1507,7 @@ exports.json_get_invitee_orders = function(req, res, next) {
     UserService.getOneInvitee({_id:req.user._id, inviteeId:req.data.inviteeId}, function(err, user) {
         if (err) {
             console.error('user json_get_invitee err:', err);
-            res.respond({code:1001, message:'获取客户信息失败'});
+            res.respond({code:1001, message:'获取客户订单列表失败，请重试'});
             return;
         }
 
@@ -1556,7 +1529,7 @@ exports.json_get_invitee_orders = function(req, res, next) {
         OrderService.query(options, function(err, data) {
             if (err) {
                 console.error('User json_get_invitee_orders err:', err);
-                res.respond({code:1001, message:'获取客户订单失败'});
+                res.respond({code:1001, message:'获取客户订单列表失败，请重试'});
                 return;
             }
 
@@ -1643,7 +1616,12 @@ exports.process_add_potential_customer = function(req, res, next) {
         return;
     }
 
-    if (!req.data.phone || !tools.isPhone(req.data.phone.toString())) {
+    if(!req.data.phone){
+        res.respond({code:1001, message:'请输入手机号'});
+        return;
+    }
+
+    if (!tools.isPhone(req.data.phone.toString())) {
         res.respond({code: 1001, message: '请输入正确的手机号'});
         return;
     }
@@ -1703,13 +1681,13 @@ exports.json_potential_customer = function(req, res, next){
         var max = U.parseInt(req.data.max, 20);
         PotentialCustomerService.queryPage(req.user, page, max, function (err, potentialCustomers, totalCount, pageCount) {
             if (err) {
-                res.respond({code: 1001, message: '获取潜在客户列表失败'});
+                res.respond({code: 1001, message: '获取潜在客户列表失败，请重试'});
                 return;
             }
 
             PotentialCustomerService.countLeftToday(req.user, function (err, count) {
                 if (err) {
-                    res.respond({code: 1001, message: '查询客户列表失败'});
+                    res.respond({code: 1001, message: '获取潜在客户列表失败，请重试'});
                     return;
                 }
 
@@ -1730,7 +1708,7 @@ exports.json_potential_customer = function(req, res, next){
 exports.json_potential_customer_orderby_namePinyin = function(req, res, next){
     PotentialCustomerService.queryOrderbynamePinyin(req.user, function (err, potentialCustomers) {
         if (err) {
-            res.respond({code: 1001, message: '获取潜在客户列表失败'});
+            res.respond({code: 1001});
             return;
         }
 
@@ -1747,13 +1725,13 @@ exports.json_potential_customer_islatest = function(req, res, next){
     var count = req.data.count || 0;
     PotentialCustomerService.queryOrderbynamePinyin(req.user, function (err, potentialCustomers) {
         if (err) {
-            res.respond({code: 1001, message: '获取潜在客户列表失败'});
+            res.respond({code: 1001, message: '查询失败，请重试'});
             return;
         }
 
         PotentialCustomerService.countLeftToday(req.user, function (err, countLeftToday) {
             if (err) {
-                res.respond({code: 1001, message: '查询客户列表失败'});
+                res.respond({code: 1001, message: '查询失败，请重试'});
                 return;
             }
 
@@ -1810,7 +1788,7 @@ exports.json_potential_customer_get = function(req, res, next){
 
     PotentialCustomerService.getById(req.data._id, function(err, doc){
         if(err){
-            res.respond({code:1001, message:'获取客户信息失败'});
+            res.respond({code:1001, message:'获取客户详情失败，请重试'});
             return;
         }
 

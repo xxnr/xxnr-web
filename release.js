@@ -73,6 +73,9 @@ app.use(function (req, res, next) {
 
 	// APP will add extra slash at the beginning of the path improperly, here to remove them
 	req.url = req.url.replace(/\/*/, '/');
+
+	// for nginx proxy
+	req.clientIp = req.headers['x-real-ip'] || req.headers['ip'] || req.ip;
 	return next();
 });
 
@@ -114,8 +117,8 @@ app.use(function (err, req, res, next) {
 
 module.exports = app;
 
-http.createServer(app).listen(80);
-console.info('application listen at port 80');
+http.createServer(app).listen(8070);
+console.info('application listen at port 8070');
 
 if(config.secure) {
 	var options = {
@@ -123,7 +126,6 @@ if(config.secure) {
 		key: fs.readFileSync('xxnr.key'),
 		cert: fs.readFileSync('xxnr.crt')
 	};
-
-	https.createServer(options, app).listen(443);
-	console.info('application listen at port 443');
+	https.createServer(options, app).listen(8442);
+	console.info('application listen at port 8442');
 }

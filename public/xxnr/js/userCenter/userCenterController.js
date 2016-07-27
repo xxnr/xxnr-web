@@ -253,7 +253,10 @@ app.controller('userCenterController', function($scope, $rootScope,$timeout ,rem
                                     window.location.href = "/logon.html";
                                     return false
                                 },3000);
-                            }else {
+                            }else if(data.code == 1001){
+                                $scope.my_xxnr_password_err_msg = data.message;
+                            }
+                            else {
                                 //sweetalert(data.message);
                                 var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">'+data.message;
                                 var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);
@@ -350,6 +353,9 @@ app.controller('userCenterController', function($scope, $rootScope,$timeout ,rem
         }
     };
     $scope.show_page = function (pageId) {
+        $('html,body').animate({
+            scrollTop: 0
+        }, 100);
         $scope.current_page = pageId;
         for (var pageIndex in $scope.pages) {
             if ($scope.pages[pageIndex].id == pageId) {
@@ -549,7 +555,7 @@ app.controller('userCenterController', function($scope, $rootScope,$timeout ,rem
                         order.showModifyAction = true;
                         order.actionName = '查看付款信息';
                         order.action = function (order) {
-                            window.location.href = "commitPay.html?id=" + order.id + "&offlinePay=1";
+                            window.location.href = "commitPay.html?id=" + order.id + "&offlinePay=1&auditingOrder=1";
                         };
                         order.modifyPay = function (order) {
                             window.location.href = "commitPay.html?id=" + order.id + "&auditingOrder=1";

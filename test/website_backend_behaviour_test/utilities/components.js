@@ -82,16 +82,17 @@ exports.prepare_SKU_attributes = function(category, brand_index, index, count, b
 
 exports.create_RSC = function(RSC, backend_admin_token, done) {
     var test_user_token;
-    var account = utils.GUID(11);
+    var account = '1380000' + utils.random(1999, 1000);
     var password = utils.GUID(20);
     Routing.User.create_frontend_account(account, password, function (body) {
         var user_id = body._id;
         Routing.User.frontendLogin(account, password, function (body) {
+            body.should.have.property('code', '1000');
             test_user_token = body.token;
             var user = body.datas;
             user._id = user_id;
             Routing.RSC.fill_RSC_info(test_user_token, RSC.name, RSC.IDNo, RSC.phone, RSC.companyName, RSC.companyAddress, function() {
-                Routing.RSC.modify_RSC_info(backend_admin_token, user.userid, RSC.products, function(){
+                Routing.RSC.modify_RSC_info(backend_admin_token, user.userid, RSC.products, RSC.gifts, function(){
                     Routing.User.verify_user_type(user.userid, ['5'], backend_admin_token, function () {
                         done(user, test_user_token);
                     });
@@ -200,5 +201,45 @@ function GetAndPostTest(caseName) {
         }
     };
 }
+
+exports.prepare_gift = function(backend_admin_token, deliveryType, gift_index, done){
+    var test_gift = test_data.random_test_gift(gift_index);
+    Routing.Rewardshop.query_categories(null, backend_admin_token, function (body) {
+        body.should.have.property('code', 1000);
+        test_categories = body.categories;
+        test_categories.should.not.be.empty;
+        var category = null;
+        if (deliveryType) {
+            for (var i=0; i < test_categories.length; i++) {
+                if (test_categories[i].deliveries) {
+                    for (var j=0; j < test_categories[i].deliveries.length; j++) {
+                        var delivery = test_categories[i].deliveries[j];
+                        if (deliveryType && delivery.deliveryType == deliveryType) {
+                            category = test_categories[i];
+                            break;
+                        }
+                    }
+                }
+            }
+        } else {
+            category = test_categories[0];
+        }
+        if (!category) {
+            done(null);
+            return;
+        }
+        Routing.Rewardshop.save_gift(utils.extend(test_gift, {
+            category: category._id
+        }), backend_admin_token, function (body) {
+            body.should.have.property('code', 1000);
+            var gift = body.gift;
+            Routing.Rewardshop.online_gift(gift._id, true, backend_admin_token, function(body){
+                    body.should.have.property('code', 1000);
+                    gift.online = true;
+                    done(gift);
+            });
+        });
+    });
+};
 
 exports.request = request;

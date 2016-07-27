@@ -6,6 +6,7 @@ var router = express.Router();
 var controllers = require('../controllers');
 var path = require('path');
 var middleware = require('../middlewares/authentication');
+var throttle = require('../middlewares/throttle');
 
 // area address APIs
 router.get('/api/v2.0/area/getAreaList', controllers.Area.json_province_query);
@@ -78,8 +79,16 @@ router.get('/app/order/getOderList', middleware.isLoggedIn_middleware, controlle
 router.post('/app/order/getOderList', middleware.isLoggedIn_middleware, controllers.Order.api10_getOrders);
 
 // Vcod
-router.get('/api/v2.0/sms', middleware.throttle, controllers.VCode.generate_sms);
-router.post('/api/v2.0/sms', middleware.throttle, controllers.VCode.generate_sms);
+// Old
+router.get('/api/v2.0/sms', throttle.forbidden_sms_attack_request, middleware.throttle, controllers.VCode.generate_sms);
+router.post('/api/v2.0/sms', throttle.forbidden_sms_attack_request, middleware.throttle, controllers.VCode.generate_sms);
+// new
+// graph vcode
+// refresh graph vcode
+router.get('/:type/captcha/:filename', throttle.forbidden_sms_attack_request, middleware.throttle, controllers.VCode.graph_vcode_image);
+router.get('/api/v2.3/captcha', throttle.forbidden_sms_attack_request, middleware.throttle, controllers.VCode.generate_refresh_graph_vcode);
+// new sms
+router.post('/api/v2.3/sms', throttle.forbidden_sms_attack_request, middleware.throttle, controllers.VCode.generate_validate_sms);
 
 // news APIs
 router.get('/api/v2.0/news', controllers.News.json_news_query);
@@ -184,6 +193,10 @@ router.get('/api/v2.3/rewardshop/gifts', controllers.Rewardshop.json_rewardshop_
 router.post('/api/v2.3/rewardshop/addGiftOrder', middleware.isLoggedIn_middleware, controllers.Rewardshop.add_gift_order);
 router.get('/api/v2.3/rewardshop/getGiftOrderList', middleware.isLoggedIn_middleware, controllers.Rewardshop.json_gift_order_query);
 router.get('/rewardshop/rules', controllers.Rewardshop.view_rewardshop_rules);
+// RSC rewardshop order
+router.get('/api/v2.3/RSC/rewardshop/getGiftOrderList', middleware.isLoggedIn_middleware, middleware.isRSC_middleware, controllers.Rewardshop.json_RSC_gift_order_query);
+router.post('/api/v2.3/RSC/rewardshop/order/selfDelivery', middleware.isLoggedIn_middleware, middleware.isRSC_middleware, controllers.Rewardshop.process_RSC_gift_order_self_delivery);
+
 
 // compatibility APIs
 controllers.Compatibility.compatibilityAPIs(router);

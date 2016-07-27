@@ -1,8 +1,8 @@
 /**
  * Created by pepelu on 9/18/2015.
  */
-var app = angular.module('login', ['xxnr_common']);
-app.controller('loginController', function($scope, $timeout, remoteApiService, commonService,$window){
+var app = angular.module('login', ['xxnr_common',"ngFlash"]);
+app.controller('loginController', function($scope, $timeout, remoteApiService, commonService,$window,Flash){
     function getQueryStringByName(name) {
         var result = location.search.match(new RegExp("[\?\&]" + name + "=([^\&]+)", "i"));
         if (result == null || result.length < 1) {
@@ -30,6 +30,7 @@ app.controller('loginController', function($scope, $timeout, remoteApiService, c
     $scope.resetPasswordSucceedMsg = '';
     $scope.focusInputGroupNum = 0;
     $scope.errorInputGroupNum = 0;
+    $scope.captcha = '';
 
     $scope.focusShowValidate = function(formInputGroupNum) {
         $scope.focusInputGroupNum = formInputGroupNum? formInputGroupNum : 0;
@@ -56,7 +57,9 @@ app.controller('loginController', function($scope, $timeout, remoteApiService, c
         resetPasswordCode:9,
         resetPassword:10,
         resetPasswordConfirm:11,
-        resetConfirmPasswordsMismatch:12
+        resetConfirmPasswordsMismatch:12,
+        registerCaptcha:13,
+        resetCaptcha:14
     }
     $scope.login = function(){
         $scope.loginResMsg = "";
@@ -133,6 +136,11 @@ app.controller('loginController', function($scope, $timeout, remoteApiService, c
         $scope.isOverflow = false;
         $scope.showPop = false;
         $scope.phoneNumber = "";
+        $scope.code = undefined;
+        $scope.newPassword = undefined;
+        $scope.confirm_newPassword = undefined;
+        $scope.resetPasswordMsg = '';
+        $scope.reset_captcha = undefined;
     };
     $scope.sendRegistCode = function(event){
         if($scope.regBlockSendCode){
@@ -140,23 +148,66 @@ app.controller('loginController', function($scope, $timeout, remoteApiService, c
             return;
         }
         if(checkPhoneNumber()) {
-            remoteApiService.sendCode($scope.phoneNumber, 'register')
+            $scope.captcha_loading = true;
+            remoteApiService.sendCode($scope.phoneNumber, 'register', $scope.graph_code?$scope.graph_code:'')
                 .then(function (data) {
                     if(data.code == 1000){
                         //sweetalert('成功获取短信，请注意查收');
-                        $scope.registerSucceedResMsg = '成功获取短信，请注意查收';
-                        $scope.regBlockSendCode = true;
-                        regSetTimeOut(60);
+                        if(data.captcha){
+                            if(!$scope.graph_code && $scope.captcha){
+                                $scope.registerResMsg = '请输入图形验证码';
+                                $scope.errorInputGroupNum = $scope.formInputsKeyValue.registerCaptcha;
+                            }else if($scope.graph_code && $scope.captcha){
+                                $scope.registerResMsg = data.message;
+                                $scope.errorInputGroupNum = $scope.formInputsKeyValue.registerCaptcha;
+                            }
+                            $scope.captcha = data.captcha?data.captcha:'';
+                        }else{
+                            $scope.captcha = '';
+                            $scope.registerSucceedResMsg = '成功获取短信，请注意查收';
+                            $scope.graph_code = undefined;
+                            $scope.regBlockSendCode = true;
+                            regSetTimeOut(60);
+                        }
+                        $scope.captcha_loading = false;
                     }else if(data.message=='请求参数错误，无效的tel参数'){
-                        //sweetalert(data.message);
-                        $scope.registerResMsg = '手机号格式错误';
+                        $scope.registerResMsg = '请输入正确的手机号';
                         $scope.errorInputGroupNum = $scope.formInputsKeyValue.registerPhone;
+                        $scope.captcha_loading = false;
                     }else{
-                        //sweetalert(data.message);
                         $scope.registerResMsg = data.message;
                         $scope.errorInputGroupNum = $scope.formInputsKeyValue.registerPhone;
+                        $scope.captcha_loading = false;
                     }
                 })
+        }
+    };
+    $scope.getCaptcha = function(bizcode,isReset){
+        if(checkPhoneNumber(isReset)) {
+            if(bizcode == 'register'){
+                remoteApiService.findAccount($scope.phoneNumber)
+                    .then(function (data) {
+                        if(data.code == 1000){
+                            $scope.registerResMsg = data.message;
+                            $scope.errorInputGroupNum = $scope.formInputsKeyValue.registerPhone;
+                        }else if(data.code == 1001){
+                            var captchaUrl = commonService.baseUrl + 'api/v2.3/captcha?' + 'bizcode=' + bizcode + '&tel=' + $scope.phoneNumber + '&time=' + new Date().getTime();
+                            $scope.captcha = captchaUrl;
+                        }
+                    })
+
+            }else if(bizcode == 'resetpwd'){
+                remoteApiService.findAccount($scope.phoneNumber)
+                    .then(function (data) {
+                        if(data.code == 1000){
+                            var captchaUrl = commonService.baseUrl + 'api/v2.3/captcha?' + 'bizcode=' + bizcode + '&tel=' + $scope.phoneNumber + '&time=' + new Date().getTime();
+                            $scope.reset_captcha = captchaUrl;
+                        }else{
+                            $scope.resetPasswordMsg = data.message;
+                            $scope.errorInputGroupNum = $scope.formInputsKeyValue.resetPasswordPhone
+                        }
+                    })
+            }
         }
     };
     $scope.sendResetCode = function(event){
@@ -166,23 +217,54 @@ app.controller('loginController', function($scope, $timeout, remoteApiService, c
         }
         $scope.focusShowValidate();
         if(checkPhoneNumber(true)) {
-            remoteApiService.sendCode($scope.phoneNumber, 'resetpwd')
+            $scope.captcha_loading = true;
+            remoteApiService.sendCode($scope.phoneNumber, 'resetpwd', $scope.reset_graph_code?$scope.reset_graph_code:'')
                 .then(function (data) {
                     if(data.code == 1000){
                         //sweetalert('成功获取短信，请注意查收');
-                        $scope.resetPasswordSucceedMsg = '成功获取短信，请注意查收';
-                        $scope.resetBlockSendCode = true;
-                        resetSetTimeOut(60);
-                    }else{
-                        //sweetalert(data.message);
-                        if(data.message == '请求参数错误，无效的tel参数'){
-                            $scope.resetPasswordMsg = '手机号格式错误';
+                        if(data.captcha){
+                            if(!$scope.reset_graph_code && $scope.reset_captcha){
+                                $scope.resetPasswordMsg = '请输入图形验证码';
+                                $scope.errorInputGroupNum = $scope.formInputsKeyValue.resetCaptcha;
+                            }else if($scope.reset_graph_code && $scope.reset_captcha){
+                                $scope.resetPasswordMsg = data.message;
+                                $scope.errorInputGroupNum = $scope.formInputsKeyValue.resetCaptcha;
+                            }
+                            $scope.reset_captcha = data.captcha?data.captcha:'';
                         }else{
-                            $scope.resetPasswordMsg = data.message;
-
+                            $scope.reset_captcha = '';
+                            $scope.resetPasswordSucceedMsg = '成功获取短信，请注意查收';
+                            $scope.reset_graph_code = undefined;
+                            $scope.resetBlockSendCode = true;
+                            resetSetTimeOut(60);
                         }
+                        $scope.captcha_loading = false;
+                    }else if(data.message=='请求参数错误，无效的tel参数'){
+                        $scope.resetPasswordMsg = '手机号格式错误';
+                        $scope.captcha_loading = false;
+                    }else{
+                        $scope.resetPasswordMsg = data.message;
+                        $scope.captcha_loading = false;
                     }
                 })
+
+            //remoteApiService.sendCode($scope.phoneNumber, 'resetpwd')
+            //    .then(function (data) {
+            //        if(data.code == 1000){
+            //            //sweetalert('成功获取短信，请注意查收');
+            //            $scope.resetPasswordSucceedMsg = '成功获取短信，请注意查收';
+            //            $scope.resetBlockSendCode = true;
+            //            resetSetTimeOut(60);
+            //        }else{
+            //            //sweetalert(data.message);
+            //            if(data.message == '请求参数错误，无效的tel参数'){
+            //                $scope.resetPasswordMsg = '手机号格式错误';
+            //            }else{
+            //                $scope.resetPasswordMsg = data.message;
+            //
+            //            }
+            //        }
+            //    })
         }
     };
     var regSetTimeOut = function(timeOut){
@@ -227,7 +309,7 @@ app.controller('loginController', function($scope, $timeout, remoteApiService, c
                 return true;
             }else{
                 //sweetalert('密码长度需大于6位');
-                $scope.loginResMsg = '密码长度需大于6位';
+                $scope.loginResMsg = '密码需不小于6位';
                 $scope.errorInputGroupNum = $scope.formInputsKeyValue.loginPassword;
             }
         }else{
@@ -245,10 +327,10 @@ app.controller('loginController', function($scope, $timeout, remoteApiService, c
             }
             else if(!isResetPassword){
                 //sweetalert('手机号格式错误');
-                $scope.registerResMsg = '手机号格式错误';
+                $scope.registerResMsg = '请输入正确的手机号';
                 $scope.errorInputGroupNum = $scope.formInputsKeyValue.registerPhone;
             }else if(isResetPassword){
-                $scope.resetPasswordMsg = '手机号格式错误';
+                $scope.resetPasswordMsg = '请输入正确的手机号';
                 $scope.errorInputGroupNum = $scope.formInputsKeyValue.resetPasswordPhone
             }
         }else if(!isResetPassword){
@@ -258,6 +340,24 @@ app.controller('loginController', function($scope, $timeout, remoteApiService, c
         }else if(isResetPassword){
             $scope.resetPasswordMsg = '请输入手机号';
             $scope.errorInputGroupNum = $scope.formInputsKeyValue.resetPasswordPhone;
+        }
+        return false;
+    };
+    var checkCaptcha = function(){
+        if($scope.captcha){
+            $scope.registerResMsg = '请先发送验证码';
+            $scope.errorInputGroupNum = $scope.formInputsKeyValue.registerCode;
+        }else{
+            return true;
+        }
+        return false;
+    };
+    var checkResetCaptcha = function(){
+        if($scope.reset_captcha){
+            $scope.resetPasswordMsg = '请先发送验证码';
+            $scope.errorInputGroupNum = $scope.formInputsKeyValue.resetCaptcha;
+        }else{
+            return true;
         }
         return false;
     };
@@ -280,10 +380,10 @@ app.controller('loginController', function($scope, $timeout, remoteApiService, c
                 return true;
             }else if(!isResetPassword){
                 //sweetalert('密码长度需大于6位');
-                $scope.registerResMsg = '密码长度需大于6位';
+                $scope.registerResMsg = '密码需不小于6位';
                 $scope.errorInputGroupNum = $scope.formInputsKeyValue.registerPassword;
             }else if(isResetPassword){
-                $scope.resetPasswordMsg = '密码长度需大于6位';
+                $scope.resetPasswordMsg = '密码需不小于6位';
                 $scope.errorInputGroupNum = $scope.formInputsKeyValue.resetPassword;
             }
         }else if(!isResetPassword){
@@ -304,18 +404,18 @@ app.controller('loginController', function($scope, $timeout, remoteApiService, c
                     return true;
                 }else if(!isResetPassword){
                     //sweetalert('两次密码不一致');
-                    $scope.registerResMsg = '两次密码不一致';
+                    $scope.registerResMsg = '两次密码输入不一致，请重新输入';
                     $scope.errorInputGroupNum = $scope.formInputsKeyValue.registerConfirmPasswordsMismatch;
                 }else if(isResetPassword){
-                    $scope.resetPasswordMsg = '两次密码不一致';
+                    $scope.resetPasswordMsg = '两次密码输入不一致，请重新输入';
                     $scope.errorInputGroupNum = $scope.formInputsKeyValue.resetConfirmPasswordsMismatch;
                 }
             }else if(!isResetPassword){
                 //sweetalert('密码长度需大于6位');
-                $scope.registerResMsg = '密码长度需大于6位';
+                $scope.registerResMsg = '密码需不小于6位';
                 $scope.errorInputGroupNum = $scope.formInputsKeyValue.registerPasswordConfirm;
             }else if(isResetPassword){
-                $scope.resetPasswordMsg = '密码长度需大于6位';
+                $scope.resetPasswordMsg = '密码需不小于6位';
                 $scope.errorInputGroupNum = $scope.formInputsKeyValue.resetPasswordConfirm;
             }
         }else if(!isResetPassword){
@@ -333,7 +433,7 @@ app.controller('loginController', function($scope, $timeout, remoteApiService, c
             return true;
         }else{
             //sweetalert('请接受使用协议');
-            $scope.registerResMsg = '请接受使用协议';
+            $scope.registerResMsg = '请同意网站使用协议';
         }
         return false;
     };
@@ -352,8 +452,15 @@ app.controller('loginController', function($scope, $timeout, remoteApiService, c
                         .then(function (data) {
                             if (data.code == 1000) {
                                 //sweetalert('重置密码成功',"logon.html");
-                                $scope.resetPasswordSucceedMsg = '重置密码成功';
+                                //$scope.resetPasswordSucceedMsg = '重置密码成功';
                                 //window.location.href = 'logon.html';
+                                var message = '<img class="xxnr--flash--icon" src="images/correct_prompt.png" alt="">重置密码成功';
+                                var id = Flash.create('success', message, 3000, {class: 'xxnr-success-flash', id: 'xxnr-success-flash'}, false);
+                                //$timeout(function(){
+                                //    window.location.href = "/logon.html";
+                                //    return false
+                                //},3000);
+                                $scope.closePop();
                             } else {
                                 //sweetalert(data.message);
                                 $scope.resetPasswordMsg = data.message;
@@ -392,13 +499,21 @@ app.controller('loginController', function($scope, $timeout, remoteApiService, c
                     var encrypt = new JSEncrypt();
                     encrypt.setPublicKey(public_key);
                     var encrypted = encrypt.encrypt($scope.newPassword);
+                    $scope.registerSucceedResMsg = '';  //当点击注册按钮的时候初始化提示信息
+                    $scope.registerResMsg = '';   //当点击注册按钮的时候初始化提示信息
                     remoteApiService.regist($scope.phoneNumber, encodeURI(encrypted), $scope.code, $scope.nickName)
                         .then(function (data) {
                             if (data.code == 1000) {
                                 sessionStorage.setItem('user', JSON.stringify(data.datas));
                                 window.location.href = '/fillProfile.html';
                             } else {
-                                sweetalert(data.message);
+                                //sweetalert(data.message);
+                                $scope.registerResMsg = data.message;
+                                if(data.message =='请输入正确的手机号'){
+                                    $scope.errorInputGroupNum = $scope.formInputsKeyValue.registerPhone;
+                                }else if(data.message =='验证码输入错误'){
+                                    $scope.errorInputGroupNum = $scope.formInputsKeyValue.registerCode;
+                                }
                             }
                         })
                 })

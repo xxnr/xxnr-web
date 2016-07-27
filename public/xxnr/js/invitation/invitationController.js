@@ -44,7 +44,7 @@ app.controller('invitationController', function($scope, remoteApiService, common
     var formatingPager = function(pager){
         if(pager.pages.length<=7){                                                     // e.g.: 1 2 3 4 5 6 7
             pager.pages = pager.pages;
-        }else if($scope.pages.length>7 && pager.current_page<5){                              // e.g.: 1 2 3 4 5 ... 20
+        }else if(pager.pages.length>7 && pager.current_page<5){                              // e.g.: 1 2 3 4 5 ... 20
             pager.pages = pager.pages.slice(0,6).concat(pager.pages[pager.pages.length-1]);
             pager.pages[5].id = '...';
         }else if(pager.pages.length>7 && pager.current_page <= pager.pages_count && pager.current_page> pager.pages_count - 4 ) {    // e.g.: 1 ... 16 17 18 19 20
@@ -235,6 +235,11 @@ app.controller('invitationController', function($scope, remoteApiService, common
         .then(function (data) {
             $scope.inviterTypeNum = data.datas.inviterUserType;
             $scope.inviterAddresses = data.datas.inviterAddress;
+            $scope.inviterAddressProvinceName = $scope.inviterAddresses.province?$scope.inviterAddresses.province.name:"";
+            $scope.inviterAddressCityName = $scope.inviterAddresses.city?$scope.inviterAddresses.city.name:"";
+            $scope.inviterAddressCountyName = $scope.inviterAddresses.county?$scope.inviterAddresses.county.name:"";
+            $scope.inviterAddressTownName = $scope.inviterAddresses.town?$scope.inviterAddresses.town.name:"";
+            $scope.inviterAddressesString = $scope.inviterAddressProvinceName + " " + $scope.inviterAddressCityName + " " + $scope.inviterAddressCountyName + " " + $scope.inviterAddressTownName;
             $scope.inviterIsVerified = data.datas.inviterIsVerified;
             $scope.inviterPhone = data.datas.inviterPhone;
             $scope.inviterName = data.datas.inviterName;
@@ -286,6 +291,9 @@ app.controller('invitationController', function($scope, remoteApiService, common
     };
 
     $scope.show_page = function(pager,pageId){
+        $('html,body').animate({
+            scrollTop: 0
+        }, 100);
         if(pageId!='...'){
             pager.current_page = pageId;
             for(var pageIndex in pager.pages){

@@ -22,7 +22,7 @@ describe('Shopping process', function() {
     var backend_admin = test_data.backend_admin;
     var backend_admin_token;
     var test_user_token;
-    var test_user = test_data.random_test_user(utils.GUID(5));
+    var test_user = test_data.random_test_user('0009');
     var test_address;
     before('delete SKU attributes', function(done){
         SKUAttributesModel.find({}).remove(done);

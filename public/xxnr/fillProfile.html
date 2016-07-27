@@ -64,7 +64,7 @@
 </div>
 <div ng-controller="fillProfileController" class="fillProfile">
     <p class="guide" ng-show="userInfoFullFilled">
-        <a href="/">首页</a> ／ <a href="fillProfile.html">修改资料</a>
+        <a href="/">首页</a> ／ <a href="my_xxnr.html">我的新农人</a> ／  <a href="fillProfile.html">用户资料</a>
     </p>
     <div class="clearfix wrap">
         <div class="container">
@@ -95,15 +95,15 @@
                         </li>
                         <li class="sex">
                             <label class="label">性别 </label>
-                            <form class="sex_form">
+                            <div class="sex_form">
                                 <input type="radio" checked="checked" name="Sex" value="male" ng-model="sex" />
                                 <img src="images/boy-img.png" alt=""/>
-                                男
+                                <span>男</span>
 
                                 <input class="female" type="radio" name="Sex" value="female" ng-model="sex" />
                                 <img src="images/girl-img.png" alt=""/>
-                                女
-                            </form>
+                                <span>女</span>
+                            </div>
                         </li>
                         <li class="address">
                             <label class="label">所在地区</label>

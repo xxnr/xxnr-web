@@ -6,7 +6,6 @@ var router = express.Router();
 var controllers = require('../controllers');
 var path = require('path');
 var middleware = require('../middlewares/authentication');
-var secure = require('../middlewares/secure');
 
 // front end page
 router.get('/', function(req, res){
@@ -22,8 +21,8 @@ router.get('//images/:type(small|large|original|thumbnail)/:filename.jpg', contr
 router.get('//images/:type(small|large|original|thumbnail)/:category/:filename.jpg', controllers.Default.file_image);
 
 // pay related views
-router.get('/alipay', secure.redirectToHttps, middleware.isInWhiteList_middleware, middleware.throttle, controllers.Pay.alipayOrder);
-router.post('/alipay', secure.redirectToHttps, middleware.isInWhiteList_middleware, middleware.throttle, controllers.Pay.alipayOrder);
+router.get('/alipay', middleware.isInWhiteList_middleware, middleware.throttle, controllers.Pay.alipayOrder);
+router.post('/alipay', middleware.isInWhiteList_middleware, middleware.throttle, controllers.Pay.alipayOrder);
 router.get('/alipay/success', controllers.Pay.aliPaySuccess);
 router.post('/unionpay/success', controllers.Pay.aliPaySuccess);
 

@@ -84,9 +84,11 @@ app.controller('shoppingCartController', function($scope, $timeout, remoteApiSer
                                 item.name = itemData.productName.length > 40 ? (itemData.productName.substr(0, 40) + '...') : itemData.productName;
                                 item.additions = itemData.additions;
                                 item.additionsPrice = 0;
+                                item.additionsIds = [];
                                 for (var i in item.additions) {
                                     if(item.additions.hasOwnProperty(i)){
                                         item.additionsPrice = item.additionsPrice + item.additions[i].price;
+                                        item.additionsIds.push(item.additions[i]._id);
                                     }
                                 }
                                 item.attributes = itemData.attributes;
@@ -244,7 +246,7 @@ app.controller('shoppingCartController', function($scope, $timeout, remoteApiSer
             $scope.shops[shopIndex].items[itemIndex].buyCount++;
             $scope.shops[shopIndex].totalCount++;
             $scope.buyCountChange(shopIndex, itemIndex, $scope.shops[shopIndex].items[itemIndex].buyCount, $scope.shops[shopIndex].items[itemIndex].buyCount - 1);
-            addToSKUCartNum($scope.shops[shopIndex].items[itemIndex].SKU_id);
+            addToSKUCartNum($scope.shops[shopIndex].items[itemIndex].SKU_id,$scope.shops[shopIndex].items[itemIndex].additionsIds);
         }
     };
     $scope.reduce = function(shopIndex, itemIndex) {
@@ -252,7 +254,7 @@ app.controller('shoppingCartController', function($scope, $timeout, remoteApiSer
             $scope.shops[shopIndex].items[itemIndex].buyCount--;
             $scope.shops[shopIndex].totalCount--;
             $scope.buyCountChange(shopIndex, itemIndex, $scope.shops[shopIndex].items[itemIndex].buyCount, $scope.shops[shopIndex].items[itemIndex].buyCount + 1);
-            reduceToSKUCartNum($scope.shops[shopIndex].items[itemIndex].SKU_id);
+            reduceToSKUCartNum($scope.shops[shopIndex].items[itemIndex].SKU_id,$scope.shops[shopIndex].items[itemIndex].additionsIds);
         }
     };
     $scope.buyCountChange = function(shopIndex, itemIndex, newValue, oldValue) {
@@ -317,8 +319,8 @@ app.controller('shoppingCartController', function($scope, $timeout, remoteApiSer
                 }
             });
     };
-    var addToSKUCartNum = function(SKU_id){
-        remoteApiService.addToShoppingCart(SKU_id,1,[] ,true)
+    var addToSKUCartNum = function(SKU_id,additionsIds){
+        remoteApiService.addToShoppingCart(SKU_id,1,additionsIds,true)
             .then(function(data) {
                 if (data && data.code == 1000) {
                     // set shoppingCartCount
@@ -326,8 +328,8 @@ app.controller('shoppingCartController', function($scope, $timeout, remoteApiSer
                 }
             });
     };
-    var reduceToSKUCartNum = function(SKU_id){
-        remoteApiService.addToShoppingCart(SKU_id,-1,[] ,true)
+    var reduceToSKUCartNum = function(SKU_id,additionsIds){
+        remoteApiService.addToShoppingCart(SKU_id,-1,additionsIds,true)
             .then(function(data) {
                 if (data && data.code == 1000) {
                     // set shoppingCartCount
@@ -365,7 +367,7 @@ app.controller('shoppingCartController', function($scope, $timeout, remoteApiSer
         } else {
             swal({
                     title: " ",
-                    text: "\n\n您确定要删除吗?\n\n",
+                    text: "\n您确定要删除吗?\n",
                     //type: "warning",
                     showCancelButton: true,
                     confirmButtonColor: '#00913a',
