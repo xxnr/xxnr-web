@@ -10,8 +10,8 @@ module.exports = {
     productionSourceMap: true
   },
   domain: ".xinxinnongren.com",
-  pcsubdomain: "ppe",
-  mobilesubdomain: "mppe",
+  pcsubdomain: "www",
+  mobilesubdomain: "m",
   dev: {
     port: 8080,
     proxyTable: {}
