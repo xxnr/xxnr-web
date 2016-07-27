@@ -9,6 +9,7 @@ module.exports = {
         },
         registeredPhone : {
             number : 18610240422
-        }
+        },
+        randomVerificationCode : "a1b2"
     }
 };
