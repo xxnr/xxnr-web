@@ -59,6 +59,14 @@
 
 <script src="/js/zepto.js"></script>
 <script  type="text/javascript">
+    var campaign = <%- JSON.stringify(campaign) %>;
+    var title = campaign.title;
+    var _id = campaign._id;
+    var share_title = campaign.share_title;
+    var share_url = campaign.share_url;
+    var share_abstract = campaign.share_abstract;
+    var share_image = campaign.share_image;
+
     $(function() {
         $('#page_jump').on('click', function(){
             jsObj.startActivity("RewardShopActivity");

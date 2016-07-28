@@ -51,12 +51,53 @@ exports.campaign_page = function(req, res, next){
     var type = req.params.type;
     var name = req.params.name;
 
-    res.render(path.join(__dirname, '../views/G.campaign/', type, name), function (err, html) {
+    var url = req.path;
+
+    CampaignService.findByUrl(url, function(err, campaign) {
         if (err) {
-            res.status(404).send('404: Page not found');
+            res.status(500).send('500: Internal Error');
+            return;
         }
-        res.send(html);
-    });
+
+        if (!campaign) {
+            res.status(404).send('404: Page not found');
+            return;
+        }
+
+        var prevurl = req.url_prefix;
+        var previmg = getprevImg(req);
+        var imgtype = '.jpg';
+        if(campaign.url){
+            campaign.url = prevurl + campaign.url;
+        }
+        if(campaign.share_url){
+            campaign.share_url = prevurl + campaign.share_url;
+        }
+        if(campaign.image){
+            campaign.image = previmg + campaign.image + imgtype;
+        }
+        if(campaign.share_image){
+            campaign.share_image = previmg + campaign.share_image + imgtype;
+        }
+
+        res.render(path.join(__dirname, '../views/G.campaign/', type, name)
+            ,{
+                campaign: {
+                    title: campaign.title,
+                    _id: campaign._id,
+                    share_url: campaign.share_url,
+                    share_abstract: campaign.share_abstract,
+                    share_image: campaign.share_image,
+                    share_title: campaign.share_title
+                }
+            }
+            ,function (err, html) {
+            if (err) {
+                res.status(404).send('404: Page not found');
+            }
+            res.send(html);
+        });
+    })
 };
 
 exports.campaign_status = function(req, res, next){
