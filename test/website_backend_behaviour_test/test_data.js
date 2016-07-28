@@ -59,7 +59,6 @@ module.exports = {
         }
     },
     test_SKU:{
-        name:'test_sku',
         price:{
             market_price:10.1,
             platform_price:9.9
