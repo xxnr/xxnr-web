@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html xmlns:v-bind="http://www.w3.org/1999/xhtml" xmlns:v-on="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=10"/>
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, minimum-scale=0.5, maximum-scale=2.0, user-scalable=yes"/>
+    <meta name="robots" content="all,follow"/>
+    <style>
+        [v-cloak] {display: none;}
+        body, div, dl, dt, dd, ul, ol, li, h1, h2, h3, h4, h5, h6, input, button, textarea, p, blockquote, th, td, span, a {margin: 0;padding: 0;  }
+        /*html,body{min-height: 100%}*/
+        html {background: #98EBED}
+        img {border: none;}
+        li {list-style: none;}
+        table {border-collapse: collapse;border-spacing: 0;}
+        a:hover {text-decoration: none;}
+        a {text-decoration: none;}
+        body {background-color: white;font-family: "微软雅黑", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif;  height: 100%}
+        .clearfix:before, .clearfix:after {content: " "; /* 1 */display: table; /* 2 */}
+        .clearfix:after {clear}
+        .container {
+            margin: 0 auto;
+            width: 100%;
+            height: 100%;
+            background: #98EBED;
+        }
+        .title_image {text-align: center;width: 100%;position: absolute;z-index: 50;}
+        .question_backgroud {width: 100%;position: relative;}
+        .question_backgroud--image_body {width: 90%;margin: auto;display: block;margin-left: 3%;margin-top: 45%;position: absolute;display: block;z-index: 0;}
+        .question_backgroud--image_question{    z-index: 100;position: absolute;margin-top: 75%;margin-left: 25%;width: 50%;}
+        .start_button{z-index: 20; margin-top: 120%;position: absolute;left: 25%;width: 50%;}
+        .start_button img{width: 100%}
+        .question { position: absolute;margin-top: 75%;width: 60%;margin-left: 20%;}
+        .question--title { font-size: 4vw;margin-bottom: 20px;}
+        .question--option{ background: url('/images/campaign/quiz/activity_option.png') no-repeat;background-size: 100% 100%;height: 4vh;margin-bottom: 5%;text-align: center;line-height: 4vh;font-size: 4.2vw;position: relative;}
+        .question--option--title {position: absolute;left: 3.5%;color: #FFF;}
+        .result_img{position: absolute;right: 10%;height: 15px;width: 15px;top:20%}
+        .quiz--rule {margin-top: 155%;background: url('/images/campaign/quiz/activity_text_box1.png') no-repeat;background-position: center top;background-size: 90% 100%;}
+        .quiz--rule p {font-size: 3vw;padding: 5%;padding-left: 15%;padding-right: 15%;}
+        .quiz--info {background: url('/images/campaign/quiz/activity_text_box2.png') no-repeat;background-position: center top;background-size: 90% 100%;}
+        .quiz--info--text {padding: 15%;font-size: 3vw}
+        .quiz--info--text p{margin-bottom: 6px;color:#280505}
+        .quiz--info--text--title {color: #FF6600 !important;font-size: 5vw !important;margin-bottom: 12px !important;}
+        .quit_btn{ float: left;color: #646464;font-size: 3.5vw;}
+        .progress{ float: right;color: #280505;font-size: 3.5vw;}
+        .points_result{width: 80%;margin: auto;display: block;margin-top: 7%;}
+        .points_image {position: relative}
+        .points_earned { text-shadow: #bfa326 0 2px 0;    color: #FEF973;font-size: 14vw;top: 20%;position: absolute;text-align: center;margin: auto;display: block;margin-left: auto;margin-right: auto;left: 0;right: 0;padding-left: 2%;}
+        .points_image p{text-align: center;font-size: 3vw;margin-top: 10px;color: #280505;}
+        .download_app {background: #FFFFFF;height: 60px;}
+        .download_app .download_btn{background: #FF9700;color: #FFFFFF;display: inline-block;height: 22px;width: 60px;margin-right: 5%;margin-top: 20px;text-align: center;float: right;font-size: 10px;line-height: 22px;border-radius: 3px;}
+        .xxnr_logo {float: left;height: 80%;display: inline-block;margin: auto;margin-top: 6px;}
+        .download_app--text_info {float: left;display: inline-block;margin-top: 15px;margin-left: 7px}
+        .download_app--text_title {color:#323232}
+        .download_app--text_text {font-size: 9px;color: #909090;}
+        .download_app--close {float: left;width: 10px;height: 10px;margin-top: 25px;margin-left: 6px;margin-right: 12px;}
+    </style>
+</head>
+
+<body>
+<div id="app">
+    <div class="container">
+        <div class="download_app" v-show="showDownloadApp">
+            <img @click="closeDownloadApp()" class="download_app--close" src="/images/campaign/quiz/activity_shut_down.png" alt="">
+            <img class="xxnr_logo" src="/images/campaign/quiz/activity_xxnr_logo.png" alt="">
+            <div class="download_app--text_info">
+                <p class="download_app--text_title">新新农人</p>
+                <p class="download_app--text_text">农业互联网综合服务领先者</p>
+            </div>
+            <div class="download_btn">打开APP</div>
+        </div>
+        <div class="question_backgroud clearfix">
+            <img class="title_image" src="/images/campaign/quiz/activity_banner3.png" alt="">
+            <img class="question_backgroud--image_body" src="/images/campaign/quiz/bg3.png" alt="">
+            <img v-show="!started" class="question_backgroud--image_question" src="/images/campaign/quiz/coin_icon.png" alt="">
+            <div class="start_button" v-show="!started && !isLogin" v-cloak>
+                <img v-on:click="goToLogin" src="/images/campaign/quiz/button（not）.png" alt="">
+            </div>
+            <div class="start_button" v-show="!started && isLogin" v-cloak>
+                <img v-on:click="start" src="/images/campaign/quiz/button（logined）.png" alt="">
+            </div>
+            <div class="question" v-show="started" v-cloak>
+                <div v-show="currentQuestion">
+                    <p class="question--title">{{currentQuestion.question}}</p>
+                    <p class="question--option" v-for="option in currentQuestion.options" v-on:click.stop="answerAndNext($index, option)">
+                        <img class="result_img" src="/images/campaign/quiz/activity_right-.png" alt="" v-show="$index == answerOptionIndex && option.is_right_answer">
+                        <img class="result_img" src="/images/campaign/quiz/activity_wrong.png" alt="" v-show="$index == answerOptionIndex && !option.is_right_answer">
+                        <span class="question--option--title">{{option.order_key | indexToChar}}</span>{{option.value}}
+                    </p>
+                </div>
+                <div v-show="currentQuestion" v-on:click='resetPage'><span class="quit_btn">不答了</span> <span class="progress">{{currentQuestionIndex+1}}/{{quizs.length}}</span></div>
+                <div v-show="!currentQuestion" class="points_image">
+                    <img class="points_result" src="/images/campaign/quiz/activity_answer.png" alt="">
+                    <div class="points_earned">{{pointsEarned}}</div>
+                    <p>共{{quizs.length}}题，答对{{rightAnswerCount}}题</p>
+                    <p>奖励{{pointsEarned}}积分</p>
+                </div>
+            </div>
+        </div>
+        <div class="quiz--rule">
+            <p>看这里！答题时请直接点击答案,选择后即出结果;若中途退出，则可再次答题</p>
+        </div>
+        <div class="quiz--info">
+            <div class="quiz--info--text">
+                <p class="quiz--info--text--title">活动说明</p>
+                <p>活动范围：所有注册用户</p>
+                <p>活动时间：2016-07-15~2016-08-15</p>
+                <p>活动规则：</p>
+                <p>1.活动需登录后参与，登录后分享获取积分</p>
+                <p>2.每个用户每天可分享X次，每次分享可得X积分</p>
+                <p>3.每次分享以分享成功为准，不区分微信、朋友圈、QQ、QQ空间</p>
+            </div>
+        </div>
+        <!--{{test}}-->
+        <!--{{testMsg}}-->
+    </div>
+</div>
+
+
+<script src="/js/zepto.js"></script>
+<script src="/js/vue.min.v1.0.26.js"></script>
+<script src="/js/campaignConfig.js"></script>
+<script type="text/javascript">
+    Vue.config.debug = true;
+    Vue.config.devtools = true;
+    function getCookie(name) {
+        var value = "; " + document.cookie;
+        var parts = value.split("; " + name + "=");
+        if (parts.length == 2) return parts.pop().split(";").shift();
+    };
+    $('.download_btn').on('click', function(){
+        var params = {
+            inapp_data :{
+                activity : "CampaignDetailActivity",
+                params : [
+                    {
+                        key: 'url',
+                        value : 'http://192.168.1.21:8070/campaigns/quizs/jacCarsQuiz'
+                    }
+                ]
+            }
+        };
+        var paramsJson = JSON.stringify(params);
+        $.ajax({
+            url: 'https://fds.so/v2/url/363ebd292023cc28',
+            type: 'POST',
+            data: paramsJson,
+            xhrFields: {withCredentials: true},
+            success: function(result) {
+                //deepshareUrl为所生成的DeepShare Link
+                window.location.href = result.url;
+            },
+            error: function() {
+                //出错情况下可以继续用户正常逻辑，可设置一个默认url.
+            }
+        })
+    });
+    new Vue({
+        el: '#app',
+        data: {
+            quizs:[],
+            currentQuestionIndex:0,
+            currentQuestion: {},
+            clicked:false,
+            rightAnswerCount: 0,
+            started: false,
+            isLogin: false,
+            answerOptionIndex:-1,
+            pointsEarned:0,
+            answersWillCommit:[],
+            test:'',
+            testMsg:'',
+            token:'',
+            showDownloadApp:false
+        },
+        created: function () {
+            this.getQA();
+            this.currentQuestion = this.quizs[this.currentQuestionIndex];
+            this.checkLogin();
+            if(typeof jsObj == "undefined"){
+                this.showDownloadApp = true;
+            }else {
+                this.showDownloadApp = false
+            }
+        },
+        methods: {
+            answerAndNext: function ($index,option) {
+                if(!this.clicked){
+                    this.answerOptionIndex = $index;
+                    var _that = this;
+                    this.clicked = true;
+                    this.answersWillCommit.push({order_key:this.currentQuestion.order_key,choices:[option.order_key]});
+                    if(option.is_right_answer == true ){
+                        this.rightAnswerCount += 1;
+                        this.pointsEarned += this.quizs[this.currentQuestionIndex].points;
+                    }
+
+                    setTimeout(function(){
+                        if(_that.currentQuestionIndex < _that.quizs.length - 1){
+                            _that.currentQuestionIndex += 1;
+                            _that.currentQuestion = _that.quizs[_that.currentQuestionIndex];
+                            _that.clicked = false;
+                            _that.answerOptionIndex = -1;
+                        }else{
+                            (function(){
+                                var token;
+                                if(typeof jsObj == "undefined"){
+                                    token = getCookie(token);
+                                    if(token){
+                                        this.token = token;
+                                        this.isLogin = true;
+                                    }
+                                }else {
+                                    token = jsObj.getToken();
+                                }
+                                config.ajaxPost(config.baseURI, '/api/v2.3/campaign/QA/require_reward', {token:token,_id:config.jacCarsQuizEventId,answers:_that.answersWillCommit})
+                                        .then(function(data){
+//                                    _that.test = data.code;
+//                                    _that.testMsg = data.message;
+                                            if(data.code==1000){
+                                                _that.currentQuestion = null;
+                                                _that.currentQuestionIndex = 0;
+                                            }
+                                        })
+                            }());
+
+                        }
+                    },2000);
+
+                }
+            },
+            resetPage: function () {
+                this.started = false;
+                this.currentQuestionIndex = 0;
+                this.currentQuestion = {};
+                this.clicked = false;
+                this.rightAnswerCount = 0;
+            },
+            start : function(){
+                this.started = true;
+                this.currentQuestion = this.quizs[this.currentQuestionIndex];
+            },
+            getQA : function(){
+                var that = this;
+                config.ajaxGet(config.baseURI, '/api/v2.3/campaign/QA/getQA', {_id:config.jacCarsQuizEventId})
+                    .then(function(data){
+//                        console.log(data);
+                        that.quizs = data.QA;
+                    })
+            },
+            checkLogin : function(){
+                if(typeof jsObj == "undefined"){
+                    var token = getCookie('token');
+//                    console.log(token);
+                    if(token){
+                        this.token = token;
+                        this.isLogin = true;
+                    }
+                } else {
+                    this.isLogin = jsObj.isLogin();
+                }
+
+            },
+            goToLogin : function(){
+                if(typeof jsObj == "undefined"){
+                    window.location.href = encodeURI("http://mppe.xinxinnongren.com:8080/login?redirect="+window.location.href);
+                } else {
+                    jsObj.toLogin();
+                }
+            },
+            closeDownloadApp : function(){
+                this.showDownloadApp = false;
+            }
+        }
+    });
+    Vue.filter('indexToChar', function (index) {
+        return String.fromCharCode(64 + index);
+    })
+</script>
+</body>
+</html>
