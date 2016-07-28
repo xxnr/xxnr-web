@@ -116,9 +116,12 @@ app.use(function (err, req, res, next) {
 });
 
 module.exports = app;
-
-http.createServer(app).listen(8070);
-console.info('application listen at port 8070');
+var port = 8070;
+if(config.environment == 'sandbox'){
+	port = 80;
+}
+http.createServer(app).listen(port);
+console.info('application listen at port', port);
 
 if(config.secure) {
 	var options = {
