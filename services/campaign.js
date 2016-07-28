@@ -188,7 +188,9 @@ CampaignService.prototype.save = function(campaign, callback){
             callback('share_image required');
             return;
         }
+    }
 
+    if(campaign.share_url_name){
         campaign.share_url = this.campaign_url(campaign.share_url_name, campaign.type);
     }
 
