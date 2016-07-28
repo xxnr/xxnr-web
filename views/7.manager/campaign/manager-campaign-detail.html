@@ -1,0 +1,287 @@
+<link rel="stylesheet" href="/css/pikaday.css"/>
+<script type="text/javascript" async src="/js/pikaday.js"></script>
+<link rel="stylesheet" href="/css/jquery-ui-timepicker-addon.css"/>
+<script type="text/javascript" async src="/js/jquery-ui-timepicker-addon.js"></script>
+<link rel="stylesheet" href="/css/timePicker.css"/>
+<script type="text/javascript" async src="/js/jquery.timePicker.min.js"></script>
+<div class="filter" style="padding-bottom:9px">
+    <div class="container">
+        <div class="caption"><span class="fa fa-campaign mr5"></span><a href="/manager/campaign">活动管理</a>&nbsp;&nbsp;&nbsp;&nbsp;<h6 class="nopadding inline">活动详情</h6></div>
+    </div>
+</div>
+
+<div class="container">
+    <div style="position: relative;" id="campaign">
+        <div class="row m">
+            <div class="col-md-12 m">
+                <h3 class="ui-left">基本信息</h3>
+            </div>
+            <div class="col-md-12">
+                <div class="col-md-8">
+                    <div class="col-md-12 mb10" data-component="dropdown" data-component-path="campaign.info.type" data-source="campaign.types" data-source-value="id" data-empty-text="请先选择类目" data-empty="true" data-required="true">活动类型</div>
+                    <div class="mb10 col-md-12" data-component="textbox" data-component-path="campaign.info.title" data-required="true">活动标题</div>
+                    <div class="mb10 col-md-6">开始时间：
+                        <input type="text" class="date-selector" id="startTime">
+                    </div>
+                    <div class="mb10 col-md-6">结束时间：
+                        <input type="text" class="date-selector" id="endTime">
+                    </div>
+                    <div class="mb10 col-md-6">上线时间：
+                        <input type="text" class="date-selector" id="onlineTime">
+                    </div>
+                    <div class="mb10 col-md-6">下线时间：
+                        <input type="text" class="date-selector" id="offlineTime">
+                        <div data-component="checkbox" data-component-path="campaign.info.same_as_start_end_time">与开始结束时间相同</div>
+                    </div>
+                    <div class="mb10 col-md-12" data-component="textbox" data-component-path="campaign.info.campaign_url_name" data-required="true">活动链接</div>
+                    <div class="mb10 col-md-12" data-component="textbox" data-component-path="campaign.info.reward_times">奖励次数</div>
+                    <div class="mb10 col-md-12" data-component="textbox" data-component-path="campaign.info.comment">活动说明</div>
+                    <div class="mb10 col-md-12" data-component="fileupload" data-component-path="campaign.info.image" data-placeholder="添加图片" data-accept="image/png,image/jpeg" data-multiple="true" data-icon="fa-camera" data-extension="false">活动banner</div>
+                    <div class="mb10 col-md-12" data-component="pictures" data-component-path="campaign.info.image"></div>
+                </div>
+                <div class="col-md-8">
+                    <div class="mb10 col-md-12" data-component="checkbox" data-component-path="campaign.info.shareable" id="shareable">页面可分享</div>
+                    <div style="margin-left:50px" data-component="visible" data-component-path="campaign.info.shareable" data-if="campaign.info.shareable">
+                        <div class="mb10" data-component="textbox" data-component-path="campaign.info.share_points_add">分享加积分</div>
+                        <div class="mb10" data-component="checkbox" data-component-path="campaign.info.share_button">APP分享按钮</div>
+                        <div class="mb10" data-component="textbox" data-component-path="campaign.info.share_title">分享标题</div>
+                        <div class="mb10" data-component="textbox" data-component-path="campaign.info.share_url_name">分享url</div>
+                        <div data-component="checkbox" data-component-path="campaign.info.same_as_campaign_url_name">与活动url相同</div>
+                        <div class="mb10" data-component="textbox" data-component-path="campaign.info.share_abstract">分享摘要</div>
+                        <div class="mb10" data-component="fileupload" data-component-path="campaign.info.share_image" data-placeholder="添加图片" data-accept="image/png,image/jpeg" data-multiple="true" data-icon="fa-camera" data-extension="false">分享图片</div>
+                        <div class="mb10" data-component="pictures" data-component-path="campaign.info.share_image"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr>
+        <hr>
+        <div data-component="error" data-component-path="campaign.giftresponse"></div>
+        <div class="ui-buttons mb50">
+            <button name="submit" data-component="template" data-component-path="campaign.info">
+                <script type="text/html">
+                    {{ if type==1 }}
+                        {{ if _id }}
+                            更新
+                        {{ else }}
+                            添加
+                        {{ fi }}
+                    {{ else }}
+                        下一步
+                    {{ fi }}</script>
+            </button>
+        </div>
+    </div>
+</div>
+<script>
+    var types = <%- JSON.stringify(types) %>;
+    var campaign_detail = <%- JSON.stringify(campaign) %>;
+
+    var startTimePicker, endTimePicker, onlineTimePicker, offlineTimePicker;
+    var campaign = {
+        info:{}
+    };
+
+    campaign_detail_refresh();
+    bindShareableCheckbox();
+    init_time_picker();
+    function campaign_detail_refresh(){
+        campaign.types = types.array;
+        campaign.info = campaign_detail;
+        SET('campaign.types', campaign.types);
+        SET('campaign.info', campaign.info);
+
+        $('#campaign button').off('click').on('click', function(){
+            var el = $(this);
+            switch(el.attr('name')) {
+                case 'submit':
+                    add_or_update_campaign(campaign.info._id ? true : false);
+                    break;
+            }
+        });
+
+    }
+
+    function bindShareableCheckbox(){
+        WATCH('campaign.info.shareable', function(path, value){
+            if (NOTMODIFIED('campaign.info.shareable', campaign.info.shareable))
+                return;
+            console.log(campaign.info.shareable);
+            SET('campaign.info.shareable', campaign.info.shareable);
+        })
+    }
+
+    function add_or_update_campaign(update){
+        if(!campaign.info.type){
+            alert('请选择活动类型');
+            return;
+        }
+        campaign.info.type = parseInt(campaign.info.type);
+        if(!campaign.info.title){
+            alert('请填写活动标题');
+            return;
+        }
+        if(campaign.info.same_as_start_end_time){
+            campaign.info.online_time = campaign.info.start_time;
+            campaign.info.offline_time = campaign.info.end_time;
+        }
+        if(!campaign.info.online_time){
+            alert('请选择上线时间');
+            return;
+        }
+        if(!campaign.info.start_time){
+            campaign.info.start_time = campaign.info.online_time;
+        }
+        if(!campaign.info.campaign_url_name){
+            alert('请填写活动链接');
+            return;
+        }
+        if(campaign.info.shareable){
+            if(!campaign.info.share_title){
+                alert('请填写分享标题');
+                return;
+            }
+            if(campaign.info.same_as_campaign_url_name){
+                campaign.info.share_url_name = campaign.info.campaign_url_name;
+            }
+            if(!campaign.info.share_url_name){
+                alert('请填写分享url');
+                return;
+            }
+            if(!campaign.info.share_abstract){
+                alert('请填写分享摘要');
+                return;
+            }
+            if(!campaign.info.share_image){
+                alert('请选择分享图片');
+                return;
+            }
+            if(campaign.info.share_image instanceof Array)
+                campaign.info.share_image = campaign.info.share_image[0];
+        }
+        if(!campaign.info.image){
+            alert('请选择活动banner');
+            return;
+        }
+        if(campaign.info.image instanceof Array)
+            campaign.info.image = campaign.info.image[0];
+        var api;
+        if(update){
+            api = managerurl+'/api/campaign/modify'
+        } else{
+            api = managerurl+'/api/campaign/create'
+        }
+
+        $.components.POST(api, {campaign:campaign.info}, function(response){
+            if(response.code==1000){
+                var _id = response.campaign._id;
+                switch(campaign.info.type){
+                    case 1:
+                        success();
+                        window.location.href=managerurl+'/campaign';
+                        break;
+                    case 2:
+                        window.location.href=managerurl+'/campaign/detail/QA?_id='+_id;
+                        break;
+                    case 3:
+                        window.location.href=managerurl+'/campaign/detail/quiz?_id='+_id;
+                        break;
+                }
+            } else{
+                alert(response.message);
+            }
+        })
+    }
+
+    function init_time_picker(){
+        if(campaign.info.start_time)
+            $('#startTime').val(new Date(campaign.info.start_time).format('yyyy-MM-dd hh:mm:ss'));
+        $('#startTime').datetimepicker({
+            timeInput: true,
+            timeFormat: "HH:mm:ss",
+            dateFormat: "yy-mm-dd",
+            onSelect:function(datetimeText){
+                campaign.info.start_time = new Date(datetimeText);
+            }
+        });
+        if(campaign.info.end_time)
+            $('#endTime').val(new Date(campaign.info.end_time).format('yyyy-MM-dd hh:mm:ss'));
+        $('#endTime').datetimepicker({
+            timeInput: true,
+            timeFormat: "HH:mm:ss",
+            dateFormat: "yy-mm-dd",
+            onSelect:function(datetimeText){
+                campaign.info.end_time = new Date(datetimeText);
+            }
+        });
+        if(campaign.info.online_time)
+            $('#onlineTime').val(new Date(campaign.info.online_time).format('yyyy-MM-dd hh:mm:ss'));
+        $('#onlineTime').datetimepicker({
+            timeInput: true,
+            timeFormat: "HH:mm:ss",
+            dateFormat: "yy-mm-dd",
+            onSelect:function(datetimeText){
+                campaign.info.online_time = new Date(datetimeText);
+            }
+        });
+        if(campaign.info.offline_time)
+            $('#offlineTime').val(new Date(campaign.info.offline_time).format('yyyy-MM-dd hh:mm:ss'));
+        $('#offlineTime').datetimepicker({
+            timeInput: true,
+            timeFormat: "HH:mm:ss",
+            dateFormat: "yy-mm-dd",
+            onSelect:function(datetimeText){
+                campaign.info.offline_time = new Date(datetimeText);
+            }
+        });
+    }
+
+    function datePickers_init() {
+        startTimePicker = datePicker_init('startTime', null, null, campaign.info.start_time);
+        endTimePicker = datePicker_init('endTime',null, null, campaign.info.end_time);
+        onlineTimePicker = datePicker_init('onlineTime', null, null, campaign.info.online_time);
+        offlineTimePicker = datePicker_init('offlineTime', null, null, campaign.info.offline_time);
+    }
+
+    function datePicker_init(pickerId, minDate, maxDate, defaultDate) {
+        var options = {
+            field: $('#'+pickerId)[0],
+            yearRange: [2000,2020],
+            i18n: i18n,
+            bound: true,
+            format: 'YYYY-MM-DD HH:mm:ss',
+            onSelect: function() {
+                $('#'+pickerId).val(this.getMoment().format('YYYY-MM-DD HH:mm:ss'));
+                var d = this.getMoment().format('YYYY-MM-DD HH:mm:ss');
+                $(".date-selector").find('.selected').removeClass('selected');
+                switch(pickerId){
+                    case 'startTime':
+                        campaign.info.start_time = d;
+                        break;
+                    case 'endTime':
+                        campaign.info.end_time = d;
+                        break;
+                    case 'onlineTime':
+                        campaign.info.online_time = d;
+                        break;
+                    case 'offlineTime':
+                        campaign.info.offline_time = d;
+                        break;
+                }
+            }
+        };
+        if (minDate) {
+            options.minDate = new Date(minDate);
+        }
+        if (maxDate) {
+            options.maxDate = new Date(maxDate);
+        }
+        if (defaultDate) {
+            options.defaultDate = new Date(defaultDate);
+            options.setDefaultDate = true;
+        }
+        var startpicker = new Pikaday(options);
+
+        return startpicker;
+    }
+</script>

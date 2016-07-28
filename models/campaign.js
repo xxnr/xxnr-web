@@ -16,11 +16,11 @@ var campaign_schema = new mongoose.Schema({
     comment:{type:String},
     reward_times:{type:Number, default:0},
     shareable:{type:Boolean, default:false},
-    share_points_add: {type:Number},
+    share_points_add: {type:Number, default:0},
     share_button:{type:Boolean, default:false},
     share_title:{type:String},
     share_url_name:{type:String},
-    share_url:{type:String, unique:true},
+    share_url:{type:String},
     share_abstract:{type:String},
     share_image:{type:String}
 });

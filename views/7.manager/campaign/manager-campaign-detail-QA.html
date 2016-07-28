@@ -1,0 +1,261 @@
+<style type="text/css">
+    .question_info {color:#999999;}
+    .question button {margin-left:20px; border-left:1px solid #E0E0E0; float:right; border:0; background-color: transparent}
+    .question button:first-child {border-left:0;}
+</style>
+<div class="filter" style="padding-bottom:9px">
+    <div class="container">
+        <div class="caption"><span class="fa fa-campaign mr5"></span><a href="/manager/campaign">活动管理</a>&nbsp;&nbsp;&nbsp;&nbsp;<h6 class="nopadding inline">活动详情</h6></div>
+    </div>
+</div>
+
+<div class="container">
+    <div style="position: relative;" id="campaign">
+        <div class="row m">
+            <div class="col-md-12 m">
+                <h3 class="ui-left">题目设置</h3>
+            </div>
+            <div class="col-md-5 m" style="margin-left:20px" data-component="template" data-component-path="detail_QA">
+                <script type="text/html">
+                    <h4>已经创建了{{ QA.length }}道题</h4>
+                    <div class="col-md-12">
+                        <div class="col-xs-3"><a href="javascript:void(0)" class="linkbutton" name="选择题"><span class="fa fa-plus-circle"></span>选择题</a></div>
+                    </div>
+                    {{ foreach q in QA }}
+                        <p class="question">
+                            <span>{{ $index+1 }}.{{ q.question}}</span>
+                            <button class="question_button" name="delete" data-index="{{ $index }}"><span title="删除" class="fa fa-times"></span></button>
+                            <button class="question_button" name="edit" data-index="{{ $index }}"><span title="编辑" class="fa fa-pencil"></span></button>
+                        </p>
+                        <p>
+                            <span class="question_info">
+                                {{ if q.type==1}}
+                                    选择题
+                                {{ fi }}
+                            </span>
+                            <span class="question_info">送{{ q.points }}积分</span>
+                        </p>
+                        <hr>
+                    {{ end }}
+                    <div class="ui-buttons mb50">
+                        <button id="submit_QA" >保存活动</button>
+                    </div>
+                </script>
+            </div>
+            <div style="margin-left:50px; margin-top:70px" class="col-md-5 m" data-component="visible" data-component-path="detail_QA.showEdit">
+                <div class="col-md-12">
+                    <div class="mb10" data-component="textarea" data-component-path="detail_QA.current.question">1.设置问题</div>
+                    <div class="mb10" data-component="textbox" data-component-path="detail_QA.current.points">2.答对送积分</div>
+                    <div class="mb10">3.设置答案（至少有两个选项）</div>
+                    <div class="mb10" data-component="template" data-component-path="detail_QA.current" id="options_template">
+                        <script type="text/html">
+                        {{ foreach option in options }}
+                        <tr class="col-md-12 m">
+                            <td style="width:20%">
+                                选项{{ $index+1 }}：
+                            </td>
+                            <td style="width:50%">
+                                <input name="value" type="text" value="{{option.value}}" data-index="{{$index}}">
+                            </td>
+                            <td style="width:30%">
+                                <input name="is_right_answer" data-index="{{$index}}" type="checkbox" {{ if option.is_right_answer}}checked{{ fi }}>正确答案
+                            </td>
+                            <td style="width:10%">
+                                <button class="delete_option" data-index="{{ $index }}"><span title="删除" class="fa fa-times"></span></button>
+                            </td>
+                        </tr>
+                        {{ end }}
+                        </script>
+                    </div>
+                    <div class="mb10"><a id="add_new_option" href="javascript:void(0)"><span class="fa fa-plus-circle"></span>增加选项</a></div>
+                </div>
+                <div class="ui-form-buttons mb50">
+                    <button id="submit_one_question" >确定</button>
+                    <button id="cancel_question_edit">取消</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var POINTSREGEX = /^[0-9]+$/;
+    var QA = <%- JSON.stringify(QA) %>;
+    var _id = getUrlParam('_id');
+    var detail_QA = {
+        QA:[]
+    };
+
+    refresh_QA();
+    function refresh_QA(){
+        detail_QA.QA = QA;
+        SET('detail_QA.QA', detail_QA.QA);
+        bind_init_page_button();
+    }
+    function bind_init_page_button(){
+        setTimeout(bind_question_edit_delete, 500);
+        setTimeout(bind_add_question_button, 500);
+        setTimeout(bind_submit_QA_button, 500);
+        detail_QA.isAdding = false;
+    }
+    function bind_edit_page_button(){
+        setTimeout(bindSubmitOneQuestionButton, 500);
+        setTimeout(bind_cancel_question_edit_button, 500);
+        setTimeout(bind_delete_option_button, 500);
+        setTimeout(bind_add_option_button, 500);
+        setTimeout(bind_option_value_changed, 500);
+    }
+    function bind_question_edit_delete(){
+        $('.question button').off('click').on('click', function(){
+            var el = $(this);
+            var index = el.attr('data-index');
+            var name = el.attr('name');
+            switch(name){
+                case 'edit':
+                    detail_QA.showEdit = true;
+                    detail_QA.current = detail_QA.QA[index];
+                    detail_QA.currentIndex = index;
+                    SET('detail_QA.showEdit', detail_QA.showEdit);
+                    SET('detail_QA.current', detail_QA.current);
+                    bind_edit_page_button();
+                    break;
+                case 'delete':
+                    if(confirm('确认要删除题目？')){
+                        detail_QA.QA.splice(index, 1);
+                        submit_current_QA();
+                    }
+                    break;
+            }
+        })
+    }
+    function bindSubmitOneQuestionButton(){
+        $('#submit_one_question').off('click').on('click', function(){
+            if(!detail_QA.QA[detail_QA.currentIndex].question){
+                alert('请填写问题');
+                return;
+            }
+            if(!POINTSREGEX.test(detail_QA.QA[detail_QA.currentIndex].points)){
+                alert('请填写正确的积分值');
+                return;
+            }
+            buildOptionsTemplate(function(err, options){
+                if(!err) {
+                    if(!confirm('确认要提交更改？')){
+                        return;
+                    }
+                    detail_QA.QA[detail_QA.currentIndex].options = options;
+                    submit_current_QA();
+                }
+            });
+        })
+    }
+    function bind_cancel_question_edit_button(){
+        $('#cancel_question_edit').off('click').on('click', function(){
+            if(!confirm('确认要放弃更改？')){
+                return;
+            }
+            window.location.reload();
+        })
+    }
+    function submit_current_QA(){
+        $.components.POST(managerurl+'/api/campaign/modify', {campaign:{_id:_id, detail:detail_QA.QA}}, function(response){
+            if(response.code == 1000){
+                success();
+            } else {
+                alert(response.message);
+            }
+
+            detail_QA.showEdit = false;
+            SET('detail_QA.showEdit', detail_QA.showEdit);
+            SET('detail_QA.QA', detail_QA.QA);
+            bind_init_page_button();
+        })
+    }
+    function buildOptionsTemplate(cb){
+        var options = [];
+        var index = 0;
+        var allOptions = $('#options_template tr');
+        var right_answer_set = false;
+        for(var i=0; i<allOptions.length; i++){
+            var option = allOptions[i];
+            var value = option.children[1].children[0].value;
+            if(!value){
+                alert('请填写选项');
+                cb('error');
+                return;
+            }
+            var is_right_answer = option.children[2].children[0].checked;
+            if(is_right_answer){
+                right_answer_set = true;
+            }
+            index++;
+            options.push({order_key:index, value:value, is_right_answer:is_right_answer});
+        }
+
+        if(!right_answer_set){
+            alert('请至少选择一个答案');
+            cb('err');
+            return;
+        }
+
+        cb(null,options);
+    }
+    function add_question(){
+        var index = detail_QA.QA.length;
+        detail_QA.showEdit = true;
+        detail_QA.QA.push({type:1, options:[{order_key:1, value:''}, {order_key:2, value:''}]});
+        detail_QA.current = detail_QA.QA[index];
+        detail_QA.currentIndex = index;
+        SET('detail_QA.showEdit', detail_QA.showEdit);
+        SET('detail_QA.current', detail_QA.current);
+        detail_QA.isAdding = true;
+        bind_edit_page_button();
+    }
+    function bind_add_question_button(){
+        $('.linkbutton').off('click').on('click', function(){
+            var el = $(this);
+            var name = el.attr('name');
+            switch(name){
+                case '选择题':
+                    add_question();
+                    break;
+            }
+        })
+    }
+    function bind_submit_QA_button(){
+        $('#submit_QA').off('click').on('click', function(){
+            window.location.href=managerurl+'/campaign';
+        })
+    }
+    function bind_delete_option_button(){
+        $('.delete_option').off('click').on('click', function(){
+            var el = $(this);
+            var index = el.attr('data-index');
+            detail_QA.current.options.splice(index, 1);
+            SET('detail_QA.current', detail_QA.current);
+            bind_edit_page_button();
+        })
+    }
+    function bind_add_option_button(){
+        $('#add_new_option').off('click').on('click', function(){
+            detail_QA.current.options.push({value:''});
+            SET('detail_QA.current', detail_QA.current);
+            bind_edit_page_button();
+        })
+    }
+    function bind_option_value_changed(){
+        $('#options_template input').off('change').on('change', function(){
+            var el = $(this);
+            var name = el.attr('name');
+            var option_index = el.attr('data-index');
+            switch(name){
+                case 'value':
+                    detail_QA.current.options[option_index].value = el.val();
+                    break;
+                case 'is_right_answer':
+                    detail_QA.current.options[option_index].is_right_answer = el[0].checked;
+                    break;
+            }
+        })
+    }
+</script>

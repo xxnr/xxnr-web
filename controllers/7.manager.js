@@ -27,6 +27,7 @@ var DELIVERYTYPE =  require('../common/defs').DELIVERYTYPE;
 var config = require('../config');
 var path = require('path');
 var CampaignService = services.Campaign;
+var URL = require('url');
 
 exports.install = function() {
 	// Auto-localize static HTML templates
@@ -519,7 +520,8 @@ exports.manager = function(req, res, next){
 			currency_entity:F.config['currency_entity'],
 			user:req.user,
 			version:F.config['version'],
-			author:F.config['author']
+			author:F.config['author'],
+			query: URL.parse(req.url).query
 		}
 	);
 };
@@ -2951,4 +2953,89 @@ exports.get_campaign = function(req, res, next){
 
 		res.respond({code:1000, campaign:campaign});
 	}, true)
+};
+
+exports.campaigns = function(req, res, next){
+	var type = req.data.type;
+	var search = req.data.search;
+	var status = req.data.status;
+	var page = req.data.page;
+	var max = req.data.max;
+
+	var options = {};
+	if(type)
+		options.type = parseInt(type);
+	if(search)
+		options.search = search;
+	if(status)
+		options.status = parseInt(status);
+	if(page)
+		options.page = parseInt(page);
+	if(max)
+		options.max = parseInt(max);
+
+	CampaignService.query(options, function(err, campaigns, count, pages){
+		res.render(path.join(__dirname, '../views/7.manager/campaign/manager-campaign.html'),
+			{
+				err:err,
+				campaigns:campaigns,
+				types:{array:CampaignService.campaign_type_array, map:CampaignService.campaign_type_map},
+				get_campaign_status:CampaignService.get_campaign_status.toString(),
+				campaign_status:CampaignService.campaign_status,
+				count:count,
+				pages:pages
+			});
+	})
+};
+
+exports.campaign_detail = function(req, res, next){
+	var campaign_id = req.data._id;
+	if(!campaign_id){
+		res.render(path.join(__dirname, '../views/7.manager/campaign/manager-campaign-detail.html'),
+			{
+				campaign:{},
+				types:{array:CampaignService.campaign_type_array, map:CampaignService.campaign_type_map}
+			});
+	} else {
+		CampaignService.findById(campaign_id, function (err, campaign) {
+			res.render(path.join(__dirname, '../views/7.manager/campaign/manager-campaign-detail.html'),
+				{
+					err:err,
+					campaign: campaign,
+					types: {array: CampaignService.campaign_type_array, map: CampaignService.campaign_type_map}
+				});
+		})
+	}
+};
+
+exports.campaign_detail_QA = function(req, res, next){
+	var campaign_id = req.data._id;
+	if(!campaign_id){
+		res.respond({code:1001, message:'campaign_id required'});
+		return;
+	}
+
+	CampaignService.queryQA(campaign_id, function(err, QA){
+		res.render(path.join(__dirname, '../views/7.manager/campaign/manager-campaign-detail-QA.html'),
+			{
+				err:err,
+				QA:QA || []
+			})
+	})
+};
+
+exports.campaign_detail_quiz = function(req, res, next){
+	var campaign_id = req.data._id;
+	if(!campaign_id){
+		res.respond({code:1001, message:'campaign_id required'});
+		return;
+	}
+
+	CampaignService.query_quiz_question(campaign_id, function(err, QA){
+		res.render(path.join(__dirname, '../views/7.manager/campaign/manager-campaign-detail-quiz.html'),
+			{
+				err:err,
+				QA:QA || []
+			})
+	})
 };

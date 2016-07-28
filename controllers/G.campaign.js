@@ -104,7 +104,7 @@ exports.campaign_status = function(req, res, next){
     }
 
     var campaign_status_promise = new Promise(function(resolve, reject){
-        CampaignService.get_campaign_status(campaign_id, function(err, status, message){
+        CampaignService.get_campaign_status_by_id(campaign_id, function(err, status, message){
             if(err){
                 reject(err);
                 return;

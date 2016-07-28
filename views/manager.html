@@ -28,6 +28,7 @@
 					<% if (user.role.view_roles.indexOf('users') !== -1) { %><li><a class="jrouting" href="<%= manager_url %>/users/" title="用户" data-role="users"><span class="fa fa-users"></span></a></li><% } %>
 					<% if (user.role.view_roles.indexOf('rsc') !== -1) { %><li><a class="jrouting" href="<%= manager_url %>/rsc/" title="服务站管理" data-role="rsc"><span class="fa fa-truck"></span></a></li><% } %>
 					<% if (user.role.view_roles.indexOf('agents') !== -1) { %><li><a class="jrouting" href="<%= manager_url %>/agents/" title="经纪人管理" data-role="agents"><span class="fa fa-user-secret"></span></a></li><% } %>
+					<% if (user.role.view_roles.indexOf('campaigns') !== -1) { %><li><a class="jrouting" href="<%= manager_url %>/campaign" title="活动管理" data-role="campaigns"><span class="fa fa-newspaper-o"></span></a></li><% } %>
 					<% if (user.role.view_roles.indexOf('news') !== -1) { %><li><a class="jrouting" href="<%= manager_url %>/news/" title="资讯" data-role="news"><span class="fa fa-newspaper-o"></span></a></li><% } %>
 					<% if (user.role.view_roles.indexOf('rewardshop') !== -1) { %><li><a class="jrouting" href="<%= manager_url %>/rewardshop/" title="积分商城" data-role="rewardshop"><span class="fa fa-gift"></span></a></li><% } %>
 					<% if (user.role.view_roles.indexOf('payrefunds') !== -1) { %><li><a class="jrouting" href="<%= manager_url %>/payrefunds/" title="退款" data-role="payrefunds"><span class="fa fa-money"></span></a></li><% } %>
@@ -63,6 +64,12 @@
 		<% if (user.role.view_roles.indexOf('agents') !== -1) { %>
 		<div data-component="page" data-component-path="common.page" data-if="agents" data-template="/templates/manager-agents.html"></div>
 		<div data-component="page" data-component-path="common.page" data-if="agents-detail" data-template="/templates/manager-agents-detail.html"></div>
+		<% } %>
+		<% if (user.role.view_roles.indexOf('campaigns') !== -1) { %>
+		<div data-component="page" data-component-path="common.page" data-if="campaigns" data-template="<%= manager_url %>/campaigns<% if (query){%>?<%= query %> <% } %>"></div>
+		<div data-component="page" data-component-path="common.page" data-if="campaign-detail" data-template="<%= manager_url %>/campaign-detail<% if (query){%>?<%= query %> <% } %>"></div>
+		<div data-component="page" data-component-path="common.page" data-if="campaign-detail-QA" data-template="<%= manager_url %>/campaign-detail-QA<% if (query){%>?<%= query %> <% } %>"></div>
+		<div data-component="page" data-component-path="common.page" data-if="campaign-detail-quiz" data-template="<%= manager_url %>/campaign-detail-quiz<% if (query){%>?<%= query %> <% } %>"></div>
 		<% } %>
 		<% if (user.role.view_roles.indexOf('news') !== -1) { %>
 		<div data-component="page" data-component-path="common.page" data-if="news" data-template="/templates/manager-news.html"></div>
@@ -105,5 +112,6 @@
 	<script src="/js/ui.js"></script>
 	<script src="/js/manager.js"></script>
 	<script src="/js/moment.min.js"></script>
+	<script src="/js/jquery-ui.min.js"></script>
 </body>
 </html>

@@ -1,0 +1,225 @@
+<script type="text/javascript" async src="/js/simplePagination.js"></script>
+<div class="filter" style="padding-bottom:9px">
+    <div class="container">
+        <div class="caption"><span class="fa fa-gift mr5"></span>活动管理</div>
+        <div class="col-md-3 col-sm-6 m">
+            <div data-component="textbox" data-component-path="campaigns.filter.search" data-placeholder="活动标题" data-control-icon="fa-search">查询活动</div>
+            <div class="help" data-component="template" data-component-path="campaigns.info"><script type="text/html">{{ count | pluralize('items','item','items','items') }} / {{ pages | pluralize('pages','page','pages','pages') }}</script></div>
+        </div>
+        <div class="ui-buttons col-md-2 col-sm-3 m" style="padding-top: 21px">
+            <button name="search" title="查询" style="height: 26px;">查询<span class="fa fa-search"></span></button>
+        </div>
+        <div class="col-md-3 col-sm-4 m">
+            <div data-component="dropdown" data-component-path="campaigns.filter.type" data-source="campaigns.types_array" data-empty="true" data-empty-text="全部活动" data-source-value="id">活动类型</div>
+        </div>
+        <div class="col-md-2 col-sm-3 m" style="padding-top:21px">
+            <a href="javascript:void(0)" data-component="click" title="新增活动" class="linkbutton" style="height: 26px;"><span class="fa fa-plus-circle"></span>新增活动</a>
+        </div>
+    </div>
+</div>
+<div class="container">
+    <div style="width:100%;float:left;">
+        <ul class="tabmenu">
+            <li data-type="0">全部</li>
+            <li data-type="1">未上线</li>
+            <li data-type="2">未开始</li>
+            <li data-type="3">进行中</li>
+            <li data-type="4">已结束</li>
+            <li data-type="5">已下线</li>
+        </ul>
+        <div data-component="template" data-component-path="campaigns" class="ui-grid campaigns" data-max="auto" data-component-id="campaigns.grid">
+            <script type="text/html">
+                {{ if grid && grid.length > 0 }}
+                <table class="table" width="100%" cellpadding="0" cellspacing="0" border="0">
+                    <tbody>
+                    <tr>
+                        <td style="width:20px" class="silver hidden-xs ui-center active">序号</td>
+                        <td style="width:30px" class="silver hidden-xs ui-center active">banner图</td>
+                        <td style="width:60px" class="silver hidden-xs ui-left active">活动标题</td>
+                        <td style="width:30px" class="silver hidden-xs ui-center active">活动类型</td>
+                        <td style="width:60px" class="silver hidden-xs ui-center active">活动英文名称</td>
+                        <td style="width:30px" class="silver hidden-xs ui-center active">活动状态</td>
+                        <td style="width:60px" class="silver hidden-xs ui-right active">创建时间</td>
+                        <td style="width:25px" class="silver hidden-xs ui-center active">操作</td>
+                    </tr>
+                    {{ foreach campaign in grid }}
+                    <tr data-index="{{ $index }}">
+                        <td style="width:20px" class="hidden-xs ui-center">{{ $index + 1 }}</td>
+                        <td style="width:30px" class="hidden-xs ui-center"><img width="70px" src="/images/thumbnail/{{ campaign.image }}.jpg"</td>
+                        <td style="width:60px" class="hidden-xs ui-left" title="{{campaign.title}}">{{campaign.title}}</span></td>
+                        <td style="width:30px" class="hidden-xs ui-center" title="{{types_map[campaign.type]}}">{{ types_map[campaign.type] }}</td>
+                        <td style="width:60px" class="hidden-xs ui-center" title="{{campaign.campaign_url_name}}">{{ campaign.campaign_url_name }}</td>
+                        <td style="width:30px" class="hidden-xs ui-center">{{ campaign_status_map[get_campaign_status(campaign)] }}</td>
+                        <td style="width:60px" class="hidden-xs ui-right" title="{{campaign.date_created | format('yyyy-MM-dd HH:mm:ss')}}">{{ campaign.date_created | format('yyyy-MM-dd HH:mm:ss') }}</td>
+                        <td style="width:25px" class="hidden-xs ui-left">
+                            <button name="edit" title="编辑"><span class="fa fa-pencil"></span></button>
+                            {{ if (get_campaign_status(campaign) == 2 || get_campaign_status(campaign) == 3)}}
+                                <button name="offline" title="下线">下线</button>
+                            {{ fi }}
+                        </td>
+                    </tr>
+                    {{ end }}
+                    </tbody>
+                </table>
+                {{ else }}
+                暂无数据
+                {{ fi }}
+            </script>
+        </div>
+
+        <div class="campaigns-pages">
+        </div>
+        <div data-component="error" data-component-path="giftorders.giftordersresponse"></div>
+    </div>
+</div>
+<script>
+    var types = <%- JSON.stringify(types) %>;
+    var campaign_grid = <%- JSON.stringify(campaigns) %>;
+    var get_campaign_status = <%- get_campaign_status %>;
+    var CAMPAIGNSTATUS = <%- JSON.stringify(campaign_status) %>;
+    var total_campaign_count = <%- count %>;
+    var total_campaign_pages = <%- pages %>;
+    var campaigns = {
+        filter:{
+            page:1,
+            search:'',
+            type:'',
+            status:''
+        },
+        grid:[],
+        info:{},
+        campaigns_response:'',
+        campaign_status_map:{
+            1:'未上线',
+            2:'未开始',
+            3:'进行中',
+            4:'已结束',
+            5:'已下线'
+        }
+    };
+
+    campaigns.filter.type = getUrlParam('type');
+    campaigns.filter.status = getUrlParam('status');
+    campaigns.filter.search = getUrlParam('search');
+
+    showSelectedStatus();
+    bindStatusSelection();
+    bindTypeSelection();
+    bindSearchButton();
+    bindNewCampaignButton();
+    ON('#campaigns.grid', function(component){
+        campaigns.filter.max = component.max;
+        campaigns.filter.page = getUrlParam('page');
+        campaigns.filter.max = getUrlParam('max');
+        refreshCampaigns();
+    });
+
+    function refreshCampaigns() {
+        campaigns.grid = campaign_grid;
+        campaigns.info.count = total_campaign_count;
+        campaigns.info.pages = total_campaign_pages;
+        campaigns.types_array = types.array;
+        campaigns.types_map = types.map;
+        campaigns.get_campaign_status = get_campaign_status;
+        SET('campaigns.grid', campaigns.grid);
+        SET('campaigns.types_array', campaigns.types_array);
+
+        if (campaigns.info.pages && campaigns.info.count) {
+            Pagination($('div.campaigns-pages'),
+                    campaigns.info.count,
+                    campaigns.info.count / campaigns.info.pages,
+                    campaigns.filter.page ? campaigns.filter.page : null,
+                    function (pageNumber) {
+                        console.log(pageNumber);
+                        campaigns.filter.page = pageNumber;
+                        redirectURL();
+                    });
+        }
+        
+        $('.campaigns tr td button').off('click').on('click', function () {
+            var index = parseInt($(this).parent().parent().attr('data-index'));
+            var row = typeof index != 'undefined' && campaigns.grid && index < campaigns.grid.length ? campaigns.grid[index] : null;
+            if (row) {
+                switch ($(this).attr('name')) {
+                    case 'edit':
+                        window.location.href = managerurl + '/campaign/detail?_id='+row._id;
+                        break;
+                    case 'offline':
+                        if (!confirm('你确定要下线你选择的活动吗?'))
+                            return;
+                        $.components.POST(managerurl + '/api/campaign/offline', {_id: row._id}, function (response) {
+                            if (response.code == 1000) {
+                                success();
+                                window.location.reload();
+                            } else {
+                                alert(response.message);
+                            }
+                        });
+                        break;
+                }
+            }
+        })
+    }
+
+    function showSelectedStatus(){
+        var statusSelected = false;
+        if (campaigns.filter.status) {
+            $('.tabmenu li').each(function() {
+                if (parseInt(campaigns.filter.status) == $(this).attr('data-type')) {
+                    $(this).addClass('selected');
+                    statusSelected = true;
+                }
+            });
+        }
+        if (!statusSelected) {
+            $('.tabmenu li').eq(0).addClass('selected');
+        }
+    }
+
+    function bindStatusSelection(){
+        $('.tabmenu li').off('click').on('click', function(){
+            var el = $(this);
+            $('.tabmenu li').each(function() {
+                $(this).removeClass('selected');
+            });
+            el.addClass('selected');
+            if (el.attr('data-type') && campaigns.filter.status != el.attr('data-type')) {
+                campaigns.filter.status = parseInt(el.attr('data-type'));
+                redirectURL();
+            }
+        });
+    }
+
+    function bindSearchButton(){
+        $('.filter .ui-buttons button').off('click').on('click', function() {
+            switch ($(this).attr('name')) {
+                case 'search':
+                    redirectURL();
+                    break;
+            }
+        });
+    }
+
+    function bindTypeSelection(){
+        WATCH('campaigns.filter.type', function(path, value) {
+            if (NOTMODIFIED('campaigns.filter.type', campaigns.filter.type))
+                return;
+            redirectURL();
+        });
+    }
+
+    function redirectURL() {
+        var urlParam = campaigns.filter.search ? 'search=' + campaigns.filter.search : '';
+        urlParam += campaigns.filter.page ? (urlParam ? '&' : '') + 'page=' + campaigns.filter.page : '';
+        urlParam += campaigns.filter.max ? (urlParam ? '&' : '') + 'max=' + campaigns.filter.max : '';
+        urlParam += campaigns.filter.status ? (urlParam ? '&' : '') + 'status=' + campaigns.filter.status : '';
+        urlParam += campaigns.filter.type ? (urlParam ? '&' : '') + 'type=' + campaigns.filter.type : '';
+        window.location.href = managerurl + "/campaign" + (urlParam ? '?' + urlParam : '');
+    }
+
+    function bindNewCampaignButton(){
+        $('.linkbutton').off('click').on('click', function(){
+            window.location.href = managerurl + "/campaign/detail";
+        })
+    }
+</script>
