@@ -116,9 +116,8 @@ app.use(function (err, req, res, next) {
 });
 
 module.exports = app;
-
 var port = 8070;
-if(F.config.environment === 'sandbox'){
+if(config.environment == 'sandbox'){
 	port = 80;
 }
 

@@ -2009,11 +2009,6 @@ exports.json_businesses = function(req, res, next){
 };
 
 exports.process_SKU_add = function(req, res, next) {
-	if (!req.data.name) {
-		res.respond({code: 1001, message: '请输入SKU名称'});
-		return;
-	}
-
 	if (!req.data.product) {
 		res.respond({code: 1001, message: '请选择商品'});
 		return;
