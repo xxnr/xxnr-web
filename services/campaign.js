@@ -780,7 +780,8 @@ CampaignService.prototype.findByUrl = function(url, callback){
     CampaignModel.findOne({url:url})
         .exec(function(err, campaign){
         if(err || !campaign){
-            console.error(err || 'campaign not found with url ' + url);
+            if(err)
+                console.error(err);
             callback('查找活动失败，请重试');
             return;
         }

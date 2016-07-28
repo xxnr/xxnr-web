@@ -54,34 +54,25 @@ exports.campaign_page = function(req, res, next){
     var url = req.path;
 
     CampaignService.findByUrl(url, function(err, campaign) {
-        if (err) {
-            res.status(500).send('500: Internal Error');
-            return;
-        }
+        var render_campaign = {};
+        if(campaign) {
+            var prevurl = req.url_prefix;
+            var previmg = getprevImg(req);
+            var imgtype = '.jpg';
+            if (campaign.url) {
+                campaign.url = prevurl + campaign.url;
+            }
+            if (campaign.share_url) {
+                campaign.share_url = prevurl + campaign.share_url;
+            }
+            if (campaign.image) {
+                campaign.image = previmg + campaign.image + imgtype;
+            }
+            if (campaign.share_image) {
+                campaign.share_image = previmg + campaign.share_image + imgtype;
+            }
 
-        if (!campaign) {
-            res.status(404).send('404: Page not found');
-            return;
-        }
-
-        var prevurl = req.url_prefix;
-        var previmg = getprevImg(req);
-        var imgtype = '.jpg';
-        if(campaign.url){
-            campaign.url = prevurl + campaign.url;
-        }
-        if(campaign.share_url){
-            campaign.share_url = prevurl + campaign.share_url;
-        }
-        if(campaign.image){
-            campaign.image = previmg + campaign.image + imgtype;
-        }
-        if(campaign.share_image){
-            campaign.share_image = previmg + campaign.share_image + imgtype;
-        }
-
-        res.render(path.join(__dirname, '../views/G.campaign/', type, name)
-            ,{
+            render_campaign = {
                 campaign: {
                     title: campaign.title,
                     _id: campaign._id,
@@ -91,6 +82,10 @@ exports.campaign_page = function(req, res, next){
                     share_title: campaign.share_title
                 }
             }
+        }
+
+        res.render(path.join(__dirname, '../views/G.campaign/', type, name)
+            ,render_campaign
             ,function (err, html) {
             if (err) {
                 res.status(404).send('404: Page not found');
