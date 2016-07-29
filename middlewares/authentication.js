@@ -358,6 +358,17 @@ exports.convert_token_to_user = function(req, res, next){
                 return;
             }
 
+            var valid = payload.appLoginId ?
+            payload.appLoginId == data.appLoginId :
+                payload.webLoginId ?
+                payload.webLoginId == data.webLoginId :
+                    false;
+
+            if (!valid) {
+                res.respond({code: 1401, message: '您已在其他地方登录'});
+                return;
+            }
+
             req.user = data;
             next();
         })
