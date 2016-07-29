@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title></title>
+    <title><%- campaign.title %></title>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=10" />
     <meta name="format-detection" content="telephone=no" />
@@ -51,6 +51,9 @@
 </head>
 
 <body>
+<div style='margin:0 auto;width:0px;height:0px;overflow:hidden;'>
+    <img src="<% campaign.share_image %>" width='700'>
+</div>
 <div class="container">
     <div class="title_image">
         <img src="/images/campaign/event/activity_banner2.png" alt="">
@@ -79,10 +82,11 @@
             <p>活动范围：所有注册用户</p>
             <p>活动时间：2016-07-15~2016-08-15</p>
             <p>活动规则：</p>
-            <p>1.活动需登录后参与，登录后分享获得积分；未登录的分享不能获得积分</p>
-            <p>2.分享成功后需要返回APP，才能获得积分奖励；分享不区分微信、朋友圈、QQ、QQ空间</p>
-            <p>3.推荐APP给好友活动，每个用户可分享1次，分享成功后获得50积分</p>
-            <p>4.日常资讯、活动，每个用户可分享1次，分享成功后根据分享内容获得相应积分</p>
+            <p>1. 活动需在安卓APP（版本2.3.2及以上）上登录后参与，登录后分享获得积分；未登录的分享不能获得积分</p>
+            <p>2. 分享成功后需要返回APP，才能获得积分奖励；分享不区分微信、朋友圈、QQ、QQ空间</p>
+            <p>3. 推荐APP给好友活动，每个用户可分享1次，分享成功后获得50积分</p>
+            <p>4. 日常资讯、活动，每个用户可分享1次，分享成功后根据分享内容获得相应积分</p>
+            <p>5. 可通过新新农人安卓APP或手机端网站查看积分记录（积分商城-我的积分）</p>
         </div>
     </div>
     <p class="event_info--comment"><img src="/images/campaign/event/--.png" alt="">新新农人保留对本活动的最终解释权</p>
@@ -91,6 +95,14 @@
 <script src="/js/zepto.js"></script>
 <script src="/js/campaignConfig.js"></script>
 <script  type="text/javascript">
+    var campaign = <%- JSON.stringify(campaign) %>;
+    var title = campaign.title;
+    var _id = campaign._id;
+    var share_title = campaign.share_title;
+    var share_url = campaign.share_url;
+    var share_abstract = campaign.share_abstract;
+    var share_image = campaign.share_image;
+
     $(function() {
         var deepshareUrl;
         $.ajax({
@@ -113,13 +125,13 @@
                 //出错情况下可以继续用户正常逻辑，可设置一个默认url.
             }
         });
-        config.ajaxGet(config.baseURI, '/api/v2.3/campaign_status', {_id:config.shareAndGetPointsEventId})
+        config.ajaxGet(config.baseURI, '/api/v2.3/campaign_status', {_id:"<%- campaign._id %>"})
             .then(function(data){
                 if(data.code == 1000){
                     if(data.status == 3){
                         if(jsObj.isLogin()){
                             var appToken = jsObj.getToken();
-                            config.ajaxGet(config.baseURI, '/api/v2.3/campaign_status', {token:appToken,_id:config.shareAndGetPointsEventId})
+                            config.ajaxGet(config.baseURI, '/api/v2.3/campaign_status', {token:appToken,_id:"<%- campaign._id %>"})
                                     .then(function(data){
                                       if(data.times_left >= 1){
                                           $('.red_packet--btn').attr('src','/images/campaign/event/button（has-not）.png');

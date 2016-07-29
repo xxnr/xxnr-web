@@ -5,7 +5,7 @@ var config = (function () {
     var configObj = {};
 
     //configObj.baseURI = 'http://101.200.194.203';
-    configObj.baseURI = 'http://192.168.1.21:8070';
+    configObj.baseURI = 'http://192.168.1.15:8070';
     //configObj.baseURI = 'http://mppe.xinxinnongren.com:8070';
     configObj.ajaxGet = function (baseURI,apiURI,data) {
         var deferred = $.Deferred();
