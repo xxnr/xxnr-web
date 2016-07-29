@@ -1,5 +1,3 @@
-<link rel="stylesheet" href="/css/pikaday.css"/>
-<script type="text/javascript" async src="/js/pikaday.js"></script>
 <link rel="stylesheet" href="/css/jquery-ui-timepicker-addon.css"/>
 <script type="text/javascript" async src="/js/jquery-ui-timepicker-addon.js"></script>
 <link rel="stylesheet" href="/css/timePicker.css"/>
@@ -193,95 +191,46 @@
         })
     }
 
-    function init_time_picker(){
-        if(campaign.info.start_time)
+    function init_time_picker() {
+        if (campaign.info.start_time)
             $('#startTime').val(new Date(campaign.info.start_time).format('yyyy-MM-dd hh:mm:ss'));
         $('#startTime').datetimepicker({
             timeInput: true,
             timeFormat: "HH:mm:ss",
             dateFormat: "yy-mm-dd",
-            onSelect:function(datetimeText){
+            onSelect: function (datetimeText) {
                 campaign.info.start_time = new Date(datetimeText);
             }
         });
-        if(campaign.info.end_time)
+        if (campaign.info.end_time)
             $('#endTime').val(new Date(campaign.info.end_time).format('yyyy-MM-dd hh:mm:ss'));
         $('#endTime').datetimepicker({
             timeInput: true,
             timeFormat: "HH:mm:ss",
             dateFormat: "yy-mm-dd",
-            onSelect:function(datetimeText){
+            onSelect: function (datetimeText) {
                 campaign.info.end_time = new Date(datetimeText);
             }
         });
-        if(campaign.info.online_time)
+        if (campaign.info.online_time)
             $('#onlineTime').val(new Date(campaign.info.online_time).format('yyyy-MM-dd hh:mm:ss'));
         $('#onlineTime').datetimepicker({
             timeInput: true,
             timeFormat: "HH:mm:ss",
             dateFormat: "yy-mm-dd",
-            onSelect:function(datetimeText){
+            onSelect: function (datetimeText) {
                 campaign.info.online_time = new Date(datetimeText);
             }
         });
-        if(campaign.info.offline_time)
+        if (campaign.info.offline_time)
             $('#offlineTime').val(new Date(campaign.info.offline_time).format('yyyy-MM-dd hh:mm:ss'));
         $('#offlineTime').datetimepicker({
             timeInput: true,
             timeFormat: "HH:mm:ss",
             dateFormat: "yy-mm-dd",
-            onSelect:function(datetimeText){
+            onSelect: function (datetimeText) {
                 campaign.info.offline_time = new Date(datetimeText);
             }
         });
-    }
-
-    function datePickers_init() {
-        startTimePicker = datePicker_init('startTime', null, null, campaign.info.start_time);
-        endTimePicker = datePicker_init('endTime',null, null, campaign.info.end_time);
-        onlineTimePicker = datePicker_init('onlineTime', null, null, campaign.info.online_time);
-        offlineTimePicker = datePicker_init('offlineTime', null, null, campaign.info.offline_time);
-    }
-
-    function datePicker_init(pickerId, minDate, maxDate, defaultDate) {
-        var options = {
-            field: $('#'+pickerId)[0],
-            yearRange: [2000,2020],
-            i18n: i18n,
-            bound: true,
-            format: 'YYYY-MM-DD HH:mm:ss',
-            onSelect: function() {
-                $('#'+pickerId).val(this.getMoment().format('YYYY-MM-DD HH:mm:ss'));
-                var d = this.getMoment().format('YYYY-MM-DD HH:mm:ss');
-                $(".date-selector").find('.selected').removeClass('selected');
-                switch(pickerId){
-                    case 'startTime':
-                        campaign.info.start_time = d;
-                        break;
-                    case 'endTime':
-                        campaign.info.end_time = d;
-                        break;
-                    case 'onlineTime':
-                        campaign.info.online_time = d;
-                        break;
-                    case 'offlineTime':
-                        campaign.info.offline_time = d;
-                        break;
-                }
-            }
-        };
-        if (minDate) {
-            options.minDate = new Date(minDate);
-        }
-        if (maxDate) {
-            options.maxDate = new Date(maxDate);
-        }
-        if (defaultDate) {
-            options.defaultDate = new Date(defaultDate);
-            options.setDefaultDate = true;
-        }
-        var startpicker = new Pikaday(options);
-
-        return startpicker;
     }
 </script>
