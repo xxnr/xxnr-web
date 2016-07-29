@@ -117,7 +117,6 @@
                     detail_QA.currentIndex = index;
                     SET('detail_QA.showEdit', detail_QA.showEdit);
                     SET('detail_QA.current', detail_QA.current);
-                    bind_edit_page_button();
                     break;
                 case 'delete':
                     if(confirm('确认要删除题目？')){
@@ -209,7 +208,6 @@
         SET('detail_QA.showEdit', detail_QA.showEdit);
         SET('detail_QA.current', detail_QA.current);
         detail_QA.isAdding = true;
-        bind_edit_page_button();
     }
     function bind_add_question_button(){
         $('.linkbutton').off('click').on('click', function(){
@@ -233,14 +231,12 @@
             var index = el.attr('data-index');
             detail_QA.current.options.splice(index, 1);
             SET('detail_QA.current', detail_QA.current);
-            bind_edit_page_button();
         })
     }
     function bind_add_option_button(){
         $('#add_new_option').off('click').on('click', function(){
             detail_QA.current.options.push({value:''});
             SET('detail_QA.current', detail_QA.current);
-            bind_edit_page_button();
         })
     }
     function bind_option_value_changed(){
@@ -258,4 +254,9 @@
             }
         })
     }
+    WATCH('detail_QA.current', function(path, value){
+        if(NOTMODIFIED('detail_QA.current', detail_QA.current))
+            return;
+        bind_edit_page_button();
+    })
 </script>
