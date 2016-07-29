@@ -57,7 +57,7 @@
                         <td style="width:60px" class="hidden-xs ui-right" title="{{campaign.date_created | format('yyyy-MM-dd HH:mm:ss')}}">{{ campaign.date_created | format('yyyy-MM-dd HH:mm:ss') }}</td>
                         <td style="width:25px" class="hidden-xs ui-left">
                             <button name="edit" title="编辑"><span class="fa fa-pencil"></span></button>
-                            {{ if (get_campaign_status(campaign) == 2 || get_campaign_status(campaign) == 3)}}
+                            {{ if (get_campaign_status(campaign) == 2 || get_campaign_status(campaign) == 3 || get_campaign_status(campaign) == 4)}}
                                 <button name="offline" title="下线">下线</button>
                             {{ fi }}
                         </td>
