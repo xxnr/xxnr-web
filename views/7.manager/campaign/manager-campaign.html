@@ -46,7 +46,11 @@
                     <tr data-index="{{ $index }}">
                         <td style="width:20px" class="hidden-xs ui-center">{{ $index + 1 }}</td>
                         <td style="width:30px" class="hidden-xs ui-center"><img width="70px" src="/images/thumbnail/{{ campaign.image }}.jpg"</td>
-                        <td style="width:60px" class="hidden-xs ui-left" title="{{campaign.title}}">{{campaign.title}}</span></td>
+                        <td style="width:60px" class="hidden-xs ui-left" title="{{campaign.title}}">
+                            {{ if (get_campaign_status(campaign) == 2 || get_campaign_status(campaign) == 3 || get_campaign_status(campaign) == 4) }}
+                                <b class="mr5 fs11 green">Online</b>
+                            {{ fi }}
+                            {{campaign.title}}</span></td>
                         <td style="width:30px" class="hidden-xs ui-center" title="{{types_map[campaign.type]}}">{{ types_map[campaign.type] }}</td>
                         <td style="width:60px" class="hidden-xs ui-center" title="{{campaign.campaign_url_name}}">{{ campaign.campaign_url_name }}</td>
                         <td style="width:30px" class="hidden-xs ui-center">{{ campaign_status_map[get_campaign_status(campaign)] }}</td>

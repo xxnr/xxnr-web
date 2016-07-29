@@ -591,19 +591,19 @@ describe('campaign', function(){
                     code:1000,
                     campaigns:[
                         {
-                            _id:campaign_A._id
-                        },
-                        {
-                            _id:campaign_B._id
-                        },
-                        {
-                            _id:campaign_C._id
+                            _id:campaign_E._id
                         },
                         {
                             _id:campaign_D._id
                         },
                         {
-                            _id:campaign_E._id
+                            _id:campaign_C._id
+                        },
+                        {
+                            _id:campaign_B._id
+                        },
+                        {
+                            _id:campaign_A._id
                         }
                     ]
                 };

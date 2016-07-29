@@ -10,7 +10,7 @@ var tools = require('../common/tools');
 var URL = require('url');
 
 exports.query_campaign = function(req, res, next){
-    CampaignService.query({online:true}, function(err, campaigns){
+    CampaignService.query({online:true, sort:{online_time:-1}}, function(err, campaigns){
         if(err){
             res.respond({code:1001, message:'查询活动失败'});
             return;

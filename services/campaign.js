@@ -35,15 +35,15 @@ CampaignService.prototype.query = function(options, callback){
     var take = 0;
     var skip = 0;
     if(options){
-        if(options.online){
-            query.online_time = {$lt: currentTime};
-            query['$or'] = [{offline_time:{$exists:true, $gt: currentTime}}, {offline_time:{$exists:false}}];
-        }
         if(options.type){
             query.type = options.type;
         }
         if(options.search){
             query.title = {$regex:new RegExp(options.search)}
+        }
+        if(options.online){
+            query.online_time = {$lt: currentTime};
+            query['$or'] = [{offline_time:{$exists:true, $gt: currentTime}}, {offline_time:{$exists:false}}];
         }
         switch(options.status){
             case CAMPAIGNSTATUS.NOTONLINE:
@@ -81,6 +81,11 @@ CampaignService.prototype.query = function(options, callback){
         }
     }
 
+    var sort = {date_created:-1};
+    if(options.sort){
+        sort = options.sort;
+    }
+
     CampaignModel.count(query, function(err, count) {
         if (err) {
             console.error(err);
@@ -96,6 +101,7 @@ CampaignService.prototype.query = function(options, callback){
 
         CampaignModel.find(query)
             .lean()
+            .sort(sort)
             .skip(skip)
             .limit(take)
             .exec(function (err, campaigns) {

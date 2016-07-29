@@ -25,6 +25,9 @@ var campaign_schema = new mongoose.Schema({
     share_image:{type:String}
 });
 
+campaign_schema.index({type:1, title:1, online_time:1, start_time:1, end_time:1, offline_time:1, date_created:-1});
+campaign_schema.index({title:1, online_time:1, start_time:1, end_time:1, offline_time:1, date_created:-1});
+
 var reward_control_schema = new mongoose.Schema({
     user:{type:mongoose.Schema.ObjectId, ref:'user', required:true},
     campaign:{type:mongoose.Schema.ObjectId, ref:'campaign', required:true},
@@ -49,6 +52,8 @@ var QA_campaign_schema = new mongoose.Schema({
     date_created:{type:Date, default:Date.now},
     date_last_modified:{type:Date, required:true}
 }, {_id: false});
+
+QA_campaign_schema.index({campaign:1});
 
 var quiz_campaign_schema = new mongoose.Schema({
     campaign:{type:mongoose.Schema.ObjectId, ref:"campaign", required:true},
