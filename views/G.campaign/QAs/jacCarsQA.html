@@ -18,28 +18,31 @@
         table {border-collapse: collapse;border-spacing: 0;}
         a:hover {text-decoration: none;}
         a {text-decoration: none;}
-        body {background-color: white;font-family: "微软雅黑", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif;  height: 100%}
+        body {background-color: white;font-family: "微软雅黑", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif;}
         .clearfix:before, .clearfix:after {content: " "; /* 1 */display: table; /* 2 */}
-        .clearfix:after {clear}
+        .clearfix:after {clear:both}
         .container {
             margin: 0 auto;
             width: 100%;
-            height: 100%;
+            /*height: 100%;*/
             background: #98EBED;
+            position: relative;
         }
-        .title_image {text-align: center;width: 100%;position: absolute;z-index: 50;}
+        .title_image {text-align: center;width: 100%;z-index: 50;}
         .question_backgroud {width: 100%;position: relative;}
-        .question_backgroud--image_body {width: 90%;margin: auto;display: block;margin-left: 3%;margin-top: 45%;position: absolute;display: block;z-index: 0;}
-        .question_backgroud--image_question{    z-index: 100;position: absolute;margin-top: 75%;margin-left: 25%;width: 50%;}
-        .start_button{z-index: 20; margin-top: 120%;position: absolute;left: 25%;width: 50%;}
+        .question_backgroud--image_body {width: 90%;margin: auto;display: block;margin-left: 3%;display: block;z-index: 0;}
+        .question_backgroud--image_question{    z-index: 100;margin-left: 25%;width: 50%;    position: relative;margin-top: 150px;}
+        .start_button{z-index: 20;left: 25%;width: 50%;    position: relative;}
         .start_button img{width: 100%}
         .start_button--unavailable_text {position: absolute;top: 30%;width: 100%;color: #FFFFFF;text-align: center;    font-size: 4vw;}
-        .question { position: absolute;margin-top: 75%;width: 60%;margin-left: 20%;}
+        .question {width: 60%;margin-left: 20%;position: relative;padding-top: 130px;}
         .question--title { font-size: 4vw;margin-bottom: 20px;}
-        .question--option{ background: url('/images/campaign/QA/activity_option.png') no-repeat;background-size: 100% 100%;height: 4vh;margin-bottom: 5%;text-align: center;line-height: 4vh;font-size: 4.2vw;position: relative;}
-        .question--option--title {position: absolute;left: 3.5%;color: #FFF;}
-        .result_img{position: absolute;right: 10%;height: 15px;width: 15px;top:20%}
-        .quiz--rule {margin-top: 155%;background: url('/images/campaign/QA/activity_text_box1.png') no-repeat;background-position: center top;background-size: 90% 100%;}
+        .question--option{margin-bottom: 5%;position: relative;}
+        .question--option--title {position: absolute;color: #FFF;display: block;background: #FF970E;width: 32px;height: 32px;border-radius: 50%;    line-height: 32px;text-align: center;}
+        .question--option--contents{ display: inline-block;background: #FDF9EA;border: 1px solid #fad3a1;line-height: 30px;font-size: 3.7vw;width: 95%;margin-left: 17px;box-sizing: border-box;padding-left: 20px;padding-right: 30px}
+        .question--option--selected { border: 1px solid #FF970E;box-sizing: border-box;}
+        .result_img{position: absolute;right: 0%;height: 15px;width: 15px;top:25%}
+        .quiz--rule {background: url('/images/campaign/QA/activity_text_box1.png') no-repeat;background-position: center top;background-size: 90% 100%;}
         .quiz--rule p {font-size: 3vw;padding: 5%;padding-left: 15%;padding-right: 15%;}
         .quiz--info {background: url('/images/campaign/QA/activity_text_box2.png') no-repeat;background-position: center top;background-size: 90% 100%;}
         .quiz--info--text {padding: 15%;font-size: 3vw}
@@ -59,6 +62,7 @@
         .download_app--text_text {font-size: 9px;color: #909090;}
         .download_app--close {float: left;width: 10px;height: 10px;margin-top: 25px;margin-left: 6px;margin-right: 12px;}
         .campaign_mask {position: fixed;width: 100%;height: 100%;background: rgba(0,0,0,0.6);;top:0;z-index: 200;color:#323232;padding-top: 70px;padding-left: 30px;padding-right: 30px;box-sizing: border-box;font-size: 4.5vw;}
+        .question--section{    padding-bottom: 70px;position: relative;background: url('/images/campaign/QA/bg3.png') no-repeat;background-position: center top;background-size: 90% 100%;  min-height: 400px;margin-top: -34px;  margin-left: -20px;margin-bottom: 20px}
     </style>
 </head>
 
@@ -77,40 +81,44 @@
             </div>
             <div class="download_btn" v-on:click="redirectToApp()">打开APP</div>
         </div>
-        <div class="question_backgroud clearfix">
+        <div class="question_backgroud clearfix" >
             <img class="title_image" src="/images/campaign/QA/activity_banner3.png" alt="">
-            <img class="question_backgroud--image_body" src="/images/campaign/QA/bg3.png" alt="">
-            <img v-show="!started" class="question_backgroud--image_question" src="/images/campaign/QA/coin_icon.png" alt="">
-            <div class="start_button" v-show="!started && !campaignAvailable" v-cloak>
-                <img src="/images/campaign/QA/activity_button_gray.png" alt="">
-                <p class="start_button--unavailable_text">{{unavailableText}}</p>
-            </div>
-            <div class="start_button" v-show="!started && !isLogin && campaignAvailable" v-cloak>
-                <img v-on:click="goToLogin" src="/images/campaign/QA/button（not）.png" alt="">
-            </div>
-            <div class="start_button" v-show="!started && isLogin && campaignAvailable" v-cloak>
-                <img v-on:click="start" src="/images/campaign/QA/button（logined）.png" alt="">
-            </div>
-            <div class="question" v-show="started" v-cloak>
-                <div v-show="currentQuestion">
-                    <p class="question--title">{{currentQuestion.question}}</p>
-                    <p class="question--option" v-for="option in currentQuestion.options" v-on:click.stop="answerAndNext($index, option)">
-                        <img class="result_img" src="/images/campaign/QA/activity_right-.png" alt="" v-show="$index == answerOptionIndex && option.is_right_answer">
-                        <img class="result_img" src="/images/campaign/QA/activity_wrong.png" alt="" v-show="$index == answerOptionIndex && !option.is_right_answer">
-                        <span class="question--option--title">{{option.order_key | indexToChar}}</span>{{option.value}}
-                    </p>
+            <!--<img class="question_backgroud&#45;&#45;image_body" src="/images/campaign/QA/bg3.png" alt="">-->
+            <div class="question--section" >
+                <img v-show="!started" class="question_backgroud--image_question" src="/images/campaign/QA/coin_icon.png" alt="">
+                <div class="start_button" v-show="!started && !campaignAvailable" v-cloak>
+                    <img src="/images/campaign/QA/activity_button_gray.png" alt="">
+                    <p class="start_button--unavailable_text">{{unavailableText}}</p>
                 </div>
-                <div v-show="currentQuestion"><span class="quit_btn" @click="isConfirm = true">不答了</span> <span class="progress">{{currentQuestionIndex+1}}/{{quizs.length}}</span></div>
-                <div v-show="!currentQuestion && !hadAnswered" class="points_image">
-                    <img class="points_result" src="/images/campaign/QA/activity_answer.png" alt="">
-                    <div class="points_earned">{{pointsEarned}}</div>
-                    <p>共{{quizs.length}}题，答对{{rightAnswerCount}}题</p>
-                    <p>奖励{{pointsEarned}}积分</p>
+                <div class="start_button" v-show="!started && !isLogin && campaignAvailable" v-cloak>
+                    <img v-on:click="goToLogin" src="/images/campaign/QA/button（not）.png" alt="">
                 </div>
-                <div v-show="!currentQuestion && hadAnswered" class="points_image">
-                    <p>您已在其他地方参加过活动了</p>
+                <div class="start_button" v-show="!started && isLogin && campaignAvailable" v-cloak>
+                    <img v-on:click="start" src="/images/campaign/QA/button（logined）.png" alt="">
+                </div>
+                <div class="question" v-show="started" v-cloak>
+                    <div v-show="currentQuestion">
+                        <p class="question--title">{{currentQuestion.question}}</p>
+                        <p class="question--option" v-for="option in currentQuestion.options" v-on:click.stop="answerAndNext($index, option)">
+                            <img class="result_img" src="/images/campaign/QA/activity_right-.png" alt="" v-show="$index == answerOptionIndex && option.is_right_answer">
+                            <img class="result_img" src="/images/campaign/QA/activity_wrong.png" alt="" v-show="$index == answerOptionIndex && !option.is_right_answer">
+                            <span class="question--option--title">{{option.order_key | indexToChar}}</span>
+                            <span class="question--option--contents" v-bind:class="{ 'question--option--selected': $index == answerOptionIndex}">{{option.value}}</span>
+                        </p>
+                    </div>
+                    <div v-show="currentQuestion"><span class="quit_btn" @click="isConfirm = true">不答了</span> <span class="progress">{{currentQuestionIndex+1}}/{{quizs.length}}</span></div>
+                    <div v-show="!currentQuestion && !hadAnswered" class="points_image">
+                        <img class="points_result" src="/images/campaign/QA/activity_answer.png" alt="">
+                        <div class="points_earned">{{pointsEarned}}</div>
+                        <p>共{{quizs.length}}题，答对{{rightAnswerCount}}题</p>
+                        <p>奖励{{pointsEarned}}积分</p>
+                    </div>
+                    <div v-show="!currentQuestion && hadAnswered" class="points_image">
+                        <p>您已在其他地方参加过活动了</p>
+                    </div>
                 </div>
             </div>
+
         </div>
         <div class="quiz--rule">
             <p>看这里！答题时请直接点击答案,选择后即出结果;若中途退出，则可再次答题</p>
@@ -149,7 +157,9 @@
         var parts = value.split("; " + name + "=");
         if (parts.length == 2) return parts.pop().split(";").shift();
     };
-
+    var deleteCookie = function(name) {
+        document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:01 GMT;path=/';
+    };
     var campaignConfirm = Vue.extend({
         props:
         {
@@ -286,7 +296,7 @@
                             (function(){
                                 var token;
                                 if(typeof jsObj == "undefined"){
-                                    token = getCookie(token);
+                                    token = getCookie('token');
                                     if(token){
                                         this.token = token;
                                         this.isLogin = true;
@@ -294,7 +304,7 @@
                                 }else {
                                     token = jsObj.getToken();
                                 }
-                                config.ajaxPost(config.baseURI, '/api/v2.3/campaign/QA/require_reward', {token:token,_id:"<%- campaign._id %>",answers:_that.answersWillCommit})
+                                config.ajaxPost(config.baseURI, ':8070/api/v2.3/campaign/QA/require_reward', {token:token,_id:"<%- campaign._id %>",answers:_that.answersWillCommit})
                                         .then(function(data){
 //                                    _that.test = data.code;
 //                                    _that.testMsg = data.message;
@@ -313,7 +323,7 @@
                             }());
 
                         }
-                    },2000);
+                    },1000);
 
                 }
             },
@@ -330,7 +340,7 @@
             },
             getQA : function(){
                 var that = this;
-                config.ajaxGet(config.baseURI, '/api/v2.3/campaign/QA/getQA', {_id:"<%- campaign._id %>"})
+                config.ajaxGet(config.baseURI, ':8070/api/v2.3/campaign/QA/getQA', {_id:"<%- campaign._id %>"})
                     .then(function(data){
 //                        console.log(data);
                         that.quizs = data.QA;
@@ -351,14 +361,14 @@
             },
             goToLogin : function(){
                 if(typeof jsObj == "undefined"){
-                    window.location.href = encodeURI("http://192.168.1.15:8080/login?redirect="+window.location.href);
+                    window.location.href = encodeURI(config.baseURI + ":8080/login?redirect="+window.location.href);
                 } else {
                     jsObj.toLogin();
                 }
             },
             checkStatus : function(){
                 var _this = this;
-                config.ajaxGet(config.baseURI, '/api/v2.3/campaign_status', {_id:"<%- campaign._id %>"})
+                config.ajaxGet(config.baseURI, ':8070/api/v2.3/campaign_status', {_id:"<%- campaign._id %>"})
                         .then(function(data){
                             if(data.code == 1000){
                                 if(data.status == 1){
@@ -383,7 +393,7 @@
             },
             checkTimesLeft : function(){
                 var _this = this;
-                config.ajaxGet(config.baseURI, '/api/v2.3/campaign_status', {token:this.token,_id:"<%- campaign._id %>"})
+                config.ajaxGet(config.baseURI, ':8070/api/v2.3/campaign_status', {token:_this.token,_id:"<%- campaign._id %>"})
                         .then(function(data){
                             if(data.code == 1000){
                                 if(data.times_left <= 0){
@@ -392,9 +402,13 @@
                                 }
                             }else if(data.code == 1401){
                                 _this.campaignAvailable = false;
-                                _this.unavailableText = '已参加';
+                                _this.unavailableText = '请重新登录';
                                 _this.isToast = true;
                                 _this.toastMsg = '您已被登出';
+                                deleteCookie('token');
+                                _this.timeout = setTimeout(function () {
+                                    window.location.href = window.location.href;
+                                }, 1000);
                             }
                         })
             }
