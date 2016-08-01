@@ -58,6 +58,7 @@
         .download_app--text_title {color:#323232}
         .download_app--text_text {font-size: 9px;color: #909090;}
         .download_app--close {float: left;width: 10px;height: 10px;margin-top: 25px;margin-left: 6px;margin-right: 12px;}
+        .campaign_mask {position: fixed;width: 100%;height: 100%;background: rgba(0,0,0,0.6);;top:0;z-index: 200;color:#323232;padding-top: 70px;padding-left: 30px;padding-right: 30px;box-sizing: border-box;font-size: 4.5vw;}
     </style>
 </head>
 
@@ -99,7 +100,7 @@
                         <span class="question--option--title">{{option.order_key | indexToChar}}</span>{{option.value}}
                     </p>
                 </div>
-                <div v-show="currentQuestion" v-on:click='resetPage'><span class="quit_btn">不答了</span> <span class="progress">{{currentQuestionIndex+1}}/{{quizs.length}}</span></div>
+                <div v-show="currentQuestion"><span class="quit_btn" @click="isConfirm = true">不答了</span> <span class="progress">{{currentQuestionIndex+1}}/{{quizs.length}}</span></div>
                 <div v-show="!currentQuestion && !hadAnswered" class="points_image">
                     <img class="points_result" src="/images/campaign/QA/activity_answer.png" alt="">
                     <div class="points_earned">{{pointsEarned}}</div>
@@ -132,6 +133,8 @@
     </div>
     <campaign-confirm confirm-title="确定退出本次答题吗?" :is-show.sync="isConfirm"></campaign-confirm>
     <campaign-toast :toast-title="toastMsg" :is-show.sync="isToast"></campaign-toast>
+    <div class="campaign_mask" v-show="isMask" v-cloak>
+    </div>
 </div>
 
 
@@ -163,11 +166,15 @@
             '</div>' +
             '<div @click="closeConfirm()" class="confirm-option" style="color:#00B38A;display: inline-block;width: 50%;height: 50px;line-height: 50px;text-align: center;font-size: 18px;border-right: 1px solid #E2E2E2;box-sizing: border-box;">取消' +
             '</div>' +
-            '<div class="confirm-option" style="color:#00B38A;display: inline-block;width: 50%;height: 50px;line-height: 50px;text-align: center;font-size: 18px;">确定' +
+            '<div @click="confirmed()" class="confirm-option" style="color:#00B38A;display: inline-block;width: 50%;height: 50px;line-height: 50px;text-align: center;font-size: 18px;">确定' +
             '</div>' +
         '</div>',
         methods: {
             closeConfirm: function () {
+                this.isShow = false;
+            },
+            confirmed: function () {
+                this.$dispatch('pop-confirmed');
                 this.isShow = false;
             }
         }
@@ -252,6 +259,7 @@
                 if(val == false){
                     this.isMask = false;
                 }else if(val == true){
+                    console.log('haha');
                     this.isMask = true;
                 }
             }
@@ -315,7 +323,6 @@
                 this.currentQuestion = {};
                 this.clicked = false;
                 this.rightAnswerCount = 0;
-                this.isConfirm = true;
             },
             start : function(){
                 this.started = true;
@@ -372,7 +379,6 @@
                 this.showDownloadApp = false;
             },
             redirectToApp : function(){
-                this.isMask = true;
                 window.location.href = '/staticPage/campaignRedirect.html';
             },
             checkTimesLeft : function(){
@@ -391,6 +397,11 @@
                                 _this.toastMsg = '您已被登出';
                             }
                         })
+            }
+        },
+        events: {
+            'pop-confirmed': function () {
+                this.resetPage();
             }
         }
     });
