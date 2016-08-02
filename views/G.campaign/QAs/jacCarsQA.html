@@ -160,6 +160,7 @@
     };
     var deleteCookie = function(name) {
         document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:01 GMT;path=/';
+        document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:01 GMT;path=/;domain=.xinxinnongren.com';
     };
     var campaignConfirm = Vue.extend({
         props:
@@ -363,7 +364,7 @@
             },
             goToLogin : function(){
                 if(typeof jsObj == "undefined"){
-                    window.location.href = encodeURI(config.mobileBaseURI + ":8080/login?redirect="+window.location.href);
+                    window.location.href = encodeURI(config.mobileBaseURI + "/login?redirect="+window.location.href);
                 } else {
                     jsObj.toLogin();
                 }

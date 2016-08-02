@@ -6,7 +6,8 @@ var config = (function () {
 
     //configObj.baseURI = 'http://101.200.194.203';
     configObj.baseURI = '';
-    configObj.mobileBaseURI = 'http://192.168.1.15';
+    //configObj.mobileBaseURI = 'http://192.168.1.15:8080';
+    configObj.mobileBaseURI = 'http://mppe.xinxinnongren.com';
     //configObj.baseURI = 'http://mppe.xinxinnongren.com:8070';
     configObj.ajaxGet = function (apiURI,data) {
         var deferred = $.Deferred();

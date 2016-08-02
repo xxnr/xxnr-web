@@ -29,6 +29,10 @@ echo "-------- mkdir & ln xxnr->images banners ... time:$now_time"
 mkdir -p $DIR/xxnrMobilePro/images
 ln -s ../../../xxnr/images/banners $DIR/xxnrMobilePro/images
 
+echo "-------- mkdir & ln xxnr->staticPage ... time:$now_time"
+mkdir -p $DIR/xxnrMobilePro/staticPage
+ln -s ../../../staticPage $DIR/xxnrMobilePro/staticPage
+
 echo "-------- mkdir & ln xxnr->xxnrMobilePro ... time:$now_time"
 cd $DIR/..
 ln -s $DIR/xxnrMobilePro ./
