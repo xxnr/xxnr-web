@@ -132,7 +132,7 @@ describe('campaign', function(){
         return 'http://127.0.0.1/campaigns/' + campaign_type_english_name[type] + '/' + url_name;
     };
     var campaign_image = function(image){
-        return 'http://127.0.0.1/images/original/' + image + '.jpg';
+        return 'http://127.0.0.1/images/original/' + image + '.png';
     };
     before('create backend admin and login', function (done) {
         Routing.User.create_backend_account(backend_admin.account, backend_admin.password, backend_admin.role, function () {

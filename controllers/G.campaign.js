@@ -17,8 +17,6 @@ exports.query_campaign = function(req, res, next){
         }
 
         var prevurl = req.url_prefix;
-        var previmg = getprevImg(req);
-        var imgtype = '.jpg';
         campaigns.forEach(function(campaign){
             delete campaign.type;
             delete campaign.campaign_url_name;
@@ -31,10 +29,10 @@ exports.query_campaign = function(req, res, next){
             delete campaign.shareable;
 
             if(campaign.image){
-                campaign.image = previmg + campaign.image + imgtype;
+                campaign.image = image_url(campaign.image, req);
             }
             if(campaign.share_image){
-                campaign.share_image = previmg + campaign.share_image + imgtype;
+                campaign.share_image = image_url(campaign.share_image, req);
             }
             if(campaign.url){
                 campaign.url = prevurl + campaign.url;
@@ -57,8 +55,6 @@ exports.campaign_page = function(req, res, next){
         var render_campaign = {};
         if(campaign) {
             var prevurl = req.url_prefix;
-            var previmg = getprevImg(req);
-            var imgtype = '.jpg';
             if (campaign.url) {
                 campaign.url = prevurl + campaign.url;
             }
@@ -66,10 +62,10 @@ exports.campaign_page = function(req, res, next){
                 campaign.share_url = prevurl + campaign.share_url;
             }
             if (campaign.image) {
-                campaign.image = previmg + campaign.image + imgtype;
+                campaign.image = image_url(campaign.image, req);
             }
             if (campaign.share_image) {
-                campaign.share_image = previmg + campaign.share_image + imgtype;
+                campaign.share_image = image_url(campaign.share_image, req);
             }
 
             render_campaign = {
@@ -325,13 +321,11 @@ exports.get_app_share_info = function(req, res, next){
         }
 
         var prevurl = req.url_prefix;
-        var previmg = getprevImg(req);
-        var imgtype = '.jpg';
         if(campaign.url){
             campaign.url = prevurl + campaign.url;
         }
         if(campaign.share_image){
-            campaign.share_image = previmg + campaign.share_image + imgtype;
+            campaign.share_image = image_url(campaign.share_image, req);
         }
         res.respond({
             code: 1000,
@@ -348,4 +342,10 @@ function getprevImg(req){
     var prevurl = req.url_prefix;
     var previmg = prevurl + '/images/original/';
     return previmg;
+}
+
+function image_url(id, req){
+    var previmg = getprevImg(req);
+    var imgtype = '.png';
+    return previmg + id + imgtype;
 }
