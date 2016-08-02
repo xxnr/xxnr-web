@@ -19,10 +19,11 @@ exports.deploy_auth = function(callback) {
 
 exports.deploy_SKU = function(callback) {
     async.series({
-            one: SKU.deploy_suppliers,
-            two: SKU.deploy_brands,
-            three: SKU.deploy_product_attributes,
-            four: SKU.deploy_SKU_attributes
+            one:SKU.deploy_product_categories,
+            two: SKU.deploy_suppliers,
+            three: SKU.deploy_brands,
+            four: SKU.deploy_product_attributes,
+            five: SKU.deploy_SKU_attributes
         },
         function () {
             console.log('finish deploy SKU');
