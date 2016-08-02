@@ -30,7 +30,7 @@ mkdir -p $DIR/xxnrMobilePro/images
 ln -s ../../../xxnr/images/banners $DIR/xxnrMobilePro/images
 
 echo "-------- mkdir & ln xxnr->staticPage ... time:$now_time"
-ln -s ../../staticPage $DIR/xxnrMobilePro
+ln -s ../../campaignStatics $DIR/xxnrMobilePro
 
 echo "-------- mkdir & ln xxnr->xxnrMobilePro ... time:$now_time"
 cd $DIR/..
