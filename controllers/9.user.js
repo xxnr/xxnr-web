@@ -1338,7 +1338,7 @@ exports.json_get_inviter = function(req, res, next) {
                     user.inviterSex = inviter.sex;
                     user.inviterAddress = inviter.address;
                     user.inviterUserType = inviter.type;
-                    user.inviterUserTypeInName = F.global.usertypes[inviter.type] || '其他';
+                    user.inviterUserTypeInName = F.global.usertypes[inviter.type] || '普通用户';
 
                     // inviter verified user types
                     user.inviterVerifiedTypes = inviter.typeVerified || [];
@@ -1346,7 +1346,7 @@ exports.json_get_inviter = function(req, res, next) {
                         user.inviterVerifiedTypesInJson = [];
                         user.inviterVerifiedTypes.forEach(function(type){
                             if(F.global.usertypes[type]){
-                                user.inviterVerifiedTypesInJson.push({typeId:type, typeName: F.global.usertypes[type] || '其他'});
+                                user.inviterVerifiedTypesInJson.push({typeId:type, typeName: F.global.usertypes[type] || '普通用户'});
                             }
                         });
                     }
@@ -1809,7 +1809,7 @@ function convert_user_type_info(user, data){
     }
 
     user.userType = data.type;
-    user.userTypeInName = Global.usertypes[user.userType] || '其他';
+    user.userTypeInName = Global.usertypes[user.userType] || '普通用户';
 
     // verified user types
     user.verifiedTypes = data.typeVerified || [];
@@ -1817,7 +1817,7 @@ function convert_user_type_info(user, data){
         user.verifiedTypesInJson = [];
         user.verifiedTypes.forEach(function(type){
             if(Global.usertypes[type]){
-                user.verifiedTypesInJson.push({typeId:type, typeName: Global.usertypes[type] || '其他'});
+                user.verifiedTypesInJson.push({typeId:type, typeName: Global.usertypes[type] || '普通用户'});
             }
         });
     }
