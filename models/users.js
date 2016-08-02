@@ -14,6 +14,12 @@ var UserSchema = new mongoose.Schema({
     "nameInitialType":{type:Number, default: 2},                            // 姓名汉语拼音首字母类型 1:字母(a-z-A-Z) 2:其他符号
     "type": {type: String, default:"1"},                                    // 用户类型 1：其他 2：种植大户 3：村级经销商 4：乡镇经销商 5：县级经销商 it"s configured in config file right now
     "typeVerified": [{type: String}],                                       // 认证类型
+    "dateTypeVerified": {
+        "dateFirstAgent": Date,                                             // 用户第一次被认证为经纪人时间
+        "dateAgent": Date,                                                  // 用户被认证为经纪人时间
+        "dateFirstRSC": Date,                                               // 用户第一次被认证为县级经销商时间
+        "dateRSC": Date                                                     // 用户被认证为县级经销商时间
+    },
     "sex": {type: Boolean, default:false},                                  // 性别 0：男 1：女
     "photo": String,                                                        // 用户头像
     "regmethod": Boolean,                                                   // 注册方式 0：手机 1：web
@@ -104,13 +110,14 @@ UserSchema.index({type:1});
 UserSchema.index({name:1});
 UserSchema.index({inviter:1, nameInitialType:1, namePinyin:1, dateinvited:-1, datecreated:-1});
 UserSchema.index({RSCInfo:1, 'RSCInfo.products':1, 'RSCInfo.supportEPOS':1, 'RSCInfo.EPOSNo':1});
-UserSchema.index({typeVerified:1, type:1, datecreated:-1});
+UserSchema.index({typeVerified:1, type:1, inviter:1, 'dateTypeVerified.dateFirstAgent':-1, 'dateTypeVerified.dateFirstRSC':-1, datecreated:-1});
 
 PotentialCustomerSchema.index({"phone":1, unique:true});
 PotentialCustomerSchema.index({"user":1, "dateAdded":1, "nameInitialType":1, "namePinyin":1, "dateTimeAdded":-1});
 PotentialCustomerSchema.index({"user":1, "isRegistered":1, "isBinded":1});
 PotentialCustomerSchema.index({"dateTimeAdded":-1});
 PotentialCustomerSchema.index({"nameInitialType":1, "namePinyin":1});
+PotentialCustomerSchema.index({"dateTimeRegistered":-1});
 
 IntentionProductSchema.index({"name":1, unique:true});
 

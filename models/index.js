@@ -91,6 +91,7 @@ exports.deliveryCode = mongoose.model('deliveryCode');
 exports.hourlyReport = mongoose.model('hourlyReport');
 exports.reportUpdateTime = mongoose.model('reportUpdateTime');
 exports.agentReport = mongoose.model('agentReport');
+exports.dailyAgentReport = mongoose.model('dailyAgentReport');
 // user sign
 exports.userSign = mongoose.model('user_sign');
 // vcode

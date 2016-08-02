@@ -325,7 +325,9 @@
 					select_user_form_tab($('#user_info_button'));
 					$.components.GET(managerurl + '/api/users/' + row.id, null, function(response) {
                         if(response.code!=1000){
-                            alert(response.message);
+                        	if (response.message) {
+                            	alert(response.message);
+                            }
                             return;
                         }
 
@@ -387,7 +389,9 @@
 					});
 					$.components.GET(managerurl+'/api/v2.1/agentinfo/'+row.id, null, function(response){
 						if(response.code!=1000){
-							alert(response.message);
+							if (response.message) {
+                            	alert(response.message);
+                            }
 							return;
 						}
 						if (objIsEmpty(response.agent)) {
@@ -398,7 +402,9 @@
 					});
 					$.components.GET(managerurl+'/api/v2.2/RSCInfo/'+row._id, null, function(response){
 						if(response.code!=1000){
-							alert(response.message);
+							if (response.message) {
+                            	alert(response.message);
+                            }
 							return;
 						}
 						if (objIsEmpty(response.RSCInfo)) {
@@ -499,7 +505,10 @@
 
 		$.components.GET(managerurl + '/api/users/', users.filter, function(response) {
 			if(response.code!=1000){
-				alert(response.message);
+				if (response.message) {
+                	alert(response.message);
+                }
+				return;
 			}
 
 			response = response.users;

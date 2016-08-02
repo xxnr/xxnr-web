@@ -7,7 +7,8 @@
     <div class="rsc-sidebar">
         <ul class="rsc-sidebar-ul">
             <li class="checked">网点管理</li>
-            <li id="rsc-order-link">网点订单</a></li>
+            <li id="rsc-order-link">网点订单</li>
+            <li id="rsc-gift-link">礼品兑换</li>
             <li class="clear"></li>
         </ul>
     </div>
@@ -1211,6 +1212,9 @@
 
         $("#rsc-order-link").click(function(){
             window.location.href = managerurl + "/rsc/rsc-order?id=" + rscInfo_id;
+        });
+        $("#rsc-gift-link").click(function(){
+            window.location.href = managerurl + "/rsc/rsc-giftOrder?id=" + rscInfo_id;
         });
 
     });

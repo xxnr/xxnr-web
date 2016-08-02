@@ -34,11 +34,10 @@ ReportUpdateTimeModel.findOne({}, function(err, updateTime){
 
         Promise.all(promises)
             .then(function () {
-                hourDiff = hourDiff - max;
-                if(hourDiff > concurrency){
+                if((hourDiff - max) > concurrency){
                     batchGenerateHourlyReport(max, max + concurrency);
-                } else if (hourDiff > 0) {
-                    batchGenerateHourlyReport(max, max + hourDiff);
+                } else if ((hourDiff - max) > 0) {
+                    batchGenerateHourlyReport(max, hourDiff);
                 } else{
                     // all finished
                     ReportUpdateTimeModel.update({}, {$set: {hourly: new Date()}}, {upsert: true}, function (err, numAffected) {

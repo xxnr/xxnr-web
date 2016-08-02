@@ -18,12 +18,13 @@
         <h3 class="ui-left">经纪人数据</h3>
         <ul class="dashboard-sidebar">
             <li class="selected">- 业绩排行</li>
+            <li name="agentPerformance">- 汇总排行</li>
             <li class="cl"></li>
         </ul>
     </div>
     <div class="col-md-10">
 		<div class="mb50">
-		<div class="row m">
+		<div class="row">
 			<div class="col-md-12">
 				<h3 class="ui-left">昨日业绩排行</h3>
 			</div>
@@ -66,6 +67,15 @@
 								    		</div>
 							    		</div>
 							    	</td>
+							    	<td style="width:70px" class="silver hidden-xs ui-center active">
+							    		<div class="agentstitle">
+								    		<span>经纪人数</span>
+								    		<div class="agentsort">
+								    			<div class="fa fa-caret-up" id="NEWAGENT-ASC"></div>
+								    			<div class="fa fa-caret-down" id="NEWAGENT-DESC"></div>
+								    		</div>
+							    		</div>
+							    	</td>
 							    	<td style="width:80px" class="silver hidden-xs ui-center active">
 							    		<div class="agentstitle">
 								    		<span>昨日登记客户</span>
@@ -97,8 +107,8 @@
 							    		<div class="agentstitle">
 								    		<span>已完成金额</span>
 								    		<div class="agentsort">
-								    			<div class="fa fa-caret-up" id="TOTALPAIDAMOUT-ASC"></div>
-								    			<div class="fa fa-caret-down" id="TOTALPAIDAMOUT-DESC"></div>
+								    			<div class="fa fa-caret-up" id="TOTALCOMPLETEDPAIDAMOUT-ASC"></div>
+								    			<div class="fa fa-caret-down" id="TOTALCOMPLETEDPAIDAMOUT-DESC"></div>
 								    		</div>
 							    		</div>
 							    	</td>
@@ -110,10 +120,11 @@
 								    	<td style="width:60px" class="silver hidden-xs ui-center" title="{{ agent.phone }}">{{ agent.phone }}</td>
 								    	<td style="width:80px" class="silver hidden-xs ui-center">{{ agent.newInviteeCount | format(0) }}</td>
 								    	<td style="width:70px" class="silver hidden-xs ui-center">{{ agent.totalInviteeCount | format(0) }}</td>
+								    	<td style="width:70px" class="silver hidden-xs ui-center">{{ agent.newAgentCount | format(0) }}</td>
 								    	<td style="width:80px" class="silver hidden-xs ui-center">{{ agent.newPotentialCustomerCount | format(0) }}</td>
 								    	<td style="width:70px" class="silver hidden-xs ui-center">{{ agent.totalPotentialCustomerCount | format(0) }}</td>
 								    	<td style="width:70px" class="silver hidden-xs ui-center">{{ agent.totalCompletedOrderCount | format(0) }}</td>
-								    	<td style="width:80px" class="silver hidden-xs ui-right" title="{{ agent.totalPaidAmount | format(0) }}">{{ agent.totalPaidAmount | price(2) }}</td>
+								    	<td style="width:80px" class="silver hidden-xs ui-right" title="{{ agent.totalCompletedOrderPaidAmount | toFixed(2) }}">{{ agent.totalCompletedOrderPaidAmount | toFixed(2) }}</td>
 								    </tr>
 								{{ end }}
 							</tbody>
@@ -137,7 +148,7 @@
 <script>
 
 	var dashboard = {};
-	dashboard.agentsSortList = ['NEWINVITEE-DESC', 'NEWINVITEE-ASC', 'TOTALINVITEE-DESC', 'TOTALINVITEE-ASC', 'NEWPOTENTIALCUSTOMER-DESC', 'NEWPOTENTIALCUSTOMER-ASC', 'TOTALPOTENTIALCUSTOMER-DESC', 'TOTALPOTENTIALCUSTOMER-ASC', 'TOTALCOMPLETEDORDER-DESC', 'TOTALCOMPLETEDORDER-ASC', 'TOTALPAIDAMOUT-DESC', 'TOTALPAIDAMOUT-ASC'];
+	dashboard.agentsSortList = ['NEWINVITEE-DESC', 'NEWINVITEE-ASC', 'TOTALINVITEE-DESC', 'TOTALINVITEE-ASC', 'NEWAGENT-DESC', 'NEWAGENT-ASC', 'NEWPOTENTIALCUSTOMER-DESC', 'NEWPOTENTIALCUSTOMER-ASC', 'TOTALPOTENTIALCUSTOMER-DESC', 'TOTALPOTENTIALCUSTOMER-ASC', 'TOTALCOMPLETEDORDER-DESC', 'TOTALCOMPLETEDORDER-ASC', 'TOTALCOMPLETEDPAIDAMOUT-DESC', 'TOTALCOMPLETEDPAIDAMOUT-ASC', 'TOTALPAIDAMOUT-DESC', 'TOTALPAIDAMOUT-ASC'];
 
 	dashboard.agents = [];
 	dashboard.agentsSelected;

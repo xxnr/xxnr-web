@@ -64,6 +64,16 @@ jRouting.route(managerurl + '/dashboard/agent-rank/', function(){
 	redirectToHomePage();
 });
 
+jRouting.route(managerurl + '/dashboard/agent-performance/', function(){
+	if(can('dashboard')) {
+		navClass('dashboard');
+		SET('common.page', 'dashboard-agentPERF');
+		return;
+	}
+
+	redirectToHomePage();
+});
+
 jRouting.route(managerurl + '/orders/', function() {
 
     if (can('orders')) {
@@ -214,6 +224,16 @@ jRouting.route(managerurl + '/rsc/rsc-order', function(){
 	redirectToHomePage();
 });
 
+jRouting.route(managerurl + '/rsc/rsc-giftorder', function(){
+	if(can('rsc')) {
+		navClass('rsc');
+		SET('common.page', 'rsc-giftorder');
+		return;
+	}
+
+	redirectToHomePage();
+});
+
 jRouting.route(managerurl + '/agents', function(){
 	if(can('agents')) {
 		navClass('agents');
@@ -311,9 +331,9 @@ function success() {
 }
 
 function can(name) {
-	if (su.roles.length === 0)
+	if (su && su.roles.length === 0)
 		return true;
-	return su.roles.indexOf(name) !== -1;
+	return su && su.roles && su.roles.indexOf(name) !== -1;
 }
 
 Tangular.register('price', function(value, format) {
@@ -443,6 +463,9 @@ function dashboardInit() {
 				break;
 			case 'agentRank':
 				url = '/dashboard/agent-rank/';
+				break;
+			case 'agentPerformance':
+				url = '/dashboard/agent-performance/';
 				break;
 		}
 		if (url) {
