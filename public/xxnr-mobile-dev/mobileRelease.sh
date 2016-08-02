@@ -31,7 +31,7 @@ ln -s ../../../xxnr/images/banners $DIR/xxnrMobilePro/images
 
 echo "-------- mkdir & ln xxnr->staticPage ... time:$now_time"
 mkdir -p $DIR/xxnrMobilePro/staticPage
-ln -s ../../../staticPage $DIR/xxnrMobilePro/staticPage
+ln -s ../../../staticPage $DIR/xxnrMobilePro/
 
 echo "-------- mkdir & ln xxnr->xxnrMobilePro ... time:$now_time"
 cd $DIR/..
