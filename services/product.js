@@ -418,7 +418,7 @@ ProductService.prototype.idJoinWithCount = function(options, callback){
     joinProduct(0);
 };
 
-ProductService.prototype.updateAttributeOrderAndDisplay = function(category, brand, name, order, callback, display){
+ProductService.prototype.updateAttributeOrderAndDisplay = function(category, brand, name, value, order, callback, display){
     if(!category){
         callback('category required');
         return;
@@ -439,7 +439,7 @@ ProductService.prototype.updateAttributeOrderAndDisplay = function(category, bra
         setOption = {$set:{order:order, display:display}}
     }
 
-    ProductAttributeModel.update({category:category, brand:brand, name:name}, setOption, {multi:true}, function(err){
+    ProductAttributeModel.update({category:category, brand:brand, name:name, value:value}, setOption, {multi:true}, function(err){
         if(err){
             console.error(err);
             callback(err);
