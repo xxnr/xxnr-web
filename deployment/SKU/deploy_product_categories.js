@@ -28,7 +28,7 @@ module.exports = function(callback) {
 
         Promise.all(saveAllCategories)
             .then(function () {
-                console.info('done');
+                console.info('Deploy product categories done');
                 callback();
             })
             .catch(function (err) {

@@ -16,15 +16,17 @@ var config = require('../../config');
 var utils = require('../../common/utils');
 var Components = require('./utilities/components');
 var cookieParser = require('cookie');
+var deployment = require('../../deployment');
 
 describe('Rewardshop', function() {
 	var test_user = test_data.test_user;
     var backend_admin = test_data.backend_admin;
     var backend_admin_token;
-    var test_categories;
+    var test_category;
     var test_gift;
     var imgUrl;
-    before('create backend admin and login', function (done) {
+
+	before('create backend admin and login', function (done) {
         Routing.User.create_backend_account(backend_admin.account, backend_admin.password, backend_admin.role, function () {
             Routing.User.backendLogin(backend_admin.account, backend_admin.password, function (err, token) {
                 should.not.exist(err);
@@ -60,10 +62,10 @@ describe('Rewardshop', function() {
      	beforeEach('create gift', function(done) {
 	         Routing.Rewardshop.query_categories(null, backend_admin_token, function (body) {
 	         	body.should.have.property('code', 1000);
-	             test_categories = body.categories;
-	             test_categories.should.not.be.empty;
+	             test_category = body.categories[1];
+	             test_category.should.not.be.empty;
 	             Routing.Rewardshop.save_gift(utils.extend(test_data.test_gift, {
-	                 category: test_categories[0]._id,
+	                 category: test_category._id,
 	                 pictures: [imgUrl]
 	             }), backend_admin_token, function (body) {
 	                 body.should.have.property('code', 1000);
@@ -109,8 +111,8 @@ describe('Rewardshop', function() {
 	 						appbody_url: 'http://127.0.0.1/gift/appbody/'+test_gift.id,
 	 						category: {
 	 							_id: test_gift.category.ref,
-	 							name: test_categories[0].name,
-	 							deliveries: test_categories[0].deliveries
+	 							name: test_category.name,
+	 							deliveries: test_category.deliveries
 	 						},
 	 						pictures: [
 	 						{
@@ -178,8 +180,8 @@ describe('Rewardshop', function() {
 	 						appbody_url: 'http://127.0.0.1/gift/appbody/'+test_gift.id,
 	 						category: {
 	 							_id: test_gift.category.ref,
-	 							name: test_categories[0].name,
-	 							deliveries: test_categories[0].deliveries
+	 							name: test_category.name,
+	 							deliveries: test_category.deliveries
 	 						},
 	 						pictures: [
 	 						{
@@ -244,7 +246,7 @@ describe('Rewardshop', function() {
 	 								online: true,
 	 								category: {
 	 									_id: test_gift.category.ref,
-	 									name: test_categories[0].name
+	 									name: test_category.name
 	 								},
 	 								pictures: [
 	 								{
@@ -412,10 +414,10 @@ describe('Rewardshop', function() {
 	    	before('create gift', function(done) {
 		        Routing.Rewardshop.query_categories(null, backend_admin_token, function (body) {
 		        	body.should.have.property('code', 1000);
-		            test_categories = body.categories;
-		            test_categories.should.not.be.empty;
+		            test_category = body.categories[1];
+		            test_category.should.not.be.empty;
 		            Routing.Rewardshop.save_gift(utils.extend(test_data.test_gift, {
-		                category: test_categories[0]._id,
+		                category: test_category._id,
 		                pictures: [imgUrl]
 		            }), backend_admin_token, function (body) {
 		                body.should.have.property('code', 1000);

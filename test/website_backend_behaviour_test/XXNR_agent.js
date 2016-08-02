@@ -25,9 +25,6 @@ describe('XXNR agent', function(){
     var intention_product;
     var XXNRAgent_token;
     var XXNRAgent_img;
-    before('deploy supplier, brands, product_attributes, SKU_attributes', function(done){
-        deployment.deploy_SKU(done);
-    });
     before('delete users', function(done){
         UserModel.find({}).remove(done);
     });
@@ -45,9 +42,6 @@ describe('XXNR agent', function(){
             test_address = address;
             done();
         })
-    });
-    before('deploy intention product', function (done) {
-        deployment.deploy_intention_product(done);
     });
     before('get intention products', function (done) {
         request(app)

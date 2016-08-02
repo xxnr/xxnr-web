@@ -101,7 +101,7 @@ module.exports = function(callback) {
 
         Promise.all(promises)
             .then(function () {
-                //console.log('Deploy product attributes success!!!!!!!!!!!!!');
+                console.log('Deploy product attributes success!!!!!!!!!!!!!');
                 callback();
             })
             .catch(function(err){

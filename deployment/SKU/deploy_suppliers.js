@@ -46,7 +46,7 @@ module.exports = function(callback) {
 
         Promise.all(promises)
             .then(function(){
-                //console.log('Deploy suppliers success!!!!!!!!!!!');
+                console.log('Deploy suppliers success!!!!!!!!!!!');
                 callback();
             })
             .catch(function(err){

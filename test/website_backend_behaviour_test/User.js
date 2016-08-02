@@ -27,9 +27,6 @@ describe('User', function() {
     var backend_admin_token;
     var test_address;
     var test_address_2, test_address_3, test_address_4;
-    before('deploy supplier, brands, product_attributes, SKU_attributes', function(done){
-        deployment.deploy_SKU(done);
-    });
     before('delete users', function(done){
         UserModel.find({}).remove(done);
     });

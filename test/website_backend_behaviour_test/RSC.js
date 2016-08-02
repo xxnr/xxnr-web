@@ -7,6 +7,7 @@ var UserModel = models.user;
 var Routing = require('./Routing');
 require('should-http');
 var should = require('should');
+var deployment = require('../../deployment');
 
 describe('RSC', function(){
     var test_user = test_data.test_user;

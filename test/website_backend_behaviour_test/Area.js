@@ -5,6 +5,7 @@ var should = require('should');
 var Components = require('./utilities/components');
 var test_data = require('./test_data');
 var Routing = require('./Routing');
+var deployment = require('../../deployment');
 
 describe('Area', function() {
     var test_address;

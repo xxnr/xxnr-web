@@ -95,7 +95,7 @@ module.exports = function(callback) {
 
         Promise.all(promises)
             .then(function(){
-                //console.log('deploy brand success!!!!!!!!!!!');
+                console.log('deploy brand success!!!!!!!!!!!');
                 callback()
             })
             .catch(function(err){

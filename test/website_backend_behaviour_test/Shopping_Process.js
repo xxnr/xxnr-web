@@ -30,12 +30,6 @@ describe('Shopping process', function() {
     before('deploy supplier, brands, product_attributes, SKU_attributes', function (done) {
         deployment.deploy_SKU(done);
     });
-    before('deploy roles and permissions', function (done) {
-        deployment.deploy_auth(done);
-    });
-    after('delete SKU attributes', function(done){
-        SKUAttributesModel.find({}).remove(done);
-    });
     before('create backend admin and login', function (done) {
         Routing.User.create_backend_account(backend_admin.account, backend_admin.password, backend_admin.role, function () {
             Routing.User.backendLogin(backend_admin.account, backend_admin.password, function (err, token) {
