@@ -63,6 +63,7 @@
         .download_app--close {float: left;width: 10px;height: 10px;margin-top: 25px;margin-left: 6px;margin-right: 12px;}
         .campaign_mask {position: fixed;width: 100%;height: 100%;background: rgba(0,0,0,0.6);;top:0;z-index: 200;color:#323232;padding-top: 70px;padding-left: 30px;padding-right: 30px;box-sizing: border-box;font-size: 4.5vw;}
         .question--section{    padding-bottom: 70px;position: relative;background: url('/images/campaign/QA/bg3.png') no-repeat;background-position: center top;background-size: 90% 100%;  min-height: 400px;margin-top: -34px;  margin-left: -20px;margin-bottom: 20px}
+        .event_info--comment {margin-left: 6%;margin-bottom: 30px;margin-top: 10px;}
     </style>
 </head>
 
@@ -136,8 +137,8 @@
                 <p>5. 可通过新新农人安卓APP或手机端网站查看积分记录（积分商城-我的积分）</p>
             </div>
         </div>
-        <!--{{test}}-->
         <!--{{testMsg}}-->
+        <p class="event_info--comment"><img src="/images/campaign/event/--.png" alt="">新新农人保留对本活动的最终解释权</p>
     </div>
     <campaign-confirm confirm-title="确定退出本次答题吗?" :is-show.sync="isConfirm"></campaign-confirm>
     <campaign-toast :toast-title="toastMsg" :is-show.sync="isToast"></campaign-toast>
@@ -171,13 +172,13 @@
             }
         },
         template:
-        '<div v-show="isShow" style="position:fixed;left: 50%;top: 50%;transform: translate(-50%, -50%);height: 110px;width: 80%;z-index: 250;background: #FFFFFF;border-radius: 5px;">' +
-            '<div style="text-align: center;height: 60px;line-height: 60px;font-size: 18px;border-bottom: 1px solid #E2E2E2;"> {{confirmTitle}}' +
-            '</div>' +
-            '<div @click="closeConfirm()" class="confirm-option" style="color:#00B38A;display: inline-block;width: 50%;height: 50px;line-height: 50px;text-align: center;font-size: 18px;border-right: 1px solid #E2E2E2;box-sizing: border-box;">取消' +
-            '</div>' +
-            '<div @click="confirmed()" class="confirm-option" style="color:#00B38A;display: inline-block;width: 50%;height: 50px;line-height: 50px;text-align: center;font-size: 18px;">确定' +
-            '</div>' +
+        '<div v-show="isShow" style="position:fixed;left: 50%;top: 50%;margin-top: -55px;margin-left: -125px;height: 110px;width: 80%;z-index: 250;background: #FFFFFF;border-radius: 5px;">' +
+        '<div style="text-align: center;height: 60px;line-height: 60px;font-size: 18px;border-bottom: 1px solid #E2E2E2;"> {{confirmTitle}}' +
+        '</div>' +
+        '<div @click="closeConfirm()" class="confirm-option" style="color:#00B38A;display: inline-block;width: 50%;height: 50px;line-height: 50px;text-align: center;font-size: 18px;border-right: 1px solid #E2E2E2;box-sizing: border-box;">取消' +
+        '</div>' +
+        '<div @click="confirmed()" class="confirm-option" style="color:#00B38A;display: inline-block;width: 50%;height: 50px;line-height: 50px;text-align: center;font-size: 18px;">确定' +
+        '</div>' +
         '</div>',
         methods: {
             closeConfirm: function () {
@@ -205,7 +206,7 @@
         },
         template:
         '<div v-show="isShow" style="position: fixed;width: 60%;left: 50%;bottom: 10%;transform: translate(-50%, -50%);background-color:rgba(0,0,0,0.4);color: #EAF8F4;border-radius: 5px;text-align: center;line-height: 20px;padding: 5px;-webkit-animation: fadein 1s;-moz-animation: fadein 1s;-ms-animation: fadein 1s;-o-animation: fadein 1s;animation: fadein 1s;z-index: 250;">' +
-            '{{toastTitle}}' +
+        '{{toastTitle}}' +
         '</div>',
         watch: {
             isShow: function (val) {
@@ -304,7 +305,7 @@
                                 }else {
                                     token = jsObj.getToken();
                                 }
-                                config.ajaxPost(config.baseURI, ':8070/api/v2.3/campaign/QA/require_reward', {token:token,_id:"<%- campaign._id %>",answers:_that.answersWillCommit})
+                                config.ajaxPost('/api/v2.3/campaign/QA/require_reward', {token:token,_id:"<%- campaign._id %>",answers:_that.answersWillCommit})
                                         .then(function(data){
 //                                    _that.test = data.code;
 //                                    _that.testMsg = data.message;
@@ -340,11 +341,11 @@
             },
             getQA : function(){
                 var that = this;
-                config.ajaxGet(config.baseURI, ':8070/api/v2.3/campaign/QA/getQA', {_id:"<%- campaign._id %>"})
-                    .then(function(data){
+                config.ajaxGet('/api/v2.3/campaign/QA/getQA', {_id:"<%- campaign._id %>"})
+                        .then(function(data){
 //                        console.log(data);
-                        that.quizs = data.QA;
-                    })
+                            that.quizs = data.QA;
+                        })
             },
             checkLogin : function(){
                 if(typeof jsObj == "undefined"){
@@ -355,20 +356,21 @@
                         this.isLogin = true;
                     }
                 } else {
+                    this.token = jsObj.getToken();
                     this.isLogin = jsObj.isLogin();
                 }
 
             },
             goToLogin : function(){
                 if(typeof jsObj == "undefined"){
-                    window.location.href = encodeURI(config.baseURI + ":8080/login?redirect="+window.location.href);
+                    window.location.href = encodeURI(config.mobileBaseURI + ":8080/login?redirect="+window.location.href);
                 } else {
                     jsObj.toLogin();
                 }
             },
             checkStatus : function(){
                 var _this = this;
-                config.ajaxGet(config.baseURI, ':8070/api/v2.3/campaign_status', {_id:"<%- campaign._id %>"})
+                config.ajaxGet('/api/v2.3/campaign_status', {_id:"<%- campaign._id %>"})
                         .then(function(data){
                             if(data.code == 1000){
                                 if(data.status == 1){
@@ -379,8 +381,6 @@
                                     _this.unavailableText = '已结束';
                                 }else if(data.status == 5){
                                     _this.unavailableText = '已下线';
-                                }else{
-                                    _this.campaignAvailable = true;
                                 }
                             }
                         });
@@ -389,16 +389,18 @@
                 this.showDownloadApp = false;
             },
             redirectToApp : function(){
-                window.location.href = '/staticPage/campaignRedirect.html';
+                window.location.href = '/staticPage/campaignRedirect.html' + '?path='+window.location.pathname;
             },
             checkTimesLeft : function(){
                 var _this = this;
-                config.ajaxGet(config.baseURI, ':8070/api/v2.3/campaign_status', {token:_this.token,_id:"<%- campaign._id %>"})
+                config.ajaxGet('/api/v2.3/campaign_status', {token:_this.token,_id:"<%- campaign._id %>"})
                         .then(function(data){
                             if(data.code == 1000){
                                 if(data.times_left <= 0){
                                     _this.campaignAvailable = false;
                                     _this.unavailableText = '已参加';
+                                }else{
+                                    _this.campaignAvailable = true;
                                 }
                             }else if(data.code == 1401){
                                 _this.campaignAvailable = false;

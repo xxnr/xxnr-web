@@ -125,13 +125,13 @@
                 //出错情况下可以继续用户正常逻辑，可设置一个默认url.
             }
         });
-        config.ajaxGet(config.baseURI, ':8070/api/v2.3/campaign_status', {_id:"<%- campaign._id %>"})
+        config.ajaxGet('/api/v2.3/campaign_status', {_id:"<%- campaign._id %>"})
             .then(function(data){
                 if(data.code == 1000){
                     if(data.status == 3){
                         if(jsObj.isLogin()){
                             var appToken = jsObj.getToken();
-                            config.ajaxGet(config.baseURI, ':8070/api/v2.3/campaign_status', {token:appToken,_id:"<%- campaign._id %>"})
+                            config.ajaxGet('/api/v2.3/campaign_status', {token:appToken,_id:"<%- campaign._id %>"})
                                     .then(function(data){
                                       if(data.times_left >= 1){
                                           $('.red_packet--btn').attr('src','/images/campaign/event/button（has-not）.png');

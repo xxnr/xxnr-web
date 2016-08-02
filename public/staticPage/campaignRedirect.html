@@ -6,7 +6,7 @@
     <style>
         body, div, dl, dt, dd, ul, ol, li, h1, h2, h3, h4, h5, h6, input, button, textarea, p, blockquote, th, td, span, a {margin: 0;padding: 0;  }
         .campaign_mask {position: fixed;width: 100%;height: 100%;background: #FFFFFF;top:0;z-index: 200;color:#323232;padding-top: 70px;padding-left: 30px;padding-right: 30px;box-sizing: border-box;font-size: 4.5vw;}
-        .campaign_mask p {margin-bottom: 6px}
+        .campaign_mask p {margin-bottom: 6px;font-size: 34px; }
         .campaign_mask--signature {float: right;}
     </style>
 </head>
@@ -26,13 +26,20 @@
 </div>
 <script src="/js/zepto.js"></script>
 <script type="text/javascript">
+    function getUrlParam(name) {
+        var param = window.location.href.match(new RegExp("[\?\&]" + name + "=([^\&]+)", "i"));
+        if(!param) {
+            return false;
+        }
+        return param[1];
+    }
     var params = {
         inapp_data :{
             activity : "CampaignDetailActivity",
             params : [
                 {
                     key: 'url',
-                    value : window.location.pathname
+                    value : getUrlParam('path')
                 }
             ]
         }

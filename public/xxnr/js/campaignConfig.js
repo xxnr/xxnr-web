@@ -5,16 +5,17 @@ var config = (function () {
     var configObj = {};
 
     //configObj.baseURI = 'http://101.200.194.203';
-    configObj.baseURI = 'http://192.168.1.15';
+    configObj.baseURI = '';
+    configObj.mobileBaseURI = 'http://192.168.1.15';
     //configObj.baseURI = 'http://mppe.xinxinnongren.com:8070';
-    configObj.ajaxGet = function (baseURI,apiURI,data) {
+    configObj.ajaxGet = function (apiURI,data) {
         var deferred = $.Deferred();
-        var _baseURI = baseURI?baseURI:'';
+        //var _baseURI = baseURI?baseURI:'';
         var _apiURI = apiURI?apiURI:'';
-        var getURI = _baseURI + _apiURI;
+        //var getURI = _baseURI + _apiURI;
         $.ajax({
             type:"GET",
-            url: getURI,
+            url: _apiURI,
             data:data,
             success:function(data) {
                 deferred.resolve(data);
@@ -26,14 +27,14 @@ var config = (function () {
 
         return deferred.promise();
     };
-    configObj.ajaxPost = function (baseURI,apiURI,data) {
+    configObj.ajaxPost = function (apiURI,data) {
         var deferred = $.Deferred();
-        var _baseURI = baseURI?baseURI:'';
+        //var _baseURI = baseURI?baseURI:'';
         var _apiURI = apiURI?apiURI:'';
-        var getURI = _baseURI + _apiURI;
+        //var getURI = _baseURI + _apiURI;
         $.ajax({
             type:"POST",
-            url: getURI,
+            url: _apiURI,
             data: JSON.stringify(data),
             contentType: 'application/json',
             success:function(data) {
