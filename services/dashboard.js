@@ -420,7 +420,7 @@ DashboardService.prototype.generateAgentReport = function(dateMinus, callback){
                         })
                     }),
                     new Promise(function(resolve, reject){
-                        getCompletedOrderCountByAgent(endTime, agent._id, function(err, count){
+                        getCompletedOrderCountByAgent(endTime.format('yyyyMMdd'), agent._id, function(err, count){
                             if(err){
                                 reject(err);
                                 return;
@@ -431,7 +431,7 @@ DashboardService.prototype.generateAgentReport = function(dateMinus, callback){
                         })
                     }),
                     new Promise(function(resolve, reject){
-                        getOrderPaidAmountByAgent(endTime, agent._id, function(err, count){
+                        getOrderPaidAmountByAgent(endTime.format('yyyyMMdd'), agent._id, function(err, count){
                             if(err){
                                 reject(err);
                                 return;
@@ -442,7 +442,7 @@ DashboardService.prototype.generateAgentReport = function(dateMinus, callback){
                         })
                     })
                     , new Promise(function(resolve, reject){
-                        getCompletedOrderPaidAmountByAgent(endTime, agent._id, function(err, count){
+                        getCompletedOrderPaidAmountByAgent(endTime.format('yyyyMMdd'), agent._id, function(err, count){
                             if(err){
                                 reject(err);
                                 return;

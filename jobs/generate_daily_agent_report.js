@@ -9,6 +9,7 @@ var utils = require('../common/utils');
 const millisecondsInDay = 24*60*60*1000;
 const concurrency = 20;
 
+console.log('[', new Date(), '] Start generating daily agent reports...');
 ReportUpdateTimeModel.findOne({}, function(err, updateTime){
     var lastModifyTime = new Date(config.serviceStartTime).getTime();
     if(updateTime && updateTime.dailyAgentReport) {
@@ -43,12 +44,11 @@ ReportUpdateTimeModel.findOne({}, function(err, updateTime){
                     // all finished
                     ReportUpdateTimeModel.update({}, {$set: {dailyAgentReport: new Date()}}, {upsert: true}, function (err, numAffected) {
                         if (err) {
-                            reject(err);
-                            return;
+                            console.log('[', new Date(), '] generate daily agent report ReportUpdateTime fail:', err);
+                        } else {
+                            console.log('[', new Date(), '] generate daily agent report job success. ', recordedCount, 'days recorded');
                         }
-
-                        console.log('[', new Date(), '] generate daily agent report job success. ', recordedCount, 'days recorded');
-                        process.exit(0);
+                        require('./update_daily_agent_values_by_orders.js');
                     });
                 }
             })

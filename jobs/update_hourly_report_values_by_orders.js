@@ -12,6 +12,7 @@ var PAYMENTSTATUS = require('../common/defs').PAYMENTSTATUS;
 var DELIVERSTATUS = require('../common/defs').DELIVERSTATUS;
 var moment = require('moment');
 
+console.log('[', new Date(), '] Start update hourly reports values...');
 UserService.getTestAccountList(function(err, testAccountList) {
     if (err) {
         console.error('Finding get test account list err:', err);
@@ -79,7 +80,7 @@ UserService.getTestAccountList(function(err, testAccountList) {
 					console.error('[', new Date(), '] update other hourly reports job fail:', err);
 					process.exit(0);
 				}
-				console.log('All Hourly Report Update End...');
+				console.log('[', new Date(), '] All Hourly Report Update End...');
 			});
 	    })
 	    .catch(function (err, hourInBeijingTime, hourlyReport) {

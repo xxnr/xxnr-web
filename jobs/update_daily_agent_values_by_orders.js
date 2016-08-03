@@ -13,6 +13,7 @@ var PAYMENTSTATUS = require('../common/defs').PAYMENTSTATUS;
 var DELIVERSTATUS = require('../common/defs').DELIVERSTATUS;
 var moment = require('moment');
 
+console.log('[', new Date(), '] Start update daily agent reports values by orders...');
 UserService.getTestAccountList(function(err, testAccountList) {
     if (err) {
         console.error('Finding get test account list err:', err);
@@ -132,7 +133,8 @@ UserService.getTestAccountList(function(err, testAccountList) {
 				}
 				Promise.all(promises)
 				.then(function () {
-					console.log('All AgentReport Update End...');
+					console.log('[', new Date(), '] All AgentReport Update End...');
+					require('./generate_agent_report.js');
 				})
 				.catch(function (err, agentId) {
 					console.error('[', new Date(), '] update other daily agent reports job fail:', err, 'agentId:', agentId);
