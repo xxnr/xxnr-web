@@ -792,7 +792,7 @@ LoyaltyPointsService.prototype.queryGiftOrders = function(buyerId, RSC, type, ti
                 callback(null, logs||[], count, pageCount);
         });
     });
-}
+};
 
 LoyaltyPointsService.prototype.convertGift = function(gift) {
 	if (gift) {

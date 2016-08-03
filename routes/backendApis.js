@@ -131,4 +131,15 @@ router.post(F.config['manager-url']+'/api/backend/users', middleware.backend_aut
 router.post(F.config['manager-url']+'/api/backend/user/password/modify',middleware.backend_auth, middleware.auditing_middleware, controllers.Manager.process_modify_password);
 router.post(F.config['manager-url']+'/api/backend/user/create', middleware.backend_auth, middleware.auditing_middleware, controllers.Manager.process_createUser);
 
+// campaign
+// framework
+router.post(F.config.manager_url+'/api/campaign/create', middleware.backend_auth, controllers.Manager.create_campaign);
+router.post(F.config.manager_url+'/api/campaign/modify', middleware.backend_auth, controllers.Manager.modify_campaign);
+router.get(F.config.manager_url+'/api/campaigns', middleware.backend_auth, controllers.Manager.query_campaign);
+router.post(F.config.manager_url+'/api/campaign/offline', middleware.backend_auth, controllers.Manager.offline_campaign);
+router.get(F.config.manager_url+'/api/campaign', middleware.backend_auth, controllers.Manager.get_campaign);
+// quiz
+router.post(F.config.manager_url+'/api/campaign/quiz/modify_right_answer', middleware.backend_auth, controllers.Manager.modify_quiz_right_answer);
+router.post(F.config.manager_url+'/api/campaign/quiz/trigger_reward', middleware.backend_auth, controllers.Manager.trigger_quiz_reward);
+
 module.exports = router;

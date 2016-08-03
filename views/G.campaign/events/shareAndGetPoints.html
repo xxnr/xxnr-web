@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title><%- campaign.title %></title>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=10" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=0.5, maximum-scale=2.0, user-scalable=yes" />
+    <meta name="robots" content="all,follow" />
+    <style>
+        body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,input,button,textarea,p,blockquote,th,td,span,a { margin: 0; padding: 0; }
+        /*html,body{min-height: 100%}*/
+        * {
+            -webkit-text-size-adjust: none;
+        }
+        html{background: #FFF2AD;}
+        img { border: none; }
+        li { list-style: none; }
+        table { border-collapse: collapse; border-spacing: 0; }
+        a:hover { text-decoration: none; }
+        a { text-decoration: none; }
+        body { background-color: white; font-family: "微软雅黑","Microsoft YaHei","Helvetica Neue",Helvetica,Arial,sans-serif;height: 100% }
+        .clearfix:before, .clearfix:after {  content: " "; /* 1 */  display: table; /* 2 */  }
+        .clearfix:after {  clear: both;  }
+        .container { margin: 0 auto;width: 100%;background: #FFF2AD;height: 100%}
+        .title_image {text-align: center;}
+        .title_image img{width: 100%}
+        .red_packet {width: 100%;position: relative;margin-top: 20px;}
+        .red_packet--text{ width: 100%;position: absolute;padding-top: 20px;font-size: 4vw;color:#ED9200}
+        .red_packet--image_body {width: 75%;margin: auto;display: block;}
+        .red_packet--btn {width: 45%;margin: auto;display: block;position: absolute;margin-top: -53px;margin-left: 28%;}
+        .red_packet--title {text-align: center;}
+        .red_packet--info {text-align: center;font-size: 4.5vw;padding-top: 2px;}
+        .red_packet--info span{font-size: 6vw;color: #E94935}
+        .event_rule {width: 100%;padding-top: 40px;position: relative}
+        .event_rule img{width: 90%;display: block;margin: auto}
+        .event_rule--title {position: absolute;width: 100%;text-align: center;color: #FDE905;font-size: 4vw;padding-top: 2px;}
+        .event_rule--info {position: absolute;margin-top: 10%;font-size: 2.4vw;text-align: center;width: 100%;color: #280505;box-sizing: border-box;padding-left: 7%;padding-right: 7%;}
+        .event_rule--info p{margin-bottom: 10px}
+        .event_rule--info span{color: #FF6600;font-size: 4vw;padding-right: 10px}
+        .event_rule--comment {font-size: 10px;text-align: left;padding: 10px;padding-left: 6%;padding-right: 20px;display: block;margin: auto}
+        .event_info {width: 100%;position: relative;background: url('/images/campaign/event/backgroundimg2.png') no-repeat;background-position: center top;background-size: 90% 100%;padding-bottom: 40px;}
+        .event_info img{width: 90%;display: block;margin: auto;}
+        .event_info--text {width: 80%;display: block;margin-left: 10%;margin-top: 20px;color: #280505;font-size: 3.2vw}
+        .event_info--text--title {font-size: 4vw;color:#FF6600;margin-bottom: 16px;}
+        .event_info--text p {margin-top: 10px;}
+        .event_info--comment {margin-left: 6%;margin-bottom: 60px;margin-top: 30px;font-size: 12px;}
+        #test1{ background:red;height: 200px;width: 100px}
+        #test2{ background:blue;height: 200px;width: 100px}
+    </style>
+</head>
+
+<body>
+<div style='margin:0 auto;width:0px;height:0px;overflow:hidden;'>
+    <img src="<% campaign.share_image %>" width='700'>
+</div>
+<div class="container">
+    <div class="title_image">
+        <img src="/images/campaign/event/activity_banner2.png" alt="">
+    </div>
+    <div class="red_packet">
+        <div class="red_packet--text">
+            <p class="red_packet--title">推荐新新农人给好友</p>
+            <p class="red_packet--info">领<span>30</span>积分</p>
+        </div>
+        <img class="red_packet--image_body" src="/images/campaign/event/red-packet.png" alt="">
+        <img class="red_packet--btn" src="" alt="">
+    </div>
+    <div class="event_rule">
+        <p class="event_rule--title">更多抢积分的姿势</p>
+        <div class="event_rule--info">
+            <p><span>分享活动</span>可分享的活动页面,首次分享成功可得5积分</p>
+            <p><span>分享资讯</span>每个资讯详情页面,首次分享成功可得3积分</p>
+        </div>
+        <img src="/images/campaign/event/backgroundimg1.png" alt="">
+        <p class="event_rule--comment">看这里！以上方式,登录且分享成功后立即选择返回新新农人,才能拿到积分呦</p>
+    </div>
+    <div class="event_info clearfix">
+        <div class="event_info--text">
+            <p class="event_info--text--title">活动说明</p>
+
+            <p>活动范围：所有注册用户</p>
+            <p>活动时间：2016-07-15~2016-08-15</p>
+            <p>活动规则：</p>
+            <p>1. 活动需在安卓APP（版本2.3.2及以上）上登录后参与，登录后分享获得积分；未登录的分享不能获得积分</p>
+            <p>2. 分享成功后需要返回APP，才能获得积分奖励；分享不区分微信、朋友圈、QQ、QQ空间</p>
+            <p>3. 推荐APP给好友活动，每个用户可分享1次，分享成功后获得50积分</p>
+            <p>4. 日常资讯、活动，每个用户可分享1次，分享成功后根据分享内容获得相应积分</p>
+            <p>5. 可通过新新农人安卓APP或手机端网站查看积分记录（积分商城-我的积分）</p>
+        </div>
+    </div>
+    <p class="event_info--comment"><img src="/images/campaign/event/--.png" alt="">新新农人保留对本活动的最终解释权</p>
+</div>
+
+<script src="/js/zepto.js"></script>
+<script src="/js/campaignConfig.js"></script>
+<script  type="text/javascript">
+    var campaign = <%- JSON.stringify(campaign) %>;
+    var title = campaign.title;
+    var _id = campaign._id;
+    var share_title = campaign.share_title;
+    var share_url = campaign.share_url;
+    var share_abstract = campaign.share_abstract;
+    var share_image = campaign.share_image;
+
+    $(function() {
+        var deepshareUrl;
+        $.ajax({
+            type:"POST",
+            url: 'https://fds.so/v2/url/c8c3c0850ecb8d07',
+            data: JSON.stringify({
+                "inapp_data":
+                {
+                    "activity":"GoodsDetailActivity",
+                    "key":"goodId",
+                    "value":"4597374de4"
+                }
+            }),
+            xhrFields: {withCredentials: true},
+            success: function(result) {
+                //deepshareUrl为所生成的DeepShare Link
+                deepshareUrl = result.url;
+            },
+            error: function() {
+                //出错情况下可以继续用户正常逻辑，可设置一个默认url.
+            }
+        });
+        config.ajaxGet('/api/v2.3/campaign_status', {_id:"<%- campaign._id %>"})
+            .then(function(data){
+                if(data.code == 1000){
+                    if(data.status == 3){
+                        if(jsObj.isLogin()){
+                            var appToken = jsObj.getToken();
+                            config.ajaxGet('/api/v2.3/campaign_status', {token:appToken,_id:"<%- campaign._id %>"})
+                                    .then(function(data){
+                                      if(data.times_left >= 1){
+                                          $('.red_packet--btn').attr('src','/images/campaign/event/button（has-not）.png');
+                                          $('.red_packet--btn').on('click', function(){
+                                              jsObj.shareUrl('http://m.xinxinnongren.com');
+                                          });
+                                      }else if(data.times_left == 0){
+                                          $('.red_packet--btn').attr('src','/images/campaign/event/button（share-）-.png');
+                                      }
+                                    })
+                        }else{
+                            $('.red_packet--btn').attr('src','/images/campaign/event/button（not）-.png');
+                            $('.red_packet--btn').on('click', function(){
+                                jsObj.toLogin();
+                            })
+                        }
+                    }else if(data.status == 1){
+                        $('.red_packet--btn').attr('src','/images/campaign/event/activity_online.png');
+                    }else if(data.status == 2){
+                        $('.red_packet--btn').attr('src','/images/campaign/event/activity_begin.png');
+                    }else if(data.status == 4){
+                        $('.red_packet--btn').attr('src','/images/campaign/event/has-ended.png');
+                    }else if(data.status == 5){
+                        $('.red_packet--btn').attr('src','/images/campaign/event/activity_offline-.png');
+                    }
+                }
+            });
+    });
+</script>
+
+</body>
+</html>

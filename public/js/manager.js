@@ -295,6 +295,46 @@ jRouting.route(managerurl + '/rewardshop/points-logs', function(){
 	redirectToHomePage();
 });
 
+jRouting.route(managerurl + '/campaign', function(){
+	if(can('campaigns')) {
+		navClass('campaigns');
+		SET('common.page', 'campaigns');
+		return;
+	}
+
+	redirectToHomePage();
+});
+
+jRouting.route(managerurl + '/campaign/detail', function(){
+	if(can('campaigns')) {
+		navClass('campaigns');
+		SET('common.page', 'campaign-detail');
+		return;
+	}
+
+	redirectToHomePage();
+});
+
+jRouting.route(managerurl + '/campaign/detail/QA', function(){
+	if(can('campaigns')) {
+		navClass('campaigns');
+		SET('common.page', 'campaign-detail-QA');
+		return;
+	}
+
+	redirectToHomePage();
+});
+
+jRouting.route(managerurl + '/campaign/detail/quiz', function(){
+	if(can('campaigns')) {
+		navClass('campaigns');
+		SET('common.page', 'campaign-detail-quiz');
+		return;
+	}
+
+	redirectToHomePage();
+});
+
 // jRouting.on('location', function(url) {
 // 	// var nav = $('nav');
 // 	// nav.find('.selected').removeClass('selected');
