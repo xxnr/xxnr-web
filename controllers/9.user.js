@@ -18,6 +18,7 @@ var LoyaltypointService = services.loyaltypoint;
 var REG_MOBILE = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|Tablet|IOS/i;
 var config = require('../config');
 var Global = require('../global.js');
+var LOYALTYPOINTSTYPE = require('../common/defs').LOYALTYPOINTSTYPE;
 
 exports.install = function() {
 	// LOGIN
@@ -663,7 +664,7 @@ exports.json_user_modify = function(req, res, next) {
                         UserService.update({userid:req.data.userId, isUserInfoFullFilled: true}, function (err, data) {
                             // UserService.increaseScore({userid: req.data.userId, score: config.user_info_full_filled_point_add}, function (err) {
                             var points = config.user_info_full_filled_point_add;
-                            LoyaltypointService.increase(old_user_info._id, points, 'ORGANIZINGINFO', null, null, function (err) {
+                            LoyaltypointService.increase(old_user_info._id, points, LOYALTYPOINTSTYPE.ORGANIZINGINFO, null, null, function (err) {
                                 var response = {'code': '1000', 'message': 'success'};
                                 if (!err) {
                                     response.scoreAdded = points;
@@ -1048,7 +1049,7 @@ exports.process_user_sign = function(req, res, next){
                 // UserService.increaseScore({userid:req.data.userId, score: config.user_sign_point_add}, function (err) {
                 var points = config.user_sign_point_add;
                 var description = beijingTimeNow.format('YYYY-MM-DD') + '签到';
-                LoyaltypointService.increase(user._id, points, 'SIGN', description, null, function (err, points, otherOptions) {
+                LoyaltypointService.increase(user._id, points, LOYALTYPOINTSTYPE.SIGN, description, null, function (err, points, otherOptions) {
                     if (err) {
                         // error happen,
                         // there are 2 cases of error: one is db operation error,

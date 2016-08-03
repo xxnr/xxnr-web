@@ -426,7 +426,7 @@ LoyaltyPointsService.prototype.addGiftOrder = function(addGiftOptions, callback)
             callback('LoyaltyPointsService addGiftOrder save err');
             return;
         }
-        self.increase(addGiftOptions.user._id, -giftInfo.points, 'EXCHANGE', giftInfo.name, giftOrderObj._id, function(err, points) {
+        self.increase(addGiftOptions.user._id, -giftInfo.points, LOYALTYPOINTSTYPE.EXCHANGE, giftInfo.name, giftOrderObj._id, function(err, points) {
             if (err) {
                 console.error('LoyaltyPointsService addGiftOrder increase err:', err);
                 callback('LoyaltyPointsService addGiftOrder increase err');
@@ -526,14 +526,14 @@ LoyaltyPointsService.prototype.updateGiftOrder = function(id, userId, deliverSta
  * LoyaltyPoints increase function
  * @param  {String}   user_id     user _id
  * @param  {Number}   points      points of increase
- * @param  {String}   type        the type of loyalty points increase
+ * @param  {Object}   loyaltypoints_type        the type of loyalty points increase
  * @param  {String}   description description of loyalty points increase
  * @param  {String}   ref_id 	  the ref _id (compaign _id, order _id and so on)
  * @param  {Function} callback    the callback function
  * @param  {Object}   obj         the point increase object (user and so on)
  * @return
  */
-LoyaltyPointsService.prototype.increase = function(user_id, points, type, description, ref_id, callback, obj) {
+LoyaltyPointsService.prototype.increase = function(user_id, points, loyaltypoints_type, description, ref_id, callback, obj) {
 	var self = this;
 	if (!user_id) {
         callback('user required');
@@ -548,7 +548,7 @@ LoyaltyPointsService.prototype.increase = function(user_id, points, type, descri
     var returnOptions = {};
     var values = {};
     // user sign points logic
-    if (type && type =='SIGN') {
+    if (loyaltypoints_type && loyaltypoints_type === LOYALTYPOINTSTYPE.SIGN) {
     	var beijingTimeNow = moment().tz('Asia/Shanghai');
     	var consecutiveTimes = 1;
     	var maxTimes = 5;
@@ -587,25 +587,25 @@ LoyaltyPointsService.prototype.increase = function(user_id, points, type, descri
         }
 
         callback(null, points, returnOptions);
-        self.saveLog(user_id, points, type, description, ref_id);
+        self.saveLog(user_id, points, loyaltypoints_type, description, ref_id);
     });
 };
 
 // save loyaltypoints logs
-LoyaltyPointsService.prototype.saveLog = function(user_id, points, type, description, ref_id) {
+LoyaltyPointsService.prototype.saveLog = function(user_id, points, loyaltypoints_type, description, ref_id) {
 	var log = {};
 	log.user = user_id;
 	log.points = points;
-	if (LOYALTYPOINTSTYPE && LOYALTYPOINTSTYPE[type]) {
+	if (loyaltypoints_type) {
 		log.event = {};
-		if (LOYALTYPOINTSTYPE[type].type) {
-			log.event.type = LOYALTYPOINTSTYPE[type].type;
+		if (loyaltypoints_type.type) {
+			log.event.type = loyaltypoints_type.type;
 		}
-		if (LOYALTYPOINTSTYPE[type].name) {
-			log.event.name = LOYALTYPOINTSTYPE[type].name;
+		if (loyaltypoints_type.name) {
+			log.event.name = loyaltypoints_type.name;
 		}
-		if (ref_id && LOYALTYPOINTSTYPE[type].refName) {
-			log.event[LOYALTYPOINTSTYPE[type].refName] = ref_id;
+		if (ref_id && loyaltypoints_type.refName) {
+			log.event[loyaltypoints_type.refName] = ref_id;
 		}
 	}
 	if (description) {
