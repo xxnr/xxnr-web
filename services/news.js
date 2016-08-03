@@ -138,7 +138,9 @@ NewsService.prototype.get = function(options, callback) {
         queryoptions.category = options.category;
     if (options.id)
         queryoptions.id = options.id;
-    NewsModel.findOne(queryoptions, function(err, doc){
+    NewsModel.findOne(queryoptions)
+        .select('-_id -__v')
+        .exec(function(err, doc){
         if(err){
             console.error(err);
             callback(err);

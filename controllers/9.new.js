@@ -25,16 +25,9 @@ exports.json_news_query = function(req, res, next) {
         }
 
         if (result && result.count && result.count > 0) {
-            var hosturl = req.hostname;
-            if (hosturl) {
-                hosturl = tools.getXXNRHost(hosturl);
-            } else {
-                hosturl = 'www.xinxinnongren.com';
-            }
-            var protocol = req.protocol + '://';
-            var prevurl = protocol + hosturl + '/news/';
-            var prevshareurl = protocol + hosturl + '/sharenews/';
-            var previmg = protocol + hosturl + '/images/original/';
+            var prevurl = req.url_prefix + '/news/';
+            var prevshareurl = req.url_prefix + '/sharenews/';
+            var previmg = req.url_prefix + '/images/original/';
             var imgtype = '.jpg';
             var items = result.items || [];
             var length = items.length || 0;
@@ -97,6 +90,18 @@ exports.json_news_read = function(req, res, next) {
             res.respond({'code': '1001', 'message': '查询资讯失败'});
             return;
         }
+        if (!result) {
+            res.respond({'code': '1001', 'message': '没有查询到资讯'});
+            return;
+        }
+        var prevurl = req.url_prefix + '/news/';
+        var prevshareurl = req.url_prefix + '/sharenews/';
+        var previmg = req.url_prefix + '/images/original/';
+        var imgtype = '.jpg';
+        result = result.toObject();
+        result.image = result.picture && result.picture !== '' ? previmg + result.picture + imgtype : '';
+        result.url = prevurl + result.id;
+        result.shareurl = prevshareurl + result.id;
         res.respond({'code': '1000', 'message': 'success', 'datas': result});
     });
 };
