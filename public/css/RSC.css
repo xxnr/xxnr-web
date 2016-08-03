@@ -400,7 +400,7 @@ select {
     }
 
     .rsc-sidebar-ul li {
-        width: 50%;
+        width: 33.33333333%;
         height: 35px;
         line-height: 35px;
         cursor: pointer;
@@ -452,7 +452,7 @@ select {
     }
 
     .rsc-sidebar-ul li {
-        width: 50%;
+        width: 33.33333333%;
         height: 35px;
         line-height: 35px;
         cursor: pointer;
