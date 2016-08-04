@@ -2092,7 +2092,7 @@ var user_share_news_check = function(req, res, next) {
                 if (log) {
                     var result = log.toObject();
                     delete result.__v;
-                    res.respond({code:1000, message:'此资讯已分享', result: log});
+                    res.respond({code:1000, message:'此资讯已分享', result: result});
                     return;
                 }
                 res.respond({code:1000, message:'此资讯还未分享'});
