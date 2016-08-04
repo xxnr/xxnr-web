@@ -304,7 +304,7 @@ exports.json_gift_order_query = function(req, res, next) {
 // get gift order detail
 exports.json_gift_order_detail = function(req, res, next) {
     var self = this;
-    LoyaltypointService.getGiftOrder(req.data.id, req.data.userId, null, function(err, giftorder) {
+    LoyaltypointService.getGiftOrder(req.data.orderId, req.data.userId, null, function(err, giftorder) {
         if (err) {
             res.respond({code:1002, message:'获取积分兑换记录失败'});
             return;
