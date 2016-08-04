@@ -38,7 +38,7 @@ IntentionProductService.prototype.query_with_brand = function(callback) {
         , {
             $group: {
                 _id: '$brand',
-                products: {$addToSet: '$name'}
+                products: {$addToSet: {name:'$name', _id:'$_id'}}
             }
         }
         , {
