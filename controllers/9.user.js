@@ -1,4 +1,5 @@
 var tools = require('../common/tools');
+var mongoose = require('mongoose');
 var NodeRSA = require('node-rsa');
 var fs = require('fs');
 var crypto = require('crypto');
@@ -15,6 +16,8 @@ var vCodeService = services.vCode;
 var IntentionProductService = services.intention_product;
 var PotentialCustomerService = services.potential_customer;
 var LoyaltypointService = services.loyaltypoint;
+var CampaignService = services.Campaign;
+var NewsService = services.news;
 var REG_MOBILE = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|Tablet|IOS/i;
 var config = require('../config');
 var Global = require('../global.js');
@@ -1924,5 +1927,187 @@ exports.process_userconsignees_save = function(req, res, next) {
         }
         res.respond({code:1000,message:'success'});
         return;
+    });
+};
+
+// user share
+exports.user_share = function(req, res, next) {
+    switch(req.data.type) {
+        case 'campaign':
+            user_share_campaign(req, res, next);
+            break;
+        case 'news':
+            user_share_news(req, res, next);
+            break;
+        default:
+            res.respond({code:1001, message:'没有找到要分享的类型'});
+            break;
+    }
+};
+
+var user_share_campaign = function(req, res, next) {
+    try {
+        var campaignId = mongoose.Types.ObjectId(req.data.id);
+    } catch(e) {
+        console.log('user share campaign user_share_campaign_check mongoose ObjectId err:', e);
+        res.respond({code:1001, message:'没有找到活动'});
+        return;
+    }
+    CampaignService.findById(campaignId, function(err, campaign) {
+        if (err || !campaign) {
+            res.respond({code:1001, message:'没有找到要分享的活动'});
+            return;
+        }
+        if (campaign.shareable) {
+            if (campaign.share_points_add) {
+                LoyaltypointService.getLog(null, req.user._id, LOYALTYPOINTSTYPE.SHARE, campaign._id, LOYALTYPOINTSTYPE.SHARE.refName[req.data.type] || 'campaign', function(err, log) {
+                    if (err) {
+                        console.error('user share campaign LoyaltypointService getLog err:', err);
+                        res.respond({code:1001, message:'添加积分失败'});
+                        return;
+                    }
+                    if (log) {
+                        res.respond({code:1001, message:'此活动已分享'});
+                        return;
+                    }
+                    LoyaltypointService.increase(req.user._id, campaign.share_points_add, LOYALTYPOINTSTYPE.SHARE, campaign.title, campaign._id, function(err, points) {
+                        if (err) {
+                            console.error('user share campaign LoyaltypointService increase err:', err);
+                            res.respond({code:1001, message:'添加积分失败'});
+                            return;
+                        }
+                        res.respond({code:1000, message:'添加积分成功', points:points});
+                        return;
+                    }, campaign, LOYALTYPOINTSTYPE.SHARE.refName[req.data.type] || 'campaign');
+                });
+            } else {
+                res.respond({code:1001, message:'活动分享不添加积分'});
+                return;
+            }
+        } else {
+            res.respond({code:1001, message:'活动不能分享'});
+            return;
+        }
+    });
+};
+
+var user_share_news = function(req, res, next) {
+    var options = {id: req.data.id, status: '2'};
+    NewsService.get(options, function(err, news) {
+        if (err || !news) {
+            res.respond({code:1001, message:'没有找到要分享的资讯'});
+            return;
+        }
+        if (LOYALTYPOINTSTYPE.SHARE.points) {
+            LoyaltypointService.getLog(null, req.user._id, LOYALTYPOINTSTYPE.SHARE, news._id, LOYALTYPOINTSTYPE.SHARE.refName[req.data.type] || 'news', function(err, log) {
+                if (err) {
+                    console.error('user share news LoyaltypointService getLog err:', err);
+                    res.respond({code:1001, message:'添加积分失败'});
+                    return;
+                }
+                if (log) {
+                    res.respond({code:1001, message:'此资讯已分享'});
+                    return;
+                }
+                LoyaltypointService.increase(req.user._id, LOYALTYPOINTSTYPE.SHARE.points, LOYALTYPOINTSTYPE.SHARE, news.title, news._id, function(err, points) {
+                    if (err) {
+                        console.error('user share news LoyaltypointService increase err:', err);
+                        res.respond({code:1001, message:'添加积分失败'});
+                        return;
+                    }
+                    res.respond({code:1000, message:'添加积分成功', points:points});
+                    return;
+                }, news, LOYALTYPOINTSTYPE.SHARE.refName[req.data.type] || 'news');
+            });
+        } else {
+            res.respond({code:1001, message:'资讯分享不添加积分'});
+            return;
+        }
+    });
+};
+
+// user share check
+exports.user_share_check = function(req, res, next) {
+    switch(req.data.type) {
+        case 'campaign':
+            user_share_campaign_check(req, res, next);
+            break;
+        case 'news':
+            user_share_news_check(req, res, next);
+            break;
+        default:
+            res.respond({code:1001, message:'没有找到要分享的类型'});
+            break;
+    }
+};
+
+var user_share_campaign_check = function(req, res, next) {
+    try {
+        var campaignId = mongoose.Types.ObjectId(req.data.id);
+    } catch(e) {
+        console.log('user share campaign user_share_campaign_check mongoose ObjectId err:', e);
+        res.respond({code:1001, message:'没有找到活动'});
+        return;
+    }
+    CampaignService.findById(campaignId, function(err, campaign) {
+        if (err || !campaign) {
+            res.respond({code:1001, message:'没有找到活动'});
+            return;
+        }
+        if (campaign.shareable) {
+            if (campaign.share_points_add) {
+                LoyaltypointService.getLog(null, req.user._id, LOYALTYPOINTSTYPE.SHARE, campaign._id, LOYALTYPOINTSTYPE.SHARE.refName[req.data.type] || 'campaign', function(err, log) {
+                    if (err) {
+                        console.error('user share campaign LoyaltypointService getLog err:', err);
+                        res.respond({code:1001, message:'查找分享记录失败'});
+                        return;
+                    }
+                    if (log) {
+                        var result = log.toObject();
+                        delete result.__v;
+                        res.respond({code:1000, message:'此活动已分享', result: result});
+                        return;
+                    }
+                    res.respond({code:1000, message:'此活动还未分享'});
+                    return;
+                });
+            } else {
+                res.respond({code:1001, message:'活动分享不添加积分'});
+                return;
+            }
+        } else {
+            res.respond({code:1001, message:'活动不能分享'});
+            return;
+        }
+    });
+};
+
+var user_share_news_check = function(req, res, next) {
+    var options = {id: req.data.id, status: '2'};
+    NewsService.get(options, function(err, news) {
+        if (err || !news) {
+            res.respond({code:1001, message:'没有找到资讯'});
+            return;
+        }
+        if (LOYALTYPOINTSTYPE.SHARE.points) {
+            LoyaltypointService.getLog(null, req.user._id, LOYALTYPOINTSTYPE.SHARE, news._id, LOYALTYPOINTSTYPE.SHARE.refName[req.data.type] || 'news', function(err, log) {
+                if (err) {
+                    console.error('user share news LoyaltypointService getLog err:', err);
+                    res.respond({code:1001, message:'查找分享记录失败'});
+                    return;
+                }
+                if (log) {
+                    var result = log.toObject();
+                    delete result.__v;
+                    res.respond({code:1000, message:'此资讯已分享', result: log});
+                    return;
+                }
+                res.respond({code:1000, message:'此资讯还未分享'});
+                return;
+            });
+        } else {
+            res.respond({code:1001, message:'资讯分享不添加积分'});
+            return;
+        }
     });
 };

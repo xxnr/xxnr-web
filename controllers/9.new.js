@@ -102,6 +102,7 @@ exports.json_news_read = function(req, res, next) {
         result.image = result.picture && result.picture !== '' ? previmg + result.picture + imgtype : '';
         result.url = prevurl + result.id;
         result.shareurl = prevshareurl + result.id;
+        delete result._id;
         res.respond({'code': '1000', 'message': 'success', 'datas': result});
     });
 };

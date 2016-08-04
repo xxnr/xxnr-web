@@ -23,6 +23,7 @@ LoyaltyPointsLogsSchema.index({"date":-1});
 LoyaltyPointsLogsSchema.index({"event.type":1, "date":-1});
 LoyaltyPointsLogsSchema.index({"user":1, "points":1, "date":-1});
 LoyaltyPointsLogsSchema.index({"points":1, "date":-1});
+LoyaltyPointsLogsSchema.index({"user":1, "event.type":1, "event.order":1, "event.giftOrder":1, "event.campaign":1, "event.news":1});
 
 mongoose.model("loyalty_points_logs", LoyaltyPointsLogsSchema);
 
