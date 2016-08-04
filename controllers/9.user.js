@@ -18,6 +18,7 @@ var LoyaltypointService = services.loyaltypoint;
 var REG_MOBILE = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|Tablet|IOS/i;
 var config = require('../config');
 var Global = require('../global.js');
+var LOYALTYPOINTSTYPE = require('../common/defs').LOYALTYPOINTSTYPE;
 
 exports.install = function() {
 	// LOGIN
@@ -663,7 +664,7 @@ exports.json_user_modify = function(req, res, next) {
                         UserService.update({userid:req.data.userId, isUserInfoFullFilled: true}, function (err, data) {
                             // UserService.increaseScore({userid: req.data.userId, score: config.user_info_full_filled_point_add}, function (err) {
                             var points = config.user_info_full_filled_point_add;
-                            LoyaltypointService.increase(old_user_info._id, points, 'ORGANIZINGINFO', null, null, function (err) {
+                            LoyaltypointService.increase(old_user_info._id, points, LOYALTYPOINTSTYPE.ORGANIZINGINFO, null, null, function (err) {
                                 var response = {'code': '1000', 'message': 'success'};
                                 if (!err) {
                                     response.scoreAdded = points;
@@ -1048,7 +1049,7 @@ exports.process_user_sign = function(req, res, next){
                 // UserService.increaseScore({userid:req.data.userId, score: config.user_sign_point_add}, function (err) {
                 var points = config.user_sign_point_add;
                 var description = beijingTimeNow.format('YYYY-MM-DD') + '签到';
-                LoyaltypointService.increase(user._id, points, 'SIGN', description, null, function (err, points, otherOptions) {
+                LoyaltypointService.increase(user._id, points, LOYALTYPOINTSTYPE.SIGN, description, null, function (err, points, otherOptions) {
                     if (err) {
                         // error happen,
                         // there are 2 cases of error: one is db operation error,
@@ -1761,6 +1762,24 @@ exports.json_intention_products = function(req, res, next){
         });
 
         res.respond({code:1000, message:'success', intentionProducts:products});
+    })
+};
+
+exports.json_intention_products_with_brand = function(req, res, next){
+    IntentionProductService.query_with_brand(function(err, brands){
+        if(err){
+            res.respond({code:1001, message:'获取意向商品列表失败'});
+            return;
+        }
+
+        brands.sort(function(a, b){
+            if(a=='其他')
+                return 1;
+            else
+                return -1;
+        });
+
+        res.respond({code:1000, message:'success', intentionProducts:brands});
     })
 };
 

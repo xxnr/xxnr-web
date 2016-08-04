@@ -3,7 +3,8 @@
  */
 var fs = require('fs');
 var IntentionProductService = require('../services/intention_product');
-module.exports = function(done) {
+var ProductModel = require('../models').product;
+var deploy = function(done) {
     fs.readFile(__dirname + '/intention_products.txt', function (err, content) {
         if (err) {
             console.log(err);
@@ -24,15 +25,32 @@ module.exports = function(done) {
                 }
 
                 var name = fields[0].trim();
-                IntentionProductService.save(name, function (err) {
-                    if (err) {
-                        reject(err);
-                        return;
-                    }
+                ProductModel.findOne({name:{$regex:new RegExp(name)}})
+                    .populate('brand')
+                    .exec(function(err, product){
+                        if(err){
+                            reject(err);
+                            return;
+                        }
 
-                    //console.log(name, 'saved');
-                    resolve();
-                });
+                        var brand = '其他';
+                        var productRef = null;
+                        var brandRef = null;
+                        if(product) {
+                            brand = product.brand.name;
+                            productRef = product._id;
+                            brandRef = product.brand._id;
+                        }
+                        IntentionProductService.save(name, brand, productRef, brandRef, function (err) {
+                            if (err) {
+                                reject(err);
+                                return;
+                            }
+
+                            //console.log(name, 'saved');
+                            resolve();
+                        });
+                })
             });
         });
 
@@ -43,9 +61,15 @@ module.exports = function(done) {
                 done()
             })
             .catch(function (err) {
-                console.log(err);
+                console.error(err);
                 //process.exit(1);
                 done(err);
             })
     });
 };
+
+module.exports =  deploy;
+
+//deploy(function(err){
+//    process.exit(0);
+//});

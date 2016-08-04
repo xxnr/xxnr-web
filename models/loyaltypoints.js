@@ -12,7 +12,9 @@ var LoyaltyPointsLogsSchema = new mongoose.Schema({
         "name": {type:String},												// 事件名
         "type": {type:Number}, 												// 事件类型
         "order": {type: mongoose.Schema.ObjectId, ref: 'order'},			// 获取积分的相关订单
-        "gift": {type: mongoose.Schema.ObjectId, ref: 'rewardshopgift'}		// 积分兑换的礼品
+        "giftOrder": {type: mongoose.Schema.ObjectId, ref: 'rewardshopgiftorder'},	// 积分兑换的礼品订单
+        "campaign": {type: mongoose.Schema.ObjectId, ref: 'campaign'},		// 获取积分的相关活动
+        "news": {type: mongoose.Schema.ObjectId, ref: 'news'}				// 获取积分的相关资讯
     },
     "description": {type:String}											// 描述
 });
@@ -106,5 +108,6 @@ RewardshopGiftOrderSchema.index({dateCreated: -1});
 RewardshopGiftOrderSchema.index({buyerId: 1, dateCreated: -1});
 RewardshopGiftOrderSchema.index({'RSCInfo.RSC': 1, dateCreated: -1});
 RewardshopGiftOrderSchema.index({deliverStatus: 1, buyerId: 1, 'RSCInfo.RSC': 1, dateCreated: -1});
+RewardshopGiftOrderSchema.index({id: 1, buyerId: 1, 'RSCInfo.RSC': 1, dateCreated: -1});
 
 mongoose.model('rewardshopgiftorder', RewardshopGiftOrderSchema);
