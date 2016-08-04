@@ -8,6 +8,7 @@ var PAYTYPE = require('../common/defs').PAYTYPE;
 var SUBORDERTYPE = require('../common/defs').SUBORDERTYPE;
 var SUBORDERTYPEKEYS = require('../common/defs').SUBORDERTYPEKEYS;
 var DELIVERYTYPENAME = require('../common/defs').DELIVERYTYPENAME;
+var LOYALTYPOINTSTYPE = require('../common/defs').LOYALTYPOINTSTYPE;
 var OrderModel = require('../models').order;
 var UseOrdersNumberModel = require('../models').userordersnumber;
 var UserModel = require('../models').user;
@@ -756,7 +757,7 @@ OrderService.prototype.updateSKUs = function(options, callback) {
 				}
 				// 订单完成 加积分
 				if (parseInt(order.deliverStatus) === DELIVERSTATUS.RECEIVED && order.deliverStatus != order_oldDeliverStatus && !order.isRewardPoint) {
-					self.increaseLoyaltyPointsbyOrder(order, 'ORDERCOMPLETED');
+					self.increaseLoyaltyPointsbyOrder(order, LOYALTYPOINTSTYPE.ORDERCOMPLETED);
 				}
 			});
 		} else {
@@ -1038,7 +1039,7 @@ OrderService.prototype.confirm = function(orderId, SKURefs, callback) {
 			}
 			// 订单完成 加积分
 			if (allConfirmed && !order.isRewardPoint) {
-				self.increaseLoyaltyPointsbyOrder(order, 'ORDERCOMPLETED');
+				self.increaseLoyaltyPointsbyOrder(order, LOYALTYPOINTSTYPE.ORDERCOMPLETED);
 			}
 		});
 	});

@@ -170,6 +170,7 @@ router.get('/api/v2.1/potentialCustomer/query', middleware.isLoggedIn_middleware
 router.get('/api/v2.1/potentialCustomer/queryAllOrderbyName', middleware.isLoggedIn_middleware, middleware.isXXNRAgent_middleware, controllers.User.json_potential_customer_orderby_namePinyin);
 router.get('/api/v2.1/potentialCustomer/isLatest', middleware.isLoggedIn_middleware, middleware.isXXNRAgent_middleware, controllers.User.json_potential_customer_islatest);
 router.get('/api/v2.1/potentialCustomer/get', middleware.isLoggedIn_middleware, middleware.isXXNRAgent_middleware, controllers.User.json_potential_customer_get);
+router.get('/api/v2.3/intentionProducts', controllers.User.json_intention_products_with_brand);
 
 // RSC related APIs
 router.get('/api/v2.2/RSC/info/get', middleware.isLoggedIn_middleware, controllers.RSC.json_RSC_info_get);
@@ -192,10 +193,11 @@ router.get('/api/v2.3/rewardshop/gifts/getGiftDetail', controllers.Rewardshop.js
 router.get('/api/v2.3/rewardshop/gifts', controllers.Rewardshop.json_rewardshop_gifts);
 router.post('/api/v2.3/rewardshop/addGiftOrder', middleware.isLoggedIn_middleware, controllers.Rewardshop.add_gift_order);
 router.get('/api/v2.3/rewardshop/getGiftOrderList', middleware.isLoggedIn_middleware, controllers.Rewardshop.json_gift_order_query);
+router.get('/api/v2.3/rewardshop/getGiftOrder', middleware.isLoggedIn_middleware, controllers.Rewardshop.json_gift_order_detail);
 router.get('/rewardshop/rules', controllers.Rewardshop.view_rewardshop_rules);
 // RSC rewardshop order
 router.get('/api/v2.3/RSC/rewardshop/getGiftOrderList', middleware.isLoggedIn_middleware, middleware.isRSC_middleware, controllers.Rewardshop.json_RSC_gift_order_query);
-router.post('/api/v2.3/RSC/rewardshop/order/selfDelivery', middleware.isLoggedIn_middleware, middleware.isRSC_middleware, controllers.Rewardshop.process_RSC_gift_order_self_delivery);
+router.post('/api/v2.3/RSC/rewardshop/order/selfDelivery', middleware.isLoggedIn_middleware, middleware.isRSC_middleware, middleware.throttle, controllers.Rewardshop.process_RSC_gift_order_self_delivery);
 
 
 // compatibility APIs

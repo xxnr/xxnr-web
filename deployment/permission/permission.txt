@@ -84,6 +84,7 @@
 /manager/api/agents/:_id, get, super_admin
 
 #rewardshop
+/manager/rewardshop/uploadImage, post, super_admin
 /manager/api/rewardshop/categories, get, super_admin
 /manager/api/rewardshop/gifts, get, super_admin
 /manager/api/rewardshop/gift/add, post, super_admin

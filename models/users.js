@@ -94,7 +94,11 @@ var PotentialCustomerSchema = new mongoose.Schema({
 });
 
 var IntentionProductSchema = new mongoose.Schema({
+    brand:{type:String, require:true},                   // 品牌名称
+    order:{type:String, require:true},
     name:{type:String, required:true},                   // 商品名称
+    productRef:{type:mongoose.Schema.ObjectId, ref:'product'},
+    brandRef:{type:mongoose.Schema.ObjectId, ref:'brand'},
     count:{type:Number, default:0}                      // 意向购买人数
 });
 
@@ -113,6 +117,7 @@ PotentialCustomerSchema.index({"dateTimeAdded":-1});
 PotentialCustomerSchema.index({"nameInitialType":1, "namePinyin":1});
 
 IntentionProductSchema.index({"name":1, unique:true});
+IntentionProductSchema.index({"order":1, unique:true});
 
 var UserLogSchema = new mongoose.Schema({id: String, account: String, ip: String, date: String, loginAgent: String});
 
