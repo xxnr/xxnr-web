@@ -599,22 +599,66 @@ CampaignService.prototype.trigger_quiz_reward = function(campaign_id, callback){
                                         }
                                     });
 
-                                    LoyaltypointService.increase(user.user, points_add, LOYALTYPOINTSTYPE.COMPAIGNREWARD, quizAnswers[i].campaign.title, quizAnswers[i].campaign._id, function (err) {
-                                        if(err){
-                                            console.error(err);
-                                            reject(err);
-                                            return;
-                                        }
-
-                                        self.record_reward(user.user, campaign_id, function (err) {
-                                            if(err){
+                                    if(points_add) {
+                                        LoyaltypointService.increase(user.user, points_add, LOYALTYPOINTSTYPE.COMPAIGNREWARD, quizAnswers[i].campaign.title, quizAnswers[i].campaign._id, function (err) {
+                                            if (err) {
                                                 console.error(err);
                                                 reject(err);
                                                 return;
                                             }
 
-                                            QuizAnswerModel.findOneAndUpdate({user:user.user, campaign:campaign_id}, {$set:{result:{has_result:true, points:points_add, right_answer_count:right_answer_count, date_time:new Date()}}}, function(err){
-                                                if(err){
+                                            self.record_reward(user.user, campaign_id, function (err) {
+                                                if (err) {
+                                                    console.error(err);
+                                                    reject(err);
+                                                    return;
+                                                }
+
+                                                QuizAnswerModel.findOneAndUpdate({
+                                                    user: user.user,
+                                                    campaign: campaign_id
+                                                }, {
+                                                    $set: {
+                                                        result: {
+                                                            has_result: true,
+                                                            points: points_add,
+                                                            right_answer_count: right_answer_count,
+                                                            date_time: new Date()
+                                                        }
+                                                    }
+                                                }, function (err) {
+                                                    if (err) {
+                                                        console.error(err);
+                                                        reject(err);
+                                                        return;
+                                                    }
+
+                                                    resolve();
+                                                })
+                                            })
+                                        })
+                                    } else{
+                                        self.record_reward(user.user, campaign_id, function (err) {
+                                            if (err) {
+                                                console.error(err);
+                                                reject(err);
+                                                return;
+                                            }
+
+                                            QuizAnswerModel.findOneAndUpdate({
+                                                user: user.user,
+                                                campaign: campaign_id
+                                            }, {
+                                                $set: {
+                                                    result: {
+                                                        has_result: true,
+                                                        points: points_add,
+                                                        right_answer_count: right_answer_count,
+                                                        date_time: new Date()
+                                                    }
+                                                }
+                                            }, function (err) {
+                                                if (err) {
                                                     console.error(err);
                                                     reject(err);
                                                     return;
@@ -623,7 +667,7 @@ CampaignService.prototype.trigger_quiz_reward = function(campaign_id, callback){
                                                 resolve();
                                             })
                                         })
-                                    })
+                                    }
                                 }))
                             }
 
