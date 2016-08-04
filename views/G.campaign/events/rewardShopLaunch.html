@@ -68,6 +68,8 @@
     var share_abstract = campaign.share_abstract;
     var share_image = campaign.share_image;
 
+    var wechart_basic_config = <%- JSON.stringify(wechart_basic_config) %>;
+
     $(function() {
         $('#page_jump').on('click', function(){
             jsObj.startActivity("RewardShopActivity");

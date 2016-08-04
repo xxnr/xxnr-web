@@ -94,8 +94,22 @@ var config = {
 
     //Android IOS app版本号
     nowIosVersion: '2.2.1',
-    nowAndroidVersion: '2.3.1'
+    nowAndroidVersion: '2.3.1',
 
+    wechart:{
+        require_token_url:{
+            protocol:'https:',
+            hostname:'api.weixin.qq.com',
+            path:'/cgi-bin/token'
+        },
+        require_jsapi_ticket_url:{
+            protocol:'https:',
+            hostname:'api.weixin.qq.com',
+            path:'/cgi-bin/ticket/getticket'
+        },
+        app_id:'wx5578c9a6a3c663ce',
+        app_secret:'84d8d32816609462c3f491472346c6ea'
+    }
 };
 
 module.exports = config;
