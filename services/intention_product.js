@@ -5,22 +5,16 @@ var IntentionProductModel = require('../models').intention_product;
 
 var IntentionProductService = function(){};
 
-IntentionProductService.prototype.save = function(name, callback){
-    var newIntentionProduct = new IntentionProductModel({name: name});
-    newIntentionProduct.save(function (err) {
+IntentionProductService.prototype.save = function(name, brand, productRef, brandRef, callback){
+    IntentionProductModel.update({name:name}, {$set:{name:name, brand:brand, productRef:productRef, brandRef:brandRef}}, {upsert:true}, function(err){
         if(err){
-            if(11000 == err.code){
-                callback();
-                return;
-            }
-
             console.error(err);
             callback(err);
             return;
         }
 
         callback();
-    });
+    })
 };
 
 IntentionProductService.prototype.query = function(callback, returnCount){
@@ -37,6 +31,32 @@ IntentionProductService.prototype.query = function(callback, returnCount){
 
         callback(null, products || []);
     })
+};
+
+IntentionProductService.prototype.query_with_brand = function(callback) {
+    IntentionProductModel.aggregate({$match: {}}
+        , {
+            $group: {
+                _id: '$brand',
+                products: {$addToSet: '$name'}
+            }
+        }
+        , {
+            $project: {
+                brand: '$_id',
+                _id: false,
+                products: 1
+            }
+        })
+        .exec(function (err, results) {
+            if (err) {
+                console.error(err);
+                callback(err);
+                return;
+            }
+
+            callback(null, results || []);
+        });
 };
 
 module.exports = new IntentionProductService();

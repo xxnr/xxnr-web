@@ -301,6 +301,22 @@ exports.json_gift_order_query = function(req, res, next) {
     });
 }
 
+// get gift order detail
+exports.json_gift_order_detail = function(req, res, next) {
+    var self = this;
+    LoyaltypointService.getGiftOrder(req.data.orderId, req.data.userId, null, function(err, giftorder) {
+        if (err) {
+            res.respond({code:1002, message:'获取积分兑换记录失败'});
+            return;
+        }
+        var result = giftorder.toObject();
+        result.orderStatus = LoyaltypointService.giftOrderStatus(result);
+        delete result._id;
+        delete result.__v;
+        res.respond({code:1000, message:'success', giftorder:result});
+    });
+}
+
 // RSC gift order
 exports.json_RSC_gift_order_query = function(req, res, next) {
     var self = this;
