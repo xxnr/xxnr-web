@@ -334,6 +334,7 @@ exports.get_app_share_info = function(req, res, next){
         }
         res.respond({
             code: 1000,
+            campaign_id: campaign._id,
             share_button: campaign.shareable && campaign.share_button,
             share_title: campaign.share_title,
             share_url: campaign.url,
