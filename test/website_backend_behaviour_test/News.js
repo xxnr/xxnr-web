@@ -80,8 +80,8 @@ describe('News', function(){
             }
         };
         var expected_news_detail_before_online = {
-            code:'1000',
-            datas:null
+            code:'1001',
+            message: '没有查询到资讯'
         };
         var expected_news_detail_after_online={
             code:'1000',
@@ -211,8 +211,8 @@ describe('News', function(){
             }
         };
         var expected_news_detail_after_delete = {
-            code:'1000',
-            datas:null
+            code:'1001',
+            message: '没有查询到资讯'
         };
         Routing.News.change_news_status(test_data.test_news.id, 2, test_data.test_news.category, backend_admin_token, function(body) {
             body.should.have.property('code', 1000);

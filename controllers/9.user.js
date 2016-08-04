@@ -1765,6 +1765,24 @@ exports.json_intention_products = function(req, res, next){
     })
 };
 
+exports.json_intention_products_with_brand = function(req, res, next){
+    IntentionProductService.query_with_brand(function(err, brands){
+        if(err){
+            res.respond({code:1001, message:'获取意向商品列表失败'});
+            return;
+        }
+
+        brands.sort(function(a, b){
+            if(a=='其他')
+                return 1;
+            else
+                return -1;
+        });
+
+        res.respond({code:1000, message:'success', intentionProducts:brands});
+    })
+};
+
 exports.json_potential_customer_available = function(req, res, next){
     if(!req.data.phone || !tools.isPhone(req.data.phone.toString())){
         res.respond({code:1001, message:'请填写正确的手机号'});

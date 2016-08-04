@@ -108,5 +108,6 @@ RewardshopGiftOrderSchema.index({dateCreated: -1});
 RewardshopGiftOrderSchema.index({buyerId: 1, dateCreated: -1});
 RewardshopGiftOrderSchema.index({'RSCInfo.RSC': 1, dateCreated: -1});
 RewardshopGiftOrderSchema.index({deliverStatus: 1, buyerId: 1, 'RSCInfo.RSC': 1, dateCreated: -1});
+RewardshopGiftOrderSchema.index({id: 1, buyerId: 1, 'RSCInfo.RSC': 1, dateCreated: -1});
 
 mongoose.model('rewardshopgiftorder', RewardshopGiftOrderSchema);

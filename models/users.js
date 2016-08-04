@@ -100,7 +100,10 @@ var PotentialCustomerSchema = new mongoose.Schema({
 });
 
 var IntentionProductSchema = new mongoose.Schema({
+    brand:{type:String, require:true},                   // 品牌名称
     name:{type:String, required:true},                   // 商品名称
+    productRef:{type:mongoose.Schema.ObjectId, ref:'product'},
+    brandRef:{type:mongoose.Schema.ObjectId, ref:'brand'},
     count:{type:Number, default:0}                      // 意向购买人数
 });
 
