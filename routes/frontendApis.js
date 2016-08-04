@@ -161,6 +161,9 @@ router.get('/api/v2.2/user/queryConsignees', middleware.isLoggedIn_middleware, c
 router.get('/api/v2.2/user/saveConsignees', middleware.isLoggedIn_middleware, controllers.User.process_userconsignees_save);
 router.post('/api/v2.2/user/saveConsignees', middleware.isLoggedIn_middleware, controllers.User.process_userconsignees_save);
 router.get('/api/v2.2/getOfflinePayType', controllers.Pay.json_offline_pay_type);
+// user share
+router.post('/api/v2.3/user/shareAddPoints', middleware.isLoggedIn_middleware, controllers.User.user_share);
+router.get('/api/v2.3/user/checkShareAddPoints', middleware.isLoggedIn_middleware, controllers.User.user_share_check);
 
 // potential customer/intention products related APIs
 router.get('/api/v2.1/intentionProducts', controllers.User.json_intention_products);
