@@ -19,8 +19,9 @@ const loyaltyPointsType = {
     "ORGANIZINGINFO": {'type':1, 'name':'完善资料'},
     "SIGN": {'type':2, 'name':'每日签到'},
     "ORDERCOMPLETED": {'type':3, 'name':'完成订单', 'refName':'order'},
-    "EXCHANGE": {'type':4, 'name':'积分兑换', 'refName':'rewardshopgift'},
-    "COMPAIGNREWARD": {'type':5, 'name':'活动奖励', 'refName':'compaign'}
+    "EXCHANGE": {'type':4, 'name':'积分兑换', 'refName':'giftOrder'},
+    "COMPAIGNREWARD": {'type':5, 'name':'活动奖励', 'refName':'compaign'},
+    "SHARE": {'type':6, 'name':'分享奖励', 'refName':'compaign'}
 };
 var deliveryTypeSort = {};
 deliveryTypeSort[SONGHUO]=10;

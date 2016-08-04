@@ -12,7 +12,9 @@ var LoyaltyPointsLogsSchema = new mongoose.Schema({
         "name": {type:String},												// 事件名
         "type": {type:Number}, 												// 事件类型
         "order": {type: mongoose.Schema.ObjectId, ref: 'order'},			// 获取积分的相关订单
-        "gift": {type: mongoose.Schema.ObjectId, ref: 'rewardshopgift'}		// 积分兑换的礼品
+        "giftOrder": {type: mongoose.Schema.ObjectId, ref: 'rewardshopgiftorder'},	// 积分兑换的礼品订单
+        "campaign": {type: mongoose.Schema.ObjectId, ref: 'campaign'},		// 获取积分的相关活动
+        "news": {type: mongoose.Schema.ObjectId, ref: 'news'}				// 获取积分的相关资讯
     },
     "description": {type:String}											// 描述
 });
