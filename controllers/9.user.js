@@ -1772,13 +1772,6 @@ exports.json_intention_products_with_brand = function(req, res, next){
             return;
         }
 
-        brands.sort(function(a, b){
-            if(a=='其他')
-                return 1;
-            else
-                return -1;
-        });
-
         res.respond({code:1000, message:'success', intentionProducts:brands});
     })
 };
