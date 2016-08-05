@@ -70,3 +70,5 @@ exports.Appupgrade= require('./appupgrade');
 
 // campaign
 exports.Campaign = require('./campaign');
+
+exports.wechart = require('./wechart');

@@ -30,6 +30,7 @@ require('./vcodes');
 require('./loyaltypoints');
 require('./appdeviceversion');
 require('./campaign');
+require('./wechart');
 
 //user
 exports.user = mongoose.model('user');
@@ -112,6 +113,8 @@ exports.QA_campaign = mongoose.model('QA_campaign');
 exports.quiz_campaign = mongoose.model('quiz_campaign');
 exports.reward_control = mongoose.model('reward_control');
 exports.quiz_answer = mongoose.model('quiz_answer');
+//wechart
+exports.wechart = mongoose.model('wechart');
 
 exports.getModel = function (name, options) {
     options = options || {};

@@ -1,0 +1,59 @@
+{
+  "name": "err-code",
+  "version": "1.1.1",
+  "description": "Create an error with a code",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha --bail",
+    "browserify": "browserify -s err-code index.js > index.umd.js"
+  },
+  "bugs": {
+    "url": "https://github.com/IndigoUnited/js-err-code/issues/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/IndigoUnited/js-err-code.git"
+  },
+  "keywords": [
+    "error",
+    "err",
+    "code",
+    "properties",
+    "property"
+  ],
+  "author": {
+    "name": "IndigoUnited",
+    "email": "hello@indigounited.com",
+    "url": "http://indigounited.com"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@satazor/eslint-config": "^1.0.8",
+    "browserify": "^13.0.0",
+    "expect.js": "^0.3.1",
+    "mocha": "^2.3.4"
+  },
+  "gitHead": "51cf8730f49dc6e12580e22ed714c7bc52238889",
+  "homepage": "https://github.com/IndigoUnited/js-err-code#readme",
+  "_id": "err-code@1.1.1",
+  "_shasum": "739d71b6851f24d050ea18c79a5b722420771d59",
+  "_from": "err-code@>=1.0.0 <2.0.0",
+  "_npmVersion": "2.14.7",
+  "_nodeVersion": "4.2.3",
+  "_npmUser": {
+    "name": "satazor",
+    "email": "andremiguelcruz@msn.com"
+  },
+  "maintainers": [
+    {
+      "name": "satazor",
+      "email": "andremiguelcruz@msn.com"
+    }
+  ],
+  "dist": {
+    "shasum": "739d71b6851f24d050ea18c79a5b722420771d59",
+    "tarball": "https://registry.npmjs.org/err-code/-/err-code-1.1.1.tgz"
+  },
+  "directories": {},
+  "_resolved": "https://registry.npmjs.org/err-code/-/err-code-1.1.1.tgz"
+}

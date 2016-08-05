@@ -10,7 +10,7 @@ var tools = require('../common/tools');
 var config = require('../config');
 var utils = require('../common/utils');
 var URL = require('url');
-var Wechart_Module = require('../modules/wechart');
+var WechartService = services.wechart;
 
 exports.query_campaign = function(req, res, next){
     CampaignService.query({online:true, sort:{online_time:-1}}, function(err, campaigns){
@@ -80,19 +80,24 @@ exports.campaign_page = function(req, res, next){
                     share_abstract: campaign.share_abstract,
                     share_image: campaign.share_image,
                     share_title: campaign.share_title
-                },
-                wechart_basic_config: utils.extend(Wechart_Module.generate_basic_config(fullURLWithoutHash), {app_id:config.wechart.app_id}, true)
+                }
             }
         }
 
-        res.render(path.join(__dirname, '../views/G.campaign/', type, name)
-            ,render_campaign
-            ,function (err, html) {
-            if (err) {
-                res.status(404).send('404: Page not found');
+        WechartService.generate_basic_config(fullURLWithoutHash, function(err, result){
+            if(!err){
+                render_campaign.wechart_basic_config = utils.extend(result, {app_id:config.wechart.app_id}, true);
             }
-            res.send(html);
-        });
+
+            res.render(path.join(__dirname, '../views/G.campaign/', type, name)
+                ,render_campaign
+                ,function (err, html) {
+                    if (err) {
+                        res.status(404).send('404: Page not found');
+                    }
+                    res.send(html);
+                });
+        })
     })
 };
 
