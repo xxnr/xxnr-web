@@ -211,7 +211,7 @@ CampaignService.prototype.save = function(campaign, callback){
         newCampaign.save(function(err){
             if(err){
                 console.error(err);
-                callback(err);
+                callback(err.toString());
                 return;
             }
 
