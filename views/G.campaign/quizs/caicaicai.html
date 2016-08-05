@@ -236,6 +236,7 @@
             });
         });
 
+
         Vue.config.debug = true;
         Vue.config.devtools = true;
         function getCookie(name) {
@@ -249,7 +250,6 @@
         };
         function toggleArray(array, value) {
             var index = array.indexOf(value);
-
             if (index === -1) {
                 array.push(value);
             } else {
@@ -272,7 +272,7 @@
                 },
             },
             template:
-            '<div v-show="isShow" style="position: fixed;width: 260px;height:130px;left: 50%;top:50%;margin-top: -65px;margin-left: -130px;box-sizing:border-box;background-color:rgba(0,0,0,0.4);color: #EAF8F4;border-radius: 5px;text-align: center;line-height: 20px;padding: 5px;padding-top: 25px;padding-bottom: 25px;-webkit-animation: fadein 1s;-moz-animation: fadein 1s;-ms-animation: fadein 1s;-o-animation: fadein 1s;animation: fadein 1s;z-index: 250;">' +
+            '<div v-show="isShow" style="position: fixed;width: 260px;height:130px;left: 50%;top:50%;margin-top: -65px;margin-left: -130px;box-sizing:border-box;background-color:rgba(0,0,0,0.8);color: #EAF8F4;border-radius: 5px;text-align: center;line-height: 20px;padding: 5px;padding-top: 25px;padding-bottom: 25px;-webkit-animation: fadein 1s;-moz-animation: fadein 1s;-ms-animation: fadein 1s;-o-animation: fadein 1s;animation: fadein 1s;z-index: 250;">' +
             '<img src="/images/campaign/quiz/failure.png" alt="" style="height: 60px;width: 60px;display: block;margin: auto;margin-bottom: 14px;">' +
             '{{warningTitle}}' +
             '</div>',
@@ -303,7 +303,7 @@
                 },
             },
             template:
-            '<div v-show="isShow" style="position: fixed;width: 60%;left: 50%;bottom: 10%;transform: translate(-50%, -50%);background-color:rgba(0,0,0,0.4);color: #EAF8F4;border-radius: 5px;text-align: center;line-height: 20px;padding: 5px;-webkit-animation: fadein 1s;-moz-animation: fadein 1s;-ms-animation: fadein 1s;-o-animation: fadein 1s;animation: fadein 1s;z-index: 250;">' +
+            '<div v-show="isShow" style="position: fixed;width: 260px;left: 50%;bottom: 10%;margin-left:-130px;background-color:rgba(0,0,0,0.4);color: #EAF8F4;border-radius: 5px;text-align: center;line-height: 20px;padding: 5px;-webkit-animation: fadein 1s;-moz-animation: fadein 1s;-ms-animation: fadein 1s;-o-animation: fadein 1s;animation: fadein 1s;z-index: 250;">' +
             '{{toastTitle}}' +
             '</div>',
             watch: {
@@ -340,6 +340,9 @@
             methods: {
                 closeAlert: function () {
                     this.isShow = false;
+                    _this.timeout = setTimeout(function () {
+                        window.location.href = window.location.href;
+                    }, 1500);
                 },
                 confirmed: function () {
                     this.$dispatch('pop-confirmed');
@@ -368,6 +371,7 @@
                 showRightAnswers:false
             },
             created: function () {
+
                 this.checkStatus();
                 this.getQuizs();
 //            this.checkLogin();
@@ -405,7 +409,6 @@
                                         _this.campaignAvailable = true;
                                     }
                                     _this.checkLogin();
-
                                     if(_this.isLogin){
                                         _this.checkTimesLeft();
                                     }
@@ -417,13 +420,25 @@
                     config.ajaxGet('/api/v2.3/campaign/quiz/getQ', {_id:"<%- campaign._id %>"})
                             .then(function(data){
                                 if(data.code == 1000){
+                                    _this.answers = [];
                                     _this.quizs = data.questions;
-                                    for(var i in _this.quizs){
+                                    console.log(_this.quizs);
+                                    _this.quizs.forEach(function(quiz){
                                         _this.answers.push({
-                                            order_key:_this.quizs[i].order_key,
-                                            choices:[]
+                                            order_key: _this.quizs[quiz.order_key-1].order_key,
+                                            choices: []
                                         });
-                                    }
+                                    });
+//                                for(var i in _this.quizs){
+//                                    if(_this.quizs.hasOwnProperty(i)) {
+//                                        console.log(i);
+//                                        _this.answers.push({
+//                                            order_key: _this.quizs[i].order_key,
+//                                            choices: []
+//                                        });
+//                                    }
+//                                }
+                                    console.log(_this.answers);
                                 }
                             })
                 },
@@ -462,31 +477,28 @@
                     var _this = this;
                     config.ajaxGet('/api/v2.3/campaign/quiz/my_answer', {token:this.token,_id:"<%- campaign._id %>"})
                             .then(function(data){
-                                if(data.code == 1000){
-                                    if(Object.keys(data.answers).length === 0){
-                                        console.log("haven't answer");
-                                    }else{
-                                        if(!data.result.has_result){
-                                            _this.campaignAvailable = false;
-                                            _this.unavailableText = '已参加';
+                                if(Object.keys(data.answers).length === 0){
+                                    console.log("haven't answer");
+                                }else{
+                                    if(!data.result.has_result){
+                                        _this.campaignAvailable = false;
+                                        _this.unavailableText = '已参加';
 
-                                            for(var i in data.answers){
-                                                if(data.answers.hasOwnProperty(i)) {
-                                                    for(var x in data.answers[i]){
-                                                        if(data.answers[i].hasOwnProperty(x)) {
-                                                            _this.answers[Number(i-1)].choices.push(Number(x));
-                                                        }
+                                        for(var i in data.answers){
+                                            if(data.answers.hasOwnProperty(i)) {
+                                                for(var x in data.answers[i]){
+                                                    if(data.answers[i].hasOwnProperty(x)) {
+                                                        _this.answers[Number(i-1)].choices.push(Number(x));
                                                     }
-
                                                 }
+
                                             }
-                                        }else {
-                                            this.showRightAnswers = true
                                         }
-
+                                    }else {
+                                        _this.showRightAnswers = true
                                     }
-                                }
 
+                                }
                             })
                 },
                 checkTimesLeft : function(){
@@ -517,6 +529,7 @@
                         var isCheckbox = Checkboxes?Checkboxes:false;  //是否支持多选,默认为单选
                         if(!isCheckbox){  //单选
                             this.answers[questionOrderKey-1].choices = [answerOrderKey];
+                            console.log(this.answers);
                         }else{
                             toggleArray(this.answers[questionOrderKey-1].choices, answerOrderKey);
                         }
@@ -527,6 +540,7 @@
                     if(!this.isLogin && (this.unavailableText == '立即登录竞猜' || this.unavailableText == '请重新登录')){
                         this.goToLogin();
                     }else {
+//                    console.log(this.checkQuizCompleted());
                         if(this.campaignAvailable){
                             if (this.checkQuizCompleted() == true) {
                                 this.submitAnswer();
@@ -543,7 +557,6 @@
                         }
 
                     }
-
                 },
                 submitAnswer : function(){
                     var _this = this;
