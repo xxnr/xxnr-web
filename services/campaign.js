@@ -174,10 +174,6 @@ CampaignService.prototype.save = function(campaign, callback){
     }
 
     if(campaign.shareable){
-        if(!campaign.hasOwnProperty('share_button')){
-            callback('share_button required');
-            return;
-        }
         if(!campaign.share_title){
             callback('share_title required');
             return;
@@ -215,7 +211,7 @@ CampaignService.prototype.save = function(campaign, callback){
         newCampaign.save(function(err){
             if(err){
                 console.error(err);
-                callback(err);
+                callback(err.toString());
                 return;
             }
 
