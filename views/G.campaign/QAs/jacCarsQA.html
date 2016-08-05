@@ -146,11 +146,141 @@
     </div>
 </div>
 
-
+<script src="https://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
 <script src="/js/zepto.js"></script>
 <script src="/js/vue.min.v1.0.26.js"></script>
 <script src="/js/campaignConfig.js"></script>
 <script type="text/javascript">
+    var campaign = <%- JSON.stringify(campaign) %>;
+    var wechart_basic_config = <%- JSON.stringify(wechart_basic_config) %>;
+    wx.config({
+        debug: false,
+        appId: wechart_basic_config.app_id,
+        timestamp: Number(wechart_basic_config.timestamp),
+        nonceStr: wechart_basic_config.nonceStr,
+        signature: wechart_basic_config.signature,
+        jsApiList: [
+            'checkJsApi',
+            'onMenuShareAppMessage',
+            'onMenuShareTimeline',
+            'onMenuShareQQ',
+            'onMenuShareWeibo',
+            'onMenuShareQZone'
+        ]
+    });
+    wx.ready(function () {
+        // 2.1 监听“分享给朋友”，按钮点击、自定义分享内容及分享结果接口
+        wx.onMenuShareAppMessage({
+            title: campaign.share_title,
+            desc: campaign.share_abstract,
+            link: campaign.share_url,
+            imgUrl: campaign.share_image,
+            trigger: function (res) {
+                // 不要尝试在trigger中使用ajax异步请求修改本次分享的内容，因为客户端分享操作是一个同步操作，这时候使用ajax的回包会还没有返回
+                alert('用户点击发送给朋友');
+            },
+            success: function (res) {
+                alert('已分享');
+            },
+            cancel: function (res) {
+                alert('已取消');
+            },
+            fail: function (res) {
+                alert(JSON.stringify(res));
+            }
+        });
+
+        // 2.2 监听“分享到朋友圈”按钮点击、自定义分享内容及分享结果接口
+        wx.onMenuShareTimeline({
+            title: campaign.share_title,
+            link: campaign.share_url,
+            imgUrl: campaign.share_image,
+            trigger: function (res) {
+                // 不要尝试在trigger中使用ajax异步请求修改本次分享的内容，因为客户端分享操作是一个同步操作，这时候使用ajax的回包会还没有返回
+                alert('用户点击分享到朋友圈');
+            },
+            success: function (res) {
+                alert('已分享');
+            },
+            cancel: function (res) {
+                alert('已取消');
+            },
+            fail: function (res) {
+                alert(JSON.stringify(res));
+            }
+        });
+
+        // 2.3 监听“分享到QQ”按钮点击、自定义分享内容及分享结果接口
+        wx.onMenuShareQQ({
+            title: campaign.share_title,
+            desc: campaign.share_abstract,
+            link: campaign.share_url,
+            imgUrl: campaign.share_image,
+            trigger: function (res) {
+                alert('用户点击分享到QQ');
+            },
+            complete: function (res) {
+                alert(JSON.stringify(res));
+            },
+            success: function (res) {
+                alert('已分享');
+            },
+            cancel: function (res) {
+                alert('已取消');
+            },
+            fail: function (res) {
+                alert(JSON.stringify(res));
+            }
+        });
+
+        // 2.4 监听“分享到微博”按钮点击、自定义分享内容及分享结果接口
+        wx.onMenuShareWeibo({
+            title: campaign.share_title,
+            desc: campaign.share_abstract,
+            link: campaign.share_url,
+            imgUrl: campaign.share_image,
+            trigger: function (res) {
+                alert('用户点击分享到微博');
+            },
+            complete: function (res) {
+                alert(JSON.stringify(res));
+            },
+            success: function (res) {
+                alert('已分享');
+            },
+            cancel: function (res) {
+                alert('已取消');
+            },
+            fail: function (res) {
+                alert(JSON.stringify(res));
+            }
+        });
+
+        // 2.5 监听“分享到QZone”按钮点击、自定义分享内容及分享接口
+        wx.onMenuShareQZone({
+            title: campaign.share_title,
+            desc: campaign.share_abstract,
+            link: campaign.share_url,
+            imgUrl: campaign.share_image,
+            trigger: function (res) {
+                alert('用户点击分享到QZone');
+            },
+            complete: function (res) {
+                alert(JSON.stringify(res));
+            },
+            success: function (res) {
+                alert('已分享');
+            },
+            cancel: function (res) {
+                alert('已取消');
+            },
+            fail: function (res) {
+                alert(JSON.stringify(res));
+            }
+        });
+    });
+
+
     Vue.config.debug = true;
     Vue.config.devtools = true;
     function getCookie(name) {
@@ -222,7 +352,7 @@
         }
     });
     Vue.component('campaign-confirm', campaignConfirm);
-    Vue.component('campaign-toast', campaignToast)
+    Vue.component('campaign-toast', campaignToast);
     new Vue({
         el: '#app',
         data: {

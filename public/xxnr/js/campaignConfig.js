@@ -6,14 +6,11 @@ var config = (function () {
 
     //configObj.baseURI = 'http://101.200.194.203';
     configObj.baseURI = '';
-    //configObj.mobileBaseURI = 'http://192.168.1.15:8080';
-    configObj.mobileBaseURI = 'http://mppe.xinxinnongren.com';
-    //configObj.baseURI = 'http://mppe.xinxinnongren.com:8070';
+    configObj.mobileBaseURI = 'http://192.168.1.21:8080';
+    //configObj.mobileBaseURI = 'http://mppe.xinxinnongren.com';
     configObj.ajaxGet = function (apiURI,data) {
         var deferred = $.Deferred();
-        //var _baseURI = baseURI?baseURI:'';
         var _apiURI = apiURI?apiURI:'';
-        //var getURI = _baseURI + _apiURI;
         $.ajax({
             type:"GET",
             url: _apiURI,
@@ -22,7 +19,7 @@ var config = (function () {
                 deferred.resolve(data);
             },
             error:function(error) {
-                console.error('error = ' + error + ', and data = ' + data + ', and methodname = ' + apiURI + ', and BaseUrl = ' + baseURI);
+                console.error('error = ' + error + ', and data = ' + data + ', and methodname = ' + apiURI + ', and BaseUrl = ' + mobileBaseURI);
             }
         });
 
@@ -30,9 +27,7 @@ var config = (function () {
     };
     configObj.ajaxPost = function (apiURI,data) {
         var deferred = $.Deferred();
-        //var _baseURI = baseURI?baseURI:'';
         var _apiURI = apiURI?apiURI:'';
-        //var getURI = _baseURI + _apiURI;
         $.ajax({
             type:"POST",
             url: _apiURI,
@@ -42,7 +37,7 @@ var config = (function () {
                 deferred.resolve(data);
             },
             error:function(error) {
-                console.error('error = ' + error + ', and data = ' + data + ', and methodname = ' + apiURI + ', and BaseUrl = ' + baseURI);
+                console.error('error = ' + error + ', and data = ' + data + ', and methodname = ' + apiURI + ', and BaseUrl = ' + mobileBaseURI);
             }
         });
 
