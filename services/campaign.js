@@ -182,8 +182,11 @@ CampaignService.prototype.save = function(campaign, callback){
             callback('share_title required');
             return;
         }
-        if(!campaign.share_url_name){
-            callback('share_url_name required');
+        if(campaign.same_as_campaign_url){
+            campaign.share_url = campaign.url;
+        }
+        if(!campaign.share_url){
+            callback('share_url required');
             return;
         }
         if(!campaign.share_abstract){
@@ -194,10 +197,6 @@ CampaignService.prototype.save = function(campaign, callback){
             callback('share_image required');
             return;
         }
-    }
-
-    if(campaign.share_url_name){
-        campaign.share_url = this.campaign_url(campaign.share_url_name, campaign.type);
     }
 
     if(campaign._id){

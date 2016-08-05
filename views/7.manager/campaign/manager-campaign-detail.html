@@ -43,8 +43,8 @@
                         <div class="mb10" data-component="textbox" data-component-path="campaign.info.share_points_add">分享加积分</div>
                         <div class="mb10" data-component="checkbox" data-component-path="campaign.info.share_button">APP分享按钮</div>
                         <div class="mb10" data-component="textbox" data-component-path="campaign.info.share_title">分享标题</div>
-                        <div class="mb10" data-component="textbox" data-component-path="campaign.info.share_url_name">分享url</div>
-                        <div data-component="checkbox" data-component-path="campaign.info.same_as_campaign_url_name">与活动url相同</div>
+                        <div class="mb10" data-component="textbox" data-component-path="campaign.info.share_url">分享url</div>
+                        <div data-component="checkbox" data-component-path="campaign.info.same_as_campaign_url">与活动url相同</div>
                         <div class="mb10" data-component="textbox" data-component-path="campaign.info.share_abstract">分享摘要</div>
                         <div class="mb10" data-component="fileupload" data-component-path="campaign.info.share_image" data-placeholder="添加图片" data-accept="image/png,image/jpeg" data-multiple="true" data-icon="fa-camera" data-extension="false">分享图片</div>
                         <div class="mb10" data-component="pictures" data-component-path="campaign.info.share_image"></div>
@@ -139,10 +139,7 @@
                 alert('请填写分享标题');
                 return;
             }
-            if(campaign.info.same_as_campaign_url_name){
-                campaign.info.share_url_name = campaign.info.campaign_url_name;
-            }
-            if(!campaign.info.share_url_name){
+            if(!campaign.info.share_url && !campaign.info.same_as_campaign_url){
                 alert('请填写分享url');
                 return;
             }

@@ -17,14 +17,16 @@ var WechartService = function(){
     var self = this;
     // copy key file to temp folder;
     //utils.copyFile(keyFile, tempKeyFile);
-    lockfile.lock(keyFile, function (err, release) {
-        if(!err) {
-            console.info('process start to require token and ticket');
-            self.refresh_access_token(function () {
-                self.refresh_jsapi_ticket();
-            });
-        }
-    })
+    if(config.environment == 'production' || config.environment == 'test') {
+        lockfile.lock(keyFile, function (err, release) {
+            if (!err) {
+                console.info('process start to require token and ticket');
+                self.refresh_access_token(function () {
+                    self.refresh_jsapi_ticket();
+                });
+            }
+        })
+    }
 };
 
 WechartService.prototype.refresh_access_token = function(cb){
@@ -119,8 +121,8 @@ WechartService.prototype.refresh_jsapi_ticket = function(cb){
 WechartService.prototype.generate_basic_config = function(url, cb){
     var self = this;
     WechartModel.findOne({}, function(err, wechart){
-        if(err){
-            console.error(err);
+        if(err || !wechart){
+            console.error(err || 'wechart not found');
             cb('error find ticket');
             return;
         }

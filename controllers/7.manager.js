@@ -2902,7 +2902,7 @@ exports.modify_campaign = function(req, res, next){
 		var canUpdateProperties = ['type', 'title', 'online_time', 'offline_time'
 			, 'start_time', 'end_time', 'campaign_url_name', 'url', 'image', 'comment'
 			, 'reward_times', 'shareable', 'share_points_add', 'share_button', 'share_title'
-			, 'share_url_name', 'share_url', 'share_abstract', 'share_image'];
+			, 'share_url', 'share_abstract', 'share_image', 'same_as_campaign_url'];
 		canUpdateProperties.forEach(function(property){
 			if(campaign.hasOwnProperty(property)) {
 				updateBasicInfo = true;
