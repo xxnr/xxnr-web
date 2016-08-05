@@ -79,7 +79,7 @@
             <div class="quiz_questions" v-cloak>
                 <div class="right_answers_result" v-show="showRightAnswers">
                     竞猜结束
-                    <p v-show="points">恭喜你获得<span>{{points}}</span>积分</p>
+                    <p v-show="points > 0">恭喜你获得<span>{{points}}</span>积分</p>
                 </div>
                 <img class="gold_medal" src="/images/campaign/quiz/gold-medal.png" alt="">
                 <div class="quiz-entry" v-for="quiz in quizs">
