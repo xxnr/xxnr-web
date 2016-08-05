@@ -107,8 +107,10 @@ var config = {
             hostname:'api.weixin.qq.com',
             path:'/cgi-bin/ticket/getticket'
         },
-        app_id:'wx5578c9a6a3c663ce',
-        app_secret:'84d8d32816609462c3f491472346c6ea'
+        //app_id:'wx5578c9a6a3c663ce',
+        //app_secret:'84d8d32816609462c3f491472346c6ea'
+        app_id:'wx8c0b64b266d6b36b',
+        app_secret:'0c45b9bf55cf30ea595eaa97d13a32d6'
     }
 };
 
