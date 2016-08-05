@@ -143,6 +143,7 @@
                         return;
                     }
                     detail_QA.QA[detail_QA.currentIndex].options = options;
+                    detail_QA.QA[detail_QA.currentIndex].order_key = detail_QA.currentIndex+1;
                     submit_current_QA();
                 }
             });
@@ -162,6 +163,7 @@
                 success();
             } else {
                 alert(response.message);
+                window.location.reload();
             }
 
             detail_QA.showEdit = false;
