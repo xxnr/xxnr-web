@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html xmlns:v-bind="http://www.w3.org/1999/xhtml" xmlns:v-on="http://www.w3.org/1999/xhtml">
+<head>
+    <title><%- campaign.title %></title>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=10"/>
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, minimum-scale=0.5, maximum-scale=2.0, user-scalable=yes"/>
+    <meta name="robots" content="all,follow"/>
+    <style>
+        [v-cloak] {display: none;}
+        body, div, dl, dt, dd, ul, ol, li, h1, h2, h3, h4, h5, h6, input, button, textarea, p, blockquote, th, td, span, a {margin: 0;padding: 0;  }
+        /*html,body{min-height: 100%}*/
+        html {}
+        img {border: none;}
+        li {list-style: none;}
+        table {border-collapse: collapse;border-spacing: 0;}
+        a:hover {text-decoration: none;}
+        a {text-decoration: none;}
+        body {font-family: "微软雅黑", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif;}
+        .clearfix:before, .clearfix:after {content: " "; /* 1 */display: table; /* 2 */}
+        .clearfix:after {clear:both}
+        .container {
+            margin: 0 auto;
+            width: 100%;
+            /*height: 100%;*/
+            position: relative;
+        }
+        .title_image img{width: 100%;margin: auto;display: block}
+        .quiz_body {width: 100%;background: url('/images/campaign/quiz/background_imgd.jpg') repeat-y;}
+        .quiz_questions {position: relative;color: #323232;width: 90%;border: 3px solid #92C102; background: #FFF8DC;margin: auto;border-radius: 5px;padding: 28px;box-sizing: border-box;    margin-bottom: 25px;}
+        .quiz_question {font-size: 16px;margin-bottom: 13px}
+        .quiz-entry {margin-bottom: 25px}
+        .gold_medal {position: absolute;top: 0;right: 5%;width: 26px;height: 45px}
+        .submit_btn {width: 60%;height: 40px;line-height: 40px;font-size: 20px;text-align: center;margin: auto;background: #92C102;color: #FFF660;border-radius: 6px;}
+        .quiz--info {background: url('/images/campaign/quiz/activity_text_box2.png') no-repeat;background-position: center top;background-size: 90% 100%;}
+        .quiz--info--text {padding: 15%;font-size: 3vw}
+        .quiz--info--text p{margin-bottom: 6px;color:#280505}
+        .quiz--info--text--title {color: #FF6600 !important;font-size: 5vw !important;margin-bottom: 12px !important;}
+        .quiz_option{width: 90%;margin: auto;border: 2px solid #92C102;background: #FFFFFF;margin-bottom: 10px;text-align: center;line-height: 25px;border-radius: 5px;padding-left: 5px;padding-right: 5px}
+        .quiz_option_selected {background: #92C102;color: #FFF660}
+        .option--correct_answer {position: absolute;height: 40px;right: 50px;margin-top: -10px;}
+        .download_app {background: #FFFFFF;height: 60px;}
+        .download_app .download_btn{cursor: pointer;background: #FF9700;color: #FFFFFF;display: inline-block;height: 22px;width: 60px;margin-right: 5%;margin-top: 20px;text-align: center;float: right;font-size: 10px;line-height: 22px;border-radius: 3px;}
+        .xxnr_logo {float: left;height: 80%;display: inline-block;margin: auto;margin-top: 6px;}
+        .download_app--text_info {float: left;display: inline-block;margin-top: 15px;margin-left: 7px}
+        .download_app--text_title {color:#323232}
+        .download_app--text_text {font-size: 9px;color: #909090;}
+        .download_app--close {float: left;width: 10px;height: 10px;margin-top: 25px;margin-left: 6px;margin-right: 12px;}
+        .campaign_mask {position: fixed;width: 100%;height: 100%;background: rgba(0,0,0,0.6);;top:0;z-index: 200;color:#323232;padding-top: 70px;padding-left: 30px;padding-right: 30px;box-sizing: border-box;font-size: 4.5vw;}
+        .campaign_unavailable_style {background: #D5D5D5;color: #FFFFFF}
+    </style>
+</head>
+
+<body>
+<div id="app">
+    <div class="container">
+        <div class="download_app" v-show="showDownloadApp" v-cloak>
+            <img @click="closeDownloadApp()" class="download_app--close" src="/images/campaign/QA/activity_shut_down.png" alt="">
+            <img class="xxnr_logo" src="/images/campaign/QA/activity_xxnr_logo.png" alt="">
+            <div class="download_app--text_info">
+                <p class="download_app--text_title">新新农人</p>
+                <p class="download_app--text_text">农业互联网综合服务领先者</p>
+            </div>
+            <div class="download_btn" v-on:click="redirectToApp()">打开APP</div>
+        </div>
+        <div class="title_image">
+            <img src="/images/campaign/quiz/background_imgt.jpg" alt="">
+        </div>
+        <div class="quiz_body" v-cloak>
+            <div class="quiz_questions" v-cloak>
+                <img class="gold_medal" src="/images/campaign/quiz/gold-medal.png" alt="">
+                <div class="quiz-entry" v-for="quiz in quizs">
+                    <p class="quiz_question">{{quiz.order_key}}. {{quiz.question}}</p>
+                    <p @click="clickOption(quiz.order_key,option.order_key,Checkboxes)" v-for="option in quiz.options" v-bind:class="['quiz_option',{'quiz_option_selected': answers[$parent.$index].choices.indexOf(option.order_key) != -1}]">
+                        {{option.value}}
+                        <img class="option--correct_answer" v-show="option.is_right_answer && showRightAnswers" src="/images/campaign/quiz/correct.png" alt="">
+                    </p>
+                </div>
+                <div v-show="!showRightAnswers" v-bind:class="['submit_btn',{'campaign_unavailable_style':!campaignAvailable && unavailableText != '立即登录竞猜' && unavailableText != '请重新登录'}]" @click="submitAction()">{{campaignAvailable?'提交竞猜':unavailableText}}</div>
+            </div>
+            <div class="quiz--info">
+                <div class="quiz--info--text">
+                    <p class="quiz--info--text--title">活动说明</p>
+                    <p>活动范围：所有注册用户</p>
+                    <p>活动时间：2016-07-15~2016-08-15</p>
+                    <p>活动规则：</p>
+                    <p>1. 活动需登录后参与</p>
+                    <p>2. 登录后开始答题，每个题目有且仅有一个正确选项，点击选项即提交</p>
+                    <p>3. 提交答案后，根据回答正确的题目数量与每题的分值，获得积分</p>
+                    <p>4. 每个用户只能参与一次答题活动</p>
+                    <p>5. 可通过新新农人安卓APP或手机端网站查看积分记录（积分商城-我的积分）</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <campaign-warning :warning-title="warningMsg" :is-show.sync="isWarning"></campaign-warning>
+    <campaign-toast :toast-title="toastMsg" :is-show.sync="isToast"></campaign-toast>
+    <campaign-alert alert-title="竞猜完成" alert-message="您可通过积分商城->积分记录查看结果" :is-show.sync="isAlert"></campaign-alert>
+    <div class="campaign_mask" v-show="isMask" v-cloak>
+</div>
+
+<script src="https://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+<script src="/js/zepto.js"></script>
+<script src="/js/vue.min.v1.0.26.js"></script>
+<script src="/js/campaignConfig.js"></script>
+<script type="text/javascript">
+    var campaign = <%- JSON.stringify(campaign) %>;
+    var wechart_basic_config = <%- JSON.stringify(wechart_basic_config) %>;
+    wx.config({
+        debug: false,
+        appId: wechart_basic_config.app_id,
+        timestamp: Number(wechart_basic_config.timestamp),
+        nonceStr: wechart_basic_config.nonceStr,
+        signature: wechart_basic_config.signature,
+        jsApiList: [
+            'checkJsApi',
+            'onMenuShareAppMessage',
+            'onMenuShareTimeline',
+            'onMenuShareQQ',
+            'onMenuShareWeibo',
+            'onMenuShareQZone'
+        ]
+    });
+    wx.ready(function () {
+        // 2.1 监听“分享给朋友”，按钮点击、自定义分享内容及分享结果接口
+        wx.onMenuShareAppMessage({
+            title: campaign.share_title,
+            desc: campaign.share_abstract,
+            link: campaign.share_url,
+            imgUrl: campaign.share_image,
+            trigger: function (res) {
+                // 不要尝试在trigger中使用ajax异步请求修改本次分享的内容，因为客户端分享操作是一个同步操作，这时候使用ajax的回包会还没有返回
+                alert('用户点击发送给朋友');
+            },
+            success: function (res) {
+                alert('已分享');
+            },
+            cancel: function (res) {
+                alert('已取消');
+            },
+            fail: function (res) {
+                alert(JSON.stringify(res));
+            }
+        });
+
+        // 2.2 监听“分享到朋友圈”按钮点击、自定义分享内容及分享结果接口
+        wx.onMenuShareTimeline({
+            title: campaign.share_title,
+            link: campaign.share_url,
+            imgUrl: campaign.share_image,
+            trigger: function (res) {
+                // 不要尝试在trigger中使用ajax异步请求修改本次分享的内容，因为客户端分享操作是一个同步操作，这时候使用ajax的回包会还没有返回
+                alert('用户点击分享到朋友圈');
+            },
+            success: function (res) {
+                alert('已分享');
+            },
+            cancel: function (res) {
+                alert('已取消');
+            },
+            fail: function (res) {
+                alert(JSON.stringify(res));
+            }
+        });
+
+        // 2.3 监听“分享到QQ”按钮点击、自定义分享内容及分享结果接口
+        wx.onMenuShareQQ({
+            title: campaign.share_title,
+            desc: campaign.share_abstract,
+            link: campaign.share_url,
+            imgUrl: campaign.share_image,
+            trigger: function (res) {
+                alert('用户点击分享到QQ');
+            },
+            complete: function (res) {
+                alert(JSON.stringify(res));
+            },
+            success: function (res) {
+                alert('已分享');
+            },
+            cancel: function (res) {
+                alert('已取消');
+            },
+            fail: function (res) {
+                alert(JSON.stringify(res));
+            }
+        });
+
+        // 2.4 监听“分享到微博”按钮点击、自定义分享内容及分享结果接口
+        wx.onMenuShareWeibo({
+            title: campaign.share_title,
+            desc: campaign.share_abstract,
+            link: campaign.share_url,
+            imgUrl: campaign.share_image,
+            trigger: function (res) {
+                alert('用户点击分享到微博');
+            },
+            complete: function (res) {
+                alert(JSON.stringify(res));
+            },
+            success: function (res) {
+                alert('已分享');
+            },
+            cancel: function (res) {
+                alert('已取消');
+            },
+            fail: function (res) {
+                alert(JSON.stringify(res));
+            }
+        });
+
+        // 2.5 监听“分享到QZone”按钮点击、自定义分享内容及分享接口
+        wx.onMenuShareQZone({
+            title: campaign.share_title,
+            desc: campaign.share_abstract,
+            link: campaign.share_url,
+            imgUrl: campaign.share_image,
+            trigger: function (res) {
+                alert('用户点击分享到QZone');
+            },
+            complete: function (res) {
+                alert(JSON.stringify(res));
+            },
+            success: function (res) {
+                alert('已分享');
+            },
+            cancel: function (res) {
+                alert('已取消');
+            },
+            fail: function (res) {
+                alert(JSON.stringify(res));
+            }
+        });
+    });
+
+
+    Vue.config.debug = true;
+    Vue.config.devtools = true;
+    function getCookie(name) {
+        var value = "; " + document.cookie;
+        var parts = value.split("; " + name + "=");
+        if (parts.length == 2) return parts.pop().split(";").shift();
+    };
+    var deleteCookie = function(name) {
+        document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:01 GMT;path=/';
+        document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:01 GMT;path=/;domain=.xinxinnongren.com';
+    };
+    function toggleArray(array, value) {
+        var index = array.indexOf(value);
+
+        if (index === -1) {
+            array.push(value);
+        } else {
+            array.splice(index, 1);
+        }
+    }
+
+    var campaignWarning = Vue.extend({
+        props:
+        {
+            warningTitle:String,
+            isShow:{
+                type: Boolean,
+                default: false,
+                twoWay: true
+            },
+            time: {
+                type: Number,
+                default: 2500
+            },
+        },
+        template:
+        '<div v-show="isShow" style="position: fixed;width: 260px;height:130px;left: 50%;top:50%;margin-top: -65px;margin-left: -130px;box-sizing:border-box;background-color:rgba(0,0,0,0.8);color: #EAF8F4;border-radius: 5px;text-align: center;line-height: 20px;padding: 5px;padding-top: 25px;padding-bottom: 25px;-webkit-animation: fadein 1s;-moz-animation: fadein 1s;-ms-animation: fadein 1s;-o-animation: fadein 1s;animation: fadein 1s;z-index: 250;">' +
+        '<img src="/images/campaign/quiz/failure.png" alt="" style="height: 60px;width: 60px;display: block;margin: auto;margin-bottom: 14px;">' +
+        '{{warningTitle}}' +
+        '</div>',
+        watch: {
+            isShow: function (val) {
+                const _this = this;
+                if (val) {
+                    clearTimeout(this.timeout)
+                    this.timeout = setTimeout(function () {
+                        _this.isShow = false
+                    }, _this.time)
+                }
+            }
+        }
+    });
+    var campaignToast = Vue.extend({
+        props:
+        {
+            toastTitle:String,
+            isShow:{
+                type: Boolean,
+                default: false,
+                twoWay: true
+            },
+            time: {
+                type: Number,
+                default: 2500
+            },
+        },
+        template:
+        '<div v-show="isShow" style="position: fixed;width: 60%;left: 50%;bottom: 10%;transform: translate(-50%, -50%);background-color:rgba(0,0,0,0.4);color: #EAF8F4;border-radius: 5px;text-align: center;line-height: 20px;padding: 5px;-webkit-animation: fadein 1s;-moz-animation: fadein 1s;-ms-animation: fadein 1s;-o-animation: fadein 1s;animation: fadein 1s;z-index: 250;">' +
+        '{{toastTitle}}' +
+        '</div>',
+        watch: {
+            isShow: function (val) {
+                const _this = this;
+                if (val) {
+                    clearTimeout(this.timeout)
+                    this.timeout = setTimeout(function () {
+                        _this.isShow = false
+                    }, _this.time)
+                }
+            }
+        }
+    });
+    var campaignAlert = Vue.extend({
+        props:
+        {
+            alertTitle:String,
+            alertMessage:String,
+            isShow:{
+                type: Boolean,
+                default: false,
+                twoWay: true
+            }
+        },
+        template:
+        '<div v-show="isShow" style="position:fixed;left: 50%;top: 50%;margin-top: -55px;margin-left: -130px;height: 140px;width: 260px;z-index: 250;background: #FFFFFF;border-radius: 5px;">' +
+        '<div style="text-align: center;font-size: 18px;border-bottom: 1px solid #E2E2E2;padding-top: 19px;padding: 10px;"> {{alertTitle}}' +
+        '<p style="margin-top: 12px;margin-bottom: 19px;font-size: 14px">{{alertMessage}}</p> ' +
+        '</div>' +
+        '<div @click="closeAlert()" class="confirm-option" style="color:#00B38A;display: inline-block;width: 100%;height: 50px;line-height: 50px;text-align: center;font-size: 18px;border-right: 1px solid #E2E2E2;box-sizing: border-box;">好的' +
+        '</div>' +
+        '</div>',
+        methods: {
+            closeAlert: function () {
+                this.isShow = false;
+            },
+            confirmed: function () {
+                this.$dispatch('pop-confirmed');
+                this.isShow = false;
+            }
+        }
+    });
+    Vue.component('campaign-toast', campaignToast);
+    Vue.component('campaign-warning', campaignWarning);
+    Vue.component('campaign-alert', campaignAlert);
+    new Vue({
+        el: '#app',
+        data: {
+            quizs:[],
+            answers:[],
+            campaignAvailable:false,
+            unavailableText:'',
+            showDownloadApp:false,
+            isLogin: false,
+            isWarning:false,
+            warningMsg:'',
+            isToast:false,
+            toastMsg:'',
+            isAlert:false,
+            isMask:false,
+            showRightAnswers:false
+        },
+        created: function () {
+
+            this.checkStatus();
+            this.getQuizs();
+//            this.checkLogin();
+//            this.checkTimesLeft();
+            if(typeof jsObj == "undefined"){
+                this.showDownloadApp = true;
+            }else {
+                this.showDownloadApp = false
+            };
+        },
+        watch: {
+            'isAlert': function (val, oldVal) {
+                if(val == false){
+                    this.isMask = false;
+                }else if(val == true){
+                    this.isMask = true;
+                }
+            }
+        },
+        methods: {
+            checkStatus : function(){
+                var _this = this;
+                config.ajaxGet('/api/v2.3/campaign_status', {_id:"<%- campaign._id %>"})
+                        .then(function(data){
+                            if(data.code == 1000){
+                                if(data.status == 1){
+                                    _this.unavailableText = '即将上线';
+                                }else if(data.status == 2){
+                                    _this.unavailableText = '即将开始';
+                                }else if(data.status == 4){
+                                    _this.unavailableText = '已结束';
+                                }else if(data.status == 5){
+                                    _this.unavailableText = '已下线';
+                                }else if(data.status == 3){
+                                    _this.campaignAvailable = true;
+                                }
+                                _this.checkLogin();
+                                if(_this.isLogin){
+                                    _this.checkTimesLeft();
+                                }
+                            }
+                        });
+            },
+            getQuizs : function(){
+                var _this = this;
+                config.ajaxGet('/api/v2.3/campaign/quiz/getQ', {_id:"<%- campaign._id %>"})
+                        .then(function(data){
+                            if(data.code == 1000){
+                                _this.quizs = data.questions;
+                                for(var i in _this.quizs){
+                                    _this.answers.push({
+                                        order_key:_this.quizs[i].order_key,
+                                        choices:[]
+                                    });
+                                }
+                            }
+                        })
+            },
+            checkLogin : function(){
+                if(typeof jsObj == "undefined"){
+                    var token = getCookie('token');
+                    if(token){
+                        this.token = token;
+                        this.isLogin = true;
+                        this.checkAnswers();
+                    }
+                } else {
+                    this.token = jsObj.getToken();
+                    this.isLogin = jsObj.isLogin();
+                    this.checkAnswers();
+                }
+                if(!this.isLogin && this.campaignAvailable){
+                    this.unavailableText = '立即登录竞猜';
+                    this.campaignAvailable = false;
+                }
+            },
+            goToLogin : function(){
+                if(typeof jsObj == "undefined"){
+                    window.location.href = encodeURI(config.mobileBaseURI + "/login?redirect="+window.location.href);
+                } else {
+                    jsObj.toLogin();
+                }
+            },
+            closeDownloadApp : function(){
+                this.showDownloadApp = false;
+            },
+            redirectToApp : function(){
+                window.location.href = '/campaignStatics/campaignRedirect.html' + '?path='+window.location.pathname;
+            },
+            checkAnswers : function(){
+                var _this = this;
+                config.ajaxGet('/api/v2.3/campaign/quiz/my_answer', {token:this.token,_id:"<%- campaign._id %>"})
+                        .then(function(data){
+                            if(Object.keys(data.answers).length === 0){
+                                console.log("haven't answer");
+                            }else{
+                                if(!data.result.has_result){
+                                    _this.campaignAvailable = false;
+                                    _this.unavailableText = '已参加';
+
+                                    for(var i in data.answers){
+                                        if(data.answers.hasOwnProperty(i)) {
+                                            for(var x in data.answers[i]){
+                                                if(data.answers[i].hasOwnProperty(x)) {
+                                                    _this.answers[Number(i-1)].choices.push(Number(x));
+                                                }
+                                            }
+
+                                        }
+                                    }
+                                }else {
+                                    this.showRightAnswers = true
+                                }
+
+                            }
+                        })
+            },
+            checkTimesLeft : function(){
+                var _this = this;
+                config.ajaxGet('/api/v2.3/campaign_status', {token:_this.token,_id:"<%- campaign._id %>"})
+                        .then(function(data){
+                            if(data.code == 1000){
+                                if(data.times_left <= 0){
+                                    _this.campaignAvailable = false;
+                                    _this.unavailableText = '已参加';
+                                }else{
+                                    _this.campaignAvailable = true;
+                                }
+                            }else if(data.code == 1401){
+                                _this.campaignAvailable = false;
+                                _this.unavailableText = '请重新登录';
+                                _this.isToast = true;
+                                _this.toastMsg = '您已被登出';
+                                deleteCookie('token');
+                                _this.timeout = setTimeout(function () {
+                                    window.location.href = window.location.href;
+                                }, 1000);
+                            }
+                        })
+            },
+            clickOption : function(questionOrderKey,answerOrderKey,Checkboxes){
+                if(this.campaignAvailable){
+                    var isCheckbox = Checkboxes?Checkboxes:false;  //是否支持多选,默认为单选
+                    if(!isCheckbox){  //单选
+                        this.answers[questionOrderKey-1].choices = [answerOrderKey];
+                    }else{
+                        toggleArray(this.answers[questionOrderKey-1].choices, answerOrderKey);
+                    }
+                }
+
+            },
+            submitAction : function(){
+                if(!this.isLogin && (this.unavailableText == '立即登录竞猜' || this.unavailableText == '请重新登录')){
+                    this.goToLogin();
+                }else {
+                    if(this.campaignAvailable){
+                        if (this.checkQuizCompleted() == true) {
+                            this.submitAnswer();
+                        } else {
+                            if (this.quizs.length == 1) {
+                                this.isWarning = true;
+                                this.warningMsg = '请选择一个答案';
+                            } else {
+                                this.isWarning = true;
+                                this.warningMsg = '您还有题目未选择答案';
+                            }
+
+                        }
+                    }
+
+                }
+            },
+            submitAnswer : function(){
+                var _this = this;
+                config.ajaxPost('/api/v2.3/campaign/quiz/answer', {token:_this.token,_id:"<%- campaign._id %>",answers:this.answers})
+                        .then(function(data){
+                            if(data.code==1000){
+                                _this.isToast = true;
+                                _this.toastMsg = '提交成功';
+                                _this.isAlert = true;
+                            }else if(data.code==1020){
+                                _this.isToast = true;
+                                _this.toastMsg = '您已经参加过游戏';
+                            }
+                        })
+            },
+            checkQuizCompleted : function(){
+                for (var i in this.answers){
+                    if(this.answers[i].choices.length == 0){
+                        return false;
+                    }
+                }
+                return true;
+            }
+        },
+        events: {
+            'pop-confirmed': function () {
+                this.resetPage();
+            }
+        }
+    });
+    Vue.filter('indexToChar', function (index) {
+        return String.fromCharCode(64 + index);
+    });
+</script>
+</body>
+</html>

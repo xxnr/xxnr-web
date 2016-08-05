@@ -46,7 +46,7 @@
             </div>
         </div>
         <button class="download-app">
-            <a href="http://a.app.qq.com/o/simple.jsp?pkgname=com.ksfc.newfarmer">下载APP</a>
+            <a>打开APP</a>
         </button>
     </div>
 </div>
@@ -63,6 +63,14 @@
         <%- result.newsbody %>
     </div>
 </div>
-
+<script src="/js/zepto.js"></script>
+<script  type="text/javascript">
+    $(function() {
+        $('.download-app').on('click', function(){
+            console.log('hahahha');
+            window.location.href = '/newsStatics/newsRedirect.html' + '?id=' + window.location.pathname.substr(window.location.pathname.lastIndexOf('/')+1); //截取最后的/后面的 news id
+        });
+    });
+</script>
 </body>
 </html>
