@@ -335,11 +335,8 @@ exports.convert_token_to_user = function(req, res, next){
     // check if token is valid
     var data = req.data;
     if(data.token){
-        // if data contains token
-        // it means the request is from app
+        // only check token in req.data
         token = data.token;
-    }else if (req.cookies[F.config.tokencookie]){
-        token = req.cookies[F.config.tokencookie];
     }
 
     if(!token){
