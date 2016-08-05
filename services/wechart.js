@@ -16,8 +16,8 @@ const tempKeyFile = path.join(__dirname, '../tmp/require_token_and_ticket');
 var WechartService = function(){
     var self = this;
     // copy key file to temp folder;
-    utils.copyFile(keyFile, tempKeyFile);
-    lockfile.lock(tempKeyFile, function (err, release) {
+    //utils.copyFile(keyFile, tempKeyFile);
+    lockfile.lock(keyFile, function (err, release) {
         if(!err) {
             console.info('process start to require token and ticket');
             self.refresh_access_token(function () {

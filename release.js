@@ -134,3 +134,11 @@ if(config.secure) {
 	https.createServer(options, app).listen(1111);
 	console.info('application listen at port 1111');
 }
+
+process
+	.once('SIGINT', function () {
+		process.exit(1);
+	})
+	.once('SIGTERM', function () {
+		process.exit(1);
+	});
