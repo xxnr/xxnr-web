@@ -9,7 +9,7 @@ var utils = require('../../common/utils');
 var fs = require('fs');
 
 const default_campaign_url_name = 'testcampaign';
-const default_campaign_share_url_name = 'testcampaignshare';
+const default_campaign_share_url = '/testcampaignshare.html';
 const campaign_type_name = {1:'品牌宣传', 2:'答题活动', 3:'竞猜活动'};
 const campaign_status_message = {1:'活动尚未上线', 2:'活动还未开始', 3:'活动正在进行', 4:'活动已经结束', 5:'活动已经下线'};
 var test_campaign = {
@@ -24,7 +24,7 @@ var test_campaign = {
         share_points_add: 10,
         share_button: true,
         share_title: '分享活动标题1',
-        share_url_name: default_campaign_share_url_name,
+        share_url: default_campaign_share_url,
         share_abstract: 'testshareabstract1',
         reward_times:1
     },
@@ -39,7 +39,7 @@ var test_campaign = {
         share_points_add: 10,
         share_button: true,
         share_title: '分享活动标题2',
-        share_url_name: default_campaign_share_url_name,
+        share_url: default_campaign_share_url,
         share_abstract: 'testshareabstract2',
         reward_times:1,
         detail: [
@@ -78,7 +78,7 @@ var test_campaign = {
         share_points_add: 10,
         share_button: false,
         share_title: '分享活动标题3',
-        share_url_name: default_campaign_share_url_name,
+        share_url: default_campaign_share_url,
         share_abstract: 'testshareabstract3',
         reward_times:1,
         detail: [
@@ -117,7 +117,7 @@ var test_campaign = {
         share_points_add: 10,
         share_button: false,
         share_title: '分享活动标题1',
-        share_url_name: utils.GUID(10),
+        share_url: utils.GUID(10),
         share_abstract: 'testshareabstract1',
         reward_times:1
     }}
@@ -194,9 +194,9 @@ describe('campaign', function(){
             var QA_campaign_path = __dirname + '/../../views/G.campaign/QAs/' + default_campaign_url_name + '.html';
             var quiz_campaign_path = __dirname + '/../../views/G.campaign/quizs/' + default_campaign_url_name + '.html';
 
-            var events_campaign_share_path =__dirname +  '/../../views/G.campaign/events/' + default_campaign_share_url_name + '.html';
-            var QA_campaign_share_path = __dirname + '/../../views/G.campaign/QAs/' + default_campaign_share_url_name + '.html';
-            var quiz_campaign_share_path = __dirname + '/../../views/G.campaign/quizs/' + default_campaign_share_url_name + '.html';
+            var events_campaign_share_path =__dirname +  '/../../views/G.campaign/events/' + default_campaign_share_url + '.html';
+            var QA_campaign_share_path = __dirname + '/../../views/G.campaign/QAs/' + default_campaign_share_url + '.html';
+            var quiz_campaign_share_path = __dirname + '/../../views/G.campaign/quizs/' + default_campaign_share_url + '.html';
 
             before('prepare default campaign page', function(done){
                 fs.readFile(__dirname + '/data/'+default_campaign_url_name + '.html', function(err, content){
@@ -244,7 +244,7 @@ describe('campaign', function(){
                         share_points_add: campaign.share_points_add,
                         share_button: campaign.share_button,
                         share_title: campaign.share_title,
-                        share_url_name: campaign.share_url_name,
+                        share_url: campaign.share_url,
                         share_abstract: campaign.share_abstract,
                         share_image:campaign_share_image_url,
                         reward_times:campaign.reward_times
@@ -257,7 +257,7 @@ describe('campaign', function(){
                         url: campaign_url(campaign.campaign_url_name, campaign.type),
                         share_button:campaign.shareable && campaign.share_button,
                         share_title: campaign.share_title,
-                        share_url: campaign_url(campaign.share_url_name, campaign.type),
+                        share_url: 'http://127.0.0.1' + campaign.share_url,
                         share_abstract: campaign.share_abstract,
                         image:campaign_image(campaign_image_url),
                         share_image:campaign_image(campaign_share_image_url)
@@ -282,11 +282,9 @@ describe('campaign', function(){
                             var campaign_page_url = body.campaigns[0].url;
                             var campaign_share_url = body.campaigns[0].share_url;
                             Routing.Campaign.get_page(campaign_page_url, function () {
-                                Routing.Campaign.get_page(campaign_share_url, function () {
-                                    Routing.Campaign.get_app_share_info(campaign_page_url, function(body){
-                                        body.should.have.properties(expected_app_share_info);
-                                        done();
-                                    })
+                                Routing.Campaign.get_app_share_info(campaign_page_url, function(body){
+                                    body.should.have.properties(expected_app_share_info);
+                                    done();
                                 })
                             })
                         })
@@ -306,7 +304,7 @@ describe('campaign', function(){
                         share_points_add: campaign.share_points_add,
                         share_button: campaign.share_button,
                         share_title: campaign.share_title,
-                        share_url_name: campaign.share_url_name,
+                        share_url: campaign.share_url,
                         share_abstract: campaign.share_abstract
                     }]
                 };
@@ -317,7 +315,7 @@ describe('campaign', function(){
                         url: campaign_url(campaign.campaign_url_name, campaign.type),
                         share_button:campaign.shareable && campaign.share_button,
                         share_title: campaign.share_title,
-                        share_url: campaign_url(campaign.share_url_name, campaign.type),
+                        share_url: 'http://127.0.0.1' + campaign.share_url,
                         share_abstract: campaign.share_abstract,
                         image:campaign_image(campaign_image_url),
                         share_image:campaign_image(campaign_share_image_url)
@@ -346,7 +344,7 @@ describe('campaign', function(){
                         share_points_add: campaign.share_points_add,
                         share_button: campaign.share_button,
                         share_title: campaign.share_title,
-                        share_url_name: campaign.share_url_name,
+                        share_url: campaign.share_url,
                         share_abstract: campaign.share_abstract,
                         detail:campaign.detail
                     }
@@ -363,18 +361,16 @@ describe('campaign', function(){
                             var campaign_page_url = body.campaigns[0].url;
                             var campaign_share_url = body.campaigns[0].share_url;
                             Routing.Campaign.get_page(campaign_page_url, function(){
-                                Routing.Campaign.get_page(campaign_share_url, function(){
-                                    Routing.Campaign.query_QA(campaign_id, function(body){
-                                        body.should.containDeep(expected_QA_list);
-                                        Routing.Campaign.get_app_share_info(campaign_page_url, function(body){
-                                            body.should.have.properties(expected_app_share_info);
-                                            Routing.Campaign.backend_get_campaign_detail(backend_admin_token, campaign_id, function(body){
-                                                body.should.containDeep(expected_campaign_detail);
-                                                done();
-                                            })
+                                Routing.Campaign.query_QA(campaign_id, function(body){
+                                    body.should.containDeep(expected_QA_list);
+                                    Routing.Campaign.get_app_share_info(campaign_page_url, function(body){
+                                        body.should.have.properties(expected_app_share_info);
+                                        Routing.Campaign.backend_get_campaign_detail(backend_admin_token, campaign_id, function(body){
+                                            body.should.containDeep(expected_campaign_detail);
+                                            done();
                                         })
-                                    });
-                                })
+                                    })
+                                });
                             })
                         })
                     })
@@ -393,7 +389,7 @@ describe('campaign', function(){
                         share_points_add: campaign.share_points_add,
                         share_button: campaign.share_button,
                         share_title: campaign.share_title,
-                        share_url_name: campaign.share_url_name,
+                        share_url: campaign.share_url,
                         share_abstract: campaign.share_abstract
                     }]
                 };
@@ -404,7 +400,7 @@ describe('campaign', function(){
                         url: campaign_url(campaign.campaign_url_name, campaign.type),
                         share_button:campaign.shareable && campaign.share_button,
                         share_title: campaign.share_title,
-                        share_url: campaign_url(campaign.share_url_name, campaign.type),
+                        share_url: 'http://127.0.0.1' + campaign.share_url,
                         share_abstract: campaign.share_abstract,
                         image:campaign_image(campaign_image_url),
                         share_image:campaign_image(campaign_share_image_url)
@@ -433,7 +429,7 @@ describe('campaign', function(){
                         share_points_add: campaign.share_points_add,
                         share_button: campaign.share_button,
                         share_title: campaign.share_title,
-                        share_url_name: campaign.share_url_name,
+                        share_url: campaign.share_url,
                         share_abstract: campaign.share_abstract,
                         detail:campaign.detail
                     }
@@ -450,18 +446,16 @@ describe('campaign', function(){
                             var campaign_page_url = body.campaigns[0].url;
                             var campaign_share_url = body.campaigns[0].share_url;
                             Routing.Campaign.get_page(campaign_page_url, function(){
-                                Routing.Campaign.get_page(campaign_share_url, function(){
-                                    Routing.Campaign.query_quiz_question(campaign_id, function(body){
-                                        body.should.containDeep(expected_question_list);
-                                        Routing.Campaign.get_app_share_info(campaign_page_url, function(body){
-                                            body.should.have.properties(expected_app_share_info);
-                                            Routing.Campaign.backend_get_campaign_detail(backend_admin_token, campaign_id, function(body){
-                                                body.should.containDeep(expected_campaign_detail);
-                                                done();
-                                            })
+                                Routing.Campaign.query_quiz_question(campaign_id, function(body){
+                                    body.should.containDeep(expected_question_list);
+                                    Routing.Campaign.get_app_share_info(campaign_page_url, function(body){
+                                        body.should.have.properties(expected_app_share_info);
+                                        Routing.Campaign.backend_get_campaign_detail(backend_admin_token, campaign_id, function(body){
+                                            body.should.containDeep(expected_campaign_detail);
+                                            done();
                                         })
-                                    });
-                                })
+                                    })
+                                });
                             })
                         })
                     })
@@ -483,7 +477,7 @@ describe('campaign', function(){
                         share_points_add: campaign.share_points_add + 10,
                         share_button: !campaign.share_button,
                         share_title: 'another share title',
-                        share_url_name: 'another share name',
+                        share_url: 'another share name',
                         share_abstract: 'another share abstract',
                         share_image:'sharetesturl',
                         reward_times:campaign.reward_times+1
