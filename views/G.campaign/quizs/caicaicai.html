@@ -340,7 +340,7 @@
             methods: {
                 closeAlert: function () {
                     this.isShow = false;
-                    _this.timeout = setTimeout(function () {
+                    this.timeout = setTimeout(function () {
                         window.location.href = window.location.href;
                     }, 1500);
                 },
