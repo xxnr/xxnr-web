@@ -129,11 +129,11 @@
             .then(function(data){
                 if(data.code == 1000){
                     if(data.status == 3){
-                        if(jsObj.isLogin()){
+                        if(typeof jsObj !== 'undefined' && jsObj.isLogin()){
                             var appToken = jsObj.getToken();
                             config.ajaxGet('/api/v2.3/user/checkShareAddPoints', {type:'campaign',token:appToken,_id:"<%- campaign._id %>"})
                                     .then(function(data){
-                                        if(typeof data.result === "undefined"){
+                                        if(data && data.result){
                                             $('.red_packet--btn').attr('src','/images/campaign/event/button（share-）-.png');
                                         }else{
                                             $('.red_packet--btn').attr('src','/images/campaign/event/button（has-not）.png');
@@ -147,7 +147,9 @@
                         }else{
                             $('.red_packet--btn').attr('src','/images/campaign/event/button（not）-.png');
                             $('.red_packet--btn').on('click', function(){
-                                jsObj.toLogin();
+                                if (typeof jsObj !== 'undefined') {
+                                    jsObj.toLogin();
+                                }
                             })
                         }
                     }else if(data.status == 1){
