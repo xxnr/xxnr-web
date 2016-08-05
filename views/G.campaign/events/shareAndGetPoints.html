@@ -141,7 +141,7 @@
                                         }else{
                                             $('.red_packet--btn').attr('src','/images/campaign/event/button（has-not）.png');
                                             $('.red_packet--btn').on('click', function(){
-                                                jsObj.shareUrl("<%- campaign.share_url %>");
+                                                jsObj.shareUrl("<%- campaign.share_url %>", true);
                                             });
                                         }
 
