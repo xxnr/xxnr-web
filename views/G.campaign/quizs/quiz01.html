@@ -50,6 +50,9 @@
         .download_app--close {float: left;width: 10px;height: 10px;margin-top: 25px;margin-left: 6px;margin-right: 12px;}
         .campaign_mask {position: fixed;width: 100%;height: 100%;background: rgba(0,0,0,0.6);;top:0;z-index: 200;color:#323232;padding-top: 70px;padding-left: 30px;padding-right: 30px;box-sizing: border-box;font-size: 4.5vw;}
         .campaign_unavailable_style {background: #D5D5D5;color: #FFFFFF}
+        .right_answers_result {margin: auto;text-align: center;margin-bottom: 10px;}
+        .right_answers_result p {margin-top: 2px}
+        .right_answers_result p span {color:#FA4603;font-size: 20px}
     </style>
 </head>
 
@@ -69,7 +72,12 @@
             <img src="/images/campaign/quiz/background_imgt.jpg" alt="">
         </div>
         <div class="quiz_body" v-cloak>
+
             <div class="quiz_questions" v-cloak>
+                <div class="right_answers_result" v-show="showRightAnswers">
+                    竞猜结束
+                    <p v-show="points">恭喜你获得<span>{{points}}</span>积分</p>
+                </div>
                 <img class="gold_medal" src="/images/campaign/quiz/gold-medal.png" alt="">
                 <div class="quiz-entry" v-for="quiz in quizs">
                     <p class="quiz_question">{{quiz.order_key}}. {{quiz.question}}</p>
@@ -368,7 +376,8 @@
             toastMsg:'',
             isAlert:false,
             isMask:false,
-            showRightAnswers:false
+            showRightAnswers:false,
+            points:0,
         },
         created: function () {
 
@@ -496,6 +505,7 @@
                                     }
                                 }else {
                                     _this.showRightAnswers = true
+                                    _this.points = data.result.points;
                                 }
 
                             }
