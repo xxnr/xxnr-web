@@ -44,12 +44,12 @@ WechartService.prototype.refresh_access_token = function(cb){
         }
 
         result = JSON.parse(result);
-        WechartModel.findOneAndUpdate({}, {$set:{access_token:result.access_token}}, {upsert:true}, function(err){
+        var expires_in = result.expires_in;
+        WechartModel.findOneAndUpdate({}, {$set:{access_token:result.access_token, access_token_update_time:new Date(), access_token_expires_in:expires_in}}, {upsert:true}, function(err){
             if(err){
                 console.error(err);
             }
 
-            var expires_in = result.expires_in;
             if(cb){
                 cb();
             }
@@ -98,12 +98,12 @@ WechartService.prototype.refresh_jsapi_ticket = function(cb){
                 return;
             }
 
-            WechartModel.findOneAndUpdate({}, {$set: {jsapi_ticket: result.ticket}}, function (err) {
+            var expires_in = result.expires_in;
+            WechartModel.findOneAndUpdate({}, {$set: {jsapi_ticket: result.ticket, jsapi_ticket_update_time:new Date(), jsapi_ticket_expires_in:expires_in}}, function (err) {
                 if (err) {
                     console.error(err);
                 }
 
-                var expires_in = result.expires_in;
                 if (cb) {
                     cb();
                 }
