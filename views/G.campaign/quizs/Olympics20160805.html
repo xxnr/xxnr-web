@@ -345,7 +345,7 @@
             '<div style="text-align: center;font-size: 18px;border-bottom: 1px solid #E2E2E2;padding-top: 19px;padding: 10px;"> {{alertTitle}}' +
             '<p style="margin-top: 12px;margin-bottom: 19px;font-size: 14px">{{alertMessage}}</p> ' +
             '</div>' +
-            '<div @click="closeAlert()" class="confirm-option" style="color:#00B38A;display: inline-block;width: 100%;height: 50px;line-height: 50px;text-align: center;font-size: 18px;border-right: 1px solid #E2E2E2;box-sizing: border-box;">好的' +
+            '<div @click="closeAlert()" class="confirm-option" style="color:#00B38A;display: inline-block;width: 100%;height: 50px;line-height: 50px;text-align: center;font-size: 18px;box-sizing: border-box;">好的' +
             '</div>' +
             '</div>',
             methods: {
@@ -523,7 +523,14 @@
                                         _this.campaignAvailable = false;
                                         _this.unavailableText = '已参加';
                                     }else{
-                                        _this.campaignAvailable = true;
+                                        config.ajaxGet('/api/v2.3/campaign_status', {_id:"<%- campaign._id %>"})
+                                                .then(function(data) {
+                                                    if (data.code == 1000) {
+                                                        if (data.status == 3) {
+                                                            _this.campaignAvailable = true;
+                                                        }
+                                                    }
+                                                })
                                     }
                                 }else if(data.code == 1401){
                                     _this.campaignAvailable = false;

@@ -131,7 +131,7 @@
             <div class="quiz--info--text">
                 <p class="quiz--info--text--title">活动说明</p>
                 <p>活动范围：所有注册用户</p>
-                <p>活动时间：2016-07-15~2016-08-15</p>
+                <p>活动时间：2016-08-06~2016-12-31</p>
                 <p>活动规则：</p>
                 <p>1. 活动需登录后参与</p>
                 <p>2. 登录后开始答题，每个题目有且仅有一个正确选项，点击选项即提交</p>
@@ -307,7 +307,7 @@
         },
         template:
         '<div v-show="isShow" style="position:fixed;left: 50%;top: 50%;margin-top: -55px;margin-left: -125px;height: 110px;width: 250px;z-index: 250;background: #FFFFFF;border-radius: 5px;">' +
-        '<div style="text-align: center;height: 60px;line-height: 60px;font-size: 18px;border-bottom: 1px solid #E2E2E2;"> {{confirmTitle}}' +
+        '<div style="box-sizing: border-box;text-align: center;height: 60px;line-height: 60px;font-size: 18px;border-bottom: 1px solid #E2E2E2;"> {{confirmTitle}}' +
         '</div>' +
         '<div @click="closeConfirm()" class="confirm-option" style="color:#00B38A;display: inline-block;width: 50%;height: 50px;line-height: 50px;text-align: center;font-size: 18px;border-right: 1px solid #E2E2E2;box-sizing: border-box;">取消' +
         '</div>' +
@@ -534,7 +534,14 @@
                                     _this.campaignAvailable = false;
                                     _this.unavailableText = '已参加';
                                 }else{
-                                    _this.campaignAvailable = true;
+                                    config.ajaxGet('/api/v2.3/campaign_status', {_id:"<%- campaign._id %>"})
+                                            .then(function(data) {
+                                                if (data.code == 1000) {
+                                                    if (data.status == 3) {
+                                                        _this.campaignAvailable = true;
+                                                    }
+                                                }
+                                            })
                                 }
                             }else if(data.code == 1401){
                                 _this.campaignAvailable = false;
