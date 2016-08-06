@@ -32,7 +32,7 @@
         }
         .title_image img{width: 100%;margin: auto;display: block}
         .quiz_body {width: 100%;background: url('/images/campaign/quiz/background_imgd.jpg') repeat-y;}
-        .quiz_questions {position: relative;color: #323232;width: 90%;border: 3px solid #92C102; background: #FFF8DC;margin: auto;border-radius: 5px;padding: 28px;box-sizing: border-box;    margin-bottom: 25px;}
+        .quiz_questions {position: relative;color: #323232;width: 90%;border: 3px solid #92C102; background: #FFF8DC;margin: auto;border-radius: 5px;padding: 28px 34px;box-sizing: border-box;    margin-bottom: 25px;}
         .quiz_question {font-size: 16px;margin-bottom: 13px}
         .quiz-entry {margin-bottom: 25px}
         .gold_medal {position: absolute;top: 0;right: 5%;width: 26px;height: 45px}
@@ -382,7 +382,9 @@
                 isMask:false,
                 showRightAnswers:false,
                 points:0,
-            },
+                statusCode:0
+
+        },
             created: function () {
 
                 this.checkStatus();
@@ -412,13 +414,18 @@
                                 if(data.code == 1000){
                                     if(data.status == 1){
                                         _this.unavailableText = '即将上线';
+                                        _this.statusCode = 1;
                                     }else if(data.status == 2){
                                         _this.unavailableText = '即将开始';
+                                        _this.statusCode = 2;
                                     }else if(data.status == 4){
                                         _this.unavailableText = '已结束';
+                                        _this.statusCode = 4;
                                     }else if(data.status == 5){
                                         _this.unavailableText = '已下线';
+                                        _this.statusCode = 5;
                                     }else if(data.status == 3){
+                                        _this.statusCode = 3;
                                         _this.campaignAvailable = true;
                                         _this.canChoose = true;
                                     }
@@ -472,6 +479,8 @@
                     if(!this.isLogin && this.campaignAvailable){
                         this.unavailableText = '立即登录竞猜';
                         this.campaignAvailable = false;
+                    }else if(!this.isLogin && this.statusCode == 4){
+                        this.showRightAnswers = true;
                     }
                 },
                 goToLogin : function(){
@@ -510,7 +519,7 @@
                                             }
                                         }
                                     }else {
-                                        _this.showRightAnswers = true
+                                        _this.showRightAnswers = true;
                                         _this.points = data.result.points;
                                     }
 
@@ -527,7 +536,9 @@
                                         _this.canChoose = false;
                                         _this.unavailableText = '已参加';
                                     }else{
-
+                                        if(data.status == 4) {
+                                            _this.showRightAnswers = true;
+                                        }
                                     }
                                 }else if(data.code == 1401){
                                     _this.campaignAvailable = false;
