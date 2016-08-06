@@ -83,7 +83,7 @@
                 </div>
                 <img class="gold_medal" src="/images/campaign/quiz/gold-medal.png" alt="">
                 <div class="quiz-entry" v-for="quiz in quizs">
-                    <p class="quiz_question">{{quiz.order_key}}. {{quiz.question}}</p>
+                    <p class="quiz_question">{{quizs.length>1?quiz.order_key + '. ':''}}{{quiz.question}}</p>
                     <p @click="clickOption(quiz.order_key,option.order_key,Checkboxes)" v-for="option in quiz.options" v-bind:class="['quiz_option',{'quiz_option_selected': answers[$parent.$index].choices.indexOf(option.order_key) != -1}]">
                         {{option.value}}
                         <img class="option--correct_answer" v-show="option.is_right_answer && showRightAnswers" src="/images/campaign/quiz/correct.png" alt="">
