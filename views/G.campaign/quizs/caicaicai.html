@@ -95,7 +95,7 @@
                 <div class="quiz--info--text">
                     <p class="quiz--info--text--title">活动说明</p>
                     <p>活动范围：所有注册用户</p>
-                    <p>活动时间：2016-07-15~2016-08-15</p>
+                    <p>活动时间：2016-08-08~2016-08-26</p>
                     <p>活动规则：</p>
                     <p>1. 活动需登录后参与</p>
                     <p>2. 登录后开始参与竞猜，每个题目只能竞猜一个选项，点击提交后不能修改</p>
@@ -345,7 +345,7 @@
             '<div style="text-align: center;font-size: 18px;border-bottom: 1px solid #E2E2E2;padding-top: 19px;padding: 10px;"> {{alertTitle}}' +
             '<p style="margin-top: 12px;margin-bottom: 19px;font-size: 14px">{{alertMessage}}</p> ' +
             '</div>' +
-            '<div @click="closeAlert()" class="confirm-option" style="color:#00B38A;display: inline-block;width: 100%;height: 50px;line-height: 50px;text-align: center;font-size: 18px;border-right: 1px solid #E2E2E2;box-sizing: border-box;">好的' +
+            '<div @click="closeAlert()" class="confirm-option" style="color:#00B38A;display: inline-block;width: 100%;height: 50px;line-height: 50px;text-align: center;font-size: 18px;box-sizing: border-box;">好的' +
             '</div>' +
             '</div>',
             methods: {
@@ -370,6 +370,7 @@
                 quizs:[],
                 answers:[],
                 campaignAvailable:false,
+                canChoose:false,
                 unavailableText:'',
                 showDownloadApp:false,
                 isLogin: false,
@@ -419,6 +420,7 @@
                                         _this.unavailableText = '已下线';
                                     }else if(data.status == 3){
                                         _this.campaignAvailable = true;
+                                        _this.canChoose = true;
                                     }
                                     _this.checkLogin();
                                     if(_this.isLogin){
@@ -494,6 +496,7 @@
                                 }else{
                                     if(!data.result.has_result){
                                         _this.campaignAvailable = false;
+                                        _this.canChoose = false;
                                         _this.unavailableText = '已参加';
 
                                         for(var i in data.answers){
@@ -521,9 +524,10 @@
                                 if(data.code == 1000){
                                     if(data.times_left <= 0){
                                         _this.campaignAvailable = false;
+                                        _this.canChoose = false;
                                         _this.unavailableText = '已参加';
                                     }else{
-                                        _this.campaignAvailable = true;
+
                                     }
                                 }else if(data.code == 1401){
                                     _this.campaignAvailable = false;
@@ -538,7 +542,7 @@
                             })
                 },
                 clickOption : function(questionOrderKey,answerOrderKey,Checkboxes){
-                    if(this.campaignAvailable){
+                    if(this.canChoose){
                         var isCheckbox = Checkboxes?Checkboxes:false;  //是否支持多选,默认为单选
                         if(!isCheckbox){  //单选
                             this.answers[questionOrderKey-1].choices = [answerOrderKey];
