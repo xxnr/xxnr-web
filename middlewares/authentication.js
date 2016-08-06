@@ -329,3 +329,49 @@ exports.isRSC_middleware = function(req, res, next){
         next();
     })
 };
+
+exports.convert_token_to_user = function(req, res, next){
+    var token = null;
+    // check if token is valid
+    var data = req.data;
+    if(data.token){
+        // only check token in req.data
+        token = data.token;
+    }
+
+    if(!token){
+        next();
+        return;
+    }
+
+    try {
+        var payload = tools.verify_token(token);
+        // token verify success, still need to check if the login id matches the current one in db
+        UserService.get({userid:payload.userId}, function(err, data) {
+            if (err) {
+                // perhaps no user find
+                console.error('isLogin_middleware user not found:', err);
+                res.respond({code: 1401, message: '用户不存在'});
+                return;
+            }
+
+            var valid = payload.appLoginId ?
+            payload.appLoginId == data.appLoginId :
+                payload.webLoginId ?
+                payload.webLoginId == data.webLoginId :
+                    false;
+
+            if (!valid) {
+                res.respond({code: 1401, message: '您已在其他地方登录'});
+                return;
+            }
+
+            req.user = data;
+            next();
+        })
+    }catch(e){
+        // authentication fail
+        console.error('Token verification fail:', e);
+        res.respond({code: 1401, message: '用户信息验证错误，请重新登录'});
+    }
+};

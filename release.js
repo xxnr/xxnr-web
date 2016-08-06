@@ -120,6 +120,7 @@ var port = 8070;
 if(config.environment == 'sandbox'){
 	port = 80;
 }
+
 http.createServer(app).listen(port);
 console.info('application listen at port', port);
 
@@ -129,6 +130,15 @@ if(config.secure) {
 		key: fs.readFileSync('xxnr.key'),
 		cert: fs.readFileSync('xxnr.crt')
 	};
-	https.createServer(options, app).listen(8442);
-	console.info('application listen at port 8442');
+
+	https.createServer(options, app).listen(1111);
+	console.info('application listen at port 1111');
 }
+
+process
+	.once('SIGINT', function () {
+		process.exit(1);
+	})
+	.once('SIGTERM', function () {
+		process.exit(1);
+	});

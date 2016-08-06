@@ -21,7 +21,7 @@ const loyaltyPointsType = {
     "ORDERCOMPLETED": {'type':3, 'name':'完成订单', 'refName':'order'},
     "EXCHANGE": {'type':4, 'name':'积分兑换', 'refName':'giftOrder'},
     "COMPAIGNREWARD": {'type':5, 'name':'活动奖励', 'refName':'campaign'},
-    "SHARE": {'type':6, 'name':'分享奖励', 'refName':'campaign'}
+    "SHARE": {'type':6, 'name':'分享奖励', 'refName':{'campaign':'campaign', 'news':'news'}, 'points': 2}
 };
 var deliveryTypeSort = {};
 deliveryTypeSort[SONGHUO]=10;

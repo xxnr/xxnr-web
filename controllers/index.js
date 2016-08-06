@@ -16,3 +16,4 @@ exports.Cart = require('./D.cart.js');
 exports.Pay = require('./E.pay.js');
 exports.RSC = require('./E.RSC.js');
 exports.Rewardshop = require('./F.rewardshop.js');
+exports.Campaign = require('./G.campaign.js');

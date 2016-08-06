@@ -132,14 +132,15 @@ NewsService.prototype.get = function(options, callback) {
 
     // Gets a specific document from DB
     var queryoptions = {};
+    if (options.id)
+        queryoptions.id = options.id;
     if (options.status)
         queryoptions.status = options.status;
     if (options.category)
         queryoptions.category = options.category;
-    if (options.id)
-        queryoptions.id = options.id;
+    
     NewsModel.findOne(queryoptions)
-        .select('-_id -__v')
+        .select('-__v')
         .exec(function(err, doc){
         if(err){
             console.error(err);

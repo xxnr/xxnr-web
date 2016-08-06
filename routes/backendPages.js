@@ -13,6 +13,12 @@ router.get(F.config['manager-url']+'/rewardshop/rewardshop-gifts-detail', middle
 router.get(F.config['manager-url']+'/rewardshop/rewardshop-points-logs', middleware.backend_auth, controllers.Manager.rewardshop_points_logs);
 router.get(F.config['manager-url']+'/rewardshop/rewardshop-gifts-orders', middleware.backend_auth ,controllers.Manager.rewardshop_gifts_orders);
 
+// campaign
+router.get(F.config.manager_url + '/campaigns', middleware.backend_auth, controllers.Manager.campaigns);
+router.get(F.config.manager_url + '/campaign-detail', middleware.backend_auth, controllers.Manager.campaign_detail);
+router.get(F.config.manager_url + '/campaign-detail-QA', middleware.backend_auth, controllers.Manager.campaign_detail_QA);
+router.get(F.config.manager_url + '/campaign-detail-quiz', middleware.backend_auth, controllers.Manager.campaign_detail_quiz);
+
 //// admin / manager
 router.get(F.config['manager-url'], middleware.backend_auth ,controllers.Manager.manager);
 router.get(F.config['manager-url']+'/*', middleware.backend_auth ,controllers.Manager.manager);

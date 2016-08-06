@@ -91,8 +91,8 @@ export function configRouter (router) {
     if (transition.to.auth) {
       const user = getCookie('__user');
       if(!user){
-        let redirect = encodeURIComponent(transition.to.path);
-        transition.redirect('/login?redirect=' + redirect);
+        //let redirect = encodeURIComponent(encodeURI(transition.to.path));
+        transition.redirect('/login?ref=' + transition.to.path);
         //redirect 作为参数，登录之后跳转回来
         //console.log('Wrong way!');
       }else{
