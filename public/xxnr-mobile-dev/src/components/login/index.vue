@@ -34,7 +34,7 @@
     data: function () {
       return {
         toastShow:false,
-        link: getUrlParam('ref') ? {path: '/register?ref='+getUrlParam('ref')} : getUrlParam('redirect') ? {path: '/register?redirect='+getUrlParam('redirect')} : {path: '/register'}
+        link: getUrlParam('ref') ? {path: '/register?ref='+getUrlParam('ref')} : getUrlParam('redirect') ? {path: '/register?redirect='+decodeURIComponent(getUrlParam('redirect'))} : {path: '/register'}
       }
     },
     methods: {
