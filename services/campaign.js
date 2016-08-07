@@ -431,10 +431,15 @@ CampaignService.prototype.QA_check_answers = function(user_id, campaign_id, answ
             });
         });
 
+        var alreadyAnswered = [];
         answers.forEach(function(answer){
-            if(answers_equal(questions[answer.order_key].right_answers, answer.choices)){
-                right_answered_questions_count++;
-                points_added += questions[answer.order_key].points;
+            if(!alreadyAnswered[answer.order_key]) {
+                if (answers_equal(questions[answer.order_key].right_answers, answer.choices)) {
+                    right_answered_questions_count++;
+                    points_added += questions[answer.order_key].points;
+                }
+
+                alreadyAnswered[answer.order_key] = true;
             }
         });
 
@@ -586,11 +591,17 @@ CampaignService.prototype.trigger_quiz_reward = function(campaign_id, callback){
                                     var user = quizAnswers[i];
                                     var points_add = 0;
                                     var right_answer_count = 0;
+
+                                    var alreadyAnswered = [];
                                     user.answer.forEach(function (answer) {
-                                        if (answers_equal(quiz[answer.order_key].right_answers, answer.choices)) {
-                                            // answer right
-                                            points_add += quiz[answer.order_key].points;
-                                            right_answer_count++;
+                                        if(!alreadyAnswered[answer.order_key]) {
+                                            if (answers_equal(quiz[answer.order_key].right_answers, answer.choices)) {
+                                                // answer right
+                                                points_add += quiz[answer.order_key].points;
+                                                right_answer_count++;
+                                            }
+
+                                            alreadyAnswered[answer.order_key] = true;
                                         }
                                     });
 
