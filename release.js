@@ -131,8 +131,8 @@ if(config.secure) {
 		cert: fs.readFileSync('xxnr.crt')
 	};
 
-	https.createServer(options, app).listen(1111);
-	console.info('application listen at port 1111');
+	https.createServer(options, app).listen(8442);
+	console.info('application listen at port 8442');
 }
 
 process
