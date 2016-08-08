@@ -95,6 +95,7 @@
     route: {
       activate(){
         this.showBackBtn();
+        this.link = getUrlParam('ref') ? {path: '/login?ref='+getUrlParam('ref')} : getUrlParam('redirect') ? {path: decodeURI('/login?redirect='+getUrlParam('redirect'))} : {path: '/login'};
       }
     },
   }

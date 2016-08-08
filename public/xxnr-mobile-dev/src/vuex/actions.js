@@ -85,7 +85,7 @@ export const setRightButtonText = ({dispatch, state}, data, path) => {
 
 export const goBack = ({dispatch,state}) => {
   if(getUrlParam('redirect')) {
-    window.location.href = decodeURIComponent(getUrlParam('redirect'));
+    window.location.href = decodeURIComponent(getUrlParam('redirect', decodeURI(window.location.href)));
     return;
   }
   if(window.location.pathname.indexOf('my_orders')!=-1){
@@ -152,7 +152,7 @@ export const login = ({dispatch,state},PhoneNumber,password) => {
           return;
         }
         if(getUrlParam('redirect')) {
-          window.location.href = decodeURIComponent(getUrlParam('redirect'));
+          window.location.href = decodeURIComponent(getUrlParam('redirect', decodeURI(window.location.href)));
           return;
         }
         router.go('/home');
@@ -356,7 +356,7 @@ export const register = ({dispatch,state},phoneNumber,password,registerCode,conf
           return;
         }
         if(getUrlParam('redirect')) {
-          window.location.href = decodeURIComponent(getUrlParam('redirect'));
+          window.location.href = decodeURIComponent(getUrlParam('redirect', decodeURI(window.location.href)));
           return;
         }
         router.go('/home');
