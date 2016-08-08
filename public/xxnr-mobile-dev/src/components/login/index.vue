@@ -64,6 +64,7 @@
         this.hideRightBtn();
         this.showBackBtn();
         this.editTitle('我的新农人');
+        this.link = getUrlParam('ref') ? {path: '/register?ref='+getUrlParam('ref')} : getUrlParam('redirect') ? {path: decodeURI('/register?redirect=' + getUrlParam('redirect'))} : {path: '/register'};
       }
     },
   }
