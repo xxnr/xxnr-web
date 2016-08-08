@@ -53,7 +53,7 @@
         password: '',
         code: '',
         confirmPassword: '',
-        link: getUrlParam('ref') ? {path: '/login?ref='+getUrlParam('ref')} : getUrlParam('redirect') ? {path: '/login?redirect='+decodeURIComponent(getUrlParam('redirect'))} : {path: '/login'}
+        link: getUrlParam('ref') ? {path: '/login?ref='+getUrlParam('ref')} : getUrlParam('redirect') ? {path: '/login?redirect='+getUrlParam('redirect')} : {path: '/login'}
       }
     },
     methods: {
