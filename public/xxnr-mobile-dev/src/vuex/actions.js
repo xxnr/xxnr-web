@@ -84,6 +84,10 @@ export const setRightButtonText = ({dispatch, state}, data, path) => {
 }
 
 export const goBack = ({dispatch,state}) => {
+  if(getUrlParam('redirect')) {
+    window.location.href = decodeURIComponent(getUrlParam('redirect'));
+    return;
+  }
   if(window.location.pathname.indexOf('my_orders')!=-1){
     //window.location.href = '#!/my_xxnr';  //对我的订单页面有个特殊的路由处理,在任何一个标签都跳会我的新新农人
     router.go('/my_xxnr')
@@ -347,6 +351,14 @@ export const register = ({dispatch,state},phoneNumber,password,registerCode,conf
       if (response.data.code == 1000) {
       //sessionStorage.setItem('user', JSON.stringify(response.data.datas));
         dispatch(types.SET_TOASTMSG, '注册成功');
+        if(getUrlParam('ref')) {
+          router.go(decodeURIComponent(getUrlParam('ref')));
+          return;
+        }
+        if(getUrlParam('redirect')) {
+          window.location.href = decodeURIComponent(getUrlParam('redirect'));
+          return;
+        }
         router.go('/home');
       }else{
         dispatch(types.SET_TOASTMSG, response.data.message);

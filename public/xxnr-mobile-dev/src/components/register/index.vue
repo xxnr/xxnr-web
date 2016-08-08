@@ -28,7 +28,7 @@
     </button>
   </div>
   <div class="reg-section">
-    已有账号？<a href="" v-link="{ path: '/login'}" class="reg-section-green">登录</a>
+    已有账号？<a href="" v-link="link" class="reg-section-green">登录</a>
   </div>
   <verify-code :phone-num="phoneNum"></verify-code>
   <div v-show="toastMsg.length>0">
@@ -42,6 +42,7 @@
   import { sendRegisterCode,register,showBackBtn,changeRightBtnMyXXNR,changeRightBtnPathMyxxnr } from '../../vuex/actions'
   import xxnrToast from '../../xxnr_mobile_ui/xxnrToast.vue'
   import verifyCode from '../verifyCode.vue'
+  import {getUrlParam} from '../../utils/common'
 
   export default {
     data: function () {
@@ -51,7 +52,8 @@
         phoneNum: '',
         password: '',
         code: '',
-        confirmPassword: ''
+        confirmPassword: '',
+        link: getUrlParam('ref') ? {path: '/login?ref='+getUrlParam('ref')} : getUrlParam('redirect') ? {path: '/login?redirect='+decodeURIComponent(getUrlParam('redirect'))} : {path: '/login'}
       }
     },
     methods: {
