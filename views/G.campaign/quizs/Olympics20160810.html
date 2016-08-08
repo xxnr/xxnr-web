@@ -485,7 +485,7 @@
                 },
                 goToLogin : function(){
                     if(typeof jsObj == "undefined"){
-                        window.location.href = encodeURI(config.mobileBaseURI + "/login?redirect="+window.location.href);
+                        window.location.href = config.mobileBaseURI + "/login?redirect="+encodeURIComponent(window.location.href);
                     } else {
                         jsObj.toLogin();
                     }
