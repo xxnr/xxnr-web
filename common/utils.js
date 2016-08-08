@@ -4833,6 +4833,14 @@ exports.createDirectory = function(dir){
         fs.mkdirSync(dir);
 };
 
+exports.cloneJSON = function(o){
+    return JSON.parse(JSON.stringify(o));
+};
+
+exports.copyFile = function(src, des){
+    fs.createReadStream(src).pipe(fs.createWriteStream(des));
+};
+
 global.async = exports.async;
 global.sync = global.SYNCHRONIZE = exports.sync;
 global.sync2 = exports.sync2;

@@ -55,10 +55,12 @@ module.exports = function(callback) {
 
                     var valuePromises = values.map(function (value) {
                         return new Promise(function (resolve, reject) {
-                            ProductService.addAttribute(category, skipBrand ? null : brand._id, name, value, order, function (err) {
+                            var index = values.indexOf(value);
+                            var value_order = order * 100 + index;
+                            ProductService.addAttribute(category, skipBrand ? null : brand._id, name, value, value_order, function (err) {
                                 if (err) {
                                     if(11000 == err.code){
-                                        ProductService.updateAttributeOrderAndDisplay(category, skipBrand? null:brand._id, name, order, function(err){
+                                        ProductService.updateAttributeOrderAndDisplay(category, skipBrand? null:brand._id, name, value, value_order, function(err){
                                             if(err){
                                                 reject(err);
                                                 return;

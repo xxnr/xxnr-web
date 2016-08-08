@@ -21,7 +21,7 @@ describe('Rewardshop', function() {
 	var test_user = test_data.test_user;
     var backend_admin = test_data.backend_admin;
     var backend_admin_token;
-    var test_categories;
+    var test_category;
     var test_gift;
     var imgUrl;
     before('create backend admin and login', function (done) {
@@ -56,217 +56,217 @@ describe('Rewardshop', function() {
         });
     });
 
- //    describe('new gift', function(){
- //    	beforeEach('create gift', function(done) {
-	//         Routing.Rewardshop.query_categories(null, backend_admin_token, function (body) {
-	//         	body.should.have.property('code', 1000);
-	//             test_categories = body.categories;
-	//             test_categories.should.not.be.empty;
-	//             Routing.Rewardshop.save_gift(utils.extend(test_data.test_gift, {
-	//                 category: test_categories[0]._id,
-	//                 pictures: [imgUrl]
-	//             }), backend_admin_token, function (body) {
-	//                 body.should.have.property('code', 1000);
-	//                 test_gift = body.gift;
-	//                 done();
-	//             });
-	//         });
-	//     });
-	//     afterEach('delete all gift', function(done){
-	//         RewardshopGiftModel.find({}).remove(function(err){
-	//             should.not.exist(err);
-	//             done();
-	//         });
-	//     });
- //    	it('online gift', function(done){
- //            Routing.Rewardshop.backend_get_gift(test_gift._id, backend_admin_token, function(body){
- //                body.should.have.containDeep({
- //                	code:1000,
- //                    gift:{
-	// 			        _id: test_gift._id,
-	// 					id: test_gift.id,
-	// 					name: test_gift.name,
-	// 					category: test_gift.category.ref,
-	// 			        marketPrice: test_gift.marketPrice,
-	// 			        points: test_gift.points,
-	// 			        soldout: test_gift.soldout,
-	// 			        istop: test_gift.istop,
-	// 					online: test_gift.online
-	// 			    }
- //                });
- //                Routing.Rewardshop.get_gift(test_gift.id, function(body){
-	//                 body.should.have.containDeep({
-	//                 	code:1000,
-	//                     gift:{
- //                            _id: test_gift._id,
-	// 						id: test_gift.id,
-	// 						name: test_gift.name,
-	// 				        marketPrice: test_gift.marketPrice,
-	// 				        points: test_gift.points,
-	// 				        soldout: test_gift.soldout,
-	// 				        istop: test_gift.istop,
-	// 						online: test_gift.online,
-	// 						appbody_url: 'http://127.0.0.1/gift/appbody/'+test_gift.id,
-	// 						category: {
-	// 							_id: test_gift.category.ref,
-	// 							name: test_categories[0].name,
-	// 							deliveries: test_categories[0].deliveries
-	// 						},
-	// 						pictures: [
-	// 						{
-	// 						largeUrl: "/images/large/"+imgUrl+".jpg",
-	// 						thumbnail: "/images/thumbnail/"+imgUrl+".jpg",
-	// 						originalUrl: "/images/original/"+imgUrl+".jpg"
-	// 						}
-	// 						],
-	// 						largeUrl: "/images/large/"+imgUrl+".jpg",
-	// 						thumbnail: "/images/thumbnail/"+imgUrl+".jpg",
-	// 						originalUrl: "/images/original/"+imgUrl+".jpg"
-	// 				    }
-	//                 });
-	//                 Routing.Rewardshop.online_gift(test_gift._id, true, backend_admin_token, function(body) {
-	//                 	body.should.have.property('code', 1000);
-	//                 	Routing.Rewardshop.backend_get_gift(test_gift._id, backend_admin_token, function(body){
-	// 		                body.should.have.containDeep({
-	// 		                	code:1000,
-	// 		                    gift:{
-	// 								online: true
-	// 						    }
-	// 		                });
-	// 		                Routing.Rewardshop.get_gift(test_gift.id, function(body){
-	// 			                body.should.have.containDeep({
-	// 			                	code:1000,
-	// 			                    gift:{
-	// 									online: true
-	// 							    }
-	// 			                });
-	// 			                done();
-	// 			            });
-	// 			        });
-	// 			    });
-	//             });
-	//         });
-	//     });
- //        it('soldout gift', function(done){
- //            Routing.Rewardshop.backend_get_gift(test_gift._id, backend_admin_token, function(body){
- //                body.should.have.containDeep({
- //                	code:1000,
- //                    gift:{
-	// 			        _id: test_gift._id,
-	// 					id: test_gift.id,
-	// 					name: test_gift.name,
-	// 					category: test_gift.category.ref,
-	// 			        marketPrice: test_gift.marketPrice,
-	// 			        points: test_gift.points,
-	// 			        soldout: test_gift.soldout,
-	// 			        istop: test_gift.istop,
-	// 					online: test_gift.online
-	// 			    }
- //                });
- //                Routing.Rewardshop.get_gift(test_gift.id, function(body){
-	//                 body.should.have.containDeep({
-	//                 	code:1000,
-	//                     gift:{
-	// 				        _id: test_gift._id,
-	// 						id: test_gift.id,
-	// 						name: test_gift.name,
-	// 				        marketPrice: test_gift.marketPrice,
-	// 				        points: test_gift.points,
-	// 				        soldout: test_gift.soldout,
-	// 				        istop: test_gift.istop,
-	// 						online: test_gift.online,
-	// 						appbody_url: 'http://127.0.0.1/gift/appbody/'+test_gift.id,
-	// 						category: {
-	// 							_id: test_gift.category.ref,
-	// 							name: test_categories[0].name,
-	// 							deliveries: test_categories[0].deliveries
-	// 						},
-	// 						pictures: [
-	// 						{
-	// 						largeUrl: "/images/large/"+imgUrl+".jpg",
-	// 						thumbnail: "/images/thumbnail/"+imgUrl+".jpg",
-	// 						originalUrl: "/images/original/"+imgUrl+".jpg"
-	// 						}
-	// 						],
-	// 						largeUrl: "/images/large/"+imgUrl+".jpg",
-	// 						thumbnail: "/images/thumbnail/"+imgUrl+".jpg",
-	// 						originalUrl: "/images/original/"+imgUrl+".jpg"
-	// 				    }
-	//                 });
-	//                 Routing.Rewardshop.soldout_gift(test_gift._id, true, backend_admin_token, function(body) {
-	//                 	body.should.have.property('code', 1000);
-	//                 	Routing.Rewardshop.backend_get_gift(test_gift._id, backend_admin_token, function(body){
-	// 		                body.should.have.containDeep({
-	// 		                	code:1000,
-	// 		                    gift:{
-	// 								soldout: true
-	// 						    }
-	// 		                });
-	// 		                Routing.Rewardshop.get_gift(test_gift.id, function(body){
-	// 			                body.should.have.containDeep({
-	// 			                	code:1000,
-	// 			                    gift:{
-	// 									soldout: true
-	// 							    }
-	// 			                });
-	// 			                done();
-	// 			            });
-	// 			        });
-	// 			    });
-	//             });
-	//         });
-	//     });
-	//     it('online gift and query gifts by category', function(done){
- //            Routing.Rewardshop.query_gifts(test_gift.category.ref, null, null, function(body){
- //                body.should.have.containDeep({
- //                    code:1000,
- //                    datas:{
- //                        total:0,
- //                        gifts:[],
- //                        pages:0,
- //                        page:0
- //                    }
- //                });
- //                Routing.Rewardshop.online_gift(test_gift._id, true, backend_admin_token, function(body){
- //                    body.should.have.property('code', 1000);
- //                    Routing.Rewardshop.query_gifts(test_gift.category.ref, null, null, function(body) {
- //                        body.should.containDeep({
- //                            code: 1000,
- //                            datas: {
- //                                total: 1,
- //                                gifts: [{
-	// 								id: test_gift.id,
-	// 								name: test_gift.name,
-	// 						        marketPrice: test_gift.marketPrice,
-	// 						        points: test_gift.points,
-	// 						        soldout: test_gift.soldout,
-	// 						        istop: test_gift.istop,
-	// 								online: true,
-	// 								category: {
-	// 									_id: test_gift.category.ref,
-	// 									name: test_categories[0].name
-	// 								},
-	// 								pictures: [
-	// 								{
-	// 								largeUrl: "/images/large/"+imgUrl+".jpg",
-	// 								thumbnail: "/images/thumbnail/"+imgUrl+".jpg",
-	// 								originalUrl: "/images/original/"+imgUrl+".jpg"
-	// 								}
-	// 								],
-	// 								largeUrl: "/images/large/"+imgUrl+".jpg",
-	// 								thumbnail: "/images/thumbnail/"+imgUrl+".jpg",
-	// 								originalUrl: "/images/original/"+imgUrl+".jpg"
- //                                }],
- //                                pages: 1,
- //                                page: 0
- //                            }
- //                        });
- //                        done();
- //                    });
- //                });
- //            });
- //        });
-	// });
+    describe('new gift', function(){
+     	beforeEach('create gift', function(done) {
+			Routing.Rewardshop.query_categories(null, backend_admin_token, function (body) {
+	         	body.should.have.property('code', 1000);
+				test_category = body.categories[1];
+				test_category.should.not.be.empty;
+				Routing.Rewardshop.save_gift(utils.extend(test_data.test_gift, {
+					category: test_category._id,
+					pictures: [imgUrl]
+				}), backend_admin_token, function (body) {
+					body.should.have.property('code', 1000);
+					test_gift = body.gift;
+					done();
+				});
+			});
+	    });
+	    afterEach('delete all gift', function(done){
+	        RewardshopGiftModel.find({}).remove(function(err){
+				should.not.exist(err);
+				done();
+	        });
+		});
+     	it('online gift', function(done){
+			Routing.Rewardshop.backend_get_gift(test_gift._id, backend_admin_token, function(body){
+				body.should.have.containDeep({
+					code:1000,
+					gift:{
+						_id: test_gift._id,
+						id: test_gift.id,
+						name: test_gift.name,
+						category: test_gift.category.ref,
+						marketPrice: test_gift.marketPrice,
+						points: test_gift.points,
+						soldout: test_gift.soldout,
+						istop: test_gift.istop,
+						online: test_gift.online
+					}
+				});
+				Routing.Rewardshop.get_gift(test_gift.id, function(body){
+					body.should.have.containDeep({
+						code:1000,
+						gift:{
+							_id: test_gift._id,
+							id: test_gift.id,
+							name: test_gift.name,
+							marketPrice: test_gift.marketPrice,
+							points: test_gift.points,
+							soldout: test_gift.soldout,
+							istop: test_gift.istop,
+							online: test_gift.online,
+							appbody_url: 'http://127.0.0.1/gift/appbody/'+test_gift.id,
+							category: {
+								_id: test_gift.category.ref,
+								name: test_category.name,
+								deliveries: test_category.deliveries
+							},
+							pictures: [
+								{
+									largeUrl: "/images/large/"+imgUrl+".jpg",
+									thumbnail: "/images/thumbnail/"+imgUrl+".jpg",
+									originalUrl: "/images/original/"+imgUrl+".jpg"
+								}
+							],
+							largeUrl: "/images/large/"+imgUrl+".jpg",
+							thumbnail: "/images/thumbnail/"+imgUrl+".jpg",
+							originalUrl: "/images/original/"+imgUrl+".jpg"
+						}
+					});
+					Routing.Rewardshop.online_gift(test_gift._id, true, backend_admin_token, function(body) {
+				 		body.should.have.property('code', 1000);
+				 		Routing.Rewardshop.backend_get_gift(test_gift._id, backend_admin_token, function(body){
+				            body.should.have.containDeep({
+				            	code:1000,
+				                gift:{
+									online: true
+							    }
+				            });
+				            Routing.Rewardshop.get_gift(test_gift.id, function(body){
+				                body.should.have.containDeep({
+				                	code:1000,
+				                    gift:{
+										online: true
+								    }
+				                });
+				                done();
+				            });
+				        });
+				    });
+				});
+			});
+	    });
+		it('soldout gift', function(done){
+			Routing.Rewardshop.backend_get_gift(test_gift._id, backend_admin_token, function(body){
+				body.should.have.containDeep({
+                 	code:1000,
+					gift:{
+						_id: test_gift._id,
+						id: test_gift.id,
+						name: test_gift.name,
+						category: test_gift.category.ref,
+						marketPrice: test_gift.marketPrice,
+						points: test_gift.points,
+						soldout: test_gift.soldout,
+						istop: test_gift.istop,
+						online: test_gift.online
+					}
+				});
+				Routing.Rewardshop.get_gift(test_gift.id, function(body){
+					body.should.have.containDeep({
+						code:1000,
+						gift:{
+							_id: test_gift._id,
+							id: test_gift.id,
+							name: test_gift.name,
+							marketPrice: test_gift.marketPrice,
+							points: test_gift.points,
+							soldout: test_gift.soldout,
+							istop: test_gift.istop,
+							online: test_gift.online,
+							appbody_url: 'http://127.0.0.1/gift/appbody/'+test_gift.id,
+	 						category: {
+	 							_id: test_gift.category.ref,
+	 							name: test_category.name,
+	 							deliveries: test_category.deliveries
+	 						},
+	 						pictures: [
+	 						{
+	 						largeUrl: "/images/large/"+imgUrl+".jpg",
+	 						thumbnail: "/images/thumbnail/"+imgUrl+".jpg",
+	 						originalUrl: "/images/original/"+imgUrl+".jpg"
+	 						}
+	 						],
+	 						largeUrl: "/images/large/"+imgUrl+".jpg",
+	 						thumbnail: "/images/thumbnail/"+imgUrl+".jpg",
+	 						originalUrl: "/images/original/"+imgUrl+".jpg"
+	 				    }
+					});
+					Routing.Rewardshop.soldout_gift(test_gift._id, true, backend_admin_token, function(body) {
+						body.should.have.property('code', 1000);
+						Routing.Rewardshop.backend_get_gift(test_gift._id, backend_admin_token, function(body){
+							body.should.have.containDeep({
+								code:1000,
+								gift:{
+									soldout: true
+								}
+							});
+	 		                Routing.Rewardshop.get_gift(test_gift.id, function(body){
+								body.should.have.containDeep({
+									code:1000,
+									gift:{
+										soldout: true
+									}
+								});
+								done();
+							});
+						});
+					});
+				});
+			});
+		});
+		it('online gift and query gifts by category', function(done){
+			Routing.Rewardshop.query_gifts(test_gift.category.ref, null, null, function(body){
+				body.should.have.containDeep({
+					code:1000,
+					datas:{
+						total:0,
+						gifts:[],
+						pages:0,
+						page:0
+					}
+				});
+				Routing.Rewardshop.online_gift(test_gift._id, true, backend_admin_token, function(body){
+					body.should.have.property('code', 1000);
+					Routing.Rewardshop.query_gifts(test_gift.category.ref, null, null, function(body) {
+						body.should.containDeep({
+							code: 1000,
+							datas: {
+								total: 1,
+								gifts: [{
+									id: test_gift.id,
+									name: test_gift.name,
+									marketPrice: test_gift.marketPrice,
+									points: test_gift.points,
+									soldout: test_gift.soldout,
+									istop: test_gift.istop,
+									online: true,
+									category: {
+										_id: test_gift.category.ref,
+										name: test_category.name
+									},
+									pictures: [
+										{
+											largeUrl: "/images/large/"+imgUrl+".jpg",
+											thumbnail: "/images/thumbnail/"+imgUrl+".jpg",
+											originalUrl: "/images/original/"+imgUrl+".jpg"
+										}
+									],
+									largeUrl: "/images/large/"+imgUrl+".jpg",
+									thumbnail: "/images/thumbnail/"+imgUrl+".jpg",
+									originalUrl: "/images/original/"+imgUrl+".jpg"
+								}],
+								pages: 1,
+								page: 0
+							}
+						});
+						done();
+					});
+				});
+			});
+		});
+	});
 
 	describe('exchange gift', function(){
 		var test_user_token;
@@ -412,10 +412,10 @@ describe('Rewardshop', function() {
 	    	before('create gift', function(done) {
 		        Routing.Rewardshop.query_categories(null, backend_admin_token, function (body) {
 		        	body.should.have.property('code', 1000);
-		            test_categories = body.categories;
-		            test_categories.should.not.be.empty;
+		            test_category = body.categories[1];
+		            test_category.should.not.be.empty;
 		            Routing.Rewardshop.save_gift(utils.extend(test_data.test_gift, {
-		                category: test_categories[0]._id,
+		                category: test_category._id,
 		                pictures: [imgUrl]
 		            }), backend_admin_token, function (body) {
 		                body.should.have.property('code', 1000);

@@ -305,7 +305,13 @@ exports.httpRequest = function(options, callback) {
         return;
     }
 
-    var req = http.request(options.httpOptions, function (res) {
+    var client = http;
+    var protocol = options.httpOptions.protocol;
+    if(protocol == 'https:'){
+        client=https;
+    }
+
+    var req = client.request(options.httpOptions, function (res) {
         res.setEncoding('utf8');
         res.on('data', function (chunk) {
             if (res.statusCode == 200) {
