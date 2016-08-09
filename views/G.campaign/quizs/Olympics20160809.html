@@ -94,6 +94,7 @@
             <div class="quiz--info">
                 <div class="quiz--info--text">
                     <p class="quiz--info--text--title">活动说明</p>
+                    <p>新新农人商丘4S店同步为中国加油！中国健儿每获得一块金牌，新新农人即每车送出一升气油！8月5日- 21日活动期间下载APP并下单购车，金牌多少  就送多少！</p>
                     <p>活动范围：所有注册用户</p>
                     <p>活动时间：2016-08-08~2016-08-26</p>
                     <p>活动规则：</p>
@@ -485,7 +486,7 @@
                 },
                 goToLogin : function(){
                     if(typeof jsObj == "undefined"){
-                        window.location.href = encodeURI(config.mobileBaseURI + "/login?redirect="+window.location.href);
+                        window.location.href = config.mobileBaseURI + "/login?redirect="+encodeURIComponent(window.location.href);
                     } else {
                         jsObj.toLogin();
                     }
