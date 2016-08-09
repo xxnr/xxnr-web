@@ -617,11 +617,12 @@ exports.AppUpgrade = function (req, res, next) {
     var userAgent = (req.data['user_agent'] || '').toLowerCase();
     var device_id = req.data['device_id'] || '';
 
-    var host = req.get('host');
-    host = host ? host : req.hostname;
-    // var host = req.hostname;
-    var protocol = req.protocol + '://';
-    var android_update_url = protocol + host + '/resources/newFarmer.apk';
+    // var host = req.get('host');
+    // host = host ? host : req.hostname;
+    // // var host = req.hostname;
+    // var protocol = req.protocol + '://';
+    // var android_update_url = protocol + host + '/resources/newFarmer.apk';
+    var android_update_url = req.url_prefix + '/resources/newFarmer.apk';
 
     // var nowIosVersion = F.config.nowIosVersion;
     // var nowAndroidVersion = F.config.nowAndroidVersion;
