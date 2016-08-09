@@ -1122,7 +1122,8 @@
             if ($(".products-edit-list-ul > li.checked").length != 0) {
                 var g_id = $(".products-edit-list-ul > li.checked").attr('gift_id');
                 var g_name = $(".products-edit-list-ul > li.checked").attr('gift_name');
-                var g_online = $(".products-edit-list-ul > li.checked").attr('gift_online');
+                var value_online = $(".products-edit-list-ul > li.checked").attr('gift_online');
+                var g_online = value_online == 'true' ? true : false;
 
                 rscCategoryGifts.giftsExisted.push({
                     _id: g_id,
@@ -1172,7 +1173,8 @@
         $(".gift-delete").off('click').on('click',function () {
             var g_id = $(this).parents('li').attr('gift_id');
             var g_name = $(this).parents('li').attr('gift_name');
-            var g_online = $(this).parents('li').attr('gift_online');
+            var value_online = $(this).parents('li').attr('gift_online');
+            var g_online = value_online == 'true' ? true : false;
             rscCategoryGifts.gifts.push({
                 _id: g_id,
                 name: g_name,
