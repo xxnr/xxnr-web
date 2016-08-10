@@ -3,8 +3,36 @@
  */
 var mongoose = require('mongoose');
 var config = require('../configuration/mongoose_config');
+var disconnected_reconnect_lock = false;
 
-mongoose.connect(config.db[config.environment],{user:'xxnr',pass:'txht001'});
+function connect_mongoDB() {
+    mongoose.connect(config.db[config.environment],{user:'xxnr',pass:'txht001',server:{auto_reconnect:true}});
+};
+connect_mongoDB();
+mongoose.connection.on('connected', function() {
+    console.log('MongoDB connected!');
+});
+mongoose.connection.once('open', function() {
+    console.log('MongoDB connection opened!');
+});
+mongoose.connection.on('connecting', function() {
+    console.log('connecting to MongoDB...');
+});
+mongoose.connection.on('error', function(error) {
+    console.error('Error in MongoDb connection: ' + error);
+    mongoose.disconnect();
+});
+mongoose.connection.on('reconnected', function () {
+    console.error('MongoDB reconnected!');
+});
+mongoose.connection.on('disconnected', function() {
+    console.error('MongoDB disconnected!');
+    disconnected_reconnect_lock = false;
+    if (!disconnected_reconnect_lock) {
+        disconnected_reconnect_lock = true;
+        setTimeout(function(){connect_mongoDB();}, 5000);
+    }
+});
 
 require('./users');
 require('./auth');
