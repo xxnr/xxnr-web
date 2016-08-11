@@ -212,7 +212,7 @@ app.controller('rscManagementController', function($scope, $rootScope,remoteApiS
                                 //sweetalert('审核付款成功', "rsc_management.html");
                                 //$scope.closePop();
                                 var message = '<img class="xxnr--flash--icon" src="images/correct_prompt.png" alt="">审核付款成功';
-                                var id = Flash.create('success', message, 3000, {class: 'xxnr-success-flash', id: 'xxnr-success-flash'}, false);
+                                var id = Flash.create('success', message, 3000, {"class": 'xxnr-success-flash', "id": 'xxnr-success-flash'}, false);
                                 $scope.closePop();
                                 $timeout(function(){
                                     window.location.href = window.location.href;
@@ -223,7 +223,7 @@ app.controller('rscManagementController', function($scope, $rootScope,remoteApiS
                                 //sweetalert('审核付款失败', "rsc_management.html");
                                 //$scope.closePop();
                                 var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">订单已审核';
-                                var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);
+                                var id = Flash.create('success', message, 3000, {"class": 'xxnr-warning-flash', "id": 'xxnr-warning-flash'}, false);
                                 $scope.closePop();
                             }
                         });
@@ -312,7 +312,7 @@ app.controller('rscManagementController', function($scope, $rootScope,remoteApiS
                                         if(data.code == 1000) {
                                             if(data.datas.rows.order.orderStatus && data.datas.rows.order.orderStatus.type != 7){
                                                 var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">订单已审核';
-                                                var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);
+                                                var id = Flash.create('success', message, 3000, {"class": 'xxnr-warning-flash', "id": 'xxnr-warning-flash'}, false);
                                                 $timeout(function(){
                                                     window.location.href = window.location.href;
                                                     return false
@@ -462,7 +462,7 @@ app.controller('rscManagementController', function($scope, $rootScope,remoteApiS
                         //sweetalert('开始配送成功', "rsc_management.html");
                         $scope.closePop();
                         var message = '<img class="xxnr--flash--icon" src="images/correct_prompt.png" alt="">开始配送成功';
-                        var id = Flash.create('success', message, 3000, {class: 'xxnr-success-flash', id: 'xxnr-success-flash'}, false);
+                        var id = Flash.create('success', message, 3000, {"class": 'xxnr-success-flash', "id": 'xxnr-success-flash'}, false);
                         $timeout(function(){
                             window.location.href = "/rsc_management.html";
                             return false
@@ -470,7 +470,7 @@ app.controller('rscManagementController', function($scope, $rootScope,remoteApiS
                     }else if(data.code == 1401){
                         //sweetalert('你已被登出，请重新登录', "logon.html");
                         var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">你已被登出，请重新登录';
-                        var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);
+                        var id = Flash.create('success', message, 3000, {"class": 'xxnr-warning-flash', "id": 'xxnr-warning-flash'}, false);
                         $timeout(function(){
                             window.location.href = "/logon.html";
                             return false
@@ -479,7 +479,7 @@ app.controller('rscManagementController', function($scope, $rootScope,remoteApiS
                         //sweetalert('开始配送失败', "rsc_management.html");
                         $scope.closePop();
                         var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">开始配送失败';
-                        var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);
+                        var id = Flash.create('success', message, 3000, {"class": 'xxnr-warning-flash', "id": 'xxnr-warning-flash'}, false);
                         $timeout(function(){
                             window.location.href = "/rsc_management.html";
                             return false
@@ -522,7 +522,7 @@ app.controller('rscManagementController', function($scope, $rootScope,remoteApiS
                         //sweetalert('客户自提成功', "rsc_management.html");
                         $scope.closePop();
                         var message = '<img class="xxnr--flash--icon" src="images/correct_prompt.png" alt="">客户自提成功';
-                        var id = Flash.create('success', message, 3000, {class: 'xxnr-success-flash', id: 'xxnr-success-flash'}, false);
+                        var id = Flash.create('success', message, 3000, {"class": 'xxnr-success-flash', "id": 'xxnr-success-flash'}, false);
                         $timeout(function(){
                             window.location.href = "/rsc_management.html";
                             return false
@@ -530,7 +530,7 @@ app.controller('rscManagementController', function($scope, $rootScope,remoteApiS
                     }else if(data.code == 1401){
                         //sweetalert('你已被登出，请重新登录', "logon.html");
                         var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">你已被登出，请重新登录';
-                        var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);
+                        var id = Flash.create('success', message, 3000, {"class": 'xxnr-warning-flash', "id": 'xxnr-warning-flash'}, false);
                         $timeout(function(){
                             window.location.href = "/logon.html";
                             return false
@@ -558,7 +558,7 @@ app.controller('rscManagementController', function($scope, $rootScope,remoteApiS
                         //sweetalert('客户自提成功', "rsc_management.html");
                         $scope.closePop();
                         var message = '<img class="xxnr--flash--icon" src="images/correct_prompt.png" alt="">客户自提成功';
-                        var id = Flash.create('success', message, 3000, {class: 'xxnr-success-flash', id: 'xxnr-success-flash'}, false);
+                        var id = Flash.create('success', message, 3000, {"class": 'xxnr-success-flash', "id": 'xxnr-success-flash'}, false);
                         $timeout(function(){
                             window.location.href = "/rsc_management.html";
                             return false
@@ -566,7 +566,7 @@ app.controller('rscManagementController', function($scope, $rootScope,remoteApiS
                     }else if(data.code == 1401){
                         //sweetalert('你已被登出，请重新登录', "logon.html");
                         var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">你已被登出，请重新登录';
-                        var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);
+                        var id = Flash.create('success', message, 3000, {"class": 'xxnr-warning-flash', "id": 'xxnr-warning-flash'}, false);
                         $timeout(function(){
                             window.location.href = "/logon.html";
                             return false

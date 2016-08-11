@@ -179,15 +179,15 @@ app.controller('invitationController', function($scope, remoteApiService, common
         if(!$scope.inviterNum){
             //sweetalert('该手机号未注册，请确认后重新输入');
             var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">请输入代表人手机号';
-            var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);
+            var id = Flash.create('success', message, 3000, {"class": 'xxnr-warning-flash', "id": 'xxnr-warning-flash'}, false);
         } else if(!$scope.phoneNumberValidated){
             //sweetalert('该手机号未注册，请确认后重新输入');
             var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">该手机号未注册，请确认后重新输入';
-            var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);
+            var id = Flash.create('success', message, 3000, {"class": 'xxnr-warning-flash', "id": 'xxnr-warning-flash'}, false);
         } else if($scope.phone==$scope.inviterNum){
             //sweetalert('不能设置自己为邀请人');
             var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">不能设置自己为邀请人';
-            var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);
+            var id = Flash.create('success', message, 3000, {"class": 'xxnr-warning-flash', "id": 'xxnr-warning-flash'}, false);
         }else {
             if (navigator.appName == "Microsoft Internet Explorer" && navigator.appVersion.match(/8./i) == "8.") {
                 var r = confirm("代表人添加后不可修改,确定设置该用户为您的代表吗?");
