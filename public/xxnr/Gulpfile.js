@@ -520,7 +520,28 @@ gulp.task('rsc_management_js_minify', function() {
         .pipe(gulp.dest('./rev/rsc_management_js'));
 });
 
-
+gulp.task('points_recording_js_minify', function() {
+    var revAll = new RevAll();
+    gulp.src([
+            './js/payService.js',
+            './js/shoppingCart/shoppingCartController.js',
+            './js/shoppingCart/shoppingCartService.js',
+            './js/pointsRecording/pointsRecordingController.js',
+            './js/login/loginController.js',
+            './js/login/loginService.js',
+            './js/headerFooterDirective.js',
+            './js/headerController.js',
+            './js/sideService.js',
+            './js/myPlaceholderDirective.js'])
+        .pipe(concat('points_recording_js.js'))
+        .pipe(ngmin())
+        .pipe(uglify({mangle: false}))
+        .pipe(gulp.dest('./dev/js'))
+        .pipe(revAll.revision())
+        .pipe(gulp.dest('./production_js'))
+        .pipe(revAll.manifestFile())
+        .pipe(gulp.dest('./rev/points_recording_js'));
+});
 
 gulp.task('rev', function() {
     var manifest = gulp.src('./rev/**/*.json');
@@ -585,7 +606,8 @@ gulp.task('js_minify_all',
         'xxnr_institute_js_minify',
         'xxnr_finance_js_minify',
         'xxnr_bigdata_js_minify',
-        'rsc_management_js_minify'
+        'rsc_management_js_minify',
+        'points_recording_js_minify'
     ]);
 
 

@@ -353,23 +353,25 @@ app.controller('userCenterController', function($scope, $rootScope,$timeout ,rem
         }
     };
     $scope.show_page = function (pageId) {
-        $('html,body').animate({
-            scrollTop: 0
-        }, 100);
-        $scope.current_page = pageId;
-        for (var pageIndex in $scope.pages) {
-            if ($scope.pages[pageIndex].id == pageId) {
-                $scope.pages[pageIndex].isSelected = true;
-            } else {
-                $scope.pages[pageIndex].isSelected = false;
-            }
-        }
-        for (var i = 0; i < $scope.showTypes.length; i++) {
-            if ($scope.showTypes[i].isSelected == true) {
-                $scope.show($scope.showTypes[i].id, i);
-            }
-        }
 
+        if(pageId!='...') {
+            $('html,body').animate({
+                scrollTop: 0
+            }, 100);
+            $scope.current_page = pageId;
+            for (var pageIndex in $scope.pages) {
+                if ($scope.pages[pageIndex].id == pageId) {
+                    $scope.pages[pageIndex].isSelected = true;
+                } else {
+                    $scope.pages[pageIndex].isSelected = false;
+                }
+            }
+            for (var i = 0; i < $scope.showTypes.length; i++) {
+                if ($scope.showTypes[i].isSelected == true) {
+                    $scope.show($scope.showTypes[i].id, i);
+                }
+            }
+        }
 
     };
 

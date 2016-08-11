@@ -291,10 +291,10 @@ app.controller('invitationController', function($scope, remoteApiService, common
     };
 
     $scope.show_page = function(pager,pageId){
-        $('html,body').animate({
-            scrollTop: 0
-        }, 100);
         if(pageId!='...'){
+            $('html,body').animate({
+                scrollTop: 0
+            }, 100);
             pager.current_page = pageId;
             for(var pageIndex in pager.pages){
                 if(pager.pages[pageIndex].id == pageId){

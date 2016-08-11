@@ -65,6 +65,11 @@ app.controller('orderDetailController', function ($scope, remoteApiService, comm
                 $scope.RSCInfo = data.datas.rows.RSCInfo;
                 $scope.recipientName = data.datas.rows.recipientName;
                 $scope.recipientPhone = data.datas.rows.recipientPhone;
+                $scope.order.duePrice = data.datas.rows.duePrice;
+                $scope.order.isRewardPoint = data.datas.rows.isRewardPoint;
+                $scope.order.rewardPoints = data.datas.rows.rewardPoints;
+                //$scope.order.isRewardPoint = true;
+                //$scope.order.rewardPoints = 30;
                 if ($scope.order.orderStatus.type == 0) {
                     //$scope.order.statusName = '已关闭';
                     $scope.order.showAction = false;

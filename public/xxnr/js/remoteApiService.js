@@ -630,9 +630,47 @@ app.service('remoteApiService', function(commonService){
         };
         return commonService.sendPost(data);
     };
+    this.RSC_checkGiftCode = function(orderId,code){
+        var data={
+            'methodname':'/api/v2.3/RSC/rewardshop/order/selfDelivery',
+            'orderId':orderId,
+            'code':code
+        };
+        return commonService.sendPost(data);
+    };
     this.getInviter = function(){
         var params = {
             'methodname':'api/v2.0/user/getInviter',
+        };
+        return commonService.ajax(params);
+    };
+
+    this.getGiftOrderList = function(type,search,page,max){
+        var params = {
+            'methodname':'/api/v2.3/RSC/rewardshop/getGiftOrderList',
+            'type':type,
+            'search':search,
+            'page':page,
+            'max':max
+        };
+        return commonService.ajax(params);
+    };
+
+    this.getGiftOrderList = function(type,search,page,max){
+        var params = {
+            'methodname':'/api/v2.3/RSC/rewardshop/getGiftOrderList',
+            'type':type,
+            'search':search,
+            'page':page,
+            'max':max
+        };
+        return commonService.ajax(params);
+    };
+    this.getPointsLogs = function(page,max){
+        var params = {
+            'methodname':'/api/v2.3/rewardshop/pointslogs',
+            'page':page,
+            'max':max
         };
         return commonService.ajax(params);
     };
