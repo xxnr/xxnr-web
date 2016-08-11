@@ -292,6 +292,10 @@ function refresh(categoryname) {
     if (categoryname)
         queryOptions.category = categoryname;
     NewsModel.find(queryOptions, function(err, docs){
+        if(err){
+            console.error(err);
+            return;
+        }
         for (var i = 0; i < docs.length; i++) {
             var doc = docs[i];
             setcategories(doc);
