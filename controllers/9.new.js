@@ -146,8 +146,9 @@ exports.view_newsshare_detail = function(req,res,next) {
 
         var result = result.toObject();
         var datecreated = JSON.stringify(result.datecreated);
-        var protocol = req.protocol + '://';
-        result.shareurl = protocol + req.hostname + '/newsshare/' + id;
+        // var protocol = req.protocol + '://';
+        // result.shareurl = protocol + req.hostname + '/newsshare/' + id;
+        result.shareurl = req.url_prefix + '/newsshare/' + id;
         result.datecreated = moment(datecreated,"YYYY-MM-DDTHH:mm:ssZ").format('YYYY-MM-DD HH:mm:ss');
         res.render(path.join(__dirname, '../views/9.new/newsAppDetailTemplate.html'),
             {
