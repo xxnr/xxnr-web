@@ -21,7 +21,10 @@ UserService.getTestAccountList(function(err, testAccountList) {
     }
 
     var querier = {buyerId:{$nin:testAccountList}};
-	OrderModel.find(querier).sort({dateCreated:-1}).exec(function (err, orders) {
+	OrderModel.find(querier)
+		.select('buyerId dateCreated dateCompleted payStatus deliverStatus depositPaid price deposit duePrice')
+		.sort({dateCreated:-1})
+		.exec(function (err, orders) {
 		if (err) {
 			console.error('Finding orders are not test err:', err);
 			return;
@@ -36,7 +39,10 @@ UserService.getTestAccountList(function(err, testAccountList) {
 				userIds.push(order.buyerId);
 			}
 		});
-		UserModel.find({id:{$in:userIds}, inviter:{$exists: true}}).populate({path:'inviter', select:'_id id name account'}).exec(function (err, docs) {
+		UserModel.find({id:{$in:userIds}, inviter:{$exists: true}})
+			.populate({path:'inviter', select:'_id id name account'})
+			.select('_id id inviter dateinvited')
+			.exec(function (err, docs) {
 			if (err) {
 				console.error('Finding orders users err:', err);
 				return;
@@ -122,8 +128,9 @@ UserService.getTestAccountList(function(err, testAccountList) {
 					initDailyAgentReport.name = agents[agentId].name;
 					initDailyAgentReport.phone = agents[agentId].phone;
 					promises.push(new Promise(function (resolve, reject) {
-						DailyAgentReportModel.findOneAndUpdate({agent:agentId, dayInBeijingTime:{$nin:agents[agentId].dates}}, {$set:initDailyAgentReport}, function(err){
-							if(err){
+						// DailyAgentReportModel.findOneAndUpdate({agent:agentId, dayInBeijingTime:{$nin:agents[agentId].dates}}, {$set:initDailyAgentReport}, function(err){
+						DailyAgentReportModel.update({agent:agentId, dayInBeijingTime:{$nin:agents[agentId].dates}}, {$set:initDailyAgentReport}, {multi: true}, function(err){
+							if (err) {
 								reject(err, agentId);
 								return;
 							}

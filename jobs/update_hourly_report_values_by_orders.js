@@ -20,7 +20,10 @@ UserService.getTestAccountList(function(err, testAccountList) {
     }
 
     var querier = {buyerId:{$nin:testAccountList}};
-	OrderModel.find(querier).sort({dateCreated:-1}).exec(function (err, orders) {
+	OrderModel.find(querier)
+		.select('dateCreated payStatus deliverStatus depositPaid price deposit duePrice')
+		.sort({dateCreated:-1})
+		.exec(function (err, orders) {
 		if (err) {
 			console.error('Finding orders err:', err);
 			return;
@@ -75,12 +78,14 @@ UserService.getTestAccountList(function(err, testAccountList) {
 			    completedOrderPaidAmount: 0
 			};
 			
-			HourlyReportModel.findOneAndUpdate({hourInBeijingTime:{$nin:hours}}, {$set:initHourlyReport}, function(err){
-				if(err){
+			// HourlyReportModel.findOneAndUpdate({hourInBeijingTime:{$nin:hours}}, {$set:initHourlyReport}, function(err){
+			HourlyReportModel.update({hourInBeijingTime:{$nin:hours}}, {$set:initHourlyReport}, {multi: true}, function(err){
+				if (err) {
 					console.error('[', new Date(), '] update other hourly reports job fail:', err);
 					process.exit(0);
 				}
 				console.log('[', new Date(), '] All Hourly Report Update End...');
+				process.exit(0);
 			});
 	    })
 	    .catch(function (err, hourInBeijingTime, hourlyReport) {
