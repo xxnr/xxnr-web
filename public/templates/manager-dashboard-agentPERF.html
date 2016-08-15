@@ -93,7 +93,7 @@
 										    	<td style="width:40px" class="silver hidden-xs ui-center" title="{{ agent.name }}">{{ agent.name }}</td>
 										    	<td style="width:60px" class="silver hidden-xs ui-center" title="{{ agent.phone }}">{{ agent.phone }}</td>
 										    	<td style="width:70px" class="silver hidden-xs ui-center">{{ agent.completedOrderCount | format(0) }}</td>
-										    	<td style="width:70px" class="silver hidden-xs ui-center" title="{{ agent.completedOrderPaidAmount | toFixed(2) }}">{{ agent.completedOrderPaidAmount | toFixed(2) }}</td>
+										    	<td style="width:70px" class="silver hidden-xs ui-center" title="{{ agent.completedOrderPaidAmount | price(2) }}">{{ agent.completedOrderPaidAmount | price(2) }}</td>
 										    </tr>
 										{{ end }}
 									</tbody>

@@ -424,7 +424,7 @@
             			weekliesamount[reportkeys[i]] = 0;
             		}
             		if (weeklyReports[len].hasOwnProperty(reportkeys[i])) {
-            			weekliesamount[reportkeys[i]] += parseFloat(weeklyReports[len][reportkeys[i]]);
+            			weekliesamount[reportkeys[i]] += parseFloat(parseFloat(weeklyReports[len][reportkeys[i]]).toFixed(2));
             		}
             	}
             	var date = weeklyReports[len]['week'];

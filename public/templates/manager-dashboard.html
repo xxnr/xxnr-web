@@ -55,7 +55,7 @@
 							</div>
 							<div class="col-md-4">
 								<div class="mb10">已支付金额（元）</div>
-								<div class="num">{{ today.paidAmount | toFixed(2) }}</div>
+								<div class="num">{{ today.paidAmount | price(2) }}</div>
 							</div>
 							<div class="cl"></div>
 						</div>
@@ -99,7 +99,7 @@
 							</div>
 							<div class="col-md-4">
 								<div class="mb10">已支付金额（元）</div>
-								<div class="num">{{ yesterday.paidAmount | toFixed(2) }}</div>
+								<div class="num">{{ yesterday.paidAmount | price(2) }}</div>
 							</div>
 							<div class="cl"></div>
 						</div>
@@ -135,7 +135,7 @@
 							</div>
 							<div class="col-md-4">
 								<div class="mb10">已完成金额（元）</div>
-								<div class="num">{{ statistic.completedOrderPaidAmount | toFixed(2) }}</div>
+								<div class="num">{{ statistic.completedOrderPaidAmount | price(2) }}</div>
 							</div>
 							<div class="cl"></div>
 						</div>
@@ -195,7 +195,7 @@
 							</div>
 							<div class="col-md-4">
 								<div class="mb10">已支付金额（元）</div>
-								<div class="num">{{ dailiesamount.paidAmount | toFixed(2) }}</div>
+								<div class="num">{{ dailiesamount.paidAmount | price(2) }}</div>
 							</div>
 							<div class="cl"></div>
 						</div>
@@ -238,7 +238,7 @@
 								    	<td style="width:60px" class="silver hidden-xs ui-center">{{ daily.agentVerifiedCount | format(0) }}</td>
 								    	<td style="width:60px" class="silver hidden-xs ui-center">{{ daily.orderCount | format(0) }}</td>
 								    	<td style="width:60px" class="silver hidden-xs ui-center">{{ daily.paidOrderCount | format(0) }}</td>
-								    	<td style="width:90px" class="silver hidden-xs ui-right">{{ daily.paidAmount | toFixed(2) }}</td>
+								    	<td style="width:90px" class="silver hidden-xs ui-right">{{ daily.paidAmount | price(2) }}</td>
 								    </tr>
 								{{ end }}
 							</tbody>
@@ -514,7 +514,7 @@
             			dailiesamount[reportkeys[i]] = 0;
             		}
             		if (dailyReports[len].hasOwnProperty(reportkeys[i])) {
-            			dailiesamount[reportkeys[i]] += parseFloat(dailyReports[len][reportkeys[i]]);
+            			dailiesamount[reportkeys[i]] += parseFloat(parseFloat(dailyReports[len][reportkeys[i]]).toFixed(2));
             		}
             	}
 

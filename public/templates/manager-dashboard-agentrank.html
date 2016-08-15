@@ -124,7 +124,7 @@
 								    	<td style="width:80px" class="silver hidden-xs ui-center">{{ agent.newPotentialCustomerCount | format(0) }}</td>
 								    	<td style="width:70px" class="silver hidden-xs ui-center">{{ agent.totalPotentialCustomerCount | format(0) }}</td>
 								    	<td style="width:70px" class="silver hidden-xs ui-center">{{ agent.totalCompletedOrderCount | format(0) }}</td>
-								    	<td style="width:80px" class="silver hidden-xs ui-right" title="{{ agent.totalCompletedOrderPaidAmount | toFixed(2) }}">{{ agent.totalCompletedOrderPaidAmount | toFixed(2) }}</td>
+								    	<td style="width:80px" class="silver hidden-xs ui-right" title="{{ agent.totalCompletedOrderPaidAmount | price(2) }}">{{ agent.totalCompletedOrderPaidAmount | price(2) }}</td>
 								    </tr>
 								{{ end }}
 							</tbody>

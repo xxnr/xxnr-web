@@ -376,10 +376,19 @@ function can(name) {
 	return su && su.roles && su.roles.indexOf(name) !== -1;
 }
 
+// Tangular.register('price', function(value, format) {
+// 	if (value === undefined)
+// 		value = 0;
+// 	return value.format(format) + ' ' + currency;
+// });
+
 Tangular.register('price', function(value, format) {
 	if (value === undefined)
 		value = 0;
-	return value.format(format) + ' ' + currency;
+	if (format === undefined)
+		format = (value.toString()).length();
+	var price = value.toFixed(format).split('.');
+	return parseInt(price[0]).format(0) + '.' + price[1] + ' ' + currency;
 });
 
 Tangular.register('toFixed', function(value, format) {
