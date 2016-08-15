@@ -1,5 +1,5 @@
-/**
- * Created by pepelu on 2016/5/4.
+/*
+ * Created by zhouxin on 2016/7/28.
  */
 var config = require('../config');
 var services = require('../services');
@@ -7,13 +7,13 @@ var DashboardService = services.dashboard;
 var ReportUpdateTimeModel = require('../models').reportUpdateTime;
 var utils = require('../common/utils');
 const millisecondsInDay = 24*60*60*1000;
-const concurrency = 10;
+const concurrency = 20;
 
-console.log('[', new Date(), '] Start generating agent reports...');
+console.log('[', new Date(), '] Start generating daily agent reports...');
 ReportUpdateTimeModel.findOne({}, function(err, updateTime){
     var lastModifyTime = new Date(config.serviceStartTime).getTime();
-    if(updateTime && updateTime.agentReport) {
-        lastModifyTime = new Date(updateTime.agentReport).add('h', -config.currentTimeZoneDiff).getTime();
+    if(updateTime && updateTime.dailyAgentReport) {
+        lastModifyTime = new Date(updateTime.dailyAgentReport).add('h', -config.currentTimeZoneDiff).getTime();
     }
 
     var currentTime = new Date().add('h', -config.currentTimeZoneDiff).getTime();
@@ -23,7 +23,7 @@ ReportUpdateTimeModel.findOne({}, function(err, updateTime){
         var promises = [];
         for (; i < max; i++) {
             promises.push(new Promise(function (resolve, reject) {
-                DashboardService.generateAgentReport(i + 1, function (err) {
+                DashboardService.generateDailyAgentReport(i + 1, function (err) {
                     if (err) {
                         reject(err);
                         return;
@@ -42,19 +42,18 @@ ReportUpdateTimeModel.findOne({}, function(err, updateTime){
                     batchGenerateAgentReport(max, dayDiff);
                 } else{
                     // all finished
-                    ReportUpdateTimeModel.update({}, {$set: {agentReport: new Date()}}, {upsert: true}, function (err, numAffected) {
+                    ReportUpdateTimeModel.update({}, {$set: {dailyAgentReport: new Date()}}, {upsert: true}, function (err, numAffected) {
                         if (err) {
-                            console.error('[', new Date(), '] generate agent report ReportUpdateTime:', err);
-                            process.exit(0);
+                            console.log('[', new Date(), '] generate daily agent report ReportUpdateTime fail:', err);
+                        } else {
+                            console.log('[', new Date(), '] generate daily agent report job success. ', recordedCount, 'days recorded');
                         }
-
-                        console.log('[', new Date(), '] generate agent report job success. ', recordedCount, 'days recorded');
-                        process.exit(0);
+                        require('./update_daily_agent_values_by_orders.js');
                     });
                 }
             })
             .catch(function (err) {
-                console.log('[', new Date(), '] generate agent report job fail:', err);
+                console.log('[', new Date(), '] generate daily agent report job fail:', err);
                 process.exit(0);
             })
     };

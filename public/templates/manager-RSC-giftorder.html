@@ -1,0 +1,176 @@
+<script type="text/javascript" async src="/js/simplePagination.js"></script>
+<div class="filter">
+    <div class="container">
+        <div class="caption"><span class="fa fa-truck mr5"></span> 服务站管理</div>
+        <div class="row">
+            <div class="col-md-3 col-sm-6 m">
+                <div class="help" data-component="template" data-component-path="rscGiftOrder.info"><script type="text/html">{{ count | pluralize('items','item','items','items') }} / {{pages | pluralize('pages', 'page', 'pages', 'pages') }}</script></div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container" style="position: relative;">
+    <div class="rsc-sidebar">
+        <ul class="rsc-sidebar-ul">
+            <li id="rsc-info-link">网点管理</li>
+            <li id="rsc-order-link">网点订单</li>
+            <li class="checked">礼品兑换</li>
+        </ul>
+    </div>
+    <div class="row m">
+        <div class="padding col-md-12" style="padding-top: 0;">
+            <ul class="tabmenu">
+                <li data-type="0">全部</li>
+                <li data-type="1">未完成</li>
+                <li data-type="2">已完成</li>
+            </ul>
+            <div data-component="template" data-component-path="rscGiftOrder" class="ui-grid giftorders" data-max="auto" data-component-id="rscGiftOrder.grid">
+                <script type="text/html">
+                {{ if grid && grid.length > 0 }}
+                    <table class="table" width="100%" cellpadding="0" cellspacing="0" border="0">
+                        <tbody>
+                            <tr>
+                                <td style="width:30px" class="silver hidden-xs ui-center active">序号</td>
+                                <td style="width:80px" class="silver hidden-xs ui-right active">兑换时间</td>
+                                <td style="width:70px" class="silver hidden-xs ui-center active">兑换人</td>
+                                <td style="width:120px" class="silver hidden-xs ui-left active">礼品</td>
+                                <td style="width:70px" class="silver hidden-xs ui-center active">收货人信息</td>
+                                <td style="width:40px" class="silver hidden-xs ui-center active">配送方式</td>
+                                <td style="width:40px" class="silver hidden-xs ui-right active">所用积分</td>
+                                <td style="width:40px" class="silver hidden-xs ui-center active">订单状态</td>
+                            </tr>
+                        {{ foreach order in grid }}
+                            <tr data-index="{{ $index }}">
+                                <td style="width:30px" class="hidden-xs ui-center">{{ $index + 1 }}</td>
+                                <td style="width:80px" class="hidden-xs ui-right" title="{{order.dateCreated | format('yyyy-MM-dd HH:mm:ss')}}">{{ order.dateCreated | format('yyyy-MM-dd HH:mm:ss') }}</td>
+                                <td style="width:70px" class="hidden-xs ui-center" title="{{if order.buyerName}}{{order.buyerName}}{{else}}{{if order.buyerPhone}}{{order.buyerPhone}}{{fi}}{{fi}}">{{ order.buyerName }}</br>{{ order.buyerPhone }}</td>
+                                <td style="width:120px" class="hidden-xs ui-left" title="{{order.gift.name}}">{{if order.gift.thumbnail}}<img style="width:30px" src="{{ order.gift.thumbnail }}"></img>{{fi}}<span style="padding-left:3px;">{{ order.gift.name }}</span></td>
+                                <td style="width:70px" class="hidden-xs ui-center" title="{{if order.consigneeName}}{{order.consigneeName}}{{else}}{{if order.consigneePhone}}{{order.consigneePhone}}{{fi}}{{fi}}">{{ order.consigneeName }}</br>{{ order.consigneePhone }}</td>
+                                <td style="width:40px" class="hidden-xs ui-center" title="{{if order.deliveryType==1}}自提{{else}}配送到户{{fi}}">{{ if order.deliveryType==1 }}自提{{ else }}配送到户{{ fi }}</td>
+                                <td style="width:40px" class="hidden-xs ui-right" title="{{order.points}}">{{ order.points }}</td>
+                                <td style="width:80px" class="hidden-xs ui-center" title="">{{ if order && order.orderStatus && order.orderStatus.value }}{{ if order.orderStatus.type == 4 }}<span class="green">{{else}}<span class="red">{{fi}}{{order.orderStatus.value}}</span>{{ else }}-{{ fi }}</td>
+                            </tr>
+                        {{ end }}
+                        </tbody>
+                    </table>
+                {{ else }}
+                    {{ if !gridresponse }}
+                        暂无数据
+                    {{ fi }}
+                {{ fi }}
+                </script>
+            </div>
+
+            <div class="rscGiftOrder-pages">
+            </div>
+            <div data-component="error" data-component-path="rscGiftOrder.gridresponse"></div>
+        </div>
+    </div>
+</div>
+<script>
+    var rscGiftOrder = {};
+
+    rscGiftOrder.filter = {};
+    rscGiftOrder.filter.page = 1;
+    rscGiftOrder.grid = [];
+    rscGiftOrder.gridresponse;
+    rscGiftOrder.info = {};
+    rscGiftOrder.pages;
+    rscGiftOrder.page;
+    rscGiftOrder.count;
+
+    var rscInfo_id = getUrlParam('id');
+    if (rscInfo_id) {
+        rscGiftOrder.filter.id = rscInfo_id;
+        var giftorders_page = getUrlParam('page');
+        if (giftorders_page) {
+            rscGiftOrder.filter.page = giftorders_page;
+        }
+        var giftorders_type = getUrlParam('type');
+        var typeSelected = false;
+        if (giftorders_type) {
+            rscGiftOrder.filter.type = giftorders_type;
+            $('.tabmenu li').each(function() {
+                if (parseInt(rscGiftOrder.filter.type) == $(this).attr('data-type')) {
+                    $(this).addClass('selected');
+                    typeSelected = true;
+                }
+            });
+        }
+        if (!typeSelected) {
+            $('.tabmenu li').eq(0).addClass('selected');
+        }
+
+        $('.tabmenu li').on('click', function(){
+            select_tabmenu($(this));
+        });
+
+        ON('#rscGiftOrder.grid', function(component){
+            rscGiftOrder.filter.max = component.max;
+            getRSCGiftorders();
+        });
+        
+        function getRSCGiftorders() {
+            var urlParam = rscGiftOrder.filter.id ? 'RSCId=' + rscGiftOrder.filter.id : '';
+            urlParam += rscGiftOrder.filter.page ? (urlParam ? '&' : '') + 'page=' + rscGiftOrder.filter.page : '';
+            urlParam += rscGiftOrder.filter.max ? (urlParam ? '&' : '') + 'max=' + rscGiftOrder.filter.max : '';
+            urlParam += rscGiftOrder.filter.type ? (urlParam ? '&' : '') + 'type=' + rscGiftOrder.filter.type : '';
+            var url = '/api/rewardshop/giftorders' + (urlParam ? '?' + urlParam : '');
+            $.components.GET(managerurl + url, null, function(response) {
+                if (response && response.code && response.code==1000) {
+                    rscGiftOrder.grid = response.giftorders;
+                    rscGiftOrder.info.count = response.count;
+                    rscGiftOrder.info.pages = response.pageCount;
+                    rscGiftOrder.info.page = response.page;
+                    SET('rscGiftOrder.grid', rscGiftOrder.grid);
+                    if (rscGiftOrder.info.pages && rscGiftOrder.info.count) {
+                        Pagination($('div.rscGiftOrder-pages'), rscGiftOrder.info.count, rscGiftOrder.info.count/rscGiftOrder.info.pages, rscGiftOrder.info.page?rscGiftOrder.info.page:null, function(pageNumber){redirectRSCGiftordersURL(pageNumber)});
+                    }
+                    UPDATE('rscGiftOrder.info');
+                } else {
+                    if (response.error || response.message) {
+                        if (response.message) {
+                            response = [{error: response.message}];
+                        } else {
+                            response = response.error;
+                        }
+                    } else {
+                        response = [{error:'请求礼品订单列表失败'}];
+                    }
+                    SET('rscGiftOrder.gridresponse', response);
+                }
+            });
+        }
+
+        function redirectRSCGiftordersURL(page) {
+            var urlParam = rscGiftOrder.filter.id ? 'id=' + rscGiftOrder.filter.id : '';
+            urlParam += page ? (urlParam ? '&' : '') + 'page=' + page : '';
+            urlParam += rscGiftOrder.filter.max ? (urlParam ? '&' : '') + 'max=' + rscGiftOrder.filter.max : '';
+            urlParam += rscGiftOrder.filter.type ? (urlParam ? '&' : '') + 'type=' + rscGiftOrder.filter.type : '';
+            window.location.href = managerurl + "/rsc/rsc-giftOrder" + (urlParam ? '?' + urlParam : '');
+        }
+
+        function select_tabmenu(el){
+            if (el.hasClass('selected')) {
+                return;
+            }
+            $('.tabmenu li').each(function() {
+                $(this).removeClass('selected');
+            });
+            el.addClass('selected');
+            if (el.attr('data-type') && rscGiftOrder.filter.type != el.attr('data-type')) {
+                rscGiftOrder.filter.type = parseInt(el.attr('data-type'));
+                redirectRSCGiftordersURL();
+            }
+        }
+
+        $(function(){
+            $("#rsc-info-link").click(function(){
+                window.location.href = managerurl + "/rsc/rsc-detail?id=" + rscInfo_id;
+            });
+            $("#rsc-order-link").click(function(){
+                window.location.href = managerurl + "/rsc/rsc-order?id=" + rscInfo_id;
+            });
+        });
+    }
+</script>

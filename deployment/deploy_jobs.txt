@@ -19,7 +19,7 @@
 #######################################################
 ###            generate agent report                ###
 #######################################################
-0 4 * * * /usr/bin/node /root/xxnr/v2.0/website-git/jobs/generate_agent_report.js >> /root/xxnr/v2.0/logs/jobs/generate_agent_report/generate_agent_report_`date +\%Y\%m`.log
+0 4 * * * /usr/bin/node /root/xxnr/v2.0/website-git/jobs/generate_daily_agent_report.js >> /root/xxnr/v2.0/logs/jobs/generate_daily_agent_report/generate_daily_agent_report_`date +\%Y\%m`.log
 #######################################################
 ###               forbidden forever                 ###
 #######################################################
