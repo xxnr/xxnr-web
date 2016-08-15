@@ -71,7 +71,7 @@
         <a href="/">首页</a> ／ <a href="my_xxnr.html">我的新农人</a> ／ <a href="pointsRecording.html">我的积分</a>
     </p>
     <div class="wrap pointsRecording_section">
-        <div class="my_points" >积分：<span>2046</span></div>
+        <div class="my_points" >积分：<span>{{myPoints}}</span></div>
         <ul class="recordings_title row">
             <li>时间</li>
             <li>事件</li>
@@ -91,7 +91,7 @@
                 <ul class="row">
                     <li ng-hide="current_page==1" class="pre_btn"><a href="" ng-click="pre_page()"><em class="ban ban_8_0">&nbsp;</em></a></li>
                     <li ng-repeat="page in pages"><a href="" ng-click="show_page(page.id)" ng-class="{true:'current', false:''}[page.isSelected]">{{page.id}}</a></li>
-                    <li ng-hide="current_page==pageCount || orderList.length==0" class="next_btn"><a href="" ng-click="next_page()"><em class="ban ban_9_0">&nbsp;</em></a></li>
+                    <li ng-hide="current_page==pageCount || pointslogs.length==0" class="next_btn"><a href="" ng-click="next_page()"><em class="ban ban_9_0">&nbsp;</em></a></li>
                 </ul>
             </div>
         </div>

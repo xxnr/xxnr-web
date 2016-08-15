@@ -5969,10 +5969,11 @@ body {
     color: #323232;
     font-size: 12px;
     margin-right: 3px;
-    padding-left: 0px;
+    padding-left: 3px;
 }
 .order-detail-section .order .order-info .order-statusName .points_number{
     padding-left: 0px;
+    color: #FF4E00;
 }
 .order-detail-section .order .order-info .order-statusName span {
     /*padding-left: 10px;*/
@@ -7997,7 +7998,7 @@ body {
 .rsc_mgmt_body .switch_section{
     position: absolute;
     /*margin-left: -160px;*/
-    z-index: 99;
+    z-index: 4;
     width: 130px;
     height: 100px;
     background: #FFFFFF;
@@ -8945,9 +8946,12 @@ body {
 .pointsRecording_section .single_recording{
     height: 44px;
     line-height: 44px;
-    border: 1px solid #E0E0E0;
+    border-top: 1px solid #E0E0E0;
     box-sizing: border-box;
     color: #323232;
+}
+.pointsRecording_section .single_recording:first-child{
+    border-top: 0px solid #E0E0E0;
 }
 .pointsRecording_section .all_recordings .single_recording:nth-child(even) {
     background: #f8f8f8;

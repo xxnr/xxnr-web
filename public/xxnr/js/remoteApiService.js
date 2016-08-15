@@ -674,5 +674,18 @@ app.service('remoteApiService', function(commonService){
         };
         return commonService.ajax(params);
     };
-
+    this.getPointsLogs = function(page,max){
+        var params = {
+            'methodname':'/api/v2.3/rewardshop/pointslogs',
+            'page':page,
+            'max':max
+        };
+        return commonService.ajax(params);
+    };
+    this.rewardshopGetPoint = function(){
+        var params = {
+            methodname:'/api/v2.3/rewardshop/get'
+        };
+        return commonService.ajax(params);
+    };
 });

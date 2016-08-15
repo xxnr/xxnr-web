@@ -205,7 +205,7 @@
                 <li ng-repeat="type in pointsTypes" ng-class="{true:'current', false:''}[type.isSelected]"><a href="" ng-click='pointsSelectTab($index)' ng-cloak>{{type.name}}</a></li>
             </ul>
             <div class="order--search" ng-show="pointsTypes[0].isSelected">
-                <input type="text" class="search--input" my-placeholder="收货人手机号/兑换人手机号" placeholder="收货人手机号/兑换人手机号" ng-model="giftOrderSearchInput">
+                <input type="text" class="search--input" my-placeholder="姓名/手机号" placeholder="姓名/手机号" ng-model="giftOrderSearchInput">
                 <a href="" class="search--btn" ng-click='getGiftOrders(type.id, giftOrderSearchInput,1,20 )' >搜索</a>
             </div>
             <ul class="giftOrderslist--titles">
@@ -252,6 +252,11 @@
                 </div>
 
             </div>
+            <div class="rscMgmt--noOrders" ng-show="giftOrderList.length==0">
+                <img src="./images/noOrder_icon.png" alt="">
+                <p ng-show="pointsTypes[0].isSelected && searchOrder">未找到符合条件的积分订单</p>
+                <p ng-show="!searchOrder">还没有相关积分订单</p>
+            </div>
         </div>
     </div>
     <div class="xxnr--pager">
@@ -259,7 +264,7 @@
             <ul class="row">
                 <li ng-hide="current_page==1" class="pre_btn"><a href="" ng-click="pre_page()"><em class="ban ban_8_0">&nbsp;</em></a></li>
                 <li ng-repeat="page in pages"><a href="" ng-click="show_page(page.id)" ng-class="{true:'current', false:''}[page.isSelected]">{{page.id}}</a></li>
-                <li ng-hide="current_page==pageCount || orderList.length==0" class="next_btn"><a href="" ng-click="next_page()"><em class="ban ban_9_0">&nbsp;</em></a></li>
+                <li ng-hide="current_page==pageCount || orderList.length==0 || giftOrderList.length==0" class="next_btn"><a href="" ng-click="next_page()"><em class="ban ban_9_0">&nbsp;</em></a></li>
             </ul>
 
         </div>

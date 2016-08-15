@@ -52,9 +52,14 @@ app.controller('rscManagementController', function($scope, $rootScope,remoteApiS
     $scope.RSC_pickingUp_errMsg = '';
     var sweetalert = commonService.sweetalert;
 
-    $scope.focusShowValidate = function() {
-        $scope.RSC_pickingUp_errMsg = '';
-    };
+    function getQueryStringByName(name) {
+        var result = location.search.match(new RegExp("[\?\&]" + name + "=([^\&]+)", "i"));
+        if (result == null || result.length < 1) {
+            return "";
+        }
+        return result[1];
+    }
+
 
     $scope.current_page = 1;
     $scope.pageCount = 0;
@@ -66,8 +71,8 @@ app.controller('rscManagementController', function($scope, $rootScope,remoteApiS
     $scope.pickUpCode = null;
     $scope.pickUpGiftCode = null;
     $scope.orderSearchInput = '';
+    $scope.giftOrderSearchInput = '';
     $scope.searchOrder = false;   //点击搜索订单
-    $scope.contentsSwitch = 1;    // 1表示现在在查看orders(默认),2表示现在在查看积分兑换
 
     var reset_RSC_ConfirmPayment_pop = function(){
         $scope.RSC_ConfirmPayment_payMethod = 3;
@@ -170,7 +175,7 @@ app.controller('rscManagementController', function($scope, $rootScope,remoteApiS
             }else if($scope.contentsSwitch == 2){
                 for (var i = 0; i < $scope.pointsTypes.length; i++) {
                     if ($scope.pointsTypes[i].isSelected == true) {
-                        $scope.getGiftOrders($scope.pointsTypes[i].id,'',null,20);
+                        $scope.getGiftOrders($scope.pointsTypes[i].id,$scope.giftOrderSearchInput,$scope.current_page,20);
                     }
                 }
             }
@@ -426,7 +431,6 @@ app.controller('rscManagementController', function($scope, $rootScope,remoteApiS
                 }
             });
     };
-    $scope.show(null, 0);
 
     $scope.addToSKU_List = function(index,SKU_list,SKU_list_refs){   //index是要加入list的序号,SKU_list是需要操作的订单列表,SKU_list_refs是被选中的sku的ref
         if(SKU_list_refs.length == 0){
@@ -516,7 +520,7 @@ app.controller('rscManagementController', function($scope, $rootScope,remoteApiS
                 .then(function(data) {
                     if(data.code == 1429){
                         //sweetalert('您输入错误次数较多，请1分钟后再操作');
-                        $scope.RSC_pickingUp_errMsg = '您输入错误次数较多，请1分钟后再操作';
+                        $scope.RSC_pickingUp_errMsg = data.message;
                         //$scope.closePop();
                     }else if(data.code == 1000){
                         //sweetalert('客户自提成功', "rsc_management.html");
@@ -552,7 +556,7 @@ app.controller('rscManagementController', function($scope, $rootScope,remoteApiS
                 .then(function(data) {
                     if(data.code == 1429){
                         //sweetalert('您输入错误次数较多，请1分钟后再操作');
-                        $scope.RSC_pickingUp_errMsg = '您输入错误次数较多，请1分钟后再操作';
+                        $scope.RSC_pickingUp_errMsg = data.message;
                         //$scope.closePop();
                     }else if(data.code == 1000){
                         //sweetalert('客户自提成功', "rsc_management.html");
@@ -560,7 +564,7 @@ app.controller('rscManagementController', function($scope, $rootScope,remoteApiS
                         var message = '<img class="xxnr--flash--icon" src="images/correct_prompt.png" alt="">客户自提成功';
                         var id = Flash.create('success', message, 3000, {"class": 'xxnr-success-flash', "id": 'xxnr-success-flash'}, false);
                         $timeout(function(){
-                            window.location.href = "/rsc_management.html";
+                            window.location.href = "/rsc_management.html?section=rewardMgnt";
                             return false
                         },3000);
                     }else if(data.code == 1401){
@@ -590,6 +594,9 @@ app.controller('rscManagementController', function($scope, $rootScope,remoteApiS
             }else if(switchNum == 1){
                 $scope.show(null, 0);
             }
+            $scope.orderSearchInput = '';
+            $scope.giftOrderSearchInput = '';
+            $scope.searchOrder = false;
             $('html,body').animate({
                 scrollTop: 0
             }, 100);
@@ -609,6 +616,10 @@ app.controller('rscManagementController', function($scope, $rootScope,remoteApiS
     $scope.getGiftOrders = function(tabIndex,search,page,max){
         if(tabIndex){   //当点击非 "所有订单"tab的时候隐藏 搜索输入框并且清空
             $scope.giftOrderSearchInput = '';
+            $scope.searchOrder = false;
+        }
+        if(search){
+            $scope.searchOrder = true;
         }
         remoteApiService.getGiftOrderList(tabIndex,search,page,max)
             .then(function(data){
@@ -644,5 +655,12 @@ app.controller('rscManagementController', function($scope, $rootScope,remoteApiS
                 }
             });
     }
+    if(getQueryStringByName('section')=='rewardMgnt') {
+        $scope.contentsSwitch = 2;
+        $scope.getGiftOrders(null,'',1,20);
+    }else{
+        $scope.contentsSwitch = 1;    // 1表示现在在查看orders(默认),2表示现在在查看积分兑换
+        $scope.show(null, 0);
+    };
 
 });

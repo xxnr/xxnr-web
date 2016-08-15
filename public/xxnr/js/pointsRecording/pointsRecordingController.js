@@ -28,6 +28,12 @@ app.controller('pointsRecordingController', function($scope, remoteApiService, c
             })
     };
     $scope.getPointsLogs(1,20);
+    remoteApiService.rewardshopGetPoint()
+        .then(function (data){
+            $scope.myPoints = data.datas.score?data.datas.score:0;
+        });
+
+
     var generate_page = function() {
         $scope.pages = [];
         for (var id = 1; id <= $scope.pageCount; id++) {
