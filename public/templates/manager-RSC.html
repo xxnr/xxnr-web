@@ -64,7 +64,9 @@
 
         $.components.GET(managerurl + '/api/v2.2/RSCs', rsc.filter, function(response) {
             if(response.code != '1000') {
-                alert(response.message);
+                if (response.message) {
+                    alert(response.message);
+                }
                 return;
             }
 

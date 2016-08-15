@@ -9,6 +9,7 @@ var utils = require('../common/utils');
 const millisecondsInHour = 60*60*1000;
 const concurrency = 10000;
 
+console.log('[', new Date(), '] Start generating hourly reports...');
 ReportUpdateTimeModel.findOne({}, function(err, updateTime){
     var lastModifyTime = new Date(config.serviceStartTime).getTime();
     if(updateTime && updateTime.hourly) {
@@ -34,21 +35,19 @@ ReportUpdateTimeModel.findOne({}, function(err, updateTime){
 
         Promise.all(promises)
             .then(function () {
-                hourDiff = hourDiff - max;
-                if(hourDiff > concurrency){
+                if((hourDiff - max) > concurrency){
                     batchGenerateHourlyReport(max, max + concurrency);
-                } else if (hourDiff > 0) {
-                    batchGenerateHourlyReport(max, max + hourDiff);
+                } else if ((hourDiff - max) > 0) {
+                    batchGenerateHourlyReport(max, hourDiff);
                 } else{
                     // all finished
                     ReportUpdateTimeModel.update({}, {$set: {hourly: new Date()}}, {upsert: true}, function (err, numAffected) {
                         if (err) {
-                            reject(err);
-                            return;
+                            console.error('[', new Date(), '] generate hourly reports ReportUpdateTime fail:', err);
+                        } else {
+                            console.log('[', new Date(), '] generate hourly report job success. ', recordedCount, 'hours recorded');
                         }
-
-                        console.log('[', new Date(), '] generate hourly report job success. ', recordedCount, 'hours recorded');
-                        process.exit(0);
+                        require('./update_hourly_report_values_by_orders.js');
                     });
                 }
             })
