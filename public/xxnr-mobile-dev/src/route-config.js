@@ -73,10 +73,48 @@ export function configRouter (router) {
         }
       }
     },
-    '/my_points': {
-      name: 'myPoints',
-      component: require('./components/my_points/index.vue'),
-      auth: true // 这里 auth 是一个自定义字段
+    '/rewardShop': {
+      name: 'rewardShop',
+      component: require('./components/rewardShop/index.vue'),
+      auth: true // 这里 auth 是一个自定义字段,
+    },
+    '/myPoint': {
+      name: 'myPoint',
+      component: require('./components/rewardShop/myPoint.vue'),
+      auth: true // 这里 auth 是一个自定义字段,
+    },
+    '/pointsLogs': {
+      name: 'pointsLogs',
+      component: require('./components/rewardShop/pointsLogs.vue'),
+      auth: true, // 这里 auth 是一个自定义字段,
+      subRoutes : {
+        '/unComplete' : {
+          component : require('./components/rewardShop/unCompleteOrders.vue'),
+        },
+        '/completed' : {
+          component : require('./components/rewardShop/completedOrders.vue'),
+        }
+      }
+    },
+    '/rules': {
+      name: 'rules',
+      component: require('./components/rewardShop/rules.vue'),
+      auth: true // 这里 auth 是一个自定义字段,
+    },
+    '/giftDetail': {
+      name: 'giftDetail',
+      component: require('./components/rewardShop/giftDetail.vue'),
+      auth: true // 这里 auth 是一个自定义字段,
+    },
+    '/giftOrder': {
+      name: 'giftOrder',
+      component: require('./components/rewardShop/giftOrder.vue'),
+      auth: true
+    },
+    '/giftOrderDone': {
+      name: 'giftOrderDone',
+      component: require('./components/rewardShop/giftOrderDone.vue'),
+      auth: true
     },
     '/my_invitation': {
       name: 'myInvitation',

@@ -14,7 +14,8 @@ import {
   SAVE_CONSIGNEE,
   RESET_ORDERRSC,
   RESET_ORDERCONSIGNEE,
-  SELECT_CONSIGNEEAUTO
+  SELECT_CONSIGNEEAUTO,
+  COMMIT_GIFTORDER
   } from '../mutation-types'
 
 import {getUrlParam} from '../../utils/common'
@@ -55,6 +56,10 @@ const mutations = {
     var address = state.RSCList[index].RSCInfo.companyAddress;
     state.orderRSC.address = address.province.name + address.city.name + address.county.name + address.town.name + address.details;
     state.orderRSC._id = state.RSCList[index]._id;
+    if(getUrlParam('giftId')) {
+      router.go('/giftOrder?giftId=' + getUrlParam('giftId') + '&gift_id=' + getUrlParam('gift_id'));
+      return;
+    }
     router.go('/order?id=' + getUrlParam('id') + '&count=' + getUrlParam('count') + '&productId=' + getUrlParam('productId'));
     //window.history.back();
   },
@@ -116,6 +121,11 @@ const mutations = {
   [SAVE_CONSIGNEE] (state, consigneePhone, consigneeName) {
     state.orderConsignee.consigneePhone = consigneePhone;
     state.orderConsignee.consigneeName = consigneeName;
+
+    if(getUrlParam('giftId')) {
+      router.go('/giftOrder?giftId=' + getUrlParam('giftId') + '&gift_id=' + getUrlParam('gift_id'));
+      return;
+    }
     router.go( '/order?id=' + getUrlParam('id') + '&count=' + getUrlParam('count') + '&productId=' + getUrlParam('productId'));
   },
   [CONFIRM_CONSIGNEE] (state, index) {
@@ -132,6 +142,12 @@ const mutations = {
       }
       state.orderConsignee.consigneePhone = state.consigneeList[consigneeNum].consigneePhone;
       state.orderConsignee.consigneeName = state.consigneeList[consigneeNum].consigneeName;
+      console.log(getUrlParam('giftId'));
+      if(getUrlParam('giftId')) {
+        router.go('/giftOrder?giftId=' + getUrlParam('giftId') + '&gift_id=' + getUrlParam('gift_id'));
+        return;
+      }
+
       router.go('/order?id=' + getUrlParam('id') + '&count=' + getUrlParam('count') + '&productId=' + getUrlParam('productId'));
       //window.history.back();
   },
@@ -174,6 +190,9 @@ const mutations = {
 
     state.orderConsignee.consigneePhone = consigneeList[0].consigneePhone;
     state.orderConsignee.consigneeName = consigneeList[0].consigneeName;
+  },
+  [COMMIT_GIFTORDER] (state,data) {
+    router.go('/giftOrderDone?id=' + data.id);
   }
 }
 
