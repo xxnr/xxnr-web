@@ -19,6 +19,7 @@
         <h3 class="ui-left">经纪人数据</h3>
         <ul class="dashboard-sidebar">
             <li name="agentRank">- 业绩排行</li>
+            <li name="agentPerformance">- 汇总排行</li>
             <li class="cl"></li>
         </ul>
     </div>
@@ -36,19 +37,23 @@
 					{{ if today }}
 						<p>更新时间：{{ today.lastUpdateTime | format('yyyy-MM-dd HH:mm:ss') }}</p>
 						<div class="box">
-							<div class="col-md-3">
+							<div class="col-md-2">
 								<div class="mb10">注册用户数</div>
 								<div class="num">{{ today.registeredUserCount | format(0) }}</div>
 							</div>
-							<div class="col-md-3">
+							<div class="col-md-2">
+								<div class="mb10">新增经纪人</div>
+								<div class="num">{{ today.agentVerifiedCount | format(0) }}</div>
+							</div>
+							<div class="col-md-2">
 								<div class="mb10">订单数</div>
 								<div class="num">{{ today.orderCount | format(0) }}</div>
 							</div>
-							<div class="col-md-3">
+							<div class="col-md-2">
 								<div class="mb10">付款订单数</div>
 								<div class="num">{{ today.paidOrderCount | format(0) }}</div>
 							</div>
-							<div class="col-md-3">
+							<div class="col-md-4">
 								<div class="mb10">已支付金额（元）</div>
 								<div class="num">{{ today.paidAmount | price(2) }}</div>
 							</div>
@@ -76,19 +81,23 @@
 					{{ if yesterday }}
 						<p>昨日数据（{{ yesterday.date }}）</p>
 						<div class="box">
-							<div class="col-md-3">
+							<div class="col-md-2">
 								<div class="mb10">注册用户数</div>
 								<div class="num">{{ yesterday.registeredUserCount | format(0) }}</div>
 							</div>
-							<div class="col-md-3">
+							<div class="col-md-2">
+								<div class="mb10">新增经纪人</div>
+								<div class="num">{{ yesterday.agentVerifiedCount | format(0) }}</div>
+							</div>
+							<div class="col-md-2">
 								<div class="mb10">订单数</div>
 								<div class="num">{{ yesterday.orderCount | format(0) }}</div>
 							</div>
-							<div class="col-md-3">
+							<div class="col-md-2">
 								<div class="mb10">付款订单数</div>
 								<div class="num">{{ yesterday.paidOrderCount | format(0) }}</div>
 							</div>
-							<div class="col-md-3">
+							<div class="col-md-4">
 								<div class="mb10">已支付金额（元）</div>
 								<div class="num">{{ yesterday.paidAmount | price(2) }}</div>
 							</div>
@@ -108,21 +117,25 @@
 					{{ if statistic }}
 						<p>累计数据（{{ statistic.serviceStartTime }} ~ {{ statistic.EndTime }}）</p>
 						<div class="box">
-							<div class="col-md-3">
+							<div class="col-md-2">
 								<div class="mb10">总用户数</div>
 								<div class="num">{{ statistic.registeredUserCount | format(0) }}</div>
 							</div>
-							<div class="col-md-3">
+							<div class="col-md-2">
+								<div class="mb10">经纪人数</div>
+								<div class="num">{{ statistic.agentVerifiedCount | format(0) }}</div>
+							</div>
+							<div class="col-md-2">
 								<div class="mb10">总订单数</div>
 								<div class="num">{{ statistic.orderCount | format(0) }}</div>
 							</div>
-							<div class="col-md-3">
+							<div class="col-md-2">
 								<div class="mb10">已完成订单数</div>
 								<div class="num">{{ statistic.completedOrderCount | format(0) }}</div>
 							</div>
-							<div class="col-md-3">
-								<div class="mb10">已支付金额（元）</div>
-								<div class="num">{{ statistic.paidAmount | price(2) }}</div>
+							<div class="col-md-4">
+								<div class="mb10">已完成金额（元）</div>
+								<div class="num">{{ statistic.completedOrderPaidAmount | price(2) }}</div>
 							</div>
 							<div class="cl"></div>
 						</div>
@@ -130,7 +143,7 @@
 					{{ fi }}
 					</script>
 				</div>
-				<div data-component="error" data-component-path="dashboard.yesterdayresponse"></div>
+				<div data-component="error" data-component-path="dashboard.statisticresponse"></div>
 			</div>
 		</div>
 	</div>
@@ -159,6 +172,38 @@
 		</div>
 		<div class="row m">
 			<div class="col-md-12 m">
+				<div data-component="template" data-component-path="dashboard">
+					<script type="text/html">
+					{{ if dailiesamount }}
+						<p>数据统计（{{ dailiesStartDate }} ~ {{ dailiesEndDate }}）</p>
+						<div class="box">
+							<div class="col-md-2">
+								<div class="mb10">注册用户数</div>
+								<div class="num">{{ dailiesamount.registeredUserCount | format(0) }}</div>
+							</div>
+							<div class="col-md-2">
+								<div class="mb10">经纪人数</div>
+								<div class="num">{{ dailiesamount.agentVerifiedCount | format(0) }}</div>
+							</div>
+							<div class="col-md-2">
+								<div class="mb10">订单数</div>
+								<div class="num">{{ dailiesamount.orderCount | format(0) }}</div>
+							</div>
+							<div class="col-md-2">
+								<div class="mb10">付款订单数</div>
+								<div class="num">{{ dailiesamount.paidOrderCount | format(0) }}</div>
+							</div>
+							<div class="col-md-4">
+								<div class="mb10">已支付金额（元）</div>
+								<div class="num">{{ dailiesamount.paidAmount | price(2) }}</div>
+							</div>
+							<div class="cl"></div>
+						</div>
+					{{ fi }}
+					</script>
+				</div>
+			</div>
+			<div class="col-md-12 m">
 				<div class="chart-buttons">
 					<span>数据指标：</span>
 					<div class="selected" data-name="users">用户数</div>
@@ -180,6 +225,7 @@
 									<td style="width:40px" class="silver hidden-xs ui-center active">序号</td>
 							    	<td style="width:60px" class="silver hidden-xs ui-center active">日期</td>
 							    	<td style="width:60px" class="silver hidden-xs ui-center active">注册用户数</td>
+							    	<td style="width:60px" class="silver hidden-xs ui-center active">经纪人数</td>
 							    	<td style="width:60px" class="silver hidden-xs ui-center active">订单数</td>
 							    	<td style="width:60px" class="silver hidden-xs ui-center active">付款订单数</td>
 							    	<td style="width:90px" class="silver hidden-xs ui-right active">已支付金额（元）</td>
@@ -189,6 +235,7 @@
 										<td style="width:40px" class="silver hidden-xs ui-center">{{ $index + 1 }}</td>
 								    	<td style="width:60px" class="silver hidden-xs ui-center">{{ daily.day }}</td>
 								    	<td style="width:60px" class="silver hidden-xs ui-center">{{ daily.registeredUserCount | format(0) }}</td>
+								    	<td style="width:60px" class="silver hidden-xs ui-center">{{ daily.agentVerifiedCount | format(0) }}</td>
 								    	<td style="width:60px" class="silver hidden-xs ui-center">{{ daily.orderCount | format(0) }}</td>
 								    	<td style="width:60px" class="silver hidden-xs ui-center">{{ daily.paidOrderCount | format(0) }}</td>
 								    	<td style="width:90px" class="silver hidden-xs ui-right">{{ daily.paidAmount | price(2) }}</td>
@@ -214,7 +261,6 @@
 	dashboard.online = {};
 	dashboard.cache = {};
 
-
 	dashboard.today;
 	dashboard.todayresponse;
 	dashboard.yesterday;
@@ -223,9 +269,11 @@
 	dashboard.statisticresponse;
 	dashboard.dailies = [];
 	dashboard.dailiesresponse;
+	dashboard.dailiesamount;
+	dashboard.showKeys = ['registeredUserCount', 'agentVerifiedCount', 'orderCount', 'paidOrderCount', 'paidAmount'];
 	dashboard.dailiesSelected;
 	dashboard.dailiesChartSelected;
-	dashboard.dailiesChart = {'users':{'legend':['用户数'],'yAxis':'数量','dataKey':['registeredUserCount']},'orders':{'legend':['下单订单数', '已付款订单数'],'yAxis':'数量','dataKey':['orderCount', 'paidOrderCount']},'paidAmount':{'legend':['已付金额'],'yAxis':'销量','dataKey':['paidAmount']}};
+	dashboard.dailiesChart = {'users':{'legend':['用户数', '经纪人数'],'yAxis':'数量','dataKey':['registeredUserCount', 'agentVerifiedCount']},'orders':{'legend':['下单订单数', '已付款订单数'],'yAxis':'数量','dataKey':['orderCount', 'paidOrderCount']},'paidAmount':{'legend':['已付金额'],'yAxis':'销量','dataKey':['paidAmount']}};
 	dashboard.dailiesChartDatas;
 	dashboard.dailiesStartDate;
 	dashboard.dailiesEndDate;
@@ -299,7 +347,6 @@
 								response.EndTime = moment(endTime).format('YYYY-MM-DD');
 							}
 						}
-						
 					} else {
 						if (response.error || response.message) {
 							key = 'dashboard.statisticresponse';
@@ -429,6 +476,9 @@
 				if (resultDatas && resultDatas.dailiesChartDatas) {
 					dashboard.dailiesChartDatas = resultDatas.dailiesChartDatas;
 				}
+				if (resultDatas && resultDatas.dailiesamount) {
+					dashboard.dailiesamount = resultDatas.dailiesamount;
+				}
 		        dashboard_charts('users', $('.chart-buttons').children('div:first'));
 			} else {
 				if (response.error || response.message) {
@@ -456,7 +506,18 @@
 
 			var chartKeys = Object.keys(dashboard.dailiesChart);
 			var seriesDatas = {};
+			var dailiesamount = {};
             while (len--) {
+            	var reportkeys = dashboard.showKeys;
+            	for (var i=0; i < reportkeys.length; i++) {
+            		if (!dailiesamount.hasOwnProperty(reportkeys[i])) {
+            			dailiesamount[reportkeys[i]] = 0;
+            		}
+            		if (dailyReports[len].hasOwnProperty(reportkeys[i])) {
+            			dailiesamount[reportkeys[i]] += parseFloat(parseFloat(dailyReports[len][reportkeys[i]]).toFixed(2));
+            		}
+            	}
+
             	var date = dailyReports[len]['day'];
             	
             	// chartKey xAxis
@@ -489,6 +550,7 @@
 		        }
             }
             result.dailiesChartDatas = {xAxis:xAxis, series:series};
+            result.dailiesamount = dailiesamount;
 		}
 		return result;
 	}

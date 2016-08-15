@@ -166,6 +166,92 @@ function backend_auth_fail(req, res, data){
 }
 
 /**
+ * get backend auth data:
+ * 1. check if user logged in, if not, return relogin page
+ * 2. check if user has permission to access the route, if not, return code 1401
+ * @param req
+ * @param res
+ * @param next
+ */
+exports.get_backend_auth = function(req, res, next){
+    var token = null;
+
+    // check if token is valid
+    var data = req.data;
+    if(data.token){
+        // if data contains token
+        // it means the request is from app
+        token = data.token;
+    }else if (req.cookies[F.config.backendtokencookie]){
+        token = req.cookies[F.config.backendtokencookie];
+    }
+
+    try {
+        var payload = tools.verify_token(token);
+        // token verify success, still need to check if the login id matches the current one in db
+        BackEndUserService.get({_id:payload.userId}, function(err, data) {
+            if (err) {
+                // perhaps no user find
+                console.error('user not found:', err);
+                //controller.view('login');
+                backend_auth_fail(req, res, data);
+                return;
+            }
+
+            if (req.method == 'GET') {
+                req.query['userId'] = payload.userId;
+            } else {
+                req.body.userId = payload.userId;
+            }
+
+            // check user auth
+            if(!req.route){
+                res.respond({code:1403, message: '您没有权限这样操作'});
+                return;
+            }
+
+            var route = req.route.path.toString().trim().toLowerCase();
+            var method = req.method.trim().toLowerCase();
+            if (route.endsWith('/'))
+                route = route.substring(0, route.length - 1);
+            AuthService.auth_backend(data._id, route, method, function (err, hasPermission) {
+                if (err || !hasPermission) {
+                    if (err)
+                        console.error('auth_middleware err:', err);
+                    res.respond({code: 1403, message: '您没有权限这样操作'});
+                    return;
+                }
+
+                // now we have the permission to execute this method
+                // but we need to do some specific validation for super admin
+                // if the user is super admin, let businessId in query to be the user's businessId
+                // so we can simplify the code in each api to just use user's businessId as current control set
+                var isSuperAdmin = data.toObject().role.isSuperAdmin;
+                if (isSuperAdmin) {
+                    if (req.method == 'GET') {
+                        data.business = req.query['business'];
+                    } else {
+                        data.business = req.body.business;
+                    }
+                }
+
+                req.user = data;
+                next();
+            })
+        })
+    }catch(e){
+        // authentication fail
+        res.render('./7.manager/relogin.html',
+        {
+            manager_url: F.config['manager-url'],
+            user: null,
+            version: F.config['version']
+        });
+        return;
+    }
+};
+
+/**
  * check user in user white list
  * @param req
  * @param res
@@ -328,4 +414,50 @@ exports.isRSC_middleware = function(req, res, next){
 
         next();
     })
+};
+
+exports.convert_token_to_user = function(req, res, next){
+    var token = null;
+    // check if token is valid
+    var data = req.data;
+    if(data.token){
+        // only check token in req.data
+        token = data.token;
+    }
+
+    if(!token){
+        next();
+        return;
+    }
+
+    try {
+        var payload = tools.verify_token(token);
+        // token verify success, still need to check if the login id matches the current one in db
+        UserService.get({userid:payload.userId}, function(err, data) {
+            if (err) {
+                // perhaps no user find
+                console.error('isLogin_middleware user not found:', err);
+                res.respond({code: 1401, message: '用户不存在'});
+                return;
+            }
+
+            var valid = payload.appLoginId ?
+            payload.appLoginId == data.appLoginId :
+                payload.webLoginId ?
+                payload.webLoginId == data.webLoginId :
+                    false;
+
+            if (!valid) {
+                res.respond({code: 1401, message: '您已在其他地方登录'});
+                return;
+            }
+
+            req.user = data;
+            next();
+        })
+    }catch(e){
+        // authentication fail
+        console.error('Token verification fail:', e);
+        res.respond({code: 1401, message: '用户信息验证错误，请重新登录'});
+    }
 };

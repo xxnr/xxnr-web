@@ -68,8 +68,8 @@
 				                <td style="width:30px" class="hidden-xs ui-center">{{ $index + 1 }}</td>
 				                <td style="width:80px" class="hidden-xs ui-right" title="{{ pointslog.date | format('yyyy-MM-dd HH:mm:ss') }}">{{ pointslog.date | format('yyyy-MM-dd HH:mm:ss') }}</td>
 				                <td style="width:50px" class="hidden-xs ui-center">{{ if pointslog.points > 0 }}获得积分{{ else }}{{ if pointslog.points < 0}}使用积分{{ else }}其他{{ fi }}{{ fi }}</td>
-				                <td style="width:60px" class="hidden-xs ui-center">{{pointslog.event.name}}</td>
-				                <td style="width:150px" class="hidden-xs ui-left">{{ pointslog.description }}</td>
+				                <td style="width:60px" class="hidden-xs ui-center">{{ if pointslog.event }}{{ pointslog.event.name }}{{ fi }}</td>
+				                <td style="width:150px" class="hidden-xs ui-left" title="{{ pointslog.description }}">{{ pointslog.description }}</td>
 				                <td style="width:50px" class="hidden-xs ui-right">{{ pointslog.points }}</td>
 				                <td style="width:100px" class="hidden-xs ui-center">{{ if pointslog.user }}{{ pointslog.user.name }}</br>{{ pointslog.user.account }}</br>积分:{{ pointslog.user.score }}{{ else }}-{{ fi }}</td>
 				            </tr>
@@ -214,6 +214,9 @@
 	}
 
 	function select_tabmenu(el){
+		if (el.hasClass('selected')) {
+            return;
+        }
         $('.tabmenu li').each(function() {
             $(this).removeClass('selected');
         });

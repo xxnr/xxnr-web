@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>页面跳转中</title>
+    <style>
+        body, div, dl, dt, dd, ul, ol, li, h1, h2, h3, h4, h5, h6, input, button, textarea, p, blockquote, th, td, span, a {margin: 0;padding: 0;  }
+        .campaign_mask {position: fixed;width: 100%;height: 100%;background: #FFFFFF;top:0;z-index: 200;color:#323232;padding-top: 70px;padding-left: 30px;padding-right: 30px;box-sizing: border-box;font-size: 4.5vw;}
+        .campaign_mask p {margin-bottom: 6px;font-size: 34px; }
+        .campaign_mask--signature {float: right;}
+    </style>
+</head>
+<body>
+<div class="campaign_mask" v-show="isMask" v-cloak>
+    <div>
+        <p>
+            正在努力跳转......
+        </p>
+        <p>
+            若跳转失败请返回上一页面
+        </p>
+        <p class="campaign_mask--signature">
+            - 新新农人
+        </p>
+    </div>
+</div>
+<script src="zepto.js"></script>
+<script type="text/javascript">
+    function getUrlParam(name) {
+        var param = window.location.href.match(new RegExp("[\?\&]" + name + "=([^\&]+)", "i"));
+        if(!param) {
+            return false;
+        }
+        return param[1];
+    }
+    var params = {
+        inapp_data :{
+            activity : "CampaignDetailActivity",
+            params : [
+                {
+                    key: 'url',
+                    value : getUrlParam('path')
+                }
+            ]
+        }
+    };
+    var paramsJson = JSON.stringify(params);
+    $.ajax({
+        url: 'https://fds.so/v2/url/363ebd292023cc28',
+        type: 'POST',
+        data: paramsJson,
+        xhrFields: {withCredentials: true},
+        success: function(result) {
+            //deepshareUrl为所生成的DeepShare Link
+            window.location.href = result.url;
+        },
+        error: function() {
+            //出错情况下可以继续用户正常逻辑，可设置一个默认url.
+        }
+    })
+</script>
+</body>
+</html>

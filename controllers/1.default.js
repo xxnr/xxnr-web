@@ -147,6 +147,7 @@ function file_read(req, res, is) {
 exports.file_image = function(req, res, next) {
 	var type = req.params.type;
 	var path = req.params.filename;
+	var extension = req.params.extension;
 	fileExists(req, res, 10, function(next, filename) {
 		//var path = (req.path.length > 3 ? req.path[3] : req.path[2]);
 
@@ -164,7 +165,7 @@ exports.file_image = function(req, res, next) {
 
 				// Image processing
 				responseImage(req, res, filename, function(image) {
-					image.output('jpg');
+					image.output(extension);
 
 					var category = req.query['category'];
 					

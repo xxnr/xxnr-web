@@ -271,6 +271,7 @@ select {
 .rsc-order-box {
     border: 1px solid #ddd;
     padding: 0 20px 10px;
+    min-height: 145px;
 }
 
 .rsc-order-sec-title {
@@ -347,6 +348,7 @@ select {
         top: -20px;
         padding-top: 25px;
         border-right: 1px solid #ddd;
+        min-height: 200px;
     }
 
     .rsc-sidebar-ul li {
@@ -374,6 +376,7 @@ select {
         top: -20px;
         padding-top: 25px;
         border-right: 1px solid #ddd;
+        min-height: 200px;
     }
 
     .rsc-sidebar-ul li {
@@ -400,7 +403,7 @@ select {
     }
 
     .rsc-sidebar-ul li {
-        width: 50%;
+        width: 33.33333333%;
         height: 35px;
         line-height: 35px;
         cursor: pointer;
@@ -426,6 +429,7 @@ select {
         top: -20px;
         padding-top: 25px;
         border-right: 1px solid #ddd;
+        min-height: 200px;
     }
 
     .rsc-sidebar-ul li {
@@ -452,7 +456,7 @@ select {
     }
 
     .rsc-sidebar-ul li {
-        width: 50%;
+        width: 33.33333333%;
         height: 35px;
         line-height: 35px;
         cursor: pointer;

@@ -1,4 +1,5 @@
 var tools = require('../common/tools');
+var mongoose = require('mongoose');
 var NodeRSA = require('node-rsa');
 var fs = require('fs');
 var crypto = require('crypto');
@@ -15,9 +16,12 @@ var vCodeService = services.vCode;
 var IntentionProductService = services.intention_product;
 var PotentialCustomerService = services.potential_customer;
 var LoyaltypointService = services.loyaltypoint;
+var CampaignService = services.Campaign;
+var NewsService = services.news;
 var REG_MOBILE = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|Tablet|IOS/i;
 var config = require('../config');
 var Global = require('../global.js');
+var LOYALTYPOINTSTYPE = require('../common/defs').LOYALTYPOINTSTYPE;
 
 exports.install = function() {
 	// LOGIN
@@ -663,7 +667,7 @@ exports.json_user_modify = function(req, res, next) {
                         UserService.update({userid:req.data.userId, isUserInfoFullFilled: true}, function (err, data) {
                             // UserService.increaseScore({userid: req.data.userId, score: config.user_info_full_filled_point_add}, function (err) {
                             var points = config.user_info_full_filled_point_add;
-                            LoyaltypointService.increase(old_user_info._id, points, 'ORGANIZINGINFO', null, null, function (err) {
+                            LoyaltypointService.increase(old_user_info._id, points, LOYALTYPOINTSTYPE.ORGANIZINGINFO, null, null, function (err) {
                                 var response = {'code': '1000', 'message': 'success'};
                                 if (!err) {
                                     response.scoreAdded = points;
@@ -1048,7 +1052,7 @@ exports.process_user_sign = function(req, res, next){
                 // UserService.increaseScore({userid:req.data.userId, score: config.user_sign_point_add}, function (err) {
                 var points = config.user_sign_point_add;
                 var description = beijingTimeNow.format('YYYY-MM-DD') + '签到';
-                LoyaltypointService.increase(user._id, points, 'SIGN', description, null, function (err, points, otherOptions) {
+                LoyaltypointService.increase(user._id, points, LOYALTYPOINTSTYPE.SIGN, description, null, function (err, points, otherOptions) {
                     if (err) {
                         // error happen,
                         // there are 2 cases of error: one is db operation error,
@@ -1764,6 +1768,17 @@ exports.json_intention_products = function(req, res, next){
     })
 };
 
+exports.json_intention_products_with_brand = function(req, res, next){
+    IntentionProductService.query_with_brand(function(err, brands){
+        if(err){
+            res.respond({code:1001, message:'获取意向商品列表失败'});
+            return;
+        }
+
+        res.respond({code:1000, message:'success', intentionProducts:brands});
+    })
+};
+
 exports.json_potential_customer_available = function(req, res, next){
     if(!req.data.phone || !tools.isPhone(req.data.phone.toString())){
         res.respond({code:1001, message:'请填写正确的手机号'});
@@ -1905,5 +1920,195 @@ exports.process_userconsignees_save = function(req, res, next) {
         }
         res.respond({code:1000,message:'success'});
         return;
+    });
+};
+
+// user share
+exports.user_share = function(req, res, next) {
+    switch(req.data.type) {
+        case 'campaign':
+            user_share_campaign(req, res, next);
+            break;
+        case 'news':
+            user_share_news(req, res, next);
+            break;
+        default:
+            res.respond({code:1001, message:'没有找到要分享的类型'});
+            break;
+    }
+};
+
+var user_share_campaign = function(req, res, next) {
+    try {
+        var campaignId = mongoose.Types.ObjectId(req.data.id);
+    } catch(e) {
+        console.log('user share campaign user_share_campaign_check mongoose ObjectId err:', e);
+        res.respond({code:1001, message:'没有找到要分享的活动'});
+        return;
+    }
+    CampaignService.findById(campaignId, function(err, campaign) {
+        if (err || !campaign) {
+            res.respond({code:1001, message:'没有找到要分享的活动'});
+            return;
+        }
+        if (campaign.shareable) {
+            if (campaign.share_points_add) {
+                LoyaltypointService.getLog(null, req.user._id, LOYALTYPOINTSTYPE.SHARE, campaign._id, LOYALTYPOINTSTYPE.SHARE.refName[req.data.type] || 'campaign', function(err, log) {
+                    if (err) {
+                        console.error('user share campaign LoyaltypointService getLog err:', err);
+                        res.respond({code:1004, message:'添加积分失败，请重试'});
+                        return;
+                    }
+                    if (log) {
+                        res.respond({code:1003, message:'该活动已分享过'});
+                        return;
+                    }
+                    LoyaltypointService.increase(req.user._id, campaign.share_points_add, LOYALTYPOINTSTYPE.SHARE, campaign.title, campaign._id, function(err, points) {
+                        if (err) {
+                            console.error('user share campaign LoyaltypointService increase err:', err);
+                            res.respond({code:1004, message:'添加积分失败，请重试'});
+                            return;
+                        }
+                        var res_message = '分享成功';
+                        if (points && parseInt(points) > 0) {
+                            res_message = '分享成功，奖励您' + points + '积分';
+                        }
+                        res.respond({code:1000, message:res_message, points:points});
+                        return;
+                    }, campaign, LOYALTYPOINTSTYPE.SHARE.refName[req.data.type] || 'campaign');
+                });
+            } else {
+                res.respond({code:1001, message:'该活动分享不加积分'});
+                return;
+            }
+        } else {
+            res.respond({code:1001, message:'该活动不能分享'});
+            return;
+        }
+    });
+};
+
+var user_share_news = function(req, res, next) {
+    var options = {id: req.data.id, status: '2'};
+    NewsService.get(options, function(err, news) {
+        if (err || !news) {
+            res.respond({code:1001, message:'没有找到要分享的资讯'});
+            return;
+        }
+        if (LOYALTYPOINTSTYPE.SHARE.points) {
+            LoyaltypointService.getLog(null, req.user._id, LOYALTYPOINTSTYPE.SHARE, news._id, LOYALTYPOINTSTYPE.SHARE.refName[req.data.type] || 'news', function(err, log) {
+                if (err) {
+                    console.error('user share news LoyaltypointService getLog err:', err);
+                    res.respond({code:1004, message:'添加积分失败，请重试'});
+                    return;
+                }
+                if (log) {
+                    res.respond({code:1003, message:'该资讯已分享过'});
+                    return;
+                }
+                LoyaltypointService.increase(req.user._id, LOYALTYPOINTSTYPE.SHARE.points, LOYALTYPOINTSTYPE.SHARE, news.title, news._id, function(err, points) {
+                    if (err) {
+                        console.error('user share news LoyaltypointService increase err:', err);
+                        res.respond({code:1004, message:'添加积分失败，请重试'});
+                        return;
+                    }
+                    var res_message = '分享成功';
+                    if (points && parseInt(points) > 0) {
+                        res_message = '分享成功，奖励您' + points + '积分';
+                    }
+                    res.respond({code:1000, message:res_message, points:points});
+                    return;
+                }, news, LOYALTYPOINTSTYPE.SHARE.refName[req.data.type] || 'news');
+            });
+        } else {
+            res.respond({code:1001, message:'该资讯分享不加积分'});
+            return;
+        }
+    });
+};
+
+// user share check
+exports.user_share_check = function(req, res, next) {
+    switch(req.data.type) {
+        case 'campaign':
+            user_share_campaign_check(req, res, next);
+            break;
+        case 'news':
+            user_share_news_check(req, res, next);
+            break;
+        default:
+            res.respond({code:1001, message:'没有找到要分享的类型'});
+            break;
+    }
+};
+
+var user_share_campaign_check = function(req, res, next) {
+    try {
+        var campaignId = mongoose.Types.ObjectId(req.data.id);
+    } catch(e) {
+        console.log('user share campaign user_share_campaign_check mongoose ObjectId err:', e);
+        res.respond({code:1001, message:'没有找到要分享的活动'});
+        return;
+    }
+    CampaignService.findById(campaignId, function(err, campaign) {
+        if (err || !campaign) {
+            res.respond({code:1001, message:'没有找到要分享的活动'});
+            return;
+        }
+        if (campaign.shareable) {
+            if (campaign.share_points_add) {
+                LoyaltypointService.getLog(null, req.user._id, LOYALTYPOINTSTYPE.SHARE, campaign._id, LOYALTYPOINTSTYPE.SHARE.refName[req.data.type] || 'campaign', function(err, log) {
+                    if (err) {
+                        console.error('user share campaign LoyaltypointService getLog err:', err);
+                        res.respond({code:1001, message:'查找失败，请重试'});
+                        return;
+                    }
+                    if (log) {
+                        var result = log.toObject();
+                        delete result.__v;
+                        res.respond({code:1000, message:'该活动已分享过', result: result});
+                        return;
+                    }
+                    res.respond({code:1000, message:'该活动还未分享'});
+                    return;
+                });
+            } else {
+                res.respond({code:1001, message:'该活动分享不加积分'});
+                return;
+            }
+        } else {
+            res.respond({code:1001, message:'该活动不能分享'});
+            return;
+        }
+    });
+};
+
+var user_share_news_check = function(req, res, next) {
+    var options = {id: req.data.id, status: '2'};
+    NewsService.get(options, function(err, news) {
+        if (err || !news) {
+            res.respond({code:1001, message:'没有找到要分享的资讯'});
+            return;
+        }
+        if (LOYALTYPOINTSTYPE.SHARE.points) {
+            LoyaltypointService.getLog(null, req.user._id, LOYALTYPOINTSTYPE.SHARE, news._id, LOYALTYPOINTSTYPE.SHARE.refName[req.data.type] || 'news', function(err, log) {
+                if (err) {
+                    console.error('user share news LoyaltypointService getLog err:', err);
+                    res.respond({code:1001, message:'查找失败，请重试'});
+                    return;
+                }
+                if (log) {
+                    var result = log.toObject();
+                    delete result.__v;
+                    res.respond({code:1000, message:'该资讯已分享过', result: result});
+                    return;
+                }
+                res.respond({code:1000, message:'该资讯还未分享'});
+                return;
+            });
+        } else {
+            res.respond({code:1001, message:'该资讯分享不加积分'});
+            return;
+        }
     });
 };

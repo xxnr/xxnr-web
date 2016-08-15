@@ -3,8 +3,36 @@
  */
 var mongoose = require('mongoose');
 var config = require('../configuration/mongoose_config');
+var disconnected_reconnect_lock = false;
 
-mongoose.connect(config.db[config.environment],{user:'xxnr',pass:'txht001'});
+function connect_mongoDB() {
+    mongoose.connect(config.db[config.environment],{user:'xxnr',pass:'txht001',server:{auto_reconnect:true}});
+};
+connect_mongoDB();
+mongoose.connection.on('connected', function() {
+    console.log('MongoDB connected!');
+});
+mongoose.connection.once('open', function() {
+    console.log('MongoDB connection opened!');
+});
+mongoose.connection.on('connecting', function() {
+    console.log('connecting to MongoDB...');
+});
+mongoose.connection.on('error', function(error) {
+    console.error('Error in MongoDb connection: ' + error);
+    mongoose.disconnect();
+});
+mongoose.connection.on('reconnected', function () {
+    console.error('MongoDB reconnected!');
+});
+mongoose.connection.on('disconnected', function() {
+    console.error('MongoDB disconnected!');
+    disconnected_reconnect_lock = false;
+    if (!disconnected_reconnect_lock) {
+        disconnected_reconnect_lock = true;
+        setTimeout(function(){connect_mongoDB();}, 5000);
+    }
+});
 
 require('./users');
 require('./auth');
@@ -29,6 +57,8 @@ require('./user_sign');
 require('./vcodes');
 require('./loyaltypoints');
 require('./appdeviceversion');
+require('./campaign');
+require('./wechart');
 
 //user
 exports.user = mongoose.model('user');
@@ -91,6 +121,7 @@ exports.deliveryCode = mongoose.model('deliveryCode');
 exports.hourlyReport = mongoose.model('hourlyReport');
 exports.reportUpdateTime = mongoose.model('reportUpdateTime');
 exports.agentReport = mongoose.model('agentReport');
+exports.dailyAgentReport = mongoose.model('dailyAgentReport');
 // user sign
 exports.userSign = mongoose.model('user_sign');
 // vcode
@@ -105,6 +136,14 @@ exports.loyaltypointslogs = mongoose.model('loyalty_points_logs');
 exports.rewardshopgiftorder = mongoose.model('rewardshopgiftorder');
 // app upgrade
 exports.app_Device_Version = mongoose.model('app_Device_Version');
+// campaign
+exports.campaign = mongoose.model('campaign');
+exports.QA_campaign = mongoose.model('QA_campaign');
+exports.quiz_campaign = mongoose.model('quiz_campaign');
+exports.reward_control = mongoose.model('reward_control');
+exports.quiz_answer = mongoose.model('quiz_answer');
+//wechart
+exports.wechart = mongoose.model('wechart');
 
 exports.getModel = function (name, options) {
     options = options || {};

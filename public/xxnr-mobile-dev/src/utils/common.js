@@ -3,8 +3,12 @@
  */
 var URI = require('urijs');
 require('urijs/src/URI.fragmentURI.js');
-export function getUrlParam(name) {
+export function getUrlParam(name, url) {
   var param = window.location.href.match(new RegExp("[\?\&]" + name + "=([^\&]+)", "i"));
+  if (url) {
+    param = url.match(new RegExp("[\?\&]" + name + "=([^\&]+)", "i"));
+  }
+  
   if(!param) {
     return false;
   }

@@ -161,6 +161,9 @@ router.get('/api/v2.2/user/queryConsignees', middleware.isLoggedIn_middleware, c
 router.get('/api/v2.2/user/saveConsignees', middleware.isLoggedIn_middleware, controllers.User.process_userconsignees_save);
 router.post('/api/v2.2/user/saveConsignees', middleware.isLoggedIn_middleware, controllers.User.process_userconsignees_save);
 router.get('/api/v2.2/getOfflinePayType', controllers.Pay.json_offline_pay_type);
+// user share
+router.post('/api/v2.3/user/shareAddPoints', middleware.isLoggedIn_middleware, controllers.User.user_share);
+router.get('/api/v2.3/user/checkShareAddPoints', middleware.isLoggedIn_middleware, controllers.User.user_share_check);
 
 // potential customer/intention products related APIs
 router.get('/api/v2.1/intentionProducts', controllers.User.json_intention_products);
@@ -170,6 +173,7 @@ router.get('/api/v2.1/potentialCustomer/query', middleware.isLoggedIn_middleware
 router.get('/api/v2.1/potentialCustomer/queryAllOrderbyName', middleware.isLoggedIn_middleware, middleware.isXXNRAgent_middleware, controllers.User.json_potential_customer_orderby_namePinyin);
 router.get('/api/v2.1/potentialCustomer/isLatest', middleware.isLoggedIn_middleware, middleware.isXXNRAgent_middleware, controllers.User.json_potential_customer_islatest);
 router.get('/api/v2.1/potentialCustomer/get', middleware.isLoggedIn_middleware, middleware.isXXNRAgent_middleware, controllers.User.json_potential_customer_get);
+router.get('/api/v2.3/intentionProducts', controllers.User.json_intention_products_with_brand);
 
 // RSC related APIs
 router.get('/api/v2.2/RSC/info/get', middleware.isLoggedIn_middleware, controllers.RSC.json_RSC_info_get);
@@ -192,11 +196,25 @@ router.get('/api/v2.3/rewardshop/gifts/getGiftDetail', controllers.Rewardshop.js
 router.get('/api/v2.3/rewardshop/gifts', controllers.Rewardshop.json_rewardshop_gifts);
 router.post('/api/v2.3/rewardshop/addGiftOrder', middleware.isLoggedIn_middleware, controllers.Rewardshop.add_gift_order);
 router.get('/api/v2.3/rewardshop/getGiftOrderList', middleware.isLoggedIn_middleware, controllers.Rewardshop.json_gift_order_query);
+router.get('/api/v2.3/rewardshop/getGiftOrder', middleware.isLoggedIn_middleware, controllers.Rewardshop.json_gift_order_detail);
 router.get('/rewardshop/rules', controllers.Rewardshop.view_rewardshop_rules);
 // RSC rewardshop order
 router.get('/api/v2.3/RSC/rewardshop/getGiftOrderList', middleware.isLoggedIn_middleware, middleware.isRSC_middleware, controllers.Rewardshop.json_RSC_gift_order_query);
-router.post('/api/v2.3/RSC/rewardshop/order/selfDelivery', middleware.isLoggedIn_middleware, middleware.isRSC_middleware, controllers.Rewardshop.process_RSC_gift_order_self_delivery);
+router.post('/api/v2.3/RSC/rewardshop/order/selfDelivery', middleware.isLoggedIn_middleware, middleware.isRSC_middleware, middleware.throttle, controllers.Rewardshop.process_RSC_gift_order_self_delivery);
 
+// campaign
+// framework
+router.get('/api/v2.3/campaigns', controllers.Campaign.query_campaign);
+router.get('/campaigns/:type/:name', controllers.Campaign.campaign_page);
+router.get('/api/v2.3/campaign_status', middleware.convert_token_to_user, controllers.Campaign.campaign_status);
+router.get('/api/v2.3/campaign/app_share_info', controllers.Campaign.get_app_share_info);
+// QA
+router.get('/api/v2.3/campaign/QA/getQA', controllers.Campaign.get_QA);
+router.post('/api/v2.3/campaign/QA/require_reward', middleware.isLoggedIn_middleware, controllers.Campaign.QA_require_reward);
+// quiz
+router.get('/api/v2.3/campaign/quiz/getQ', controllers.Campaign.query_quiz_question);
+router.post('/api/v2.3/campaign/quiz/answer', middleware.isLoggedIn_middleware, controllers.Campaign.submit_quiz_answer);
+router.get('/api/v2.3/campaign/quiz/my_answer', middleware.isLoggedIn_middleware, controllers.Campaign.query_my_quiz_answer);
 
 // compatibility APIs
 controllers.Compatibility.compatibilityAPIs(router);

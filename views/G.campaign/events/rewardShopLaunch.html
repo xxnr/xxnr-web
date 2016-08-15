@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title><%- campaign.title %></title>
+    <meta itemprop="name" content="<%- campaign.share_title %>"/>
+    <meta itemprop="image" content="<%- campaign.share_image %>" />
+    <meta name="description" itemprop="description" content="<%- campaign.share_abstract %>" />
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=10" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=0.5, maximum-scale=2.0, user-scalable=yes" />
+    <meta name="robots" content="all,follow" />
+    <style>
+        body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,input,button,textarea,p,blockquote,th,td,span,a { margin: 0; padding: 0; }
+        /*html,body{min-height: 100%}*/
+        html{background: #CAEAEF;}
+        img { border: none; }
+        li { list-style: none; }
+        table { border-collapse: collapse; border-spacing: 0; }
+        a:hover { text-decoration: none; }
+        a { text-decoration: none; }
+        body { background-color: white; font-family: "微软雅黑","Microsoft YaHei","Helvetica Neue",Helvetica,Arial,sans-serif;height: 100% }
+        .clearfix:before, .clearfix:after {  content: " "; /* 1 */  display: table; /* 2 */  }
+        .clearfix:after {  clear: both;  }
+        .container { margin: 0 auto;width: 100%;background: #CAEAEF;height: 100%}
+        .title_image {text-align: center;background: #CAEAEF;}
+        .title_image img{width: 100%}
+        .main_contents {width: 100%}
+        .first_section {width: 100%;margin-top: -10px;}
+        .second_section {width: 100%}
+        .first_section--text {float: left;width: 38%;margin-left: 5%;margin-top: 28px;}
+        .first_section--image {float: left;width: 56%}
+        .second_section--text {float: left;width: 38%;margin-top: 46px;margin-left: -10px;}
+        .second_section--image {float: left;width: 60%;margin-top: -10px;}
+        .jump_App_button {margin-bottom: 60px;}
+        .jump_App_button a{width: 50%;display: block;margin: 0 auto;}
+        .jump_App_button img{width: 100%;}
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+    <div class="title_image">
+        <img src="/images/campaign/event/activity_banner1.png"/>
+    </div>
+    <div class="main_contents">
+        <div class="first_section clearfix">
+            <img class="first_section--text" src="/images/campaign/event/activity_text2.png" alt="">
+            <img class="first_section--image" src="/images/campaign/event/activity_photo1.png" alt="">
+        </div>
+        <div class="second_section clearfix">
+            <img class="second_section--image" src="/images/campaign/event/activity_photo2.png" alt="">
+            <img class="second_section--text" src="/images/campaign/event/activity_text3.png" alt="">
+        </div>
+        <div class="jump_App_button">
+            <a id="page_jump" href="">
+                <img src="/images/campaign/event/reward_shop_button.png" alt="">
+            </a>
+        </div>
+    </div>
+</div>
+
+<script src="/js/zepto.js"></script>
+<script  type="text/javascript">
+    var campaign = <%- JSON.stringify(campaign) %>;
+    var title = campaign.title;
+    var _id = campaign._id;
+    var share_title = campaign.share_title;
+    var share_url = campaign.share_url;
+    var share_abstract = campaign.share_abstract;
+    var share_image = campaign.share_image;
+
+    var wechart_basic_config = <%- JSON.stringify(wechart_basic_config) %>;
+
+    $(function() {
+        $('#page_jump').on('click', function(){
+            jsObj.startActivity("RewardShopActivity");
+        });
+    });
+</script>
+
+</body>
+</html>

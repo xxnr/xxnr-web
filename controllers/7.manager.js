@@ -26,6 +26,8 @@ var OFFLINEPAYTYPE = require('../common/defs').OFFLINEPAYTYPE;
 var DELIVERYTYPE =  require('../common/defs').DELIVERYTYPE;
 var config = require('../config');
 var path = require('path');
+var CampaignService = services.Campaign;
+var URL = require('url');
 
 exports.install = function() {
 	// Auto-localize static HTML templates
@@ -416,7 +418,7 @@ function fixPointslogs(pointslogs) {
 exports.json_rewardshop_giftorders = function(req, res, next) {
 	var page = U.parseInt(req.data.page, 1) - 1;
 	var max = U.parseInt(req.data.max, 20);
-	LoyaltypointService.queryGiftOrders(null, null, req.data.type, req.data.times, req.data.search, page, max, function(err, giftorders, count, pageCount) {
+	LoyaltypointService.queryGiftOrders(null, req.data.RSCId, req.data.type, req.data.times, req.data.search, page, max, function(err, giftorders, count, pageCount) {
 		if (err) {
 			res.respond({code:1002, message:'获取积分兑换记录失败'});
 			return;
@@ -424,6 +426,9 @@ exports.json_rewardshop_giftorders = function(req, res, next) {
 		var results = [];
 		giftorders.forEach(function(giftorder) {
 			giftorder.orderStatus = LoyaltypointService.giftOrderStatus(giftorder);
+			if (req.data.RSCId) {
+				delete giftorder.deliveryCode;
+			}
 			results.push(giftorder);
 		});
 		res.respond({code:1000, message:'success', giftorders:results, count:count, pageCount:pageCount, page:page+1});
@@ -518,7 +523,8 @@ exports.manager = function(req, res, next){
 			currency_entity:F.config['currency_entity'],
 			user:req.user,
 			version:F.config['version'],
-			author:F.config['author']
+			author:F.config['author'],
+			query: URL.parse(req.url).query
 		}
 	);
 };
@@ -1435,15 +1441,46 @@ exports.json_users_save = function(req,res,next) {
 		options.typeVerified = req.data.typeVerified;
 
 	// req.body.$save(self.callback());
-	UserService.update(options, function(err){
-        if(err){
+	UserService.get({userid:req.data.id}, function(err, user) {
+        if (err) {
         	console.error('manager json_users_save err:', err);
-            res.respond({code:1004, message:'系统错误，更新失败'});
+            res.respond({code: 1004, message: '更新用户信息失败'});
             return;
         }
+        if (!user) {
+			res.respond({code:1001, message:'未查询到用户'});
+			return;
+		}
+		// user dateFirstAgent
+		if (!options.dateTypeVerified || !options.dateTypeVerified.dateFirstAgent) {
+			if (user && user.dateTypeVerified && user.dateTypeVerified.dateFirstAgent) {
+				if (!options.dateTypeVerified) {
+					options.dateTypeVerified = {dateFirstAgent: user.dateTypeVerified.dateFirstAgent};
+				} else {
+					options.dateTypeVerified.dateFirstAgent = user.dateTypeVerified.dateFirstAgent;
+				}
+			}
+		}
+		// user dateFirstRSC
+		if (!options.dateTypeVerified || !options.dateTypeVerified.dateFirstRSC) {
+			if (user && user.dateTypeVerified && user.dateTypeVerified.dateFirstRSC) {
+				if (!options.dateTypeVerified) {
+					options.dateTypeVerified = {dateFirstRSC: user.dateTypeVerified.dateFirstRSC};
+				} else {
+					options.dateTypeVerified.dateFirstRSC = user.dateTypeVerified.dateFirstRSC;
+				}
+			}
+		}
+		UserService.update(options, function(err){
+	        if(err){
+	        	console.error('manager json_users_save err:', err);
+	            res.respond({code:1004, message:'系统错误，更新失败'});
+	            return;
+	        }
 
-        res.respond({code:1000, message:'success'});
-    });
+	        res.respond({code:1000, message:'success'});
+	    });
+	});
 }
 
 // // Removes specific user
@@ -2614,6 +2651,7 @@ exports.getDailyReport = function(req, res, next) {
 		orderCount: 0,
 		paidOrderCount: 0,
 		paidAmount: 0,
+		agentVerifiedCount: 0,
 		lastUpdateTime: currentTime
 	};
 
@@ -2633,6 +2671,7 @@ exports.getDailyReport = function(req, res, next) {
 					dailyReportResult.orderCount = dailyReport.orderCount;
 					dailyReportResult.paidOrderCount = dailyReport.paidOrderCount;
 					dailyReportResult.paidAmount = parseFloat(dailyReport.paidAmount.toFixed(2));
+					dailyReportResult.agentVerifiedCount = dailyReport.agentVerifiedCount;
 				}
 
 				res.respond(dailyReportResult);
@@ -2650,7 +2689,8 @@ exports.getStatistic = function(req, res, next) {
 		registeredUserCount: 0,
 		orderCount: 0,
 		completedOrderCount: 0,
-		paidAmount: 0,
+		completedOrderPaidAmount: 0,
+		agentVerifiedCount: 0,
 		serviceStartTime: config.serviceStartTime
 	};
 
@@ -2659,10 +2699,15 @@ exports.getStatistic = function(req, res, next) {
 			statisticResult.registeredUserCount = statistic.registeredUserCount;
 			statisticResult.orderCount = statistic.orderCount;
 			statisticResult.completedOrderCount = statistic.completedOrderCount;
-			statisticResult.paidAmount = parseFloat(statistic.paidAmount.toFixed(2));
+			statisticResult.completedOrderPaidAmount = parseFloat(statistic.completedOrderPaidAmount.toFixed(2));
 		}
 
-		res.respond(statisticResult);
+		DashboardService.getAgentCount(function (err, agentVerifiedCount) {
+			if (!err) {
+				statisticResult.agentVerifiedCount = agentVerifiedCount;
+			}
+			res.respond(statisticResult);
+		});
 	})
 };
 
@@ -2682,7 +2727,8 @@ exports.getWeeklyReport = function(req, res, next) {
 		registeredUserCount: 0,
 		orderCount: 0,
 		paidOrderCount: 0,
-		paidAmount: 0
+		paidAmount: 0,
+		agentVerifiedCount: 0
 	};
 
 	DashboardService.queryWeeklyReport(startDate, startDate, function(err, weeklyReports){
@@ -2692,6 +2738,7 @@ exports.getWeeklyReport = function(req, res, next) {
 			weeklyReportResult.orderCount = weeklyReport.orderCount;
 			weeklyReportResult.paidOrderCount = weeklyReport.paidOrderCount;
 			weeklyReportResult.paidAmount = parseFloat(weeklyReport.paidAmount.toFixed(2));
+			weeklyReportResult.agentVerifiedCount = weeklyReport.agentVerifiedCount;
 		}
 
 		res.respond(weeklyReportResult);
@@ -2745,4 +2792,343 @@ exports.queryAgentReportYesterday = function(req, res, next){
 			res.respond({code:1001, message:'没有获取到经纪人数据'});
 		})
 	}, req.data.sort, req.data.sortOrder, req.data.page)
+};
+
+exports.queryAgentReportByDates = function(req, res, next){
+	var dateStart = new Date(req.data.dateStart).format('yyyyMMdd');
+	var dateEnd = new Date(req.data.dateEnd).format('yyyyMMdd');
+	if (req.data.search) {
+		AgentService.getAgentList(null, null, null, null, 0, 0, req.data.search, null, function(err, agents, count, pageCount) {
+			if(err){
+				res.respond({code:1002, message:err});
+				return;
+			}
+			var agentIds = [];
+			agents.map(function(agent) {
+				agentIds.push(agent._id);
+			});
+			DashboardService.queryAgentReportByDates(function(err, result){
+				if(err){
+					res.respond({code:1001, message:'获取经纪人数据失败'});
+					return;
+				}
+
+				DashboardService.lastUpdateTime(function(err, lastUpdateTime){
+					if(err){
+						res.respond({code:1001, message:'获取更新时间失败'});
+						return;
+					}
+					if (result) {
+						res.respond({code:1000, agentReports:result.items, lastUpdateTime:lastUpdateTime.agentReport, page: result.page, pageCount: result.pageCount, count: result.count});
+						return;
+					}
+					res.respond({code:1001, message:'没有获取到经纪人数据'});
+				})
+			}, dateStart, dateEnd, agentIds, req.data.type, req.data.sort, req.data.sortOrder, req.data.page, req.data.max);
+		}, true);
+	} else {
+		DashboardService.queryAgentReportByDates(function(err, result){
+			if(err){
+				res.respond({code:1001, message:'获取经纪人数据失败'});
+				return;
+			}
+
+			DashboardService.lastUpdateTime(function(err, lastUpdateTime){
+				if(err){
+					res.respond({code:1001, message:'获取更新时间失败'});
+					return;
+				}
+				if (result) {
+					res.respond({code:1000, agentReports:result.items, lastUpdateTime:lastUpdateTime.agentReport, page: result.page, pageCount: result.pageCount, count: result.count});
+					return;
+				}
+				res.respond({code:1001, message:'没有获取到经纪人数据'});
+			})
+		}, dateStart, dateEnd, null, req.data.type, req.data.sort, req.data.sortOrder, req.data.page, req.data.max);
+	}
+};
+
+exports.create_campaign = function(req, res, next){
+	//TODO: create campaign
+	var campaign = req.data.campaign;
+	if(!campaign){
+		res.respond({code:1001, message:'请填写活动信息'});
+		return;
+	}
+
+	CampaignService.save(campaign, function(err, newCampaign){
+		if(err){
+			res.respond({code:1001, message:err});
+			return;
+		}
+
+		campaign._id = newCampaign._id;
+		if(campaign.detail){
+			CampaignService.save_detail(campaign, function(err, newCampaignDetail){
+				if(err){
+					res.respond({code:1001, message:err});
+					return;
+				}
+
+				res.respond({code:1000, campaign:newCampaign, campaignDetail:newCampaignDetail});
+			})
+		} else{
+			res.respond({code:1000, campaign:newCampaign});
+		}
+	})
+};
+
+exports.modify_campaign = function(req, res, next){
+	//TODO: modify campaign
+	var campaign = req.data.campaign;
+	if(!campaign){
+		res.respond({code:1001, message:'请填写活动信息'});
+		return;
+	}
+
+	if(!campaign._id){
+		res.respond({code:1001, message:'缺少活动_id'});
+		return;
+	}
+
+	CampaignService.findById(campaign._id, function(err, currentCampaign){
+		if(err){
+			self.respond({code:1001, message:'查找失败'});
+			return;
+		}
+
+		var updateBasicInfo = false;
+		var online_time = currentCampaign.online_time;
+		var canUpdateProperties = ['type', 'title', 'online_time', 'offline_time'
+			, 'start_time', 'end_time', 'campaign_url_name', 'url', 'image', 'comment'
+			, 'reward_times', 'shareable', 'share_points_add', 'share_button', 'share_title'
+			, 'share_url', 'share_abstract', 'share_image', 'same_as_campaign_url'];
+		canUpdateProperties.forEach(function(property){
+			if(campaign.hasOwnProperty(property)) {
+				updateBasicInfo = true;
+				currentCampaign[property] = campaign[property];
+			}
+		});
+
+		var datetimeNow = new Date();
+		// don't do this
+		//if(updateBasicInfo && online_time < datetimeNow){
+		//	res.respond({code:1001, message:'活动上线后不能更改基础信息'});
+		//	return;
+		//}
+
+		CampaignService.save(currentCampaign, function(err, newCampaign){
+			if(err){
+				res.respond({code:1001, message:err});
+				return;
+			}
+
+			campaign.type = newCampaign.type;
+			if(campaign.detail){
+				if(new Date(currentCampaign.start_time) < datetimeNow){
+					res.respond({code:1001, message:'活动开始后不能修改详情'});
+					return;
+				}
+
+				CampaignService.save_detail(campaign, function(err, newCampaignDetail) {
+					if (err) {
+						res.respond({code: 1001, message: err});
+						return;
+					}
+
+					res.respond({code:1000, campaign:newCampaign, campaignDetail:newCampaignDetail});
+				})
+			} else {
+				res.respond({code: 1000, campaign: newCampaign});
+			}
+		})
+	})
+};
+
+exports.query_campaign = function(req, res, next){
+	var type = req.data.type;
+	var search = req.data.search;
+	var status = req.data.status;
+
+	var options = {};
+	if(type)
+		options.type = type;
+	if(search)
+		options.search = search;
+	if(status)
+		options.status = status;
+	CampaignService.query(options, function(err, campaigns){
+		if(err){
+			res.respond({code:1001, message:'查询失败'});
+			return;
+		}
+
+		res.respond({code:1000, campaigns:campaigns});
+	})
+};
+
+exports.offline_campaign = function(req, res, next){
+	var campaign_id = req.data._id;
+	if(!campaign_id){
+		res.respond({code:1001, message:'campaign_id required'});
+		return;
+	}
+
+	CampaignService.findById(campaign_id, function(err, campaign){
+		if(err){
+			res.respond({code:1001, message:'查询失败'});
+			return;
+		}
+
+		var current_time = new Date();
+		if(current_time < campaign.online_time){
+			res.respond({code:1001, message:'不能下线还未上线的活动'});
+			return;
+		}
+
+		if(campaign.offline_time && campaign.offline_time < current_time){
+			res.respond({code:1001, message:'不能下线已经下线的活动'});
+			return;
+		}
+
+		if(!(campaign.start_time && campaign.start_time <= current_time)){
+			campaign.start_time = current_time;
+		}
+		if(!(campaign.end_time && campaign.end_time <= current_time)){
+			campaign.end_time = current_time;
+		}
+		campaign.offline_time = current_time;
+		CampaignService.save(campaign, function(err, newCampaign){
+			if(err){
+				res.respond({code:1001, message:'修改失败'});
+				return;
+			}
+
+			res.respond({code:1000, message:'success'});
+		})
+	})
+};
+
+exports.modify_quiz_right_answer = function(req, res, next){
+	var campaign_id = req.data._id;
+	var answers = req.data.answers;
+
+	CampaignService.modify_quiz_right_answer(campaign_id, answers, function(err){
+		if(err){
+			res.respond({code:1001, message:err});
+			return;
+		}
+
+		res.respond({code:1000});
+	})
+};
+
+exports.trigger_quiz_reward = function(req, res, next){
+	var campaign_id = req.data._id;
+
+	CampaignService.trigger_quiz_reward(campaign_id, function(err){
+		if(err){
+			res.respond({code:1001, message:err});
+			return;
+		}
+
+		res.respond({code:1000});
+	})
+};
+
+exports.get_campaign = function(req, res, next){
+	var campaign_id = req.data._id;
+	CampaignService.findById(campaign_id, function(err, campaign){
+		if(err){
+			res.respond({code:1001, message:err});
+			return;
+		}
+
+		res.respond({code:1000, campaign:campaign});
+	}, true)
+};
+
+exports.campaigns = function(req, res, next){
+	var type = req.data.type;
+	var search = req.data.search;
+	var status = req.data.status;
+	var page = req.data.page;
+	var max = req.data.max;
+
+	var options = {};
+	if(type)
+		options.type = parseInt(type);
+	if(search)
+		options.search = search;
+	if(status)
+		options.status = parseInt(status);
+	if(page)
+		options.page = parseInt(page);
+	if(max)
+		options.max = parseInt(max);
+
+	CampaignService.query(options, function(err, campaigns, count, pages){
+		res.render(path.join(__dirname, '../views/7.manager/campaign/manager-campaign.html'),
+			{
+				err:err,
+				campaigns:campaigns,
+				types:{array:CampaignService.campaign_type_array, map:CampaignService.campaign_type_map},
+				get_campaign_status:CampaignService.get_campaign_status.toString(),
+				campaign_status:CampaignService.campaign_status,
+				count:count,
+				pages:pages
+			});
+	})
+};
+
+exports.campaign_detail = function(req, res, next){
+	var campaign_id = req.data._id;
+	if(!campaign_id){
+		res.render(path.join(__dirname, '../views/7.manager/campaign/manager-campaign-detail.html'),
+			{
+				campaign:{},
+				types:{array:CampaignService.campaign_type_array, map:CampaignService.campaign_type_map}
+			});
+	} else {
+		CampaignService.findById(campaign_id, function (err, campaign) {
+			res.render(path.join(__dirname, '../views/7.manager/campaign/manager-campaign-detail.html'),
+				{
+					err:err,
+					campaign: campaign,
+					types: {array: CampaignService.campaign_type_array, map: CampaignService.campaign_type_map}
+				});
+		})
+	}
+};
+
+exports.campaign_detail_QA = function(req, res, next){
+	var campaign_id = req.data._id;
+	if(!campaign_id){
+		res.respond({code:1001, message:'campaign_id required'});
+		return;
+	}
+
+	CampaignService.queryQA(campaign_id, function(err, QA){
+		res.render(path.join(__dirname, '../views/7.manager/campaign/manager-campaign-detail-QA.html'),
+			{
+				err:err,
+				QA:QA || []
+			})
+	})
+};
+
+exports.campaign_detail_quiz = function(req, res, next){
+	var campaign_id = req.data._id;
+	if(!campaign_id){
+		res.respond({code:1001, message:'campaign_id required'});
+		return;
+	}
+
+	CampaignService.query_quiz_question(campaign_id, function(err, QA){
+		res.render(path.join(__dirname, '../views/7.manager/campaign/manager-campaign-detail-quiz.html'),
+			{
+				err:err,
+				QA:QA || []
+			})
+	})
 };

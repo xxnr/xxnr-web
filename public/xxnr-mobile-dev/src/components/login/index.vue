@@ -15,7 +15,7 @@
       确认登录
     </button>
     <div class="reg-section">
-      还没有帐号？<a href="" v-link="{ path: '/register'}" class="reg-section-green">立即注册</a>
+      还没有帐号？<a href="" v-link="link" class="reg-section-green">立即注册</a>
     </div>
   </div>
   <div v-show="toastMsg.length>0">
@@ -28,11 +28,13 @@
 <script>
   import { login,showBackBtn,hideRightBtn,editTitle } from '../../vuex/actions'
   import xxnrToast from '../../xxnr_mobile_ui/xxnrToast.vue'
+  import {getUrlParam} from '../../utils/common'
 
   export default {
     data: function () {
       return {
-        toastShow:false
+        toastShow:false,
+        link: getUrlParam('ref') ? {path: '/register?ref='+getUrlParam('ref')} : getUrlParam('redirect') ? {path: '/register?redirect='+getUrlParam('redirect')} : {path: '/register'}
       }
     },
     methods: {
@@ -62,6 +64,7 @@
         this.hideRightBtn();
         this.showBackBtn();
         this.editTitle('我的新农人');
+        this.link = getUrlParam('ref') ? {path: '/register?ref='+getUrlParam('ref')} : getUrlParam('redirect') ? {path: decodeURI('/register?redirect=' + getUrlParam('redirect'))} : {path: '/register'};
       }
     },
   }

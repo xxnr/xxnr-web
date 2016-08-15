@@ -4,6 +4,7 @@
 var config = require('../../../config');
 var request = require('supertest');
 var should = require('should');
+require('should-http');
 var authentication = require('../../../middlewares/authentication');
 
 if(config.environment != 'sandbox'){
@@ -21,6 +22,7 @@ exports.Cart = require('./cart');
 exports.Order = require('./order');
 exports.News = require('./news');
 exports.RSC = require('./RSC');
+exports.Campaign = require('./campaign');
 exports.Rewardshop = require('./rewardshop');
 
 exports.backend_upload_photo = function(token, imgPath, done){

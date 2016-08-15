@@ -133,7 +133,11 @@ exports.sendActivePhoneMessage = function (phonenumber, code) {
     var content = '验证码：' + code + '，确认后请在10分钟内填写，切勿泄露给他人，如非本人操作，建议及时与客服人员联系 - 新新农人';
     const template_id = '3021025';
     console.log(phonenumber + content);
-    sendPhoneMessage(phonenumber, template_id, [code], function(){});
+    if (config.environment !== 'sandbox') {
+        sendPhoneMessage(phonenumber, template_id, [code], function(){});
+    } else {
+        console.log('sandbox...');
+    }
 };
 
 function guessMobileCode(mobile_code, target) {
@@ -305,7 +309,13 @@ exports.httpRequest = function(options, callback) {
         return;
     }
 
-    var req = http.request(options.httpOptions, function (res) {
+    var client = http;
+    var protocol = options.httpOptions.protocol;
+    if(protocol == 'https:'){
+        client=https;
+    }
+
+    var req = client.request(options.httpOptions, function (res) {
         res.setEncoding('utf8');
         res.on('data', function (chunk) {
             if (res.statusCode == 200) {

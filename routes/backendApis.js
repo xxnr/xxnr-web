@@ -28,6 +28,7 @@ router.get(F.config['manager-url']+'/api/dashboard/queryDailyReport', middleware
 router.get(F.config['manager-url']+'/api/dashboard/queryWeeklyReport', middleware.backend_auth, controllers.Manager.queryWeeklyReport);
 router.get(F.config['manager-url']+'/api/dashboard/lastUpdateTime', middleware.backend_auth, controllers.Manager.lastUpdateTime);
 router.get(F.config['manager-url']+'/api/dashboard/queryAgentReportYesterday', middleware.backend_auth, controllers.Manager.queryAgentReportYesterday);
+router.get(F.config['manager-url']+'/api/dashboard/queryAgentReports', middleware.backend_auth, controllers.Manager.queryAgentReportByDates);
 
 // orders
 router.get(F.config['manager-url']+'/api/orders',middleware.backend_auth ,controllers.Manager.json_orders_query);
@@ -129,5 +130,16 @@ router.get(F.config['manager-url']+ '/api/backend/users',middleware.backend_auth
 router.post(F.config['manager-url']+'/api/backend/users', middleware.backend_auth, middleware.auditing_middleware, controllers.Manager.json_be_users_update);
 router.post(F.config['manager-url']+'/api/backend/user/password/modify',middleware.backend_auth, middleware.auditing_middleware, controllers.Manager.process_modify_password);
 router.post(F.config['manager-url']+'/api/backend/user/create', middleware.backend_auth, middleware.auditing_middleware, controllers.Manager.process_createUser);
+
+// campaign
+// framework
+router.post(F.config.manager_url+'/api/campaign/create', middleware.backend_auth, controllers.Manager.create_campaign);
+router.post(F.config.manager_url+'/api/campaign/modify', middleware.backend_auth, controllers.Manager.modify_campaign);
+router.get(F.config.manager_url+'/api/campaigns', middleware.backend_auth, controllers.Manager.query_campaign);
+router.post(F.config.manager_url+'/api/campaign/offline', middleware.backend_auth, controllers.Manager.offline_campaign);
+router.get(F.config.manager_url+'/api/campaign', middleware.backend_auth, controllers.Manager.get_campaign);
+// quiz
+router.post(F.config.manager_url+'/api/campaign/quiz/modify_right_answer', middleware.backend_auth, controllers.Manager.modify_quiz_right_answer);
+router.post(F.config.manager_url+'/api/campaign/quiz/trigger_reward', middleware.backend_auth, controllers.Manager.trigger_quiz_reward);
 
 module.exports = router;
