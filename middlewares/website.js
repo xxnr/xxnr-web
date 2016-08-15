@@ -112,7 +112,7 @@ module.exports = function(req, res, next) {
     }
 
     buildURLPrefix(req);
-
+    getFullURL(req);
     next();
 };
 
@@ -132,4 +132,8 @@ function buildURLPrefix(req){
 
     var protocol = req.protocol + '://';
     req.url_prefix = protocol + hosturl + (port ? ':' + port : '');
+}
+
+function getFullURL(req){
+    req.full_URL_without_hash = req.protocol + '://' + req.get('host') + req.originalUrl;
 }

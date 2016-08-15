@@ -13,12 +13,12 @@ router.get('/', function(req, res){
 });
 router.get('/header', function(req, res){res.sendFile(path.join(__dirname, '..' + F.config.directory_xxnr_public + 'header.html'));});
 router.get('/footer', function(req, res){res.sendFile(path.join(__dirname, '..' + F.config.directory_xxnr_public + 'footer.html'));});
-router.get('/images/:type(small|large|original|thumbnail)/:filename.jpg', controllers.Default.file_image);
-router.get('/images/:type(small|large|original|thumbnail)/:category/:filename.jpg', controllers.Default.file_image);
+router.get('/images/:type(small|large|original|thumbnail)/:filename.:extension(jpg|png)', controllers.Default.file_image);
+router.get('/images/:type(small|large|original|thumbnail)/:category/:filename.:extension(jpg|png)', controllers.Default.file_image);
 
 // support old app
-router.get('//images/:type(small|large|original|thumbnail)/:filename.jpg', controllers.Default.file_image);
-router.get('//images/:type(small|large|original|thumbnail)/:category/:filename.jpg', controllers.Default.file_image);
+router.get('//images/:type(small|large|original|thumbnail)/:filename.:extension(jpg|png)', controllers.Default.file_image);
+router.get('//images/:type(small|large|original|thumbnail)/:category/:filename.:extension(jpg|png)', controllers.Default.file_image);
 
 // pay related views
 router.get('/alipay', middleware.isInWhiteList_middleware, middleware.throttle, controllers.Pay.alipayOrder);

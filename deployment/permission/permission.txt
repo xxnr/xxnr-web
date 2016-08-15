@@ -98,6 +98,20 @@
 /manager/rewardshop/rewardshop-points-logs, get, super_admin
 /manager/rewardshop/rewardshop-gifts-orders, get, super_admin, customer_op
 
+#campaign
+/manager/api/campaign/create, post, super_admin
+/manager/api/campaign/modify, post, super_admin
+/manager/api/api/campaigns, get, super_admin
+/manager/api/campaign/offline, post, super_admin
+/manager/api/campaign, get, super_admin
+/manager/api/campaign/quiz/modify_right_answer, post, super_admin
+/manager/api/campaign/quiz/trigger_reward, post, super_admin
+#campaign page
+/manager/campaigns, get, super_admin
+/manager/campaign-detail, get, super_admin
+/manager/campaign-detail-QA, get, super_admin
+/manager/campaign-detail-quiz, get, super_admin
+
 #area
 /manager/api/area/getProvinceList, get, super_admin
 /manager/api/area/getCityList, get, super_admin

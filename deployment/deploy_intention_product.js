@@ -24,7 +24,8 @@ var deploy = function(done) {
                     return;
                 }
 
-                var name = fields[0].trim();
+                var order = fields[0].trim();
+                var name = fields[1].trim();
                 ProductModel.findOne({name:{$regex:new RegExp(name)}})
                     .populate('brand')
                     .exec(function(err, product){
@@ -41,7 +42,7 @@ var deploy = function(done) {
                             productRef = product._id;
                             brandRef = product.brand._id;
                         }
-                        IntentionProductService.save(name, brand, productRef, brandRef, function (err) {
+                        IntentionProductService.save(name, order, brand, productRef, brandRef, function (err) {
                             if (err) {
                                 reject(err);
                                 return;

@@ -14,7 +14,7 @@ var newsCategorySchema = new mongoose.Schema({
 });
 
 var newsSchema = new mongoose.Schema({
-    'id': String,
+    'id': {type:String, required:true, index: true, unique: true},
     'picture': String,
     'category': {type: String, required: true},
     'title': {type: String, required: true},

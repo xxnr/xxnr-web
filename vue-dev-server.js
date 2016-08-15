@@ -72,6 +72,7 @@ app.use(hotMiddleware)
 var staticPath = path.posix.join(config.build.assetsPublicPath, config.build.assetsSubDirectory)
 app.use(staticPath, express.static('./public/xxnr-mobile-dev/static'));
 app.use(express.static('./public/xxnr'));
+app.use(express.static('./public'));
 
 buildMobileApp(app);
 
