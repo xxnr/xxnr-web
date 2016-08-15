@@ -111,6 +111,18 @@ canvas { display: block; }
 .tabmenu .fa { margin-right: 8px; }
 .tabmenu li:hover { background-color: white; top: 1px; border-color: #E0E0E0; color: black; }
 
+select {
+	text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    vertical-align: middle;
+}
+select option {
+	text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    vertical-align: middle;
+}
 
 @media(max-width: 767px) {
 	/*header { height: 45px; }*/
@@ -238,7 +250,8 @@ canvas { display: block; }
 
 .box { border: 1px solid #E0E0E0; padding: 10px; text-align: center; }
 .box div:first-child { border-left: none }
-.box .col-md-3 { border-left: 1px solid #E0E0E0; }
+/*.box .col-md-3 { border-left: 1px solid #E0E0E0; }*/
+.box .col-md-1, .box .col-md-2, .box .col-md-3, .box .col-md-4, .box .col-md-5, .box .col-md-6, .box .col-md-7, .box .col-md-8, .box .col-md-9, .box .col-md-10, .box .col-md-11, .box .col-md-12 { border-left: 1px solid #E0E0E0; }
 .box .num { color: #008000; font-size: 20px; }
 
 .quick-view { font-size: 14px;float: right; }

@@ -34,7 +34,7 @@ AgentService.prototype.getAgent = function(_id, callback) {
     }
 };
 
-AgentService.prototype.getAgentList = function(province, city, county, town, page, max, search, options, callback) {
+AgentService.prototype.getAgentList = function(province, city, county, town, page, max, search, options, callback, all) {
     var query = buildQuery(province, city, county, town, search, options);
 
     if(page<0 || !page){
@@ -54,6 +54,10 @@ AgentService.prototype.getAgentList = function(province, city, county, town, pag
             console.error('AgentService getAgentList count err:', err);
             callback('error query agents:', err);
             return;
+        }
+
+        if (all) {
+            max = count;
         }
 
         UserModel.find(query)
