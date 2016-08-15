@@ -5,6 +5,7 @@ var UserSignSchema = new mongoose.Schema({
     id_date: {type:String, unique:true, sparse: true}, //userid and sign date, unique sparse index
     datetime: Date   //datetime that user sign
 });
+UserSignSchema.index({"datetime":-1});
 
 // Model
 var UserSign = mongoose.model('user_sign', UserSignSchema);

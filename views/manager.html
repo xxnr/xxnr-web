@@ -49,6 +49,7 @@
 		<div data-component="page" data-component-path="common.page" data-if="dashboard" data-template="/templates/manager-dashboard.html"></div>
 		<div data-component="page" data-component-path="common.page" data-if="dashboard-weekly" data-template="/templates/manager-dashboard-weekly.html"></div>
 		<div data-component="page" data-component-path="common.page" data-if="dashboard-agentRank" data-template="/templates/manager-dashboard-agentrank.html"></div>
+		<div data-component="page" data-component-path="common.page" data-if="dashboard-agentPERF" data-template="/templates/manager-dashboard-agentPERF.html"></div>
 		<% } %>
 		<% if (user.role.view_roles.indexOf('orders') !== -1) { %>
 		<div data-component="page" data-component-path="common.page" data-if="orders" data-template="/templates/manager-orders.html"></div>
@@ -88,13 +89,13 @@
 		<% } %>
 		<% if (user.role.view_roles.indexOf('settings') !== -1) { %>
 		<div data-component="page" data-component-path="common.page" data-if="settings" data-template="/templates/manager-settings.html"></div>
-		<% } %>	
+		<% } %>
 		<% if (user.role.view_roles.indexOf('rsc') !== -1) { %>
 		<div data-component="page" data-component-path="common.page" data-if="rsc" data-template="/templates/manager-RSC.html"></div>
 		<div data-component="page" data-component-path="common.page" data-if="rsc-detail" data-template="/templates/manager-RSC-detail.html"></div>
 		<div data-component="page" data-component-path="common.page" data-if="rsc-order" data-template="/templates/manager-RSC-order.html"></div>
-		<div data-component="page" data-component-path="common.page" data-if="rsc-orderDetail" data-template="/templates/manager-RSC-orderDetail.html"></div>
-		<% } %>	
+		<div data-component="page" data-component-path="common.page" data-if="rsc-giftorder" data-template="/templates/manager-RSC-giftorder.html"></div>
+		<% } %>
 	<% } %>
 	</div>
 
