@@ -14,7 +14,7 @@ var moment = require('moment');
 AppupgradeService.isNeedPush(function (err,result) {
     if (err) {
         console.error("AppUpgrade isNeedPush err:", err);
-        return;
+        process.exit(0);
     }
     console.log("AppUpgrade isNeedPush result:", result);
     process.exit(0);
