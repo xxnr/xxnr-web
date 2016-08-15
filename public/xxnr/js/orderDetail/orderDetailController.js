@@ -65,6 +65,11 @@ app.controller('orderDetailController', function ($scope, remoteApiService, comm
                 $scope.RSCInfo = data.datas.rows.RSCInfo;
                 $scope.recipientName = data.datas.rows.recipientName;
                 $scope.recipientPhone = data.datas.rows.recipientPhone;
+                $scope.order.duePrice = data.datas.rows.duePrice;
+                $scope.order.isRewardPoint = data.datas.rows.isRewardPoint;
+                $scope.order.rewardPoints = data.datas.rows.rewardPoints;
+                //$scope.order.isRewardPoint = true;
+                //$scope.order.rewardPoints = 30;
                 if ($scope.order.orderStatus.type == 0) {
                     //$scope.order.statusName = '已关闭';
                     $scope.order.showAction = false;
@@ -128,7 +133,7 @@ app.controller('orderDetailController', function ($scope, remoteApiService, comm
                             }else if(data.code == 1401){
                                 //sweetalert('你已被登出，请重新登录', "logon.html");
                                 var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">你已被登出，请重新登录';
-                                var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);
+                                var id = Flash.create('success', message, 3000, {"class": 'xxnr-warning-flash', "id": 'xxnr-warning-flash'}, false);
                                 $timeout(function(){
                                     window.location.href = "/logon.html";
                                     return false
@@ -136,7 +141,7 @@ app.controller('orderDetailController', function ($scope, remoteApiService, comm
                             } else {
                                 //sweetalert('获取提货码失败');
                                 var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">获取提货码失败';
-                                var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);
+                                var id = Flash.create('success', message, 3000, {"class": 'xxnr-warning-flash', "id": 'xxnr-warning-flash'}, false);
                             }
                         });
                 } else if ($scope.order.orderStatus.type == 6) {
@@ -258,7 +263,7 @@ app.controller('orderDetailController', function ($scope, remoteApiService, comm
                     if(data.code == 1000){
                         //sweetalert('收货成功',window.location.pathname+"?id="+$scope.id);
                         var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">收货成功';
-                        var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);
+                        var id = Flash.create('success', message, 3000, {"class": 'xxnr-warning-flash', "id": 'xxnr-warning-flash'}, false);
                         $timeout(function(){
                             window.location.href = window.location.pathname+"?id="+$scope.id;
                             return false
@@ -266,14 +271,14 @@ app.controller('orderDetailController', function ($scope, remoteApiService, comm
                     }else if(data.code == 1401){
                         //sweetalert('你已被登出，请重新登录', "logon.html");
                         var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">你已被登出，请重新登录';
-                        var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);
+                        var id = Flash.create('success', message, 3000, {"class": 'xxnr-warning-flash', "id": 'xxnr-warning-flash'}, false);
                         $timeout(function(){
                             window.location.href = "/logon.html";
                             return false
                         },3000);
                     }else{
                         var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">确认收货失败';
-                        var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);
+                        var id = Flash.create('success', message, 3000, {"class": 'xxnr-warning-flash', "id": 'xxnr-warning-flash'}, false);
                         $timeout(function(){
                             window.location.href = window.location.pathname+"?id="+$scope.id;
                             return false

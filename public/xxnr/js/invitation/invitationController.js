@@ -100,15 +100,15 @@ app.controller('invitationController', function($scope, remoteApiService, common
     $scope.inviterPhoneNumberValidated = false;
     $scope.$watch('inviterNum',function(){
         if(!isNaN($scope.inviterNum) && /^1\d{10}$/.test($scope.inviterNum)){
-            remoteApiService.findAccount($scope.inviterNum)
-                .then(function (data) {
-                    if(data.code == 1000){
-                        $scope.phoneNumberValidated = true;
-                    }else{
-                        $scope.phoneNumberValidated = false;
-                    }
-                })
-
+            //remoteApiService.findAccount($scope.inviterNum)
+            //    .then(function (data) {
+            //        if(data.code == 1000){
+            //            $scope.phoneNumberValidated = true;
+            //        }else{
+            //            $scope.phoneNumberValidated = false;
+            //        }
+            //    })
+            $scope.phoneNumberValidated = true;
         }else{
             $scope.phoneNumberValidated = false;
         }
@@ -178,57 +178,66 @@ app.controller('invitationController', function($scope, remoteApiService, common
         $scope.$apply();
         if(!$scope.inviterNum){
             //sweetalert('该手机号未注册，请确认后重新输入');
-            var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">请输入代表人手机号';
-            var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);
+            var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">请输入手机号';
+            var id = Flash.create('success', message, 3000, {"class": 'xxnr-warning-flash', "id": 'xxnr-warning-flash'}, false);
         } else if(!$scope.phoneNumberValidated){
             //sweetalert('该手机号未注册，请确认后重新输入');
-            var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">该手机号未注册，请确认后重新输入';
-            var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);
-        } else if($scope.phone==$scope.inviterNum){
+            var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">请输入正确的手机号';
+            var id = Flash.create('success', message, 3000, {"class": 'xxnr-warning-flash', "id": 'xxnr-warning-flash'}, false);
+        } else if($scope.userPhone==$scope.inviterNum){
             //sweetalert('不能设置自己为邀请人');
             var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">不能设置自己为邀请人';
-            var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);
+            var id = Flash.create('success', message, 3000, {"class": 'xxnr-warning-flash', "id": 'xxnr-warning-flash'}, false);
         }else {
-            if (navigator.appName == "Microsoft Internet Explorer" && navigator.appVersion.match(/8./i) == "8.") {
-                var r = confirm("代表人添加后不可修改,确定设置该用户为您的代表吗?");
-                if (r == true) {
-                    remoteApiService.bindInviter($scope.inviterNum)
-                        .then(function (data) {
-                            if (data.code == 1000) {
-                                var url = window.location.href;
-                                window.location.href = url.substr(0,url.length-1)+"?tab=2";
+            remoteApiService.findAccount($scope.inviterNum)
+                .then(function (data) {
+                    if(data.code == 1000){
+                        if (navigator.appName == "Microsoft Internet Explorer" && navigator.appVersion.match(/8./i) == "8.") {
+                            var r = confirm("代表人添加后不可修改,确定设置该用户为您的代表吗?");
+                            if (r == true) {
+                                remoteApiService.bindInviter($scope.inviterNum)
+                                    .then(function (data) {
+                                        if (data.code == 1000) {
+                                            var url = window.location.href;
+                                            window.location.href = url.substr(0,url.length-1)+"?tab=2";
+                                        } else {
+                                            sweetalert(data.message);
+                                        }
+                                    });
                             } else {
-                                sweetalert(data.message);
+                                return false;
                             }
-                        });
-                } else {
-                    return false;
-                }
-            } else {
-                swal({
-                        title: "新新农人",
-                        text: "代表人添加后不可修改,确定设置该用户为您的代表吗?",
-                        //type: "warning",
-                        showCancelButton: true,
-                        confirmButtonColor: '#00913a',
-                        confirmButtonText: '确定',
-                        cancelButtonText: "取消",
-                        closeOnConfirm: false
-                    },
-                    function (isConfirm) {
-                        if (isConfirm) {
-                            remoteApiService.bindInviter($scope.inviterNum)
-                                .then(function (data) {
-                                    if (data.code == 1000) {
-                                        var url = window.location.href;
-                                        window.location.href = url.substr(0,url.length-1)+"?tab=2";
-                                    } else {
-                                        sweetalert(data.message);
+                        } else {
+                            swal({
+                                    title: "新新农人",
+                                    text: "代表人添加后不可修改,确定设置该用户为您的代表吗?",
+                                    //type: "warning",
+                                    showCancelButton: true,
+                                    confirmButtonColor: '#00913a',
+                                    confirmButtonText: '确定',
+                                    cancelButtonText: "取消",
+                                    closeOnConfirm: false
+                                },
+                                function (isConfirm) {
+                                    if (isConfirm) {
+                                        remoteApiService.bindInviter($scope.inviterNum)
+                                            .then(function (data) {
+                                                if (data.code == 1000) {
+                                                    var url = window.location.href;
+                                                    window.location.href = url.substr(0,url.length-1)+"?tab=2";
+                                                } else {
+                                                    sweetalert(data.message);
+                                                }
+                                            });
                                     }
                                 });
                         }
-                    });
-            }
+                    }else{
+                        var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">'+data.message;
+                        var id = Flash.create('success', message, 3000, {"class": 'xxnr-warning-flash', "id": 'xxnr-warning-flash'}, false);
+                    }
+                })
+
         }
     };
     remoteApiService.getInviter()
@@ -244,7 +253,7 @@ app.controller('invitationController', function($scope, remoteApiService, common
             $scope.inviterPhone = data.datas.inviterPhone;
             $scope.inviterName = data.datas.inviterName;
             $scope.inviterIsVerified = data.datas.inviterIsVerified;
-            $scope.inviterSex = data.datas.sex;
+            $scope.inviterSex = data.datas.inviterSex;
             remoteApiService.userTypeList()
                 .then(function (data) {
                     $scope.inviterType = data.data[Number($scope.inviterTypeNum)]
@@ -257,7 +266,7 @@ app.controller('invitationController', function($scope, remoteApiService, common
 
     remoteApiService.getBasicUserInfo()
         .then(function (data) {
-
+            $scope.userPhone = data.datas.phone;
         });
 
     $scope.getInviteeOrders = function(inviteeUserId,page){
@@ -291,10 +300,10 @@ app.controller('invitationController', function($scope, remoteApiService, common
     };
 
     $scope.show_page = function(pager,pageId){
-        $('html,body').animate({
-            scrollTop: 0
-        }, 100);
         if(pageId!='...'){
+            $('html,body').animate({
+                scrollTop: 0
+            }, 100);
             pager.current_page = pageId;
             for(var pageIndex in pager.pages){
                 if(pager.pages[pageIndex].id == pageId){
