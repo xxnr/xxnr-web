@@ -110,14 +110,14 @@ UserSchema.index({inviter:1, nameInitialType:1, namePinyin:1, dateinvited:-1, da
 UserSchema.index({RSCInfo:1, 'RSCInfo.products':1, 'RSCInfo.supportEPOS':1, 'RSCInfo.EPOSNo':1});
 UserSchema.index({typeVerified:1, type:1, datecreated:-1});
 
-PotentialCustomerSchema.index({"phone":1, unique:true});
+PotentialCustomerSchema.index({"phone":1}, {unique:true});
 PotentialCustomerSchema.index({"user":1, "dateAdded":1, "nameInitialType":1, "namePinyin":1, "dateTimeAdded":-1});
 PotentialCustomerSchema.index({"user":1, "isRegistered":1, "isBinded":1});
 PotentialCustomerSchema.index({"dateTimeAdded":-1});
 PotentialCustomerSchema.index({"nameInitialType":1, "namePinyin":1});
 
-IntentionProductSchema.index({"name":1, unique:true});
-IntentionProductSchema.index({"order":1, unique:true});
+IntentionProductSchema.index({"name":1}, {unique:true});
+IntentionProductSchema.index({"order":1}, {unique:true});
 
 var UserLogSchema = new mongoose.Schema({id: String, account: String, ip: String, date: String, loginAgent: String});
 
