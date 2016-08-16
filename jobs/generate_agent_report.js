@@ -13,10 +13,10 @@ console.log('[', new Date(), '] Start generating agent reports...');
 ReportUpdateTimeModel.findOne({}, function(err, updateTime){
     var lastModifyTime = new Date(config.serviceStartTime).getTime();
     if(updateTime && updateTime.agentReport) {
-        lastModifyTime = new Date(updateTime.agentReport).add('h', -config.currentTimeZoneDiff).getTime();
+        lastModifyTime = new Date(updateTime.agentReport).add('h', config.currentTimeZoneDiff).getTime();
     }
 
-    var currentTime = new Date().add('h', -config.currentTimeZoneDiff).getTime();
+    var currentTime = new Date().add('h', config.currentTimeZoneDiff).getTime();
     var dayDiff = parseInt(currentTime/millisecondsInDay) - parseInt(lastModifyTime/millisecondsInDay);
     var recordedCount = dayDiff;
     var batchGenerateAgentReport = function(i, max) {
