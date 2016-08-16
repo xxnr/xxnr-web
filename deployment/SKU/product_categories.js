@@ -9,8 +9,8 @@ module.exports = [{
         "width" : 190
     },
     "productImgSize" : {
-        "height" : 350,
-        "width" : 350
+        "height" : 440,
+        "width" : 440
     },
     "deliveries" : [
         {
@@ -31,8 +31,8 @@ module.exports = [{
         "width" : 190
     },
     "productImgSize" : {
-        "height" : 350,
-        "width" : 350
+        "height" : 440,
+        "width" : 440
     },
     "deliveries" : [
         {
