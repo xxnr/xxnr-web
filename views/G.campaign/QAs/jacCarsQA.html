@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html xmlns:v-bind="http://www.w3.org/1999/xhtml" xmlns:v-on="http://www.w3.org/1999/xhtml">
+<head>
+    <title><%- campaign.title %></title>
+    <meta itemprop="name" content="<%- campaign.share_title %>"/>
+    <meta itemprop="image" content="<%- campaign.share_image %>" />
+    <meta name="description" itemprop="description" content="<%- campaign.share_abstract %>" />
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=10"/>
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, minimum-scale=0.5, maximum-scale=2.0, user-scalable=yes"/>
+    <meta name="robots" content="all,follow"/>
+    <style>
+        [v-cloak] {display: none;}
+        body, div, dl, dt, dd, ul, ol, li, h1, h2, h3, h4, h5, h6, input, button, textarea, p, blockquote, th, td, span, a {margin: 0;padding: 0;  }
+        /*html,body{min-height: 100%}*/
+        html {background: #98EBED}
+        img {border: none;}
+        li {list-style: none;}
+        table {border-collapse: collapse;border-spacing: 0;}
+        a:hover {text-decoration: none;}
+        a {text-decoration: none;}
+        body {background-color: white;font-family: "微软雅黑", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif;}
+        .clearfix:before, .clearfix:after {content: " "; /* 1 */display: table; /* 2 */}
+        .clearfix:after {clear:both}
+        .container {
+            margin: 0 auto;
+            width: 100%;
+            /*height: 100%;*/
+            background: #98EBED;
+            position: relative;
+        }
+        .title_image {text-align: center;width: 100%;z-index: 50;}
+        .question_backgroud {width: 100%;position: relative;}
+        .question_backgroud--image_body {width: 90%;margin: auto;display: block;margin-left: 3%;display: block;z-index: 0;}
+        .question_backgroud--image_question{    z-index: 100;margin-left: 25%;width: 50%;    position: relative;margin-top: 150px;}
+        .start_button{z-index: 20;left: 25%;width: 50%;    position: relative;}
+        .start_button img{width: 100%}
+        .start_button--unavailable_text {position: absolute;top: 30%;width: 100%;color: #FFFFFF;text-align: center;    font-size: 4vw;}
+        .question {width: 60%;margin-left: 20%;position: relative;padding-top: 130px;}
+        .question--title { font-size: 4vw;margin-bottom: 20px;}
+        .question--option{margin-bottom: 5%;position: relative;}
+        .question--option--title {position: absolute;color: #FFF;display: block;background: #FF970E;width: 32px;height: 32px;border-radius: 50%;    line-height: 32px;text-align: center;}
+        .question--option--contents{ display: inline-block;background: #FDF9EA;border: 1px solid #fad3a1;line-height: 30px;font-size: 3.7vw;width: 95%;margin-left: 17px;box-sizing: border-box;padding-left: 20px;padding-right: 30px}
+        .question--option--selected { border: 1px solid #FF970E;box-sizing: border-box;}
+        .result_img{position: absolute;right: 0%;height: 15px;width: 15px;top:25%}
+        .quiz--rule {background: url('/images/campaign/QA/activity_text_box1.png') no-repeat;background-position: center top;background-size: 90% 100%;}
+        .quiz--rule p {font-size: 3vw;padding: 5%;padding-left: 15%;padding-right: 15%;}
+        .quiz--info {background: url('/images/campaign/QA/activity_text_box2.png') no-repeat;background-position: center top;background-size: 90% 100%;}
+        .quiz--info--text {padding: 15%;font-size: 3vw}
+        .quiz--info--text p{margin-bottom: 6px;color:#280505}
+        .quiz--info--text--title {color: #FF6600 !important;font-size: 5vw !important;margin-bottom: 12px !important;}
+        .quit_btn{ float: left;color: #646464;font-size: 3.5vw;}
+        .progress{ float: right;color: #280505;font-size: 3.5vw;}
+        .points_result{width: 80%;margin: auto;display: block;margin-top: 7%;}
+        .points_image {position: relative}
+        .points_earned { text-shadow: #bfa326 0 2px 0;    color: #FEF973;font-size: 14vw;top: 20%;position: absolute;text-align: center;margin: auto;display: block;margin-left: auto;margin-right: auto;left: 0;right: 0;padding-left: 2%;}
+        .points_image p{text-align: center;font-size: 3vw;margin-top: 10px;color: #280505;}
+        .download_app {background: #FFFFFF;height: 60px;}
+        .download_app .download_btn{cursor: pointer;background: #FF9700;color: #FFFFFF;display: inline-block;height: 22px;width: 60px;margin-right: 5%;margin-top: 20px;text-align: center;float: right;font-size: 10px;line-height: 22px;border-radius: 3px;}
+        .xxnr_logo {float: left;height: 80%;display: inline-block;margin: auto;margin-top: 6px;}
+        .download_app--text_info {float: left;display: inline-block;margin-top: 15px;margin-left: 7px}
+        .download_app--text_title {color:#323232}
+        .download_app--text_text {font-size: 9px;color: #909090;}
+        .download_app--close {float: left;width: 10px;height: 10px;margin-top: 25px;margin-left: 6px;margin-right: 12px;}
+        .campaign_mask {position: fixed;width: 100%;height: 100%;background: rgba(0,0,0,0.6);;top:0;z-index: 200;color:#323232;padding-top: 70px;padding-left: 30px;padding-right: 30px;box-sizing: border-box;font-size: 4.5vw;}
+        .question--section{    padding-bottom: 70px;position: relative;background: url('/images/campaign/QA/bg3.png') no-repeat;background-position: center top;background-size: 90% 100%;  min-height: 400px;margin-top: -34px;  margin-left: -20px;margin-bottom: 20px}
+        .event_info--comment {margin-left: 6%;margin-bottom: 30px;margin-top: 10px;font-size: 12px;}
+    </style>
+</head>
+
+<body>
+<div style='margin:0 auto;width:0px;height:0px;overflow:hidden;'>
+    <img src="<% campaign.share_image %>" width='700'>
+</div>
+<div id="app">
+    <div class="container">
+        <div class="download_app" v-show="showDownloadApp" v-cloak>
+            <img @click="closeDownloadApp()" class="download_app--close" src="/images/campaign/QA/activity_shut_down.png" alt="">
+            <img class="xxnr_logo" src="/images/campaign/QA/activity_xxnr_logo.png" alt="">
+            <div class="download_app--text_info">
+                <p class="download_app--text_title">新新农人</p>
+                <p class="download_app--text_text">农业互联网综合服务领先者</p>
+            </div>
+            <div class="download_btn" v-on:click="redirectToApp()">打开APP</div>
+        </div>
+        <div class="question_backgroud clearfix" >
+            <img class="title_image" src="/images/campaign/QA/activity_banner3.png" alt="">
+            <!--<img class="question_backgroud&#45;&#45;image_body" src="/images/campaign/QA/bg3.png" alt="">-->
+            <div class="question--section" >
+                <img v-show="!started" class="question_backgroud--image_question" src="/images/campaign/QA/coin_icon.png" alt="">
+                <div class="start_button" v-show="!started && !campaignAvailable" v-cloak>
+                    <img src="/images/campaign/QA/activity_button_gray.png" alt="">
+                    <p class="start_button--unavailable_text">{{unavailableText}}</p>
+                </div>
+                <div class="start_button" v-show="!started && !isLogin && campaignAvailable" v-cloak>
+                    <img v-on:click="goToLogin" src="/images/campaign/QA/button（not）.png" alt="">
+                </div>
+                <div class="start_button" v-show="!started && isLogin && campaignAvailable" v-cloak>
+                    <img v-on:click="start" src="/images/campaign/QA/button（logined）.png" alt="">
+                </div>
+                <div class="question" v-show="started" v-cloak>
+                    <div v-show="currentQuestion">
+                        <p class="question--title">{{currentQuestion.question}}</p>
+                        <p class="question--option" v-for="option in currentQuestion.options" v-on:click.stop="answerAndNext($index, option)">
+                            <img class="result_img" src="/images/campaign/QA/activity_right-.png" alt="" v-show="$index == answerOptionIndex && option.is_right_answer">
+                            <img class="result_img" src="/images/campaign/QA/activity_wrong.png" alt="" v-show="$index == answerOptionIndex && !option.is_right_answer">
+                            <span class="question--option--title">{{option.order_key | indexToChar}}</span>
+                            <span class="question--option--contents" v-bind:class="{ 'question--option--selected': $index == answerOptionIndex}">{{option.value}}</span>
+                        </p>
+                    </div>
+                    <div v-show="currentQuestion"><span class="quit_btn" @click="isConfirm = true">不答了</span> <span class="progress">{{currentQuestionIndex+1}}/{{quizs.length}}</span></div>
+                    <div v-show="!currentQuestion && !hadAnswered" class="points_image">
+                        <img class="points_result" src="/images/campaign/QA/activity_answer.png" alt="">
+                        <div class="points_earned">{{pointsEarned}}</div>
+                        <p>共{{quizs.length}}题，答对{{rightAnswerCount}}题</p>
+                        <p>奖励{{pointsEarned}}积分</p>
+                    </div>
+                    <div v-show="!currentQuestion && hadAnswered" class="points_image">
+                        <p>您已在其他地方参加过活动了</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="quiz--rule">
+            <p>看这里！答题时请直接点击答案,选择后即出结果;若中途退出，则可再次答题</p>
+        </div>
+        <div class="quiz--info">
+            <div class="quiz--info--text">
+                <p class="quiz--info--text--title">活动说明</p>
+                <p>活动范围：所有注册用户</p>
+                <p>活动时间：2016-08-06~2016-12-31</p>
+                <p>活动规则：</p>
+                <p>1. 活动需登录后参与</p>
+                <p>2. 登录后开始答题，每个题目有且仅有一个正确选项，点击选项即提交</p>
+                <p>3. 提交答案后，根据回答正确的题目数量与每题的分值，获得积分</p>
+                <p>4. 每个用户只能参与一次答题活动</p>
+                <p>5. 可通过新新农人安卓APP或手机端网站查看积分记录（积分商城-我的积分）</p>
+            </div>
+        </div>
+        <!--{{testMsg}}-->
+        <p class="event_info--comment"><img src="/images/campaign/event/--.png" alt="">新新农人保留对本活动的最终解释权</p>
+    </div>
+    <campaign-confirm confirm-title="确定退出本次答题吗?" :is-show.sync="isConfirm"></campaign-confirm>
+    <campaign-toast :toast-title="toastMsg" :is-show.sync="isToast"></campaign-toast>
+    <div class="campaign_mask" v-show="isMask" v-cloak>
+    </div>
+</div>
+
+<script src="https://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+<script src="/js/zepto.js"></script>
+<script src="/js/vue.min.v1.0.26.js"></script>
+<script src="/js/campaignConfig.js"></script>
+<script type="text/javascript">
+    var campaign = <%- JSON.stringify(campaign) %>;
+    var wechart_basic_config = <%- JSON.stringify(wechart_basic_config) %>;
+    wx.config({
+        debug: false,
+        appId: wechart_basic_config.app_id,
+        timestamp: Number(wechart_basic_config.timestamp),
+        nonceStr: wechart_basic_config.nonceStr,
+        signature: wechart_basic_config.signature,
+        jsApiList: [
+            'checkJsApi',
+            'onMenuShareAppMessage',
+            'onMenuShareTimeline',
+            'onMenuShareQQ',
+            'onMenuShareWeibo',
+            'onMenuShareQZone'
+        ]
+    });
+    wx.ready(function () {
+        // 2.1 监听“分享给朋友”，按钮点击、自定义分享内容及分享结果接口
+        wx.onMenuShareAppMessage({
+            title: campaign.share_title,
+            desc: campaign.share_abstract,
+            link: campaign.share_url,
+            imgUrl: campaign.share_image,
+            trigger: function (res) {
+                // 不要尝试在trigger中使用ajax异步请求修改本次分享的内容，因为客户端分享操作是一个同步操作，这时候使用ajax的回包会还没有返回
+                alert('用户点击发送给朋友');
+            },
+            success: function (res) {
+                alert('已分享');
+            },
+            cancel: function (res) {
+                alert('已取消');
+            },
+            fail: function (res) {
+                alert(JSON.stringify(res));
+            }
+        });
+
+        // 2.2 监听“分享到朋友圈”按钮点击、自定义分享内容及分享结果接口
+        wx.onMenuShareTimeline({
+            title: campaign.share_title,
+            link: campaign.share_url,
+            imgUrl: campaign.share_image,
+            trigger: function (res) {
+                // 不要尝试在trigger中使用ajax异步请求修改本次分享的内容，因为客户端分享操作是一个同步操作，这时候使用ajax的回包会还没有返回
+                alert('用户点击分享到朋友圈');
+            },
+            success: function (res) {
+                alert('已分享');
+            },
+            cancel: function (res) {
+                alert('已取消');
+            },
+            fail: function (res) {
+                alert(JSON.stringify(res));
+            }
+        });
+
+        // 2.3 监听“分享到QQ”按钮点击、自定义分享内容及分享结果接口
+        wx.onMenuShareQQ({
+            title: campaign.share_title,
+            desc: campaign.share_abstract,
+            link: campaign.share_url,
+            imgUrl: campaign.share_image,
+            trigger: function (res) {
+                alert('用户点击分享到QQ');
+            },
+            complete: function (res) {
+                alert(JSON.stringify(res));
+            },
+            success: function (res) {
+                alert('已分享');
+            },
+            cancel: function (res) {
+                alert('已取消');
+            },
+            fail: function (res) {
+                alert(JSON.stringify(res));
+            }
+        });
+
+        // 2.4 监听“分享到微博”按钮点击、自定义分享内容及分享结果接口
+        wx.onMenuShareWeibo({
+            title: campaign.share_title,
+            desc: campaign.share_abstract,
+            link: campaign.share_url,
+            imgUrl: campaign.share_image,
+            trigger: function (res) {
+                alert('用户点击分享到微博');
+            },
+            complete: function (res) {
+                alert(JSON.stringify(res));
+            },
+            success: function (res) {
+                alert('已分享');
+            },
+            cancel: function (res) {
+                alert('已取消');
+            },
+            fail: function (res) {
+                alert(JSON.stringify(res));
+            }
+        });
+
+        // 2.5 监听“分享到QZone”按钮点击、自定义分享内容及分享接口
+        wx.onMenuShareQZone({
+            title: campaign.share_title,
+            desc: campaign.share_abstract,
+            link: campaign.share_url,
+            imgUrl: campaign.share_image,
+            trigger: function (res) {
+                alert('用户点击分享到QZone');
+            },
+            complete: function (res) {
+                alert(JSON.stringify(res));
+            },
+            success: function (res) {
+                alert('已分享');
+            },
+            cancel: function (res) {
+                alert('已取消');
+            },
+            fail: function (res) {
+                alert(JSON.stringify(res));
+            }
+        });
+    });
+
+
+    Vue.config.debug = true;
+    Vue.config.devtools = true;
+    function getCookie(name) {
+        var value = "; " + document.cookie;
+        var parts = value.split("; " + name + "=");
+        if (parts.length == 2) return parts.pop().split(";").shift();
+    };
+    var deleteCookie = function(name) {
+        document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:01 GMT;path=/';
+        document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:01 GMT;path=/;domain=.xinxinnongren.com';
+    };
+    var campaignConfirm = Vue.extend({
+        props:
+        {
+            confirmTitle:String,
+            isShow:{
+                type: Boolean,
+                default: false,
+                twoWay: true
+            }
+        },
+        template:
+        '<div v-show="isShow" style="position:fixed;left: 50%;top: 50%;margin-top: -55px;margin-left: -125px;height: 110px;width: 250px;z-index: 250;background: #FFFFFF;border-radius: 5px;">' +
+        '<div style="box-sizing: border-box;text-align: center;height: 60px;line-height: 60px;font-size: 18px;border-bottom: 1px solid #E2E2E2;"> {{confirmTitle}}' +
+        '</div>' +
+        '<div @click="closeConfirm()" class="confirm-option" style="color:#00B38A;display: inline-block;width: 50%;height: 50px;line-height: 50px;text-align: center;font-size: 18px;border-right: 1px solid #E2E2E2;box-sizing: border-box;">取消' +
+        '</div>' +
+        '<div @click="confirmed()" class="confirm-option" style="color:#00B38A;display: inline-block;width: 50%;height: 50px;line-height: 50px;text-align: center;font-size: 18px;">确定' +
+        '</div>' +
+        '</div>',
+        methods: {
+            closeConfirm: function () {
+                this.isShow = false;
+            },
+            confirmed: function () {
+                this.$dispatch('pop-confirmed');
+                this.isShow = false;
+            }
+        }
+    });
+    var campaignToast = Vue.extend({
+        props:
+        {
+            toastTitle:String,
+            isShow:{
+                type: Boolean,
+                default: false,
+                twoWay: true
+            },
+            time: {
+                type: Number,
+                default: 2500
+            },
+        },
+        template:
+        '<div v-show="isShow" style="position: fixed;width: 60%;left: 50%;bottom: 10%;transform: translate(-50%, -50%);background-color:rgba(0,0,0,0.4);color: #EAF8F4;border-radius: 5px;text-align: center;line-height: 20px;padding: 5px;-webkit-animation: fadein 1s;-moz-animation: fadein 1s;-ms-animation: fadein 1s;-o-animation: fadein 1s;animation: fadein 1s;z-index: 250;">' +
+        '{{toastTitle}}' +
+        '</div>',
+        watch: {
+            isShow: function (val) {
+                const _this = this;
+                if (val) {
+                    clearTimeout(this.timeout)
+                    this.timeout = setTimeout(function () {
+                        _this.isShow = false
+                    }, _this.time)
+                }
+            }
+        }
+    });
+    Vue.component('campaign-confirm', campaignConfirm);
+    Vue.component('campaign-toast', campaignToast);
+    new Vue({
+        el: '#app',
+        data: {
+            quizs:[],
+            campaignAvailable:false,
+            unavailableText:'',
+            currentQuestionIndex:0,
+            currentQuestion: {},
+            clicked:false,
+            rightAnswerCount: 0,
+            started: false,
+            isLogin: false,
+            answerOptionIndex:-1,
+            pointsEarned:0,
+            answersWillCommit:[],
+            hadAnswered:false,
+            test:'',
+            testMsg:'',
+            token:'',
+            showDownloadApp:false,
+            isMask:false, //isXXX 的意思,是否是某种状态
+            isConfirm:false,
+            isRedirect:false,
+            isToast:false,
+            toastMsg:''
+        },
+        created: function () {
+            this.checkStatus();
+            this.getQA();
+            this.currentQuestion = this.quizs[this.currentQuestionIndex];
+            this.checkLogin();
+            this.checkTimesLeft();
+            if(typeof jsObj == "undefined"){
+                this.showDownloadApp = true;
+            }else {
+                this.showDownloadApp = false
+            }
+//            var _this = this;
+//            setTimeout(function(){
+//                _this.isToast = true;
+//                _this.toastMsg = '您已经在其他地方登陆了';
+//            },2000)
+        },
+        watch: {
+            'isConfirm': function (val, oldVal) {
+                if(val == false){
+                    this.isMask = false;
+                }else if(val == true){
+                    console.log('haha');
+                    this.isMask = true;
+                }
+            }
+        },
+        methods: {
+            answerAndNext: function ($index,option) {
+                if(!this.clicked){
+                    this.answerOptionIndex = $index;
+                    var _that = this;
+                    this.clicked = true;
+                    this.answersWillCommit.push({order_key:this.currentQuestion.order_key,choices:[option.order_key]});
+                    if(option.is_right_answer == true ){
+                        this.rightAnswerCount += 1;
+                        this.pointsEarned += this.quizs[this.currentQuestionIndex].points;
+                    }
+
+                    setTimeout(function(){
+                        if(_that.currentQuestionIndex < _that.quizs.length - 1){
+                            _that.currentQuestionIndex += 1;
+                            _that.currentQuestion = _that.quizs[_that.currentQuestionIndex];
+                            _that.clicked = false;
+                            _that.answerOptionIndex = -1;
+                        }else{
+                            (function(){
+                                var token;
+                                if(typeof jsObj == "undefined"){
+                                    token = getCookie('token');
+                                    if(token){
+                                        this.token = token;
+                                        this.isLogin = true;
+                                    }
+                                }else {
+                                    token = jsObj.getToken();
+                                }
+                                config.ajaxPost('/api/v2.3/campaign/QA/require_reward', {token:token,_id:"<%- campaign._id %>",answers:_that.answersWillCommit})
+                                        .then(function(data){
+//                                    _that.test = data.code;
+//                                    _that.testMsg = data.message;
+                                            if(data.code==1000){
+                                                _that.currentQuestion = null;
+                                                _that.currentQuestionIndex = 0;
+                                            }else if(data.code==1020){
+                                                _that.currentQuestion = null;
+                                                _that.hadAnswered = true;
+                                            }else if(data.code == 1401){
+                                                _that.currentQuestion = null;
+                                                this.isToast = true;
+                                                this.toastMsg = '您已被登出';
+                                            }
+                                        })
+                            }());
+
+                        }
+                    },1000);
+
+                }
+            },
+            resetPage: function () {
+                this.started = false;
+                this.currentQuestionIndex = 0;
+                this.currentQuestion = {};
+                this.clicked = false;
+                this.rightAnswerCount = 0;
+                this.answersWillCommit = [];
+                this.pointsEarned = 0;
+            },
+            start : function(){
+                this.started = true;
+                this.currentQuestion = this.quizs[this.currentQuestionIndex];
+            },
+            getQA : function(){
+                var that = this;
+                config.ajaxGet('/api/v2.3/campaign/QA/getQA', {_id:"<%- campaign._id %>"})
+                        .then(function(data){
+//                        console.log(data);
+                            that.quizs = data.QA;
+                        })
+            },
+            checkLogin : function(){
+                if(typeof jsObj == "undefined"){
+                    var token = getCookie('token');
+//                    console.log(token);
+                    if(token){
+                        this.token = token;
+                        this.isLogin = true;
+                    }
+                } else {
+                    this.token = jsObj.getToken();
+                    this.isLogin = jsObj.isLogin();
+                }
+
+            },
+            goToLogin : function(){
+                if(typeof jsObj == "undefined"){
+                    window.location.href = config.mobileBaseURI + "/login?redirect="+encodeURIComponent(window.location.href);
+                } else {
+                    jsObj.toLogin();
+                }
+            },
+            checkStatus : function(){
+                var _this = this;
+                config.ajaxGet('/api/v2.3/campaign_status', {_id:"<%- campaign._id %>"})
+                        .then(function(data){
+                            if(data.code == 1000){
+                                if(data.status == 1){
+                                    _this.unavailableText = '即将上线';
+                                }else if(data.status == 2){
+                                    _this.unavailableText = '即将开始';
+                                }else if(data.status == 4){
+                                    _this.unavailableText = '已结束';
+                                }else if(data.status == 5){
+                                    _this.unavailableText = '已下线';
+                                }
+                            }
+                        });
+            },
+            closeDownloadApp : function(){
+                this.showDownloadApp = false;
+            },
+            redirectToApp : function(){
+                window.location.href = '/campaignStatics/campaignRedirect.html' + '?path='+window.location.pathname;
+            },
+            checkTimesLeft : function(){
+                var _this = this;
+                config.ajaxGet('/api/v2.3/campaign_status', {token:_this.token,_id:"<%- campaign._id %>"})
+                        .then(function(data){
+                            if(data.code == 1000){
+                                if(data.times_left <= 0){
+                                    _this.campaignAvailable = false;
+                                    _this.unavailableText = '已参加';
+                                }else{
+                                    config.ajaxGet('/api/v2.3/campaign_status', {_id:"<%- campaign._id %>"})
+                                            .then(function(data) {
+                                                if (data.code == 1000) {
+                                                    if (data.status == 3) {
+                                                        _this.campaignAvailable = true;
+                                                    }
+                                                }
+                                            })
+                                }
+                            }else if(data.code == 1401){
+                                _this.campaignAvailable = false;
+                                _this.unavailableText = '请重新登录';
+                                _this.isToast = true;
+                                _this.toastMsg = '您已被登出';
+                                deleteCookie('token');
+                                _this.timeout = setTimeout(function () {
+                                    window.location.href = window.location.href;
+                                }, 1000);
+                            }
+                        })
+            }
+        },
+        events: {
+            'pop-confirmed': function () {
+                this.resetPage();
+            }
+        }
+    });
+    Vue.filter('indexToChar', function (index) {
+        return String.fromCharCode(64 + index);
+    });
+
+</script>
+</body>
+</html>

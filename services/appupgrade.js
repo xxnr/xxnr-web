@@ -3,6 +3,7 @@
  */
 var AppUpgrade = require('../models').app_Device_Version;
 var UMENG = require('../modules/umeng');
+var appVersionConfig = require('../configuration/appVersion_config');
 
 
 // Service
@@ -13,8 +14,10 @@ var AppUpgradeService = function () {
 //是否需要发送app升级推送
 AppUpgradeService.prototype.isNeedPush = function (callback) {
     var self = this;
-    var nowIosVersion = F.config.nowIosVersion;
-    var nowAndroidVersion = F.config.nowAndroidVersion;
+    // var nowIosVersion = F.config.nowIosVersion;
+    // var nowAndroidVersion = F.config.nowAndroidVersion;
+    var nowIosVersion = appVersionConfig.nowIosVersion;
+    var nowAndroidVersion = appVersionConfig.nowAndroidVersion;
 
     AppUpgrade.find({'date_update': {$lte: new Date().add('days', -15)}})
         .select('device_token date_update user_agent version')
@@ -59,15 +62,19 @@ AppUpgradeService.prototype.isNeedPush = function (callback) {
             var android_device_tokens = "";
             var ios_count = 0;
             var android_count = 0;
+            var all_ios = 0;
+            var all_android = 0;
 
             //遍历处理
             docs.forEach(function (doc) {
                 if (doc.user_agent == 'android' && compareVersion(nowAndroidVersion, doc.version)) {
                     android_device_tokens += doc.device_token + ",";
                     android_count++;
+                    all_android++;
                 } else if (doc.user_agent == 'ios' && compareVersion(nowIosVersion, doc.version)) {
                     ios_device_tokens += doc.device_token + ",";
                     ios_count++;
+                    all_ios++;
                 }
                 if (ios_count == 500) {
                     UMENG.sendIOSListCast(ios_device_tokens.substring(0, ios_device_tokens.length - 1), update_callback);
@@ -87,6 +94,8 @@ AppUpgradeService.prototype.isNeedPush = function (callback) {
             if (android_count >= 1) {
                 UMENG.sendAndroidListCast(android_device_tokens, update_callback);
             }
+            console.log('android device number:', all_ios);
+            console.log('ios device number:', all_android);
         });
 };
 

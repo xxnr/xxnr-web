@@ -19,6 +19,7 @@
         <h3 class="ui-left">经纪人数据</h3>
         <ul class="dashboard-sidebar">
             <li name="agentRank">- 业绩排行</li>
+            <li name="agentPerformance">- 汇总排行</li>
             <li class="cl"></li>
         </ul>
     </div>
@@ -36,19 +37,23 @@
 					{{ if thisweek }}
 						<p>统计时间 {{ if thisweek.startDate && thisweek.endDate }}（{{ thisweek.startDate }} ~ {{ thisweek.endDate }}） {{ fi }} {{ if thisweek.dates }}共{{ thisweek.dates }}天{{fi}}</p>
 						<div class="box">
-							<div class="col-md-3">
+							<div class="col-md-2">
 								<div class="mb10">注册用户数</div>
 								<div class="num">{{ thisweek.registeredUserCount | format(0) }}</div>
 							</div>
-							<div class="col-md-3">
+							<div class="col-md-2">
+								<div class="mb10">新增经纪人</div>
+								<div class="num">{{ thisweek.agentVerifiedCount | format(0) }}</div>
+							</div>
+							<div class="col-md-2">
 								<div class="mb10">订单数</div>
 								<div class="num">{{ thisweek.orderCount | format(0) }}</div>
 							</div>
-							<div class="col-md-3">
+							<div class="col-md-2">
 								<div class="mb10">付款订单数</div>
 								<div class="num">{{ thisweek.paidOrderCount | format(0) }}</div>
 							</div>
-							<div class="col-md-3">
+							<div class="col-md-4">
 								<div class="mb10">已支付金额（元）</div>
 								<div class="num">{{ thisweek.paidAmount | price(2) }}</div>
 							</div>
@@ -76,19 +81,23 @@
 					{{ if lastweek }}
 						<p>统计时间 {{ if lastweek.startDate && lastweek.endDate }}（{{ lastweek.startDate }} ~ {{ lastweek.endDate }}） {{ fi }} {{ if lastweek.dates }}共{{ lastweek.dates }}天{{fi}}</p>
 						<div class="box">
-							<div class="col-md-3">
+							<div class="col-md-2">
 								<div class="mb10">注册用户数</div>
 								<div class="num">{{ lastweek.registeredUserCount | format(0) }}</div>
 							</div>
-							<div class="col-md-3">
+							<div class="col-md-2">
+								<div class="mb10">新增经纪人</div>
+								<div class="num">{{ lastweek.agentVerifiedCount | format(0) }}</div>
+							</div>
+							<div class="col-md-2">
 								<div class="mb10">订单数</div>
 								<div class="num">{{ lastweek.orderCount | format(0) }}</div>
 							</div>
-							<div class="col-md-3">
+							<div class="col-md-2">
 								<div class="mb10">付款订单数</div>
 								<div class="num">{{ lastweek.paidOrderCount | format(0) }}</div>
 							</div>
-							<div class="col-md-3">
+							<div class="col-md-4">
 								<div class="mb10">已支付金额（元）</div>
 								<div class="num">{{ lastweek.paidAmount | price(2) }}</div>
 							</div>
@@ -129,6 +138,38 @@
 		</div>
 		<div class="row m">
 			<div class="col-md-12 m">
+				<div data-component="template" data-component-path="dashboard">
+					<script type="text/html">
+					{{ if weekliesamount }}
+						<p>数据统计</p>
+						<div class="box">
+							<div class="col-md-2">
+								<div class="mb10">注册用户数</div>
+								<div class="num">{{ weekliesamount.registeredUserCount | format(0) }}</div>
+							</div>
+							<div class="col-md-2">
+								<div class="mb10">经纪人数</div>
+								<div class="num">{{ weekliesamount.agentVerifiedCount | format(0) }}</div>
+							</div>
+							<div class="col-md-2">
+								<div class="mb10">订单数</div>
+								<div class="num">{{ weekliesamount.orderCount | format(0) }}</div>
+							</div>
+							<div class="col-md-2">
+								<div class="mb10">付款订单数</div>
+								<div class="num">{{ weekliesamount.paidOrderCount | format(0) }}</div>
+							</div>
+							<div class="col-md-4">
+								<div class="mb10">已支付金额（元）</div>
+								<div class="num">{{ weekliesamount.paidAmount | price(2) }}</div>
+							</div>
+							<div class="cl"></div>
+						</div>
+					{{ fi }}
+					</script>
+				</div>
+			</div>
+			<div class="col-md-12 m">
 				<div class="chart-buttons">
 					<span>数据指标：</span>
 					<div class="selected" data-name="users">用户数</div>
@@ -150,6 +191,7 @@
 									<td style="width:30px" class="silver hidden-xs ui-center active">序号</td>
 							    	<td style="width:100px" class="silver hidden-xs ui-center active">日期（时间段）</td>
 							    	<td style="width:60px" class="silver hidden-xs ui-center active">注册用户数</td>
+							    	<td style="width:60px" class="silver hidden-xs ui-center active">经纪人数</td>
 							    	<td style="width:60px" class="silver hidden-xs ui-center active">订单数</td>
 							    	<td style="width:60px" class="silver hidden-xs ui-center active">付款订单数</td>
 							    	<td style="width:90px" class="silver hidden-xs ui-right active">已支付金额（元）</td>
@@ -157,8 +199,9 @@
 							    {{ foreach weekly in weeklies }}
 							    	<tr>
 										<td style="width:30px" class="silver hidden-xs ui-center">{{ $index + 1 }}</td>
-								    	<td style="width:100px" class="silver hidden-xs ui-center">{{ if weekly.weekIndex }}{{ weekly.weekIndex }}{{ else }}{{ weekly.week }}{{ fi }}</td>
+								    	<td style="width:100px" class="silver hidden-xs ui-center" title="{{ if weekly.weekIndex }}{{ weekly.weekIndex }}{{ else }}{{ weekly.week }}{{ fi }}">{{ if weekly.weekIndex }}{{ weekly.weekIndex }}{{ else }}{{ weekly.week }}{{ fi }}</td>
 								    	<td style="width:60px" class="silver hidden-xs ui-center">{{ weekly.registeredUserCount | format(0) }}</td>
+								    	<td style="width:60px" class="silver hidden-xs ui-center">{{ weekly.agentVerifiedCount | format(0) }}</td>
 								    	<td style="width:60px" class="silver hidden-xs ui-center">{{ weekly.orderCount | format(0) }}</td>
 								    	<td style="width:60px" class="silver hidden-xs ui-center">{{ weekly.paidOrderCount | format(0) }}</td>
 								    	<td style="width:90px" class="silver hidden-xs ui-right">{{ weekly.paidAmount | price(2) }}</td>
@@ -187,8 +230,10 @@
 	dashboard.weeklies = [];
 	dashboard.weekly;
 	dashboard.weekliesresponse;
+	dashboard.weekliesamount;
+	dashboard.showKeys = ['registeredUserCount', 'agentVerifiedCount', 'orderCount', 'paidOrderCount', 'paidAmount'];
 	dashboard.weekliesChartSelected;
-	dashboard.weekliesChart = {'users':{'legend':['用户数'],'yAxis':'数量','dataKey':['registeredUserCount']},'orders':{'legend':['下单订单数', '已付款订单数'],'yAxis':'数量','dataKey':['orderCount', 'paidOrderCount']},'paidAmount':{'legend':['已付金额'],'yAxis':'销量','dataKey':['paidAmount']}};
+	dashboard.weekliesChart = {'users':{'legend':['用户数', '经纪人数'],'yAxis':'数量','dataKey':['registeredUserCount', 'agentVerifiedCount']},'orders':{'legend':['下单订单数', '已付款订单数'],'yAxis':'数量','dataKey':['orderCount', 'paidOrderCount']},'paidAmount':{'legend':['已付金额'],'yAxis':'销量','dataKey':['paidAmount']}};
 	dashboard.weekliesChartDatas;
 	dashboard.weekliesUpdateDate;
 	dashboard.weekliesStartDate;
@@ -336,6 +381,9 @@
 				if (resultDatas && resultDatas.weekliesChartDatas) {
 					dashboard.weekliesChartDatas = resultDatas.weekliesChartDatas;
 				}
+				if (resultDatas && resultDatas.weekliesamount) {
+					dashboard.weekliesamount = resultDatas.weekliesamount;
+				}
 		        dashboard_charts('users', $('.chart-buttons').children('div:first'));
 		        var updateDate = dashboard.weekliesUpdateDate;
 		        var endDate = firstDateofWeek(updateDate) == firstDateofWeek(dateEnd) && updateDate > dateEnd ? updateDate : dateEnd;
@@ -368,7 +416,17 @@
 
 			var chartKeys = Object.keys(dashboard.weekliesChart);
 			var seriesDatas = {};
+			var weekliesamount = {};
             while (len--) {
+            	var reportkeys = dashboard.showKeys;
+            	for (var i=0; i < reportkeys.length; i++) {
+            		if (!weekliesamount.hasOwnProperty(reportkeys[i])) {
+            			weekliesamount[reportkeys[i]] = 0;
+            		}
+            		if (weeklyReports[len].hasOwnProperty(reportkeys[i])) {
+            			weekliesamount[reportkeys[i]] += parseFloat(parseFloat(weeklyReports[len][reportkeys[i]]).toFixed(2));
+            		}
+            	}
             	var date = weeklyReports[len]['week'];
             	var week = date ? moment(date,'YYYYMMDD').isoWeek() : null;
 
@@ -416,6 +474,7 @@
             }
             result.weeklies = weeklyReports;
             result.weekliesChartDatas = {xAxis:xAxis, series:series};
+            result.weekliesamount = weekliesamount;
 		}
 		return result;
 	}

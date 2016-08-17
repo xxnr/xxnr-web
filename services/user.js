@@ -87,8 +87,21 @@ UserService.prototype.update = function(options, callback) {
         setValue.webLoginId = options.webLoginId;
     if (options.address)
         setValue.address = options.address;
-    if (options.typeVerified)
+    if (options.typeVerified) {
         setValue.typeVerified = options.typeVerified;
+        if (tools.isXXNRAgent(options.typeVerified)) {
+            if (!options.dateTypeVerified || !options.dateTypeVerified.dateFirstAgent) {
+                setValue['dateTypeVerified.dateFirstAgent'] = new Date();
+            }
+            setValue['dateTypeVerified.dateAgent'] = new Date();
+        }
+        if (tools.isRSC(options.typeVerified)) {
+            if (!options.dateTypeVerified || !options.dateTypeVerified.dateFirstRSC) {
+                setValue['dateTypeVerified.dateFirstRSC'] = new Date();
+            }
+            setValue['dateTypeVerified.dateRSC'] = new Date();
+        }
+    }
     if( typeof options.isUserInfoFullFilled != 'undefined')
         setValue.isUserInfoFullFilled = options.isUserInfoFullFilled;
 
@@ -210,7 +223,7 @@ UserService.prototype.get = function(options, callback) {
         .exec(function (err, user) {
             if (err) {
                 console.error('User Service get user error:', err);
-                callback('获取用户信息失败');
+                callback('获取用户信息失败', err);
                 return;
             }
 

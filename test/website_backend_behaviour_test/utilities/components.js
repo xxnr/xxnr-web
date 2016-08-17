@@ -10,6 +10,8 @@ var supertest = require('supertest');
 var should = require('should');
 var request = supertest(app);
 var extend = require('extend');
+var fs = require('fs');
+var path = require('path');
 
 exports.prepare_SKU = function(backend_admin_token, brand_index, category, product_index, SKU, SKU_index, done){
     if(!done){
@@ -87,12 +89,12 @@ exports.create_RSC = function(RSC, backend_admin_token, done) {
     Routing.User.create_frontend_account(account, password, function (body) {
         var user_id = body._id;
         Routing.User.frontendLogin(account, password, function (body) {
-            body.should.have.property('code', 1000);
+            body.should.have.property('code', '1000');
             test_user_token = body.token;
             var user = body.datas;
             user._id = user_id;
             Routing.RSC.fill_RSC_info(test_user_token, RSC.name, RSC.IDNo, RSC.phone, RSC.companyName, RSC.companyAddress, function() {
-                Routing.RSC.modify_RSC_info(backend_admin_token, user.userid, RSC.products, function(){
+                Routing.RSC.modify_RSC_info(backend_admin_token, user.userid, RSC.products, RSC.gifts, function(){
                     Routing.User.verify_user_type(user.userid, ['5'], backend_admin_token, function () {
                         done(user, test_user_token);
                     });
@@ -201,5 +203,63 @@ function GetAndPostTest(caseName) {
         }
     };
 }
+
+exports.request = request;
+
+exports.save_file = function(content, filepath, done){
+    var dir = path.dirname(filepath);
+
+    fs.appendFile(filepath, content, 'utf-8', function(err){
+        should.not.exist(err);
+        done();
+    })
+};
+
+exports.remove_file = function(path, done){
+    fs.unlink(path, function(err){
+        should.not.exist(err);
+        done();
+    })
+};
+
+exports.prepare_gift = function(backend_admin_token, deliveryType, gift_index, done){
+    var test_gift = test_data.random_test_gift(gift_index);
+    Routing.Rewardshop.query_categories(null, backend_admin_token, function (body) {
+        body.should.have.property('code', 1000);
+        test_categories = body.categories;
+        test_categories.should.not.be.empty;
+        var category = null;
+        if (deliveryType) {
+            for (var i=0; i < test_categories.length; i++) {
+                if (test_categories[i].deliveries) {
+                    for (var j=0; j < test_categories[i].deliveries.length; j++) {
+                        var delivery = test_categories[i].deliveries[j];
+                        if (deliveryType && delivery.deliveryType == deliveryType) {
+                            category = test_categories[i];
+                            break;
+                        }
+                    }
+                }
+            }
+        } else {
+            category = test_categories[0];
+        }
+        if (!category) {
+            done(null);
+            return;
+        }
+        Routing.Rewardshop.save_gift(utils.extend(test_gift, {
+            category: category._id
+        }), backend_admin_token, function (body) {
+            body.should.have.property('code', 1000);
+            var gift = body.gift;
+            Routing.Rewardshop.online_gift(gift._id, true, backend_admin_token, function(body){
+                    body.should.have.property('code', 1000);
+                    gift.online = true;
+                    done(gift);
+            });
+        });
+    });
+};
 
 exports.request = request;

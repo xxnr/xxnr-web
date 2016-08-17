@@ -72,6 +72,12 @@ module.exports = {
                 max_hits_per_ip : 3,
                 interval:60 * 60
             }
-        }
+        },
+        '/api/v2.3/RSC/rewardshop/order/selfDelivery':{
+            'post':{
+                max_hits_per_user:3,
+                interval:60
+            }
+        },
     }
 };

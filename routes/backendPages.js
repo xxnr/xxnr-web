@@ -8,13 +8,19 @@ var path = require('path');
 var middleware = require('../middlewares/authentication');
 
 // rewardshop
-router.get(F.config['manager-url']+'/rewardshop/rewardshop-gifts', middleware.backend_auth, controllers.Manager.rewardshop_gifts);
-router.get(F.config['manager-url']+'/rewardshop/rewardshop-gifts-detail', middleware.backend_auth, controllers.Manager.rewardshop_gifts_detail);
-router.get(F.config['manager-url']+'/rewardshop/rewardshop-points-logs', middleware.backend_auth, controllers.Manager.rewardshop_points_logs);
-router.get(F.config['manager-url']+'/rewardshop/rewardshop-gifts-orders', middleware.backend_auth ,controllers.Manager.rewardshop_gifts_orders);
+router.get(F.config['manager-url']+'/rewardshop/rewardshop-gifts', middleware.get_backend_auth, controllers.Manager.rewardshop_gifts);
+router.get(F.config['manager-url']+'/rewardshop/rewardshop-gifts-detail', middleware.get_backend_auth, controllers.Manager.rewardshop_gifts_detail);
+router.get(F.config['manager-url']+'/rewardshop/rewardshop-points-logs', middleware.get_backend_auth, controllers.Manager.rewardshop_points_logs);
+router.get(F.config['manager-url']+'/rewardshop/rewardshop-gifts-orders', middleware.get_backend_auth, controllers.Manager.rewardshop_gifts_orders);
+
+// campaign
+router.get(F.config.manager_url + '/campaigns', middleware.get_backend_auth, controllers.Manager.campaigns);
+router.get(F.config.manager_url + '/campaign-detail', middleware.get_backend_auth, controllers.Manager.campaign_detail);
+router.get(F.config.manager_url + '/campaign-detail-QA', middleware.get_backend_auth, controllers.Manager.campaign_detail_QA);
+router.get(F.config.manager_url + '/campaign-detail-quiz', middleware.get_backend_auth, controllers.Manager.campaign_detail_quiz);
 
 //// admin / manager
-router.get(F.config['manager-url'], middleware.backend_auth ,controllers.Manager.manager);
-router.get(F.config['manager-url']+'/*', middleware.backend_auth ,controllers.Manager.manager);
+router.get(F.config['manager-url'], middleware.backend_auth, controllers.Manager.manager);
+router.get(F.config['manager-url']+'/*', middleware.backend_auth, controllers.Manager.manager);
 
 module.exports = router;

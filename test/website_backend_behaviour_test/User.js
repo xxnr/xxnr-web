@@ -103,7 +103,7 @@ describe('User', function() {
         });
 
         var userLoginValidator = function (res, keepLogin) {
-            res.body.should.have.property('code', 1000);
+            res.body.should.have.property('code', '1000');
             res.body.should.have.properties('datas', 'token');
             res.body.token.should.match(/.+/);
             res.body.datas.should.have.properties('userid', 'loginName', 'phone', 'sex', 'isUserInfoFullFilled', 'isVerified', 'isXXNRAgent', 'isRSC', 'RSCInfoVerifing', 'userType', 'userTypeInName', 'verifiedTypes', 'verifiedTypesInJson', 'cartId');
@@ -224,7 +224,7 @@ describe('User', function() {
                 name: 'user register api w/o account',
                 params: {},
                 result: {
-                    code: 1001,
+                    code: '1001',
                     message: '请输入正确的手机号'
                 }
             },
@@ -232,7 +232,7 @@ describe('User', function() {
                 name: 'user register api w/ invalid account',
                 params: {account: '111'},
                 result: {
-                    code: 1001,
+                    code: '1001',
                     message: '请输入正确的手机号'
                 }
             },
@@ -240,7 +240,7 @@ describe('User', function() {
                 name: 'user register api w/o vCode',
                 params: {account: test_data.test_user.account},
                 result: {
-                    code: 1001,
+                    code: '1001',
                     message: '请输入验证码'
                 }
             },
@@ -248,7 +248,7 @@ describe('User', function() {
                 name: 'user register api w/o password',
                 params: {account: test_data.test_user.account, smsCode: '123456'},
                 result: {
-                    code: 1001,
+                    code: '1001',
                     message: '请输入密码'
                 }
             },
@@ -262,7 +262,7 @@ describe('User', function() {
                     }
                 },
                 result: {
-                    code: 1001,
+                    code: '1001',
                     message: '密码需不小于6位'
                 }
             },
@@ -276,7 +276,7 @@ describe('User', function() {
                     }
                 },
                 result: {
-                    code: 1001,
+                    code: '1001',
                     message: '没有查找到验证码'
                 }
             }];
@@ -496,7 +496,7 @@ describe('User', function() {
                     townId:'invalidtownid'
                 }
             }},
-            result:{code: 1001, message: '没有查到要修改的省'}
+            result:{code: 1001, message: '没有查找到省'}
         },{
             name:'modify user info w/ invalid city id',
             params:function(){return{
@@ -507,7 +507,7 @@ describe('User', function() {
                     townId:'invalidtownid'
                 }
             }},
-            result:{code: 1001, message: '没有查到要修改的市'}
+            result:{code: 1001, message: '没有查找到市'}
         },{
             name:'modify user info w/ invalid county id',
             params:function(){return{
@@ -519,7 +519,7 @@ describe('User', function() {
                     townId:'invalidtownid'
                 }
             }},
-            result:{code: 1001, message: '没有查到要修改的区县'}
+            result:{code: 1001, message: '没有查找到区县'}
         },{
             name:'modify user info w/ invalid town id',
             params:function(){return{
@@ -531,7 +531,7 @@ describe('User', function() {
                     townId:'invalidtownid'
                 }
             }},
-            result:{code: 1001, message: '没有查到要修改的乡镇'}
+            result:{code: 1001, message: '没有查找到乡镇'}
         },{
             name:'modify user info w/ invalid town id',
             params:function(){return{
@@ -542,7 +542,7 @@ describe('User', function() {
                     townId:'invalidtownid'
                 }
             }},
-            result:{code: 1001, message: '没有查到要修改的乡镇'}
+            result:{code: 1001, message: '没有查找到乡镇'}
         },{
             name:'modify user info w/ city not belong to province',
             params:function(){return{
@@ -553,7 +553,7 @@ describe('User', function() {
                     townId:'invalidtownid'
                 }
             }},
-            result:{code: 1001, message: '所选城市不属于所选省份'}
+            result:{code: 1001, message: '所选城市与省份不匹配，请重新选择'}
         },{
             name:'modify user info w/ county not belong to city',
             params:function(){return{
@@ -565,9 +565,9 @@ describe('User', function() {
                     townId:'invalidtownid'
                 }
             }},
-            result:{code: 1001, message: '所选区县不属于所选城市'}
+            result:{code: 1001, message: '所选区县与城市不匹配，请重新选择'}
         },{
-            name:'modify user info w/ city not belong to province',
+            name:'modify user info w/ town not belong to county',
             params:function(){return{
                 token:token,
                 address:{
@@ -577,9 +577,9 @@ describe('User', function() {
                     townId:test_address_2.town.id
                 }
             }},
-            result:{code: 1001, message: '所选乡镇不属于所选区县'}
+            result:{code: 1001, message: '所选乡镇与区县不匹配，请重新选择'}
         },{
-            name:'modify user info w/ city not belong to province',
+            name:'modify user info w/ town not belong to city',
             params:function(){return{
                 token:token,
                 address:{
@@ -588,7 +588,7 @@ describe('User', function() {
                     townId:test_address_2.town.id
                 }
             }},
-            result:{code: 1001, message: '所选乡镇不属于所选城市'}
+            result:{code: 1001, message: '所选乡镇与城市不匹配，请重新选择'}
         },{
             name:'modify user info w/ only province city town',
             params:function(){return{
@@ -624,11 +624,15 @@ describe('User', function() {
         var testCases = [{
             name:'test user account w/ invalid account',
             params:{account:'10000000000'},
-            result:{code:'1001'}
+            result:{code:1001, message: '请输入正确的手机号'}
+        },{
+            name:'test user account w/ invalid account',
+            params:{account:'17112341234'},
+            result:{code:1001, message: '该手机号未注册'}
         },{
             name:'test user account w/ valid account',
             params:{account:test_user.account},
-            result:{code:'1000'}
+            result:{code:1000, message: '该手机号已注册'}
         }];
 
         testCases.forEach(function (test) {
@@ -659,24 +663,24 @@ describe('User', function() {
         var testCases = [{
             name:'generate vcode (register) w/o account',
             params:{bizcode:'register'},
-            result:{code: 1001, message: '请输入正确的手机号'}
+            result:{code: '1001', message: '请输入正确的手机号'}
         },{
             name:'generate vcode (register) w/ invalid account',
             params:{bizcode:'register', tel:'12345'},
-            result:{code: 1001, message: '请输入正确的手机号'}
+            result:{code: '1001', message: '请输入正确的手机号'}
         },{
             name:'generate vcode (register) w/ registered account',
             params:{bizcode:'register', tel:test_user.account},
-            result:{code: 1001, message: '该手机号已注册，请重新输入'}
+            result:{code: '1001', message: '该手机号已注册，请重新输入'}
         },{
             name:'generate vcode (register) w/ new account',
             params:{bizcode:'register', tel:test_data.random_test_user('0001').account},
-            result:{code: 1000},
+            result:{code: '1000'},
             noGet:true
         },{
             name:'generate vcode (register) w/ new account 2nd time',
             params:{bizcode:'register', tel:test_data.random_test_user('0001').account},
-            result:{code: 1001, message: '获取短信验证码太频繁，请稍后再试'}
+            result:{code: '1001', message: '获取短信验证码太频繁，请稍后再试'}
         },{
             name:'generate vcode (reset password) w/o account',
             params:{bizcode:'resetpwd'},

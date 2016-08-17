@@ -362,6 +362,9 @@
     // }
 
     function select_tabmenu(el){
+        if (el.hasClass('selected')) {
+            return;
+        }
         $('.tabmenu li').each(function() {
             $(this).removeClass('selected');
         });

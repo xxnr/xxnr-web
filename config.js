@@ -26,6 +26,8 @@ var config = {
     tokencookie: "token",
     usercookie: "__user",
     domain: ".xinxinnongren.com",
+    //mobileDomain: "m.xinxinnongren.com",
+    //mobileDevDomain: "localhost",
     usercookie_expires_in: "30 days",
     shopingCartcookie: "__scart",
 
@@ -83,6 +85,7 @@ var config = {
     directory_temp: '/tmp/',
     directory_public: '/public/',
     directory_xxnr_public: '/public/xxnr/',
+    directory_xxnr_mobile_public: '/public/xxnrMobilePro/',
 
     default_request_timeout: 5000,
     default_maximum_file_descriptors: 0,
@@ -91,8 +94,24 @@ var config = {
 
     //Android IOS app版本号
     nowIosVersion: '2.2.1',
-    nowAndroidVersion: '2.3.1'
+    nowAndroidVersion: '2.3.1',
 
+    wechart:{
+        require_token_url:{
+            protocol:'https:',
+            hostname:'api.weixin.qq.com',
+            path:'/cgi-bin/token'
+        },
+        require_jsapi_ticket_url:{
+            protocol:'https:',
+            hostname:'api.weixin.qq.com',
+            path:'/cgi-bin/ticket/getticket'
+        },
+        //app_id:'wx5578c9a6a3c663ce',
+        //app_secret:'84d8d32816609462c3f491472346c6ea'
+        app_id:'wx8c0b64b266d6b36b',
+        app_secret:'0c45b9bf55cf30ea595eaa97d13a32d6'
+    }
 };
 
 module.exports = config;

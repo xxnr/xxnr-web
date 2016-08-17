@@ -9,13 +9,14 @@ var utils = require('../common/utils');
 const millisecondsInDay = 24*60*60*1000;
 const concurrency = 10;
 
+console.log('[', new Date(), '] Start generating agent reports...');
 ReportUpdateTimeModel.findOne({}, function(err, updateTime){
     var lastModifyTime = new Date(config.serviceStartTime).getTime();
     if(updateTime && updateTime.agentReport) {
-        lastModifyTime = new Date(updateTime.agentReport).add('h', -config.currentTimeZoneDiff).getTime();
+        lastModifyTime = new Date(updateTime.agentReport).add('h', config.currentTimeZoneDiff).getTime();
     }
 
-    var currentTime = new Date().add('h', -config.currentTimeZoneDiff).getTime();
+    var currentTime = new Date().add('h', config.currentTimeZoneDiff).getTime();
     var dayDiff = parseInt(currentTime/millisecondsInDay) - parseInt(lastModifyTime/millisecondsInDay);
     var recordedCount = dayDiff;
     var batchGenerateAgentReport = function(i, max) {
@@ -35,17 +36,16 @@ ReportUpdateTimeModel.findOne({}, function(err, updateTime){
 
         Promise.all(promises)
             .then(function () {
-                dayDiff = dayDiff - max;
-                if(dayDiff > concurrency){
+                if((dayDiff - max) > concurrency){
                     batchGenerateAgentReport(max, max + concurrency);
-                } else if (dayDiff > 0) {
-                    batchGenerateAgentReport(max, max + dayDiff);
+                } else if ((dayDiff - max) > 0) {
+                    batchGenerateAgentReport(max, dayDiff);
                 } else{
                     // all finished
                     ReportUpdateTimeModel.update({}, {$set: {agentReport: new Date()}}, {upsert: true}, function (err, numAffected) {
                         if (err) {
-                            reject(err);
-                            return;
+                            console.error('[', new Date(), '] generate agent report ReportUpdateTime:', err);
+                            process.exit(0);
                         }
 
                         console.log('[', new Date(), '] generate agent report job success. ', recordedCount, 'days recorded');

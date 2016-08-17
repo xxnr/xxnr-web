@@ -90,6 +90,7 @@ var PAYTYPE = require('../common/defs').PAYTYPE;
 var OFFLINEPAYTYPE = require('../common/defs').OFFLINEPAYTYPE;
 var dri = require('../common/dri');
 var moment = require('moment-timezone');
+var appVersionConfig = require('../configuration/appVersion_config');
 // console.log('PAYMENTSTATUS=' + JSON.stringify(PAYMENTSTATUS));
 
 exports.getProducts = function (req, res, next) {
@@ -269,8 +270,8 @@ exports.getAppProductDetails = function (req, res, next) {
         res.respond({"code": "1001", "message": "缺少商品ID"});
         return;
     }
-    var host = req.hostname;
-    var prevurl = 'http://' + host + '/product/';
+
+    var prevurl = req.url_prefix + '/product/';
     var options = {};
     options.id = req.data['productId'];
 
@@ -616,13 +617,21 @@ exports.AppUpgrade = function (req, res, next) {
     var userAgent = (req.data['user_agent'] || '').toLowerCase();
     var device_id = req.data['device_id'] || '';
 
-    var host = req.hostname;
-    var android_update_url = 'http://' + host + '/resources/newFarmer.apk';
+    // var host = req.get('host');
+    // host = host ? host : req.hostname;
+    // // var host = req.hostname;
+    // var protocol = req.protocol + '://';
+    // var android_update_url = protocol + host + '/resources/newFarmer.apk';
+    var android_update_url = req.url_prefix + '/resources/newFarmer.apk';
 
-    var nowIosVersion = F.config.nowIosVersion;
-    var nowAndroidVersion = F.config.nowAndroidVersion;
+    // var nowIosVersion = F.config.nowIosVersion;
+    // var nowAndroidVersion = F.config.nowAndroidVersion;
+
+    var nowIosVersion = appVersionConfig.nowIosVersion;
+    var nowAndroidVersion = appVersionConfig.nowAndroidVersion;
 
     var options = {};
+    var upgradeMessage = '新新农人已升级版本，快去更新应用吧~';
 
     options.device_token = device_token;
     options.version = postVersion;
@@ -632,9 +641,12 @@ exports.AppUpgrade = function (req, res, next) {
     if (userAgent.indexOf('android') !=-1) {
         options.user_agent = 'android';
         if (!postVersion || AppupgradeService.compareVersion(nowAndroidVersion, postVersion)) {
+            if (appVersionConfig.version_map && appVersionConfig.version_map['android'] && appVersionConfig.version_map['android'] && appVersionConfig.version_map['android'][nowAndroidVersion]) {
+                upgradeMessage = appVersionConfig.version_map['android'][nowAndroidVersion];
+            }
             res.respond({
                 code: 1000,
-                message: '1.积分商城全新上线，精美礼品等你兑换\n2.签到规则改装升级，连续签到积分翻倍\n3.完成订单奖励积分，还能兑换礼品呦',
+                message: upgradeMessage,
                 version: nowAndroidVersion,
                 android_update_url: android_update_url
             });
@@ -644,9 +656,12 @@ exports.AppUpgrade = function (req, res, next) {
     } else if (userAgent.indexOf('ios') != -1) {
         options.user_agent = 'ios';
         if (!postVersion || AppupgradeService.compareVersion(nowIosVersion, postVersion)) {
+            if (appVersionConfig.version_map && appVersionConfig.version_map['ios'] && appVersionConfig.version_map['ios'] && appVersionConfig.version_map['ios'][nowIosVersion]) {
+                upgradeMessage = appVersionConfig.version_map['ios'][nowIosVersion];
+            }
             res.respond({
                 code: 1000,
-                message: '1.新增配送方式，购车可自选网点提车\n2.网点支持付现金或POS机刷卡，支付更安心\n3.自提订单凭自提码至网点，提车有保障',
+                message: upgradeMessage,
                 version: nowIosVersion
             });
         } else {

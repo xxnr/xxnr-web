@@ -8,6 +8,7 @@ var PAYTYPE = require('../common/defs').PAYTYPE;
 var SUBORDERTYPE = require('../common/defs').SUBORDERTYPE;
 var SUBORDERTYPEKEYS = require('../common/defs').SUBORDERTYPEKEYS;
 var DELIVERYTYPENAME = require('../common/defs').DELIVERYTYPENAME;
+var LOYALTYPOINTSTYPE = require('../common/defs').LOYALTYPOINTSTYPE;
 var OrderModel = require('../models').order;
 var UseOrdersNumberModel = require('../models').userordersnumber;
 var UserModel = require('../models').user;
@@ -756,7 +757,7 @@ OrderService.prototype.updateSKUs = function(options, callback) {
 				}
 				// 订单完成 加积分
 				if (parseInt(order.deliverStatus) === DELIVERSTATUS.RECEIVED && order.deliverStatus != order_oldDeliverStatus && !order.isRewardPoint) {
-					self.increaseLoyaltyPointsbyOrder(order, 'ORDERCOMPLETED');
+					self.increaseLoyaltyPointsbyOrder(order, LOYALTYPOINTSTYPE.ORDERCOMPLETED);
 				}
 			});
 		} else {
@@ -1038,7 +1039,7 @@ OrderService.prototype.confirm = function(orderId, SKURefs, callback) {
 			}
 			// 订单完成 加积分
 			if (allConfirmed && !order.isRewardPoint) {
-				self.increaseLoyaltyPointsbyOrder(order, 'ORDERCOMPLETED');
+				self.increaseLoyaltyPointsbyOrder(order, LOYALTYPOINTSTYPE.ORDERCOMPLETED);
 			}
 		});
 	});
@@ -1707,6 +1708,9 @@ OrderService.prototype._checkPayStatus = function(order, callback) {
 						payment = self.createPayment({'paymentId':U.GUID(10),'slice':(Payments[key].paidtimes+1),'price':Payments[key].payprice,'suborderId':subOrder.id});
 						pushValues = {'payments':payment};
 					}
+					if (order.depositPaid && key === SUBORDERTYPE.DEPOSIT) {
+						setValues['depositPaid'] = false;
+					}
 					// order info
 					if (!orderPayment) {
 						if (order.paymentId !== payment.id) {
@@ -1721,6 +1725,7 @@ OrderService.prototype._checkPayStatus = function(order, callback) {
 						orderPayment = payment;
 						break
 					}
+					
 				} else {
 					if (!order.depositPaid && key === SUBORDERTYPE.DEPOSIT) {
 						setValues['depositPaid'] = true;
@@ -1830,7 +1835,7 @@ OrderService.prototype.getByRSC = function(RSC, page, max, type, callback, searc
 		return;
 	}
 
-	var query = {'RSCInfo.RSC':RSC};
+	var query = {};
 
 	if(page<0 || !page){
 		page = 0;
@@ -1860,13 +1865,13 @@ OrderService.prototype.getByRSC = function(RSC, page, max, type, callback, searc
 				break;
 			case 3:		//待配送
 				query.payStatus = PAYMENTSTATUS.PAID;
-				query.deliverStatus = {$in:[DELIVERSTATUS.RSCRECEIVED, DELIVERSTATUS.PARTDELIVERED]};
 				query.deliveryType = DELIVERYTYPE.SONGHUO.id;
+				query.deliverStatus = {$in:[DELIVERSTATUS.RSCRECEIVED, DELIVERSTATUS.PARTDELIVERED]};
 				break;
 			case 4:		//待自提
 				query.payStatus = PAYMENTSTATUS.PAID;
-				query.deliverStatus = {$in:[DELIVERSTATUS.RSCRECEIVED, DELIVERSTATUS.PARTDELIVERED]};
 				query.deliveryType = DELIVERYTYPE.ZITI.id;
+				query.deliverStatus = {$in:[DELIVERSTATUS.RSCRECEIVED, DELIVERSTATUS.PARTDELIVERED]};
 				break;
 			case 5:		//已完成
 				query.payStatus = PAYMENTSTATUS.PAID;
@@ -1877,6 +1882,7 @@ OrderService.prototype.getByRSC = function(RSC, page, max, type, callback, searc
 		}
 	}
 
+	query['RSCInfo.RSC'] = RSC;
 	if (search) {
 		if (query && query.$or) {
 			query.$or.concat([

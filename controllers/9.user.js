@@ -1,4 +1,5 @@
 var tools = require('../common/tools');
+var mongoose = require('mongoose');
 var NodeRSA = require('node-rsa');
 var fs = require('fs');
 var crypto = require('crypto');
@@ -15,9 +16,12 @@ var vCodeService = services.vCode;
 var IntentionProductService = services.intention_product;
 var PotentialCustomerService = services.potential_customer;
 var LoyaltypointService = services.loyaltypoint;
+var CampaignService = services.Campaign;
+var NewsService = services.news;
 var REG_MOBILE = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|Tablet|IOS/i;
 var config = require('../config');
 var Global = require('../global.js');
+var LOYALTYPOINTSTYPE = require('../common/defs').LOYALTYPOINTSTYPE;
 
 exports.install = function() {
 	// LOGIN
@@ -212,7 +216,18 @@ var setCookieAndResponse = function(req, res, user, keepLogin, type){
     UserService.update(options, function(err){
         if(err){
             console.error('setCookieAndResponse err:', err);
-            res.respond({code:1001, message:'登录失败'});
+            var resultMessage = '登录失败';
+            if (type) {
+                switch(type) {
+                    case 'login':
+                        resultMessage = '登录失败';
+                        break;
+                    case 'register':
+                        resultMessage = '注册失败';
+                        break;
+                }
+            }
+            res.respond({code:'1001', message:resultMessage});
             return;
         }
 
@@ -272,7 +287,7 @@ var setCookieAndResponse = function(req, res, user, keepLogin, type){
                 }
             }
             // Return results
-            var result = {code: 1000, message: resultMessage, datas: user, token:token};
+            var result = {code: '1000', message: resultMessage, datas: user, token:token};
             res.respond(result);
             return;
         }, true);
@@ -299,21 +314,21 @@ exports.process_register = function(req, res, next) {
     var options = {};
     var keepLogin = req.data.keepLogin || true; //是否保存登录状态，默认保存
     if (!req.data.account || !tools.isPhone(req.data.account.toString())) {
-        res.respond({code: 1001, message: '请输入正确的手机号'});
+        res.respond({code: '1001', message: '请输入正确的手机号'});
         return;
     }
     if (!req.data.smsCode) {
-        res.respond({code: 1001, message: '请输入验证码'});
+        res.respond({code: '1001', message: '请输入验证码'});
         return;
     }
     if (!req.data.password) {
-        res.respond({code: 1001, message: '请输入密码'});
+        res.respond({code: '1001', message: '请输入密码'});
         return;
     }
 
     var decrypted = tools.decrypt_password(decodeURI(req.data.password));
     if (decrypted.length < 6) {
-        res.respond({code: 1001, message: '密码需不小于6位'});
+        res.respond({code: '1001', message: '密码需不小于6位'});
         return;
     }
     options.account = req.data.account;
@@ -329,7 +344,7 @@ exports.process_register = function(req, res, next) {
     var vcodeoptions = {'target': req.data.account.toString(), 'code_type': 'register', 'code': req.data.smsCode};
     vCodeService.verify(vcodeoptions, function(err, result){
         if (err || !result) {
-            res.respond({code: 1001, message: '验证码验证失败'});
+            res.respond({code: '1001', message: '验证码验证失败'});
             return;
         } else {
             if (result && result.type === 1) {
@@ -355,7 +370,7 @@ exports.process_register = function(req, res, next) {
                     }
                 }, true);
             } else {
-                res.respond({code: 1001, message: result.data});
+                res.respond({code: '1001', message: result.data});
                 return;
             }
         }
@@ -652,7 +667,7 @@ exports.json_user_modify = function(req, res, next) {
                         UserService.update({userid:req.data.userId, isUserInfoFullFilled: true}, function (err, data) {
                             // UserService.increaseScore({userid: req.data.userId, score: config.user_info_full_filled_point_add}, function (err) {
                             var points = config.user_info_full_filled_point_add;
-                            LoyaltypointService.increase(old_user_info._id, points, 'ORGANIZINGINFO', null, null, function (err) {
+                            LoyaltypointService.increase(old_user_info._id, points, LOYALTYPOINTSTYPE.ORGANIZINGINFO, null, null, function (err) {
                                 var response = {'code': '1000', 'message': 'success'};
                                 if (!err) {
                                     response.scoreAdded = points;
@@ -684,20 +699,26 @@ exports.json_user_modify = function(req, res, next) {
 
 // Find Account in users
 exports.json_user_findaccount = function(req, res, next) {
+    if (!req.data.account|| !tools.isPhone(req.data.account.toString())) {
+        res.respond({code: 1001, message: '请输入正确的手机号'});
+        return;
+    }
     var options = {};
-
-    if (req.data.account)
-        options.account = req.data.account;
+    options.account = req.data.account;
     options.ip = req.clientIp;
 
     UserService.get(options, function (err, data) {
         // Error
-        if (err) {
-            res.respond({'code': '1001', 'message': err});
+        if (err || !data) {
+            if (err && data) {
+                res.respond({code: 1001, message: '查找信息失败'});
+                return;
+            }
+            res.respond({code: 1001, message: '该手机号未注册'});
             return;
         }
 
-        res.respond({'code': '1000', 'message': 'success'});
+        res.respond({code: 1000, message: '该手机号已注册'});
     });
 };
 
@@ -1031,7 +1052,7 @@ exports.process_user_sign = function(req, res, next){
                 // UserService.increaseScore({userid:req.data.userId, score: config.user_sign_point_add}, function (err) {
                 var points = config.user_sign_point_add;
                 var description = beijingTimeNow.format('YYYY-MM-DD') + '签到';
-                LoyaltypointService.increase(user._id, points, 'SIGN', description, null, function (err, points, otherOptions) {
+                LoyaltypointService.increase(user._id, points, LOYALTYPOINTSTYPE.SIGN, description, null, function (err, points, otherOptions) {
                     if (err) {
                         // error happen,
                         // there are 2 cases of error: one is db operation error,
@@ -1240,6 +1261,11 @@ exports.process_bind_inviter = function(req, res, next){
         return;
     }
 
+    if(!tools.isPhone(req.data.inviter)){
+        res.respond({code:1001,message:'请输入正确的手机号'});
+        return;
+    }
+
     if(!req.data.userId){
         res.respond({code:1001,message:'请填写用户ID'});
         return;
@@ -1256,6 +1282,11 @@ exports.process_bind_inviter = function(req, res, next){
         if(data.inviter){
             // already has inviter
             res.respond({code:1002, message:'已经绑定过邀请人，请勿重复操作'});
+            return;
+        }
+
+        if(data.account == req.data.inviter){
+            res.respond({code:1002, message:'不能绑定自己为新农代表，请重新输入'});
             return;
         }
 
@@ -1292,13 +1323,13 @@ exports.json_get_inviter = function(req, res, next) {
     UserService.get(options, function (err, data) {
         // Error
         if (err) {
-            res.respond({'code': '1001', 'message': err});
+            res.respond({'code': '1001', 'message': '获取新农代表失败，请重试'});
             return;
         }
         if (data && data.inviter && data.inviter.id) {
             UserService.get({userid: data.inviter.id}, function (err, inviter) {
                 if (err) {
-                    res.respond({'code': '1001', 'message': err});
+                    res.respond({'code': '1001', 'message': '获取新农代表失败，请重试'});
                     return;
                 }
                 if (inviter) {
@@ -1311,7 +1342,7 @@ exports.json_get_inviter = function(req, res, next) {
                     user.inviterSex = inviter.sex;
                     user.inviterAddress = inviter.address;
                     user.inviterUserType = inviter.type;
-                    user.inviterUserTypeInName = F.global.usertypes[inviter.type] || '其他';
+                    user.inviterUserTypeInName = F.global.usertypes[inviter.type] || '普通用户';
 
                     // inviter verified user types
                     user.inviterVerifiedTypes = inviter.typeVerified || [];
@@ -1319,19 +1350,19 @@ exports.json_get_inviter = function(req, res, next) {
                         user.inviterVerifiedTypesInJson = [];
                         user.inviterVerifiedTypes.forEach(function(type){
                             if(F.global.usertypes[type]){
-                                user.inviterVerifiedTypesInJson.push({typeId:type, typeName: F.global.usertypes[type] || '其他'});
+                                user.inviterVerifiedTypesInJson.push({typeId:type, typeName: F.global.usertypes[type] || '普通用户'});
                             }
                         });
                     }
                     user.inviterIsVerified = inviter.isVerified;
                     res.respond({code: '1000', message: 'success', datas: user});
                 } else {
-                    res.respond({code: '1001', message: '没有找到新农代表信息'});
+                    res.respond({code: '1001', 'message': '获取新农代表失败，请重试'});
                     return; 
                 }
             });
         } else {
-            res.respond({code: '1000', message: '没有找到新农代表信息', datas:{}});
+            res.respond({code: '1000', datas:{}});
             return;
         }
     });
@@ -1344,7 +1375,7 @@ exports.json_get_inviteeOrderbynamePinyin = function(req, res, next) {
     UserService.getInviteeOrderbynamePinyin(options, function(err, result) {
         if (err) {
             console.error('user getInviteeOrderbynamePinyin err:', err);
-            res.respond({code:1001, message:'获取被邀请人列表失败'});
+            res.respond({code:1001});
             return;
         }
 
@@ -1375,7 +1406,7 @@ exports.json_get_inviteeOrderbynamePinyin = function(req, res, next) {
                 UserService.getInviteeOrderNumber(inviteeIds, function (err, inviteeOrderData) {
                     if (err) {
                         console.error('user json_get_invitee getInviteeOrderNumber err:', err);
-                        res.respond({code:1001, message:'获取被邀请人列表失败'});
+                        res.respond({code:1001});
                         return;
                     }
 
@@ -1417,7 +1448,7 @@ exports.json_get_invitee = function(req, res, next) {
     UserService.getInvitee(options, function(err, result) {
         if (err) {
             console.error('user json_get_invitee err:', err);
-            res.respond({code:1001, message:'无法获取被邀请人列表'});
+            res.respond({code:1001, message:'获取客户列表失败，请重试'});
             return;
         }
 
@@ -1445,7 +1476,7 @@ exports.json_get_invitee = function(req, res, next) {
                 UserService.getInviteeOrderNumber(inviteeIds, function (err, inviteeOrderData) {
                     if (err) {
                         console.error('user json_get_invitee getInviteeOrderNumber err:', err);
-                        res.respond({code:1001, message:'获取被邀请人列表错误'});
+                        res.respond({code:1001, message:'获取客户列表失败，请重试'});
                         return;
                     }
 
@@ -1480,7 +1511,7 @@ exports.json_get_invitee_orders = function(req, res, next) {
     UserService.getOneInvitee({_id:req.user._id, inviteeId:req.data.inviteeId}, function(err, user) {
         if (err) {
             console.error('user json_get_invitee err:', err);
-            res.respond({code:1001, message:'获取客户信息失败'});
+            res.respond({code:1001, message:'获取客户订单列表失败，请重试'});
             return;
         }
 
@@ -1502,7 +1533,7 @@ exports.json_get_invitee_orders = function(req, res, next) {
         OrderService.query(options, function(err, data) {
             if (err) {
                 console.error('User json_get_invitee_orders err:', err);
-                res.respond({code:1001, message:'获取客户订单失败'});
+                res.respond({code:1001, message:'获取客户订单列表失败，请重试'});
                 return;
             }
 
@@ -1589,7 +1620,12 @@ exports.process_add_potential_customer = function(req, res, next) {
         return;
     }
 
-    if (!req.data.phone || !tools.isPhone(req.data.phone.toString())) {
+    if(!req.data.phone){
+        res.respond({code:1001, message:'请输入手机号'});
+        return;
+    }
+
+    if (!tools.isPhone(req.data.phone.toString())) {
         res.respond({code: 1001, message: '请输入正确的手机号'});
         return;
     }
@@ -1649,13 +1685,13 @@ exports.json_potential_customer = function(req, res, next){
         var max = U.parseInt(req.data.max, 20);
         PotentialCustomerService.queryPage(req.user, page, max, function (err, potentialCustomers, totalCount, pageCount) {
             if (err) {
-                res.respond({code: 1001, message: '获取潜在客户列表失败'});
+                res.respond({code: 1001, message: '获取潜在客户列表失败，请重试'});
                 return;
             }
 
             PotentialCustomerService.countLeftToday(req.user, function (err, count) {
                 if (err) {
-                    res.respond({code: 1001, message: '查询客户列表失败'});
+                    res.respond({code: 1001, message: '获取潜在客户列表失败，请重试'});
                     return;
                 }
 
@@ -1676,7 +1712,7 @@ exports.json_potential_customer = function(req, res, next){
 exports.json_potential_customer_orderby_namePinyin = function(req, res, next){
     PotentialCustomerService.queryOrderbynamePinyin(req.user, function (err, potentialCustomers) {
         if (err) {
-            res.respond({code: 1001, message: '获取潜在客户列表失败'});
+            res.respond({code: 1001});
             return;
         }
 
@@ -1693,13 +1729,13 @@ exports.json_potential_customer_islatest = function(req, res, next){
     var count = req.data.count || 0;
     PotentialCustomerService.queryOrderbynamePinyin(req.user, function (err, potentialCustomers) {
         if (err) {
-            res.respond({code: 1001, message: '获取潜在客户列表失败'});
+            res.respond({code: 1001, message: '查询失败，请重试'});
             return;
         }
 
         PotentialCustomerService.countLeftToday(req.user, function (err, countLeftToday) {
             if (err) {
-                res.respond({code: 1001, message: '查询客户列表失败'});
+                res.respond({code: 1001, message: '查询失败，请重试'});
                 return;
             }
 
@@ -1732,6 +1768,17 @@ exports.json_intention_products = function(req, res, next){
     })
 };
 
+exports.json_intention_products_with_brand = function(req, res, next){
+    IntentionProductService.query_with_brand(function(err, brands){
+        if(err){
+            res.respond({code:1001, message:'获取意向商品列表失败'});
+            return;
+        }
+
+        res.respond({code:1000, message:'success', intentionProducts:brands});
+    })
+};
+
 exports.json_potential_customer_available = function(req, res, next){
     if(!req.data.phone || !tools.isPhone(req.data.phone.toString())){
         res.respond({code:1001, message:'请填写正确的手机号'});
@@ -1756,7 +1803,7 @@ exports.json_potential_customer_get = function(req, res, next){
 
     PotentialCustomerService.getById(req.data._id, function(err, doc){
         if(err){
-            res.respond({code:1001, message:'获取客户信息失败'});
+            res.respond({code:1001, message:'获取客户详情失败，请重试'});
             return;
         }
 
@@ -1777,7 +1824,7 @@ function convert_user_type_info(user, data){
     }
 
     user.userType = data.type;
-    user.userTypeInName = Global.usertypes[user.userType] || '其他';
+    user.userTypeInName = Global.usertypes[user.userType] || '普通用户';
 
     // verified user types
     user.verifiedTypes = data.typeVerified || [];
@@ -1785,7 +1832,7 @@ function convert_user_type_info(user, data){
         user.verifiedTypesInJson = [];
         user.verifiedTypes.forEach(function(type){
             if(Global.usertypes[type]){
-                user.verifiedTypesInJson.push({typeId:type, typeName: Global.usertypes[type] || '其他'});
+                user.verifiedTypesInJson.push({typeId:type, typeName: Global.usertypes[type] || '普通用户'});
             }
         });
     }
@@ -1873,5 +1920,195 @@ exports.process_userconsignees_save = function(req, res, next) {
         }
         res.respond({code:1000,message:'success'});
         return;
+    });
+};
+
+// user share
+exports.user_share = function(req, res, next) {
+    switch(req.data.type) {
+        case 'campaign':
+            user_share_campaign(req, res, next);
+            break;
+        case 'news':
+            user_share_news(req, res, next);
+            break;
+        default:
+            res.respond({code:1001, message:'没有找到要分享的类型'});
+            break;
+    }
+};
+
+var user_share_campaign = function(req, res, next) {
+    try {
+        var campaignId = mongoose.Types.ObjectId(req.data.id);
+    } catch(e) {
+        console.log('user share campaign user_share_campaign_check mongoose ObjectId err:', e);
+        res.respond({code:1001, message:'没有找到要分享的活动'});
+        return;
+    }
+    CampaignService.findById(campaignId, function(err, campaign) {
+        if (err || !campaign) {
+            res.respond({code:1001, message:'没有找到要分享的活动'});
+            return;
+        }
+        if (campaign.shareable) {
+            if (campaign.share_points_add) {
+                LoyaltypointService.getLog(null, req.user._id, LOYALTYPOINTSTYPE.SHARE, campaign._id, LOYALTYPOINTSTYPE.SHARE.refName[req.data.type] || 'campaign', function(err, log) {
+                    if (err) {
+                        console.error('user share campaign LoyaltypointService getLog err:', err);
+                        res.respond({code:1004, message:'添加积分失败，请重试'});
+                        return;
+                    }
+                    if (log) {
+                        res.respond({code:1003, message:'该活动已分享过'});
+                        return;
+                    }
+                    LoyaltypointService.increase(req.user._id, campaign.share_points_add, LOYALTYPOINTSTYPE.SHARE, campaign.title, campaign._id, function(err, points) {
+                        if (err) {
+                            console.error('user share campaign LoyaltypointService increase err:', err);
+                            res.respond({code:1004, message:'添加积分失败，请重试'});
+                            return;
+                        }
+                        var res_message = '分享成功';
+                        if (points && parseInt(points) > 0) {
+                            res_message = '分享成功，奖励您' + points + '积分';
+                        }
+                        res.respond({code:1000, message:res_message, points:points});
+                        return;
+                    }, campaign, LOYALTYPOINTSTYPE.SHARE.refName[req.data.type] || 'campaign');
+                });
+            } else {
+                res.respond({code:1001, message:'该活动分享不加积分'});
+                return;
+            }
+        } else {
+            res.respond({code:1001, message:'该活动不能分享'});
+            return;
+        }
+    });
+};
+
+var user_share_news = function(req, res, next) {
+    var options = {id: req.data.id, status: '2'};
+    NewsService.get(options, function(err, news) {
+        if (err || !news) {
+            res.respond({code:1001, message:'没有找到要分享的资讯'});
+            return;
+        }
+        if (LOYALTYPOINTSTYPE.SHARE.points) {
+            LoyaltypointService.getLog(null, req.user._id, LOYALTYPOINTSTYPE.SHARE, news._id, LOYALTYPOINTSTYPE.SHARE.refName[req.data.type] || 'news', function(err, log) {
+                if (err) {
+                    console.error('user share news LoyaltypointService getLog err:', err);
+                    res.respond({code:1004, message:'添加积分失败，请重试'});
+                    return;
+                }
+                if (log) {
+                    res.respond({code:1003, message:'该资讯已分享过'});
+                    return;
+                }
+                LoyaltypointService.increase(req.user._id, LOYALTYPOINTSTYPE.SHARE.points, LOYALTYPOINTSTYPE.SHARE, news.title, news._id, function(err, points) {
+                    if (err) {
+                        console.error('user share news LoyaltypointService increase err:', err);
+                        res.respond({code:1004, message:'添加积分失败，请重试'});
+                        return;
+                    }
+                    var res_message = '分享成功';
+                    if (points && parseInt(points) > 0) {
+                        res_message = '分享成功，奖励您' + points + '积分';
+                    }
+                    res.respond({code:1000, message:res_message, points:points});
+                    return;
+                }, news, LOYALTYPOINTSTYPE.SHARE.refName[req.data.type] || 'news');
+            });
+        } else {
+            res.respond({code:1001, message:'该资讯分享不加积分'});
+            return;
+        }
+    });
+};
+
+// user share check
+exports.user_share_check = function(req, res, next) {
+    switch(req.data.type) {
+        case 'campaign':
+            user_share_campaign_check(req, res, next);
+            break;
+        case 'news':
+            user_share_news_check(req, res, next);
+            break;
+        default:
+            res.respond({code:1001, message:'没有找到要分享的类型'});
+            break;
+    }
+};
+
+var user_share_campaign_check = function(req, res, next) {
+    try {
+        var campaignId = mongoose.Types.ObjectId(req.data.id);
+    } catch(e) {
+        console.log('user share campaign user_share_campaign_check mongoose ObjectId err:', e);
+        res.respond({code:1001, message:'没有找到要分享的活动'});
+        return;
+    }
+    CampaignService.findById(campaignId, function(err, campaign) {
+        if (err || !campaign) {
+            res.respond({code:1001, message:'没有找到要分享的活动'});
+            return;
+        }
+        if (campaign.shareable) {
+            if (campaign.share_points_add) {
+                LoyaltypointService.getLog(null, req.user._id, LOYALTYPOINTSTYPE.SHARE, campaign._id, LOYALTYPOINTSTYPE.SHARE.refName[req.data.type] || 'campaign', function(err, log) {
+                    if (err) {
+                        console.error('user share campaign LoyaltypointService getLog err:', err);
+                        res.respond({code:1001, message:'查找失败，请重试'});
+                        return;
+                    }
+                    if (log) {
+                        var result = log.toObject();
+                        delete result.__v;
+                        res.respond({code:1000, message:'该活动已分享过', result: result});
+                        return;
+                    }
+                    res.respond({code:1000, message:'该活动还未分享'});
+                    return;
+                });
+            } else {
+                res.respond({code:1001, message:'该活动分享不加积分'});
+                return;
+            }
+        } else {
+            res.respond({code:1001, message:'该活动不能分享'});
+            return;
+        }
+    });
+};
+
+var user_share_news_check = function(req, res, next) {
+    var options = {id: req.data.id, status: '2'};
+    NewsService.get(options, function(err, news) {
+        if (err || !news) {
+            res.respond({code:1001, message:'没有找到要分享的资讯'});
+            return;
+        }
+        if (LOYALTYPOINTSTYPE.SHARE.points) {
+            LoyaltypointService.getLog(null, req.user._id, LOYALTYPOINTSTYPE.SHARE, news._id, LOYALTYPOINTSTYPE.SHARE.refName[req.data.type] || 'news', function(err, log) {
+                if (err) {
+                    console.error('user share news LoyaltypointService getLog err:', err);
+                    res.respond({code:1001, message:'查找失败，请重试'});
+                    return;
+                }
+                if (log) {
+                    var result = log.toObject();
+                    delete result.__v;
+                    res.respond({code:1000, message:'该资讯已分享过', result: result});
+                    return;
+                }
+                res.respond({code:1000, message:'该资讯还未分享'});
+                return;
+            });
+        } else {
+            res.respond({code:1001, message:'该资讯分享不加积分'});
+            return;
+        }
     });
 };

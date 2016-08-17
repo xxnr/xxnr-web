@@ -64,6 +64,16 @@ jRouting.route(managerurl + '/dashboard/agent-rank/', function(){
 	redirectToHomePage();
 });
 
+jRouting.route(managerurl + '/dashboard/agent-performance/', function(){
+	if(can('dashboard')) {
+		navClass('dashboard');
+		SET('common.page', 'dashboard-agentPERF');
+		return;
+	}
+
+	redirectToHomePage();
+});
+
 jRouting.route(managerurl + '/orders/', function() {
 
     if (can('orders')) {
@@ -214,6 +224,16 @@ jRouting.route(managerurl + '/rsc/rsc-order', function(){
 	redirectToHomePage();
 });
 
+jRouting.route(managerurl + '/rsc/rsc-giftorder', function(){
+	if(can('rsc')) {
+		navClass('rsc');
+		SET('common.page', 'rsc-giftorder');
+		return;
+	}
+
+	redirectToHomePage();
+});
+
 jRouting.route(managerurl + '/agents', function(){
 	if(can('agents')) {
 		navClass('agents');
@@ -275,6 +295,46 @@ jRouting.route(managerurl + '/rewardshop/points-logs', function(){
 	redirectToHomePage();
 });
 
+jRouting.route(managerurl + '/campaign', function(){
+	if(can('campaigns')) {
+		navClass('campaigns');
+		SET('common.page', 'campaigns');
+		return;
+	}
+
+	redirectToHomePage();
+});
+
+jRouting.route(managerurl + '/campaign/detail', function(){
+	if(can('campaigns')) {
+		navClass('campaigns');
+		SET('common.page', 'campaign-detail');
+		return;
+	}
+
+	redirectToHomePage();
+});
+
+jRouting.route(managerurl + '/campaign/detail/QA', function(){
+	if(can('campaigns')) {
+		navClass('campaigns');
+		SET('common.page', 'campaign-detail-QA');
+		return;
+	}
+
+	redirectToHomePage();
+});
+
+jRouting.route(managerurl + '/campaign/detail/quiz', function(){
+	if(can('campaigns')) {
+		navClass('campaigns');
+		SET('common.page', 'campaign-detail-quiz');
+		return;
+	}
+
+	redirectToHomePage();
+});
+
 // jRouting.on('location', function(url) {
 // 	// var nav = $('nav');
 // 	// nav.find('.selected').removeClass('selected');
@@ -311,15 +371,24 @@ function success() {
 }
 
 function can(name) {
-	if (su.roles.length === 0)
+	if (su && su.roles.length === 0)
 		return true;
-	return su.roles.indexOf(name) !== -1;
+	return su && su.roles && su.roles.indexOf(name) !== -1;
 }
+
+// Tangular.register('price', function(value, format) {
+// 	if (value === undefined)
+// 		value = 0;
+// 	return value.format(format) + ' ' + currency;
+// });
 
 Tangular.register('price', function(value, format) {
 	if (value === undefined)
 		value = 0;
-	return value.format(format) + ' ' + currency;
+	if (format === undefined)
+		format = (value.toString()).length();
+	var price = value.toFixed(format).split('.');
+	return parseInt(price[0]).format(0) + '.' + price[1] + ' ' + currency;
 });
 
 Tangular.register('toFixed', function(value, format) {
@@ -443,6 +512,9 @@ function dashboardInit() {
 				break;
 			case 'agentRank':
 				url = '/dashboard/agent-rank/';
+				break;
+			case 'agentPerformance':
+				url = '/dashboard/agent-performance/';
 				break;
 		}
 		if (url) {

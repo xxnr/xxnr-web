@@ -11,7 +11,9 @@ var pinyin = require("pinyin");
 var regexpPhone = new RegExp('^(13[0-9]|15[012356789]|17[013678]|18[0-9]|14[57])[0-9]{8}$');
 var regexpPrice = new RegExp('^[0-9]*(\.[0-9]{1,2})?$');
 var regexIdentityNo = /^(\d{15}$|^\d{18}$|^\d{17}(\d|X|x))$/;
-var regexpXXNRHost = new RegExp('(.*\.|^)xinxinnongren\.com.*');
+var regexpXXNRHost = new RegExp('(api\.|^)xinxinnongren\.com.*');
+var regexpMPPEXXNRHost = new RegExp('(mppe\.|^)xinxinnongren\.com.*');
+var regexpMXXNRHost = new RegExp('(m\.|^)xinxinnongren\.com.*');
 var config = require('../config');
 var Global = require('../global.js');
 var moment = require('moment-timezone');
@@ -133,7 +135,11 @@ exports.sendActivePhoneMessage = function (phonenumber, code) {
     var content = '验证码：' + code + '，确认后请在10分钟内填写，切勿泄露给他人，如非本人操作，建议及时与客服人员联系 - 新新农人';
     const template_id = '3021025';
     console.log(phonenumber + content);
-    sendPhoneMessage(phonenumber, template_id, [code], function(){});
+    if (config.environment !== 'sandbox') {
+        sendPhoneMessage(phonenumber, template_id, [code], function(){});
+    } else {
+        console.log('sandbox...');
+    }
 };
 
 function guessMobileCode(mobile_code, target) {
@@ -280,6 +286,19 @@ exports.getXXNRHost = function(url){
     }
 };
 
+exports.getXXNRWebHost = function(url){
+    if (!url)
+        return 'www.xinxinnongren.com';
+
+    if (regexpXXNRHost.test(url.toString()) || regexpMXXNRHost.test(url.toString())) {
+        return 'www.xinxinnongren.com';
+    } else if (regexpMPPEXXNRHost.test(url.toString())) {
+        return 'ppe.xinxinnongren.com';
+    } else{
+        return url;
+    }
+};
+
 exports.isOfflinePayType = function(type){
     const offlinePayType = [3, 4];
     return offlinePayType.indexOf(type) != -1;
@@ -305,7 +324,13 @@ exports.httpRequest = function(options, callback) {
         return;
     }
 
-    var req = http.request(options.httpOptions, function (res) {
+    var client = http;
+    var protocol = options.httpOptions.protocol;
+    if(protocol == 'https:'){
+        client=https;
+    }
+
+    var req = client.request(options.httpOptions, function (res) {
         res.setEncoding('utf8');
         res.on('data', function (chunk) {
             if (res.statusCode == 200) {
@@ -416,7 +441,7 @@ exports.randomWord = function(randomFlag, min, max){
     var str = "",
         range = min || 4,
         // arr = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'],
-        arr = ['2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'],
+        arr = ['2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'm', 'n', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'],
         max = max ? max : arr.length;
  
     // 随机产生

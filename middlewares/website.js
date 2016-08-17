@@ -4,6 +4,9 @@
 var services = require('../services');
 var AuditService = services.auditservice;
 var path = require('path');
+var URL = require('url');
+var tools = require('../common/tools');
+var config = require('../config');
 module.exports = function(req, res, next) {
     req.data = req.method == 'GET' ? req.query : req.body;
     res.jsonp = function (obj, name) {
@@ -108,5 +111,37 @@ module.exports = function(req, res, next) {
             res.set('Expires', new Date().add('M', 2));
     }
 
+    buildURLPrefix(req);
+    getFullURL(req);
     next();
 };
+
+function buildURLPrefix(req){
+    var urlObject = URL.parse(req.protocol + '://' + req.get('host'));
+    var port = urlObject.port;
+    if (port == '80' || port == '443' || config.environment == 'sandbox') {
+        port = undefined;
+    }
+
+    var hosturl = req.hostname;
+    if (hosturl) {
+        hosturl = tools.getXXNRHost(hosturl);
+    } else {
+        hosturl = 'www.xinxinnongren.com';
+    }
+
+    var webhosturl = req.hostname;
+    if(webhosturl){
+        webhosturl = tools.getXXNRWebHost(webhosturl)
+    } else{
+        webhosturl = 'www.xinxinnongren.com';
+    }
+
+    var protocol = req.protocol + '://';
+    req.url_prefix = protocol + hosturl + (port ? ':' + port : '');
+    req.web_url_prefix = protocol + webhosturl + (port ? ':' + port : '');
+}
+
+function getFullURL(req){
+    req.full_URL_without_hash = req.protocol + '://' + req.get('host') + req.originalUrl;
+}

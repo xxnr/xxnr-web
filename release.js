@@ -116,9 +116,13 @@ app.use(function (err, req, res, next) {
 });
 
 module.exports = app;
+var port = 8070;
+if(config.environment == 'sandbox'){
+	port = 80;
+}
 
-http.createServer(app).listen(80);
-console.info('application listen at port 80');
+http.createServer(app).listen(port);
+console.info('application listen at port', port);
 
 if(config.secure) {
 	var options = {
@@ -127,6 +131,14 @@ if(config.secure) {
 		cert: fs.readFileSync('xxnr.crt')
 	};
 
-	https.createServer(options, app).listen(443);
-	console.info('application listen at port 443');
+	https.createServer(options, app).listen(8442);
+	console.info('application listen at port 8442');
 }
+
+process
+	.once('SIGINT', function () {
+		process.exit(1);
+	})
+	.once('SIGTERM', function () {
+		process.exit(1);
+	});

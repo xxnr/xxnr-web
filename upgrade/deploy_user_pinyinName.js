@@ -7,9 +7,9 @@ var UserModel = require('../models/index').user;
 var pinyin = require('pinyin');
 var tools = require('../common/tools');
 
-UserModel.find({}).sort({dateTimeAdded:-1}).exec(function (err, users) {
+UserModel.find({}).sort({datecreated:-1}).exec(function (err, users) {
 	if (err) {
-		console.error('Finding PotentialCustomerModel err:', err);
+		console.error('Finding UserModel err:', err);
 		return;
 	}
 	console.log('All users num:', users.length)
