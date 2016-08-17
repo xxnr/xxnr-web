@@ -3124,11 +3124,12 @@ exports.campaign_detail_quiz = function(req, res, next){
 		return;
 	}
 
-	CampaignService.query_quiz_question(campaign_id, function(err, QA){
+	CampaignService.query_quiz_question(campaign_id, function(err, QA, right_answer_published){
 		res.render(path.join(__dirname, '../views/7.manager/campaign/manager-campaign-detail-quiz.html'),
 			{
 				err:err,
-				QA:QA || []
+				QA:QA || [],
+				right_answer_published: right_answer_published || false
 			})
 	})
 };
