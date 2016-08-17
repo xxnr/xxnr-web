@@ -125,7 +125,6 @@ export function configRouter (router) {
   router.beforeEach((transition) => {
     if (transition.to.auth) {
       const user = getCookie('__user');
-      console.log(user);
       if(!user){
         //let redirect = encodeURIComponent(encodeURI(transition.to.path));
         transition.redirect('/login?ref=' + transition.to.path);

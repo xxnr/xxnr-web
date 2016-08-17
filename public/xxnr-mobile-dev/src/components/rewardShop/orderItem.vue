@@ -5,7 +5,22 @@
         {{order.dateCreated}}
         <div class="order-line-right"><span class="order-orange">{{order.orderStatus.value}}</span></div>
       </div>
-      <div class="order-gift-con">
+      <div class="order-gift-con" @click="toggleCode($index);" v-if="order.orderStatus.type != 0 && order.orderStatus.type != 4">
+        <div class="order-gift-img">
+          <img :src="order.gift.thumbnail" onerror="javascript:this.src='/static/assets/images/no_picture.png';this.onerror = null;">
+        </div>
+        <div class="order-gift-info">
+          <div class="order-gift-info-con">
+            <div class="order-gift-name">{{order.gift.name}}</div>
+            <div class="order-gift-point">{{order.gift.points}}</div>
+          </div>
+        </div>
+        <div class="clear"></div>
+        <div class="order-arrow" @click="showCode($index);" :class="{rotate180: $index == showIndex}" v-if="order.orderStatus.type != 0 && order.orderStatus.type != 4">
+          <img src="/assets/images/order-arrow.png">
+        </div>
+      </div>
+      <div class="order-gift-con" v-else>
         <div class="order-gift-img">
           <img :src="order.gift.thumbnail" onerror="javascript:this.src='/static/assets/images/no_picture.png';this.onerror = null;">
         </div>
@@ -69,6 +84,13 @@
       },
       hideCode: function () {
         this.showIndex = -1;
+      },
+      toggleCode: function(index) {
+        if(this.showIndex == -1) {
+          this.showCode(index);
+          return;
+        }
+        this.hideCode();
       }
     }
   }
@@ -129,8 +151,9 @@
   .order-gift-point {
     font-size: 20px;
     color: #EE4E00;
-    background: url('/static/assets/images/integral_detail.png') 0 7px no-repeat;
+    background: url('/static/assets/images/integral_detail.png') 0 8px no-repeat;
     padding-left: 15px;
+    line-height: 30px;
   }
 
   .order-gift-con {
