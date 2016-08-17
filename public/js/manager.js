@@ -74,6 +74,16 @@ jRouting.route(managerurl + '/dashboard/agent-performance/', function(){
 	redirectToHomePage();
 });
 
+jRouting.route(managerurl + '/dashboard/introductions/', function(){
+	if(can('dashboard')) {
+		navClass('dashboard');
+		SET('common.page', 'dashboard-introductions');
+		return;
+	}
+
+	redirectToHomePage();
+});
+
 jRouting.route(managerurl + '/orders/', function() {
 
     if (can('orders')) {
@@ -515,6 +525,19 @@ function dashboardInit() {
 				break;
 			case 'agentPerformance':
 				url = '/dashboard/agent-performance/';
+				break;
+		}
+		if (url) {
+        	window.location.href = managerurl + url;
+        }
+    });
+    $(".dashboard .filter .ui-left a").off('click').on('click', function() {
+    	var url;
+		var el = $(this);
+		var name = el.attr('name');
+		switch (name) {
+			case 'introductions':
+				url = '/dashboard/introductions';
 				break;
 		}
 		if (url) {
