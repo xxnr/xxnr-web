@@ -169,7 +169,6 @@ exports.get_QA = function(req, res, next){
 };
 
 exports.QA_require_reward = function(req, res, next){
-    //TODO:QA require reward
     var user = req.user;
     var campaign_id = req.data._id;
     var answers = req.data.answers;
@@ -293,7 +292,6 @@ exports.submit_quiz_answer = function(req, res, next){
 };
 
 exports.query_my_quiz_answer = function(req, res, next){
-    //TODO: query quiz answer
     var user = req.user;
     var campaign_id = req.data._id;
 
