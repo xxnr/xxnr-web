@@ -53,6 +53,7 @@ h5 b { font-weight: 400; }
 .mr15 { margin-right: 15px !important; }
 .nmb { margin-bottom: 0 !important; }
 .mb10 { margin-bottom: 10px; }
+.mb20 { margin-bottom: 20px; }
 .mb50 { margin-bottom: 50px; }
 
 .bg-smoke { background-color: #F8F8F8; }
@@ -110,6 +111,10 @@ canvas { display: block; }
 .tabmenu .selected { background-color: white; top: 1px; border-color: #E0E0E0; color: black; cursor: auto; }
 .tabmenu .fa { margin-right: 8px; }
 .tabmenu li:hover { background-color: white; top: 1px; border-color: #E0E0E0; color: black; }
+.tabmenu li.noborder{ font-size: 16px; border: 0; margin: 0 0 0 100px; border-radius: 0; background-color: white; }
+.tabmenu li.noborder:first-child { margin-left: 100px; }
+.tabmenu li.noborder:hover { border-bottom: 2px solid #FF6F00; color: #FF6F00; }
+.tabmenu li.underline { top: 1px; border-bottom: 2px solid #FF6F00; color: #FF6F00; cursor: auto; }
 
 select {
 	text-overflow: ellipsis;
@@ -242,11 +247,18 @@ select option {
 .sidebar .selected { color: #FF6F00; cursor: auto; }
 
 /* dash board */
-
+.dashboard a {cursor: pointer;}
+.dashboard a:hover { color: #FF6F00; }
+.dashboard a.selected { color: #FF6F00; cursor: auto; }
 .dashboard-sidebar {font-size: 14px;}
 .dashboard-sidebar li { line-height: 25px; cursor: pointer; }
 .dashboard-sidebar li:hover { color: #FF6F00; }
 .dashboard-sidebar .selected { color: #FF6F00; cursor: auto; }
+.dashboard .introductions .type { display: none; }
+.dashboard .introductions .selected { display: block; }
+.dashboard .details { margin-top: 20px; }
+.dashboard .details div { display: none; }
+.dashboard .details .selected { display: block; }
 
 .box { border: 1px solid #E0E0E0; padding: 10px; text-align: center; }
 .box div:first-child { border-left: none }
