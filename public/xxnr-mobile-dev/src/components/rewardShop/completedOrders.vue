@@ -2,9 +2,9 @@
   <scroller v-ref:scroller lock-x scrollbar-y use-pullup @pullup:loading="loadMoreOrders" v-if="orders.length > 0">
     <div>
       <order-item v-if="orders.length != 0" :orders="orders"></order-item>
-      <no-gift-orders v-else></no-gift-orders>
     </div>
   </scroller>
+  <no-gift-orders v-else></no-gift-orders>
 </template>
 
 <script>
@@ -44,15 +44,17 @@
               //TODO
               return;
             }
+
             if(pageNum==response.data.pages){
               this.end = true;
             }
+            var resData = response.data.datas;
             if(response.data.datas.total != 0 && response.data.datas.giftorders) {
-              var resData = response.data.datas;
               for(let i = 0; i < resData.giftorders.length; i++) {
                 resData.giftorders[i].dateCreated = getTime(new Date(resData.giftorders[i].dateCreated), 'yyyy-MM-dd hh:mm')
               }
             }
+//            console.log(resData);
             this.orders = this.orders.concat(resData.giftorders);
             this.$broadcast('resetHeightScrollTop');
         }, response => {

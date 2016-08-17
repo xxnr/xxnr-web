@@ -76,6 +76,7 @@ Swiper.prototype.setStyle = function () {
       $item.style.height = height + 'px'
     }
     if(key != me._current) {
+      me.$items[key].style['-webkit-transform'] = 'scale(.95)';
       $item.style.left = key * (width * 1 + margin * 1) + 'px';
     }
 
@@ -167,8 +168,6 @@ Swiper.prototype._bind = function () {
       return;
     }
     var moveX = parseInt(me._options.width) + parseInt(me._options.margin);
-    //var moveX1 = (me._options.width * 1 + me._options.margin * 1) * (me._current + 1) * -1;
-    //var moveX2 = (me._current - 1) * (me._options.width * 1 + me._options.margin * 1);
     if(distance <= me._options.threshold  && distance > - me._options.threshold) { //less than half
       me.$container.style.transition = me._options.duration + 'ms';
       me.$container.style['-webkit-transform'] = 'translate3d(' + (-1) * me._current * moveX + 'px, 0 , 0)';
@@ -220,11 +219,16 @@ Swiper.prototype._bind = function () {
     me._prev = me._current - 1;
     me._next = me._current + 1;
 
+
     if(me._current == 0) {
       me._prev = me.count - 1;
     } else if(me._current == me.count - 1) {
       me._next = 0;
     }
+
+    me.$items[me._current].style['-webkit-transform'] = 'scale(1)';
+    me.$items[me._prev].style['-webkit-transform'] = 'scale(.95)';
+    me.$items[me._next].style['-webkit-transform'] = 'scale(.95)';
 
     var cb = me._eventHandlers.swiped || noop
     cb.apply(me, [me._prev, me._current])

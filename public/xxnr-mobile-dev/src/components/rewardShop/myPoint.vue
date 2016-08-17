@@ -62,7 +62,7 @@
           }
           var resData = response.data.datas.pointslogs;
           for(let i = 0; i < resData.length; i++) {
-            resData[i].date = resData[i].date ? getTime(new Date(),'yyyy-MM-dd') : '';
+            resData[i].date = resData[i].date ? getTime(new Date(resData[i].date),'yyyy-MM-dd') : '';
           }
           this.logs = this.logs.concat(resData);
           this.$broadcast('resetHeightScrollTop');

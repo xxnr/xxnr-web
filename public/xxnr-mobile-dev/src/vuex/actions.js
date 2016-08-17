@@ -595,11 +595,11 @@ export const getConsigneeList = ({dispatch, state}) => {
 export const saveConsignee = ({dispatch, state}, consigneeName, consigneePhone) => {
   dispatch(types.RESET_TOASTMSG);
   var reg = /^1\d{10}$/;
-  if(consigneeName == '') {
+  if(consigneeName.trim() == '') {
     dispatch(types.SET_TOASTMSG, '请输入收货人姓名');
     return;
   }
-  if(consigneePhone == '') {
+  if(consigneePhone.trim() == '') {
     dispatch(types.SET_TOASTMSG, '请输入联系方式');
     return;
   }

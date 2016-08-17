@@ -5,7 +5,7 @@
         {{order.dateCreated}}
         <div class="order-line-right"><span class="order-orange">{{order.orderStatus.value}}</span></div>
       </div>
-      <div class="order-gift-con">
+      <div class="order-gift-con" @click="toggleCode($index);">
         <div class="order-gift-img">
           <img :src="order.gift.thumbnail" onerror="javascript:this.src='/static/assets/images/no_picture.png';this.onerror = null;">
         </div>
@@ -69,6 +69,13 @@
       },
       hideCode: function () {
         this.showIndex = -1;
+      },
+      toggleCode: function(index) {
+        if(this.showIndex == -1) {
+          this.showCode(index);
+          return;
+        }
+        this.hideCode();
       }
     }
   }
@@ -129,8 +136,9 @@
   .order-gift-point {
     font-size: 20px;
     color: #EE4E00;
-    background: url('/static/assets/images/integral_detail.png') 0 7px no-repeat;
+    background: url('/static/assets/images/integral_detail.png') 0 8px no-repeat;
     padding-left: 15px;
+    line-height: 30px;
   }
 
   .order-gift-con {
