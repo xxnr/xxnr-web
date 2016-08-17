@@ -1015,7 +1015,6 @@ export const getGiftDetail = ({dispatch, state}, giftId) => {
   api.getGiftDetail({
     id: giftId
   }, response => {
-    console.log(response);
     if (response.data.code != '1000') {
       //TODO
       return;
@@ -1096,7 +1095,6 @@ export const commitGiftOrder = ({dispatch, state}, id) => {
       return;
     }
     if(response.data.code == 1000) {
-      console.log(response);
       //dispatch(types.COMMIT_ORDER, response.data);
       dispatch(types.COMMIT_GIFTORDER, response.data.giftOrder);
     } else {
@@ -1136,7 +1134,6 @@ export const getGiftOrderDetail = ({dispatch, state}, id) => {
       return;
     }
     dispatch(types.GET_GIFTORDERDETAIL, response.data.giftorder)
-    console.log(response.data);
   }, response => {
 
   });
@@ -1149,7 +1146,9 @@ export const clearGiftDetail = ({dispatch, state}) => {
 export const getCampaigns = ({dispatch, state}) => {
   api.getCampaigns(
     response => {
-      console.log(response);
+      if(response.code == 1000) {
+        dispatch(types.GET_CAMPAIGNS, response.campaigns);
+      }
     }, response => {
   });
 }

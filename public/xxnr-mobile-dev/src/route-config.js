@@ -75,8 +75,7 @@ export function configRouter (router) {
     },
     '/rewardShop': {
       name: 'rewardShop',
-      component: require('./components/rewardShop/index.vue'),
-      auth: true // 这里 auth 是一个自定义字段,
+      component: require('./components/rewardShop/index.vue')
     },
     '/myPoint': {
       name: 'myPoint',
@@ -98,13 +97,11 @@ export function configRouter (router) {
     },
     '/rules': {
       name: 'rules',
-      component: require('./components/rewardShop/rules.vue'),
-      auth: true // 这里 auth 是一个自定义字段,
+      component: require('./components/rewardShop/rules.vue')
     },
     '/giftDetail': {
       name: 'giftDetail',
-      component: require('./components/rewardShop/giftDetail.vue'),
-      auth: true // 这里 auth 是一个自定义字段,
+      component: require('./components/rewardShop/giftDetail.vue')
     },
     '/giftOrder': {
       name: 'giftOrder',
@@ -121,6 +118,10 @@ export function configRouter (router) {
       component: require('./components/my_invitation/index.vue'),
       auth: true // 这里 auth 是一个自定义字段
     },
+    '/swiper3D': {
+      name: 'swiper3D',
+      component: require('./components/rewardShop/swiper3D.vue'),
+    },
     "*path": {
       component: require('./components/404/index.vue'),
     }
@@ -128,6 +129,7 @@ export function configRouter (router) {
   router.beforeEach((transition) => {
     if (transition.to.auth) {
       const user = getCookie('__user');
+      console.log(user);
       if(!user){
         //let redirect = encodeURIComponent(encodeURI(transition.to.path));
         transition.redirect('/login?ref=' + transition.to.path);

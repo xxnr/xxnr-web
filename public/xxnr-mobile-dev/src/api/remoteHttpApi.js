@@ -106,6 +106,8 @@ export default {
   },
   getGiftOrderDetail: function (data, cb, errCb) {
     jsonpGet(API_ROOT + 'api/v2.3/rewardshop/getGiftOrder', data, cb, errCb);
+  },getCampaigns: function (data, cb, errCb) {
+    jsonpGet(API_ROOT + 'api/v2.3/campaigns', data, cb, errCb);
   }
 }
 

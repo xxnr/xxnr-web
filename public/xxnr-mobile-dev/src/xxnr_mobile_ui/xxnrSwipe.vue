@@ -4,7 +4,7 @@
       <slot></slot>
       <div class="item" v-for="item in list" @click="clickListItem(item)">
         <a :href="item.url">
-          <img :src="item.img" class="img">
+          <img :src="item.image" class="img">
           <!--<p class="desc">{{item.title}}</p>-->
         </a>
       </div>
@@ -18,7 +18,7 @@
 </template>
 
 <script>
-  import Swiper from '../utils/swiper'
+  import Swiper from '../utils/swipe'
   export default {
     ready () {
     if (!(this.list && this.list.length === 0)) {
@@ -40,20 +40,22 @@
         interval: this.interval,
         threshold: this.threshold,
         duration: this.duration,
+        width: this.width,
         height: this.height,
+        margin: this.margin,
         minMovingDistance: this.minMovingDistance
       })
         .on('swiped', (prev, current) => {
-        this.current = current
-    })
-  },
-  rerender: function () {
-    this.destroy()
-    this.render()
-  },
-  destroy: function () {
-    this.swiper && this.swiper.destroy()
-  }
+          this.current = current
+        })
+    },
+    rerender: function () {
+      this.destroy()
+      this.render()
+    },
+    destroy: function () {
+      this.swiper && this.swiper.destroy()
+    }
   },
   props: {
     list: {
@@ -86,8 +88,15 @@
     duration: {
       type: Number,
     default: 300
+    },width: {
+      type: String,
+    default: 'auto'
     },
     height: {
+      type: String,
+    default: 'auto'
+    },
+    margin: {
       type: String,
     default: 'auto'
     },
@@ -129,13 +138,10 @@
   .swiper .item {
     position: absolute;
     height: 100%;
-    display: none;
-    transform: translateX(-100%);
   }
 
   .swiper .item.active {
     display: block;
-    transform: none;
   }
 
   .swiper .item a {
@@ -196,5 +202,15 @@
     display: block;
     width: 100%;
     height: 100%
+  }
+
+  .swiper {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    margin-top: -178px;
+    margin-left: -130px;
+    overflow: visible;
+    z-index: 100;
   }
 </style>

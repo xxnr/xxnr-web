@@ -1,9 +1,11 @@
 import {
-  GET_SLIDERIMAGES
+  GET_SLIDERIMAGES,
+  GET_CAMPAIGNS
   } from '../mutation-types'
 
 const state= {
-  slider: []
+  slider: [],
+  campaignsList: []
 }
 
 const mutations = {
@@ -16,6 +18,9 @@ const mutations = {
     slider[1].url = "/cars";
     slider[2].url = "/huafei";
     state.slider = slider;
+  },
+  [GET_CAMPAIGNS](state, data) {
+    state.campaignsList = data;
   }
 }
 
