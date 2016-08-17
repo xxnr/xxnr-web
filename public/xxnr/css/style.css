@@ -8979,3 +8979,16 @@ body {
     text-align: center;
     box-sizing: border-box;
 }
+.no_pointslogs img{
+    display: block;
+    margin: auto;
+    margin-top: 200px;
+}
+.no_pointslogs span{
+    display: block;
+    margin: auto;
+    margin-bottom: 200px;
+    margin-top: 20px;
+    color: #909090;
+    text-align: center;
+}

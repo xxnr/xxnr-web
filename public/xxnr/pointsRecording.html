@@ -72,28 +72,34 @@
     </p>
     <div class="wrap pointsRecording_section">
         <div class="my_points" >积分：<span>{{myPoints}}</span></div>
-        <ul class="recordings_title row">
-            <li>时间</li>
-            <li>事件</li>
-            <li>详情</li>
-            <li>积分数值</li>
-        </ul>
-        <div class="all_recordings">
-            <div ng-repeat="pointslog in pointslogs" class="single_recording">
-                <div>{{pointslog.date_local}}</div>
-                <div>{{pointslog.event.name}}</div>
-                <div>{{pointslog.description}}</div>
-                <div>{{pointslog.points}}</div>
+        <div ng-show="pointslogs.length!=0">
+            <ul class="recordings_title row">
+                <li>时间</li>
+                <li>事件</li>
+                <li>详情</li>
+                <li>积分数值</li>
+            </ul>
+            <div class="all_recordings">
+                <div ng-repeat="pointslog in pointslogs" class="single_recording">
+                    <div>{{pointslog.date_local}}</div>
+                    <div>{{pointslog.event.name}}</div>
+                    <div>{{pointslog.description}}</div>
+                    <div>{{pointslog.points}}</div>
+                </div>
+            </div>
+            <div class="xxnr--pager">
+                <div id="page_buttons">
+                    <ul class="row">
+                        <li ng-hide="current_page==1" class="pre_btn"><a href="" ng-click="pre_page()"><em class="ban ban_8_0">&nbsp;</em></a></li>
+                        <li ng-repeat="page in pages"><a href="" ng-click="show_page(page.id)" ng-class="{true:'current', false:''}[page.isSelected]">{{page.id}}</a></li>
+                        <li ng-hide="current_page==pageCount || pointslogs.length==0" class="next_btn"><a href="" ng-click="next_page()"><em class="ban ban_9_0">&nbsp;</em></a></li>
+                    </ul>
+                </div>
             </div>
         </div>
-        <div class="xxnr--pager">
-            <div id="page_buttons">
-                <ul class="row">
-                    <li ng-hide="current_page==1" class="pre_btn"><a href="" ng-click="pre_page()"><em class="ban ban_8_0">&nbsp;</em></a></li>
-                    <li ng-repeat="page in pages"><a href="" ng-click="show_page(page.id)" ng-class="{true:'current', false:''}[page.isSelected]">{{page.id}}</a></li>
-                    <li ng-hide="current_page==pageCount || pointslogs.length==0" class="next_btn"><a href="" ng-click="next_page()"><em class="ban ban_9_0">&nbsp;</em></a></li>
-                </ul>
-            </div>
+        <div class="no_pointslogs" ng-show="pointslogs.length==0">
+            <img src="images/no_points.png" alt=""/>
+            <span>还没有积分纪录</span>
         </div>
     </div>
 </div>
