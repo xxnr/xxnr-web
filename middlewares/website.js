@@ -130,8 +130,16 @@ function buildURLPrefix(req){
         hosturl = 'www.xinxinnongren.com';
     }
 
+    var webhosturl = req.hostname;
+    if(webhosturl){
+        webhosturl = tools.getXXNRWebHost(webhosturl)
+    } else{
+        webhosturl = 'www.xinxinnongren.com';
+    }
+
     var protocol = req.protocol + '://';
     req.url_prefix = protocol + hosturl + (port ? ':' + port : '');
+    req.web_url_prefix = protocol + webhosturl + (port ? ':' + port : '');
 }
 
 function getFullURL(req){
