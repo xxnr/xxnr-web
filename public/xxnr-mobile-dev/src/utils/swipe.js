@@ -3,17 +3,20 @@ function Swiper (options) {
   this._default = {
     container: '.swiper',
     item: '.item',
-    direction: 'vertical',
     activeClass: 'active',
     threshold: 50,
     duration: 800,
     auto: false,
     interval: 3000,
+    width: '100px',
     height: 'auto',
+    margin: '0px',
     minMovingDistance: 0
   }
   this._options = extend(this._default, options)
-  this._options.height = this._options.height.replace('px', '')
+  this._options.height = parseInt(this._options.height.replace('px', ''));
+  this._options.width = parseInt(this._options.width.replace('px', ''));
+  this._options.margin = parseInt(this._options.margin.replace('px', ''));
   this._start = {}
   this._move = {}
   this._end = {}
@@ -55,38 +58,25 @@ Swiper.prototype._auto = function () {
 }
 
 Swiper.prototype.updateItemWidth = function () {
-  this._width = this.$box.offsetWidth;
+  this._width = this._options.width;
 }
 
 Swiper.prototype.setStyle = function () {
   const me = this
-  this._height = this._options.height === 'auto' ? this.$container.offsetWidth * 350 / 720 : this._options.height
 
-  var width = me._width
-  var height = me._height
+  var width = me._options.width;
+  var height = me._options.height === 'auto' ? '100px' : me._options.height
+  var margin = me._options.margin;
 
-  var w = width
-  var h = height * me.count
-
-  if (me._options.direction === 'horizontal') {
-    w = width
-    h = height
-  }
-
-  if (me._options.direction === 'vertical') {
-    h = height * me.count
-    me.$box.style.height = height + 'px'
-  }
-
-  me.$container.style.width = w + 'px'
-  if (h > 0) {
-    me.$container.style.height = h + 'px'
-  }
+  me.$container.style.width = (width + margin) * me.count  + 'px'
 
   Array.prototype.forEach.call(me.$items, function ($item, key) {
     $item.style.width = width + 'px';
     if (height > 0) {
       $item.style.height = height + 'px'
+    }
+    if(key != me._current) {
+      $item.style.left = key * (width * 1 + margin * 1) + 'px';
     }
 
     if(key == me._current) {
@@ -125,37 +115,42 @@ Swiper.prototype._bind = function () {
   this._animating = true;
   var me = this
   this.touchstartHandler = function (e) {
-    me.stop()
+
     me._start.x = e.changedTouches[0].pageX
     me._start.y = e.changedTouches[0].pageY
 
-    me.$items[me._prev].style.display = 'block';
-    me.$items[me._next].style.display = 'block';
+    //me.$items[me._prev].style.display = 'block';
+    //me.$items[me._next].style.display = 'block';
   }
 
   this.touchmoveHandler = function (e) {
     if(this._animating) {
       return;
     }
-
     me._move.x = e.changedTouches[0].pageX
     me._move.y = e.changedTouches[0].pageY
 
-    var distance = me._move.y - me._start.y
+    var distance = me._move.x - me._start.x
 
-    if (me._options.direction === 'horizontal') {
-      distance = me._move.x - me._start.x
+    if(distance == 0) {
+      return;
     }
-
-    if(distance >= me._width || distance <= - me._width) {
+    if((me._current == 0 && distance > 0) || me._current == me.count -1 && distance < 0) {
       return;
     }
 
-    me.$items[me._current].style['-webkit-transform'] = 'translate3d('+ distance +'px, 0, 0)';
-    me.$items[me._prev].style['-webkit-transform'] = 'translate3d('+ (distance - me._width) +'px, 0 , 0)';
-    me.$items[me._next].style['-webkit-transform'] = 'translate3d('+ (me._width + distance) +'px, 0 , 0)';
-
+    //if(distance >= me._width || distance <= - me._width) {
+    //  return;
+    //}
+    var moveX = parseInt(me._options.width) + parseInt(me._options.margin);
+    me.$container.style['-webkit-transform'] = 'translate3d(' + ((-1) * me._current * moveX + distance) + 'px, 0, 0)';
+    //console.log(me.$container.style);
+    //var moveX = (me._options.width * 1 + me._options.margin * 1) * -1;
+    //me.$items[me._current].style['-webkit-transform'] = 'translate3d('+ moveX * (me._current) + distance +'px, 0, 0)';
+    //me.$items[me._prev].style['-webkit-transform'] = 'translate3d('+ moveX * (me._prev - 1) + distance +'px, 0 , 0)';
+    //me.$items[me._next].style['-webkit-transform'] = 'translate3d('+ moveX * me._next + distance +'px, 0 , 0)';
     e.preventDefault()
+
   }
 
   this.touchendHandler = function (e) {
@@ -166,44 +161,51 @@ Swiper.prototype._bind = function () {
     me._end.x = e.changedTouches[0].pageX
     me._end.y = e.changedTouches[0].pageY
 
-    var distance = me._end.y - me._start.y
-    if (me._options.direction === 'horizontal') {
-      distance = me._end.x - me._start.x
-    }
+    var distance = distance = me._end.x - me._start.x
 
-    if(distance <= me._options.threshold  && distance > - me._options.threshold) { //less than half
-      me.$items[me._current].style.transition = me._options.duration + 'ms';
-      me.$items[me._current].style['-webkit-transform'] = 'translate3d(0px, 0 ,0)';
-
-      me.$items[me._prev].style.transition = me._options.duration + 'ms';
-      me.$items[me._prev].style['-webkit-transform'] = 'translate3d(-100%, 0, 0)';
-
-      me.$items[me._next].style.transition = me._options.duration + 'ms';
-      me.$items[me._next].style['-webkit-transform'] = 'translate3d(100%, 0, 0)';
+    if((me._current == 0 && distance > 0) || (me._current == me.count -1 && distance < 0)) {
       return;
-    } else if(distance > 0){
-      me.$items[me._current].style.transition = me._options.duration + 'ms';
-      me.$items[me._current].style['-webkit-transform'] = 'translate3d(100%, 0, 0)';
-
-      me.$items[me._prev].style.transition = me._options.duration + 'ms';
-      me.$items[me._prev].style['-webkit-transform'] = 'translate3d(0, 0 ,0)';
-
+    }
+    var moveX = parseInt(me._options.width) + parseInt(me._options.margin);
+    //var moveX1 = (me._options.width * 1 + me._options.margin * 1) * (me._current + 1) * -1;
+    //var moveX2 = (me._current - 1) * (me._options.width * 1 + me._options.margin * 1);
+    if(distance <= me._options.threshold  && distance > - me._options.threshold) { //less than half
+      me.$container.style.transition = me._options.duration + 'ms';
+      me.$container.style['-webkit-transform'] = 'translate3d(' + (-1) * me._current * moveX + 'px, 0 , 0)';
+      //me.$items[me._current].style.transition = me._options.duration + 'ms';
+      //me.$items[me._current].style['-webkit-transform'] = 'translate3d(0px, 0 ,0)';
+      //
+      //me.$items[me._prev].style.transition = me._options.duration + 'ms';
+      //me.$items[me._prev].style['-webkit-transform'] = 'translate3d(-100%, 0, 0)';
+      //
+      //me.$items[me._next].style.transition = me._options.duration + 'ms';
+      //me.$items[me._next].style['-webkit-transform'] = 'translate3d(100%, 0, 0)';
+      return;
+    } else if(distance > 0){ //l to r
+      me.$container.style.transition = me._options.duration + 'ms';
+      me.$container.style['-webkit-transform'] = 'translate3d(' + (-1) * (me._current -1) * moveX + 'px, 0, 0)';
+      //me.$items[me._current].style.transition = me._options.duration + 'ms';
+      //me.$items[me._current].style['-webkit-transform'] = 'translate3d('+ moveX2 +'px, 0, 0)';
+      //
+      //me.$items[me._prev].style.transition = me._options.duration + 'ms';
+      //me.$items[me._prev].style['-webkit-transform'] = 'translate3d(' + moveX2 + 'px, 0 ,0)';
+      //
       me._current = me._prev
 
       //me.$items[me._next].style.transition = me.duration + 'ms';
       //me.$items[me._next].style.transform = 'translateX(100%)';
-    } else {
-      me.$items[me._current].style.transition = me._options.duration + 'ms';
-      me.$items[me._current].style['-webkit-transform'] = 'translate3d(-100%, 0, 0)';
-
-      //me.$items[me._prev].style.transition = me.duration + 'ms';
-      //me.$items[me._prev].style.transform = 'translateX(-100%)';
-
-      me.$items[me._next].style.transition = me._options.duration + 'ms';
-      me.$items[me._next].style['-webkit-transform'] = 'translate3d(0, 0, 0)';
+    } else { //r to l
+      me.$container.style.transition = me._options.duration + 'ms';
+      me.$container.style['-webkit-transform'] = 'translate3d(' + (-1) * (me._current + 1) * moveX + 'px, 0, 0)';
+      //me.$items[me._current].style.transition = me._options.duration + 'ms';
+      //me.$items[me._current].style['-webkit-transform'] = 'translate3d('+ moveX1 +'px, 0, 0)';
+      //
+      ////me.$items[me._prev].style.transition = me.duration + 'ms';
+      ////me.$items[me._prev].style.transform = 'translateX(-100%)';
+      //me.$items[me._next].style.transition = me._options.duration + 'ms';
+      //me.$items[me._next].style['-webkit-transform'] = 'translate3d('+ moveX1 +'px, 0, 0)';
       me._current = me._next;
     }
-
   }
 
   this.$container.addEventListener('touchstart', this.touchstartHandler, false)

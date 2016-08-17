@@ -1,7 +1,17 @@
 <template>
   <div class="container" style="padding: 0">
     <app-download-overlay></app-download-overlay>
-    <xxnr-swiper :list="slider" height="auto" auto @on-index-change="onIndexChange"></xxnr-swiper>
+    <xxnr-swiper :list="slider" height="auto" auto></xxnr-swiper>
+  </div>
+  <div v-show="showCampaign">
+    <xxnr-swipe :list="campaignsList" width="260px" height="355px" margin="20px" auto></xxnr-swipe>
+  </div>
+  <div class="campaign-icon" @click="showSwipe();">
+    <img src="/assets/images/activity_icon.png">
+  </div>
+  <div class="swipe-mask" v-show="showCampaign"></div>
+  <div class="swipe-mask-hide" @click="hideSwipe();" v-show="showCampaign">
+    <img src="/assets/images/swipe_close.png">
   </div>
   <section-tabs></section-tabs>
   <div class="container">
@@ -43,14 +53,16 @@
   import sectionTabs from './SectionTabs.vue'
   import IndexProductsBlockList from './IndexProductsBlockList.vue'
   import appDownloadOverlay from './appDownloadOverlay.vue'
-  import { getIndexCars,getIndexHeafei,showBackBtn,hideBackBtn,showRightBtn,getSliderImages,changeRightBtnMyXXNR,changeRightBtnPathMyxxnr,editTitle } from '../../vuex/actions'
+  import { getIndexCars,getIndexHeafei,showBackBtn,hideBackBtn,showRightBtn,getSliderImages,changeRightBtnMyXXNR,changeRightBtnPathMyxxnr,editTitle, getCampaigns } from '../../vuex/actions'
   import xxnrSwiper from '../../xxnr_mobile_ui/xxnrSwiper.vue'
+  import xxnrSwipe from '../../xxnr_mobile_ui/xxnrSwipe.vue'
   //import { pcsubdomain, domain } from '../../../config'
   export default {
     data: function() {
         return {
           showLoader: false,
-          protocol: window.location.protocol
+          protocol: window.location.protocol,
+          showCampaign: false
         }
     },
     vuex:{
@@ -60,7 +72,8 @@
         slider: state => state.vueSlider.slider,
         test: state => state.indexConfig.test,
         domain: state => state.indexConfig.domain,
-        pcsubdomain: state => state.indexConfig.pcsubdomain
+        pcsubdomain: state => state.indexConfig.pcsubdomain,
+        campaignsList: state => state.vueSlider.campaignsList
       },
       actions:{
         getIndexCars,
@@ -71,7 +84,8 @@
         getSliderImages,
         changeRightBtnMyXXNR,
         changeRightBtnPathMyxxnr,
-        editTitle
+        editTitle,
+        getCampaigns
       }
     },
     methods: {
@@ -85,19 +99,27 @@
         domain = domain ? '; domain=' + domain : '';
         path = '; path=' + (path ? path : '/');
         document.cookie = name + '=' + value + expires + path + domain;
+      },
+      hideSwipe: function() {
+        this.showCampaign = false;
+      },
+      showSwipe: function() {
+        this.showCampaign = true;
       }
     },
     components: {
       sectionTabs,
       IndexProductsBlockList,
       appDownloadOverlay,
-      xxnrSwiper
+      xxnrSwiper,
+      xxnrSwipe
     },
     created () {
       this.showLoader = true;
       this.getIndexCars();
       this.getIndexHeafei();
 	    this.getSliderImages();
+      this.getCampaigns();
     },
     ready (){
       this.showLoader = false;
@@ -215,4 +237,40 @@
     height: 10px;
     border-radius: 5px;
   }
+
+  .swipe-mask {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background-color: #000;
+    opacity: .5;
+    z-index: 99;
+  }
+
+  .swipe-mask-hide {
+    position: fixed;
+    z-index: 101;
+    top: 20px;
+    left: 12px;
+    width: 24px;
+  }
+
+  .swipe-mask-hide img {
+    width: 100%;
+  }
+
+  .campaign-icon {
+    position: fixed;
+    z-index: 51;
+    top: 9px;
+    width: 25px;
+    left: 2%;
+  }
+
+  .campaign-icon img {
+    width: 100%;
+  }
+
 </style>

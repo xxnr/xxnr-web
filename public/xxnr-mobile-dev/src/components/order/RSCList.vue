@@ -68,7 +68,7 @@
     },
     route: {
       activate(transition) {
-        this.getRSCListByProduct(getUrlParam('productId'));
+        this.getRSCListByProduct();
         this.editTitle('选择自提网点');
         this.showBackBtn();
         transition.next();

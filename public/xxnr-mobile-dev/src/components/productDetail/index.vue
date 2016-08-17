@@ -59,9 +59,9 @@
         </ul>
         <div class="product-detail-tab-con">
           <div v-if="tabIndex == 0">
-            <iframe name="Info1" id="Info1" onload="this.height = Info1.document.body.scrollHeight" width="100%" scrolling="no" frameborder="0" v-if="productDetail.app_body_url" :src="productDetail.app_body_url">
+            <ifrme name="Info1" id="Info1" onload="this.height = Info1.document.body.scrollHeight" width="100%" scrolling="no" frameborder="0" v-if="productDetail.app_body_url" :src="productDetail.app_body_url">
 
-            </iframe>
+            </ifrme>
           </div>
           <div v-if="tabIndex == 1">
             <iframe name="Info2" id="Info2" onload="this.height = Info2.document.body.scrollHeight" width="100%" scrolling="no" frameborder="0" v-if="productDetail.app_standard_url" :src="productDetail.app_standard_url">

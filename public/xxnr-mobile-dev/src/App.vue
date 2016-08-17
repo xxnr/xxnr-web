@@ -196,4 +196,31 @@
     z-index: 99;
   }
 
+  .gift-bottom {
+    position: fixed;
+    width: 100%;
+    height: 49px;
+    bottom: 0;
+    z-index: 100;
+    border-top: 1px solid #c7c7c7;
+    background-color: #fff;
+  }
+
+  .gift-bottom-btn {
+    width: 80%;
+    height: 34px;
+    margin: 8px 0 0 10%;
+    color: #fff;
+    font-size: 16px;
+    text-align: center;
+    line-height: 34px;
+    background-color: #FE9B00;
+    border-radius: 3px;
+  }
+
+  .gift-bottom-btn:active {
+    background-color: #FEC366;
+    -webkit-user-select: none;
+  }
+
 </style>

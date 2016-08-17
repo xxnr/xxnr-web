@@ -82,6 +82,32 @@ export default {
   },
   findAccount: function (data, cb, errCb) {
     jsonpGet(API_ROOT + "api/v2.0/user/findAccount", data, cb, errCb);
+  },
+  getUserPoint: function (cb, errCb) {
+    jsonpGet(API_ROOT + 'api/v2.3/rewardshop/get', null, cb, errCb);
+  },
+  getPointGifts: function (cb, errCb) {
+    jsonpGet(API_ROOT + 'api/v2.3/rewardshop/gifts/categories', null, cb, errCb);
+  },
+  getGiftsByCategory: function (data, cb, errCb) {
+    jsonpGet(API_ROOT + 'api/v2.3/rewardshop/gifts', data, cb, errCb);
+  },
+  getGiftDetail: function (data, cb, errCb) {
+    jsonpGet(API_ROOT + 'api/v2.3/rewardshop/gifts/getGiftDetail', data, cb, errCb);
+  },
+  getPointsLogs: function (data, cb, errCb) {
+    jsonpGet(API_ROOT + 'api/v2.3/rewardshop/pointslogs', data, cb, errCb);
+  },
+  addGiftOrder: function (data, cb, errCb) {
+    jsonpPost(API_ROOT + 'api/v2.3/rewardshop/addGiftOrder', data, cb, errCb);
+  },
+  getGiftOrderList: function (data, cb, errCb) {
+    jsonpGet(API_ROOT + 'api/v2.3/rewardshop/getGiftOrderList', data, cb, errCb);
+  },
+  getGiftOrderDetail: function (data, cb, errCb) {
+    jsonpGet(API_ROOT + 'api/v2.3/rewardshop/getGiftOrder', data, cb, errCb);
+  },getCampaigns: function (data, cb, errCb) {
+    jsonpGet(API_ROOT + 'api/v2.3/campaigns', data, cb, errCb);
   }
 }
 
