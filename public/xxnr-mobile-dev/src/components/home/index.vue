@@ -102,9 +102,14 @@
       },
       hideSwipe: function() {
         this.showCampaign = false;
+        document.body.removeEventListener('touchmove', this.touchHandler, false);
       },
       showSwipe: function() {
         this.showCampaign = true;
+        document.body.addEventListener('touchmove', this.touchHandler, false);
+      },
+      touchHandler: function(e){
+        e.preventDefault();
       }
     },
     components: {
