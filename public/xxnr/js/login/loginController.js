@@ -305,13 +305,14 @@ app.controller('loginController', function($scope, $timeout, remoteApiService, c
 
     var checkLoginPassword = function(){
         if($scope.password){
-            if($scope.password.length>=6){
-                return true;
-            }else{
-                //sweetalert('密码长度需大于6位');
-                $scope.loginResMsg = '密码需不小于6位';
-                $scope.errorInputGroupNum = $scope.formInputsKeyValue.loginPassword;
-            }
+            //if($scope.password.length>=6){
+            //    return true;
+            //}else{
+            //    //sweetalert('密码长度需大于6位');
+            //    $scope.loginResMsg = '密码需不小于6位';
+            //    $scope.errorInputGroupNum = $scope.formInputsKeyValue.loginPassword;
+            //}
+            return true;
         }else{
             //sweetalert('请输入密码');
             $scope.loginResMsg = '请输入密码';

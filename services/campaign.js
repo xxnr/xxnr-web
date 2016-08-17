@@ -9,6 +9,9 @@ var QuizAnswerModel = models.quiz_answer;
 var RewardControlModel = models.reward_control;
 var LoyaltypointService = require('./loyaltypoint');
 var LOYALTYPOINTSTYPE = require('../common/defs').LOYALTYPOINTSTYPE;
+var path = require('path');
+var fs = require('fs');
+var lockfile = require('proper-lockfile');
 
 const CAMPAIGNTYPE = {EVENTS : 1, QA : 2, QUIZ : 3};
 const CAMPAIGNSTATUS = {NOTONLINE : 1, NOTSTART : 2, START : 3, END : 4, OFFLINE : 5};
@@ -336,7 +339,7 @@ CampaignService.prototype.query_quiz_question = function(campaign_id, callback){
                 return;
             }
 
-            callback(null, QuizCampaign.QA);
+            callback(null, QuizCampaign.QA, QuizCampaign.right_answer_published);
         })
 };
 
@@ -564,55 +567,95 @@ CampaignService.prototype.trigger_quiz_reward = function(campaign_id, callback){
                     return;
                 }
 
-                var quiz = {};
-                quizCampaign.QA.forEach(function(question){
-                    quiz[question.order_key] = {points:question.points, right_answers:[]};
-                    question.options.forEach(function(option){
-                        if(option.is_right_answer){
-                            quiz[question.order_key].right_answers.push(option.order_key);
-                        }
-                    })
-                });
+                var keyFile = path.join(__dirname, '../tmp/', campaign_id);
+                fs.openSync(keyFile, 'a');
+                lockfile.lock(keyFile, function(err, release){
+                    if(err){
+                        callback('结果公布中，请勿重复操作');
+                        return;
+                    }
 
-                QuizAnswerModel.find({campaign:campaign_id})
-                    .populate('campaign')
-                    .exec(function(err, quizAnswers){
-                        if(err || !quizAnswers){
-                            console.error(err || 'quiz answer not found');
-                            callback('公布结果失败，请重试');
-                            return;
-                        }
+                    var quiz = {};
+                    quizCampaign.QA.forEach(function(question){
+                        quiz[question.order_key] = {points:question.points, right_answers:[]};
+                        question.options.forEach(function(option){
+                            if(option.is_right_answer){
+                                quiz[question.order_key].right_answers.push(option.order_key);
+                            }
+                        })
+                    });
 
-                        var userCount = quizAnswers.length;
-                        var batchRequireReward = function(i, max){
-                            var promises = [];
-                            for(; i<max; i++){
-                                promises.push(new Promise(function(resolve, reject){
-                                    var user = quizAnswers[i];
-                                    var points_add = 0;
-                                    var right_answer_count = 0;
+                    QuizAnswerModel.find({campaign:campaign_id})
+                        .populate('campaign')
+                        .exec(function(err, quizAnswers){
+                            if(err || !quizAnswers){
+                                console.error(err || 'quiz answer not found');
+                                callback('公布结果失败，请重试');
+                                release();
+                                return;
+                            }
 
-                                    var alreadyAnswered = [];
-                                    user.answer.forEach(function (answer) {
-                                        if(!alreadyAnswered[answer.order_key]) {
-                                            if (answers_equal(quiz[answer.order_key].right_answers, answer.choices)) {
-                                                // answer right
-                                                points_add += quiz[answer.order_key].points;
-                                                right_answer_count++;
+                            var userCount = quizAnswers.length;
+                            var batchRequireReward = function(i, max){
+                                var promises = [];
+                                for(; i<max; i++){
+                                    promises.push(new Promise(function(resolve, reject){
+                                        var user = quizAnswers[i];
+                                        var points_add = 0;
+                                        var right_answer_count = 0;
+
+                                        var alreadyAnswered = [];
+                                        user.answer.forEach(function (answer) {
+                                            if(!alreadyAnswered[answer.order_key]) {
+                                                if (answers_equal(quiz[answer.order_key].right_answers, answer.choices)) {
+                                                    // answer right
+                                                    points_add += quiz[answer.order_key].points;
+                                                    right_answer_count++;
+                                                }
+
+                                                alreadyAnswered[answer.order_key] = true;
                                             }
+                                        });
 
-                                            alreadyAnswered[answer.order_key] = true;
-                                        }
-                                    });
+                                        if(points_add) {
+                                            LoyaltypointService.increase(user.user, points_add, LOYALTYPOINTSTYPE.COMPAIGNREWARD, quizAnswers[i].campaign.title, quizAnswers[i].campaign._id, function (err) {
+                                                if (err) {
+                                                    console.error(err);
+                                                    reject(err);
+                                                    return;
+                                                }
 
-                                    if(points_add) {
-                                        LoyaltypointService.increase(user.user, points_add, LOYALTYPOINTSTYPE.COMPAIGNREWARD, quizAnswers[i].campaign.title, quizAnswers[i].campaign._id, function (err) {
-                                            if (err) {
-                                                console.error(err);
-                                                reject(err);
-                                                return;
-                                            }
+                                                self.record_reward(user.user, campaign_id, function (err) {
+                                                    if (err) {
+                                                        console.error(err);
+                                                        reject(err);
+                                                        return;
+                                                    }
 
+                                                    QuizAnswerModel.findOneAndUpdate({
+                                                        user: user.user,
+                                                        campaign: campaign_id
+                                                    }, {
+                                                        $set: {
+                                                            result: {
+                                                                has_result: true,
+                                                                points: points_add,
+                                                                right_answer_count: right_answer_count,
+                                                                date_time: new Date()
+                                                            }
+                                                        }
+                                                    }, function (err) {
+                                                        if (err) {
+                                                            console.error(err);
+                                                            reject(err);
+                                                            return;
+                                                        }
+
+                                                        resolve();
+                                                    })
+                                                })
+                                            })
+                                        } else{
                                             self.record_reward(user.user, campaign_id, function (err) {
                                                 if (err) {
                                                     console.error(err);
@@ -642,68 +685,40 @@ CampaignService.prototype.trigger_quiz_reward = function(campaign_id, callback){
                                                     resolve();
                                                 })
                                             })
-                                        })
-                                    } else{
-                                        self.record_reward(user.user, campaign_id, function (err) {
-                                            if (err) {
-                                                console.error(err);
-                                                reject(err);
-                                                return;
-                                            }
+                                        }
+                                    }))
+                                }
 
-                                            QuizAnswerModel.findOneAndUpdate({
-                                                user: user.user,
-                                                campaign: campaign_id
-                                            }, {
-                                                $set: {
-                                                    result: {
-                                                        has_result: true,
-                                                        points: points_add,
-                                                        right_answer_count: right_answer_count,
-                                                        date_time: new Date()
-                                                    }
-                                                }
-                                            }, function (err) {
-                                                if (err) {
-                                                    console.error(err);
-                                                    reject(err);
+                                Promise.all(promises)
+                                    .then(function(){
+                                        if(userCount-max>batchCount){
+                                            batchRequireReward(max, max + batchCount);
+                                        } else if(userCount-max > 0){
+                                            batchRequireReward(max, userCount);
+                                        } else{
+                                            // all finished
+                                            quizCampaign.right_answer_published = true;
+                                            quizCampaign.save(function(err){
+                                                if(err){
+                                                    callback('公布答案失败');
+                                                    release();
                                                     return;
                                                 }
 
-                                                resolve();
+                                                callback();
+                                                release();
                                             })
-                                        })
-                                    }
-                                }))
+                                        }
+                                    })
+                            };
+
+                            if(userCount > batchCount){
+                                batchRequireReward(0, batchCount)
+                            } else{
+                                batchRequireReward(0, userCount);
                             }
-
-                            Promise.all(promises)
-                                .then(function(){
-                                    if(userCount-max>batchCount){
-                                        batchRequireReward(max, max + batchCount);
-                                    } else if(userCount-max > 0){
-                                        batchRequireReward(max, userCount);
-                                    } else{
-                                        // all finished
-                                        quizCampaign.right_answer_published = true;
-                                        quizCampaign.save(function(err){
-                                            if(err){
-                                                callback('公布答案失败');
-                                                return;
-                                            }
-
-                                            callback()
-                                        })
-                                    }
-                                })
-                        };
-
-                        if(userCount > batchCount){
-                            batchRequireReward(0, batchCount)
-                        } else{
-                            batchRequireReward(0, userCount);
-                        }
-                    })
+                        })
+                })
             })
         })
     })
