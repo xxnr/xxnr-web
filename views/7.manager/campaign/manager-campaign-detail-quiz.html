@@ -19,7 +19,13 @@
                 <script type="text/html">
                     <div class="col-md-12">
                         <h4 style="float:left;">已经创建了{{ QA.length }}道题</h4>
-                        <div style="float:right" class="ui-left ui-buttons" style="margin-left:30px;"><button id="publish_result">公布结果</button></div>
+                        <div style="float:right" class="ui-left ui-buttons" style="margin-left:30px;">
+                            {{ if right_answer_published}}
+                                <button disabled class="green">结果已公布</button>
+                            {{ else }}
+                                <button id="publish_result">公布结果</button>
+                            {{ fi }}
+                        </div>
                     </div>
                     <div class="col-md-12">
                         <div class="col-xs-3"><a href="javascript:void(0)" class="linkbutton" name="选择题"><span class="fa fa-plus-circle"></span>选择题</a></div>
@@ -124,9 +130,11 @@
 <script>
     var POINTSREGEX = /^[0-9]+$/;
     var QA = <%- JSON.stringify(QA) %>;
+    var right_answer_published = <%- JSON.stringify(right_answer_published) %>;
     var _id = getUrlParam('_id');
     var detail_QA = {
-        QA:[]
+        QA:[],
+        right_answer_published:right_answer_published
     };
 
     refresh_QA();
@@ -335,6 +343,9 @@
                 return;
             }
 
+            var el = $(this);
+            el.prop('disabled', true);
+            el.html('公布中<img src="/img/preloader.gif" style="height: inherit">');
             $.components.POST(managerurl+'/api/campaign/quiz/trigger_reward', {_id:_id}, function(response){
                 if(response.code == 1000){
                     success();
