@@ -22,232 +22,235 @@
             <li name="agentPerformance">- 汇总排行</li>
             <li class="cl"></li>
         </ul>
+        <br />
+        <h3 class="ui-left"><a name="introductions">数据说明</a></h3>
     </div>
     <div class="col-md-10">
-	<div class="mb50">
-		<div class="row">
-			<div class="col-md-12">
-				<h3 class="ui-left">今日实时</h3>
-			</div>
-		</div>
-		<div class="row">
-			<div class="col-md-12">
-				<div data-component="template" data-component-path="dashboard">
-					<script type="text/html">
-					{{ if today }}
-						<p>更新时间：{{ today.lastUpdateTime | format('yyyy-MM-dd HH:mm:ss') }}</p>
-						<div class="box">
-							<div class="col-md-2">
-								<div class="mb10">注册用户数</div>
-								<div class="num">{{ today.registeredUserCount | format(0) }}</div>
-							</div>
-							<div class="col-md-2">
-								<div class="mb10">新增经纪人</div>
-								<div class="num">{{ today.agentVerifiedCount | format(0) }}</div>
-							</div>
-							<div class="col-md-2">
-								<div class="mb10">订单数</div>
-								<div class="num">{{ today.orderCount | format(0) }}</div>
-							</div>
-							<div class="col-md-2">
-								<div class="mb10">付款订单数</div>
-								<div class="num">{{ today.paidOrderCount | format(0) }}</div>
-							</div>
-							<div class="col-md-4">
-								<div class="mb10">已支付金额（元）</div>
-								<div class="num">{{ today.paidAmount | price(2) }}</div>
-							</div>
-							<div class="cl"></div>
-						</div>
-						
-					{{ fi }}
-					</script>
+		<div class="mb50">
+			<div class="row">
+				<div class="col-md-12">
+					<h3 class="ui-left">今日实时</h3>
 				</div>
-				<div data-component="error" data-component-path="dashboard.todayresponse"></div>
+			</div>
+			<div class="row">
+				<div class="col-md-12">
+					<div data-component="template" data-component-path="dashboard">
+						<script type="text/html">
+						{{ if today }}
+							<p>更新时间：{{ today.lastUpdateTime | format('yyyy-MM-dd HH:mm:ss') }}</p>
+							<div class="box">
+								<div class="col-md-2">
+									<div class="mb10">注册用户数</div>
+									<div class="num">{{ today.registeredUserCount | format(0) }}</div>
+								</div>
+								<div class="col-md-2">
+									<div class="mb10">新增经纪人</div>
+									<div class="num">{{ today.agentVerifiedCount | format(0) }}</div>
+								</div>
+								<div class="col-md-2">
+									<div class="mb10">订单数</div>
+									<div class="num">{{ today.orderCount | format(0) }}</div>
+								</div>
+								<div class="col-md-2">
+									<div class="mb10">付款订单数</div>
+									<div class="num">{{ today.paidOrderCount | format(0) }}</div>
+								</div>
+								<div class="col-md-4">
+									<div class="mb10">已支付金额（元）</div>
+									<div class="num">{{ today.paidAmount | price(2) }}</div>
+								</div>
+								<div class="cl"></div>
+							</div>
+							
+						{{ fi }}
+						</script>
+					</div>
+					<div data-component="error" data-component-path="dashboard.todayresponse"></div>
+				</div>
 			</div>
 		</div>
-	</div>
 
-	<div class="mb50">
-		<div class="row">
-			<div class="col-md-12">
-				<h3 class="ui-left">昨日统计</h3>
-			</div>
-		</div>
-		<div class="row m">
-			<div class="col-md-12">
-				<div data-component="template" data-component-path="dashboard">
-					<script type="text/html">
-					{{ if yesterday }}
-						<p>昨日数据（{{ yesterday.date }}）</p>
-						<div class="box">
-							<div class="col-md-2">
-								<div class="mb10">注册用户数</div>
-								<div class="num">{{ yesterday.registeredUserCount | format(0) }}</div>
-							</div>
-							<div class="col-md-2">
-								<div class="mb10">新增经纪人</div>
-								<div class="num">{{ yesterday.agentVerifiedCount | format(0) }}</div>
-							</div>
-							<div class="col-md-2">
-								<div class="mb10">订单数</div>
-								<div class="num">{{ yesterday.orderCount | format(0) }}</div>
-							</div>
-							<div class="col-md-2">
-								<div class="mb10">付款订单数</div>
-								<div class="num">{{ yesterday.paidOrderCount | format(0) }}</div>
-							</div>
-							<div class="col-md-4">
-								<div class="mb10">已支付金额（元）</div>
-								<div class="num">{{ yesterday.paidAmount | price(2) }}</div>
-							</div>
-							<div class="cl"></div>
-						</div>
-						
-					{{ fi }}
-					</script>
+		<div class="mb50">
+			<div class="row">
+				<div class="col-md-12">
+					<h3 class="ui-left">昨日统计</h3>
 				</div>
-				<div data-component="error" data-component-path="dashboard.yesterdayresponse"></div>
 			</div>
-		</div>
-		<div class="row">
-			<div class="col-md-12">
-				<div data-component="template" data-component-path="dashboard">
-					<script type="text/html">
-					{{ if statistic }}
-						<p>累计数据（{{ statistic.serviceStartTime }} ~ {{ statistic.EndTime }}）</p>
-						<div class="box">
-							<div class="col-md-2">
-								<div class="mb10">总用户数</div>
-								<div class="num">{{ statistic.registeredUserCount | format(0) }}</div>
+			<div class="row m">
+				<div class="col-md-12">
+					<div data-component="template" data-component-path="dashboard">
+						<script type="text/html">
+						{{ if yesterday }}
+							<p>昨日数据（{{ yesterday.date }}）</p>
+							<div class="box">
+								<div class="col-md-2">
+									<div class="mb10">注册用户数</div>
+									<div class="num">{{ yesterday.registeredUserCount | format(0) }}</div>
+								</div>
+								<div class="col-md-2">
+									<div class="mb10">新增经纪人</div>
+									<div class="num">{{ yesterday.agentVerifiedCount | format(0) }}</div>
+								</div>
+								<div class="col-md-2">
+									<div class="mb10">订单数</div>
+									<div class="num">{{ yesterday.orderCount | format(0) }}</div>
+								</div>
+								<div class="col-md-2">
+									<div class="mb10">付款订单数</div>
+									<div class="num">{{ yesterday.paidOrderCount | format(0) }}</div>
+								</div>
+								<div class="col-md-4">
+									<div class="mb10">已支付金额（元）</div>
+									<div class="num">{{ yesterday.paidAmount | price(2) }}</div>
+								</div>
+								<div class="cl"></div>
 							</div>
-							<div class="col-md-2">
-								<div class="mb10">经纪人数</div>
-								<div class="num">{{ statistic.agentVerifiedCount | format(0) }}</div>
-							</div>
-							<div class="col-md-2">
-								<div class="mb10">总订单数</div>
-								<div class="num">{{ statistic.orderCount | format(0) }}</div>
-							</div>
-							<div class="col-md-2">
-								<div class="mb10">已完成订单数</div>
-								<div class="num">{{ statistic.completedOrderCount | format(0) }}</div>
-							</div>
-							<div class="col-md-4">
-								<div class="mb10">已完成金额（元）</div>
-								<div class="num">{{ statistic.completedOrderPaidAmount | price(2) }}</div>
-							</div>
-							<div class="cl"></div>
-						</div>
-						
-					{{ fi }}
-					</script>
+							
+						{{ fi }}
+						</script>
+					</div>
+					<div data-component="error" data-component-path="dashboard.yesterdayresponse"></div>
 				</div>
-				<div data-component="error" data-component-path="dashboard.statisticresponse"></div>
+			</div>
+			<div class="row">
+				<div class="col-md-12">
+					<div data-component="template" data-component-path="dashboard">
+						<script type="text/html">
+						{{ if statistic }}
+							<p>累计数据（{{ statistic.serviceStartTime }} ~ {{ statistic.EndTime }}）</p>
+							<div class="box">
+								<div class="col-md-2">
+									<div class="mb10">总用户数</div>
+									<div class="num">{{ statistic.registeredUserCount | format(0) }}</div>
+								</div>
+								<div class="col-md-2">
+									<div class="mb10">经纪人数</div>
+									<div class="num">{{ statistic.agentVerifiedCount | format(0) }}</div>
+								</div>
+								<div class="col-md-2">
+									<div class="mb10">总订单数</div>
+									<div class="num">{{ statistic.orderCount | format(0) }}</div>
+								</div>
+								<div class="col-md-2">
+									<div class="mb10">已完成订单数</div>
+									<div class="num">{{ statistic.completedOrderCount | format(0) }}</div>
+								</div>
+								<div class="col-md-4">
+									<div class="mb10">已完成金额（元）</div>
+									<div class="num">{{ statistic.completedOrderPaidAmount | price(2) }}</div>
+								</div>
+								<div class="cl"></div>
+							</div>
+							
+						{{ fi }}
+						</script>
+					</div>
+					<div data-component="error" data-component-path="dashboard.statisticresponse"></div>
+				</div>
 			</div>
 		</div>
-	</div>
 
-	<div class="mb50">
-		<div class="row m">
-			<div class="col-md-12">
-				<h3 class="ui-left">业务趋势</h3>
-			</div>
-			<div class="col-md-12 m">
-				<div class="quick-view dates-select">
-					<span>筛选日期：</span>
-					<input type="text" id="dailiesStartDate">
-					<span>至</span>
-					<input type="text" id="dailiesEndDate">
-					<button data-name="datesselect">确定</button>
+		<div class="mb50">
+			<div class="row m">
+				<div class="col-md-12">
+					<h3 class="ui-left">业务趋势</h3>
+				</div>
+				<div class="col-md-12 m">
+					<div class="quick-view dates-select">
+						<span>筛选日期：</span>
+						<input type="text" id="dailiesStartDate">
+						<span>至</span>
+						<input type="text" id="dailiesEndDate">
+						<button data-name="datesselect">确定</button>
+					</div>
+				</div>
+				<div class="col-md-12">
+					<div class="quick-view">
+						<span>快速查看：</span>
+						<div class="selected" data-name="last7days">最近7天</div>
+						<div data-name="last30days">最近30天</div>
+					</div>
 				</div>
 			</div>
-			<div class="col-md-12">
-				<div class="quick-view">
-					<span>快速查看：</span>
-					<div class="selected" data-name="last7days">最近7天</div>
-					<div data-name="last30days">最近30天</div>
+			<div class="row m">
+				<div class="col-md-12 m">
+					<div data-component="template" data-component-path="dashboard">
+						<script type="text/html">
+						{{ if dailiesamount }}
+							<p>数据统计（{{ dailiesStartDate }} ~ {{ dailiesEndDate }}）</p>
+							<div class="box">
+								<div class="col-md-2">
+									<div class="mb10">注册用户数</div>
+									<div class="num">{{ dailiesamount.registeredUserCount | format(0) }}</div>
+								</div>
+								<div class="col-md-2">
+									<div class="mb10">经纪人数</div>
+									<div class="num">{{ dailiesamount.agentVerifiedCount | format(0) }}</div>
+								</div>
+								<div class="col-md-2">
+									<div class="mb10">订单数</div>
+									<div class="num">{{ dailiesamount.orderCount | format(0) }}</div>
+								</div>
+								<div class="col-md-2">
+									<div class="mb10">付款订单数</div>
+									<div class="num">{{ dailiesamount.paidOrderCount | format(0) }}</div>
+								</div>
+								<div class="col-md-4">
+									<div class="mb10">已支付金额（元）</div>
+									<div class="num">{{ dailiesamount.paidAmount | price(2) }}</div>
+								</div>
+								<div class="cl"></div>
+							</div>
+						{{ fi }}
+						</script>
+					</div>
 				</div>
-			</div>
-		</div>
-		<div class="row m">
-			<div class="col-md-12 m">
-				<div data-component="template" data-component-path="dashboard">
-					<script type="text/html">
-					{{ if dailiesamount }}
-						<p>数据统计（{{ dailiesStartDate }} ~ {{ dailiesEndDate }}）</p>
-						<div class="box">
-							<div class="col-md-2">
-								<div class="mb10">注册用户数</div>
-								<div class="num">{{ dailiesamount.registeredUserCount | format(0) }}</div>
-							</div>
-							<div class="col-md-2">
-								<div class="mb10">经纪人数</div>
-								<div class="num">{{ dailiesamount.agentVerifiedCount | format(0) }}</div>
-							</div>
-							<div class="col-md-2">
-								<div class="mb10">订单数</div>
-								<div class="num">{{ dailiesamount.orderCount | format(0) }}</div>
-							</div>
-							<div class="col-md-2">
-								<div class="mb10">付款订单数</div>
-								<div class="num">{{ dailiesamount.paidOrderCount | format(0) }}</div>
-							</div>
-							<div class="col-md-4">
-								<div class="mb10">已支付金额（元）</div>
-								<div class="num">{{ dailiesamount.paidAmount | price(2) }}</div>
-							</div>
-							<div class="cl"></div>
-						</div>
-					{{ fi }}
-					</script>
+				<div class="col-md-12 m">
+					<div class="chart-buttons">
+						<span>数据指标：</span>
+						<div class="selected" data-name="users">用户数</div>
+						<div data-name="orders">订单数</div>
+						<div data-name="paidAmount">已付金额</div>
+					</div>
 				</div>
+				<div class="col-md-12" id="chart" style="height:400px;"></div>
 			</div>
-			<div class="col-md-12 m">
-				<div class="chart-buttons">
-					<span>数据指标：</span>
-					<div class="selected" data-name="users">用户数</div>
-					<div data-name="orders">订单数</div>
-					<div data-name="paidAmount">已付金额</div>
-				</div>
-			</div>
-			<div class="col-md-12" id="chart" style="height:400px;"></div>
-		</div>
-		<div class="row m">
-			<div class="col-md-12">
-				<div data-component="template" data-component-path="dashboard" class="ui-grid">
-					<script type="text/html">
-					{{ if dailies && dailies.length > 0 }}
-						<p>数据报表</p>
-						<table class="table" width="100%" cellpadding="0" cellspacing="0" border="0" style="font-size:14px;">
-							<tbody>
-								<tr>
-									<td style="width:40px" class="silver hidden-xs ui-center active">序号</td>
-							    	<td style="width:60px" class="silver hidden-xs ui-center active">日期</td>
-							    	<td style="width:60px" class="silver hidden-xs ui-center active">注册用户数</td>
-							    	<td style="width:60px" class="silver hidden-xs ui-center active">经纪人数</td>
-							    	<td style="width:60px" class="silver hidden-xs ui-center active">订单数</td>
-							    	<td style="width:60px" class="silver hidden-xs ui-center active">付款订单数</td>
-							    	<td style="width:90px" class="silver hidden-xs ui-right active">已支付金额（元）</td>
-							    </tr>
-							    {{ foreach daily in dailies }}
-							    	<tr>
-										<td style="width:40px" class="silver hidden-xs ui-center">{{ $index + 1 }}</td>
-								    	<td style="width:60px" class="silver hidden-xs ui-center">{{ daily.day }}</td>
-								    	<td style="width:60px" class="silver hidden-xs ui-center">{{ daily.registeredUserCount | format(0) }}</td>
-								    	<td style="width:60px" class="silver hidden-xs ui-center">{{ daily.agentVerifiedCount | format(0) }}</td>
-								    	<td style="width:60px" class="silver hidden-xs ui-center">{{ daily.orderCount | format(0) }}</td>
-								    	<td style="width:60px" class="silver hidden-xs ui-center">{{ daily.paidOrderCount | format(0) }}</td>
-								    	<td style="width:90px" class="silver hidden-xs ui-right">{{ daily.paidAmount | price(2) }}</td>
+			<div class="row m">
+				<div class="col-md-12">
+					<div data-component="template" data-component-path="dashboard" class="ui-grid">
+						<script type="text/html">
+						{{ if dailies && dailies.length > 0 }}
+							<p>数据报表</p>
+							<table class="table" width="100%" cellpadding="0" cellspacing="0" border="0" style="font-size:14px;">
+								<tbody>
+									<tr>
+										<td style="width:40px" class="silver hidden-xs ui-center active">序号</td>
+								    	<td style="width:60px" class="silver hidden-xs ui-center active">日期</td>
+								    	<td style="width:60px" class="silver hidden-xs ui-center active">注册用户数</td>
+								    	<td style="width:60px" class="silver hidden-xs ui-center active">经纪人数</td>
+								    	<td style="width:60px" class="silver hidden-xs ui-center active">订单数</td>
+								    	<td style="width:60px" class="silver hidden-xs ui-center active">付款订单数</td>
+								    	<td style="width:90px" class="silver hidden-xs ui-right active">已支付金额（元）</td>
 								    </tr>
-								{{ end }}
-							</tbody>
-						</table>
-					{{ fi }}
-					</script>
+								    {{ foreach daily in dailies }}
+								    	<tr>
+											<td style="width:40px" class="silver hidden-xs ui-center">{{ $index + 1 }}</td>
+									    	<td style="width:60px" class="silver hidden-xs ui-center">{{ daily.day }}</td>
+									    	<td style="width:60px" class="silver hidden-xs ui-center">{{ daily.registeredUserCount | format(0) }}</td>
+									    	<td style="width:60px" class="silver hidden-xs ui-center">{{ daily.agentVerifiedCount | format(0) }}</td>
+									    	<td style="width:60px" class="silver hidden-xs ui-center">{{ daily.orderCount | format(0) }}</td>
+									    	<td style="width:60px" class="silver hidden-xs ui-center">{{ daily.paidOrderCount | format(0) }}</td>
+									    	<td style="width:90px" class="silver hidden-xs ui-right">{{ daily.paidAmount | price(2) }}</td>
+									    </tr>
+									{{ end }}
+								</tbody>
+							</table>
+						{{ fi }}
+						</script>
+					</div>
+					
+					<div data-component="error" data-component-path="dashboard.dailiesresponse"></div>
 				</div>
-				
-				<div data-component="error" data-component-path="dashboard.dailiesresponse"></div>
 			</div>
 		</div>
 	</div>

@@ -12,6 +12,8 @@ var regexpPhone = new RegExp('^(13[0-9]|15[012356789]|17[013678]|18[0-9]|14[57])
 var regexpPrice = new RegExp('^[0-9]*(\.[0-9]{1,2})?$');
 var regexIdentityNo = /^(\d{15}$|^\d{18}$|^\d{17}(\d|X|x))$/;
 var regexpXXNRHost = new RegExp('(api\.|^)xinxinnongren\.com.*');
+var regexpMPPEXXNRHost = new RegExp('(mppe\.|^)xinxinnongren\.com.*');
+var regexpMXXNRHost = new RegExp('(m\.|^)xinxinnongren\.com.*');
 var config = require('../config');
 var Global = require('../global.js');
 var moment = require('moment-timezone');
@@ -280,6 +282,19 @@ exports.getXXNRHost = function(url){
     if (regexpXXNRHost.test(url.toString())) {
         return 'www.xinxinnongren.com';
     } else {
+        return url;
+    }
+};
+
+exports.getXXNRWebHost = function(url){
+    if (!url)
+        return 'www.xinxinnongren.com';
+
+    if (regexpXXNRHost.test(url.toString()) || regexpMXXNRHost.test(url.toString())) {
+        return 'www.xinxinnongren.com';
+    } else if (regexpMPPEXXNRHost.test(url.toString())) {
+        return 'ppe.xinxinnongren.com';
+    } else{
         return url;
     }
 };
