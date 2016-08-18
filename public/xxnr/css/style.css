@@ -2778,8 +2778,8 @@ body {
     width: 900px;
     left: 50%;
     top: 50%;
-    margin-left: -400px;
-    margin-top: -330px;
+    margin-left: -450px;
+    margin-top: -306px;
     background: #fff;
     border-radius: 5px;
     border: 1px solid #bdbdbd;
@@ -2794,8 +2794,8 @@ body {
     background: url(../images/close.gif) no-repeat;
 }
 .pop_uploadAvatar .avatar_container .avatar_Body .uploadAvatar {
-    margin-top: 30px;
-    margin-bottom: 38px;
+    margin-top: 10px;
+    margin-bottom: 8px;
 }
 .pop_uploadAvatar .avatar_container .avatar_Body .uploadAvatar .newAvatarBody {
     display: inline-block;
@@ -2831,7 +2831,7 @@ body {
 .pop_uploadAvatar .avatar_container .avatar_Body .avatarInfo {
     border: 1px solid #c7c7c7;
     padding: 10px;
-    margin-top: 16px;
+    /*margin-top: 16px;*/
 }
 .pop_uploadAvatar .avatar_container .avatar_Body .avatarInfo p {
     line-height: 30px;
@@ -2841,7 +2841,7 @@ body {
     display: block;
     margin: 30px auto;
     width: 260px;
-    margin-bottom: 15px;
+    margin-bottom: 0px;
 }
 .pop_ConfirmSKUReceived {
     z-index: 101;
