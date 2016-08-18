@@ -184,11 +184,11 @@ app.controller('newsController', function($scope,remoteApiService,sideService){
 
 
     $scope.show_page = function(pageId){
-        $('html,body').animate({
-            scrollTop: 0
-        }, 100);
         //console.log(pageId);
         if(pageId!='...'){
+            $('html,body').animate({
+                scrollTop: 0
+            }, 100);
             $scope.current_page = pageId;
             for(var pageIndex in $scope.pages){
                 if($scope.pages[pageIndex].id == pageId){

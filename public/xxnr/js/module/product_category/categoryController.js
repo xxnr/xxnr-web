@@ -66,19 +66,21 @@ app.controller('categoryController', function($scope, remoteApiService, commonSe
             generate_page();
         });
     $scope.$parent.show_page = function(pageId){
-        current_page = pageId;
-        for(var pageIndex in $scope.$parent.pages){
-            if($scope.$parent.pages[pageIndex].id == pageId){
-                $scope.$parent.pages[pageIndex].isSelected = true;
-            }else {
-                $scope.$parent.pages[pageIndex].isSelected = false;
+        if(pageId!='...') {
+            current_page = pageId;
+            for (var pageIndex in $scope.$parent.pages) {
+                if ($scope.$parent.pages[pageIndex].id == pageId) {
+                    $scope.$parent.pages[pageIndex].isSelected = true;
+                } else {
+                    $scope.$parent.pages[pageIndex].isSelected = false;
+                }
             }
-        }
-        $scope.$parent.current_items = [];
-        var fromGoodId = (pageId - 1) * product_count_per_page;
-        var toGoodId = pageId * product_count_per_page - 1;
-        for(var j = fromGoodId; j < queried_products.length && j <= toGoodId; j++){
-            $scope.$parent.current_items.push(queried_products[j]);
+            $scope.$parent.current_items = [];
+            var fromGoodId = (pageId - 1) * product_count_per_page;
+            var toGoodId = pageId * product_count_per_page - 1;
+            for (var j = fromGoodId; j < queried_products.length && j <= toGoodId; j++) {
+                $scope.$parent.current_items.push(queried_products[j]);
+            }
         }
     };
     $scope.$parent.pre_page = function(){
