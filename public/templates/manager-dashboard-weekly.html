@@ -22,198 +22,204 @@
             <li name="agentPerformance">- 汇总排行</li>
             <li class="cl"></li>
         </ul>
+        <br />
+        <h3 class="ui-left"><a name="introductions">数据说明</a></h3>
     </div>
     <div class="col-md-10">
-	<div class="mb50">
-		<div class="row">
-			<div class="col-md-12">
-				<h3 class="ui-left">本周动态</h3>
-			</div>
-		</div>
-		<div class="row">
-			<div class="col-md-12">
-				<div data-component="template" data-component-path="dashboard">
-					<script type="text/html">
-					{{ if thisweek }}
-						<p>统计时间 {{ if thisweek.startDate && thisweek.endDate }}（{{ thisweek.startDate }} ~ {{ thisweek.endDate }}） {{ fi }} {{ if thisweek.dates }}共{{ thisweek.dates }}天{{fi}}</p>
-						<div class="box">
-							<div class="col-md-2">
-								<div class="mb10">注册用户数</div>
-								<div class="num">{{ thisweek.registeredUserCount | format(0) }}</div>
-							</div>
-							<div class="col-md-2">
-								<div class="mb10">新增经纪人</div>
-								<div class="num">{{ thisweek.agentVerifiedCount | format(0) }}</div>
-							</div>
-							<div class="col-md-2">
-								<div class="mb10">订单数</div>
-								<div class="num">{{ thisweek.orderCount | format(0) }}</div>
-							</div>
-							<div class="col-md-2">
-								<div class="mb10">付款订单数</div>
-								<div class="num">{{ thisweek.paidOrderCount | format(0) }}</div>
-							</div>
-							<div class="col-md-4">
-								<div class="mb10">已支付金额（元）</div>
-								<div class="num">{{ thisweek.paidAmount | price(2) }}</div>
-							</div>
-							<div class="cl"></div>
-						</div>
-						
-					{{ fi }}
-					</script>
-				</div>
-				<div data-component="error" data-component-path="dashboard.thisweekresponse"></div>
-			</div>
-		</div>
-	</div>
-
-	<div class="mb50">
-		<div class="row">
-			<div class="col-md-12">
-				<h3 class="ui-left">上周统计</h3>
-			</div>
-		</div>
-		<div class="row m">
-			<div class="col-md-12">
-				<div data-component="template" data-component-path="dashboard">
-					<script type="text/html">
-					{{ if lastweek }}
-						<p>统计时间 {{ if lastweek.startDate && lastweek.endDate }}（{{ lastweek.startDate }} ~ {{ lastweek.endDate }}） {{ fi }} {{ if lastweek.dates }}共{{ lastweek.dates }}天{{fi}}</p>
-						<div class="box">
-							<div class="col-md-2">
-								<div class="mb10">注册用户数</div>
-								<div class="num">{{ lastweek.registeredUserCount | format(0) }}</div>
-							</div>
-							<div class="col-md-2">
-								<div class="mb10">新增经纪人</div>
-								<div class="num">{{ lastweek.agentVerifiedCount | format(0) }}</div>
-							</div>
-							<div class="col-md-2">
-								<div class="mb10">订单数</div>
-								<div class="num">{{ lastweek.orderCount | format(0) }}</div>
-							</div>
-							<div class="col-md-2">
-								<div class="mb10">付款订单数</div>
-								<div class="num">{{ lastweek.paidOrderCount | format(0) }}</div>
-							</div>
-							<div class="col-md-4">
-								<div class="mb10">已支付金额（元）</div>
-								<div class="num">{{ lastweek.paidAmount | price(2) }}</div>
-							</div>
-							<div class="cl"></div>
-						</div>
-						
-					{{ fi }}
-					</script>
-				</div>
-				<div data-component="error" data-component-path="dashboard.lastweekresponse"></div>
-			</div>
-		</div>
-	</div>
-
-	<div class="mb50">
-		<div class="row m">
-			<div class="col-md-12">
-				<h3 class="ui-left">业务趋势</h3>
-			</div>
-			<div class="col-md-12">
-				<div class="quick-view dates-select">
-					<span>筛选日期：</span>
-					<input type="text" id="weekliesStartDate">
-					<span>至</span>
-					<input type="text" id="weekliesEndDate">
-					<button class="selected" data-name="datesselect">确定</button>
+		<div class="mb50">
+			<div class="row">
+				<div class="col-md-12">
+					<h3 class="ui-left">本周动态</h3>
 				</div>
 			</div>
-			<div class="col-md-12">
-				<div data-component="template" data-component-path="dashboard">
-					<script type="text/html">
-						{{ if weekly }}
-							<p>统计时间 {{ if weekly.startDate && weekly.endDate }}（{{ weekly.startDate }} ~ {{ weekly.endDate }}） {{ fi }} {{ if weekly.dates }}共{{ weekly.dates }}天{{fi}}</p>
+			<div class="row">
+				<div class="col-md-12">
+					<div data-component="template" data-component-path="dashboard">
+						<script type="text/html">
+						{{ if thisweek }}
+							<p>统计时间 {{ if thisweek.startDate && thisweek.endDate }}（{{ thisweek.startDate }} ~ {{ thisweek.endDate }}） {{ fi }} {{ if thisweek.dates }}共{{ thisweek.dates }}天{{fi}}</p>
+							<div class="box">
+								<div class="col-md-2">
+									<div class="mb10">注册用户数</div>
+									<div class="num">{{ thisweek.registeredUserCount | format(0) }}</div>
+								</div>
+								<div class="col-md-2">
+									<div class="mb10">新增经纪人</div>
+									<div class="num">{{ thisweek.agentVerifiedCount | format(0) }}</div>
+								</div>
+								<div class="col-md-2">
+									<div class="mb10">订单数</div>
+									<div class="num">{{ thisweek.orderCount | format(0) }}</div>
+								</div>
+								<div class="col-md-2">
+									<div class="mb10">付款订单数</div>
+									<div class="num">{{ thisweek.paidOrderCount | format(0) }}</div>
+								</div>
+								<div class="col-md-4">
+									<div class="mb10">已支付金额（元）</div>
+									<div class="num">{{ thisweek.paidAmount | price(2) }}</div>
+								</div>
+								<div class="cl"></div>
+							</div>
+							
 						{{ fi }}
-					</script>
+						</script>
+					</div>
+					<div data-component="error" data-component-path="dashboard.thisweekresponse"></div>
 				</div>
 			</div>
 		</div>
-		<div class="row m">
-			<div class="col-md-12 m">
-				<div data-component="template" data-component-path="dashboard">
-					<script type="text/html">
-					{{ if weekliesamount }}
-						<p>数据统计</p>
-						<div class="box">
-							<div class="col-md-2">
-								<div class="mb10">注册用户数</div>
-								<div class="num">{{ weekliesamount.registeredUserCount | format(0) }}</div>
-							</div>
-							<div class="col-md-2">
-								<div class="mb10">经纪人数</div>
-								<div class="num">{{ weekliesamount.agentVerifiedCount | format(0) }}</div>
-							</div>
-							<div class="col-md-2">
-								<div class="mb10">订单数</div>
-								<div class="num">{{ weekliesamount.orderCount | format(0) }}</div>
-							</div>
-							<div class="col-md-2">
-								<div class="mb10">付款订单数</div>
-								<div class="num">{{ weekliesamount.paidOrderCount | format(0) }}</div>
-							</div>
-							<div class="col-md-4">
-								<div class="mb10">已支付金额（元）</div>
-								<div class="num">{{ weekliesamount.paidAmount | price(2) }}</div>
-							</div>
-							<div class="cl"></div>
-						</div>
-					{{ fi }}
-					</script>
+
+		<div class="mb50">
+			<div class="row">
+				<div class="col-md-12">
+					<h3 class="ui-left">上周统计</h3>
 				</div>
 			</div>
-			<div class="col-md-12 m">
-				<div class="chart-buttons">
-					<span>数据指标：</span>
-					<div class="selected" data-name="users">用户数</div>
-					<div data-name="orders">订单数</div>
-					<div data-name="paidAmount">已付金额</div>
+			<div class="row m">
+				<div class="col-md-12">
+					<div data-component="template" data-component-path="dashboard">
+						<script type="text/html">
+						{{ if lastweek }}
+							<p>统计时间 {{ if lastweek.startDate && lastweek.endDate }}（{{ lastweek.startDate }} ~ {{ lastweek.endDate }}） {{ fi }} {{ if lastweek.dates }}共{{ lastweek.dates }}天{{fi}}</p>
+							<div class="box">
+								<div class="col-md-2">
+									<div class="mb10">注册用户数</div>
+									<div class="num">{{ lastweek.registeredUserCount | format(0) }}</div>
+								</div>
+								<div class="col-md-2">
+									<div class="mb10">新增经纪人</div>
+									<div class="num">{{ lastweek.agentVerifiedCount | format(0) }}</div>
+								</div>
+								<div class="col-md-2">
+									<div class="mb10">订单数</div>
+									<div class="num">{{ lastweek.orderCount | format(0) }}</div>
+								</div>
+								<div class="col-md-2">
+									<div class="mb10">付款订单数</div>
+									<div class="num">{{ lastweek.paidOrderCount | format(0) }}</div>
+								</div>
+								<div class="col-md-4">
+									<div class="mb10">已支付金额（元）</div>
+									<div class="num">{{ lastweek.paidAmount | price(2) }}</div>
+								</div>
+								<div class="cl"></div>
+							</div>
+							
+						{{ fi }}
+						</script>
+					</div>
+					<div data-component="error" data-component-path="dashboard.lastweekresponse"></div>
 				</div>
 			</div>
-			<div class="col-md-12" id="chart" style="height:400px;"></div>
 		</div>
-		<div class="row m">
-			<div class="col-md-12">
-				<div data-component="template" data-component-path="dashboard" class="ui-grid">
-					<script type="text/html">
-					{{ if weeklies && weeklies.length > 0 }}
-						<p>数据报表</p>
-						<table class="table" width="100%" cellpadding="0" cellspacing="0" border="0" style="font-size:14px;">
-							<tbody>
-								<tr>
-									<td style="width:30px" class="silver hidden-xs ui-center active">序号</td>
-							    	<td style="width:100px" class="silver hidden-xs ui-center active">日期（时间段）</td>
-							    	<td style="width:60px" class="silver hidden-xs ui-center active">注册用户数</td>
-							    	<td style="width:60px" class="silver hidden-xs ui-center active">经纪人数</td>
-							    	<td style="width:60px" class="silver hidden-xs ui-center active">订单数</td>
-							    	<td style="width:60px" class="silver hidden-xs ui-center active">付款订单数</td>
-							    	<td style="width:90px" class="silver hidden-xs ui-right active">已支付金额（元）</td>
-							    </tr>
-							    {{ foreach weekly in weeklies }}
-							    	<tr>
-										<td style="width:30px" class="silver hidden-xs ui-center">{{ $index + 1 }}</td>
-								    	<td style="width:100px" class="silver hidden-xs ui-center" title="{{ if weekly.weekIndex }}{{ weekly.weekIndex }}{{ else }}{{ weekly.week }}{{ fi }}">{{ if weekly.weekIndex }}{{ weekly.weekIndex }}{{ else }}{{ weekly.week }}{{ fi }}</td>
-								    	<td style="width:60px" class="silver hidden-xs ui-center">{{ weekly.registeredUserCount | format(0) }}</td>
-								    	<td style="width:60px" class="silver hidden-xs ui-center">{{ weekly.agentVerifiedCount | format(0) }}</td>
-								    	<td style="width:60px" class="silver hidden-xs ui-center">{{ weekly.orderCount | format(0) }}</td>
-								    	<td style="width:60px" class="silver hidden-xs ui-center">{{ weekly.paidOrderCount | format(0) }}</td>
-								    	<td style="width:90px" class="silver hidden-xs ui-right">{{ weekly.paidAmount | price(2) }}</td>
+
+		<div class="mb50">
+			<div class="row m">
+				<div class="col-md-12">
+					<h3 class="ui-left">业务趋势</h3>
+				</div>
+				<div class="col-md-12">
+					<div class="quick-view dates-select">
+						<span>筛选日期：</span>
+						<input type="text" id="weekliesStartDate">
+						<span>至</span>
+						<input type="text" id="weekliesEndDate">
+						<button class="selected" data-name="datesselect">确定</button>
+					</div>
+				</div>
+				<div class="col-md-12">
+					<div data-component="template" data-component-path="dashboard">
+						<script type="text/html">
+							{{ if weekly }}
+								<p>统计时间 {{ if weekly.startDate && weekly.endDate }}（{{ weekly.startDate }} ~ {{ weekly.endDate }}） {{ fi }} {{ if weekly.dates }}共{{ weekly.dates }}天{{fi}}</p>
+							{{ fi }}
+						</script>
+					</div>
+				</div>
+			</div>
+			<div class="row m">
+				<div class="col-md-12 m">
+					<div data-component="template" data-component-path=
+
+
+					"dashboard">
+						<script type="text/html">
+						{{ if weekliesamount }}
+							<p>数据统计</p>
+							<div class="box">
+								<div class="col-md-2">
+									<div class="mb10">注册用户数</div>
+									<div class="num">{{ weekliesamount.registeredUserCount | format(0) }}</div>
+								</div>
+								<div class="col-md-2">
+									<div class="mb10">经纪人数</div>
+									<div class="num">{{ weekliesamount.agentVerifiedCount | format(0) }}</div>
+								</div>
+								<div class="col-md-2">
+									<div class="mb10">订单数</div>
+									<div class="num">{{ weekliesamount.orderCount | format(0) }}</div>
+								</div>
+								<div class="col-md-2">
+									<div class="mb10">付款订单数</div>
+									<div class="num">{{ weekliesamount.paidOrderCount | format(0) }}</div>
+								</div>
+								<div class="col-md-4">
+									<div class="mb10">已支付金额（元）</div>
+									<div class="num">{{ weekliesamount.paidAmount | price(2) }}</div>
+								</div>
+								<div class="cl"></div>
+							</div>
+						{{ fi }}
+						</script>
+					</div>
+				</div>
+				<div class="col-md-12 m">
+					<div class="chart-buttons">
+						<span>数据指标：</span>
+						<div class="selected" data-name="users">用户数</div>
+						<div data-name="orders">订单数</div>
+						<div data-name="paidAmount">已付金额</div>
+					</div>
+				</div>
+				<div class="col-md-12" id="chart" style="height:400px;"></div>
+			</div>
+			<div class="row m">
+				<div class="col-md-12">
+					<div data-component="template" data-component-path="dashboard" class="ui-grid">
+						<script type="text/html">
+						{{ if weeklies && weeklies.length > 0 }}
+							<p>数据报表</p>
+							<table class="table" width="100%" cellpadding="0" cellspacing="0" border="0" style="font-size:14px;">
+								<tbody>
+									<tr>
+										<td style="width:30px" class="silver hidden-xs ui-center active">序号</td>
+								    	<td style="width:100px" class="silver hidden-xs ui-center active">日期（时间段）</td>
+								    	<td style="width:60px" class="silver hidden-xs ui-center active">注册用户数</td>
+								    	<td style="width:60px" class="silver hidden-xs ui-center active">经纪人数</td>
+								    	<td style="width:60px" class="silver hidden-xs ui-center active">订单数</td>
+								    	<td style="width:60px" class="silver hidden-xs ui-center active">付款订单数</td>
+								    	<td style="width:90px" class="silver hidden-xs ui-right active">已支付金额（元）</td>
 								    </tr>
-								{{ end }}
-							</tbody>
-						</table>
-					{{ fi }}
-					</script>
+								    {{ foreach weekly in weeklies }}
+								    	<tr>
+											<td style="width:30px" class="silver hidden-xs ui-center">{{ $index + 1 }}</td>
+									    	<td style="width:100px" class="silver hidden-xs ui-center" title="{{ if weekly.weekIndex }}{{ weekly.weekIndex }}{{ else }}{{ weekly.week }}{{ fi }}">{{ if weekly.weekIndex }}{{ weekly.weekIndex }}{{ else }}{{ weekly.week }}{{ fi }}</td>
+									    	<td style="width:60px" class="silver hidden-xs ui-center">{{ weekly.registeredUserCount | format(0) }}</td>
+									    	<td style="width:60px" class="silver hidden-xs ui-center">{{ weekly.agentVerifiedCount | format(0) }}</td>
+									    	<td style="width:60px" class="silver hidden-xs ui-center">{{ weekly.orderCount | format(0) }}</td>
+									    	<td style="width:60px" class="silver hidden-xs ui-center">{{ weekly.paidOrderCount | format(0) }}</td>
+									    	<td style="width:90px" class="silver hidden-xs ui-right">{{ weekly.paidAmount | price(2) }}</td>
+									    </tr>
+									{{ end }}
+								</tbody>
+							</table>
+						{{ fi }}
+						</script>
+					</div>
+					
+					<div data-component="error" data-component-path="dashboard.weekliesresponse"></div>
 				</div>
-				
-				<div data-component="error" data-component-path="dashboard.weekliesresponse"></div>
 			</div>
 		</div>
 	</div>

@@ -19,7 +19,7 @@ exports.query_campaign = function(req, res, next){
             return;
         }
 
-        var prevurl = req.url_prefix;
+        var prevurl = req.web_url_prefix;
         campaigns.forEach(function(campaign){
             delete campaign.type;
             delete campaign.campaign_url_name;
@@ -58,7 +58,7 @@ exports.campaign_page = function(req, res, next){
     CampaignService.findByUrl(url, function(err, campaign) {
         var render_campaign = {};
         if(campaign) {
-            var prevurl = req.url_prefix;
+            var prevurl = req.web_url_prefix;
             if (campaign.url) {
                 campaign.url = prevurl + campaign.url;
             }
@@ -328,7 +328,7 @@ exports.get_app_share_info = function(req, res, next){
             return;
         }
 
-        var prevurl = req.url_prefix;
+        var prevurl = req.web_url_prefix;
         if(campaign.url){
             campaign.url = prevurl + campaign.url;
         }
@@ -348,7 +348,7 @@ exports.get_app_share_info = function(req, res, next){
 };
 
 function getprevImg(req){
-    var prevurl = req.url_prefix;
+    var prevurl = req.web_url_prefix;
     var previmg = prevurl + '/images/original/';
     return previmg;
 }
