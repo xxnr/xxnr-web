@@ -568,7 +568,8 @@ gulp.task('rev', function() {
         'xxnr_institute.html',
         'applyCountyVerified.html',
         'shareApp.html',
-        'rsc_management.html'
+        'rsc_management.html',
+        'pointsRecording.html'
         ])
        //- 读取 rev-manifest.json 文件以及需要进行css名替换的文件
         .pipe(htmlreplace({
