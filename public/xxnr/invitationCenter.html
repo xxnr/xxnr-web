@@ -140,7 +140,12 @@
                         <p ng-cloak>
                             <span>姓名 ：{{name}}</span>
                             <span>手机号 ：{{phone}}</span>
-                            <span>所在地区：<span class="orders_clientInfo--address" ng-repeat="address in addresses">{{address.name}}</span></span>
+                            <span>所在地区：
+                                <span class="orders_clientInfo--address">{{addresses.province.name}}</span>
+                                <span class="orders_clientInfo--address">{{addresses.city.name}}</span>
+                                <span class="orders_clientInfo--address">{{addresses.county.name}}</span>
+                                <span class="orders_clientInfo--address">{{addresses.town.name}}</span>
+                            </span>
                             <span>订单总数 :
                                 <span class="OrdersNum">{{ordersNum}}</span>
                             </span>

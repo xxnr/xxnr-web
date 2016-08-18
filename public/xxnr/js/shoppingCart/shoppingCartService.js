@@ -25,5 +25,30 @@ app.service('shoppingCartService', function($cookieStore, BaseUrl, BaseDomainREG
                 path: "/"
             });
         }
+
+        setTimeout(function(){
+            // reset options-box position
+            var dh = dh || $(document).height();
+            var bh = $(window).height();
+            var st = st || $(window).scrollTop();
+            var el = $('.options-box');
+            var eh = el.height();
+            if (dh - st >= bh + 350 ) {
+                el.css({
+                    position: 'fixed',
+                    left: el.offset().left,
+                    border: '1px solid #e0e0e0',
+                    bottom: 0
+                });
+                $(".cart_box").css({
+                    'padding-bottom': 90
+                });
+            } else {
+                el.removeAttr("style");
+                $(".cart_box").removeAttr("style");
+            }
+            // end reset position
+        });
+
     };
 });

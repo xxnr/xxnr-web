@@ -141,6 +141,8 @@ app.controller('loginController', function($scope, $timeout, remoteApiService, c
         $scope.confirm_newPassword = undefined;
         $scope.resetPasswordMsg = '';
         $scope.reset_captcha = undefined;
+        $timeout.cancel($scope.resetCountDown);
+        $scope.resetCountDown = '发送验证码';
     };
     $scope.sendRegistCode = function(event){
         if($scope.regBlockSendCode){
@@ -286,7 +288,7 @@ app.controller('loginController', function($scope, $timeout, remoteApiService, c
         }
         else{
             $scope.resetCountDown = '重新发送(' + timeOut + ')';
-            $timeout(function(){
+            $scope.timeout = $timeout(function(){
                 resetSetTimeOut(timeOut-1);
             }, 1000);
         }
