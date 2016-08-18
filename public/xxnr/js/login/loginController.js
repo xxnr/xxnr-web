@@ -143,6 +143,7 @@ app.controller('loginController', function($scope, $timeout, remoteApiService, c
         $scope.reset_captcha = undefined;
         $timeout.cancel($scope.timeout);
         $scope.resetCountDown = '发送验证码';
+        $scope.resetPasswordSucceedMsg = "";
     };
     $scope.sendRegistCode = function(event){
         if($scope.regBlockSendCode){
