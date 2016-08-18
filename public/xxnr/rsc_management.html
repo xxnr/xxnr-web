@@ -38,6 +38,7 @@
     <script src="js/sweetalert.min.js"></script>
     <script src="js/uploadService.js"></script>
     <script src="js/sideService.js"></script>
+    <script src="js/sectionSwitchService.js"></script>
     <script src="js/myPlaceholderDirective.js"></script>
     <script src="js/angular-flash.js"></script>
     <!-- endbuild -->
@@ -73,123 +74,189 @@
 <a href="#" id="back-to-top" title="Back to top">
     <img src="images/backToTop.png" alt="" />
 </a>
+
 <div class="clear rsc_mgmt">
+
     <p class="guide">
         <a href="/">首页</a> ／ <a href="my_xxnr.html">我的新农人</a> ／ <a> 我的网点 </a>
     </p>
     <div class="rsc_mgmt_body wrap">
-        <ul class="details_tab">
-            <li ng-repeat="showType in showTypes" ng-class="{true:'current', false:''}[showType.isSelected]"><a href="" ng-click='show(showType.id, $index, 1, true, orderSearchInput)' ng-cloak>{{showType.name}}</a></li>
-        </ul>
-        <div class="order--search" ng-show="showTypes[0].isSelected">
-            <input type="text" class="search--input" my-placeholder="收货人手机号/下单人手机号/订单号" placeholder="收货人手机号/下单人手机号/订单号" ng-model="orderSearchInput">
-            <a href="" class="search--btn" ng-click='show(showType.id, 0, 1, true, orderSearchInput)' >搜索</a>
+        <div class="switch_section">
+            <p ng-class="{true:'switchSelected', false:''}[contentsSwitch==1]" ng-click="clickSwitch(1)" class="switch_section--tab">订单管理</p>
+            <p ng-class="{true:'switchSelected', false:''}[contentsSwitch==2]" ng-click="clickSwitch(2)" class="switch_section--tab">积分兑换</p>
         </div>
-        <ul class="orderslist--titles">
-            <li>商品详情</li>
-            <li>数量</li>
-            <li>发货状态</li>
-            <li>合计（元）</li>
-            <li>状态</li>
-            <li>操作</li>
-        </ul>
-        <div class="orders--list" class="ng-cloak" ng-show="orderList.length>0">
-            <div class="single--order clearfix" ng-repeat="order in orderList | orderBy:'+createTime':true">
-                <div class="singleOrder--titleInfo">
-                    <span class="order--time" ng-cloak>{{order.createTime_local}}</span>
-                    <span class="order--number ng-cloak">订单号：{{order.id}}</span>
-                    <span class="order--deliveryMethod ng-cloak">{{order.deliveryType.value}}</span>
-                </div>
-                <div class="delivery--Info">
-                    <p ng-show="order.deliveryType.type==2" class="address ng-cloak">
-                        <img src="./images/express-position-icon.png" alt="">
-                        <span>{{order.consigneeAddress}}</span>
-                        <span>{{order.consigneeName}}，{{order.consigneePhone}}</span>
-                    </p>
-                    <p ng-show="order.deliveryType.type==1" class="address ng-cloak">
-                        <img src="./images/pickup-contact-icon.png" alt="">
-                        <span>{{order.consigneeName}}&nbsp;&nbsp;&nbsp;&nbsp;{{order.consigneePhone}}</span>
-                    </p>
-                </div>
-                <div class="singleOrder--body clearfix row">
-                    <div class="products--section row">
-                        <div class="left-section">
-                            <div class="order--secition row">
-                                <div class="products">
-                                    <ul>
-                                        <li class="product clearfix" ng-repeat="product in order.products">
-                                            <div class="p-info ng-cloak clearfix">
-                                                <div class="product-row">
-                                                    <div class="product--info">
-                                                        <div class="p-img">
-                                                            <a ng-if="!product.attributes" ng-href="productDetail.html?goodsId={{product.id}}" target="_blank">
-                                                                <img class="ng-cloak" ng-src={{product.thumbnail}}>
-                                                            </a>
-                                                            <a ng-if="product.attributes" ng-href="productDetail.html?goodsId={{product.productId}}" target="_blank">
-                                                                <img class="ng-cloak" ng-src={{product.thumbnail}}>
-                                                            </a>
-                                                        </div>
-                                                        <div class="p-name">
-                                                            <a ng-hide="product.productName" class="ng-cloak" ng-href="productDetail.html?goodsId={{product.id}}" ng-cloak target="_blank">{{product.name}}</a>
-                                                            <a ng-show="product.productName" class="ng-cloak" ng-href="productDetail.html?goodsId={{product.productId}}" ng-cloak target="_blank">{{product.productName}}</a>
-                                                            <div class="p-skus clearfix" ng-if="product.attributes">
-                                                                <ul>
-                                                                    <li ng-repeat="attribute in product.attributes">
-                                                                        {{attribute.name}}：{{attribute.value}};&nbsp;
-                                                                    </li>
-
-                                                                </ul>
+        <div class="rsc_mgmt_orders" ng-show="contentsSwitch==1">
+            <ul class="details_tab">
+                <li ng-repeat="showType in showTypes" ng-class="{true:'current', false:''}[showType.isSelected]"><a href="" ng-click='show(showType.id, $index, 1, true, orderSearchInput)' ng-cloak>{{showType.name}}</a></li>
+            </ul>
+            <div class="order--search" ng-show="showTypes[0].isSelected">
+                <input type="text" class="search--input" my-placeholder="收货人手机号/下单人手机号/订单号" placeholder="收货人手机号/下单人手机号/订单号" ng-model="orderSearchInput">
+                <a href="" class="search--btn" ng-click='show(showType.id, 0, 1, true, orderSearchInput)' >搜索</a>
+            </div>
+            <ul class="orderslist--titles">
+                <li>商品详情</li>
+                <li>数量</li>
+                <li>发货状态</li>
+                <li>合计（元）</li>
+                <li>状态</li>
+                <li>操作</li>
+            </ul>
+            <div class="orders--list" class="ng-cloak" ng-show="orderList.length>0">
+                <div class="single--order clearfix" ng-repeat="order in orderList | orderBy:'+createTime':true">
+                    <div class="singleOrder--titleInfo">
+                        <span class="order--time" ng-cloak>{{order.createTime_local}}</span>
+                        <span class="order--number ng-cloak">订单号：{{order.id}}</span>
+                        <span class="order--deliveryMethod ng-cloak">{{order.deliveryType.value}}</span>
+                    </div>
+                    <div class="delivery--Info">
+                        <p ng-show="order.deliveryType.type==2" class="address ng-cloak">
+                            <img src="./images/express-position-icon.png" alt="">
+                            <span>{{order.consigneeAddress}}</span>
+                            <span>{{order.consigneeName}}，{{order.consigneePhone}}</span>
+                        </p>
+                        <p ng-show="order.deliveryType.type==1" class="address ng-cloak">
+                            <img src="./images/pickup-contact-icon.png" alt="">
+                            <span>{{order.consigneeName}}&nbsp;&nbsp;&nbsp;&nbsp;{{order.consigneePhone}}</span>
+                        </p>
+                    </div>
+                    <div class="singleOrder--body clearfix row">
+                        <div class="products--section row">
+                            <div class="left-section">
+                                <div class="order--secition row">
+                                    <div class="products">
+                                        <ul>
+                                            <li class="product clearfix" ng-repeat="product in order.products">
+                                                <div class="p-info ng-cloak clearfix">
+                                                    <div class="product-row">
+                                                        <div class="product--info">
+                                                            <div class="p-img">
+                                                                <a ng-if="!product.attributes" ng-href="productDetail.html?goodsId={{product.id}}" target="_blank">
+                                                                    <img class="ng-cloak" ng-src={{product.thumbnail}}>
+                                                                </a>
+                                                                <a ng-if="product.attributes" ng-href="productDetail.html?goodsId={{product.productId}}" target="_blank">
+                                                                    <img class="ng-cloak" ng-src={{product.thumbnail}}>
+                                                                </a>
                                                             </div>
-                                                        </div>
-                                                        <div class="p-quantity ng-cloak">
-                                                            {{product.count}}
-                                                        </div>
+                                                            <div class="p-name">
+                                                                <a ng-hide="product.productName" class="ng-cloak" ng-href="productDetail.html?goodsId={{product.id}}" ng-cloak target="_blank">{{product.name}}</a>
+                                                                <a ng-show="product.productName" class="ng-cloak" ng-href="productDetail.html?goodsId={{product.productId}}" ng-cloak target="_blank">{{product.productName}}</a>
+                                                                <div class="p-skus clearfix" ng-if="product.attributes">
+                                                                    <ul>
+                                                                        <li ng-repeat="attribute in product.attributes">
+                                                                            {{attribute.name}}：{{attribute.value}};&nbsp;
+                                                                        </li>
 
-                                                        <div class="p-deliveryStatus">
-                                                            <p class="ng-cloak">{{product.deliverStatus | RSCdeliverStatusToChineseWording}}</p>
-                                                        </div>
-                                                        <div class="additions" ng-if="product.additions">
-                                                            <div class="">
-                                                                附加项目 ：
+                                                                    </ul>
+                                                                </div>
                                                             </div>
-                                                            <div class="addition-options">
+                                                            <div class="p-quantity ng-cloak">
+                                                                {{product.count}}
+                                                            </div>
+
+                                                            <div class="p-deliveryStatus">
+                                                                <p class="ng-cloak">{{product.deliverStatus | RSCdeliverStatusToChineseWording}}</p>
+                                                            </div>
+                                                            <div class="additions" ng-if="product.additions">
+                                                                <div class="">
+                                                                    附加项目 ：
+                                                                </div>
+                                                                <div class="addition-options">
                                                                     <span ng-repeat="addition in product.additions">
                                                                         {{addition.name}}&nbsp;;
                                                                     </span>
+                                                                </div>
                                                             </div>
                                                         </div>
+                                                        <div ng-show="$index==0" class="pay-info">
+                                                            <p class="now" ng-cloak>￥{{order.totalPrice}}</p>
+                                                            <!-- <p ng-cloak>{{order.payType}}</p> -->
+                                                        </div>
+                                                        <div ng-show="$index==0" class="pay-status">
+                                                            <p class="order-statusName" ng-cloak>{{order.type.value}}</p>
+                                                            <!-- <p class="duePrice" ng-show="order.duePrice">待付金额：￥{{order.duePrice.toFixed(2)}}</p> -->
+                                                        </div>
                                                     </div>
-                                                    <div ng-show="$index==0" class="pay-info">
-                                                        <p class="now" ng-cloak>￥{{order.totalPrice}}</p>
-                                                        <!-- <p ng-cloak>{{order.payType}}</p> -->
-                                                    </div>
-                                                    <div ng-show="$index==0" class="pay-status">
-                                                        <p class="order-statusName" ng-cloak>{{order.type.value}}</p>
-                                                        <!-- <p class="duePrice" ng-show="order.duePrice">待付金额：￥{{order.duePrice.toFixed(2)}}</p> -->
-                                                    </div>
-                                                </div>
 
-                                            </div>
-                                        </li>
-                                    </ul>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="pay-step" ng-show="order.subOrders.length>1">
+                                    <div class="pay-step-1"><span class="text-info">阶段一：订金</span><span class="pay-step-1-price">¥ {{order.subOrders[0].price.toFixed(2)}}</span><span class="pay_status">{{order.subOrders[0].payStatus | payStatusToChineseWording}}</span></div>
+                                    <div class="pay-step-2"><span class="text-info">阶段二：尾款</span><span class="pay-step-2-price">¥ {{ order.subOrders[1].price.toFixed(2)}}</span><span class="pay_status">{{order.subOrders[1].payStatus | payStatusToChineseWording}}</span></div>
                                 </div>
                             </div>
-                            <div class="pay-step" ng-show="order.subOrders.length>1">
-                                <div class="pay-step-1"><span class="text-info">阶段一：订金</span><span class="pay-step-1-price">¥ {{order.subOrders[0].price.toFixed(2)}}</span><span class="pay_status">{{order.subOrders[0].payStatus | payStatusToChineseWording}}</span></div>
-                                <div class="pay-step-2"><span class="text-info">阶段二：尾款</span><span class="pay-step-2-price">¥ {{ order.subOrders[1].price.toFixed(2)}}</span><span class="pay_status">{{order.subOrders[1].payStatus | payStatusToChineseWording}}</span></div>
+                            <div class="right-section pay-action">
+                                <p ng-show="{{order.showAction}}" ng-cloak><a href='' ng-click='order.action(order)' class="order-actionName">{{order.actionName}}</a></p>
                             </div>
-                        </div>
-                        <div class="right-section pay-action">
-                            <p ng-show="{{order.showAction}}" ng-cloak><a href='' ng-click='order.action(order)' class="order-actionName">{{order.actionName}}</a></p>
                         </div>
                     </div>
                 </div>
             </div>
+            <div class="rscMgmt--noOrders" ng-show="orderList.length==0">
+                <img src="./images/noOrder_icon.png" alt="">
+                <p ng-show="showTypes[0].isSelected && searchOrder">未找到符合条件的订单</p>
+                <p ng-show="!searchOrder">还没有相关订单</p>
+            </div>
         </div>
-        <div class="rscMgmt--noOrders" ng-show="orderList.length==0">
-            <img src="./images/noOrder_icon.png" alt="">
-            <p ng-show="showTypes[0].isSelected && searchOrder">未找到符合条件的订单</p>
-            <p ng-show="!searchOrder">还没有相关订单</p>
+        <div class="rsc_mgmt_gift_orders" ng-show="contentsSwitch==2">
+            <ul class="details_tab">
+                <li ng-repeat="type in pointsTypes" ng-class="{true:'current', false:''}[type.isSelected]"><a href="" ng-click='pointsSelectTab($index)' ng-cloak>{{type.name}}</a></li>
+            </ul>
+            <div class="order--search" ng-show="pointsTypes[0].isSelected">
+                <input type="text" class="search--input" my-placeholder="姓名/手机号" placeholder="姓名/手机号" ng-model="giftOrderSearchInput">
+                <a href="" class="search--btn" ng-click='getGiftOrders(type.id, giftOrderSearchInput,1,20 )' >搜索</a>
+            </div>
+            <ul class="giftOrderslist--titles">
+                <li>商品详情</li>
+                <li>所用积分</li>
+                <li>订单状态</li>
+                <li>操作</li>
+            </ul>
+            <div class="orders--list gifts--list" class="ng-cloak" ng-show="giftOrderList.length>0">
+                <div class="single--order clearfix" ng-repeat="order in giftOrderList | orderBy:'+dateCreated':true">
+                    <div class="singleOrder--titleInfo">
+                        <span class="order--time" ng-cloak>{{order.createTime_local}}</span>
+                        <span class="order--deliveryMethod ng-cloak">{{order.deliveryType == 1?'网点自提':'配送到户'}}</span>
+                    </div>
+                    <div class="delivery--Info">
+                        <p ng-show="order.deliveryType == 1" class="address ng-cloak">
+                            <img src="./images/pickup-contact-icon.png" alt="">
+                            <span>{{order.consigneeName}}&nbsp;&nbsp;&nbsp;&nbsp;{{order.consigneePhone}}</span>
+                        </p>
+                    </div>
+                    <div class="singleOrder--body clearfix row">
+                        <div class="gift--info">
+                            <div class="g-img">
+                                <a ng-href="" target="_blank">
+                                    <img class="ng-cloak" ng-src={{order.gift.thumbnail}}>
+                                </a>
+                            </div>
+                            <div class="g-name">
+                                <a class="ng-cloak" ng-href="" ng-cloak target="_blank">{{order.gift.name}}</a>
+                            </div>
+                        </div>
+                        <div class="points_used">
+                            {{order.gift.points}}
+                        </div>
+                        <div class="gift_status">
+                            {{order.orderStatus.value}}
+                        </div>
+                        <div class="gift_action">
+                            <p ng-show="{{order.showAction}}" ng-cloak>
+                                <a href='' ng-click='order.action(order)' class="order-actionName">{{order.actionName}}</a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="rscMgmt--noOrders" ng-show="giftOrderList.length==0">
+                <img src="./images/noPointsOrder_icon.png" alt="">
+                <p ng-show="pointsTypes[0].isSelected && searchOrder">未找到符合条件的积分订单</p>
+                <p ng-show="!searchOrder">还没有相关积分订单</p>
+            </div>
         </div>
     </div>
     <div class="xxnr--pager">
@@ -197,8 +264,9 @@
             <ul class="row">
                 <li ng-hide="current_page==1" class="pre_btn"><a href="" ng-click="pre_page()"><em class="ban ban_8_0">&nbsp;</em></a></li>
                 <li ng-repeat="page in pages"><a href="" ng-click="show_page(page.id)" ng-class="{true:'current', false:''}[page.isSelected]">{{page.id}}</a></li>
-                <li ng-hide="current_page==pageCount || orderList.length==0" class="next_btn"><a href="" ng-click="next_page()"><em class="ban ban_9_0">&nbsp;</em></a></li>
+                <li ng-hide="current_page==pageCount || orderList.length==0 || giftOrderList.length==0" class="next_btn"><a href="" ng-click="next_page()"><em class="ban ban_9_0">&nbsp;</em></a></li>
             </ul>
+
         </div>
     </div>
 
@@ -287,6 +355,34 @@
         <div class="pop--buttons">
             <a href="" ng-show="pickingUp_step == 1" class="pop--button pop--confirm_btn" ng-class="{true:'pop--confirm_btn--active'}[pickingUpSKU_refs.length > 0]"  ng-click="RSC_pickingUp_nextStep()">下一步 <span ng-show="pickingUpSKU_refs.length>0">（{{SKU_number(pickingUpSKUs,pickingUpSKU_refs)}}）</span></a>
             <a href="" ng-show="pickingUp_step == 2" class="pop--button pop--pickupCode_confirm_btn" ng-class="{true:'pop--confirm_btn--active'}[pickUpCode.length == 7]"  ng-click="RSC_pickingUp_checkCode()">确定</a>
+            <!--<a href="" class="pop&#45;&#45;button pop&#45;&#45;cancel_bth" ng-click="closePop()">取消</a>-->
+        </div>
+    </div>
+
+    <div class="pop--mask ng-hide" ng-show="showRSC_Gift_Pickup" ng-cloak></div>
+    <div class="action--pop RSC_Pickup--pop RSC_Pickup_Gift--pop ng-hide" ng-show="showRSC_Gift_Pickup">
+        <div class="pop--title">
+            <span>客户自提</span>
+            <img class="pop--close" ng-click="closePop()" src="./images/close.gif" alt="">
+        </div>
+        <div class="pop--body">
+            <div class="pickup_gift--Consignee">
+                <p>收货人 <span>{{pickingUpGiftConsigneeName}}</span></p>
+                <p>手机号 <span>{{pickingUpGiftConsigneePhone}}</span></p>
+            </div>
+            <div class="pickUpCode pickUpGiftCode">
+                <div class="inputPickUpCode inputPickUpGiftCode">
+                    <span>自提码</span>
+                    <input class="code" type="text" ng-model="pickUpGiftCode" maxlength="7" ng-focus="focusShowValidate()">
+                    <div class="rsc_pickup_err rsc_pickup_gift_err ng-cloak" ng-show="RSC_pickingUp_errMsg">
+                        <img src="../xxnr/images/login_fault.png" alt="" />
+                        <span>{{RSC_pickingUp_errMsg}}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="pop--buttons">
+            <a href="" class="pop--button pop--pickupGiftCode_confirm_btn" ng-class="{true:'pop--confirm_btn--active'}[pickUpGiftCode.length == 7]"  ng-click="RSC_pickingUp_gift_checkCode()">确定</a>
             <!--<a href="" class="pop&#45;&#45;button pop&#45;&#45;cancel_bth" ng-click="closePop()">取消</a>-->
         </div>
     </div>

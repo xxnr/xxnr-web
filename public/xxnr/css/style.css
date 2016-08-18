@@ -3197,7 +3197,6 @@ body {
     position: relative;
     z-index: 5;
     vertical-align: middle;
-    _vertical-align: -1px;
     margin: 0 3px 0 0;
     padding: 0;
 }
@@ -4134,9 +4133,13 @@ body {
 .jifen_box .jifen .num {
     font-size: 28px;
     font-family: "Arial";
-    color: #ff6700;
+    color: #FEA121;
     display: inline-block;
     vertical-align:middle;
+    cursor: pointer;
+}
+.jifen_box .jifen .num:hover {
+    color: #FF6700;
 }
 .jifen_box .jifen .jifen_input .input {
     width: 220px;
@@ -5959,9 +5962,23 @@ body {
     color: #909090;
     margin-top: -10px;
 }
+.order-detail-section .order .order-info .order-statusName img{
+    margin-top: 15px;
+}
+.order-detail-section .order .order-info .order-statusName .points_text{
+    color: #323232;
+    font-size: 12px;
+    margin-right: 3px;
+    padding-left: 3px;
+}
+.order-detail-section .order .order-info .order-statusName .points_number{
+    padding-left: 0px;
+    color: #FF4E00;
+}
 .order-detail-section .order .order-info .order-statusName span {
-    padding-left: 10px;
+    /*padding-left: 10px;*/
     color: #FE9B00;
+    margin-right: 40px;
 }
 .order-detail-section .order .order-info .pickupCode{
     color: #FE9B00;
@@ -7976,13 +7993,51 @@ body {
 .rsc_mgmt{
     background: #F0F0F0;
     padding-top: 20px;
+    position: relative;
 }
-
-.rsc_mgmt_body{
+.rsc_mgmt_body .switch_section{
+    position: absolute;
+    /*margin-left: -160px;*/
+    z-index: 4;
+    width: 130px;
+    height: 100px;
     background: #FFFFFF;
+    color: #323232;
+
+}
+.rsc_mgmt_body .switch_section p{
+    height: 50px;
+    line-height: 50px;
+    text-align: center;
+    cursor: pointer;
+}
+.rsc_mgmt_body .switch_section .switchSelected{
+    color: #008A2F;
+}
+.rsc_mgmt_body{
+
+
+
+
+    /*transform: translate(70px);*/
+}
+.rsc_mgmt_body .rsc_mgmt_orders{
     padding: 0 20px;
     padding-bottom: 20px;
+    background: #FFFFFF;
     box-sizing: border-box;
+    position: relative;
+    width: 1060px;
+    margin-left: 140px;
+}
+.rsc_mgmt_body .rsc_mgmt_gift_orders{
+    padding: 0 20px;
+    padding-bottom: 20px;
+    background: #FFFFFF;
+    box-sizing: border-box;
+    position: relative;
+    width: 1060px;
+    margin-left: 140px;
 }
 /*order--search component used in rsc_management page*/
 .order--search{
@@ -8029,25 +8084,142 @@ body {
     margin-left: -4px;
 }
 .orderslist--titles li:first-child {
-    width: 440px;
+    width: 400px;
     padding-left: 30px;
     text-align: left;
     box-sizing: border-box;
 }
 .orderslist--titles li:nth-child(2) {
-    width: 120px;
-}
-.orderslist--titles li:nth-child(3) {
     width: 100px;
 }
+.orderslist--titles li:nth-child(3) {
+    width: 110px;
+}
 .orderslist--titles li:nth-child(4) {
-    width: 160px;
+    width: 130px;
 }
 .orderslist--titles li:nth-child(5) {
-    width: 180px;
+    width: 140px;
 }
 .orderslist--titles li:nth-child(6) {
+    width: 138px;
+}
+.giftOrderslist--titles {
+    height: 50px;
+    margin-bottom: 20px;
+    border: 1px solid #E0E0E0;
+    background: #F0F0F0;
+    box-sizing: border-box;
+    color:#333333;
+}
+.giftOrderslist--titles li {
+    display: inline-block;
+    width: 132px;
+    line-height: 50px;
+    text-align: center;
+    margin-left: -4px;
+}
+.giftOrderslist--titles li:first-child {
+    width: 520px;
+    padding-left: 30px;
+    text-align: left;
+    box-sizing: border-box;
+}
+.giftOrderslist--titles li:nth-child(2) {
+    width: 160px;
+}
+.giftOrderslist--titles li:nth-child(3) {
+    width: 180px;
+}
+.giftOrderslist--titles li:nth-child(4) {
+    width: 160px;
+}
+.gifts--list .gift--info{
+    width: 520px;
+    border-right: 1px solid #E0E0E0;
+    padding-bottom: 14px;
+    border-top: 1px solid #E0E0E0;
+    float: left;
+    box-sizing: border-box;
+    height: 136px;
+    overflow: hidden;
+}
+.gifts--list .gift--info .g-img {
+    overflow: hidden;
+    display: inline-block;
+    float: left;
+    box-sizing: border-box;
+
+}
+.gifts--list .gift--info .g-img img {
+    width: 100px;
+    height: 100px;
+    margin-left: 14px;
+    margin-top: 20px;
+    border: 1px solid #e0e0e0;
+}
+.gifts--list .gift--info .g-name {
+    font-size: 14px;
+    height: 100%;
+    line-height: 20px;
+    padding-top: 20px;
+    width: 330px;
+    /*padding-right: 70px;*/
+    display: inline-block;
+    float: left;
+    margin-left: 14px;
+    box-sizing: border-box;
+
+}
+.gifts--list .gift--info .g-name a {
+    width: 316px;
+    overflow: hidden;
+    display: block;
+}
+.gifts--list .points_used {
+    width: 160px;
+    border-right: 1px solid #E0E0E0;
+    padding-bottom: 14px;
+    border-top: 1px solid #E0E0E0;
+    float: left;
+    height: 137px;
+    box-sizing: border-box;
+    text-align: center;
+    padding-top: 20px;
+}
+.gifts--list .gift_status {
+    width: 180px;
+    border-right: 1px solid #E0E0E0;
+    padding-bottom: 14px;
+    border-top: 1px solid #E0E0E0;
+    float: left;
+    height: 137px;
+    box-sizing: border-box;
+    text-align: center;
+    padding-top: 20px;
+}
+.gifts--list .gift_action {
     width: 158px;
+    padding-bottom: 14px;
+    border-top: 1px solid #E0E0E0;
+    float: left;
+    height: 137px;
+    box-sizing: border-box;
+    text-align: center;
+    padding-top: 20px;
+}
+.gifts--list .gift_action a.order-actionName {
+    max-width: 140px;
+    height: 30px;
+    background: #fe9b00;
+    border: 1px solid #fe9b00;
+    color: #fff;
+    display: inline-block;
+    line-height: 30px;
+    margin: 0 auto;
+    border-radius: 5px;
+    margin-bottom: 8px;
+    padding: 0 15px;
 }
 .orders--list{
     min-height: 500px;
@@ -8066,6 +8238,7 @@ body {
     box-sizing: border-box;
     border-left: 1px solid #e0e0e0;
     border-right: 1px solid #e0e0e0;
+    overflow: hidden;
 }
 .single--order .delivery--Info .address img{
     margin-top: 8px;
@@ -8088,7 +8261,7 @@ body {
     display: inline-block;
 }
 .singleOrder--titleInfo .order--number {
-    width: 255px;
+    width: 205px;
     display: inline-block;
 }
 .singleOrder--titleInfo .order--deliveryMethod{
@@ -8102,13 +8275,13 @@ body {
     border-top: 0px;
 }
 .singleOrder--body .left-section{
-    width: 1000px;
+    width: 880px;
     display: inline-block;
     float: left;
     border-right: 1px solid #e0e0e0;
 }
 .singleOrder--body .right-section{
-    width: 157px;
+    width: 137px;
     display: inline-block;
     float: left;
     padding-top: 20px;
@@ -8133,7 +8306,7 @@ body {
     /*position: relative;*/
 }
 .products--section .product .product-row .product--info{
-    width: 660px;
+    width: 610px;
     border-right: 1px solid #E0E0E0;
     padding-bottom: 14px;
     border-top: 1px solid #E0E0E0;
@@ -8155,7 +8328,7 @@ body {
     height: 100%;
     line-height: 20px;
     padding-top: 20px;
-    width: 330px;
+    width: 290px;
     /*padding-right: 70px;*/
 }
 .products--section .product .p-info .p-name a {
@@ -8195,7 +8368,7 @@ body {
     margin-left: -1px;
 }
 .products--section .product .p-info .p-deliveryStatus {
-    width: 100px;
+    width: 110px;
     height: 110px;
     padding-top: 20px;
     box-sizing: border-box;
@@ -8204,7 +8377,7 @@ body {
 .products--section .product .p-info .p-quantity {
     height: 100px;
     padding-top: 20px;
-    width: 120px;
+    width: 100px;
     text-align: center;
 }
 
@@ -8233,25 +8406,25 @@ body {
     box-sizing: border-box;
 }
 .products--section .pay-step .pay-step-1 span.text-info {
-    width: 643px;
+    width: 593px;
     display: inline-block;
 }
 .products--section .pay-step .pay-step-2 span.text-info {
-    width: 643px;
+    width: 593px;
     display: inline-block;
 }
 .products--section .pay-step .pay-step-1 .pay-step-1-price {
-    width: 160px;
+    width: 130px;
     text-align: center;
     display: inline-block;
 }
 .products--section .pay-step .pay-step-2 .pay-step-2-price {
-    width: 160px;
+    width: 130px;
     text-align: center;
     display: inline-block;
 }
 .products--section .pay-step .pay_status {
-    width: 178px;
+    width: 138px;
     text-align: center;
     display: inline-block;
 }
@@ -8269,7 +8442,7 @@ body {
 }
 .singleOrder--body .order--secition .products{
     position: relative;
-    width: 821px;
+    width: 752px;
 }
 .singleOrder--body .order--secition div {
     float: left;
@@ -8277,7 +8450,7 @@ body {
 .singleOrder--body .order--secition .pay-info {
     box-sizing: border-box;
     margin-left: 0px;
-    width: 160px;
+    width: 130px;
     border-top: 1px solid #e0e0e0;
     text-align: center;
     padding-top: 20px;
@@ -8286,7 +8459,7 @@ body {
 }
 .singleOrder--body .order--secition .pay-status {
     box-sizing: border-box;
-    width: 179px;
+    width: 139px;
     border-left: 1px solid #e0e0e0;
     border-top: 1px solid #e0e0e0;
     padding-top: 20px;
@@ -8295,7 +8468,7 @@ body {
     position: absolute;
     height: 100%;
     right: 0;
-    margin-right: -180px;
+    margin-right: -128px;
 }
 /*.singleOrder--body .pay--section .pay-status .duePrice {*/
     /*font-size: 12px;*/
@@ -8513,6 +8686,12 @@ body {
     line-height: 40px;
     cursor: not-allowed;
 }
+.pop--pickupGiftCode_confirm_btn{
+     width: 160px;
+     height: 40px;
+     line-height: 40px;
+     cursor: not-allowed;
+ }
 .pop--confirm_btn--active{
     background: #FE9B00;
     cursor: pointer;
@@ -8593,15 +8772,39 @@ body {
     margin-left: -340px;
     margin-top: -235px;
 }
+.RSC_Pickup_Gift--pop {
+    width: 468px;
+    height: 360px;
+    margin-left: -234px;
+    margin-top: -180px;
+}
 .pop--body .pickUpCode{
     width: 640px;
     /*margin-left: 20px;*/
     height: 344px;
     /*padding-top: 16px;*/
 }
+.pop--body .pickUpGiftCode{
+    height: 130px;
+    width: 450px;
+}
+.pop--body .inputPickUpGiftCode{
+    margin: auto;
+    padding-left: 0px;
+    margin-top: 30px;
+}
+.pop--body .pickup_gift--Consignee p{
+    margin-top: 30px;
+}
+.pop--body .pickup_gift--Consignee p span{
+    margin-left: 56px;
+}
 .pop--body .pickUpCode span{
     display: inline-block;
     margin-right: 28px;
+}
+.pop--body .pickUpGiftCode span {
+    margin-right: 56px;
 }
 .pop--body input{
     height: 30px;
@@ -8629,6 +8832,10 @@ body {
     line-height: 24px;
     border-radius: 4px;
     margin-left: 116px;
+}
+.inputPickUpCode .rsc_pickup_gift_err{
+    margin-left: 98px;
+    padding-top: 5px;
 }
 .inputPickUpCode .rsc_pickup_err img{
     padding-top: 4px;
@@ -8677,4 +8884,111 @@ body {
     font-size: 16px;
     text-align: center;
     color: #909090;
+}
+
+.pointsRecording {
+    padding: 20px 0;
+}
+.pointsRecording_section{
+    padding: 40px;
+    border: 1px solid #e2e2e2;
+    background: #FFFFFF;
+    box-sizing: border-box;
+}
+
+.single_recording > div {
+    display: inline-block;
+}
+
+.pointsRecording_section .my_points{
+    margin-bottom: 16px;
+    font-size: 16px;
+    color: #323232;
+}
+.pointsRecording_section .my_points span{
+    color: #FF6700;
+}
+.pointsRecording_section .recordings_title {
+    background: #F0F0F0;
+    color: #323232;
+    font-size: 16px;
+    height: 50px;
+    line-height: 50px;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+}
+
+.pointsRecording_section .recordings_title li:nth-child(1) {
+    width: 240px;
+    text-align: center;
+    box-sizing: border-box;
+}
+.pointsRecording_section .recordings_title li:nth-child(2) {
+    width: 200px;
+    padding-left: 20px;
+    box-sizing: border-box;
+
+}
+.pointsRecording_section .recordings_title li:nth-child(3) {
+    width: 420px;
+    padding-left: 20px;
+    box-sizing: border-box;
+}
+.pointsRecording_section .recordings_title li:nth-child(4) {
+    width: 240px;
+    text-align: center;
+    box-sizing: border-box;
+}
+.pointsRecording_section .all_recordings{
+    border: 1px solid #E0E0E0;
+    box-sizing: border-box;
+}
+.pointsRecording_section .single_recording{
+    height: 44px;
+    line-height: 44px;
+    border-top: 1px solid #E0E0E0;
+    box-sizing: border-box;
+    color: #323232;
+}
+.pointsRecording_section .single_recording:first-child{
+    border-top: 0px solid #E0E0E0;
+}
+.pointsRecording_section .all_recordings .single_recording:nth-child(even) {
+    background: #f8f8f8;
+}
+.pointsRecording_section .single_recording div:nth-child(1){
+    width: 240px;
+    text-align: center;
+    border-right: 1px solid #E0E0E0;
+    box-sizing: border-box;
+}
+.pointsRecording_section .single_recording div:nth-child(2){
+    width: 200px;
+    padding-left: 20px;
+    border-right: 1px solid #E0E0E0;
+    box-sizing: border-box;
+}
+.pointsRecording_section .single_recording div:nth-child(3){
+    width: 420px;
+    padding-left: 20px;
+    border-right: 1px solid #E0E0E0;
+    box-sizing: border-box;
+}
+.pointsRecording_section .single_recording div:nth-child(4){
+    width: 240px;
+    text-align: center;
+    box-sizing: border-box;
+}
+.no_pointslogs img{
+    display: block;
+    margin: auto;
+    margin-top: 200px;
+}
+.no_pointslogs span{
+    display: block;
+    margin: auto;
+    margin-bottom: 200px;
+    margin-top: 20px;
+    color: #909090;
+    text-align: center;
 }

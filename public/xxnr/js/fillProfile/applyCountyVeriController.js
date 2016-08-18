@@ -148,7 +148,7 @@ app.controller('applyCountyController', function($scope, remoteApiService, commo
                 if (data.code == 1000) {
                     //sweetalert('县级网点资料保存成功', 'my_xxnr.html');
                     var message = '<img class="xxnr--flash--icon" src="images/correct_prompt.png" alt="">县级网点资料保存成功';
-                    var id = Flash.create('success', message, 3000, {class: 'xxnr-success-flash', id: 'xxnr-success-flash'}, false);
+                    var id = Flash.create('success', message, 3000, {"class": 'xxnr-success-flash', "id": 'xxnr-success-flash'}, false);
                     $timeout(function(){
                         window.location.href = "/my_xxnr.html";
                         return false
@@ -156,7 +156,7 @@ app.controller('applyCountyController', function($scope, remoteApiService, commo
                 } else {
                     //sweetalert(data.message, 'my_xxnr.html');
                     var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">'+data.message;
-                    var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);
+                    var id = Flash.create('success', message, 3000, {"class": 'xxnr-warning-flash', "id": 'xxnr-warning-flash'}, false);
                     $timeout(function(){
                         window.location.href = "/my_xxnr.html";
                         return false
