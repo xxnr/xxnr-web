@@ -533,7 +533,7 @@ gulp.task('points_recording_js_minify', function() {
             './js/headerController.js',
             './js/sideService.js',
             './js/myPlaceholderDirective.js'])
-        .pipe(concat('points_recording_js.js'))
+        .pipe(concat('pointsRecording_js.js'))
         .pipe(ngmin())
         .pipe(uglify({mangle: false}))
         .pipe(gulp.dest('./dev/js'))
