@@ -3,7 +3,7 @@
     <img src="/assets/images/gift_order_success.png">
   </div>
   <div class="order-done-tip1">
-    兑换码: <span class="order-done-code">{{giftOrderDetail.deliveryCode}}</span> 请凭兑换码到网点字体
+    兑换码: <span class="order-done-code">{{giftOrderDetail.deliveryCode}}</span> 请凭兑换码到网点自提
   </div>
   <div class="order-done-tip2">
     您也可在 我的新农人->积分商城->兑换记录 中查看

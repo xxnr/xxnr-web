@@ -118,6 +118,10 @@ export const goBack = ({dispatch,state}) => {
   } else if( window.location.pathname.indexOf('pointsLogs') != -1) {
     router.go('/rewardShop')
   } else if(window.location.pathname.indexOf('giftOrder') != -1) {
+    if(window.location.pathname.indexOf('giftOrderDone') != -1) {
+      router.go('/giftDetail?id=' + getUrlParam('giftId'));
+      return;
+    }
     router.go('/giftDetail?id='+ getUrlParam('giftId'));
   } else if(window.location.pathname.indexOf('giftDetail') != -1) {
     router.go('/rewardShop');

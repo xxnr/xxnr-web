@@ -17,7 +17,20 @@
 
 <script>
   export default {
-    props: ['gifts']
+    props: ['gifts'],
+    methods: {
+      setGiftStyle: function() {
+        var width = document.documentElement.clientWidth;
+        width = width * 0.96;
+        var boxWidth = (width * 0.98) / 2;
+        var imgWidth = boxWidth - 60;
+        $(".gift-box").css('width', boxWidth + 'px');
+        $(".gift-box .gift-img").css('width',imgWidth + 'px');
+      }
+    },
+    ready(){
+      this.setGiftStyle();
+    }
   }
 </script>
 
@@ -27,7 +40,7 @@
     float: left;
     width: 49%;
     background-color: #fff;
-    border: 1px solid #c7c7c7;
+    border: 1px solid #e2e2e2;
     box-sizing: border-box;
     margin-bottom: 9px;
     padding: 0 6px;
@@ -38,12 +51,12 @@
   }
 
   .gift-img {
-    height: 120px;
-    text-align: center;
+    width: 120px;
+    margin: 0 auto;
   }
 
   .gift-img img {
-    width: 120px;
+    width: 100%;
   }
 
   .gift-name {
@@ -84,6 +97,6 @@
     font-size: 12px;
     border-radius: 2px;
     margin-top: 12px;
-    margin-left: 25px;
+    margin-left: 20px;
   }
 </style>

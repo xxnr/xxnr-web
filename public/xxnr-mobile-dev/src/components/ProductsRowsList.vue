@@ -39,14 +39,14 @@
     height: 100px;
     position: relative;
     padding: 8px 0;
-    border-bottom: 1px solid #c7c7c7;
+    border-bottom: 1px solid #e2e2e2;
   }
 
   .product-img {
     position: absolute;
     width: 100px;
     height: 100px;
-    border: 1px solid #c7c7c7;
+    border: 1px solid #e2e2e2;
   }
 
   .product-img img {

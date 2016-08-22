@@ -5,11 +5,17 @@
       <div class="order-rsc" v-link="{path: rscLink}">
         <div class="order-rsc-bit"></div>
         <span v-if="!orderRSC.address">订单中的商品将配送至服务站，请选择自提网点</span>
+        <div class="order-address-arrow" v-if="!orderRSC.address">
+          <img src="/assets/images/arrow.png">
+        </div>
         {{orderRSC.address}}
       </div>
       <div class="order-consignee" v-link="{path: consigneeLink}">
         <div class="order-consignee-bit"></div>
         <span v-if="!orderConsignee.consigneePhone">请填写收货人信息</span>
+        <div class="order-address-arrow" v-if="!orderConsignee.consigneePhone">
+          <img src="/assets/images/arrow.png">
+        </div>
         {{orderConsignee.consigneeName}}
         {{orderConsignee.consigneePhone}}
       </div>
@@ -46,7 +52,7 @@
   .order-rsc, .order-consignee {
     position: relative;
     line-height: 15px;
-    padding: 10px 0 10px 25px;
+    padding: 10px 0 10px 18px;
     min-height: 15px;
   }
 
@@ -82,5 +88,16 @@
     width: 100%;
     height: 3px;
     background: url('/static/assets/images/order_line_bottom.png') 0 0 repeat-x;
+  }
+
+  .order-address-arrow {
+    position: absolute;
+    right: 2%;
+    width: 8px;
+    top: 11px;
+  }
+
+  .order-address-arrow img {
+    width: 100%;
   }
 </style>

@@ -16,7 +16,7 @@
           </div>
         </div>
         <div class="clear"></div>
-        <div class="order-arrow" @click="showCode($index);" :class="{rotate180: $index == showIndex}" v-if="order.orderStatus.type != 0 && order.orderStatus.type != 4">
+        <div class="order-arrow" :class="{rotate180: $index == showIndex}" v-if="order.orderStatus.type != 0 && order.orderStatus.type != 4">
           <img src="/assets/images/order-arrow.png">
         </div>
       </div>
@@ -81,16 +81,26 @@
           return;
         }
         this.showIndex = index;
+        this.getScrollTop($(".order-item").eq(index)[0].offsetTop - 47);
       },
       hideCode: function () {
         this.showIndex = -1;
       },
       toggleCode: function(index) {
-        if(this.showIndex == -1) {
-          this.showCode(index);
+//        if(this.showIndex == -1) {
+//          this.showCode(index);
+//          return;
+//        }
+//        this.hideCode();
+        if(index == this.showIndex) {
+          this.hideCode();
           return;
         }
-        this.hideCode();
+
+        this.showCode(index);
+      },
+      getScrollTop: function(top) {
+        this.$dispatch('getScrollTopParents', top);
       }
     }
   }
@@ -100,7 +110,7 @@
   .order-item {
     background-color: #fff;
     margin-bottom: 10px;
-    border-top: 1px solid #c7c7c7;
+    border-top: 1px solid #e0e0e0;
   }
 
   .order-line {
@@ -117,20 +127,20 @@
   }
 
   .order-gift-info {
-    position: absolute;
-    left: 0;
+    /*position: absolute;*/
+    /*left: 0;*/
   }
 
   .order-gift-info-con {
     margin-left: 105px;
-    height: 90px;
+    /*height: 90px;*/
   }
 
   .order-gift-img {
     float: left;
     width: 90px;
     height: 90px;
-    border: 1px solid #c7c7c7;
+    border: 1px solid #e0e0e0;
   }
 
   .order-gift-img img {
@@ -138,14 +148,14 @@
   }
 
   .order-gift-name {
-    font-size: 16px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
+    /*font-size: 16px;*/
+    /*overflow: hidden;*/
+    /*text-overflow: ellipsis;*/
+    /*display: -webkit-box;*/
+    /*-webkit-line-clamp: 2;*/
+    /*-webkit-box-orient: vertical;*/
     line-height: 22px;
-    height: 44px;
+    /*height: 44px;*/
   }
 
   .order-gift-point {
@@ -159,8 +169,8 @@
   .order-gift-con {
     position: relative;
     padding: 15px 2%;
-    border-top: 1px solid #c7c7c7;
-    border-bottom: 1px solid #c7c7c7;
+    border-top: 1px solid #e0e0e0;
+    border-bottom: 1px solid #e0e0e0;
   }
 
   .order-orange {
@@ -210,7 +220,7 @@
   }
 
   .order-address-consignee {
-    border-top: 1px solid #c7c7c7;
+    border-top: 1px solid #e0e0e0;
   }
 
   .order-arrow {
@@ -227,7 +237,7 @@
   }
 
   .order-list-box {
-    padding-top: 50px;
+    padding-top: 47px;
   }
 
   .order-unsupport {

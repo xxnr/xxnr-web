@@ -18,29 +18,10 @@
 <script>
     export default{
       props:['canBackToTop'],
-      data: function () {
-        return {
-          windowOffsetTop: $(window)[0].pageYOffset
-        }
-      },
       methods: {
         backToTop:function(){
           this.canBackToTop = 0;
           this.$dispatch('backToTopParent');
-        }
-      },
-      created () {
-        let that = this;
-        $(window).on('scroll',function(){
-          that.windowOffsetTop = $(window)[0].pageYOffset;
-        });
-      },
-      route: {
-        activate() {
-          let that = this;
-          $(window).on('scroll',function(){
-            that.windowOffsetTop = $(window)[0].pageYOffset;
-          });
         }
       }
     }

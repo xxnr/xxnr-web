@@ -19,7 +19,6 @@ const mutations = {
     state.user = user;
   },
   [GET_USERINFO](state,userInfo){
-    //console.log(user);
     state.userInfo = userInfo;
   },
   [GET_INVITERINFO](state, inviterInfo) {

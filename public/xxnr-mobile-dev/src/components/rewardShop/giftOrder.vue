@@ -129,8 +129,8 @@
     font-size: 14px;
     padding: 0 2%;
     line-height: 45px;
-    border-top: 1px solid #c7c7c7;
-    border-bottom: 1px solid #c7c7c7;
+    border-top: 1px solid #e2e2e2;
+    border-bottom: 1px solid #e2e2e2;
   }
 
   .order-gift-img {
@@ -138,7 +138,7 @@
     width: 90px;
     height: 90px;
     overflow: hidden;
-    border: 1px solid #c7c7c7;
+    border: 1px solid #e2e2e2;
   }
 
   .order-gift-img img {
@@ -168,7 +168,7 @@
 
   .order-gift {
     padding: 15px 0;
-    border-bottom: 1px solid #c7c7c7;
+    border-bottom: 1px solid #e2e2e2;
   }
 
   .order-gift-point {
