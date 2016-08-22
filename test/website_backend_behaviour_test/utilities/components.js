@@ -13,7 +13,7 @@ var extend = require('extend');
 var fs = require('fs');
 var path = require('path');
 
-exports.prepare_SKU = function(backend_admin_token, brand_index, category, product_index, SKU, SKU_index, done){
+exports.prepare_SKU = function(backend_admin_token, brand_index, category, product_index, SKU, SKU_index, done, product_attributes){
     if(!done){
         done = SKU_index;
         SKU_index = 0;
@@ -27,10 +27,14 @@ exports.prepare_SKU = function(backend_admin_token, brand_index, category, produ
         var imgUrl = regex.exec(body[0])[1];
         Routing.Product.query_brands(test_data.category_id[test_product_data.category], backend_admin_token, function (body) {
         var brand = body.brands[brand_index];
-        Routing.Product.save_product(utils.extend(test_product_data, {
+        var extendValues = {
             brand: brand._id,
             pictures: [imgUrl]
-        }), backend_admin_token, function (body) {
+        };
+        if (product_attributes) {
+            extendValues.attributes = product_attributes;
+        }
+        Routing.Product.save_product(utils.extend(test_product_data, extendValues), backend_admin_token, function (body) {
             body.should.have.property('code', 1000);
             var product = body.product;
             Routing.Product.query_SKU_attributes(test_data.category_id[category], brand._id, backend_admin_token, function (body) {
