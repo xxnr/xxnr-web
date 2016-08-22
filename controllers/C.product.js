@@ -5,6 +5,7 @@ var services = require('../services');
 var ProductService = services.product;
 var SKUService = services.SKU;
 var BrandService = services.brand;
+var NominateCategoryService = services.nominate_category;
 var converter = require('../common/converter');
 var api10 = converter.api10;
 exports.install = function(){
@@ -191,5 +192,12 @@ exports.json_SKU_get = function(req, res, next){
 };
 
 exports.get_nominate_category = function(req, res, next){
+    NominateCategoryService.query({online:true}, function(err, nominate_categories){
+        if(err){
+            res.respond({code:1001, message:'获取推荐类目失败'});
+            return;
+        }
 
+        res.respond({code:1000, nominate_categories:nominate_categories});
+    })
 };

@@ -27,6 +27,7 @@ var DELIVERYTYPE =  require('../common/defs').DELIVERYTYPE;
 var config = require('../config');
 var path = require('path');
 var CampaignService = services.Campaign;
+var NominateCategoryService = services.nominate_category;
 var URL = require('url');
 
 exports.install = function() {
@@ -3130,5 +3131,89 @@ exports.campaign_detail_quiz = function(req, res, next){
 				err:err,
 				QA:QA || []
 			})
+	})
+};
+
+exports.create_nominate_category = function(req, res, next){
+	var nominate_category = req.data.nominate_category;
+	if(!nominate_category){
+		res.respond({code:1001, message:'nominate_category required'});
+		return;
+	}
+
+	NominateCategoryService.create(nominate_category, function(err, nominate_category){
+		if(err){
+			res.respond({code:1001, message:'创建推荐类目失败'});
+			return;
+		}
+
+		res.respond({code:1000, nominate_category:nominate_category});
+	})
+};
+
+exports.modify_nominate_category = function(req, res, next){
+	var nominate_category = req.data.nominate_category;
+	if(!nominate_category){
+		res.respond({code:1001, message:'nominate_category required'});
+		return;
+	}
+
+	if(!nominate_category._id){
+		res.respond({code:1001, message:'nominate_category._id required'});
+		return;
+	}
+
+	NominateCategoryService.modify(nominate_category, function(err, nominate_category){
+		if(err){
+			res.respond({code:1001, message:'修改推荐类目失败'});
+			return;
+		}
+
+		res.respond({code:1000, nominate_category:nominate_category});
+	})
+};
+
+exports.delete_nominate_category = function(req, res, next){
+	var nominate_category_id = req.data._id;
+	if(!nominate_category_id){
+		res.respond({code:1001, message:'_id required'});
+		return;
+	}
+
+	NominateCategoryService.delete(nominate_category_id, function(err){
+		if(err){
+			res.respond({code:1001, message:'删除推荐类目失败'});
+			return;
+		}
+
+		res.respond({code:1000, message:'success'});
+	})
+};
+
+exports.update_nominate_category_order = function(req, res, next){
+	var nominate_category_order = req.data.nominate_category_order;
+	if(!nominate_category_order){
+		res.respond({code:1001, message:'nominate_category_order required'});
+		return;
+	}
+
+	NominateCategoryService.update_order(nominate_category_order, function(err){
+		if(err){
+			res.respond({code:1001, message:'更新推荐类目顺序失败'});
+			return;
+		}
+
+		res.respond({code:1000, message:'success'});
+	})
+};
+
+exports.query_nominate_category = function(req, res, next){
+	NominateCategoryService.query(null, function(err, nominate_categories){
+		if(err){
+			res.respond({code:1001, message:'获取推荐类目失败'});
+			return;
+		}
+
+		res.respond({code:1000, nominate_categories:nominate_categories});
 	})
 };
