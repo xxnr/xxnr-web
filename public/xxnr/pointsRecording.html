@@ -1,0 +1,108 @@
+<!doctype html>
+<html ng-app="pointRecording" ng-controller="needLoginController">
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit">
+    <meta name="force-rendering" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+    <title>我的积分</title>
+    <!--[if lte IE 7]><script>alert('为了更好的购物体验，请升级您的浏览器版本');window.location.href='http://cdn.dmeng.net/upgrade-your-browser.html?referrer='+location.href;</script><![endif]-->
+    <link rel='icon' href='images/title_logo.png' type='image/png' />
+    <meta http-equiv="pragma" content="no-cache">
+    <meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
+    <meta http-equiv="expires" content="Wed, 26 Feb 1997 08:21:57 GMT">
+    <!-- build:css -->
+    <link type="text/css" rel="stylesheet" href="css/style.css">
+    <link type="text/css" rel="stylesheet" href="css/sweetalert.css">
+    <link type="text/css" rel="stylesheet" href="css/angular-flash.css">
+    <!-- endbuild -->
+    <!-- build:js -->
+    <script src="js/jquery.min.js"></script>
+    <!--[if (gte IE 6)&(lte IE 8)]>
+    <script type="text/javascript" src="js/selectivizr-min.js"></script>
+    <![endif]-->
+    <script src="js/angular.min.js"></script>
+    <script src="js/angular-cookies.min.js"></script>
+    <script src="js/common.js"></script>
+    <script src="js/login/loginService.js"></script>
+    <script src="js/remoteApiService.js"></script>
+    <script src="js/payService.js"></script>
+    <script src="js/shoppingCart/shoppingCartService.js"></script>
+    <script src="js/shoppingCart/shoppingCartController.js"></script>
+    <script src="js/pointsRecording/pointsRecordingController.js"></script>
+    <script src="js/login/loginController.js"></script>
+    <script src="js/headerFooterDirective.js"></script>
+    <script src="js/headerController.js"></script>
+    <script src="js/sideService.js"></script>
+    <script src="js/myPlaceholderDirective.js"></script>
+    <script src="js/angular-flash.js"></script>
+    <!-- endbuild -->
+</head>
+<body ng-controller="pointsRecordingController">
+<flash-message></flash-message>
+<header ng-controller="headerController"></header>
+
+<div class="wrap nav" ng-controller="shoppingCartController">
+    <h1 class="left logo"><a href="/">新新农人</a></h1>
+    <ul class="left">
+        <li><a href="/">首页</a></li>
+        <li><a href="huafei_list.html">化肥专场</a></li>
+        <li><a href="car_list.html">汽车专场</a></li>
+        <li><a href="news_list.html">新农资讯</a></li>
+        <!-- <li><a href="#">新农论坛</a></li> -->
+        <li><a href="about.html">公司介绍</a></li>
+    </ul>
+    <div class="right buy">
+        <a href="" ng-click="accessShoppingCart()">
+            <em>&nbsp;</em>
+            购物车
+        </a>
+    </div>
+    <span class="shopping_cart_badge ng-cloak" ng-bind="shoppingCartCount"></span>
+    <a href="#" id="side_shoping_cart" ng-click="accessShoppingCart()" title="side shopping cart">
+        <img src="images/shopping-right.png" alt=""/>
+        <span class="side_shopping_cart_badge ng-cloak" ng-show="shoppingCartCount>0">{{shoppingCartCount>99?'99+':shoppingCartCount}}</span>
+    </a>
+</div>
+
+<a href="#" id="back-to-top" title="Back to top"><img src="images/backToTop.png" alt=""/></a>
+<div class="clear channel3 pointsRecording">
+    <p class="guide">
+        <a href="/">首页</a> ／ <a href="my_xxnr.html">我的新农人</a> ／ <a href="pointsRecording.html">我的积分</a>
+    </p>
+    <div class="wrap pointsRecording_section">
+        <div class="my_points" >积分：<span>{{myPoints}}</span></div>
+        <div ng-show="pointslogs.length!=0">
+            <ul class="recordings_title row">
+                <li>时间</li>
+                <li>事件</li>
+                <li>详情</li>
+                <li>积分数值</li>
+            </ul>
+            <div class="all_recordings">
+                <div ng-repeat="pointslog in pointslogs" class="single_recording">
+                    <div>{{pointslog.date_local}}</div>
+                    <div>{{pointslog.event.name}}</div>
+                    <div>{{pointslog.description}}</div>
+                    <div>{{pointslog.points}}</div>
+                </div>
+            </div>
+            <div class="xxnr--pager">
+                <div id="page_buttons">
+                    <ul class="row">
+                        <li ng-hide="current_page==1" class="pre_btn"><a href="" ng-click="pre_page()"><em class="ban ban_8_0">&nbsp;</em></a></li>
+                        <li ng-repeat="page in pages"><a href="" ng-click="show_page(page.id)" ng-class="{true:'current', false:''}[page.isSelected]">{{page.id}}</a></li>
+                        <li ng-hide="current_page==pageCount || pointslogs.length==0" class="next_btn"><a href="" ng-click="next_page()"><em class="ban ban_9_0">&nbsp;</em></a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="no_pointslogs" ng-show="pointslogs.length==0">
+            <img src="images/no_points.png" alt=""/>
+            <span>还没有积分纪录</span>
+        </div>
+    </div>
+</div>
+<footer></footer>
+</body>
+</html>

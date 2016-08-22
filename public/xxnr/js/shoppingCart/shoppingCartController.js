@@ -352,13 +352,13 @@ app.controller('shoppingCartController', function($scope, $timeout, remoteApiSer
                             }
                             calculateTotal();
                             var message = '<img class="xxnr--flash--icon" src="images/correct_prompt.png" alt="">删除商品成功';
-                            var id = Flash.create('success', message, 3000, {class: 'xxnr-success-flash', id: 'xxnr-success-flash'}, false);
+                            var id = Flash.create('success', message, 3000, {"class": 'xxnr-success-flash', "id": 'xxnr-success-flash'}, false);
                             // set shoppingCartCount
                             shoppingCartService.setSCart($scope.shoppingCartCount);
                         } else {
                             //window.location.href = window.location.href;
                             var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">'+data.message;
-                            var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);
+                            var id = Flash.create('success', message, 3000, {"class": 'xxnr-warning-flash', "id": 'xxnr-warning-flash'}, false);
                         }
                     });
             } else {
@@ -389,13 +389,13 @@ app.controller('shoppingCartController', function($scope, $timeout, remoteApiSer
                                     }
                                     calculateTotal();
                                     var message = '<img class="xxnr--flash--icon" src="images/correct_prompt.png" alt="">删除商品成功';
-                                    var id = Flash.create('success', message, 3000, {class: 'xxnr-success-flash', id: 'xxnr-success-flash'}, false);
+                                    var id = Flash.create('success', message, 3000, {"class": 'xxnr-success-flash', "id": 'xxnr-success-flash'}, false);
                                     // set shoppingCartCount
                                     shoppingCartService.setSCart($scope.shoppingCartCount);
                                 } else {
                                     //window.location.href = window.location.href;
                                     var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">'+data.message;
-                                    var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);
+                                    var id = Flash.create('success', message, 3000, {"class": 'xxnr-warning-flash', "id": 'xxnr-warning-flash'}, false);
                                 }
                             });
 
@@ -424,25 +424,25 @@ app.controller('shoppingCartController', function($scope, $timeout, remoteApiSer
         if (deliveryType == 2 && (!$scope.$parent.selectedAddressId || $scope.$parent.selectedAddressId == '')) {
             //sweetalert("请填写您的收货地址");
             var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">请填写您的收货地址';
-            var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);
+            var id = Flash.create('success', message, 3000, {"class": 'xxnr-warning-flash', "id": 'xxnr-warning-flash'}, false);
             return;
         }
         if (deliveryType == 1) {
             if(!$scope.$parent.hasCompany){
                 //sweetalert("您选择的商品不能在同一个网点自提，请返回购物车重新选择");
                 var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">您选择的商品不能在同一个网点自提，请返回购物车重新选择';
-                var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);
+                var id = Flash.create('success', message, 3000, {"class": 'xxnr-warning-flash', "id": 'xxnr-warning-flash'}, false);
                 return;
             }else if(RSCId==-1 && $scope.$parent.hasCompany){
                 //sweetalert("请选择自提网点");
                 var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">请选择自提网点';
-                var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);
+                var id = Flash.create('success', message, 3000, {"class": 'xxnr-warning-flash', "id": 'xxnr-warning-flash'}, false);
                 return;
             }
             if(!consigneePhone || !consigneeName){
                 //sweetalert("请填写收货人信息");
                 var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">请填写收货人信息';
-                var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);
+                var id = Flash.create('success', message, 3000, {"class": 'xxnr-warning-flash', "id": 'xxnr-warning-flash'}, false);
                 return;
             }
         }
@@ -475,11 +475,11 @@ app.controller('shoppingCartController', function($scope, $timeout, remoteApiSer
         if ($scope.shoppingCartCount == 0) {
             //sweetalert("购物车是空的,快去采购");
             var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">购物车是空的,快去采购';
-            var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);
+            var id = Flash.create('success', message, 3000, {"class": 'xxnr-warning-flash', "id": 'xxnr-warning-flash'}, false);
         } else if ($scope.totalCount == 0) {
             //sweetalert("请至少选中一件商品进行结算");
             var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">请至少选中一件商品进行结算';
-            var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);
+            var id = Flash.create('success', message, 3000, {"class": 'xxnr-warning-flash', "id": 'xxnr-warning-flash'}, false);
         } else {
             // console.log( $scope.shoppingCartCount);
             var products = [];

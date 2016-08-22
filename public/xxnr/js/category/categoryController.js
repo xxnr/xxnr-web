@@ -215,16 +215,18 @@ app.controller('categoryController', function($scope, remoteApiService, commonSe
     };
 
     $scope.$parent.show_page = function(pageId){
-        current_page = pageId;
-        for(var pageIndex in $scope.$parent.pages){
-            if($scope.$parent.pages[pageIndex].id == pageId){
-                $scope.$parent.pages[pageIndex].isSelected = true;
-            }else {
-                $scope.$parent.pages[pageIndex].isSelected = false;
+        if(pageId!='...') {
+            current_page = pageId;
+            for (var pageIndex in $scope.$parent.pages) {
+                if ($scope.$parent.pages[pageIndex].id == pageId) {
+                    $scope.$parent.pages[pageIndex].isSelected = true;
+                } else {
+                    $scope.$parent.pages[pageIndex].isSelected = false;
+                }
             }
+            $scope.$parent.current_items = [];
+            getPagedGoods(current_page, product_count_per_page, $scope.$parent.categoryId, $scope.$parent.brandsStr, queryAttributes, price);
         }
-        $scope.$parent.current_items = [];
-        getPagedGoods(current_page,product_count_per_page,$scope.$parent.categoryId,$scope.$parent.brandsStr, queryAttributes, price);
     };
     getPagedGoods(current_page,product_count_per_page,$scope.$parent.categoryId);
 

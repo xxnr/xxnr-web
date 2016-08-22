@@ -141,6 +141,9 @@ app.controller('loginController', function($scope, $timeout, remoteApiService, c
         $scope.confirm_newPassword = undefined;
         $scope.resetPasswordMsg = '';
         $scope.reset_captcha = undefined;
+        $timeout.cancel($scope.timeout);
+        $scope.resetCountDown = '发送验证码';
+        $scope.resetPasswordSucceedMsg = "";
     };
     $scope.sendRegistCode = function(event){
         if($scope.regBlockSendCode){
@@ -286,7 +289,7 @@ app.controller('loginController', function($scope, $timeout, remoteApiService, c
         }
         else{
             $scope.resetCountDown = '重新发送(' + timeOut + ')';
-            $timeout(function(){
+            $scope.timeout = $timeout(function(){
                 resetSetTimeOut(timeOut-1);
             }, 1000);
         }
@@ -456,7 +459,7 @@ app.controller('loginController', function($scope, $timeout, remoteApiService, c
                                 //$scope.resetPasswordSucceedMsg = '重置密码成功';
                                 //window.location.href = 'logon.html';
                                 var message = '<img class="xxnr--flash--icon" src="images/correct_prompt.png" alt="">重置密码成功';
-                                var id = Flash.create('success', message, 3000, {class: 'xxnr-success-flash', id: 'xxnr-success-flash'}, false);
+                                var id = Flash.create('success', message, 3000, {"class": 'xxnr-success-flash', "id": 'xxnr-success-flash'}, false);
                                 //$timeout(function(){
                                 //    window.location.href = "/logon.html";
                                 //    return false

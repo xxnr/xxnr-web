@@ -31,7 +31,7 @@ Released under the MIT License <http://www.opensource.org/licenses/mit-license.p
 	color: #FFF;
 	font: bold 12px Arial, Helvetica, sans-serif;
 	text-align: center;
-	text-shadow: 0 -1px 0 rgba(0,0,0,0.25);
+	/*text-shadow: 0 -1px 0 rgba(0,0,0,0.25);*/
 	width: 100%;
 }
 /*.uploadify:hover .uploadify-button {*/

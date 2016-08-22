@@ -93,6 +93,7 @@
                     <!--<span class="order-time" ng-cloak>{{order.createTime_local}}</span>-->
                     <span class="order-statusName ng-cloak" ng-cloak>订单状态：
                         <span ng-class="{true:'payOrange'}[order.payStatus!=2]">{{order.orderStatus.value}}</span>
+                        <span ng-show="order.orderStatus.type == 6 && order.isRewardPoint && order.rewardPoints"><img  src="images/coins.png" alt=""><span class="points_text">积分 </span><span class="points_number">+{{order.rewardPoints}}</span></span>
                     </span>
                     <span class="pickup" ng-show="pickupDeliveryCode">自提码：
                         <span class="pickupCode">{{pickupDeliveryCode}}</span>

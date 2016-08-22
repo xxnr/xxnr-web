@@ -283,7 +283,7 @@ app.controller('jiesuanController', function ($scope, remoteApiService, payServi
                     $scope.hideAddPop();
                     //sweetalert("添加地址成功");
                     var message = '<img class="xxnr--flash--icon" src="images/correct_prompt.png" alt="">添加地址成功';
-                    var id = Flash.create('success', message, 3000, {class: 'xxnr-success-flash', id: 'xxnr-success-flash'}, false);
+                    var id = Flash.create('success', message, 3000, {"class": 'xxnr-success-flash', "id": 'xxnr-success-flash'}, false);
                     if(!$scope.contacts || $scope.contacts === null || $scope.contacts === undefined || $scope.contacts.length === 0){
                         $scope.hasConsigneeAddress = true;
                     }
@@ -324,7 +324,7 @@ app.controller('jiesuanController', function ($scope, remoteApiService, payServi
                 }else{
                     //sweetalert(data.message);
                     var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">' + data.message;
-                    var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);
+                    var id = Flash.create('success', message, 3000, {"class": 'xxnr-warning-flash', "id": 'xxnr-warning-flash'}, false);
                 }
             })
     };
@@ -366,7 +366,7 @@ app.controller('jiesuanController', function ($scope, remoteApiService, payServi
                     $scope.hideModifyPop();
                     //sweetalert("修改地址成功");
                     var message = '<img class="xxnr--flash--icon" src="images/correct_prompt.png" alt="">修改地址成功';
-                    var id = Flash.create('success', message, 3000, {class: 'xxnr-success-flash', id: 'xxnr-success-flash'}, false);
+                    var id = Flash.create('success', message, 3000, {"class": 'xxnr-success-flash', "id": 'xxnr-success-flash'}, false);
                     updateWebpageAddressData($scope.modifyAddress.addressId);
                     $scope.modifyAddress.detailAddress = undefined;
                     $scope.modifyAddress.zipCode = undefined;
@@ -402,7 +402,7 @@ app.controller('jiesuanController', function ($scope, remoteApiService, payServi
                         if (data.code == "1000") {
                             //sweetalert("删除成功");
                             var message = '<img class="xxnr--flash--icon" src="images/correct_prompt.png" alt="">删除成功';
-                            var id = Flash.create('success', message, 3000, {class: 'xxnr-success-flash', id: 'xxnr-success-flash'}, false);
+                            var id = Flash.create('success', message, 3000, {"class": 'xxnr-success-flash', "id": 'xxnr-success-flash'}, false);
                             if($scope.contacts.length === 1 ){
                                 $scope.hasConsigneeAddress = false;
                                 $scope.selectedAddressId = null;
@@ -421,7 +421,7 @@ app.controller('jiesuanController', function ($scope, remoteApiService, payServi
                         }else{
                             //sweetalert(data.message);
                             var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">' + data.message;
-                            var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);
+                            var id = Flash.create('success', message, 3000, {"class": 'xxnr-warning-flash', "id": 'xxnr-warning-flash'}, false);
                         }
                     });
             } else {
@@ -445,7 +445,7 @@ app.controller('jiesuanController', function ($scope, remoteApiService, payServi
                                 if (data.code == "1000") {
                                     //sweetalert("删除成功");
                                     var message = '<img class="xxnr--flash--icon" src="images/correct_prompt.png" alt="">删除成功';
-                                    var id = Flash.create('success', message, 3000, {class: 'xxnr-success-flash', id: 'xxnr-success-flash'}, false);
+                                    var id = Flash.create('success', message, 3000, {"class": 'xxnr-success-flash', "id": 'xxnr-success-flash'}, false);
                                     if($scope.contacts.length === 1 ){
                                         $scope.hasConsigneeAddress = false;
                                         $scope.selectedAddressId = null;
@@ -464,7 +464,7 @@ app.controller('jiesuanController', function ($scope, remoteApiService, payServi
                                 }else{
                                     //sweetalert(data.message);
                                     var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">' + data.message;
-                                    var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);
+                                    var id = Flash.create('success', message, 3000, {"class": 'xxnr-warning-flash', "id": 'xxnr-warning-flash'}, false);
                                 }
                             });
                     }
@@ -757,7 +757,7 @@ app.controller('jiesuanController', function ($scope, remoteApiService, payServi
             }else{
                 //sweetalert("获取历史收货人失败,请重试", window.location.href);
                 var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">获取历史收货人失败,请重试';
-                var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);
+                var id = Flash.create('success', message, 3000, {"class": 'xxnr-warning-flash', "id": 'xxnr-warning-flash'}, false);
                 $timeout(function(){
                     window.location.href = window.location.href;
                     return false
@@ -775,7 +775,7 @@ app.controller('jiesuanController', function ($scope, remoteApiService, payServi
                 }else{
                     //sweetalert("保存收货人失败,请重试", window.location.href);
                     var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">获取历史收货人失败,请重试';
-                    var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);
+                    var id = Flash.create('success', message, 3000, {"class": 'xxnr-warning-flash', "id": 'xxnr-warning-flash'}, false);
                     $timeout(function(){
                         window.location.href = window.location.href;
                         return false
@@ -825,7 +825,7 @@ app.controller('jiesuanController', function ($scope, remoteApiService, payServi
                     }else{
                         //sweetalert("保存收货人失败,请重试", window.location.href);
                         var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">保存收货人失败,请重试';
-                        var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);
+                        var id = Flash.create('success', message, 3000, {"class": 'xxnr-warning-flash', "id": 'xxnr-warning-flash'}, false);
                         $timeout(function(){
                             window.location.href = window.location.href;
                             return false
