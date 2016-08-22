@@ -24,6 +24,7 @@ exports.News = require('./news');
 exports.RSC = require('./RSC');
 exports.Campaign = require('./campaign');
 exports.Rewardshop = require('./rewardshop');
+exports.Nominate_category = require('./nominate_category');
 
 exports.backend_upload_photo = function(token, imgPath, done){
     request(app)

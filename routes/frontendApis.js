@@ -216,6 +216,9 @@ router.get('/api/v2.3/campaign/quiz/getQ', controllers.Campaign.query_quiz_quest
 router.post('/api/v2.3/campaign/quiz/answer', middleware.isLoggedIn_middleware, controllers.Campaign.submit_quiz_answer);
 router.get('/api/v2.3/campaign/quiz/my_answer', middleware.isLoggedIn_middleware, controllers.Campaign.query_my_quiz_answer);
 
+// nominate category
+router.get('/api/v2.4/nominate_category', controllers.Product.get_nominate_category);
+
 // compatibility APIs
 controllers.Compatibility.compatibilityAPIs(router);
 

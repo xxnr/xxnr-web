@@ -20,10 +20,16 @@ exports.prepare_SKU = function(backend_admin_token, brand_index, category, produ
     }
 
     var test_product_data = test_data[category](product_index);
-    Routing.Product.query_brands(test_data.category_id[test_product_data.category], backend_admin_token, function (body) {
+    Routing.backend_upload_photo(backend_admin_token, __dirname+'/test.jpg', function(body){
+        body.should.have.a.lengthOf(1);
+        var regex = /(.+)\..+/;
+        body[0].should.match(regex);
+        var imgUrl = regex.exec(body[0])[1];
+        Routing.Product.query_brands(test_data.category_id[test_product_data.category], backend_admin_token, function (body) {
         var brand = body.brands[brand_index];
         Routing.Product.save_product(utils.extend(test_product_data, {
-            brand: brand._id
+            brand: brand._id,
+            pictures: [imgUrl]
         }), backend_admin_token, function (body) {
             body.should.have.property('code', 1000);
             var product = body.product;
@@ -52,12 +58,14 @@ exports.prepare_SKU = function(backend_admin_token, brand_index, category, produ
                         product.online = true;
                         Routing.Product.online_product(product._id, true, backend_admin_token, function (body) {
                             body.should.have.property('code', 1000);
+                            product.imgUrl = '/images/large/'+test_data.category_id[category]+'/'+imgUrl+'.jpg?category='+test_data.category_id[category];
                             done(brand, product, SKU, test_SKU_attributes);
                         })
                     })
                 })
             })
         })
+    })
     })
 };
 

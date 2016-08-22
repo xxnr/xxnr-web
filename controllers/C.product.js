@@ -189,3 +189,7 @@ exports.json_SKU_get = function(req, res, next){
         res.respond({code:1000, message:'success', SKU:SKU});
     })
 };
+
+exports.get_nominate_category = function(req, res, next){
+
+};

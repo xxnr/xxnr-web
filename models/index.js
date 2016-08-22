@@ -144,6 +144,8 @@ exports.reward_control = mongoose.model('reward_control');
 exports.quiz_answer = mongoose.model('quiz_answer');
 //wechart
 exports.wechart = mongoose.model('wechart');
+// nominate category
+exports.nominate_category = mongoose.mode('nominate_category');
 
 exports.getModel = function (name, options) {
     options = options || {};

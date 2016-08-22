@@ -142,4 +142,11 @@ router.get(F.config.manager_url+'/api/campaign', middleware.backend_auth, contro
 router.post(F.config.manager_url+'/api/campaign/quiz/modify_right_answer', middleware.backend_auth, controllers.Manager.modify_quiz_right_answer);
 router.post(F.config.manager_url+'/api/campaign/quiz/trigger_reward', middleware.backend_auth, controllers.Manager.trigger_quiz_reward);
 
+// nominate category
+router.post(F.config.manager_url+'/api/nominate_category/create');
+router.post(F.config.manager_url+'/api/nominate_category/modify');
+router.delete(F.config.manager_url+'/api/nominate_category/delete');
+router.post(F.config.manager_url+'/api/nominate_category/update_order');
+router.get(F.config.manager_url+'/api/nominate_category/query');
+
 module.exports = router;
