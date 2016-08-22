@@ -143,10 +143,10 @@ router.post(F.config.manager_url+'/api/campaign/quiz/modify_right_answer', middl
 router.post(F.config.manager_url+'/api/campaign/quiz/trigger_reward', middleware.backend_auth, controllers.Manager.trigger_quiz_reward);
 
 // nominate category
-router.post(F.config.manager_url+'/api/nominate_category/create');
-router.post(F.config.manager_url+'/api/nominate_category/modify');
-router.delete(F.config.manager_url+'/api/nominate_category/delete');
-router.post(F.config.manager_url+'/api/nominate_category/update_order');
-router.get(F.config.manager_url+'/api/nominate_category/query');
+router.post(F.config.manager_url+'/api/nominate_category/create', middleware.backend_auth, controllers.Manager.create_nominate_category);
+router.post(F.config.manager_url+'/api/nominate_category/modify', middleware.backend_auth, controllers.Manager.modify_nominate_category);
+router.delete(F.config.manager_url+'/api/nominate_category/delete', middleware.backend_auth, controllers.Manager.delete_nominate_category);
+router.post(F.config.manager_url+'/api/nominate_category/update_order', middleware.backend_auth, controllers.Manager.update_nominate_category_order);
+router.get(F.config.manager_url+'/api/nominate_category/query', middleware.backend_auth, controllers.Manager.query_nominate_category);
 
 module.exports = router;

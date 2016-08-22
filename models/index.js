@@ -59,6 +59,7 @@ require('./loyaltypoints');
 require('./appdeviceversion');
 require('./campaign');
 require('./wechart');
+require('./nominate_category');
 
 //user
 exports.user = mongoose.model('user');
@@ -145,7 +146,7 @@ exports.quiz_answer = mongoose.model('quiz_answer');
 //wechart
 exports.wechart = mongoose.model('wechart');
 // nominate category
-exports.nominate_category = mongoose.mode('nominate_category');
+exports.nominate_category = mongoose.model('nominate_category');
 
 exports.getModel = function (name, options) {
     options = options || {};
