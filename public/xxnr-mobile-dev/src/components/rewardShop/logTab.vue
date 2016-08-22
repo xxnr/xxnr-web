@@ -18,7 +18,7 @@
   .log-tab-ul {
     position: fixed;
     width: 100%;
-    height: 49px;
+    height: 46px;
     background-color: #fff;
     top: 44px;
     left: 0;
@@ -31,7 +31,7 @@
     width: 50%;
     font-size: 18px;
     text-align: center;
-    line-height: 48px;
+    line-height: 45px;
   }
 
   .log-tab-ul li.checked {
@@ -50,7 +50,7 @@
   .log-tab-ul .tab-line {
     position: absolute;
     width: 0;
-    border-left: 1px solid #c7c7c7;
+    border-left: 1px solid #e2e2e2;
     height: 30px;
     top: 9px;
     left: 50%;

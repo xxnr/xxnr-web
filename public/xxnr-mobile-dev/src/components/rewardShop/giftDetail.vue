@@ -10,7 +10,7 @@
         <div class="user-score" v-if="score != -1">可用积分 <span class="orange">{{score}}</span></div>
         <div class="clear"></div>
       </div>
-      <div class="gift-market-price">
+      <div class="gift-market-price" v-if="giftDetail.marketPrice && giftDetail.marketPrice != 0 && giftDetail.onsale && giftDetail.soldout">
         市场价&nbsp;&nbsp;<span class="line-through">{{giftDetail.marketPrice}}</span>
       </div>
     </div>
@@ -100,12 +100,12 @@
   .gift-info {
     background-color: #fff;
     padding: 5px 2%;
-    border-top: 1px solid #c7c7c7;
-    border-bottom: 1px solid #c7c7c7;
+    border-top: 1px solid #e2e2e2;
+    border-bottom: 1px solid #e2e2e2;
   }
 
   .gift-appbody {
-    border-top: 1px solid #c7c7c7;
+    border-top: 1px solid #e2e2e2;
     margin-top: 10px;
     padding-bottom: 50px;
   }

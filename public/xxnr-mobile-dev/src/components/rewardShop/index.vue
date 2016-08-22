@@ -85,8 +85,8 @@
     text-align: center;
     background-color: #fff;
     height: 60px;
-    border-left: 1px solid #c7c7c7;
-    border-bottom: 1px solid #c7c7c7;
+    border-left: 1px solid #e2e2e2;
+    border-bottom: 1px solid #e2e2e2;
   }
 
   .point-tab:first-child {
@@ -113,9 +113,6 @@
   }
 
   .unlogin-tips {
-    position: fixed;
-    top: 44px;
-    left: 0;
     font-size: 12px;
     color: #db8030;
     background-color: #fff6b8;
