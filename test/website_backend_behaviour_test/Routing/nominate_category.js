@@ -27,7 +27,7 @@ exports.query_nominate_category_backend = function(token, done){
 
 exports.create_nominate_category = function(nominate_category, token, done){
     request(app)
-        .post(config.manager_url+'/api/nominate_category/save')
+        .post(config.manager_url+'/api/nominate_category/create')
         .send({nominate_category:nominate_category, token:token})
         .end(function(err, res){
             should.not.exist(err);

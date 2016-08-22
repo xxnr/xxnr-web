@@ -8,12 +8,38 @@ var schema = new mongoose.Schema({
     category:{type:String, required:true},
     brand: {type: mongoose.Schema.ObjectId, ref: 'brand'},
     search_more: {type:Boolean, default:false},
-    query:String,
     show_count:{type:Number, default:4},
+    online:{type:Boolean, default: false},
     products:[{type:mongoose.Schema.ObjectId, ref:'product'}],
     order:{type:Number, require:true},
     date_created:{type:Date, default:Date.now}
+},{
+    toObject: { virtuals: true },
+    toJSON: { virtuals: true }
 });
 
 schema.index({order:1});
+
+// virtual
+schema.virtual('query').get(function(){
+    return {brand:this.brand};
+});
+
+// statics
+schema.statics.query = function(options, cb, populate_products) {
+    var query = {};
+    if (options) {
+        if (options.hasOwnProperty('online')) {
+            query.online = options.online;
+        }
+    }
+
+    var querier = this.find(query)
+        .sort({online:-1, order: 1});
+    if (populate_products) {
+        querier.populate('products');
+    }
+    querier.exec(cb);
+};
+
 mongoose.model('nominate_category', schema);

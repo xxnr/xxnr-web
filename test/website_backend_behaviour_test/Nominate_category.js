@@ -11,9 +11,14 @@ var models = require('../../models');
 var deployment = require('../../deployment');
 var SKUAttributesModel = models.SKUAttributes;
 var NominateCategoryModel = models.nominate_category;
+var ProductModel = models.product;
+var SKUModel = models.SKU;
 
 describe('nominated products', function(){
     var backend_admin_token;
+    before('delete SKU attributes', function(done){
+        SKUAttributesModel.find({}).remove(done);
+    });
     before('delete SKU attributes', function(done){
         SKUAttributesModel.find({}).remove(done);
     });
@@ -35,7 +40,15 @@ describe('nominated products', function(){
             })
         })
     });
-
+    before('delete all products and SKUs', function(done){
+        ProductModel.find({}).remove(function(err){
+            should.not.exist(err);
+            SKUModel.find({}).remove(done);
+        });
+    });
+    before('delete all nominate category', function(done){
+        NominateCategoryModel.find({}).remove(done);
+    });
     var category_1 = test_data.category_id['汽车'];
     var brand_1;
     var product_c1, product_c2, product_c3, product_c4, product_c5;
@@ -61,6 +74,12 @@ describe('nominated products', function(){
             })
         })
     });
+    afterEach('delete all products and SKUs', function(done){
+        ProductModel.find({}).remove(function(err){
+            should.not.exist(err);
+            SKUModel.find({}).remove(done);
+        });
+    });
 
     describe('new nominate category', function(){
         afterEach('delete all nominate category', function(done){
@@ -76,29 +95,24 @@ describe('nominated products', function(){
             var nominate_category = {
                 name: '测试分类1',
                 category: category_1,
-                brand:brand_1,
+                brand:brand_1._id,
                 search_more:true,
-                query:{brand:brand_1},
+                query:{brand:brand_1._id},
                 show_count:4
             };
             var expected_nominate_category = {
                 name: '测试分类1',
                 category: category_1,
-                brand:brand_1,
-                search_more:false,
-                query:{brand:brand_1},
+                brand:brand_1._id,
+                search_more:true,
+                query:{brand:brand_1._id},
                 show_count:4,
                 products:[{
-                    _id: product_c5._id,
-                    imgUrl: product_c5.imgUrl,
-                    name: product_c5.name,
-                    SKUPrice:{max:SKU_1.price.platform_price, min:SKU_1.price.platform_price},
-                    referencePrice:{max:SKU_1.price.platform_price, min:SKU_1.price.platform_price},
-                    SKUMarketPrice:{max:SKU_1.price.market_price, min:SKU_1.price.market_price},
+                    id: product_c5.id,
+                    thumbnail: product_c5.thumbnail,
                     defaultSKU:{
                         ref:SKU_1._id,
                         name:product_c5.name + ' - ' + SKU_attributes_1[0].value + ' - ' + SKU_attributes_1[1].value,
-                        online:true,
                         price:{
                             market_price:SKU_1.price.market_price,
                             platform_price:SKU_1.price.platform_price
@@ -106,42 +120,38 @@ describe('nominated products', function(){
                     },
                     presale:product_c5.presale
                 },{
-                    _id: product_c4._id
+                    id: product_c4.id
                 },{
-                    _id: product_c3._id
+                    id: product_c3.id
                 },{
-                    _id: product_c2._id
+                    id: product_c2.id
                 }]
             };
             var expected_nominate_category_after_offline_c4 = {
                 name: '测试分类1',
                 category: category_1,
-                brand:brand_1,
-                search_more:false,
-                query:{brand:brand_1},
+                brand:brand_1._id,
+                search_more:true,
+                query:{brand:brand_1._id},
                 show_count:4,
                 products:[{
-                    _id: product_c5._id,
-                    imgUrl: product_c5.imgUrl,
-                    name: product_c5.name,
-                    SKUPrice:{max:SKU_1.price.platform_price, min:SKU_1.price.platform_price},
-                    referencePrice:{max:SKU_1.price.platform_price, min:SKU_1.price.platform_price},
-                    SKUMarketPrice:{max:SKU_1.price.market_price, min:SKU_1.price.market_price},
+                    id: product_c5.id,
+                    thumbnail: product_c5.thumbnail,
                     defaultSKU:{
                         ref:SKU_1._id,
                         name:product_c5.name + ' - ' + SKU_attributes_1[0].value + ' - ' + SKU_attributes_1[1].value,
-                        online:true,
                         price:{
                             market_price:SKU_1.price.market_price,
                             platform_price:SKU_1.price.platform_price
                         }
-                    }
+                    },
+                    presale:product_c5.presale
                 },{
-                    _id: product_c3._id
+                    id: product_c3.id
                 },{
-                    _id: product_c2._id
+                    id: product_c2.id
                 },{
-                    _id: product_c1._id
+                    id: product_c1.id
                 }]
             };
             var frontend_list = {
@@ -169,11 +179,14 @@ describe('nominated products', function(){
                                 body.should.containDeepOrdered(frontend_list);
                                 Routing.Product.online_product(product_c4, false, backend_admin_token, function(body){
                                     body.should.have.property('code', 1000);
-                                    body.should.containDeepOrdered({
-                                        code:1000,
-                                        nominate_categories: [expected_nominate_category_after_offline_c4]
-                                    });
-                                    done();
+                                    Routing.Nominate_category.query_nominate_category_frontend(function(body) {
+                                        body.should.containDeepOrdered({
+                                            code: 1000,
+                                            nominate_categories: [expected_nominate_category_after_offline_c4]
+                                        });
+                                        body.nominate_categories[0].products.should.have.a.lengthOf(4);
+                                        done();
+                                    })
                                 })
                             })
                         })
@@ -190,74 +203,64 @@ describe('nominated products', function(){
             var nominate_category = {
                 name: '测试分类1',
                 category: category_1,
-                brand:brand_1,
+                brand:brand_1._id,
                 search_more:false,
-                query:{brand:brand_1},
+                query:{brand:brand_1._id},
                 show_count:4,
                 products:[product_c2._id, product_c3._id, product_c1._id, product_c5._id, product_c4._id]
             };
             var expected_nominate_category = {
                 name: '测试分类1',
                 category: category_1,
-                brand: brand_1,
+                brand: brand_1._id,
                 search_more: false,
-                query: {brand: brand_1},
+                query: {brand: brand_1._id},
                 show_count: 4,
                 products: [{
-                    _id: product_c2._id
+                    id: product_c2.id
                 }, {
-                    _id: product_c3._id
+                    id: product_c3.id
                 }, {
-                    _id: product_c1._id
+                    id: product_c1.id
                 }, {
-                    _id: product_c5._id,
-                    imgUrl: product_c5.imgUrl,
-                    name: product_c5.name,
-                    SKUPrice: {max: SKU_1.price.platform_price, min: SKU_1.price.platform_price},
-                    referencePrice: {max: SKU_1.price.platform_price, min: SKU_1.price.platform_price},
-                    SKUMarketPrice: {max: SKU_1.price.market_price, min: SKU_1.price.market_price},
-                    defaultSKU: {
-                        ref: SKU_1._id,
-                        name: product_c5.name + ' - ' + SKU_attributes_1[0].value + ' - ' + SKU_attributes_1[1].value,
-                        online: true,
-                        price: {
-                            market_price: SKU_1.price.market_price,
-                            platform_price: SKU_1.price.platform_price
+                    id: product_c5.id,
+                    thumbnail: product_c5.thumbnail,
+                    defaultSKU:{
+                        ref:SKU_1._id,
+                        name:product_c5.name + ' - ' + SKU_attributes_1[0].value + ' - ' + SKU_attributes_1[1].value,
+                        price:{
+                            market_price:SKU_1.price.market_price,
+                            platform_price:SKU_1.price.platform_price
                         }
                     },
-                    presale: product_c5.presale
+                    presale:product_c5.presale
                 }]
             };
             var expected_nominate_category_after_offline_c1 = {
                 name: '测试分类1',
                 category: category_1,
-                brand: brand_1,
+                brand: brand_1._id,
                 search_more: false,
-                query: {brand: brand_1},
+                query: {brand: brand_1._id},
                 show_count: 4,
                 products: [{
-                    _id: product_c2._id
+                    id: product_c2.id
                 }, {
-                    _id: product_c3._id
+                    id: product_c3.id
                 }, {
-                    _id: product_c5._id,
-                    imgUrl: product_c5.imgUrl,
-                    name: product_c5.name,
-                    SKUPrice: {max: SKU_1.price.platform_price, min: SKU_1.price.platform_price},
-                    referencePrice: {max: SKU_1.price.platform_price, min: SKU_1.price.platform_price},
-                    SKUMarketPrice: {max: SKU_1.price.market_price, min: SKU_1.price.market_price},
-                    defaultSKU: {
-                        ref: SKU_1._id,
-                        name: product_c5.name + ' - ' + SKU_attributes_1[0].value + ' - ' + SKU_attributes_1[1].value,
-                        online: true,
-                        price: {
-                            market_price: SKU_1.price.market_price,
-                            platform_price: SKU_1.price.platform_price
+                    id: product_c5.id,
+                    thumbnail: product_c5.thumbnail,
+                    defaultSKU:{
+                        ref:SKU_1._id,
+                        name:product_c5.name + ' - ' + SKU_attributes_1[0].value + ' - ' + SKU_attributes_1[1].value,
+                        price:{
+                            market_price:SKU_1.price.market_price,
+                            platform_price:SKU_1.price.platform_price
                         }
                     },
-                    presale: product_c5.presale
+                    presale:product_c5.presale
                 },{
-                    _id: product_c4._id
+                    id: product_c4.id
                 }]
             };
             var frontend_list = {
@@ -285,11 +288,14 @@ describe('nominated products', function(){
                                 body.should.containDeepOrdered(frontend_list);
                                 Routing.Product.online_product(product_c1, false, backend_admin_token, function(body){
                                     body.should.have.property('code', 1000);
-                                    body.should.containDeepOrdered({
-                                        code:1000,
-                                        nominate_categories: [expected_nominate_category_after_offline_c1]
-                                    });
-                                    done();
+                                    Routing.Nominate_category.query_nominate_category_frontend(function(body) {
+                                        body.should.containDeepOrdered({
+                                            code: 1000,
+                                            nominate_categories: [expected_nominate_category_after_offline_c1]
+                                        });
+                                        body.nominate_categories[0].products.should.have.a.lengthOf(4);
+                                        done();
+                                    })
                                 })
                             })
                         })
@@ -300,17 +306,14 @@ describe('nominated products', function(){
     });
 
     describe('nominate category offline/online & order', function(){
-        before('delete all nominate category', function(done){
-            NominateCategoryModel.find({}).remove(done);
-        });
         var d1, d2, d3;
         before('create nominate category d1, d2, d3 online', function(done){
             var nominate_category = {
                 name: '测试分类1',
                 category: category_1,
-                brand:brand_1,
+                brand:brand_1._id,
                 search_more:true,
-                query:{brand:brand_1},
+                query:{brand:brand_1._id},
                 show_count:4,
                 online:true
             };
@@ -371,16 +374,16 @@ describe('nominated products', function(){
                 code:1000,
                 nominate_categories:[
                     {_id: d2._id},
-                    {_id: d3._id},
-                    {_id: d1._id}
+                    {_id: d1._id},
+                    {_id: d3._id}
                 ]
             };
             var expected_backend_list_after_online_d1 = {
                 code:1000,
                 nominate_categories:[
                     {_id: d2._id},
-                    {_id: d3._id},
-                    {_id: d1._id}
+                    {_id: d1._id},
+                    {_id: d3._id}
                 ]
             };
             var expected_frontend_list_after_delete_d3 = {
@@ -392,7 +395,7 @@ describe('nominated products', function(){
             };
             Routing.Nominate_category.query_nominate_category_frontend(function(body){
                 body.should.containDeepOrdered(expected_frontend_list);
-                Routing.Nominate_category.update_nominate_category_order([d2._id, d3._id, d1._id], backend_admin_token, function(body){
+                Routing.Nominate_category.update_nominate_category_order([d2._id, d1._id, d3._id], backend_admin_token, function(body){
                     body.should.have.property('code', 1000);
                     Routing.Nominate_category.query_nominate_category_frontend(function(body){
                         body.should.containDeepOrdered(expected_frontend_list_after_change_order);
@@ -400,6 +403,7 @@ describe('nominated products', function(){
                             body.should.have.property('code', 1000);
                             Routing.Nominate_category.query_nominate_category_frontend(function(body){
                                 body.should.containDeepOrdered(expected_frontend_list_after_offline_d1);
+                                body.nominate_categories.should.have.a.lengthOf(2);
                                 Routing.Nominate_category.query_nominate_category_backend(backend_admin_token, function(body){
                                     body.should.containDeepOrdered(expected_backend_list_after_offline_d1);
                                     Routing.Nominate_category.modify_nominate_category({_id:d1._id, online:true}, backend_admin_token, function(body) {
@@ -412,6 +416,7 @@ describe('nominated products', function(){
                                                     body.should.have.property('code', 1000);
                                                     Routing.Nominate_category.query_nominate_category_frontend(function(body) {
                                                         body.should.containDeepOrdered(expected_frontend_list_after_delete_d3);
+                                                        body.nominate_categories.should.have.a.lengthOf(2);
                                                         done();
                                                     })
                                                 })

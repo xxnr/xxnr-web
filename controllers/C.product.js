@@ -198,6 +198,35 @@ exports.get_nominate_category = function(req, res, next){
             return;
         }
 
-        res.respond({code:1000, nominate_categories:nominate_categories});
-    })
+        var results = [];
+        var promises = nominate_categories.map(function(nominate_category){
+            nominate_category = nominate_category.toObject();
+            results.push(nominate_category);
+            return new Promise(function(resolve, reject){
+                if(nominate_category.products && nominate_category.products.length > 0){
+                    nominate_category.products = NominateCategoryService.convertProducts(nominate_category.products);
+                    resolve();
+                    return;
+                }
+
+                ProductService.query({category:nominate_category.category, brand:nominate_category.brand, page:1, max:nominate_category.show_count, online:true}, function(err, products){
+                    if(err){
+                        reject(err);
+                        return;
+                    }
+
+                    nominate_category.products = NominateCategoryService.convertProducts(products.items);
+                    resolve();
+                })
+            })
+        });
+
+        Promise.all(promises)
+            .then(function(){
+                res.respond({code:1000, nominate_categories:results});
+            })
+            .catch(function(err){
+                res.respond({code:1001, message:'获取推荐类目失败'})
+            });
+    }, true)
 };

@@ -59,6 +59,7 @@ exports.prepare_SKU = function(backend_admin_token, brand_index, category, produ
                         Routing.Product.online_product(product._id, true, backend_admin_token, function (body) {
                             body.should.have.property('code', 1000);
                             product.imgUrl = '/images/large/'+test_data.category_id[category]+'/'+imgUrl+'.jpg?category='+test_data.category_id[category];
+                            product.thumbnail = '/images/thumbnail/'+test_data.category_id[category]+'/'+imgUrl+'.jpg?category='+test_data.category_id[category]+'&thumb=true';
                             done(brand, product, SKU, test_SKU_attributes);
                         })
                     })
