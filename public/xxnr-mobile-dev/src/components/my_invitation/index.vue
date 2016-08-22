@@ -328,7 +328,7 @@
     width: 75%;
     font-size: 16px;
     box-sizing: border-box;
-    border: 1px solid #C7C7C7;
+    border: 1px solid #e2e2e2;
     border-radius: 5px;
     color: #B0B0B0;
     height: 35px;

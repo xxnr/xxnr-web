@@ -40,6 +40,11 @@
       api.getGiftOrderList(
         {'type':this.type,'page':pageNum, 'max': 20},
           response => {
+            if(response.data.code == '1401') {
+              router.go('/login?ref=/pointsLogs/completed');
+              return;
+            }
+
             if(response.data.code != '1000') {
               //TODO
               return;

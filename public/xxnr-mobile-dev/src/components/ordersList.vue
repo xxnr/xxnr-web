@@ -78,16 +78,16 @@
   .orderRow{
     margin-bottom: 10px;
     background: #FFFFFF;
-    border-top: 1px solid #c7c7c7;
+    border-top: 1px solid #e2e2e2;
   }
   .productRow{
-    border-bottom: 1px solid #c7c7c7;
+    border-bottom: 1px solid #e2e2e2;
     padding: 10px;
   }
   .orders-product-img{
     height: 90px;
     width: 90px;
-    border:1px solid #c7c7c7;
+    border:1px solid #e2e2e2;
     display: inline-block;
     box-sizing: border-box;
   }
@@ -118,7 +118,7 @@
   }
 
   .action-box {
-    border-bottom: 1px solid #c7c7c7;
+    border-bottom: 1px solid #e2e2e2;
     position: relative;
     height: 44px;
   }

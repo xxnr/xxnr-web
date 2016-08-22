@@ -22,17 +22,18 @@
 
 <style scoped>
   .point-logs {
+    padding-top: 86px;
   }
 
   .point-logs-item {
     position: relative;
     background-color: #fff;
-    border-bottom: 1px solid #c7c7c7;
+    border-bottom: 1px solid #e0e0e0;
     padding: 10px 2%;
   }
 
   .point-logs-item:first-child {
-    border-top: 1px solid #c7c7c7;
+    border-top: 1px solid #e0e0e0;
   }
 
   .point-logs-left {

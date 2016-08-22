@@ -42,10 +42,14 @@
   },
   methods:{
     loadMoreOrders:scrollerHandler,
-      getOrders:function(pageNum){
+    getOrders:function(pageNum){
       api.getGiftOrderList(
-        {'type':this.type,'page':pageNum, 'max': 5},
+        {'type':this.type,'page':pageNum, 'max': 20},
         response => {
+        if(response.data.code == '1401') {
+          router.go('/login?ref=/pointsLogs/unComplete');
+          return;
+        }
         if(response.data.code != '1000') {
           //TODO
           return;
@@ -66,7 +70,10 @@
       })
     }
   },
-  created(){
+  events: {
+    'getScrollTopParents': function(top) {
+      this.$broadcast('scrollTo', top);
+    }
   },
   route: {
     activate(){

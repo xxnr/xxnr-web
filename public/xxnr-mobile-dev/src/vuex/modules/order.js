@@ -192,7 +192,7 @@ const mutations = {
     state.orderConsignee.consigneeName = consigneeList[0].consigneeName;
   },
   [COMMIT_GIFTORDER] (state,data) {
-    router.go('/giftOrderDone?id=' + data.id);
+    router.go('/giftOrderDone?id=' + data.id + '&giftId=' + data.gift.id);
   }
 }
 

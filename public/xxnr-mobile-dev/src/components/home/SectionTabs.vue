@@ -36,8 +36,8 @@
     width: 50%;
     float: left;
     line-height: 50px;
-    border-bottom: 1px solid #c7c7c7;
-    border-left: 1px solid #c7c7c7;
+    border-bottom: 1px solid #e2e2e2;
+    border-left: 1px solid #e2e2e2;
     box-sizing: border-box;
     position: relative;
     background-color: #fff;

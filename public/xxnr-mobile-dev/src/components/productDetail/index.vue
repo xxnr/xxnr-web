@@ -246,7 +246,7 @@
   }
 
   .product-info {
-    border-top: 1px solid #c7c7c7;
+    border-top: 1px solid #e2e2e2;
   }
   .product-img img {
     width: 100%;
@@ -374,7 +374,7 @@
   .attr-product-img {
     float: left;
     width: 75px;
-    border: 1px solid #c7c7c7;
+    border: 1px solid #e2e2e2;
     margin-right: 6px;
     margin-left: 2%;
   }
