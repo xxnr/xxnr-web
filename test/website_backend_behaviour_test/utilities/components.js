@@ -20,7 +20,7 @@ exports.prepare_SKU = function(backend_admin_token, brand_index, category, produ
     }
 
     var test_product_data = test_data[category](product_index);
-    Routing.backend_upload_photo(backend_admin_token, __dirname+'/test.jpg', function(body){
+    Routing.backend_upload_photo(backend_admin_token, __dirname+'/../test.jpg', function(body){
         body.should.have.a.lengthOf(1);
         var regex = /(.+)\..+/;
         body[0].should.match(regex);

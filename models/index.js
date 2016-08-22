@@ -59,6 +59,7 @@ require('./loyaltypoints');
 require('./appdeviceversion');
 require('./campaign');
 require('./wechart');
+require('./nominate_category');
 
 //user
 exports.user = mongoose.model('user');
