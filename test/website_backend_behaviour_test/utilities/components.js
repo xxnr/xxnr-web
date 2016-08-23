@@ -13,7 +13,7 @@ var extend = require('extend');
 var fs = require('fs');
 var path = require('path');
 
-exports.prepare_SKU = function(backend_admin_token, brand_index, category, product_index, SKU, SKU_index, done, product_attributes){
+exports.prepare_SKU = function(backend_admin_token, brand_index, category, product_index, SKU, SKU_index, done, product_attributes, product_online){
     if(!done){
         done = SKU_index;
         SKU_index = 0;
@@ -60,7 +60,10 @@ exports.prepare_SKU = function(backend_admin_token, brand_index, category, produ
                     Routing.Product.online_SKU(SKU._id, true, backend_admin_token, function (body) {
                         body.should.have.property('code', 1000);
                         product.online = true;
-                        Routing.Product.online_product(product._id, true, backend_admin_token, function (body) {
+                        if (product_online == false) {
+                            product.online = false;
+                        }
+                        Routing.Product.online_product(product._id, product.online, backend_admin_token, function (body) {
                             body.should.have.property('code', 1000);
                             product.imgUrl = '/images/large/'+test_data.category_id[category]+'/'+imgUrl+'.jpg?category='+test_data.category_id[category];
                             done(brand, product, SKU, test_SKU_attributes);
