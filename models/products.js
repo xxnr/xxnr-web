@@ -23,7 +23,7 @@ var productSchema = new mongoose.Schema({
 	app_body: String,
 	app_standard: String,
 	app_support: String,
-	presale: Boolean,
+	presale: {type:Boolean, default:false},
 	brand: {type: mongoose.Schema.ObjectId, ref: 'brand'},
 	attributes: [{								// all attributes of this product, used for product query
 		ref: {type:mongoose.Schema.ObjectId, ref:'productAttribute', required:true},
