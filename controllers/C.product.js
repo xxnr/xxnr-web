@@ -95,6 +95,9 @@ exports.getProductsListPage = function(req, res, next) {
     if (req.data.attributes){
         options.attributes = req.data.attributes;
     }
+    if (req.data.tags){
+        options.tags = decodeURI(req.data.tags).split(',');
+    }
 
     ProductService.query(options, function(err, data) {
         if(err){
@@ -200,4 +203,15 @@ exports.get_nominate_category = function(req, res, next){
 
         res.respond({code:1000, nominate_categories:nominate_categories});
     })
+};
+
+exports.get_brandsProducts_collection = function(req, res, next){
+    ProductService.getBrandsProductsCollection(req.data.brandId, function(err, BrandProducts){
+        if(err){
+            res.respond({code:1001, message:'获取品牌商品列表失败'});
+            return;
+        }
+
+        res.respond({code:1000, brandProducts:BrandProducts});
+    });
 };
