@@ -5,7 +5,7 @@
       <div class="order-rsc" v-link="{path: rscLink}">
         <div class="order-rsc-bit"></div>
         <span v-if="!orderRSC.address">订单中的商品将配送至服务站，请选择自提网点</span>
-        <div class="order-address-arrow" v-if="!orderRSC.address">
+        <div class="order-address-arrow">
           <img src="/assets/images/arrow.png">
         </div>
         {{orderRSC.address}}
@@ -13,7 +13,7 @@
       <div class="order-consignee" v-link="{path: consigneeLink}">
         <div class="order-consignee-bit"></div>
         <span v-if="!orderConsignee.consigneePhone">请填写收货人信息</span>
-        <div class="order-address-arrow" v-if="!orderConsignee.consigneePhone">
+        <div class="order-address-arrow">
           <img src="/assets/images/arrow.png">
         </div>
         {{orderConsignee.consigneeName}}

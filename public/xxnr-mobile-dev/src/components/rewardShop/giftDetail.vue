@@ -7,10 +7,10 @@
       <div class="gift-name">{{giftDetail.name}}</div>
       <div>
         <div class="gift-points">{{giftDetail.points}}</div>
-        <div class="user-score" v-if="score != -1">可用积分 <span class="orange">{{score}}</span></div>
+        <div class="user-score" v-if="score != -1 && giftDetail.online && !giftDetail.soldout">可用积分 <span class="orange">{{score}}</span></div>
         <div class="clear"></div>
       </div>
-      <div class="gift-market-price" v-if="giftDetail.marketPrice && giftDetail.marketPrice != 0 && giftDetail.onsale && giftDetail.soldout">
+      <div class="gift-market-price" v-if="giftDetail.marketPrice && giftDetail.marketPrice != 0">
         市场价&nbsp;&nbsp;<span class="line-through">{{giftDetail.marketPrice}}</span>
       </div>
     </div>
@@ -19,7 +19,7 @@
       </iframe>
     </div>
     <div class="gift-bottom">
-      <div class="gift-bottom-btn" v-if="giftDetail.change.type == 4" v-link="{path: '/giftOrder?giftId=' + giftDetail.id + '&gift_id=' + giftDetail._id}" v-if="!giftDetail.soldout">立即兑换</div>
+      <div class="gift-bottom-btn" v-if="giftDetail.change.type == 4" @click="changeGift();" v-if="!giftDetail.soldout">立即兑换</div>
       <div class="gift-bottom-btn invilid" v-else="!giftDetail.onsale">{{giftDetail.change.text}}</div>
     </div>
   </div>
@@ -43,6 +43,11 @@
         getGiftDetail,
         getUserPoint,
         clearGiftDetail
+      }
+    },
+    methods: {
+      changeGift: function() {
+        router.go('/giftOrder?giftId=' + this.giftDetail.id + '&gift_id=' + this.giftDetail._id);
       }
     },
     components:{
@@ -101,11 +106,11 @@
     background-color: #fff;
     padding: 5px 2%;
     border-top: 1px solid #e2e2e2;
-    border-bottom: 1px solid #e2e2e2;
+    border-bottom: 1px solid #e0e0e0;
   }
 
   .gift-appbody {
-    border-top: 1px solid #e2e2e2;
+    border-top: 1px solid #e0e0e0;
     margin-top: 10px;
     padding-bottom: 50px;
   }

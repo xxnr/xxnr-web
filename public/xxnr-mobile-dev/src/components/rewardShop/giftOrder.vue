@@ -1,5 +1,5 @@
 <template>
-  <div v-if="orderGift.category.deliveries[0].deliveryType == 1">
+  <div v-if="orderGift.category.deliveries[0].deliveryType == 1" class="gift-order-container">
     <div class="gift-order-tip1">
       该礼品需到网点自提，请选择自提网点并填写收货人
     </div>
@@ -116,6 +116,7 @@
     color: #FE9B00;
     line-height: 34px;
     padding: 0 2%;
+    background-color: #FAFAFA;
   }
 
   .gift-order-tip2 {
@@ -157,7 +158,7 @@
   }
 
   .order-gift-name {
-    font-size: 14px;
+    font-size: 16px;
     line-height: 20px;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -177,5 +178,9 @@
     background: url('/static/assets/images/integral_detail.png') 0 7px no-repeat;
     padding-left: 15px;
     margin-top: 5px;
+  }
+
+  .gift-order-container {
+    background-color: #fff;
   }
 </style>

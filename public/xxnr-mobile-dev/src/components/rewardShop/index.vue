@@ -22,9 +22,9 @@
     </ul>
   </div>
   <no-gift v-if="gifts.length == 0"></no-gift>
-  <div class="container" v-if="gifts.length != 0">
+  <div class="container gift-container" v-if="gifts.length != 0">
     <div v-for="item in gifts">
-      <div class="category-name" v-if="item.gifts.length != 0">
+      <div class="category-name" v-if="item.gifts.length != 0" :class="{'green': $index % 2 == 1, 'orange': $index % 2 == 0}">
         {{item.category.name}}
       </div>
       <gift-item :gifts="item.gifts" v-if="item.gifts.length != 0"></gift-item>
@@ -104,7 +104,18 @@
 
   .category-name {
     font-size: 14px;
-    line-height: 50px;
+    line-height: 16px;
+    margin: 9px 0 10px 0;
+    border-left: 5px solid #000;
+    padding-left: 6px;
+  }
+
+  .category-name.green {
+    border-color: #33AA44;
+  }
+
+  .category-name.orange {
+    border-color: #f98521;
   }
 
   .my-point {
@@ -131,5 +142,9 @@
     width: 7px;
     height: 12px;
     background: url('/static/assets/images/unlogin_arrow.png') 0 0 no-repeat;
+  }
+
+  .gift-container {
+    margin-top: 75px;
   }
 </style>

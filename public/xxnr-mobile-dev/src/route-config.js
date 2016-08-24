@@ -127,7 +127,12 @@ export function configRouter (router) {
       const user = getCookie('__user');
       if(!user){
         //let redirect = encodeURIComponent(encodeURI(transition.to.path));
-        transition.redirect('/login?ref=' + transition.to.path);
+        var toPath = '/login?ref=' + encodeURIComponent(transition.to.path);
+        if(transition.to.path == '/myPoint' || transition.to.path.indexOf('/pointsLogs') != -1) {
+          toPath = '/login?ref=/rewardShop';
+        }
+        //transition.redirect('/login');
+        router.go(toPath);
         //redirect 作为参数，登录之后跳转回来
         //console.log('Wrong way!');
       }else{

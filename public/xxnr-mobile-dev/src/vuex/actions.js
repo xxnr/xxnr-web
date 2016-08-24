@@ -158,9 +158,8 @@ export const login = ({dispatch,state},PhoneNumber,password) => {
       ,response => {
       if (response.data.code == 1000) {
         sessionStorage.setItem('user', JSON.stringify(response.data.datas));
-        //router.go('/home');
         if(getUrlParam('ref')) {
-          router.go(decodeURIComponent(getUrlParam('ref')));
+          router.go(decodeURIComponent(decodeURIComponent(getUrlParam('ref'))));
           return;
         }
         if(getUrlParam('redirect')) {
@@ -488,7 +487,9 @@ export const buyProduct = ({dispatch, state}) => {
       response => {
         if(response.data.code != 1000) {
           if(response.data.code == 1401) {
-            router.go('/login');
+            var ref = '/order?id=' + state.productDetail.product.SKU_id + '&count='+ state.productDetail.productNumber + '&productId=' + state.productDetail.product._id;
+            router.go('/login?ref=' + encodeURIComponent(ref));
+            return;
           } else {
             dispatch(types.SET_TOASTMSG,response.data.message);
             dispatch(types.HIDE_ATTRBOX);
@@ -789,6 +790,16 @@ export const resetOrderCondignee = ({dispatch, state}, fromUrl) => {
   if(!(checkPath(fromUrl, '/orderConsignee') == 1 || checkPath(fromUrl, '/orderRSC') == 1)) {
     dispatch(types.RESET_ORDERCONSIGNEE);
     api.getConsignee(response=> {
+      if(response.data.code == 1401) {
+        var href= window.location.href;
+        if(href.indexOf('/giftOrder') != -1) {
+          var ref = '/login?ref='+ encodeURIComponent('/giftOrder?giftId=' + getUrlParam('giftId') + '&gift_id=' + getUrlParam('gift_id'));
+          //console.log(decodeURI(ref));
+          //ref = decodeURI(ref);
+          router.go(ref);
+          return;
+        }
+      }
       if(response.data.datas.rows.length != 0) {
       dispatch(types.SELECT_CONSIGNEEAUTO, response.data.datas.rows);
     }
@@ -972,14 +983,12 @@ export const getPointGifts = ({dispatch, state}) => {
       }
       dispatch(types.GET_GIFTCATEGORIES, response.data.categories);
       var resData = response.data;
-      //console.log(resData);
       var giftArr = [];
       var item = {};
       for(let i = 0; i < resData.categories.length; i ++) {
         api.getGiftsByCategory({
           category: resData.categories[i]._id
         }, response => {
-          //console.log(response);
           if(response.data.code == 1000) {
             dispatch(types.GET_GIFTSBYCATEGORY, i , response.data.datas.gifts)
           }
