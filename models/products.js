@@ -130,11 +130,13 @@ var brandsProductsCollectionSchema = new mongoose.Schema({
 
 var productTagSchema = new mongoose.Schema({
 	category:{type:String, required:true},
-	name: {type:String, required:true, unique: true},
+	name: {type:String, required:true},
 	dateCreated: {type: Date, default: Date.now},
 	order: {type:Number, default: 0},
 	productsNum: {type:Number, default: 0}
 });
+productTagSchema.index({name:1, category:1}, {unique:true});
+productTagSchema.index({dateCreated:-1});
 productTagSchema.index({category:1, productsNum:1, order:1, dateCreated:-1});
 
 mongoose.model('product', productSchema);

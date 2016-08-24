@@ -85,6 +85,8 @@ exports.order = mongoose.model('order');
 // product
 exports.product = mongoose.model('product');
 exports.productAttribute = mongoose.model('productAttribute');
+exports.brandsProductsCollection = mongoose.model('brandsProductsCollection');
+exports.productTag = mongoose.model('productTag');
 // news
 exports.news = mongoose.model('news');
 exports.newsCategory = mongoose.model('newscategory');

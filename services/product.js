@@ -7,6 +7,8 @@ var SKUModel = require('../models').SKU;
 var ProductAttributeModel = require('../models').productAttribute;
 var sortOptions = {"price-desc":{price:-1},"price-asc":{price:1}};
 var BrandModel = require('../models').brand;
+var BrandsProductsCollectionModel = require('../models').brandsProductsCollection;
+var ProductTagModel = require('../models').productTag;
 var tools = require('../common/tools');
 
 // Service
@@ -93,6 +95,11 @@ ProductService.prototype.query = function(options, callback, oldSchema) {
         nor.push({id: {$nin: options.ids}});
     }
 
+    if (options.tags) {
+        queryOptions.tags = {$elemMatch:{name:{$in:options.tags}}};
+        nor.push({tags: {$elemMatch:{name:{$in:options.tags}}}});
+    }
+
     if (options.skip) {
         queryOptions.id = {$nin:options.skip};
         nor.push({id: options.skip});
@@ -176,6 +183,7 @@ function updateSKUName(product) {
 
 // Saves the product into the database
 ProductService.prototype.save = function(model, callback) {
+    var productTagsMax = 3;
     delete model.SKUPrice;
     delete model.SKUAttributes;
     delete model.SKUAdditions;
@@ -196,6 +204,12 @@ ProductService.prototype.save = function(model, callback) {
     if (model.brand) {
         if (model.brand.name) {
             model.brandName = model.brand.name;
+        }
+    }
+    if (model.tags) {
+        if (model.tags.length > productTagsMax) {
+            callback('商品的标签最多只能'+productTagsMax+'个');
+            return;
         }
     }
 
@@ -818,4 +832,121 @@ function refresh() {
 }
 
 //setTimeout(refresh, 1000);
+
+// brands products collection
+ProductService.prototype.updateAndSaveBrandsProductsCollection = function(brandProducts, callback){
+    if (brandProducts) {
+        BrandsProductsCollectionModel.findOneAndUpdate({brandId:brandProducts.brandId}, {$set:brandProducts}, {upsert:true, new:true}, 
+            function(err, newBrandProducts) {
+            if (err) {
+                console.error('ProductService updateAndSaveBrandsProductsCollection err:', err);
+                if (callback) {
+                    callback('ProductService updateAndSaveBrandsProductsCollection err');
+                }
+                return;
+            }
+            if (callback) {
+                callback(null, newBrandProducts);
+            }
+        });
+    }
+};
+
+ProductService.prototype.getBrandsProductsCollection = function(brandId, callback){
+    var queryOptions = {};
+    if (brandId) {
+        queryOptions.brandId = brandId; 
+    }
+    BrandsProductsCollectionModel
+        .find(queryOptions) 
+        .exec(function(err, BrandProducts) {
+        if (err) {
+            console.error('ProductService getBrandsProductsCollection err:', err);
+            if (callback) {
+                callback('ProductService getBrandsProductsCollection err');
+            }
+            return;
+        }
+        if (callback) {
+            callback(null, BrandProducts);
+        }
+    });
+};
+
+// products tags
+ProductService.prototype.getTag = function(category, name, callback){
+    if (!category) {
+        callback('category required');
+        return;
+    }
+
+    if (!name) {
+        callback('name required');
+        return;
+    }
+
+    ProductTagModel.findOne({name:name, category:category}, function(err, productTag) {
+        if (err) {
+            console.error('ProductService getTag findOne err:', err);
+            callback(err);
+            return;
+        }
+        callback(null, productTag);
+        return;
+    });
+};
+
+ProductService.prototype.addTag = function(category, name, callback){
+    if (!category) {
+        callback('category required');
+        return;
+    }
+    if (!name) {
+        callback('name required');
+        return;
+    }
+    var model = {category:category, name:name};
+    var productTag = new ProductTagModel(model);
+    productTag.save(function(err){
+        if (err) {
+            console.error('ProductService addTag save err:', err);
+            callback(err);
+            return;
+        }
+
+        callback(null, productTag);
+    });
+};
+
+ProductService.prototype.queryTags = function(category, callback, all){
+    var matchOptions = {};
+    var sortOptions = {};
+    var selectStr = '-__v';
+    if (category) {
+        matchOptions.category = category;
+    }
+    if (all) {
+        sortOptions.dateCreated = -1;
+    } else {
+        matchOptions.productsNum = {$gt:0};
+        sortOptions.order = 1;
+        sortOptions.dateCreated = -1;
+        selectStr += ' -order -productsNum';
+    }
+
+    ProductTagModel
+        .find(matchOptions)
+        .sort(sortOptions)
+        .select(selectStr)
+        .exec(function(err, productTags){
+            if(err){
+                console.error(err);
+                callback(err);
+                return;
+            }
+
+            callback(null, productTags);
+        });
+};
+
 module.exports = new ProductService();

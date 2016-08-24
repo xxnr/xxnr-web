@@ -121,7 +121,8 @@ exports.getProductsListPage = function(req, res, next) {
                 /*"goodsSort":3,*/ "goodsName": product.name,
                 "model": product.model,
                 "presale": product.presale ? product.presale : false,
-                pictures:product.pictures
+                "pictures":product.pictures,
+                "tags":product.tags
             };
 
             products.push(good);
@@ -241,6 +242,18 @@ exports.get_brandsProducts_collection = function(req, res, next){
             return;
         }
 
-        res.respond({code:1000, brandProducts:BrandProducts});
+        res.respond({code:1000, message:'success', brandProducts:BrandProducts});
+    });
+};
+
+exports.json_products_tags = function(req, res, next){
+    ProductService.queryTags(req.data.category, function(err, tags){
+        if (err) {
+            console.error('product json_products_tags err:', err);
+            res.respond({code: 1001, message: '获取商品标签列表失败', error: err});
+            return;
+        }
+
+        res.respond({code:1000, message:'success', tags:tags});
     });
 };
