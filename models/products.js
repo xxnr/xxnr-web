@@ -93,7 +93,7 @@ var productAttributeSchema = new mongoose.Schema({
 });
 
 // indexes
-productSchema.index({linker_category:1, brandName:1, 'attributes.value':1, 'SKUPrice.min':1, id:1});
+productSchema.index({linker_category:1, brandName:1, 'attributes.value':1, 'SKUPrice.min':1, id:1, 'tags.name':1});
 productAttributeSchema.index({category:1, brand:1, name:1});
 productAttributeSchema.index({category:1, brand:1, name:1, value:1}, {unique:true});
 

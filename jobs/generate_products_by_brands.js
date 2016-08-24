@@ -70,6 +70,7 @@ module.exports = function(callback) {
 							}
 						}
 					}
+					var update_brands = [];
 					var promises = [];
 					var brandIds = Object.keys(brands);
 					for (var i=0; i<brandIds.length; i++) {
@@ -79,6 +80,9 @@ module.exports = function(callback) {
 						var levels = [];
 						for (var j=0; j<levelsKeys.length; j++) {
 							levels.push(brand.levels[levelsKeys[j]]);
+						}
+						if (levels.length == 0) {
+							continue;
 						}
 						brand.levels = levels;
 						promises.push(
@@ -93,11 +97,12 @@ module.exports = function(callback) {
 				                });
 							})
 						);
+						update_brands.push(brandId);
 					}
 					Promise.all(promises)
 	            	.then(function () {
-	            		console.log('[', new Date(), '] generate products by brands success. ', brandIds.length, 'brands...');
-	            		BrandsProductsCollectionModel.remove({brandId:{$nin:brandIds}}, function (err) {
+	            		console.log('[', new Date(), '] generate products by brands success. ', update_brands.length, 'brands...');
+	            		BrandsProductsCollectionModel.remove({brandId:{$nin:update_brands}}, function (err) {
 	                        if (err) {
 	                            console.error('[', new Date(), '] generate products by brands, delete fail:', err);
 	                            callback(err);

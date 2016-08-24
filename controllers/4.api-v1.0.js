@@ -247,7 +247,8 @@ exports.getGoodsDetails = function (req, res, next) {
             "SKUAdditions": product.SKUAdditions,
             "SKUPrice": product.SKUPrice,
             "pictures": product.pictures,
-            "referencePrice": product.referencePrice
+            "referencePrice": product.referencePrice,
+            "tags": product.tags
         };
 
         delete product.body;
