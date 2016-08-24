@@ -128,9 +128,15 @@ export function configRouter (router) {
       if(!user){
         //let redirect = encodeURIComponent(encodeURI(transition.to.path));
         var toPath = '/login?ref=' + encodeURIComponent(transition.to.path);
-        if(transition.to.path == '/myPoint' || transition.to.path.indexOf('/pointsLogs') != -1) {
-          toPath = '/login?ref=/rewardShop';
+
+        if(transition.to.path.indexOf('/myPoint') != -1) {
+          toPath = '/login?redirect=/rewardShop&ref=/myPoint';
         }
+
+        if(transition.to.path.indexOf('/pointsLogs') != -1) {
+          toPath = '/login?redirect=/rewardShop&ref=/pointsLogs/unComplete'
+        }
+
         //transition.redirect('/login');
         router.go(toPath);
         //redirect 作为参数，登录之后跳转回来
