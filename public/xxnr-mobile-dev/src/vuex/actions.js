@@ -127,6 +127,8 @@ export const goBack = ({dispatch,state}) => {
     router.go('/rewardShop');
   } else if(window.location.pathname.indexOf('pointsLogs') != -1) {
     router.go('/rewardShop');
+  } else if(window.location.pathname.indexOf('/myPoint') != -1) {
+    router.go('/rewardShop');
   } else {
     window.history.back();
   }
