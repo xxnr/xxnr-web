@@ -128,7 +128,7 @@ export function configRouter (router) {
       if(!user){
         //let redirect = encodeURIComponent(encodeURI(transition.to.path));
         var toPath = '/login?ref=' + encodeURIComponent(transition.to.path);
-        if(transition.to.path == '/myPoint' || transition.to.path.indexOf('/pointsLogs') != -1) {
+        if(transition.to.path.indexOf('/myPoint') != -1 || transition.to.path.indexOf('/pointsLogs') != -1) {
           toPath = '/login?ref=/rewardShop';
         }
         //transition.redirect('/login');
