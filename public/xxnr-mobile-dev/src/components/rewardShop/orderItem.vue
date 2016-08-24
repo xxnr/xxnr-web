@@ -35,7 +35,7 @@
           <img src="/assets/images/order-arrow.png">
         </div>
       </div>
-      <div  v-show="$index == showIndex" @click="hideCode();">
+      <div  v-show="$index == showIndex" @click="hideCode();" class="order-info-container">
         <div v-if="order.deliveryType != 1" class="order-unsupport">
           暂不支持该商品兑换，请下载新新农人APP~
         </div>
@@ -71,7 +71,8 @@
     props: ['orders'],
     data(){
       return {
-        showIndex: -1
+        showIndex: -1,
+        preIndex: -1
       }
     },
     methods: {
@@ -80,8 +81,13 @@
           this.showIndex = -1;
           return;
         }
+        this.preIndex = this.showIndex;
         this.showIndex = index;
-        this.getScrollTop($(".order-item").eq(index)[0].offsetTop - 47);
+        var offset = 47;
+        if(this.showIndex > this.preIndex) {
+          offset += $(".order-item").eq(this.preIndex).find('.order-info-container')[0].clientHeight;
+        }
+        this.getScrollTop($(".order-item").eq(index)[0].offsetTop - offset);
       },
       hideCode: function () {
         this.showIndex = -1;
