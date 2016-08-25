@@ -88,10 +88,12 @@
   },components: {
     xxnrToast
   },
+  detached:function() {
+    this.consigneeName = '';
+    this.consigneePhone = '';
+  },
   route: {
     activate(transition) {
-      this.consigneeName = '';
-      this.consigneePhone = '';
       this.getConsigneeList();
       this.showBackBtn();
       this.editTitle('选择收货人');
