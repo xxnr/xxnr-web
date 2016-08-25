@@ -62,6 +62,7 @@
 </div>
 
 <script src="/js/zepto.js"></script>
+<script src="/js/campaignConfig.js"></script>
 <script  type="text/javascript">
     var campaign = <%- JSON.stringify(campaign) %>;
     var title = campaign.title;
@@ -75,7 +76,12 @@
 
     $(function() {
         $('#page_jump').on('click', function(){
-            jsObj.startActivity("RewardShopActivity");
+            if(typeof jsObj == "undefined"){
+                /// 链接跳转代码
+                window.location.href =  config.mobileBaseURI + '/rewardShop';
+            }else {
+                jsObj.startActivity("RewardShopActivity");
+            }
         });
     });
 </script>
