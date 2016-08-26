@@ -1,4 +1,18 @@
-﻿<div class="filter" style="padding-bottom:9px">
+﻿<style type="text/css">    
+    .productinfo .tag { position: relative; float: left; margin: 5px 8px; cursor: pointer; padding: 4px 15px; border: 1px solid gray; border-radius: 3px; background-color: #FFFFFF; text-align: center; }
+    .productinfo .tag:hover { border: 1px solid #FF6F00; background-color: #FF6F00; color: #FFFFFF; }
+    .productinfo .tag span { position: absolute; top:5px; right:2px; color: #FFFFFF; display: none; }
+    .productinfo .tag:hover span { display: block; }
+    .productinfo .tagselected { border: 1px solid #FF6F00; background-color: #FF6F00; color: #FFFFFF; cursor: auto; }
+    .productinfo .tagselected span { display: block; }
+    .productinfo .ui-alltags { display: block; overflow: hidden; height: 80px; }
+    .productinfo .alltags { display: block; }
+    .productinfo .moretags { display: none; margin-left: 8px; cursor: pointer; }
+    .productinfo .moretags:hover { color: #FF6F00; }
+    .productinfo .lesstags { display: none; margin-left: 8px; cursor: pointer; }
+    .productinfo .lesstags:hover { color: #FF6F00; }
+</style>
+<div class="filter" style="padding-bottom:9px">
     <div class="container">
         <div class="caption"><span class="fa fa-navicon mr5"></span> 商品管理</div>
         <div class="row">
@@ -78,7 +92,7 @@
             <div class="col-md-10">
                 <div class="hidden" data-component="texthidden" data-component-path="products.form.category" data-readonly="readonly"></div>
                 <div class="brand col-md-7 m">
-                    <div data-component="dropdown" data-component-path="products.form.brand._id" data-source="products.brands" data-source-value="_id" data-source-text="name">品牌</div>
+                    <div data-component="dropdown" data-component-path="products.form.brand._id" data-source="products.brands" data-source-value="_id" data-source-text="name" data-required="true">品牌</div>
                 </div>
 
                 <div data-component="template" data-component-path="products" class="attribute_list">
@@ -140,6 +154,53 @@
                                 </div>
                             </div>
                             {{ end }}
+                        </div>
+                    </script>
+                </div>
+                <div data-component="template" data-component-path="products" class="tag_list">
+                    <script type="text/html">
+                        <div class="public">
+                            <div class="col-md-7 m">
+                                <div class="ui-dropdown-label">商品标签:</div>
+                                <div class="col-md-10 alltags">
+                                {{ if form.tags && form.tags.length > 0 }}
+                                    {{ foreach tag in form.tags }}
+                                        <div class="tag tagdelete" data-id="{{tag.ref}}">{{tag.name}}<span>×</span></div>
+                                    {{ end }}
+                                    <div class="cl"></div>
+                                {{ else }}
+                                    <span style="margin-left:8px;">暂无</span>
+                                {{ fi }}
+                                </div>
+                            </div>
+                            <div class="col-md-3 m">
+                                <div class="ui-textbox-label">新增标签:</div>
+                                <div class="ui-textbox-with-button new_public_tag">
+                                    <input class="col-md-10" type="text"/>
+                                    <a class="col-md-2 account" href="javascript:void(0)" onclick="new_public_tag()">
+                                        <span class="fa fa-plus-circle"></span>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="col-md-12 m">
+                                <div class="ui-dropdown-label">常用标签:</div>
+                                <div class="col-md-10 ui-alltags">
+                                    <div class="alltags">
+                                    {{ if tags && tags.length > 0 }}
+                                        {{ foreach tag in tags }}
+                                            <div class="{{ if tag.display == 1 }}tag tagadd{{ else }}tag tagselected{{ fi }}" data-id="{{tag._id}}" data-name="{{tag.name}}">{{tag.name}}<span>√</span></div>
+                                        {{ end }}
+                                        <div class="cl"></div>
+                                    {{ else }}
+                                        <span>暂无</span>
+                                    {{ fi }}
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="moretags">更多↓</div>
+                                    <div class="lesstags">收起↑</div>
+                                </div>
+                            </div>
                         </div>
                     </script>
                 </div>
@@ -385,6 +446,7 @@
     products.info = {};
     products.form = {};
     products.categories = [];
+    products.tags = [];
     products_init_allattributes();
     products.response = null;
     products.SKUQueryAttributes=[];
@@ -419,6 +481,12 @@
                 request_brands(response.linker_category, function() {
                     request_product_attribute(response.linker_category, 0, function (product_attributes_without_brand) {
                         request_product_attribute(response.linker_category, response.brand._id, function (product_attributes_with_brand) {
+                            request_product_tags(response.linker_category, response.tags, function(product_tags) {
+                            products.form.tags = [];
+                            if (response.tags) {
+                                products.form.tags = response.tags;
+                            }
+                            
                             // product_attributes is queried from product attributes
                             // and should be merged with current product attributes from product form
                             for(var j=0; j<product_attributes_without_brand.length; j++){
@@ -450,6 +518,7 @@
                             products_init_ckeditors(response);
                             SET('common.form', 'products');
                             formModified = false;
+
                             request_SKU_attribute(response.linker_category, response.brand._id, function(SKU_attributes){
                                 SKU_attributes_all = SKU_attributes_all.concat(SKU_attributes);
                                 request_SKU_Addition(response.linker_category, response.brand._id, function(){
@@ -469,6 +538,7 @@
                                         }
                                     });
                                 })
+                            });
                             });
                         });
                     });
@@ -734,6 +804,27 @@
         })
     }
 
+    function request_product_tags(category_id, tags, callback){
+        $.components.GET(managerurl + '/api/products/tags?category=' + category_id, null, function(response) {
+            if (response.code == 1000) {
+                var product_tags = [];
+                for (var i = 0; i < response.tags.length; i++) {
+                    var tag = {_id:response.tags[i]._id, name:response.tags[i].name, display:1};
+                    if (tags) {
+                        for (var j = 0; j < tags.length; j++) {
+                            if (tags[j].ref == tag._id) {
+                                tag.display = 0;
+                            }
+                        }
+                    }
+                    product_tags.push(tag);
+                }
+                SET('products.tags', $.extend(products.tags, product_tags));
+                callback(product_tags);
+            }
+        });
+    }
+
     function products_category() {
         SET('products.category', {}, true);
         SET('common.form', 'products.category');
@@ -746,6 +837,12 @@
                 return a.name.localeCompare(b.name);
             });
             SET('products.categories', response);
+        });
+    }
+
+    function products_refresh_tags(category_id) {
+        $.components.GET(managerurl + '/api/products/tags/?category=' + category_id, null, function(response) {
+            SET('products.tags', response.tags);
         });
     }
 
@@ -1018,6 +1115,24 @@
         });
     }
 
+    function new_public_tag(name){
+        var el=$('.new_public_tag input')[0];
+        var category = products.form.linker_category;
+        var tagName = el.value;
+        $.components.POST(managerurl+'/api/products/tag/add', {category:category, name:tagName}, function(response) {
+            if (response.code==1000) {
+                var new_tag = response.tag;
+                products.tags.splice(0, 0, {ref:new_tag._id, name:new_tag.name, display:1});
+                SET('products.tags', products.tags);
+                el.value = "";
+                products_onchange();
+                success();
+            } else {
+                alert(response.message);
+            }
+        });
+    }
+
     function request_brands(category, callback){
         SET('products.brands', null);
         $.components.GET(managerurl+'/api/brands?category='+category, null, function(response){
@@ -1106,6 +1221,93 @@
             products.form.private_attributes[index] = {ref:ref, name:name,value:value};
             formModified = true;
         });
+
+        $('.tag_list .public .tagadd').off('click').on('click', function() {
+            var el = $(this);
+            var ref = el.attr('data-id');
+            var name = el.attr('data-name');
+            if (!products.form.tags) {
+                products.form.tags = [];
+            }
+            if (products.form.tags.length > 2) {
+                alert('商品标签最多设置为3个');
+                return;
+            }
+            products.form.tags.push({ref:ref, name:name});
+            if (products.tags) {
+                for (var i=0; i<products.tags.length; i++) {
+                    if (products.tags[i]._id == ref) {
+                        products.tags[i].display = 0;
+                        break;
+                    }
+                }
+            }
+            SET('products.form.tags', products.form.tags);
+            SET('products.tags', products.tags);
+            formModified = true;
+        });
+
+        $('.tag_list .public .tagdelete').off('click').on('click', function() {
+            var el = $(this);
+            var ref = el.attr('data-id');
+            var tags = [];
+            if (products.form.tags) {
+                for (var i=0; i<products.form.tags.length; i++) {
+                    var tag = products.form.tags[i];
+                    if (tag.ref !== ref) {
+                        tags.push(tag);
+                    }
+                }
+            }
+            products.form.tags = tags;
+            if (products.tags) {
+                for (var i=0; i<products.tags.length; i++) {
+                    var tag = products.tags[i];
+                    if (tag._id == ref) {
+                        tag.display = 1;
+                        break;
+                    }
+                }
+            }
+            SET('products.form.tags', products.form.tags);
+            SET('products.tags', products.tags);
+            formModified = true;
+        });
+
+        $('.tag_list .public .moretags').off('click').on('click', function() {
+            var el = $(this);
+            var lesstags = $(this).parents().children(".lesstags");
+            var elUiAlltags = $(this).parents().children(".ui-alltags");
+            var elAlltags = $(this).parents().children(".ui-alltags").children(".alltags");
+            elUiAlltags.css({"overflow":"auto","height":"auto"});
+            el.hide();
+            lesstags.show();
+        });
+
+        $('.tag_list .public .lesstags').off('click').on('click', function() {
+            var el = $(this);
+            var moretags = $(this).parents().children(".moretags");
+            var elUiAlltags = $(this).parents().children(".ui-alltags");
+            var elAlltags = $(this).parents().children(".ui-alltags").children(".alltags");
+            elUiAlltags.css({"overflow":"hidden","height":"80px"});
+            el.hide();
+            tagsMore();
+        });
+
+        tagsMore();
+    }
+
+    function tagsMore() {
+        var alltagsHeight = $(".tag_list .public .ui-alltags .alltags") ? $(".tag_list .public .ui-alltags .alltags")[0].clientHeight : 0;
+        var uiAlltagsHeight = $(".tag_list .public .ui-alltags") ? $(".tag_list .public .ui-alltags")[0].clientHeight : 0;
+        if (alltagsHeight && uiAlltagsHeight) {
+            if (alltagsHeight > uiAlltagsHeight) {
+                $('.moretags').show();
+            }
+            if (alltagsHeight <= uiAlltagsHeight) {
+                $('.moretags').hide();
+            }
+        }
     }
 
     function checkSKU(index, changed){
