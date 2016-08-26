@@ -447,8 +447,11 @@ function generate_sms_vcode(req, res, next) {
         }
     }
 };
+
 // Generates sms
-exports.generate_sms = generate_sms_vcode;
+exports.generate_sms = function(req, res, next){
+    res.respond({code:1001, message:'该接口已停用，如您正在使用APP，请更新至最新版本。'});
+};
 
 // Generates vcode
 function generate_vcode(code_type, target, target_type, mobile_code, callback) {
