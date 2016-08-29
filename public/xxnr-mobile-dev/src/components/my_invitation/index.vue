@@ -220,9 +220,11 @@
     width: 70px;
     border-radius: 50%;
     overflow: hidden;
+    text-align: center;
   }
 
   .my-invitation-img img {
+    height: 100%;
     width: 100%;
   }
   .roundInput{
