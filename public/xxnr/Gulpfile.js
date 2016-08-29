@@ -520,7 +520,28 @@ gulp.task('rsc_management_js_minify', function() {
         .pipe(gulp.dest('./rev/rsc_management_js'));
 });
 
-
+gulp.task('points_recording_js_minify', function() {
+    var revAll = new RevAll();
+    gulp.src([
+            './js/payService.js',
+            './js/shoppingCart/shoppingCartController.js',
+            './js/shoppingCart/shoppingCartService.js',
+            './js/pointsRecording/pointsRecordingController.js',
+            './js/login/loginController.js',
+            './js/login/loginService.js',
+            './js/headerFooterDirective.js',
+            './js/headerController.js',
+            './js/sideService.js',
+            './js/myPlaceholderDirective.js'])
+        .pipe(concat('pointsRecording_js.js'))
+        .pipe(ngmin())
+        .pipe(uglify({mangle: false}))
+        .pipe(gulp.dest('./dev/js'))
+        .pipe(revAll.revision())
+        .pipe(gulp.dest('./production_js'))
+        .pipe(revAll.manifestFile())
+        .pipe(gulp.dest('./rev/points_recording_js'));
+});
 
 gulp.task('rev', function() {
     var manifest = gulp.src('./rev/**/*.json');
@@ -547,7 +568,8 @@ gulp.task('rev', function() {
         'xxnr_institute.html',
         'applyCountyVerified.html',
         'shareApp.html',
-        'rsc_management.html'
+        'rsc_management.html',
+        'pointsRecording.html'
         ])
        //- 读取 rev-manifest.json 文件以及需要进行css名替换的文件
         .pipe(htmlreplace({
@@ -585,7 +607,8 @@ gulp.task('js_minify_all',
         'xxnr_institute_js_minify',
         'xxnr_finance_js_minify',
         'xxnr_bigdata_js_minify',
-        'rsc_management_js_minify'
+        'rsc_management_js_minify',
+        'points_recording_js_minify'
     ]);
 
 

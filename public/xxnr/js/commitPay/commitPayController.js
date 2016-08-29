@@ -307,7 +307,7 @@ app.controller('commitPayController', function($scope, remoteApiService, payServ
                                 }else if(data.code == 1401){
                                     //sweetalert('你已被登出，请重新登录', "logon.html");
                                     var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">你已被登出，请重新登录';
-                                    var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);
+                                    var id = Flash.create('success', message, 3000, {"class": 'xxnr-warning-flash', "id": 'xxnr-warning-flash'}, false);
                                     $timeout(function(){
                                         window.location.href = "/logon.html";
                                         return false
@@ -315,7 +315,7 @@ app.controller('commitPayController', function($scope, remoteApiService, payServ
                                 }else{
                                     //sweetalert('线下支付申请失败,请重试');
                                     var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">线下支付申请失败,请重试';
-                                    var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);
+                                    var id = Flash.create('success', message, 3000, {"class": 'xxnr-warning-flash', "id": 'xxnr-warning-flash'}, false);
                                 }
                             });
                         //$scope.offlineSubmitted = true;
@@ -324,7 +324,7 @@ app.controller('commitPayController', function($scope, remoteApiService, payServ
                             .then(function(data) {
                                 if(data.datas.rows.payStatus == 2){
                                     var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">订单已支付';
-                                    var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);
+                                    var id = Flash.create('success', message, 3000, {"class": 'xxnr-warning-flash', "id": 'xxnr-warning-flash'}, false);
                                 }else{
                                     window.open($scope.payUrl);
                                     $scope.showPayPop = true;
@@ -336,7 +336,7 @@ app.controller('commitPayController', function($scope, remoteApiService, payServ
 
                 }else if(data.code == 1001){
                     var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">订单已支付';
-                    var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);
+                    var id = Flash.create('success', message, 3000, {"class": 'xxnr-warning-flash', "id": 'xxnr-warning-flash'}, false);
                     $timeout(function(){
                         window.location.href = window.location.href;
                         return false

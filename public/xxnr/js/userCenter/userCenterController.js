@@ -64,7 +64,7 @@ app.controller('userCenterController', function($scope, $rootScope,$timeout ,rem
                     } else if(data.code == 1401){
                         //sweetalert('你已被登出，请重新登录', "logon.html");
                         var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">你已被登出，请重新登录';
-                        var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);
+                        var id = Flash.create('success', message, 3000, {"class": 'xxnr-warning-flash', "id": 'xxnr-warning-flash'}, false);
                         $timeout(function(){
                             window.location.href = "/logon.html";
                             return false
@@ -239,7 +239,7 @@ app.controller('userCenterController', function($scope, $rootScope,$timeout ,rem
                                 //sweetalert('修改密码成功', "logon.html");
 
                                 var message = '<img class="xxnr--flash--icon" src="images/correct_prompt.png" alt="">修改密码成功';
-                                var id = Flash.create('success', message, 3000, {class: 'xxnr-success-flash', id: 'xxnr-success-flash'}, false);
+                                var id = Flash.create('success', message, 3000, {"class": 'xxnr-success-flash', "id": 'xxnr-success-flash'}, false);
                                 $timeout(function(){
                                     window.location.href = "/logon.html";
                                     return false
@@ -248,7 +248,7 @@ app.controller('userCenterController', function($scope, $rootScope,$timeout ,rem
                             }else if(data.code == 1401){
                                 //sweetalert('你已被登出，请重新登录', "logon.html");
                                 var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">你已被登出，请重新登录';
-                                var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);
+                                var id = Flash.create('success', message, 3000, {"class": 'xxnr-warning-flash', "id": 'xxnr-warning-flash'}, false);
                                 $timeout(function(){
                                     window.location.href = "/logon.html";
                                     return false
@@ -259,7 +259,7 @@ app.controller('userCenterController', function($scope, $rootScope,$timeout ,rem
                             else {
                                 //sweetalert(data.message);
                                 var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">'+data.message;
-                                var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);
+                                var id = Flash.create('success', message, 3000, {"class": 'xxnr-warning-flash', "id": 'xxnr-warning-flash'}, false);
                             }
                         })
                 })
@@ -298,7 +298,7 @@ app.controller('userCenterController', function($scope, $rootScope,$timeout ,rem
                                 //submit fail
                                 //sweetalert(data.message);
                                 var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">'+data.message;
-                                var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);
+                                var id = Flash.create('success', message, 3000, {"class": 'xxnr-warning-flash', "id": 'xxnr-warning-flash'}, false);
                             }
                         })
                 })
@@ -353,23 +353,25 @@ app.controller('userCenterController', function($scope, $rootScope,$timeout ,rem
         }
     };
     $scope.show_page = function (pageId) {
-        $('html,body').animate({
-            scrollTop: 0
-        }, 100);
-        $scope.current_page = pageId;
-        for (var pageIndex in $scope.pages) {
-            if ($scope.pages[pageIndex].id == pageId) {
-                $scope.pages[pageIndex].isSelected = true;
-            } else {
-                $scope.pages[pageIndex].isSelected = false;
-            }
-        }
-        for (var i = 0; i < $scope.showTypes.length; i++) {
-            if ($scope.showTypes[i].isSelected == true) {
-                $scope.show($scope.showTypes[i].id, i);
-            }
-        }
 
+        if(pageId!='...') {
+            $('html,body').animate({
+                scrollTop: 0
+            }, 100);
+            $scope.current_page = pageId;
+            for (var pageIndex in $scope.pages) {
+                if ($scope.pages[pageIndex].id == pageId) {
+                    $scope.pages[pageIndex].isSelected = true;
+                } else {
+                    $scope.pages[pageIndex].isSelected = false;
+                }
+            }
+            for (var i = 0; i < $scope.showTypes.length; i++) {
+                if ($scope.showTypes[i].isSelected == true) {
+                    $scope.show($scope.showTypes[i].id, i);
+                }
+            }
+        }
 
     };
 
@@ -531,7 +533,7 @@ app.controller('userCenterController', function($scope, $rootScope,$timeout ,rem
                                     }else if(data.code == 1401){
                                         //sweetalert('你已被登出，请重新登录', "logon.html");
                                         var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">你已被登出，请重新登录';
-                                        var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);
+                                        var id = Flash.create('success', message, 3000, {"class": 'xxnr-warning-flash', "id": 'xxnr-warning-flash'}, false);
                                         $timeout(function(){
                                             window.location.href = "/logon.html";
                                             return false
@@ -539,7 +541,7 @@ app.controller('userCenterController', function($scope, $rootScope,$timeout ,rem
                                     }else{
                                         //sweetalert('获取自提码失败','my_xxnr.html');
                                         var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">获取自提码失败';
-                                        var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);
+                                        var id = Flash.create('success', message, 3000, {"class": 'xxnr-warning-flash', "id": 'xxnr-warning-flash'}, false);
                                         $timeout(function(){
                                             window.location.href = "/my_xxnr.html";
                                             return false
@@ -620,7 +622,7 @@ app.controller('userCenterController', function($scope, $rootScope,$timeout ,rem
                     if(data.code == 1000){
                         //sweetalert('收货成功','my_xxnr.html');
                         var message = '<img class="xxnr--flash--icon" src="images/correct_prompt.png" alt="">收货成功';
-                        var id = Flash.create('success', message, 3000, {class: 'xxnr-success-flash', id: 'xxnr-success-flash'}, false);
+                        var id = Flash.create('success', message, 3000, {"class": 'xxnr-success-flash', "id": 'xxnr-success-flash'}, false);
                         $timeout(function(){
                             window.location.href = "/my_xxnr.html";
                             return false
@@ -628,7 +630,7 @@ app.controller('userCenterController', function($scope, $rootScope,$timeout ,rem
                     }else if(data.code == 1401){
                         //sweetalert('你已被登出，请重新登录', "logon.html");
                         var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">你已被登出，请重新登录';
-                        var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);
+                        var id = Flash.create('success', message, 3000, {"class": 'xxnr-warning-flash', "id": 'xxnr-warning-flash'}, false);
                         $timeout(function(){
                             window.location.href = "/logon.html";
                             return false
@@ -637,7 +639,7 @@ app.controller('userCenterController', function($scope, $rootScope,$timeout ,rem
                     else{
                         //sweetalert('确认收货失败','my_xxnr.html');
                         var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">确认收货失败';
-                        var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);
+                        var id = Flash.create('success', message, 3000, {"class": 'xxnr-warning-flash', "id": 'xxnr-warning-flash'}, false);
                         $timeout(function(){
                             window.location.href = "/my_xxnr.html";
                             return false

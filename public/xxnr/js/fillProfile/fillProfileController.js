@@ -187,7 +187,7 @@ app.controller('fillProfileController', function($scope, remoteApiService, commo
                     if (response.data.code == 1000) {
                         //sweetalert('个人资料保存成功','my_xxnr.html');
                         var message = '<img class="xxnr--flash--icon" src="images/correct_prompt.png" alt="">个人资料保存成功';
-                        var id = Flash.create('success', message, 3000, {class: 'xxnr-success-flash', id: 'xxnr-success-flash'}, false);
+                        var id = Flash.create('success', message, 3000, {"class": 'xxnr-success-flash', "id": 'xxnr-success-flash'}, false);
                         $timeout(function(){
                             window.location.href = "/my_xxnr.html";
                             return false
@@ -195,7 +195,7 @@ app.controller('fillProfileController', function($scope, remoteApiService, commo
                     }else if(response.data.code == 1401){
                         //sweetalert('你已被登出，请重新登录', "logon.html");
                         var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">你已被登出，请重新登录';
-                        var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);
+                        var id = Flash.create('success', message, 3000, {"class": 'xxnr-warning-flash', "id": 'xxnr-warning-flash'}, false);
                         $timeout(function(){
                             window.location.href = "/logon.html";
                             return false
@@ -209,7 +209,7 @@ app.controller('fillProfileController', function($scope, remoteApiService, commo
             }else{
                 //sweetalert('请填写完整信息');
                 var message = '<img class="xxnr--flash--icon" src="images/error_prompt.png" alt="">请填写完整信息';
-                var id = Flash.create('success', message, 3000, {class: 'xxnr-warning-flash', id: 'xxnr-warning-flash'}, false);
+                var id = Flash.create('success', message, 3000, {"class": 'xxnr-warning-flash', "id": 'xxnr-warning-flash'}, false);
             }
         }
 
