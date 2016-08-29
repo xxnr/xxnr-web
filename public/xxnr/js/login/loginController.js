@@ -421,10 +421,10 @@ app.controller('loginController', function($scope, $timeout, remoteApiService, c
             }
         }else if(!isResetPassword){
             //sweetalert('请再次输入密码');
-            $scope.registerResMsg = '请再次输入密码';
+            $scope.registerResMsg = '请输入确认密码';
             $scope.errorInputGroupNum = $scope.formInputsKeyValue.registerPasswordConfirm;
         }else if(isResetPassword){
-            $scope.resetPasswordMsg = '请再次输入密码';
+            $scope.resetPasswordMsg = '请输入确认密码';
             $scope.errorInputGroupNum = $scope.formInputsKeyValue.resetPasswordConfirm;
         }
     };
@@ -465,7 +465,7 @@ app.controller('loginController', function($scope, $timeout, remoteApiService, c
                             } else {
                                 //sweetalert(data.message);
                                 $scope.resetPasswordMsg = data.message;
-                                $scope.errorInputGroupNum = $scope.formInputsKeyValue.resetPasswordCode;
+                                $scope.errorInputGroupNum = $scope.formInputsKeyValue.resetPasswordPhone;
                             }
                         })
                 })

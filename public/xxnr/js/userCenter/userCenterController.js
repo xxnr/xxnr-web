@@ -85,7 +85,7 @@ app.controller('userCenterController', function($scope, $rootScope,$timeout ,rem
             }
         } else {
             //sweetalert('请输入新密码');
-            $scope.my_xxnr_password_err_msg = '请输入旧密码';
+            $scope.my_xxnr_password_err_msg = '请输入原密码';
         }
         return false;
     };
@@ -121,7 +121,7 @@ app.controller('userCenterController', function($scope, $rootScope,$timeout ,rem
             }
         } else {
             //sweetalert('请填写确认密码');
-            $scope.my_xxnr_password_err_msg = '请填写确认密码';
+            $scope.my_xxnr_password_err_msg = '请输入确认密码';
         }
     };
 
