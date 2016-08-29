@@ -15,7 +15,7 @@
     "react-cookie": "^0.4.5",
     "urijs": "^1.18.1",
     "vue": "^1.0.18",
-    "vue-resource": "^0.9.3",
+    "vue-resource": "^0.7.0",
     "vue-router": "^0.7.13",
     "vue-toast": "^2.0.2",
     "vuex": "^0.6.3",

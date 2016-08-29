@@ -71,8 +71,8 @@ export default {
   confirmOrder: function (data, cb, errCb) {
     jsonpPost(API_ROOT + "api/v2.2/order/confirmSKUReceived", data, cb, errCb);
   },
-  getInviter: function (data, cb, errCb) {
-    jsonpGet(API_ROOT + "api/v2.0/user/getInviter/", data, cb, errCb);
+  getInviter: function (cb, errCb) {
+    jsonpGet(API_ROOT + "api/v2.0/user/getInviter/", null, cb, errCb);
   },
   sendCode: function (data, cb, errCb) {
     jsonpPost(API_ROOT + "api/v2.3/sms", data, cb, errCb);
@@ -106,8 +106,8 @@ export default {
   },
   getGiftOrderDetail: function (data, cb, errCb) {
     jsonpGet(API_ROOT + 'api/v2.3/rewardshop/getGiftOrder', data, cb, errCb);
-  },getCampaigns: function (data, cb, errCb) {
-    jsonpGet(API_ROOT + 'api/v2.3/campaigns', data, cb, errCb);
+  },getCampaigns: function (cb, errCb) {
+    jsonpGet(API_ROOT + 'api/v2.3/campaigns', null, cb, errCb);
   }
 }
 

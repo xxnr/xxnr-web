@@ -30,7 +30,6 @@ const mutations = {
   },
   [CLEAR_INVITER](state) {
     state.inviterInfo = {};
-    console.log('clear');
   }
 }
 
