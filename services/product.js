@@ -10,6 +10,10 @@ var BrandModel = require('../models').brand;
 var BrandsProductsCollectionModel = require('../models').brandsProductsCollection;
 var ProductTagModel = require('../models').productTag;
 var tools = require('../common/tools');
+var jobs = require('../jobs');
+var path = require('path');
+var config = require('../config');
+var lockfile = require('proper-lockfile');
 
 // Service
 var ProductService = function(){};
@@ -248,6 +252,7 @@ ProductService.prototype.save = function(model, callback) {
                                 }
 
                                 callback(null, doc);
+                                doAfterProductUpdate();
                             });
                         });
                     }
@@ -255,6 +260,7 @@ ProductService.prototype.save = function(model, callback) {
             } else {
                 updateSKUName(model);
                 callback(null, updatedProduct);
+                doAfterProductUpdate();
                 //setTimeout(refresh, 1000);
             }
         })
@@ -336,64 +342,6 @@ ProductService.prototype.category = function(options, callback) {
         setTimeout(refresh, 1000);
     });
 };
-
-// Imports CSV
-//Product.addWorkflow('import', function(error, model, filename, callback) {
-//    Fs.readFile(filename, function(err, buffer) {
-//
-//        if (err) {
-//            error.push(err);
-//            callback();
-//            return;
-//        }
-//
-//        buffer = buffer.toString('utf8').split('\n');
-//
-//        var properties = [];
-//        var schema = GETSCHEMA('Product');
-//        var isFirst = true;
-//        var count = 0;
-//
-//        buffer.wait(function(line, next) {
-//
-//            if (!line)
-//                return next();
-//
-//            var data = line.replace(/\"/g, '').split(';')
-//            var product = {};
-//
-//            for (var i = 0, length = data.length; i < length; i++) {
-//                var value = data[i];
-//                if (!value)
-//                    continue;
-//
-//                if (isFirst)
-//                    properties.push(value);
-//                else
-//                    product[properties[i]] = value;
-//            }
-//
-//            if (isFirst) {
-//                isFirst = false;
-//                return next();
-//            }
-//
-//            schema.make(product, function(err, model) {
-//                if (err)
-//                    return next();
-//                count++;
-//                model.$save(next);
-//            });
-//        }, function() {
-//
-//            if (count)
-//                refresh();
-//
-//            // Done, returns response
-//            callback(SUCCESS(count > 0));
-//        });
-//    });
-//});
 
 ProductService.prototype.idJoinWithCount = function(options, callback){
     var products = {};
@@ -617,6 +565,7 @@ ProductService.prototype.updateStatus = function(_id, online, callback){
             if(err){
                 console.error(err);
                 callback(err);
+                doAfterProductUpdate();
                 return;
             }
 
@@ -948,5 +897,29 @@ ProductService.prototype.queryTags = function(category, callback, all){
             callback(null, productTags);
         });
 };
+
+// to do after the product update
+const generateBrandProducts_keyFile = path.join(__dirname, '../resources/generate_brandProducts');
+function doAfterProductUpdate() {
+    if(config.environment !== 'sandbox') {
+        try {
+            lockfile.lock(generateBrandProducts_keyFile, function (err, release) {
+                setTimeout(function(){
+                    jobs.generate_products_by_brands(function(err) {
+                        if (err) {
+                            console.error('ProductService doAfterProductUpdate job generate_products_by_brands err:', err);
+                        }
+                        if (release) {
+                            release();
+                        }
+                    });
+                }, 5*60*1000);
+            });
+        } catch(e) {
+            console.error('ProductService doAfterProductUpdate for generate_products_by_brands catch err:', e);
+            return;
+        }
+    }
+}
 
 module.exports = new ProductService();
