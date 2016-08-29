@@ -18,9 +18,7 @@ Vue.http.options.xhr = {withCredentials: true};
 export const jsonpGet = (url,data,cb,errCb) => {
   var options = data ? {params: data} : {};
   Vue.http.jsonp(url,options).then(function(response){
-    console.log(response.data.code);
     if(response.data.code == 1401) {
-      console.log('sss');
       clearCookie();
     }
     cb(response);

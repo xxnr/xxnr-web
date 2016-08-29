@@ -214,7 +214,6 @@ export const getOrders = ({dispatch,state},typeValue,pageNum,changedTab) => {
 }
 
 export const getProductDetail = ({dispatch,state}, id) => {
-  console.log(id);
   api.getProductDetail(
     {productId: id},
     response => {
