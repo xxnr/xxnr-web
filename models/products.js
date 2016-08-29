@@ -76,6 +76,10 @@ var productSchema = new mongoose.Schema({
 		min:{type:Number},
 		max:{type:Number}
 	},
+	tags: [{								// all tags of this product, used for product query
+		ref: {type:mongoose.Schema.ObjectId, ref:'productTag', required:true},
+		name: {type: String, required: true}
+	}],
 	rewardPoints:{type:Number}									// 完成商品所得积分
 });
 
@@ -90,11 +94,56 @@ var productAttributeSchema = new mongoose.Schema({
 
 // indexes
 productSchema.index({linker_category:1, brandName:1, 'attributes.value':1, 'SKUPrice.min':1, id:1});
+productSchema.index({linker_category:1, brandName:1, 'tags.name':1, 'SKUPrice.min':1, id:1});
 productAttributeSchema.index({category:1, brand:1, name:1});
 productAttributeSchema.index({category:1, brand:1, name:1, value:1}, {unique:true});
 
+var brandsProductsCollectionSchema = new mongoose.Schema({
+	ref: {type: mongoose.Schema.ObjectId, ref: 'brand', required: true},
+	brandId: {type: String, required: true, unique: true},
+	brandName: {type: String, required: true},
+	brandImg: {type: String, required: true},
+	total: {type: Number},
+	levels:[{
+		name: {type: String, required: true},
+		order: {type: Number},
+		products:[{
+			ref: {type: mongoose.Schema.ObjectId, ref: 'product'},
+			id: {type: String, required: true},
+			name: {type: String, required: true},
+			unitPrice: {type: Number, required: true},
+			brandId: {type: String, required: true},
+			brandName: {type: String, required: true},
+			imgUrl: {type: String, required: true},
+			thumbnail: {type: String, required: true},
+			originalPrice: {type: Number, required: true},
+			presale: {type: Boolean, default: false},
+			pictures:[{
+				imgUrl: {type: String, required: true},
+				thumbnail: {type: String, required: true},
+				originalUrl: {type: String, required: true}
+			}],
+			categoryId: {type: String, required: true}
+		}]
+	}],
+	date: {type: Date, default: Date.now}
+});
+
+var productTagSchema = new mongoose.Schema({
+	category:{type:String, required:true},
+	name: {type:String, required:true},
+	dateCreated: {type: Date, default: Date.now},
+	order: {type:Number, default: 0},
+	productsNum: {type:Number, default: 0}
+});
+productTagSchema.index({name:1, category:1}, {unique:true});
+productTagSchema.index({dateCreated:-1});
+productTagSchema.index({category:1, productsNum:1, order:1, dateCreated:-1});
+
 mongoose.model('product', productSchema);
 mongoose.model('productAttribute', productAttributeSchema);
+mongoose.model('brandsProductsCollection', brandsProductsCollectionSchema);
+mongoose.model('productTag', productTagSchema);
 
 //var schema = new mongoose.Schema({
 //	'id':{ type:String,required:true, unique:true},

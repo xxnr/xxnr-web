@@ -95,6 +95,9 @@ exports.getProductsListPage = function(req, res, next) {
     if (req.data.attributes){
         options.attributes = req.data.attributes;
     }
+    if (req.data.tags){
+        options.tags = decodeURI(req.data.tags).split(',');
+    }
 
     ProductService.query(options, function(err, data) {
         if(err){
@@ -118,7 +121,8 @@ exports.getProductsListPage = function(req, res, next) {
                 /*"goodsSort":3,*/ "goodsName": product.name,
                 "model": product.model,
                 "presale": product.presale ? product.presale : false,
-                pictures:product.pictures
+                "pictures":product.pictures,
+                "tags":product.tags
             };
 
             products.push(good);
@@ -200,4 +204,27 @@ exports.get_nominate_category = function(req, res, next){
 
         res.respond({code:1000, nominate_categories:nominate_categories});
     }, true)
+};
+
+exports.get_brandsProducts_collection = function(req, res, next){
+    ProductService.getBrandsProductsCollection(req.data.brandId, function(err, BrandProducts){
+        if(err){
+            res.respond({code:1001, message:'获取品牌商品列表失败'});
+            return;
+        }
+
+        res.respond({code:1000, message:'success', brandProducts:BrandProducts});
+    });
+};
+
+exports.json_products_tags = function(req, res, next){
+    ProductService.queryTags(req.data.category, function(err, tags){
+        if (err) {
+            console.error('product json_products_tags err:', err);
+            res.respond({code: 1001, message: '获取商品标签列表失败', error: err});
+            return;
+        }
+
+        res.respond({code:1000, message:'success', tags:tags});
+    });
 };

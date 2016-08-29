@@ -81,11 +81,11 @@ exports.online_product = function(product_id, online, token, done){
         })
 };
 
-exports.query_products = function(classId, brands, reservePrice, sort, attributes, done, page, max){
+exports.query_products = function(classId, brands, reservePrice, sort, attributes, done, page, max, tags){
     var brandStr = build_brand_string(brands);
     request(app)
         .post('/api/v2.1/product/getProductsListPage')
-        .send({classId:classId, brand:brandStr, reservePrice:reservePrice, sort:sort, attributes:attributes, page:page, max:max})
+        .send({classId:classId, brand:brandStr, reservePrice:reservePrice, sort:sort, attributes:attributes, page:page, max:max, tags:tags})
         .end(function(err, res){
             should.not.exist(err);
             done(res.body);
@@ -186,3 +186,42 @@ function build_brand_string(brands){
 
     return brandStr.substr(1, brandStr.length-1);
 }
+
+exports.get_brandsProducts_collection = function(done){
+    request(app)
+        .get('/api/v2.4/products/getBrandsProducts')
+        .end(function(err, res){
+            should.not.exist(err);
+            done(res.body);
+        })
+};
+
+exports.add_product_tag = function(category, name, token, done){
+    request(app)
+        .post(config.manager_url + '/api/products/tag/add')
+        .send({category:category, name:name, token:token})
+        .end(function(err, res){
+            should.not.exist(err);
+            done(res.body);
+        });
+};
+
+exports.backup_query_product_tags = function(category, token, done){
+    request(app)
+        .get(config.manager_url + '/api/products/tags')
+        .query({category:category, token:token})
+        .end(function(err, res){
+            should.not.exist(err);
+            done(res.body);
+        });
+};
+
+exports.query_product_tags = function(category, done){
+    request(app)
+        .get('/api/v2.4/products/tags')
+        .query({category:category})
+        .end(function(err, res){
+            should.not.exist(err);
+            done(res.body);
+        });
+};

@@ -811,6 +811,25 @@ exports.json_products_query =function(req,res,next) {
 // Saves (update or create) specific product
 exports.json_products_save = function(req,res,next) {
 	var self = this;
+	var productTagsMax = 3;
+
+	if (req.body.tags) {
+		var tags = [];
+		var tagsIds = {};
+		for (var i=0; i<req.body.tags.length; i++) {
+			var tag = req.body.tags[i];
+			var key = tag['ref'] || tag['_id'];
+			if (!tagsIds[key]) {
+				tagsIds[key] = tag;
+				tags.push(tag);
+			}
+		}
+		req.body.tags = tags;
+		if (req.body.tags.length > productTagsMax) {
+            res.respond({code:1001, message:'商品的标签最多只能'+productTagsMax+'个'});
+            return;
+        }
+	}
 
     ProductService.save(req.body, function(err, product){
 		if(err){
@@ -928,6 +947,19 @@ exports.json_products_attributes = function(req,res,next){
 		}
 		res.respond({code:1000, message:'success', attributes:attributes});
 	}, 1)
+}
+
+// query products tags
+exports.json_products_tags = function(req,res,next){
+	var self = this;
+	ProductService.queryTags(req.data.category, function(err, tags){
+		if (err) {
+			console.error('manager json_products_tags err:', err);
+			res.respond({code: 1004, message: '获取商品标签列表失败', error: err});
+			return;
+		}
+		res.respond({code:1000, message:'success', tags:tags});
+	}, true);
 }
 
 // Reads a specific product by ID
@@ -2153,6 +2185,31 @@ exports.process_product_attributes_add = function(req, res, next){
 
 		res.respond({code:1000, message:'success', attribute:new_attribute});
 	})
+};
+
+// product tags
+exports.process_product_tags_add = function(req, res, next){
+	ProductService.getTag(req.data.category, req.data.name, function(err, tag){
+		if (err) {
+			console.error('manager process_product_tags_add getTag err:', err);
+			res.respond({code: 1004, message: '查找标签失败'});
+			return;
+		}
+		if (tag) {
+			res.respond({code: 1001, message: '标签已存在'});
+			return;
+		}
+		ProductService.addTag(req.data.category, req.data.name, function(err, new_tag){
+			if(err){
+				console.error('manager process_product_tags_add addTag err:', err);
+				res.respond({code: 1004, message: '保存标签失败'});
+				return;
+			}
+
+			res.respond({code:1000, message:'success', tag:new_tag});
+			return;
+		});
+	});
 };
 
 exports.json_SKU_get = function(req, res, next){
