@@ -489,7 +489,7 @@ export const buyProduct = ({dispatch, state}) => {
       response => {
         if(response.data.code != 1000) {
           if(response.data.code == 1401) {
-            var ref = '/order?id=' + state.productDetail.product.SKU_id + '&count='+ state.productDetail.productNumber + '&productId=' + state.productDetail.product._id;
+            var ref = 'productDetail?id=' + state.productDetail.product.id;
             router.go('/login?ref=' + encodeURIComponent(ref));
             return;
           } else {
@@ -1167,3 +1167,4 @@ export const getCampaigns = ({dispatch, state}) => {
     }, response => {
   });
 }
+

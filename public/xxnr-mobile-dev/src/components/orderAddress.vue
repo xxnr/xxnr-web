@@ -52,7 +52,7 @@
   .order-rsc, .order-consignee {
     position: relative;
     line-height: 15px;
-    padding: 10px 0 10px 18px;
+    padding: 10px 16px 10px 18px;
     min-height: 15px;
   }
 

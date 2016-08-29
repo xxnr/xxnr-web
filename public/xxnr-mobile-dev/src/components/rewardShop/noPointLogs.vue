@@ -14,7 +14,7 @@
 <style scoped>
   .no-point-logs {
     text-align: center;
-    padding-top: 100px;
+    padding-top: 150px;
   }
 
   .no-point-logs img {

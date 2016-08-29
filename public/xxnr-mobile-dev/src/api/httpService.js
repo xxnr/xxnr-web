@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import VueResource from 'vue-resource'
+import {clearCookie} from '../utils/common'
 
 // HTTP相关
 //Vue.http.options.crossOrigin = true;
@@ -14,8 +15,14 @@ import VueResource from 'vue-resource'
 //Docs: https://github.com/vuejs/vue-resource/blob/master/docs/http.md
 Vue.use(VueResource);
 Vue.http.options.xhr = {withCredentials: true};
-export const jsonpGet = (url,params,cb,errCb) => {
-  Vue.http.jsonp(url,params).then(cb,errCb);
+export const jsonpGet = (url,data,cb,errCb) => {
+  var options = data ? {params: data} : {};
+  Vue.http.jsonp(url,options).then(function(response){
+    if(response.data.code == 1401) {
+      clearCookie();
+    }
+    cb(response);
+  },errCb);
 }
 
 Vue.http.options.emulateJSON=false;

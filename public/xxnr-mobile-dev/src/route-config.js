@@ -1,4 +1,4 @@
-import {getCookie} from './utils/authService'
+import {getCookie, removeCookie} from './utils/authService'
 
 export function configRouter (router) {
   //因为链接不能加#!以区分前端路由还是后端路由,所以需要在后端服务器最后加一个路由正则以匹配到前端的路由  (mobileRelease.js)
@@ -126,13 +126,14 @@ export function configRouter (router) {
     if (transition.to.auth) {
       const user = getCookie('__user');
       if(!user){
-        //let redirect = encodeURIComponent(encodeURI(transition.to.path));
+        removeCookie('__user');
+        removeCookie('__scart');
+        removeCookie('token');
         var toPath = '/login?ref=' + encodeURIComponent(transition.to.path);
 
         if(transition.to.path.indexOf('/myPoint') != -1) {
           toPath = '/login?redirect=/rewardShop&ref=/myPoint';
         }
-
         if(transition.to.path.indexOf('/pointsLogs') != -1) {
           toPath = '/login?redirect=/rewardShop&ref=/pointsLogs/unComplete'
         }

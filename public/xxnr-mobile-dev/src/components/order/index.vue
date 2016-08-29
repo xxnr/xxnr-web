@@ -267,23 +267,24 @@
   .product-addtions-line {
     position: relative;
     background-color: #F8F8F8;
-    height: 22px;
     line-height: 22px;
     font-size: 12px;
     border-radius: 3px;
     margin-bottom: 2px;
+    padding: 0 2%;
   }
 
   .product-addtions-attr {
-    position: absolute;
-    left: 2%;
     color: #646464;
+    width: 78%;
   }
 
   .product-addtions-value {
     position: absolute;
     right: 2%;
     color: #323232;
+    top: 50%;
+    margin-top: -11px;
   }
 
   .product-sku {

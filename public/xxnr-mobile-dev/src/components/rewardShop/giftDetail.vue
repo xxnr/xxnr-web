@@ -27,7 +27,7 @@
 
 <script>
   import { showBackBtn,hideRightBtn,editTitle, getGiftDetail, getUserPoint, clearGiftDetail } from '../../vuex/actions'
-  import {getUrlParam} from '../../utils/common'
+  import {getUrlParam, isLogin} from '../../utils/common'
 
   export default {
     vuex:{
@@ -47,7 +47,11 @@
     },
     methods: {
       changeGift: function() {
-        router.go('/giftOrder?giftId=' + this.giftDetail.id + '&gift_id=' + this.giftDetail._id);
+        if(isLogin()) {
+          router.go('/giftOrder?giftId=' + this.giftDetail.id + '&gift_id=' + this.giftDetail._id);
+          return;
+        }
+        router.go('/login?ref=/giftDetail?id=' + this.giftDetail.id);
       }
     },
     components:{
