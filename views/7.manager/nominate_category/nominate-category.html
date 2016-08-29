@@ -36,10 +36,8 @@
                             {{ fi }}
                             {{nominate_category.name}}
                         </td>
-                        <td style="width:100px" class="silver hidden-xs ui-left active">
-                            {{ foreach product in nominate_category.products}}
-                            {{product.name}}{{ if $index < nominate_category.products.length-1}},{{ fi }}
-                            {{ end }}
+                        <td style="width:100px" class="silver hidden-xs ui-left active" title="{{ foreach product in nominate_category.products}}{{product.name}}{{ if $index < nominate_category.products.length-1}} | {{ fi }}{{ end }}">
+                            {{ foreach product in nominate_category.products}}{{product.name}}{{ if $index < nominate_category.products.length-1}} | {{ fi }}{{ end }}
                         </td>
                         <td style="width:50px" class="silver hidden-xs ui-center active">
                             {{ if nominate_category.search_more}}
