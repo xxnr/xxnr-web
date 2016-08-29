@@ -762,11 +762,11 @@ export const getInviter = ({dispatch, state},userId) => {
       dispatch(types.GET_USERINFO,response.data.datas);
       if(response.data.datas.inviter) {
         api.getInviter(response=>{
-          if(response.code == 1000) {
-            dispatch(types.GET_INVITERINFO, response.datas);
+          if(response.data.code == 1000) {
+            dispatch(types.GET_INVITERINFO, response.data.datas);
             return;
           }
-          if(response.code == 1401) {
+          if(response.data.code == 1401) {
             router.go('/login');
             return;
           }
@@ -1161,8 +1161,8 @@ export const clearGiftDetail = ({dispatch, state}) => {
 export const getCampaigns = ({dispatch, state}) => {
   api.getCampaigns(
     response => {
-      if(response.code == 1000) {
-        dispatch(types.GET_CAMPAIGNS, response.campaigns);
+      if(response.data.code == 1000) {
+        dispatch(types.GET_CAMPAIGNS, response.data.campaigns);
       }
     }, response => {
   });

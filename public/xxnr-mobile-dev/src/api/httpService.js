@@ -15,9 +15,15 @@ import {clearCookie} from '../utils/common'
 //Docs: https://github.com/vuejs/vue-resource/blob/master/docs/http.md
 Vue.use(VueResource);
 Vue.http.options.xhr = {withCredentials: true};
-export const jsonpGet = (url,data,cb,errCb) => {
-  var options = data ? {params: data} : {};
-  Vue.http.jsonp(url,options).then(function(response){
+export const jsonpGet = (url,params,cb,errCb) => {
+  if(typeof data === 'function') {
+    errCb = cb;
+    cb = params;
+    params = null;
+  }
+  //var options = data ? {params: data} : {};
+  Vue.http.jsonp(url,params).then(function(response){
+    //console.log(response);
     if(response.data.code == 1401) {
       clearCookie();
     }
