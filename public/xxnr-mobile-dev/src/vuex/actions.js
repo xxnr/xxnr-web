@@ -214,6 +214,7 @@ export const getOrders = ({dispatch,state},typeValue,pageNum,changedTab) => {
 }
 
 export const getProductDetail = ({dispatch,state}, id) => {
+  console.log(id);
   api.getProductDetail(
     {productId: id},
     response => {
@@ -489,7 +490,7 @@ export const buyProduct = ({dispatch, state}) => {
       response => {
         if(response.data.code != 1000) {
           if(response.data.code == 1401) {
-            var ref = '/order?id=' + state.productDetail.product.SKU_id + '&count='+ state.productDetail.productNumber + '&productId=' + state.productDetail.product._id;
+            var ref = 'productDetail?id=' + state.productDetail.product.id;
             router.go('/login?ref=' + encodeURIComponent(ref));
             return;
           } else {
@@ -1167,3 +1168,4 @@ export const getCampaigns = ({dispatch, state}) => {
     }, response => {
   });
 }
+

@@ -1,4 +1,5 @@
 <template>
+  <logs-top :score="score" v-if="logs && logs.length == 0"></logs-top>
   <scroller v-ref:scroller lock-x scrollbar-y use-pullup @pullup:loading="loadMoreLogs" v-if="logs && logs.length > 0">
     <div class="log-list">
       <logs-top :score="score"></logs-top>
@@ -6,7 +7,7 @@
       <is-end v-if="end"></is-end>
     </div>
   </scroller>
-  <no-point-logs v-else></no-point-logs>
+  <no-point-logs v-if="logs && logs.length == 0"></no-point-logs>
 </template>
 
 <script>

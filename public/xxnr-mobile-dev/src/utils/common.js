@@ -3,12 +3,13 @@
  */
 var URI = require('urijs');
 require('urijs/src/URI.fragmentURI.js');
+import {getCookie, removeCookie} from './authService'
 export function getUrlParam(name, url) {
   var param = window.location.href.match(new RegExp("[\?\&]" + name + "=([^\&]+)", "i"));
   if (url) {
     param = url.match(new RegExp("[\?\&]" + name + "=([^\&]+)", "i"));
   }
-  
+
   if(!param) {
     return false;
   }
@@ -65,5 +66,19 @@ export function getTime(time, mode) {
     return format;
   }
   return time.format(mode);
+}
+
+export function clearCookie() {
+  removeCookie('__user');
+  removeCookie('__scart');
+  removeCookie('token');
+}
+
+export function isLogin() {
+  if(getCookie('__user')) {
+    return true;
+  }
+
+  return false;
 }
 

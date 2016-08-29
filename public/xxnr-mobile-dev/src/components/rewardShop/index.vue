@@ -124,6 +124,7 @@
   }
 
   .unlogin-tips {
+    position: relative;
     font-size: 12px;
     color: #db8030;
     background-color: #fff6b8;
