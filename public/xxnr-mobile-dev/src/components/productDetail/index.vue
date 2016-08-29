@@ -230,7 +230,6 @@
     route: {
       activate (transition) {
         this.isFromOrder(transition.from.path);
-        console.log(getUrlParam('id'));
         this.getProductDetail(getUrlParam('id'));
         this.showBackBtn();
         this.changeRightBtnHome();
