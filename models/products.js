@@ -123,7 +123,11 @@ var brandsProductsCollectionSchema = new mongoose.Schema({
 				thumbnail: {type: String, required: true},
 				originalUrl: {type: String, required: true}
 			}],
-			categoryId: {type: String, required: true}
+			categoryId: {type: String, required: true},
+			tags: [{								// all tags of this product, used for product query
+				ref: {type:mongoose.Schema.ObjectId, ref:'productTag', required:true},
+				name: {type: String, required: true}
+			}]
 		}]
 	}],
 	date: {type: Date, default: Date.now}
