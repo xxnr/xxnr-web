@@ -59,9 +59,9 @@
         </ul>
         <div class="product-detail-tab-con">
           <div v-if="tabIndex == 0">
-            <ifrme name="Info1" id="Info1" onload="this.height = Info1.document.body.scrollHeight" width="100%" scrolling="no" frameborder="0" v-if="productDetail.app_body_url" :src="productDetail.app_body_url">
+            <iframe name="Info1" id="Info1" onload="this.height = Info1.document.body.scrollHeight" width="100%" scrolling="no" frameborder="0" v-if="productDetail.app_body_url" :src="productDetail.app_body_url">
 
-            </ifrme>
+            </iframe>
           </div>
           <div v-if="tabIndex == 1">
             <iframe name="Info2" id="Info2" onload="this.height = Info2.document.body.scrollHeight" width="100%" scrolling="no" frameborder="0" v-if="productDetail.app_standard_url" :src="productDetail.app_standard_url">
@@ -171,7 +171,10 @@
     showBackBtn,
     editTitle,
     isFromOrder,
-    hideRightBtn
+    showRightBtn,
+    hideRightBtn,
+    changeRightBtnHome,
+    changeRightBtnPathHome
   } from '../../vuex/actions'
   import xxnrToast from '../../xxnr_mobile_ui/xxnrToast.vue'
   import {getUrlParam} from '../../utils/common'
@@ -213,7 +216,10 @@
         showBackBtn,
         editTitle,
         isFromOrder,
-        hideRightBtn
+        hideRightBtn,
+        showRightBtn,
+        changeRightBtnHome,
+        changeRightBtnPathHome
       }
     },
     components: {
@@ -224,14 +230,18 @@
     route: {
       activate (transition) {
         this.isFromOrder(transition.from.path);
+        console.log(getUrlParam('id'));
         this.getProductDetail(getUrlParam('id'));
         this.showBackBtn();
-        this.hideRightBtn();
+        this.changeRightBtnHome();
+        this.changeRightBtnPathHome();
+        this.showRightBtn();
         this.editTitle('商品详情');
         transition.next();
       },
       deactivate() {
         this.clearProductDetail();
+        this.hideRightBtn();
       }
     }
   }
