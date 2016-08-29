@@ -191,8 +191,9 @@ COMPONENT('dropdown', function() {
 			var item = arr[i];
 			if (typeof(item) === 'string')
 				builder.push('<option value="' + item + '"' + (value == item ? ' selected="selected"' : '') + '>' + item + '</option>');
-			else
+			else {
 				builder.push('<option value="' + item[kv] + '"' + (value == item[kv] ? ' selected="selected"' : '') + '>' + item[kt] + '</option>');
+			}
 		}
 
 		el.html(builder.join(''));

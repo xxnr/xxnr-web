@@ -186,13 +186,24 @@ jRouting.route(managerurl + '/settings/', function() {
     redirectToHomePage();
 });
 
-jRouting.route(managerurl + '/pages/', function() {
-    if (can('pages')) {
-        SET('common.page', 'pages');
-        return;
-    }
+jRouting.route(managerurl + '/pages/nominate-category/', function() {
+	if (can('pages')) {
+		navClass('pages');
+		SET('common.page', 'nominate-categories');
+		return;
+	}
 
-    redirectToHomePage();
+	redirectToHomePage();
+});
+
+jRouting.route(managerurl + '/pages/nominate-category/detail', function() {
+	if (can('pages')) {
+		navClass('pages');
+		SET('common.page', 'nominate-category-detail');
+		return;
+	}
+
+	redirectToHomePage();
 });
 
 jRouting.route(managerurl + '/system/', function() {

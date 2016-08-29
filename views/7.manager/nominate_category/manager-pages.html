@@ -1,0 +1,18 @@
+<div class="filter" style="padding-bottom:9px">
+    <div class="container">
+        <div class="caption"><span class="fa fa-gift mr5"></span>页面管理</div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="col-md-2">
+        <div class="filter left-nav" style="padding: 25px 15px;">
+            <div class="ui-left">
+                <% if (page == 'nominate-categories') { %><a class="selected"><% } else { %><a href="<%= manager_url %>/pages/nominate-category/"><% } %>首页商品管理</a>
+                <ul class="sidebar">
+                    <% if (page == 'nominate-category-detail') { %><li class="selected">-分类管理</li><% } %>
+                    <li class="cl"></li>
+                </ul>
+            </div>
+        </div>
+    </div>

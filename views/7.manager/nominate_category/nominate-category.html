@@ -1,0 +1,251 @@
+<% include manager-pages.html %>
+<style>
+    .sort_tr {cursor: move}
+</style>
+<div class="col-md-10">
+    <div class="filter col-md-12 col-sm-12" style="padding-bottom:9px">
+        <div class="row col-md-3">
+            <div class="col-md-12"><a href="javascript:void(0)" data-component="click" class="linkbutton" data-component-path="nominate_category_detail"><span class="fa fa-plus-circle"></span>新增分类</a></div>
+        </div>
+        <div id="change_order" title="调整顺序" class="change_order"><img src="/img/order.png"></div>
+    </div>
+
+    <div style="width:100%;float:left;">
+        <div data-component="template" data-component-path="nominate_categories" class="ui-grid nominate_categories" data-max="auto" data-component-id="nominate_categories.grid">
+            <script type="text/html">
+                {{ if grid && grid.length > 0 }}
+                <table class="table un_sortable_table" width="100%" cellpadding="0" cellspacing="0" border="0">
+                    <tr>
+                        <td style="width:20px" class="silver hidden-xs ui-center active">前台顺序</td>
+                        <td style="width:20px" class="silver hidden-xs ui-center active">类目</td>
+                        <td style="width:30px" class="silver hidden-xs ui-center active">品牌</td>
+                        <td style="width:40px" class="silver hidden-xs ui-center active">前台展示名称</td>
+                        <td style="width:100px" class="silver hidden-xs ui-center active">前台展示商品</td>
+                        <td style="width:50px" class="silver hidden-xs ui-center active">跳转设置</td>
+                        <td style="width:40px" class="silver hidden-xs ui-center active">操作</td>
+                    </tr>
+                    <tbody>
+                    {{ foreach nominate_category in grid }}
+                    <tr data-index="{{ $index }}" data-id="{{nominate_category._id}}">
+                        <td style="width:20px" class="silver hidden-xs ui-center active">{{ $index + 1 }}</td>
+                        <td style="width:20px" class="silver hidden-xs ui-center active">{{ if categories[nominate_category.category] }}{{categories[nominate_category.category]}}{{ else }}全部{{ fi }}</td>
+                        <td style="width:30px" class="silver hidden-xs ui-center active">{{ if nominate_category.brand }}{{nominate_category.brand.name}}{{ else }}全部{{ fi }}</td>
+                        <td style="width:40px" class="silver hidden-xs ui-center active">
+                            {{ if nominate_category.online}}
+                            <b class="mr5 fs11 green">Online</b>
+                            {{ fi }}
+                            {{nominate_category.name}}
+                        </td>
+                        <td style="width:100px" class="silver hidden-xs ui-left active">
+                            {{ foreach product in nominate_category.products}}
+                            {{product.name}}{{ if $index < nominate_category.products.length-1}},{{ fi }}
+                            {{ end }}
+                        </td>
+                        <td style="width:50px" class="silver hidden-xs ui-center active">
+                            {{ if nominate_category.search_more}}
+                            {{ if categories[nominate_category.category] }}
+                            {{categories[nominate_category.category]}}专场{{ if nominate_category.brand }} - {{nominate_category.brand.name}}{{ fi }}
+                            {{ else }}
+                            无
+                            {{ fi }}
+                            {{ else }}
+                            无
+                            {{ fi }}
+                        </td>
+                        <td style="width:40px" class="silver hidden-xs ui-center active">
+                            <button name="edit" title="编辑"><span class="fa fa-pencil"></span></button>
+                            {{ if nominate_category.online }}
+                            <button name="offline" title="下架"><span class="fa fa-stop"></span></button>
+                            {{ else }}
+                            <button name="online" title="上架"><span class="fa fa-play"></span></button>
+                            {{ fi }}
+                            <button name="remove" title="删除"><span class="fa fa-times"></span></button>
+                        </td>
+                    </tr>
+                    {{ end }}
+                    </tbody>
+                </table>
+                <table class="table sortable_table hidden" width="100%" cellpadding="0" cellspacing="0" border="0">
+                    <tr>
+                        <td style="width:20px" class="silver hidden-xs ui-center active">类目</td>
+                        <td style="width:30px" class="silver hidden-xs ui-center active">品牌</td>
+                        <td style="width:40px" class="silver hidden-xs ui-center active">前台展示名称</td>
+                        <td style="width:100px" class="silver hidden-xs ui-center active">前台展示商品</td>
+                        <td style="width:50px" class="silver hidden-xs ui-center active">跳转设置</td>
+                    </tr>
+                    <tbody id="sortable">
+                    {{ foreach nominate_category in grid }}
+                    <tr data-index="{{ $index }}" data-id="{{nominate_category._id}}">
+                        <td style="width:20px" class="silver hidden-xs ui-center active">{{ if categories[nominate_category.category] }}{{categories[nominate_category.category]}}{{ else }}全部{{ fi }}</td>
+                        <td style="width:30px" class="silver hidden-xs ui-center active">{{ if nominate_category.brand }}{{nominate_category.brand.name}}{{ else }}全部{{ fi }}</td>
+                        <td style="width:40px" class="silver hidden-xs ui-center active">
+                            {{ if nominate_category.online}}
+                            <b class="mr5 fs11 green">Online</b>
+                            {{ fi }}
+                            {{nominate_category.name}}
+                        </td>
+                        <td style="width:100px" class="silver hidden-xs ui-left active">
+                            {{ foreach product in nominate_category.products}}
+                            {{product.name}}{{ if $index < nominate_category.products.length-1}},{{ fi }}
+                            {{ end }}
+                        </td>
+                        <td style="width:50px" class="silver hidden-xs ui-center active">
+                            {{ if nominate_category.search_more}}
+                            {{ if categories[nominate_category.category] }}
+                            {{categories[nominate_category.category]}}专场{{ if nominate_category.brand }} - {{nominate_category.brand.name}}{{ fi }}
+                            {{ else }}
+                            无
+                            {{ fi }}
+                            {{ else }}
+                            无
+                            {{ fi }}
+                        </td>
+                    </tr>
+                    {{ end }}
+                    </tbody>
+                </table>
+                {{ else }}
+                    暂无数据
+                {{ fi }}
+            </script>
+        </div>
+        <div class="ui-buttons hidden">
+            <button name="submit">更新顺序</button>
+            <button name="cancel">取消</button>
+        </div>
+        <div data-component="error" data-component-path="nominate_categories.response"></div>
+    </div>
+</div>
+</div>
+
+<script>
+    var nominate_category_grid = <%- JSON.stringify(nominate_categories) %>;
+    var nominate_categories = {
+        grid:[],
+        categories:categories
+    };
+
+    var sorting = false;
+
+    ON('#nominate_categories.grid', function(component){
+        refresh();
+    });
+
+    function refresh(){
+        nominate_categories.grid = nominate_category_grid;
+        SET('nominate_categories.grid', nominate_categories.grid);
+        bind_grid_button();
+        bind_sort_button();
+    }
+
+    function bind_grid_button() {
+        $('.nominate_categories tr td button').off('click').on('click', function () {
+            var index = parseInt($(this).parent().parent().attr('data-index'));
+            var row = typeof index != 'undefined' && nominate_categories.grid && index < nominate_categories.grid.length ? nominate_categories.grid[index] : null;
+            if (row) {
+                switch ($(this).attr('name')) {
+                    case 'edit':
+                        nominate_category_detail(row._id);
+                        break;
+                    case 'online':
+                        if (!confirm('你确定要上线你选择的分类吗?'))
+                            return;
+                        $.components.POST(managerurl + '/api/nominate_category/modify', {nominate_category:{_id: row._id, online:true} }, function(response) {
+                            if(response.code == 1000) {
+                                success();
+                                redirect_nominate_category_url();
+                            } else{
+                                alert(response.message);
+                            }
+                        });
+                        break;
+                    case 'offline':
+                        if (!confirm('你确定要下线你选择的分类吗?'))
+                            return;
+                        $.components.POST(managerurl + '/api/nominate_category/modify', {nominate_category:{_id: row._id, online:false} }, function(response) {
+                            if(response.code == 1000) {
+                                success();
+                                redirect_nominate_category_url();
+                            } else{
+                                alert(response.message);
+                            }
+                        });
+                        break;
+                    case 'remove':
+                        if(!confirm('你确定要删除你选择的分类吗?'))
+                            return;
+                        $.components.DELETE(managerurl + '/api/nominate_category/delete', {_id: row._id}, function(response){
+                            if(response.code == 1000) {
+                                success();
+                                redirect_nominate_category_url();
+                            } else{
+                                alert(response.message);
+                            }
+                        })
+                }
+            }
+        });
+        $('#change_order').off('click').on('click', function (){
+            sortable();
+        })
+    }
+
+    function redirect_nominate_category_url(){
+        window.location.href = managerurl+'/pages/nominate-category';
+    }
+
+    function nominate_category_detail(_id){
+        window.location.href = managerurl + "/pages/nominate-category/detail" + (typeof _id != 'undefined' ? ('?id=' + _id) : '');
+    }
+
+    function sortable(){
+        if(!sorting) {
+            sorting = true;
+            $('.un_sortable_table').addClass('hidden');
+            $('.sortable_table').removeClass('hidden');
+            $('.ui-buttons').removeClass('hidden');
+            $("#sortable").sortable({
+                scroll: false,
+                revert: true,
+                forcePlaceholderSize:false,
+                helper:'clone'
+            });
+            $("#sortable, tr").disableSelection();
+            $('#sortable, tr').addClass('sort_tr');
+        }
+    }
+
+    function bind_sort_button(){
+        $('.ui-buttons button').off('click').on('click', function(){
+            var el = $(this);
+            switch(el.attr('name')){
+                case 'submit':
+                    if(!confirm('确认更新顺序？')){
+                        return;
+                    }
+
+                    var order = [];
+                    $('#sortable tr').each(function(){
+                        var el = $(this);
+                        var id = el.attr('data-id');
+                        order.push(id);
+                    });
+                    $.components.POST(managerurl+'/api/nominate_category/update_order', {nominate_category_order:order}, function(response){
+                        if(response.code==1000){
+                            success();
+                            redirect_nominate_category_url();
+                        } else{
+                            alert(response.message);
+                        }
+                    });
+                    break;
+                case 'cancel':
+                    if(!confirm('放弃更改？')){
+                        return;
+                    }
+
+                    redirect_nominate_category_url();
+            }
+        })
+    }
+</script>

@@ -1,0 +1,321 @@
+<style>
+    #products ul { list-style-type: none; margin: 0; padding: 0; margin-bottom: 10px; }
+    #products li { margin: 5px; padding: 5px; width: 150px; cursor: move}
+    .save_product li {padding: 5px; width: 69px; cursor:pointer; text-align:center; }
+    #products .fa-times {position: absolute;
+        margin: -10px 0 0 132px;
+        color: white;
+        background-color: red;
+        border-radius: 40px;
+        width: 21px;
+        text-align: center;
+        padding: 3px 0 2px;
+        cursor: pointer;
+        border-bottom: 2px solid #BE1317;}
+</style>
+<% include manager-pages.html %>
+<div class="col-md-10">
+    <div class="filter">
+        <div class="container">
+            <div class="caption">分类管理</div>
+        </div>
+    </div>
+    <div style="position: relative;" id="nominate_category_detail">
+        <div class="row m">
+            <div class="col-md-12 m">
+                <h3 class="ui-left">基本信息</h3>
+            </div>
+            <div class="col-md-12">
+                <div class="col-md-8">
+                    <div class="mb10" data-component="textbox" data-component-path="nominate_category.info.name" data-required="true">分类展示名称</div>
+                </div>
+                <div class="col-md-8 mb10" data-component="dropdown" data-component-path="nominate_category.info.category" data-source="nominate_category.categories" data-source-value="id" data-source-text="name" data-empty-text="请选择类目" data-empty="true" data-required="true">展示商品类目</div>
+                <div class="col-md-8 mb10" data-component="dropdown" data-component-path="nominate_category.info.brand" data-source="nominate_category.brands" data-source-value="_id" data-source-text="name" data-empty-text="请选择品牌" data-empty="true" data-required="true">展示商品品牌</div>
+                <div class="col-md-8">
+                    <div data-component="checkbox" data-component-path="nominate_category.info.search_more" style="margin-top:10px" class="red"><b>查看更多</b></div>
+                </div>
+            </div>
+        </div>
+        <hr>
+        <div class="row">
+            <div class="col-md-12 m">
+                <h3 class="ui-left">配置商品</h3>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="col-md-8">
+                    <div class="mb10" data-component="textbox" data-component-path="nominate_category.info.show_count" data-required="true">展示商品个数</div>
+                    <div style="float:left">
+                        <div class="col-md-8 hidden" id="add_product_block">
+                            <div class="col-md-8 mb10" data-component="dropdown" data-component-path="nominate_category.product_select.category" data-source="nominate_category.product_select.categories" data-source-value="id" data-source-text="name" data-empty-text="请选择类目" data-empty="true">类目</div>
+                            <div class="col-md-8 mb10" data-component="dropdown" data-component-path="nominate_category.product_select.brand" data-source="nominate_category.product_select.brands" data-source-value="_id" data-source-text="name" data-empty-text="请选择品牌" data-empty="true">品牌</div>
+                            <div class="col-md-8 mb10" data-component="dropdown" data-component-path="nominate_category.product_select.product" data-source="nominate_category.product_select.products" data-source-value="_id" data-source-text="name" data-empty-text="请选择商品" data-empty="true">商品</div>
+                        </div>
+                        <div class="col-md-4" id="products">
+                            <div data-component="template" data-component-path="product_select" class="ui-grid nominate_category_products" data-max="auto" data-component-id="nominate_category.info.products">
+                                <script type="text/html">
+                                    <ul id="sortable">
+                                        {{ foreach product in products }}
+                                        <li class="ui-state-default" product_id="{{product._id}}" product_name="{{product.name}}">
+                                            <span class="fa fa-times delete_product"></span>
+                                            {{ product.name }}
+                                        </li>
+                                        {{ end }}
+                                    </ul>
+                                </script>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <li class="ui-state-default" style="margin-left: 5px; padding: 5px; width: 150px; cursor:pointer" id="add_product_button"><span class="fa fa-plus-circle"></span>添加商品</li>
+                        <div class="col-md-2 save_product">
+                            <li class="ui-state-default hidden" id="save_product_button">保存商品</li>
+                        </div>
+                        <div class="col-md-2 save_product">
+                            <li class="ui-state-default hidden" id="cancel_save_product_button">取消</li>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr>
+        <div data-component="error" data-component-path="nominate_category.response"></div>
+        <div class="ui-buttons save_nominate_category">
+            <button name="submit" data-component="template" data-component-path="nominate_category.info">
+                <script type="text/html">{{ if _id }}更新{{ else }}添加{{ fi }}</script>
+            </button>
+        </div>
+    </div>
+</div>
+</div>
+<script>
+    var nominate_category_detail = <%- JSON.stringify(nominate_category) %>;
+    var categories = <%- JSON.stringify(categories) %>;
+    var nominate_category = {
+        info:{},
+        categories: [],
+        brands: [],
+        product_select:{}
+    };
+    var product_select = {
+        products:[]
+    };
+
+    SET('nominate_category.product_select.categories', <%- JSON.stringify(categories) %>);
+    refresh_nominate_category();
+
+    function refresh_nominate_category(){
+        if(nominate_category_detail.category === null){
+            nominate_category_detail.category = 'null';
+        }
+        if(nominate_category_detail.brand === null){
+            nominate_category_detail.brand = 'null';
+        }
+        nominate_category.info = nominate_category_detail;
+        product_select.products = nominate_category_detail.products;
+        nominate_category.categories = categories;
+        nominate_category.categories.push({id:null, name:'全部'});
+        nominate_category.product_select.category = nominate_category_detail.category == 'null' ? '' : nominate_category_detail.category;
+        nominate_category.product_select.brand = nominate_category_detail.brand == 'null' ? '' : nominate_category_detail.brand;
+        SET('nominate_category.info', nominate_category.info);
+        SET('nominate_category.categories', nominate_category.categories);
+        request_brands(nominate_category.info.category, 'nominate_category.brands', function(){});
+        request_brands(nominate_category.product_select.category, 'nominate_category.product_select.brands', function(){}, true);
+        request_products(nominate_category.product_select.category, nominate_category.product_select.brand, 'nominate_category.product_select.products', function(){});
+        bind_save_nominate_category_button();
+    }
+
+    ON('#nominate_category.info.products', function(component){
+        sortable();
+        bind_add_product_button();
+    });
+
+    function request_brands(category, field, callback, original){
+        SET(field, null);
+        if(category != '' && category !== undefined) {
+            $.components.GET(managerurl + '/api/brands' + (category == 'null' ? '' : '?category=' + category), null, function (response) {
+                if (response.code == 1000) {
+                    if (!original) {
+                        response.brands.push({_id: null, name: '全部'});
+                    }
+                    SET(field, response.brands);
+                    callback();
+                }
+            })
+        }
+    }
+
+    function request_products(category, brand, field, callback){
+        SET(field, null);
+        if(category != '' && category !== undefined && brand != '' && brand !== undefined) {
+            $.components.GET(managerurl + '/api/products?' + (brand == 'null' ? '' : 'brand=' + brand + '&') + 'max=2147483647&online=true' + (category == 'null' ? '' : '&category=' + category), null, function (response) {
+                SET(field, response.items);
+                nominate_category.product_select.products_map = {};
+                response.items.forEach(function (product) {
+                    nominate_category.product_select.products_map[product._id] = product.name;
+                });
+                callback();
+            })
+        }
+    }
+
+    WATCH('nominate_category.info.category', function(path, value){
+        if(NOTMODIFIED('nominate_category.info.category', nominate_category.info.category))
+            return;
+        nominate_category.product_select.category = nominate_category_detail.category == 'null' ? '' : nominate_category_detail.category;
+        UPDATE('nominate_category.product_select.category');
+        request_brands(nominate_category.info.category, 'nominate_category.brands', function(){});
+    });
+
+    WATCH('nominate_category.info.brand', function(path, value){
+        if(NOTMODIFIED('nominate_category.info.brand', nominate_category.info.brand))
+                return;
+        nominate_category.product_select.brand = nominate_category_detail.brand == 'null' ? '' : nominate_category_detail.brand;
+        UPDATE('nominate_category.product_select.brand');
+    });
+
+    WATCH('nominate_category.product_select.category', function(path, value){
+        if(NOTMODIFIED('nominate_category.product_select.category', nominate_category.product_select.category))
+            return;
+        request_brands(nominate_category.product_select.category, 'nominate_category.product_select.brands', function(){}, true);
+    });
+
+    WATCH('nominate_category.product_select.brand', function(path, value){
+        if(NOTMODIFIED('nominate_category.product_select.brand', nominate_category.product_select.brand))
+            return;
+        request_products(nominate_category.product_select.category, nominate_category.product_select.brand, 'nominate_category.product_select.products', function(){});
+    });
+
+    function sortable(){
+        $( "#sortable" ).sortable({
+            scroll: false,
+            revert: true
+        });
+        $( "ul, div" ).disableSelection();
+    }
+
+    function bind_add_product_button(){
+        $('#add_product_button').off('click').on('click', function(){
+            $('#add_product_block').removeClass('hidden');
+            $('#add_product_button').addClass('hidden');
+            $('#save_product_button').removeClass('hidden');
+            $('#cancel_save_product_button').removeClass('hidden');
+        });
+        $('#save_product_button').off('click').on('click', function(){
+            // check if product exist
+            var selected_product = nominate_category.product_select.product;
+            var exist = false;
+
+            $('.nominate_category_products li').each(function(){
+                var el = $(this);
+                if(el.attr('product_id') == selected_product){
+                    exist = true;
+                }
+            });
+
+            if(exist){
+                alert('该商品已存在');
+            } else {
+                if(!nominate_category.product_select.products_map){
+                    alert('请选择一个商品');
+                    return;
+                }
+
+                var selected_product_name = nominate_category.product_select.products_map[selected_product];
+                if(!selected_product_name){
+                    alert('请选择一个商品');
+                    return;
+                }
+
+//                product_select.products.push({_id:selected_product, name:selected_product_name});
+//                SET('product_select.products', product_select.products);
+                $('.nominate_category_products ul').append("<li class='ui-state-default ui-sortable-handle' product_id='" + selected_product + "' product_name='" + selected_product_name + "'><span class='fa fa-times delete_product'></span>"+ selected_product_name + "</li>");
+                sortable();
+                bind_add_product_button();
+                $('#add_product_block').addClass('hidden');
+                $('#add_product_button').removeClass('hidden');
+                $('#save_product_button').addClass('hidden');
+                $('#cancel_save_product_button').addClass('hidden');
+            }
+        });
+        $('#cancel_save_product_button').off('click').on('click', function(){
+            sortable();
+            $('#add_product_block').addClass('hidden');
+            $('#add_product_button').removeClass('hidden');
+            $('#save_product_button').addClass('hidden');
+            $('#cancel_save_product_button').addClass('hidden');
+        });
+        $('.delete_product').off('click').on('click', function(){
+            var el = $(this);
+            var li = el.parent();
+            var product_name = li.attr('product_name');
+            if(!confirm('确定要删除' + product_name + '?')){
+                return;
+            }
+            li.remove();
+        })
+    }
+
+    function bind_save_nominate_category_button(){
+        $('.save_nominate_category button').off('click').on('click', function(){
+            var el = $(this);
+            console.log(el.attr('name'));
+            switch(el.attr('name')) {
+                case 'submit':
+                    add_or_update_nominate_category();
+                    break;
+            }
+        })
+    }
+
+    function add_or_update_nominate_category(){
+        if(!nominate_category.info.name){
+            alert('请填写分类展示名称');
+            return;
+        }
+
+        if(nominate_category.info.category == '' || nominate_category.info.category === undefined){
+            alert('请选择类目');
+            return;
+        }
+
+        if(nominate_category.info.brand == '' || nominate_category.info.brand === undefined){
+            alert('请选择品牌');
+            return;
+        }
+
+        if(!nominate_category.info.show_count){
+            alert('请填写展示商品个数');
+            return;
+        }
+
+        nominate_category.info.products = build_products();
+        var api = '/api/nominate_category/create';
+        if(nominate_category.info._id){
+            // update
+            api = '/api/nominate_category/modify';
+        } else{
+            // save
+        }
+
+        $.components.POST(managerurl+api, {nominate_category:nominate_category.info}, function(response){
+            if(response.code == 1000){
+                success();
+                window.location.href=managerurl+'/pages/nominate-category'
+            } else{
+                alert(response.message);
+            }
+        })
+    }
+
+    function build_products(){
+        var products = [];
+        $('.nominate_category_products li').each(function(){
+            var el = $(this);
+            products.push(el.attr('product_id'));
+        });
+        return products;
+    }
+
+</script>

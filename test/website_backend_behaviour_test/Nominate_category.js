@@ -46,9 +46,9 @@ describe('nominated products', function(){
             SKUModel.find({}).remove(done);
         });
     });
-    before('delete all nominate category', function(done){
-        NominateCategoryModel.find({}).remove(done);
-    });
+    //before('delete all nominate category', function(done){
+    //    NominateCategoryModel.find({}).remove(done);
+    //});
     var category_1 = test_data.category_id['汽车'];
     var brand_1;
     var product_c1, product_c2, product_c3, product_c4, product_c5;
@@ -286,6 +286,7 @@ describe('nominated products', function(){
                             body.should.have.property('code', 1000);
                             Routing.Nominate_category.query_nominate_category_frontend(function(body){
                                 body.should.containDeepOrdered(frontend_list);
+                                body.nominate_categories[0].products.should.have.a.lengthOf(4);
                                 Routing.Product.online_product(product_c1, false, backend_admin_token, function(body){
                                     body.should.have.property('code', 1000);
                                     Routing.Nominate_category.query_nominate_category_frontend(function(body) {

@@ -3217,3 +3217,57 @@ exports.query_nominate_category = function(req, res, next){
 		res.respond({code:1000, nominate_categories:nominate_categories});
 	})
 };
+
+exports.nominate_categories = function(req, res, next) {
+	NominateCategoryService.query(null, function(err, nominate_categories) {
+		if (err) {
+			res.respond({code: 1001, message: '获取推荐类目失败'});
+			return;
+		}
+
+		res.render(path.join(__dirname, '../views/7.manager/nominate_category/nominate-category.html'),
+			{
+				manager_url: F.config['manager-url'],
+				page: 'nominate-categories',
+				user: req.user,
+				nominate_categories:nominate_categories
+			});
+	}, true, true);
+};
+
+exports.nominate_category_detail = function(req, res, next) {
+	var _id = req.data.id;
+	CategoryService.all(function(err, categories) {
+		if (err) {
+			res.respond({code: 1004, message: 'fail to query category'});
+			return;
+		}
+
+		if(_id) {
+			NominateCategoryService.getById(_id, function (err, nominate_category) {
+				if (err) {
+					res.respond({code: 1001, message: '获取推荐类目失败'});
+					return;
+				}
+
+				res.render(path.join(__dirname, '../views/7.manager/nominate_category/nominate-category-detail.html'),
+					{
+						manager_url: F.config['manager-url'],
+						page: 'nominate-category-detail',
+						user: req.user,
+						nominate_category: nominate_category,
+						categories: categories
+					});
+			});
+		} else{
+			res.render(path.join(__dirname, '../views/7.manager/nominate_category/nominate-category-detail.html'),
+				{
+					manager_url: F.config['manager-url'],
+					page: 'nominate-category-detail',
+					user: req.user,
+					nominate_category: {},
+					categories: categories
+				});
+		}
+	});
+};

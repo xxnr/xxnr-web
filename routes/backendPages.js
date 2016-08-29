@@ -19,6 +19,10 @@ router.get(F.config.manager_url + '/campaign-detail', middleware.get_backend_aut
 router.get(F.config.manager_url + '/campaign-detail-QA', middleware.get_backend_auth, controllers.Manager.campaign_detail_QA);
 router.get(F.config.manager_url + '/campaign-detail-quiz', middleware.get_backend_auth, controllers.Manager.campaign_detail_quiz);
 
+// nominate category
+router.get(F.config.manager_url + '/pages/nominate-categories', middleware.get_backend_auth, controllers.Manager.nominate_categories);
+router.get(F.config.manager_url + '/pages/nominate-category-detail', middleware.get_backend_auth, controllers.Manager.nominate_category_detail);
+
 //// admin / manager
 router.get(F.config['manager-url'], middleware.backend_auth, controllers.Manager.manager);
 router.get(F.config['manager-url']+'/*', middleware.backend_auth, controllers.Manager.manager);

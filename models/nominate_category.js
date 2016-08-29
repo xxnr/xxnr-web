@@ -5,7 +5,7 @@ var mongoose = require("mongoose");
 
 var schema = new mongoose.Schema({
     name:{type:String, required:true},
-    category:{type:String, required:true},
+    category:{type:String},
     brand: {type: mongoose.Schema.ObjectId, ref: 'brand'},
     search_more: {type:Boolean, default:false},
     show_count:{type:Number, default:4},
@@ -22,11 +22,18 @@ schema.index({order:1});
 
 // virtual
 schema.virtual('query').get(function(){
-    return {brand:this.brand};
+    var query = {};
+    if(this.brand){
+        query.brand = this.brand;
+        if(this.brand._id){
+            query.brand = this.brand._id;
+        }
+    }
+    return query;
 });
 
 // statics
-schema.statics.query = function(options, cb, populate_products) {
+schema.statics.query = function(options, cb, populate_products, populate_brand) {
     var query = {};
     if (options) {
         if (options.hasOwnProperty('online')) {
@@ -38,6 +45,9 @@ schema.statics.query = function(options, cb, populate_products) {
         .sort({online:-1, order: 1});
     if (populate_products) {
         querier.populate('products');
+    }
+    if (populate_brand){
+        querier.populate('brand');
     }
     querier.exec(cb);
 };
