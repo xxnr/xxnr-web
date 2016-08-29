@@ -30,7 +30,7 @@ module.exports = function(callback) {
 		    orderbyOptions.datecreated = -1;
 			ProductModel.find(queryOptions)
 				.populate('brand')
-				.select('id name pictures linker_category presale attributes price deposit SKUPrice brand')
+				.select('id name pictures linker_category presale attributes price deposit SKUPrice brand tags')
 				.sort(orderbyOptions)
 				.lean()
 				.exec(function(err, docs) {
@@ -139,7 +139,8 @@ function convertProduct(product) {
 		originalPrice: product.price,
 		presale: product.presale ? product.presale : false,
 		pictures: product.pictures,
-		categoryId: product.categoryId
+		categoryId: product.categoryId,
+		tags: product.tags
 	};
 	return data;
 }
