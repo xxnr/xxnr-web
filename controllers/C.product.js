@@ -5,6 +5,7 @@ var services = require('../services');
 var ProductService = services.product;
 var SKUService = services.SKU;
 var BrandService = services.brand;
+var NominateCategoryService = services.nominate_category;
 var converter = require('../common/converter');
 var api10 = converter.api10;
 exports.install = function(){
@@ -94,6 +95,9 @@ exports.getProductsListPage = function(req, res, next) {
     if (req.data.attributes){
         options.attributes = req.data.attributes;
     }
+    if (req.data.tags){
+        options.tags = decodeURI(req.data.tags).split(',');
+    }
 
     ProductService.query(options, function(err, data) {
         if(err){
@@ -117,7 +121,8 @@ exports.getProductsListPage = function(req, res, next) {
                 /*"goodsSort":3,*/ "goodsName": product.name,
                 "model": product.model,
                 "presale": product.presale ? product.presale : false,
-                pictures:product.pictures
+                "pictures":product.pictures,
+                "tags":product.tags
             };
 
             products.push(good);
@@ -188,4 +193,38 @@ exports.json_SKU_get = function(req, res, next){
 
         res.respond({code:1000, message:'success', SKU:SKU});
     })
+};
+
+exports.get_nominate_category = function(req, res, next){
+    NominateCategoryService.query({online:true}, function(err, nominate_categories){
+        if(err){
+            res.respond({code:1001, message:'获取推荐类目失败'});
+            return;
+        }
+
+        res.respond({code:1000, nominate_categories:nominate_categories});
+    }, true, false, 'name show_count search_more category brand products')
+};
+
+exports.get_brandsProducts_collection = function(req, res, next){
+    ProductService.getBrandsProductsCollection(req.data.brandId, function(err, BrandProducts){
+        if(err){
+            res.respond({code:1001, message:'获取品牌商品列表失败'});
+            return;
+        }
+
+        res.respond({code:1000, message:'success', brandProducts:BrandProducts});
+    });
+};
+
+exports.json_products_tags = function(req, res, next){
+    ProductService.queryTags(req.data.category, function(err, tags){
+        if (err) {
+            console.error('product json_products_tags err:', err);
+            res.respond({code: 1001, message: '获取商品标签列表失败', error: err});
+            return;
+        }
+
+        res.respond({code:1000, message:'success', tags:tags});
+    });
 };

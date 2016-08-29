@@ -644,74 +644,74 @@ describe('User', function() {
                 })
         })
     });
-    describe('Generate vcode api', function(){
-        var token;
-        before('register empty account and login', function (done) {
-            Routing.User.create_frontend_account(test_user.account, test_user.password, function () {
-                Routing.User.frontendLogin(test_user.account, test_user.password, function (body) {
-                    token = body.token;
-                    done();
-                })
-            })
-        });
-        before('delete vCodes', function(done){
-            vCodeModel.find({}).remove(done);
-        });
-        after('delete vCodes', function(done){
-            vCodeModel.find({}).remove(done);
-        });
-        var testCases = [{
-            name:'generate vcode (register) w/o account',
-            params:{bizcode:'register'},
-            result:{code: '1001', message: '请输入正确的手机号'}
-        },{
-            name:'generate vcode (register) w/ invalid account',
-            params:{bizcode:'register', tel:'12345'},
-            result:{code: '1001', message: '请输入正确的手机号'}
-        },{
-            name:'generate vcode (register) w/ registered account',
-            params:{bizcode:'register', tel:test_user.account},
-            result:{code: '1001', message: '该手机号已注册，请重新输入'}
-        },{
-            name:'generate vcode (register) w/ new account',
-            params:{bizcode:'register', tel:test_data.random_test_user('0001').account},
-            result:{code: '1000'},
-            noGet:true
-        },{
-            name:'generate vcode (register) w/ new account 2nd time',
-            params:{bizcode:'register', tel:test_data.random_test_user('0001').account},
-            result:{code: '1001', message: '获取短信验证码太频繁，请稍后再试'}
-        },{
-            name:'generate vcode (reset password) w/o account',
-            params:{bizcode:'resetpwd'},
-            result:{code: 1001, message: '请输入正确的手机号'}
-        },{
-            name:'generate vcode (reset password) w/ invalid account',
-            params:{bizcode:'resetpwd', tel:'12345'},
-            result:{code: 1001, message: '请输入正确的手机号'}
-        },{
-            name:'generate vcode (reset password) w/ unregistered account',
-            params:{bizcode:'resetpwd', tel:test_data.random_test_user('0002').account},
-            result:{code: 1001, message: '该手机号未注册，请重新输入'}
-        },{
-            name:'generate vcode (reset password) w/ unregistered account',
-            params:{bizcode:'resetpwd', tel:test_user.account},
-            result:{code: 1000},
-            noGet:true
-        },{
-            name:'generate vcode (reset password) w/ unregistered account 2nd time',
-            params:{bizcode:'resetpwd', tel:test_user.account},
-            result:{code: 1001, message: '获取短信验证码太频繁，请稍后再试'}
-        }];
-        testCases.forEach(function (test) {
-            Components.testGetAndPost(test.name)
-                .call('/api/v2.0/sms')
-                .send(test.params)
-                .end(function (err, res) {
-                    res.body.should.have.properties(test.result)
-                }, test.noGet, test.noPost)
-        })
-    });
+    //describe('Generate vcode api', function(){
+    //    var token;
+    //    before('register empty account and login', function (done) {
+    //        Routing.User.create_frontend_account(test_user.account, test_user.password, function () {
+    //            Routing.User.frontendLogin(test_user.account, test_user.password, function (body) {
+    //                token = body.token;
+    //                done();
+    //            })
+    //        })
+    //    });
+    //    before('delete vCodes', function(done){
+    //        vCodeModel.find({}).remove(done);
+    //    });
+    //    after('delete vCodes', function(done){
+    //        vCodeModel.find({}).remove(done);
+    //    });
+    //    var testCases = [{
+    //        name:'generate vcode (register) w/o account',
+    //        params:{bizcode:'register'},
+    //        result:{code: '1001', message: '请输入正确的手机号'}
+    //    },{
+    //        name:'generate vcode (register) w/ invalid account',
+    //        params:{bizcode:'register', tel:'12345'},
+    //        result:{code: '1001', message: '请输入正确的手机号'}
+    //    },{
+    //        name:'generate vcode (register) w/ registered account',
+    //        params:{bizcode:'register', tel:test_user.account},
+    //        result:{code: '1001', message: '该手机号已注册，请重新输入'}
+    //    },{
+    //        name:'generate vcode (register) w/ new account',
+    //        params:{bizcode:'register', tel:test_data.random_test_user('0001').account},
+    //        result:{code: '1000'},
+    //        noGet:true
+    //    },{
+    //        name:'generate vcode (register) w/ new account 2nd time',
+    //        params:{bizcode:'register', tel:test_data.random_test_user('0001').account},
+    //        result:{code: '1001', message: '获取短信验证码太频繁，请稍后再试'}
+    //    },{
+    //        name:'generate vcode (reset password) w/o account',
+    //        params:{bizcode:'resetpwd'},
+    //        result:{code: 1001, message: '请输入正确的手机号'}
+    //    },{
+    //        name:'generate vcode (reset password) w/ invalid account',
+    //        params:{bizcode:'resetpwd', tel:'12345'},
+    //        result:{code: 1001, message: '请输入正确的手机号'}
+    //    },{
+    //        name:'generate vcode (reset password) w/ unregistered account',
+    //        params:{bizcode:'resetpwd', tel:test_data.random_test_user('0002').account},
+    //        result:{code: 1001, message: '该手机号未注册，请重新输入'}
+    //    },{
+    //        name:'generate vcode (reset password) w/ unregistered account',
+    //        params:{bizcode:'resetpwd', tel:test_user.account},
+    //        result:{code: 1000},
+    //        noGet:true
+    //    },{
+    //        name:'generate vcode (reset password) w/ unregistered account 2nd time',
+    //        params:{bizcode:'resetpwd', tel:test_user.account},
+    //        result:{code: 1001, message: '获取短信验证码太频繁，请稍后再试'}
+    //    }];
+    //    testCases.forEach(function (test) {
+    //        Components.testGetAndPost(test.name)
+    //            .call('/api/v2.0/sms')
+    //            .send(test.params)
+    //            .end(function (err, res) {
+    //                res.body.should.have.properties(test.result)
+    //            }, test.noGet, test.noPost)
+    //    })
+    //});
     describe('Get api', function () {
         var api = '/api/v2.0/user/get';
         var token;

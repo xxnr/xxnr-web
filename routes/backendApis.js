@@ -14,7 +14,7 @@ router.post(F.config['manager-url']+'/api/login', middleware.auditing_middleware
 //7.manager
 // common
 router.post(F.config['manager-url']+'/upload', middleware.backend_auth, controllers.Manager.upload);
-router.get(F.config['manager-url']+ '/api/brands',	middleware.backend_auth,controllers.Manager.json_brands);
+router.get(F.config['manager-url']+'/api/brands',	middleware.backend_auth,controllers.Manager.json_brands);
 router.get(F.config['manager-url']+'/api/getOfflinePayType', middleware.backend_auth, controllers.Manager.json_offline_pay_type);
 
 // Dashboard
@@ -33,23 +33,26 @@ router.get(F.config['manager-url']+'/api/dashboard/queryAgentReports', middlewar
 // orders
 router.get(F.config['manager-url']+'/api/orders',middleware.backend_auth ,controllers.Manager.json_orders_query);
 router.post(F.config['manager-url']+'/api/orders/confirmOfflinePay', middleware.backend_auth, middleware.auditing_middleware, controllers.Manager.process_order_confirm_OfflinePay);
-router.put(F.config['manager-url']+ '/api/orders/RSCInfo',middleware.backend_auth,middleware.auditing_middleware ,controllers.Manager.process_orders_RSCInfo_update);
-router.put(F.config['manager-url']+ '/api/orders/subOrders',middleware.backend_auth,middleware.auditing_middleware,controllers.Manager.json_subOrders_payments_update);
-router.put(F.config['manager-url']+  '/api/orders/SKUs',middleware.backend_auth,middleware.auditing_middleware,controllers.Manager.json_orders_SKUs_update);
+router.put(F.config['manager-url']+'/api/orders/RSCInfo',middleware.backend_auth,middleware.auditing_middleware ,controllers.Manager.process_orders_RSCInfo_update);
+router.put(F.config['manager-url']+'/api/orders/subOrders',middleware.backend_auth,middleware.auditing_middleware,controllers.Manager.json_subOrders_payments_update);
+router.put(F.config['manager-url']+'/api/orders/SKUs',middleware.backend_auth,middleware.auditing_middleware,controllers.Manager.json_orders_SKUs_update);
 router.put(F.config['manager-url']+'/api/orders/SKUsDelivery', middleware.backend_auth, middleware.auditing_middleware, controllers.Manager.json_orders_SKUs_delivery);
 router.put(F.config['manager-url']+'/api/orders/products', middleware.backend_auth, middleware.auditing_middleware, controllers.Manager.json_orders_products_update);
-router.get(F.config['manager-url']+ '/api/orders/:id',middleware.backend_auth ,controllers.Manager.json_orders_read);
+router.get(F.config['manager-url']+'/api/orders/:id',middleware.backend_auth ,controllers.Manager.json_orders_read);
 
 // products
 router.post(F.config['manager-url']+'/products/uploadImage', middleware.backend_auth, controllers.Manager.CKEditor_uploadImage);
-router.get(F.config['manager-url']+  '/api/products',middleware.backend_auth,controllers.Manager.json_products_query);
-router.post(F.config['manager-url']+  '/api/products',middleware.backend_auth,middleware.auditing_middleware,controllers.Manager.json_products_save);
-router.post(F.config['manager-url']+  '/api/products/updateStatus',middleware.backend_auth,middleware.auditing_middleware,controllers.Manager.process_products_updateStatus);
-router.get(F.config['manager-url']+ '/api/products/categories',middleware.backend_auth,controllers.Manager.json_products_categories);
-router.get(F.config['manager-url']+ '/api/products/attributes',middleware.backend_auth,controllers.Manager.json_products_attributes);
-router.get(F.config['manager-url']+ '/api/products/:id',middleware.backend_auth,controllers.Manager.json_products_read);
+router.get(F.config['manager-url']+'/api/products',middleware.backend_auth,controllers.Manager.json_products_query);
+router.post(F.config['manager-url']+'/api/products',middleware.backend_auth,middleware.auditing_middleware,controllers.Manager.json_products_save);
+router.post(F.config['manager-url']+'/api/products/updateStatus',middleware.backend_auth,middleware.auditing_middleware,controllers.Manager.process_products_updateStatus);
+router.get(F.config['manager-url']+'/api/products/categories',middleware.backend_auth,controllers.Manager.json_products_categories);
+router.get(F.config['manager-url']+'/api/products/attributes',middleware.backend_auth,controllers.Manager.json_products_attributes);
 router.post(F.config['manager-url']+'/api/products/attribute/add', middleware.backend_auth, middleware.auditing_middleware, controllers.Manager.process_product_attributes_add);
 router.get(F.config['manager-url']+'/api/products/attr/:attributeName', middleware.backend_auth, controllers.Manager.json_products_attribute);
+router.post(F.config['manager-url']+'/api/products/tag/add', middleware.backend_auth, middleware.auditing_middleware, controllers.Manager.process_product_tags_add);
+router.get(F.config['manager-url']+'/api/products/tags', middleware.backend_auth, controllers.Manager.json_products_tags);
+router.get(F.config['manager-url']+'/api/products/:id',middleware.backend_auth,controllers.Manager.json_products_read);
+
 // SKU
 router.post(F.config['manager-url']+'/api/v2.1/SKU/addition/add', middleware.backend_auth, controllers.Manager.process_SKU_Addition_add);
 router.get(F.config['manager-url']+'/api/v2.1/SKU/additions', middleware.backend_auth, controllers.Manager.json_SKU_Additions_get);
@@ -71,17 +74,17 @@ router.post(F.config['manager-url']+'/api/news', middleware.backend_auth, middle
 router.delete(F.config['manager-url']+'/api/news', middleware.backend_auth, middleware.auditing_middleware, controllers.Manager.json_news_remove);
 
 // USERS
-router.get(F.config['manager-url']+ '/api/users',middleware.backend_auth,controllers.Manager.json_users_query);
-router.get(F.config['manager-url']+ '/api/users/:id',middleware.backend_auth,controllers.Manager.json_users_read);
-router.put(F.config['manager-url']+ '/api/users',middleware.backend_auth,middleware.auditing_middleware,controllers.Manager.json_users_save);
+router.get(F.config['manager-url']+'/api/users',middleware.backend_auth,controllers.Manager.json_users_query);
+router.get(F.config['manager-url']+'/api/users/:id',middleware.backend_auth,controllers.Manager.json_users_read);
+router.put(F.config['manager-url']+'/api/users',middleware.backend_auth,middleware.auditing_middleware,controllers.Manager.json_users_save);
 // agentinfo
-router.get(F.config['manager-url']+ '/api/v2.1/agentinfo/:id',middleware.backend_auth,controllers.Manager.json_agent_info_get);
+router.get(F.config['manager-url']+'/api/v2.1/agentinfo/:id',middleware.backend_auth,controllers.Manager.json_agent_info_get);
 // potentialCustomer
 router.get(F.config['manager-url']+'/api/v2.1/potentialCustomer/query', middleware.backend_auth, controllers.Manager.json_potential_customer_query);
 router.get(F.config['manager-url']+'/api/v2.1/potentialCustomer/:_id', middleware.backend_auth, controllers.Manager.json_potential_customer_get);
 
 // RSC
-router.get(F.config['manager-url']+ '/api/v2.2/RSCInfo/:_id',middleware.backend_auth,controllers.Manager.json_RSC_info_get);
+router.get(F.config['manager-url']+'/api/v2.2/RSCInfo/:_id',middleware.backend_auth,controllers.Manager.json_RSC_info_get);
 router.get(F.config['manager-url']+'/api/v2.2/RSCs', middleware.backend_auth, controllers.Manager.json_RSC_query);
 router.get(F.config['manager-url']+'/api/v2.2/RSC/orders', middleware.backend_auth, controllers.Manager.json_RSCorders_query);
 
@@ -141,5 +144,12 @@ router.get(F.config.manager_url+'/api/campaign', middleware.backend_auth, contro
 // quiz
 router.post(F.config.manager_url+'/api/campaign/quiz/modify_right_answer', middleware.backend_auth, controllers.Manager.modify_quiz_right_answer);
 router.post(F.config.manager_url+'/api/campaign/quiz/trigger_reward', middleware.backend_auth, controllers.Manager.trigger_quiz_reward);
+
+// nominate category
+router.post(F.config.manager_url+'/api/nominate_category/create', middleware.backend_auth, controllers.Manager.create_nominate_category);
+router.post(F.config.manager_url+'/api/nominate_category/modify', middleware.backend_auth, controllers.Manager.modify_nominate_category);
+router.delete(F.config.manager_url+'/api/nominate_category/delete', middleware.backend_auth, controllers.Manager.delete_nominate_category);
+router.post(F.config.manager_url+'/api/nominate_category/update_order', middleware.backend_auth, controllers.Manager.update_nominate_category_order);
+router.get(F.config.manager_url+'/api/nominate_category/query', middleware.backend_auth, controllers.Manager.query_nominate_category);
 
 module.exports = router;

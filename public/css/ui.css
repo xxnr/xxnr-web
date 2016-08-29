@@ -176,3 +176,6 @@ label span { vertical-align: middle; }
 .ui-textbox-with-button input { display: table-cell; border: 0; outline: 0; font: normal 14px Arial; color: black; background-color: white; padding: 0; }
 
 .hidden { display: none; overflow: hidden !important; }
+
+.change_order {weight: 28px; height: 28px; float:right;cursor: pointer;padding-right:10px}
+.change_order img {weight: 28px; height: 28px;}

@@ -59,6 +59,7 @@ require('./loyaltypoints');
 require('./appdeviceversion');
 require('./campaign');
 require('./wechart');
+require('./nominate_category');
 
 //user
 exports.user = mongoose.model('user');
@@ -84,6 +85,8 @@ exports.order = mongoose.model('order');
 // product
 exports.product = mongoose.model('product');
 exports.productAttribute = mongoose.model('productAttribute');
+exports.brandsProductsCollection = mongoose.model('brandsProductsCollection');
+exports.productTag = mongoose.model('productTag');
 // news
 exports.news = mongoose.model('news');
 exports.newsCategory = mongoose.model('newscategory');
@@ -144,6 +147,8 @@ exports.reward_control = mongoose.model('reward_control');
 exports.quiz_answer = mongoose.model('quiz_answer');
 //wechart
 exports.wechart = mongoose.model('wechart');
+// nominate category
+exports.nominate_category = mongoose.model('nominate_category');
 
 exports.getModel = function (name, options) {
     options = options || {};

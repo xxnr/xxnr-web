@@ -103,6 +103,8 @@ router.post('/api/v2.1/product/getProductsListPage', controllers.Product.getProd
 router.get('/api/v2.1/products/attributes', controllers.Product.json_products_attributes);
 router.post('/api/v2.1/SKU/attributes_and_price/query', controllers.Product.json_SKU_Attributes_query);
 router.get('/api/v2.1/SKU/get', controllers.Product.json_SKU_get);
+router.get('/api/v2.4/products/getBrandsProducts', controllers.Product.get_brandsProducts_collection);
+router.get('/api/v2.4/products/tags', controllers.Product.json_products_tags);
 
 // cart APIs
 router.get('/api/v2.1/cart/getShoppingCart', middleware.isLoggedIn_middleware, controllers.Cart.getShoppingCart);
@@ -215,6 +217,9 @@ router.post('/api/v2.3/campaign/QA/require_reward', middleware.isLoggedIn_middle
 router.get('/api/v2.3/campaign/quiz/getQ', controllers.Campaign.query_quiz_question);
 router.post('/api/v2.3/campaign/quiz/answer', middleware.isLoggedIn_middleware, controllers.Campaign.submit_quiz_answer);
 router.get('/api/v2.3/campaign/quiz/my_answer', middleware.isLoggedIn_middleware, controllers.Campaign.query_my_quiz_answer);
+
+// nominate category
+router.get('/api/v2.4/nominate_category', controllers.Product.get_nominate_category);
 
 // compatibility APIs
 controllers.Compatibility.compatibilityAPIs(router);

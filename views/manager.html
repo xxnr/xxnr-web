@@ -9,6 +9,7 @@
 		var currency= "<%= currency_entity %>";
 		var su= <%- JSON.stringify(user) %>;
         su.roles = su.role.view_roles;
+		var categories = {'531680A5':'化肥', '6C7D8F66':'汽车', '6C7D914D':'汽配'};
 	</script>
 	
 </head>
@@ -30,6 +31,7 @@
 					<% if (user.role.view_roles.indexOf('agents') !== -1) { %><li><a class="jrouting" href="<%= manager_url %>/agents/" title="经纪人管理" data-role="agents"><span class="fa fa-user-secret"></span></a></li><% } %>
 					<% if (user.role.view_roles.indexOf('campaigns') !== -1) { %><li><a class="jrouting" href="<%= manager_url %>/campaign" title="活动管理" data-role="campaigns"><span class="fa fa-bullhorn"></span></a></li><% } %>
 					<% if (user.role.view_roles.indexOf('news') !== -1) { %><li><a class="jrouting" href="<%= manager_url %>/news/" title="资讯" data-role="news"><span class="fa fa-newspaper-o"></span></a></li><% } %>
+					<% if (user.role.view_roles.indexOf('pages') !== -1) { %><li><a class="jrouting" href="<%= manager_url %>/pages/nominate-category/" title="页面管理" data-role="pages"><span class="fa fa-desktop"></span></a></li><% } %>
 					<% if (user.role.view_roles.indexOf('rewardshop') !== -1) { %><li><a class="jrouting" href="<%= manager_url %>/rewardshop/" title="积分商城" data-role="rewardshop"><span class="fa fa-gift"></span></a></li><% } %>
 					<% if (user.role.view_roles.indexOf('payrefunds') !== -1) { %><li><a class="jrouting" href="<%= manager_url %>/payrefunds/" title="退款" data-role="payrefunds"><span class="fa fa-money"></span></a></li><% } %>
 					<% if (user.role.view_roles.indexOf('auditlogs') !== -1) { %><li><a class="jrouting" href="<%= manager_url %>/auditlogs/" title="审计" data-role="auditlogs"><span class="fa fa-history"></span></a></li><% } %>
@@ -75,6 +77,10 @@
 		<% } %>
 		<% if (user.role.view_roles.indexOf('news') !== -1) { %>
 		<div data-component="page" data-component-path="common.page" data-if="news" data-template="/templates/manager-news.html"></div>
+		<% } %>
+		<% if (user.role.view_roles.indexOf('pages') !== -1) { %>
+		<div data-component="page" data-component-path="common.page" data-if="nominate-categories" data-template="<%= manager_url %>/pages/nominate-categories<% if (query){%>?<%= query %> <% } %>"></div>
+		<div data-component="page" data-component-path="common.page" data-if="nominate-category-detail" data-template="<%= manager_url %>/pages/nominate-category-detail<% if (query){%>?<%= query %> <% } %>"></div>
 		<% } %>
 		<% if (user.role.view_roles.indexOf('rewardshop') !== -1) { %>
 		<div data-component="page" data-component-path="common.page" data-if="rewardshop" data-template="<%= manager_url %>/rewardshop/rewardshop-gifts-orders"></div>

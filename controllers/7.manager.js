@@ -27,6 +27,7 @@ var DELIVERYTYPE =  require('../common/defs').DELIVERYTYPE;
 var config = require('../config');
 var path = require('path');
 var CampaignService = services.Campaign;
+var NominateCategoryService = services.nominate_category;
 var URL = require('url');
 
 exports.install = function() {
@@ -810,6 +811,25 @@ exports.json_products_query =function(req,res,next) {
 // Saves (update or create) specific product
 exports.json_products_save = function(req,res,next) {
 	var self = this;
+	var productTagsMax = 3;
+
+	if (req.body.tags) {
+		var tags = [];
+		var tagsIds = {};
+		for (var i=0; i<req.body.tags.length; i++) {
+			var tag = req.body.tags[i];
+			var key = tag['ref'] || tag['_id'];
+			if (!tagsIds[key]) {
+				tagsIds[key] = tag;
+				tags.push(tag);
+			}
+		}
+		req.body.tags = tags;
+		if (req.body.tags.length > productTagsMax) {
+            res.respond({code:1001, message:'商品的标签最多只能'+productTagsMax+'个'});
+            return;
+        }
+	}
 
     ProductService.save(req.body, function(err, product){
 		if(err){
@@ -927,6 +947,19 @@ exports.json_products_attributes = function(req,res,next){
 		}
 		res.respond({code:1000, message:'success', attributes:attributes});
 	}, 1)
+}
+
+// query products tags
+exports.json_products_tags = function(req,res,next){
+	var self = this;
+	ProductService.queryTags(req.data.category, function(err, tags){
+		if (err) {
+			console.error('manager json_products_tags err:', err);
+			res.respond({code: 1004, message: '获取商品标签列表失败', error: err});
+			return;
+		}
+		res.respond({code:1000, message:'success', tags:tags});
+	}, true);
 }
 
 // Reads a specific product by ID
@@ -2154,6 +2187,31 @@ exports.process_product_attributes_add = function(req, res, next){
 	})
 };
 
+// product tags
+exports.process_product_tags_add = function(req, res, next){
+	ProductService.getTag(req.data.category, req.data.name, function(err, tag){
+		if (err) {
+			console.error('manager process_product_tags_add getTag err:', err);
+			res.respond({code: 1004, message: '查找标签失败'});
+			return;
+		}
+		if (tag) {
+			res.respond({code: 1001, message: '标签已存在'});
+			return;
+		}
+		ProductService.addTag(req.data.category, req.data.name, function(err, new_tag){
+			if(err){
+				console.error('manager process_product_tags_add addTag err:', err);
+				res.respond({code: 1004, message: '保存标签失败'});
+				return;
+			}
+
+			res.respond({code:1000, message:'success', tag:new_tag});
+			return;
+		});
+	});
+};
+
 exports.json_SKU_get = function(req, res, next){
 	SKUService.querySKUByProductId(req.data.product, function(err, SKUs){
 		if(err){
@@ -3132,4 +3190,142 @@ exports.campaign_detail_quiz = function(req, res, next){
 				right_answer_published: right_answer_published || false
 			})
 	})
+};
+
+exports.create_nominate_category = function(req, res, next){
+	var nominate_category = req.data.nominate_category;
+	if(!nominate_category){
+		res.respond({code:1001, message:'nominate_category required'});
+		return;
+	}
+
+	NominateCategoryService.create(nominate_category, function(err, nominate_category){
+		if(err){
+			res.respond({code:1001, message:'创建推荐类目失败'});
+			return;
+		}
+
+		res.respond({code:1000, nominate_category:nominate_category});
+	})
+};
+
+exports.modify_nominate_category = function(req, res, next){
+	var nominate_category = req.data.nominate_category;
+	if(!nominate_category){
+		res.respond({code:1001, message:'nominate_category required'});
+		return;
+	}
+
+	if(!nominate_category._id){
+		res.respond({code:1001, message:'nominate_category._id required'});
+		return;
+	}
+
+	NominateCategoryService.modify(nominate_category, function(err, nominate_category){
+		if(err){
+			res.respond({code:1001, message:'修改推荐类目失败'});
+			return;
+		}
+
+		res.respond({code:1000, nominate_category:nominate_category});
+	})
+};
+
+exports.delete_nominate_category = function(req, res, next){
+	var nominate_category_id = req.data._id;
+	if(!nominate_category_id){
+		res.respond({code:1001, message:'_id required'});
+		return;
+	}
+
+	NominateCategoryService.delete(nominate_category_id, function(err){
+		if(err){
+			res.respond({code:1001, message:'删除推荐类目失败'});
+			return;
+		}
+
+		res.respond({code:1000, message:'success'});
+	})
+};
+
+exports.update_nominate_category_order = function(req, res, next){
+	var nominate_category_order = req.data.nominate_category_order;
+	if(!nominate_category_order){
+		res.respond({code:1001, message:'nominate_category_order required'});
+		return;
+	}
+
+	NominateCategoryService.update_order(nominate_category_order, function(err){
+		if(err){
+			res.respond({code:1001, message:'更新推荐类目顺序失败'});
+			return;
+		}
+
+		res.respond({code:1000, message:'success'});
+	})
+};
+
+exports.query_nominate_category = function(req, res, next){
+	NominateCategoryService.query(null, function(err, nominate_categories){
+		if(err){
+			res.respond({code:1001, message:'获取推荐类目失败'});
+			return;
+		}
+
+		res.respond({code:1000, nominate_categories:nominate_categories});
+	})
+};
+
+exports.nominate_categories = function(req, res, next) {
+	NominateCategoryService.query(null, function(err, nominate_categories) {
+		if (err) {
+			res.respond({code: 1001, message: '获取推荐类目失败'});
+			return;
+		}
+
+		res.render(path.join(__dirname, '../views/7.manager/nominate_category/nominate-category.html'),
+			{
+				manager_url: F.config['manager-url'],
+				page: 'nominate-categories',
+				user: req.user,
+				nominate_categories:nominate_categories
+			});
+	}, true, true);
+};
+
+exports.nominate_category_detail = function(req, res, next) {
+	var _id = req.data.id;
+	CategoryService.all(function(err, categories) {
+		if (err) {
+			res.respond({code: 1004, message: 'fail to query category'});
+			return;
+		}
+
+		if(_id) {
+			NominateCategoryService.getById(_id, function (err, nominate_category) {
+				if (err) {
+					res.respond({code: 1001, message: '获取推荐类目失败'});
+					return;
+				}
+
+				res.render(path.join(__dirname, '../views/7.manager/nominate_category/nominate-category-detail.html'),
+					{
+						manager_url: F.config['manager-url'],
+						page: 'nominate-category-detail',
+						user: req.user,
+						nominate_category: nominate_category,
+						categories: categories
+					});
+			});
+		} else{
+			res.render(path.join(__dirname, '../views/7.manager/nominate_category/nominate-category-detail.html'),
+				{
+					manager_url: F.config['manager-url'],
+					page: 'nominate-category-detail',
+					user: req.user,
+					nominate_category: {},
+					categories: categories
+				});
+		}
+	});
 };

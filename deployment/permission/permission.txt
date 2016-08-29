@@ -112,6 +112,13 @@
 /manager/campaign-detail-QA, get, super_admin
 /manager/campaign-detail-quiz, get, super_admin
 
+#nominate_category
+/manager/api/nominate_category/create, post, super_admin
+/manager/api/nominate_category/modify, post, super_admin
+/manager/api/nominate_category/delete, delete, super_admin
+/manager/api/nominate_category/update_order, post, super_admin
+/manager/api/nominate_category/query, get, super_admin
+
 #area
 /manager/api/area/getProvinceList, get, super_admin
 /manager/api/area/getCityList, get, super_admin
