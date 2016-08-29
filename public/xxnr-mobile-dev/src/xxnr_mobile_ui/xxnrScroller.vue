@@ -251,6 +251,9 @@
       },
       'backToTop': function() {
         this._xscroll.scrollTop(0,100);
+      },
+      'scrollTo': function(top) {
+        this._xscroll.scrollTop(top,100);
       }
     },
     beforeDestroy () {

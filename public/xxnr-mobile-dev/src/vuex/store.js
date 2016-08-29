@@ -11,6 +11,8 @@ import order from './modules/order'
 import vueSlider from './modules/vueSlider'
 import register from './modules/register'
 import indexConfig from './modules/indexConfig'
+import point from './modules/point.js'
+import giftOrder from './modules/giftOrder.js'
 import {
   CLOSE_APPDOWNLOAD,
   SET_TOASTMSG,
@@ -45,11 +47,13 @@ const store = new Vuex.Store({
     rowsViewProducts,
     auth,
     myOrders,
-	productDetail,
-	vueSlider,
+    productDetail,
+    vueSlider,
     register,
     order,
-    indexConfig
+    indexConfig,
+    point,
+    giftOrder
   },
   strict: debug
 });

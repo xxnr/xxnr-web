@@ -88,7 +88,7 @@ export const goBack = ({dispatch,state}) => {
     window.location.href = decodeURIComponent(getUrlParam('redirect', decodeURI(window.location.href)));
     return;
   }
-  if(window.location.pathname.indexOf('my_orders')!=-1){
+  if(window.location.pathname.indexOf('my_orders')!=-1 || window.location.pathname.indexOf('rewardShop') != -1){
     //window.location.href = '#!/my_xxnr';  //对我的订单页面有个特殊的路由处理,在任何一个标签都跳会我的新新农人
     router.go('/my_xxnr')
   }else if(window.location.pathname.indexOf('my_xxnr')!=-1){
@@ -115,7 +115,21 @@ export const goBack = ({dispatch,state}) => {
         router.go('/productDetail?id='+ state.order.orderInfo.rows.orderGoodsList[0].goodsId);
         return;
       }
-  }else {
+  } else if( window.location.pathname.indexOf('pointsLogs') != -1) {
+    router.go('/rewardShop')
+  } else if(window.location.pathname.indexOf('giftOrder') != -1) {
+    if(window.location.pathname.indexOf('giftOrderDone') != -1) {
+      router.go('/giftDetail?id=' + getUrlParam('giftId'));
+      return;
+    }
+    router.go('/giftDetail?id='+ getUrlParam('giftId'));
+  } else if(window.location.pathname.indexOf('giftDetail') != -1) {
+    router.go('/rewardShop');
+  } else if(window.location.pathname.indexOf('pointsLogs') != -1) {
+    router.go('/rewardShop');
+  } else if(window.location.pathname.indexOf('/myPoint') != -1) {
+    router.go('/rewardShop');
+  } else {
     window.history.back();
   }
 }
@@ -146,9 +160,8 @@ export const login = ({dispatch,state},PhoneNumber,password) => {
       ,response => {
       if (response.data.code == 1000) {
         sessionStorage.setItem('user', JSON.stringify(response.data.datas));
-        //router.go('/home');
         if(getUrlParam('ref')) {
-          router.go(decodeURIComponent(getUrlParam('ref')));
+          router.go(decodeURIComponent(decodeURIComponent(getUrlParam('ref'))));
           return;
         }
         if(getUrlParam('redirect')) {
@@ -476,7 +489,9 @@ export const buyProduct = ({dispatch, state}) => {
       response => {
         if(response.data.code != 1000) {
           if(response.data.code == 1401) {
-            router.go('/login');
+            var ref = 'productDetail?id=' + state.productDetail.product.id;
+            router.go('/login?ref=' + encodeURIComponent(ref));
+            return;
           } else {
             dispatch(types.SET_TOASTMSG,response.data.message);
             dispatch(types.HIDE_ATTRBOX);
@@ -496,11 +511,17 @@ export const buyProduct = ({dispatch, state}) => {
   }
 }
 
-export const getRSCListByProduct = ({dispatch, state}, id) => {
+export const getRSCListByProduct = ({dispatch, state}) => {
   dispatch(types.RESET_TOASTMSG);
-  api.getRSCListByProduct({
-    products: id
-  }, response => {
+  let postData = {};
+  if(getUrlParam('gift_id')) {
+    postData.gift = getUrlParam('gift_id');
+  }
+
+  if(getUrlParam('productId')) {
+    postData.products = getUrlParam('productId');
+  }
+  api.getRSCListByProduct(postData, response => {
     if(response.data.code == 1000) {
       dispatch(types.GET_RSCLISTBYPRODUCT, response.data.RSCs);
       return;
@@ -581,11 +602,11 @@ export const getConsigneeList = ({dispatch, state}) => {
 export const saveConsignee = ({dispatch, state}, consigneeName, consigneePhone) => {
   dispatch(types.RESET_TOASTMSG);
   var reg = /^1\d{10}$/;
-  if(consigneeName == '') {
+  if(consigneeName.trim() == '') {
     dispatch(types.SET_TOASTMSG, '请输入收货人姓名');
     return;
   }
-  if(consigneePhone == '') {
+  if(consigneePhone.trim() == '') {
     dispatch(types.SET_TOASTMSG, '请输入联系方式');
     return;
   }
@@ -741,11 +762,11 @@ export const getInviter = ({dispatch, state},userId) => {
       dispatch(types.GET_USERINFO,response.data.datas);
       if(response.data.datas.inviter) {
         api.getInviter(response=>{
-          if(response.code == 1000) {
-            dispatch(types.GET_INVITERINFO, response.datas);
+          if(response.data.code == 1000) {
+            dispatch(types.GET_INVITERINFO, response.data.datas);
             return;
           }
-          if(response.code == 1401) {
+          if(response.data.code == 1401) {
             router.go('/login');
             return;
           }
@@ -771,6 +792,16 @@ export const resetOrderCondignee = ({dispatch, state}, fromUrl) => {
   if(!(checkPath(fromUrl, '/orderConsignee') == 1 || checkPath(fromUrl, '/orderRSC') == 1)) {
     dispatch(types.RESET_ORDERCONSIGNEE);
     api.getConsignee(response=> {
+      if(response.data.code == 1401) {
+        var href= window.location.href;
+        if(href.indexOf('/giftOrder') != -1) {
+          var ref = '/login?ref='+ encodeURIComponent('/giftOrder?giftId=' + getUrlParam('giftId') + '&gift_id=' + getUrlParam('gift_id'));
+          //console.log(decodeURI(ref));
+          //ref = decodeURI(ref);
+          router.go(ref);
+          return;
+        }
+      }
       if(response.data.datas.rows.length != 0) {
       dispatch(types.SELECT_CONSIGNEEAUTO, response.data.datas.rows);
     }
@@ -926,3 +957,214 @@ export const getMyPoints = ({dispatch, state}, userId) => {
 export const resetConfirmOrder = ({dispatch, state}) => {
   dispatch(types.RESET_CONFIRMORDER);
 }
+
+export const getUserPoint = ({dispatch, state}) => {
+  api.getUserPoint(response=> {
+    var point = 0;
+    if(response.data.code == 1000) {
+      point = response.data.datas.score || 0;
+
+    } else if (response.data.code == 1401 ) {
+      point = -1;
+    } else {
+      //TODO
+    }
+
+    dispatch(types.GET_USERPOINT, point);
+  }, response => {
+
+  });
+}
+
+export const getPointGifts = ({dispatch, state}) => {
+  api.getPointGifts(response => { //get all categories
+    if(response.data.code == 1000) {
+      if(response.data.categories.length == 0) {
+        //TODO
+        return;
+      }
+      dispatch(types.GET_GIFTCATEGORIES, response.data.categories);
+      var resData = response.data;
+      var giftArr = [];
+      var item = {};
+      for(let i = 0; i < resData.categories.length; i ++) {
+        api.getGiftsByCategory({
+          category: resData.categories[i]._id
+        }, response => {
+          if(response.data.code == 1000) {
+            dispatch(types.GET_GIFTSBYCATEGORY, i , response.data.datas.gifts)
+          }
+        }, response => {
+
+        });
+      }
+
+    } else {
+      //TODO
+    }
+  }, response => {
+
+  });
+}
+
+export const clearPointGifts = ({dispatch, state}) => {
+  dispatch(types.CLEAR_POINTGIFTS);
+}
+
+export const getPointsLogs = ({dispatch, state}) => {
+  api.getPointsLogs(response => {
+    if(response.data.code == 1401) {
+      router.go('/login');
+      return;
+    }
+    if(response.data.code == '1000') {
+      dispatch(types.GET_POINTSLOGS, response.data.datas);
+    }
+    //TODO
+  }, response => {
+
+  })
+}
+
+export const getGiftDetail = ({dispatch, state}, giftId) => {
+  api.getGiftDetail({
+    id: giftId
+  }, response => {
+    if (response.data.code != '1000') {
+      //TODO
+      return;
+    }
+      let rscData = response.data.gift;
+      api.getUserPoint(response=> {
+        var score = 0;
+        if(response.data.code == 1000) {
+          score = response.data.datas.score || 0;
+        } else if (response.data.code == 1401 ) {
+          score = -1;
+        } else {
+          //TODO
+        }
+        rscData.score = score;
+        let item = {};
+        if(!rscData.online) {
+          item.text = '已下架';
+          item.type = 0;
+        } else if(rscData.soldout) {
+          item.text = '已抢光';
+          item.type = 1;
+        } else if(rscData.score != -1 && rscData.score <= rscData.points) {
+          item.text = '积分不足';
+          item.type = 3;
+        } else {
+          item.text = '立即兑换';
+          item.type = 4;
+        }
+        rscData.change = item;
+        dispatch(types.GET_GIFTDETAIL, rscData);
+      }, response => {
+
+      });
+
+    }, response => {
+
+    });
+}
+
+export const getOrderGiftDetail = ({dispatch, state}, giftId) => {
+  api.getGiftDetail({
+    id: giftId
+  },response => {
+    if(response.data.code == 1401) {
+      router.go('/login');
+      return;
+    }
+
+    if(response.data.code != '1000') {
+      //TODO
+      return;
+    }
+    dispatch(types.GET_ORDERGIFTDETAIL, response.data.gift);
+  }, response => {
+
+  });
+}
+
+export const commitGiftOrder = ({dispatch, state}, id) => {
+  dispatch(types.RESET_TOASTMSG);
+  var postData = {
+    giftId: id,
+    deliveryType: 1,
+    RSCId: state.order.orderRSC._id,
+    consigneePhone: state.order.orderConsignee.consigneePhone,
+    consigneeName: state.order.orderConsignee.consigneeName
+  };
+
+  if(!postData.RSCId) {
+    dispatch(types.SET_TOASTMSG, '请选择自提网点');
+    return;
+  }
+
+  api.addGiftOrder(postData,response => {
+    if(response.data.code == 1401) {
+      router.go('/login');
+      return;
+    }
+    if(response.data.code == 1000) {
+      //dispatch(types.COMMIT_ORDER, response.data);
+      dispatch(types.COMMIT_GIFTORDER, response.data.giftOrder);
+    } else {
+      dispatch(types.SET_TOASTMSG, response.data.message);
+    }
+  },response => {
+
+  });
+}
+
+export const getGiftOrderList = ({dispatch, state}) => {
+  api.getGiftOrderList(response => {
+    if(response.data.code == 1401) {
+      router.go('/login');
+      return;
+    }
+    if(response.data.code != '1000') {
+      //TODO
+      return;
+    }
+    dispatch(types.GET_GIFTORDERLIST, response.data.datas);
+  }, response => {
+
+  });
+}
+
+export const getGiftOrderDetail = ({dispatch, state}, id) => {
+  api.getGiftOrderDetail({
+    orderId: id
+  }, response => {
+    if(response.data.code == 1401) {
+      router.go('/login');
+      return;
+    }
+    if(response.data.code != '1000') {
+      //TODO
+      return;
+    }
+    dispatch(types.GET_GIFTORDERDETAIL, response.data.giftorder)
+  }, response => {
+
+  });
+}
+
+export const clearGiftDetail = ({dispatch, state}) => {
+  dispatch(types.CLEAR_GIFTDETAIL);
+}
+
+export const getCampaigns = ({dispatch, state}) => {
+  api.getCampaigns(
+    response => {
+      if(response.data.code == 1000) {
+        dispatch(types.GET_CAMPAIGNS, response.data.campaigns);
+      }
+    }, response => {
+  });
+}
+

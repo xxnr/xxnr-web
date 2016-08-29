@@ -35,8 +35,8 @@
         查看全部订单
       </span>
     </div>
-    <div class="profile_option" v-link="{ name: 'myPoints'}">
-      <img class="option_icon" src="/assets/images/my_xxnr_icon_point.png" alt="">我的积分
+    <div class="profile_option" v-link="{ name: 'rewardShop'}">
+      <img class="option_icon" src="/assets/images/my_xxnr_icon_point.png" alt="">积分商城
     </div>
     <div class="profile_option" v-link="{ name: 'myInvitation'}">
       <img class="option_icon" src="/assets/images/my_xxnr_icon_peasant.png" alt="">新农代表

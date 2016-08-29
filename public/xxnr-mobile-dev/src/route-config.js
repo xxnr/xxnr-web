@@ -1,4 +1,4 @@
-import {getCookie} from './utils/authService'
+import {getCookie, removeCookie} from './utils/authService'
 
 export function configRouter (router) {
   //因为链接不能加#!以区分前端路由还是后端路由,所以需要在后端服务器最后加一个路由正则以匹配到前端的路由  (mobileRelease.js)
@@ -73,10 +73,45 @@ export function configRouter (router) {
         }
       }
     },
-    '/my_points': {
-      name: 'myPoints',
-      component: require('./components/my_points/index.vue'),
-      auth: true // 这里 auth 是一个自定义字段
+    '/rewardShop': {
+      name: 'rewardShop',
+      component: require('./components/rewardShop/index.vue')
+    },
+    '/myPoint': {
+      name: 'myPoint',
+      component: require('./components/rewardShop/myPoint.vue'),
+      auth: true // 这里 auth 是一个自定义字段,
+    },
+    '/pointsLogs': {
+      name: 'pointsLogs',
+      component: require('./components/rewardShop/pointsLogs.vue'),
+      auth: true, // 这里 auth 是一个自定义字段,
+      subRoutes : {
+        '/unComplete' : {
+          component : require('./components/rewardShop/unCompleteOrders.vue'),
+        },
+        '/completed' : {
+          component : require('./components/rewardShop/completedOrders.vue'),
+        }
+      }
+    },
+    '/rules': {
+      name: 'rules',
+      component: require('./components/rewardShop/rules.vue')
+    },
+    '/giftDetail': {
+      name: 'giftDetail',
+      component: require('./components/rewardShop/giftDetail.vue')
+    },
+    '/giftOrder': {
+      name: 'giftOrder',
+      component: require('./components/rewardShop/giftOrder.vue'),
+      auth: true
+    },
+    '/giftOrderDone': {
+      name: 'giftOrderDone',
+      component: require('./components/rewardShop/giftOrderDone.vue'),
+      auth: true
     },
     '/my_invitation': {
       name: 'myInvitation',
@@ -91,8 +126,20 @@ export function configRouter (router) {
     if (transition.to.auth) {
       const user = getCookie('__user');
       if(!user){
-        //let redirect = encodeURIComponent(encodeURI(transition.to.path));
-        transition.redirect('/login?ref=' + transition.to.path);
+        removeCookie('__user');
+        removeCookie('__scart');
+        removeCookie('token');
+        var toPath = '/login?ref=' + encodeURIComponent(transition.to.path);
+
+        if(transition.to.path.indexOf('/myPoint') != -1) {
+          toPath = '/login?redirect=/rewardShop&ref=/myPoint';
+        }
+        if(transition.to.path.indexOf('/pointsLogs') != -1) {
+          toPath = '/login?redirect=/rewardShop&ref=/pointsLogs/unComplete'
+        }
+
+        //transition.redirect('/login');
+        router.go(toPath);
         //redirect 作为参数，登录之后跳转回来
         //console.log('Wrong way!');
       }else{

@@ -88,7 +88,7 @@
   },components: {
     xxnrToast
   },
-  detached() {
+  detached:function() {
     this.consigneeName = '';
     this.consigneePhone = '';
   },

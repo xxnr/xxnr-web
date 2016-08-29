@@ -125,7 +125,7 @@
 
 </script>
 
-<style type="text/css">
+<style type="text/css" scoped>
   .swiper .item {
     position: absolute;
     height: 100%;

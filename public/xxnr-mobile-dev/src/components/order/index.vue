@@ -13,21 +13,8 @@
         </div>
       </div>
     </div>
-    <div class="order-rsc-info">
-      <div class="container">
-        <div class="order-rsc" v-link="{path: '/orderRSC?id=' + orderId + '&count=' + count + '&productId=' + productId}">
-          <div class="order-rsc-bit"></div>
-          <span v-if="!orderRSC.address">订单中的商品将配送至服务站，请选择自提网点</span>
-          {{orderRSC.address}}
-        </div>
-        <div class="order-consignee" v-link="{path: '/orderConsignee?id=' + orderId + '&count=' + count + '&productId=' + productId}">
-          <div class="order-consignee-bit"></div>
-          <span v-if="!orderConsignee.consigneePhone">请填写收货人信息</span>
-          {{orderConsignee.consigneeName}}
-          {{orderConsignee.consigneePhone}}
-        </div>
-      </div>
-    </div>
+    <order-address :order-RSC=orderRSC :order-consignee="orderConsignee" :rsc-link="'/orderRSC?id=' + orderId + '&count=' + count + '&productId=' + productId" :consignee-link="'/orderConsignee?id=' + orderId + '&count=' + count + '&productId=' + productId">
+    </order-address>
     <div>
       <ul>
         <li>
@@ -115,6 +102,7 @@
   import { getRSCListByProduct, getShoppingCart, commitOrder, editTitle, showBackBtn, resetOrderCondignee, resetOrderRSC, selectConsigneeAuto } from '../../vuex/actions'
   import xxnrToast from '../../xxnr_mobile_ui/xxnrToast.vue'
   import {getUrlParam} from '../../utils/common'
+  import orderAddress from '../orderAddress.vue'
 
   export default {
     data: function () {
@@ -148,7 +136,8 @@
   }
   },
   components: {
-    xxnrToast
+    xxnrToast,
+    orderAddress
   }
   ,
   methods: {
@@ -278,23 +267,24 @@
   .product-addtions-line {
     position: relative;
     background-color: #F8F8F8;
-    height: 22px;
     line-height: 22px;
     font-size: 12px;
     border-radius: 3px;
     margin-bottom: 2px;
+    padding: 0 2%;
   }
 
   .product-addtions-attr {
-    position: absolute;
-    left: 2%;
     color: #646464;
+    width: 78%;
   }
 
   .product-addtions-value {
     position: absolute;
     right: 2%;
     color: #323232;
+    top: 50%;
+    margin-top: -11px;
   }
 
   .product-sku {

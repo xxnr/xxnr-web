@@ -49,7 +49,7 @@
   }
 
   .product-img {
-    border: 1px solid #c7c7c7;
+    border: 1px solid #e2e2e2;
     overflow: hidden;
   }
 

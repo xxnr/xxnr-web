@@ -125,7 +125,6 @@ Swiper.prototype._bind = function () {
   this._animating = true;
   var me = this
   this.touchstartHandler = function (e) {
-    //alert('aaa');
     me.stop()
     me._start.x = e.changedTouches[0].pageX
     me._start.y = e.changedTouches[0].pageY
@@ -143,7 +142,6 @@ Swiper.prototype._bind = function () {
     me._move.y = e.changedTouches[0].pageY
 
     var distance = me._move.y - me._start.y
-    //var transform = 'translate3d(0, ' + (distance - me._offset) + 'px, 0)'
 
     if (me._options.direction === 'horizontal') {
       distance = me._move.x - me._start.x

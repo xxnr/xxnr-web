@@ -171,7 +171,10 @@
     showBackBtn,
     editTitle,
     isFromOrder,
-    hideRightBtn
+    showRightBtn,
+    hideRightBtn,
+    changeRightBtnHome,
+    changeRightBtnPathHome
   } from '../../vuex/actions'
   import xxnrToast from '../../xxnr_mobile_ui/xxnrToast.vue'
   import {getUrlParam} from '../../utils/common'
@@ -213,7 +216,10 @@
         showBackBtn,
         editTitle,
         isFromOrder,
-        hideRightBtn
+        hideRightBtn,
+        showRightBtn,
+        changeRightBtnHome,
+        changeRightBtnPathHome
       }
     },
     components: {
@@ -226,12 +232,15 @@
         this.isFromOrder(transition.from.path);
         this.getProductDetail(getUrlParam('id'));
         this.showBackBtn();
-        this.hideRightBtn();
+        this.changeRightBtnHome();
+        this.changeRightBtnPathHome();
+        this.showRightBtn();
         this.editTitle('商品详情');
         transition.next();
       },
       deactivate() {
         this.clearProductDetail();
+        this.hideRightBtn();
       }
     }
   }
@@ -246,7 +255,7 @@
   }
 
   .product-info {
-    border-top: 1px solid #c7c7c7;
+    border-top: 1px solid #e2e2e2;
   }
   .product-img img {
     width: 100%;
@@ -374,7 +383,7 @@
   .attr-product-img {
     float: left;
     width: 75px;
-    border: 1px solid #c7c7c7;
+    border: 1px solid #e2e2e2;
     margin-right: 6px;
     margin-left: 2%;
   }

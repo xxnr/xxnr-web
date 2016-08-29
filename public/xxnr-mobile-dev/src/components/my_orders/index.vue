@@ -64,8 +64,8 @@
     z-index: 1;
   }
   .orders-tab{
-    border-top: 1px solid #c7c7c7;
-    border-bottom: 1px solid #c7c7c7;
+    border-top: 1px solid #e2e2e2;
+    border-bottom: 1px solid #e2e2e2;
     float: left;
     display: inline-block;
     width: 20%;

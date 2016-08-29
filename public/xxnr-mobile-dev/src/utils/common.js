@@ -3,12 +3,13 @@
  */
 var URI = require('urijs');
 require('urijs/src/URI.fragmentURI.js');
+import {getCookie, removeCookie} from './authService'
 export function getUrlParam(name, url) {
   var param = window.location.href.match(new RegExp("[\?\&]" + name + "=([^\&]+)", "i"));
   if (url) {
     param = url.match(new RegExp("[\?\&]" + name + "=([^\&]+)", "i"));
   }
-  
+
   if(!param) {
     return false;
   }
@@ -43,5 +44,41 @@ export function getStringLen (val, max) {
     return false;
   else
     return len;
+}
+
+export function getTime(time, mode) {
+  Date.prototype.format = function(format)
+  {
+    var o =
+    {
+      "M+" : this.getMonth()+1, //month
+      "d+" : this.getDate(),    //day
+      "h+" : this.getHours(),   //hour
+      "m+" : this.getMinutes(), //minute
+      "s+" : this.getSeconds(), //second
+      "q+" : Math.floor((this.getMonth()+3)/3),  //quarter
+      "S" : this.getMilliseconds() //millisecond
+    }
+    if(/(y+)/.test(format)){format=format.replace(RegExp.$1,(this.getFullYear()+"").substr(4 - RegExp.$1.length));}
+    for(var k in o){
+      if(new RegExp("("+ k +")").test(format)){format = format.replace(RegExp.$1,RegExp.$1.length==1 ? o[k] : ("00"+ o[k]).substr((""+ o[k]).length));}
+    }
+    return format;
+  }
+  return time.format(mode);
+}
+
+export function clearCookie() {
+  removeCookie('__user');
+  removeCookie('__scart');
+  removeCookie('token');
+}
+
+export function isLogin() {
+  if(getCookie('__user')) {
+    return true;
+  }
+
+  return false;
 }
 
