@@ -72,7 +72,7 @@ Nominate_category_service.prototype.create = function(nominate_category, callbac
         nominate_category.category = null;
     }
 
-    if(nominate_category.brand == null || nominate_category.brand == 'null'){
+    if(nominate_category.brand === null || nominate_category.brand === 'null'){
         nominate_category.brand = undefined;
     }
 
@@ -118,7 +118,7 @@ Nominate_category_service.prototype.modify = function(nominate_category, callbac
         nominate_category.category = null;
     }
 
-    if(nominate_category.brand == null || nominate_category.brand == 'null'){
+    if(nominate_category.brand === null || nominate_category.brand === 'null'){
         nominate_category.brand = undefined;
     }
 
