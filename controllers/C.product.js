@@ -203,7 +203,7 @@ exports.get_nominate_category = function(req, res, next){
         }
 
         res.respond({code:1000, nominate_categories:nominate_categories});
-    }, true)
+    }, true, false, 'name show_count search_more category brand products')
 };
 
 exports.get_brandsProducts_collection = function(req, res, next){

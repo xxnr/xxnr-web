@@ -46,9 +46,9 @@ describe('nominated products', function(){
             SKUModel.find({}).remove(done);
         });
     });
-    //before('delete all nominate category', function(done){
-    //    NominateCategoryModel.find({}).remove(done);
-    //});
+    before('delete all nominate category', function(done){
+        NominateCategoryModel.find({}).remove(done);
+    });
     var category_1 = test_data.category_id['汽车'];
     var brand_1;
     var product_c1, product_c2, product_c3, product_c4, product_c5;

@@ -8,7 +8,7 @@ var ProductService = require('./product');
 
 var Nominate_category_service = function(){};
 
-Nominate_category_service.prototype.query = function(options, callback, populate_products, populate_brand){
+Nominate_category_service.prototype.query = function(options, callback, populate_products, populate_brand, fields){
     var self = this;
     NominateCategoryModel.query(options, function(err, nominate_categories){
         if(err){
@@ -59,7 +59,7 @@ Nominate_category_service.prototype.query = function(options, callback, populate
         } else{
             callback(null, nominate_categories || []);
         }
-    }, populate_products, populate_brand)
+    }, populate_products, populate_brand, fields)
 };
 
 Nominate_category_service.prototype.create = function(nominate_category, callback){

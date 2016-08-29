@@ -15,7 +15,8 @@ var schema = new mongoose.Schema({
     date_created:{type:Date, default:Date.now}
 },{
     toObject: { virtuals: true },
-    toJSON: { virtuals: true }
+    toJSON: { virtuals: true },
+    id: false
 });
 
 schema.index({order:1});
@@ -29,11 +30,12 @@ schema.virtual('query').get(function(){
             query.brand = this.brand._id;
         }
     }
+
     return query;
 });
 
 // statics
-schema.statics.query = function(options, cb, populate_products, populate_brand) {
+schema.statics.query = function(options, cb, populate_products, populate_brand, fields) {
     var query = {};
     if (options) {
         if (options.hasOwnProperty('online')) {
@@ -49,7 +51,12 @@ schema.statics.query = function(options, cb, populate_products, populate_brand) 
     if (populate_brand){
         querier.populate('brand');
     }
-    querier.exec(cb);
+    if(fields){
+        querier.select(fields);
+    }
+    querier.exec(function(err, nominate_categories){
+        cb(err, nominate_categories);
+    });
 };
 
 mongoose.model('nominate_category', schema);
