@@ -369,89 +369,89 @@ function generate_graph_vcode(code_type, target, target_type, mobile_code, ip, a
 // SMS
 // ==========================================================================
 function generate_sms_vcode(req, res, next) {
-    res.respond({code:1001, message:'该接口已停用，如您正在使用APP，请更新至最新版本。'});
-    return;
+    var requestType = '';
+    var code_type, target;
+    var target_type = 'phone';
+    var mobile_code = '86';
+    if (req.data.bizcode)
+        requestType = req.data.bizcode;
 
-    //var requestType = '';
-    //var code_type, target;
-    //var target_type = 'phone';
-    //var mobile_code = '86';
-    //if (req.data.bizcode)
-    //    requestType = req.data.bizcode;
-    //
-    //if (requestType === 'resetpwd') {
-    //    if (!req.data.tel || !tools.isPhone(req.data.tel)) {
-    //        res.respond({code: 1001, message: '请输入正确的手机号'});
-    //        return;
-    //    } else {
-    //        code_type = 'resetpwd';
-    //        target = req.data.tel;
-    //        var user = {'account': target};
-    //
-    //        UserService.get(user, function (err, data) {
-    //            if (!data || err) {
-    //                res.respond({code: 1001, message: '该手机号未注册，请重新输入'});
-    //                return;
-    //            } else {
-    //                generate_vcode(code_type, target, target_type, mobile_code, function (err, result) {
-    //                    if (err) {
-    //                        res.respond({code: 1001, message: '获取短信验证码失败，请重试'});
-    //                        return;
-    //                    } else {
-    //                        if (result && result.renew && result.renew === 2) {
-    //                            res.respond({code: 1001, message: '获取短信验证码太频繁，请稍后再试'});
-    //                            return;
-    //                        }
-    //                        res.respond({code: 1000, message: 'success'});
-    //                        return;
-    //                    }
-    //                });
-    //            }
-    //
-    //        });
-    //    }
-    //} else {
-    //    if (requestType === 'register') {
-    //        //if (req.user) {
-    //        //   res.respond({code:1001,message:'用户已登录，请先登出'});
-    //        // }
-    //        if (!req.data.tel || !tools.isPhone(req.data.tel)) {
-    //            res.respond({code: '1001', message: '请输入正确的手机号'});
-    //            return;
-    //        } else {
-    //            code_type = 'register';
-    //            target = req.data.tel;
-    //            var user = {'account': target};
-    //
-    //            UserService.get(user, function (err, data) {
-    //                if (!data || err) {
-    //                    generate_vcode(code_type, target, target_type, mobile_code, function (err, result) {
-    //                        if (err) {
-    //                            res.respond({code: '1001', message: '获取短信验证码失败，请重试'});
-    //                            return;
-    //                        } else {
-    //                            if (result && result.renew && result.renew === 2) {
-    //                                res.respond({code: '1001', message: '获取短信验证码太频繁，请稍后再试'});
-    //                                return;
-    //                            }
-    //                            res.respond({code: '1000', message: 'success'});
-    //                            return;
-    //                        }
-    //                    });
-    //                } else {
-    //                    res.respond({code: '1001', message: '该手机号已注册，请重新输入'});
-    //                    return;
-    //                }
-    //            });
-    //        }
-    //    } else {
-    //        res.respond({code: '1001', message: '请求参数错误，无效的bizcode参数'});
-    //        return;
-    //    }
-    //}
+    if (requestType === 'resetpwd') {
+        if (!req.data.tel || !tools.isPhone(req.data.tel)) {
+            res.respond({code: 1001, message: '请输入正确的手机号'});
+            return;
+        } else {
+            code_type = 'resetpwd';
+            target = req.data.tel;
+            var user = {'account': target};
+
+            UserService.get(user, function (err, data) {
+                if (!data || err) {
+                    res.respond({code: 1001, message: '该手机号未注册，请重新输入'});
+                    return;
+                } else {
+                    generate_vcode(code_type, target, target_type, mobile_code, function (err, result) {
+                        if (err) {
+                            res.respond({code: 1001, message: '获取短信验证码失败，请重试'});
+                            return;
+                        } else {
+                            if (result && result.renew && result.renew === 2) {
+                                res.respond({code: 1001, message: '获取短信验证码太频繁，请稍后再试'});
+                                return;
+                            }
+                            res.respond({code: 1000, message: 'success'});
+                            return;
+                        }
+                    });
+                }
+
+            });
+        }
+    } else {
+        if (requestType === 'register') {
+            //if (req.user) {
+            //   res.respond({code:1001,message:'用户已登录，请先登出'});
+            // }
+            if (!req.data.tel || !tools.isPhone(req.data.tel)) {
+                res.respond({code: '1001', message: '请输入正确的手机号'});
+                return;
+            } else {
+                code_type = 'register';
+                target = req.data.tel;
+                var user = {'account': target};
+
+                UserService.get(user, function (err, data) {
+                    if (!data || err) {
+                        generate_vcode(code_type, target, target_type, mobile_code, function (err, result) {
+                            if (err) {
+                                res.respond({code: '1001', message: '获取短信验证码失败，请重试'});
+                                return;
+                            } else {
+                                if (result && result.renew && result.renew === 2) {
+                                    res.respond({code: '1001', message: '获取短信验证码太频繁，请稍后再试'});
+                                    return;
+                                }
+                                res.respond({code: '1000', message: 'success'});
+                                return;
+                            }
+                        });
+                    } else {
+                        res.respond({code: '1001', message: '该手机号已注册，请重新输入'});
+                        return;
+                    }
+                });
+            }
+        } else {
+            res.respond({code: '1001', message: '请求参数错误，无效的bizcode参数'});
+            return;
+        }
+    }
 };
+
 // Generates sms
-exports.generate_sms = generate_sms_vcode;
+exports.generate_sms = function(req, res, next){
+    res.respond({code:1001, message:'该接口已停用，如您正在使用APP，请更新至最新版本。'});
+};
 
 // Generates vcode
 function generate_vcode(code_type, target, target_type, mobile_code, callback) {
