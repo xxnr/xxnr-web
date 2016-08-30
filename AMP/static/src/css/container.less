@@ -1,0 +1,108 @@
+.main_con {
+    width: 98%;
+    height: 100%;
+    position: fixed;
+    left: 1%;
+    right: 1%;
+    top: 0;
+    margin-left: 270px;
+    margin-top: 59px;
+    border-radius: 4px;
+    padding-right: 270px;
+    box-sizing: border-box;
+    padding-bottom: 71px;
+    overflow: hidden;
+    background-image: url('../img/noisy.png');
+}
+.main_con .conent_list{
+    width: 100%;
+    box-sizing: border-box;
+    border-radius: 4px;
+    color: #fff;
+    position: relative;
+    height: 100%;
+    overflow: auto;
+}
+.main_con .conent_list .top{
+    width: 100%;
+    position: absolute;
+    height: 55px;
+    top: 0;
+    background-color: rgba(153,242,243,0.2);
+}
+.main_con .conent_list .top .title{
+    font-size: 22px;
+    line-height: 55px;
+    text-indent: 15px;
+}
+
+.main_con .conent_list .top a{
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    margin-top: -19px;
+}
+
+.main_con .conent_list .top .search{
+    position: absolute;height: 55px;right: 130px;top: 0;
+    width: 300px;
+}
+.main_con .conent_list .top .search input{
+    display: inline-block;vertical-align: middle;width: 100%;margin-top: 11.5px;
+}
+
+
+.main_con .conent_list .middle{
+    width: 100%;
+    box-sizing: border-box;
+    height: ~"calc(100% - 110px)";
+    position: relative;
+    overflow: auto;
+    margin-top: 55px;
+    background-color: rgba(0,0,0,0.2);
+    overflow-x: hidden;
+}
+.main_con .conent_list .middle::-webkit-scrollbar {
+    width: 0px;
+}
+
+.main_con .conent_list .bottom{
+    height: 55px;
+    width: 100%;
+    text-align: center;
+    position: absolute;
+    bottom: 0;
+    background-color: rgba(153,242,243,0.2);
+}
+
+.main_con .conent_list .bottom .btn_con{
+    text-align: right;
+    box-sizing: border-box;
+    padding-right: 15px;
+    line-height: 55px;
+    font-size: 0px;
+}
+.main_con .conent_list .bottom .btn_con a{
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.main_con .conent_list .middle .item_con .item{
+    background-color: rgba(67,58,60, 0.6);
+    background-image: url('../img/noisy.png');
+    color: #fff;
+    position: relative;
+    padding: 10px 20px;
+    box-sizing: border-box;
+    transition: all ease 0.2s;
+}
+.main_con .conent_list .middle .item_con .item:hover{
+    background-color: rgba(42,36,38,0.6);
+}
+.main_con .conent_list .middle .item_con .item:nth-child(2n+1){
+    background-color: rgba(62,49,69,0.6);
+}
+.main_con .conent_list .middle .item_con .item:nth-child(2n+1):hover{
+    background-color: rgba(42,36,38,0.6);
+}
+

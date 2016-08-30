@@ -1,0 +1,22 @@
+# OSX
+.DS_Store
+
+# Android/IJ
+.idea
+.gradle
+local.properties
+.project
+
+# node.js
+node_modules/
+npm-debug.log
+
+# project
+static/dist/**/*
+config/base.config.js
+config/db.config.js
+views/index.dev.html
+views/index.production.html
+
+upload/*
+!upload/.empty

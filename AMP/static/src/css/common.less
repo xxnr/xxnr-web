@@ -1,0 +1,98 @@
+/* 定位 */
+.vertical_center {
+    position: absolute;
+    top: 50%;
+    -webkit-transform: translateY(-50%);
+}
+
+.horizontal_center {
+    position: absolute;
+    left: 50%;
+    -webkit-transform: translateX(-50%);
+}
+
+.all_center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    -webkit-transform: translate(-50%, -50%);
+}
+
+
+/* 过度 */
+.transition {
+    transition: all ease 0.2s;
+    -webkit-transition: all ease 0.2s;
+    -moz-transition: all ease 0.2s;
+    -ms-transition: all ease 0.2s;
+}
+
+.fade-transition {
+    opacity: 1;
+}
+
+.fade-enter, .fade-leave {
+    opacity: 0;
+}
+
+/* 滚动条样式 */
+::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+    background-color: rgba(0, 0, 0, 0)
+}
+
+::-webkit-scrollbar {
+    width: 0px;
+    background-color: rgba(0, 0, 0, 0);
+}
+
+::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+    background-color: rgba(0, 0, 0, 0.2);
+}
+::selection {
+    background: #2db7f5;
+    color: #fff;
+}
+
+/* form */
+input{
+    padding: 6px 7px;
+    height: 32px;
+    display: inline-block;
+    cursor: text;
+    line-height: 1.5;
+    font-size: 12px;
+    color: #666;
+    background-color: #fff;
+    border: 1px solid #d9d9d9;
+    border-radius: 4px;
+    box-sizing: border-box;
+    transition: all ease 0.2s;
+}
+input[disabled="disabled"]{
+    cursor: not-allowed;
+    background-color: #ddd;
+}
+
+select{
+    padding: 6px 7px;
+    height: 32px;
+    display: inline-block;
+    line-height: 1.5;
+    font-size: 12px;
+    color: #666;
+    background-color: #fff;
+    border: 1px solid #d9d9d9;
+    border-radius: 4px;
+    box-sizing: border-box;
+    transition: all ease 0.2s;
+}
+pre{
+    text-shadow: none;
+}
+
+
+
