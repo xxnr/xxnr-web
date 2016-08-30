@@ -21,6 +21,14 @@
 #######################################################
 0 4 * * * /usr/bin/node /root/xxnr/v2.0/website-git/jobs/generate_daily_agent_report.js >> /root/xxnr/v2.0/logs/jobs/generate_daily_agent_report/generate_daily_agent_report_`date +\%Y\%m`.log
 #######################################################
+###            generate product tags values         ###
+#######################################################
+30 0 * * * /usr/bin/node /root/xxnr/v2.0/website-git/jobs/run_generate_producttags_values.js >> /root/xxnr/v2.0/logs/jobs/generate_producttags_values/generate_producttags_values_`date +\%Y\%m`.log
+#######################################################
+###            generate brands products             ###
+#######################################################
+35 0 * * * /usr/bin/node /root/xxnr/v2.0/website-git/jobs/run_generate_products_by_brands.js >> /root/xxnr/v2.0/logs/jobs/generate_products_by_brands/generate_products_by_brands_`date +\%Y\%m`.log
+#######################################################
 ###               forbidden forever                 ###
 #######################################################
 1 * * * * /usr/bin/node /root/xxnr/v2.0/website-git/jobs/throttle/throttle_forever.js >> /root/xxnr/v2.0/logs/jobs/throttle_forever/throttle_forever_`date +\%Y\%m\$d`.log
